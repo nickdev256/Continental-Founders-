@@ -1,0 +1,12 @@
+.cf-heading--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.cf-heading--center p {
+  margin-inline: auto;
+}
+
+.cf-heading--center .eyebrow {
+  justify-content: center;
+}

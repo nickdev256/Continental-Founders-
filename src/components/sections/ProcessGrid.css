@@ -1,0 +1,36 @@
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-top: 1px solid rgba(255,255,255,.18);
+  border-left: 1px solid rgba(255,255,255,.18);
+}
+
+.process-item {
+  min-height: 300px;
+  padding: 24px;
+  border-right: 1px solid rgba(255,255,255,.18);
+  border-bottom: 1px solid rgba(255,255,255,.18);
+}
+
+.process-item__top {
+  display: flex;
+  justify-content: space-between;
+  color: var(--gold-500);
+  font-size: .74rem;
+  font-weight: 850;
+}
+
+.process-item h3 {
+  margin-top: 90px;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.process-item p {
+  margin-top: 15px;
+  color: #b9c5cc;
+  font-size: .88rem;
+}

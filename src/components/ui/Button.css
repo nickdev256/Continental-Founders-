@@ -1,0 +1,53 @@
+.cf-button {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  padding: 0 21px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-size: .74rem;
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.cf-button:hover {
+  transform: translateY(-2px);
+}
+
+.cf-button--dark {
+  color: var(--white);
+  background: var(--navy-900);
+}
+
+.cf-button--dark:hover {
+  background: var(--navy-800);
+}
+
+.cf-button--light {
+  color: var(--navy-900);
+  background: var(--white);
+}
+
+.cf-button--outline {
+  color: var(--navy-900);
+  border-color: var(--navy-900);
+  background: transparent;
+}
+
+.cf-button--outline:hover {
+  color: var(--white);
+  background: var(--navy-900);
+}
+
+.cf-button--gold {
+  color: var(--navy-950);
+  background: var(--gold-500);
+}
+
+.cf-button--gold:hover {
+  background: #d3ab5c;
+}

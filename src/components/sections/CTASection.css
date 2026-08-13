@@ -1,0 +1,29 @@
+.cta {
+  color: var(--white);
+  background: var(--navy-900);
+  padding: 94px 0;
+}
+
+.cta__inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 50px;
+}
+
+.cta h2 {
+  max-width: 820px;
+  margin-top: 16px;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 5vw, 5.3rem);
+  font-weight: 400;
+  line-height: .98;
+  letter-spacing: -.05em;
+}
+
+.cta p {
+  max-width: 700px;
+  margin-top: 22px;
+  color: #c7d1d8;
+  font-size: 1rem;
+}

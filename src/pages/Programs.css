@@ -1,0 +1,94 @@
+.programs-intro__grid {
+  display: grid;
+  grid-template-columns: .55fr 1.45fr;
+  gap: 80px;
+}
+
+.programs-intro h2 {
+  max-width: 920px;
+  font-size: clamp(3rem, 5.5vw, 6rem);
+  line-height: .95;
+}
+
+.programs-intro p {
+  max-width: 720px;
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.program-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.program-card {
+  min-height: 420px;
+  padding: 30px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.program-card__top {
+  display: flex;
+  justify-content: space-between;
+  color: var(--gold-600);
+  font-size: .72rem;
+  font-weight: 850;
+}
+
+.program-card h3 {
+  max-width: 470px;
+  margin-top: 88px;
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.program-card > p {
+  max-width: 520px;
+  margin-top: 14px;
+  color: var(--muted);
+}
+
+.program-card ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 25px;
+}
+
+.program-card li {
+  padding: 7px 9px;
+  color: var(--navy-900);
+  border: 1px solid var(--line);
+  font-size: .68rem;
+  font-weight: 750;
+}
+
+.programs-note {
+  color: var(--white);
+  background: var(--navy-800);
+}
+
+.programs-note__grid {
+  display: grid;
+  grid-template-columns: .55fr 1.45fr;
+  gap: 80px;
+}
+
+.programs-note h2 {
+  max-width: 900px;
+  font-size: clamp(3rem, 5vw, 5.8rem);
+  line-height: .96;
+}
+
+.programs-note p {
+  max-width: 700px;
+  margin-top: 25px;
+  color: #c9d4db;
+}

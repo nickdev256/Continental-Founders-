@@ -1,0 +1,60 @@
+.university-opening__grid {
+  display: grid;
+  grid-template-columns: .55fr 1.45fr;
+  gap: 80px;
+}
+
+.university-opening h2 {
+  max-width: 920px;
+  font-size: clamp(3rem, 5.5vw, 6rem);
+  line-height: .95;
+}
+
+.university-opening p {
+  max-width: 720px;
+  margin-top: 28px;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.outcome-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.outcome-grid article {
+  position: relative;
+  min-height: 310px;
+  padding: 26px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.outcome-grid span {
+  color: var(--gold-600);
+  font-size: .7rem;
+  font-weight: 850;
+}
+
+.outcome-grid h3 {
+  margin-top: 95px;
+  color: var(--navy-900);
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 400;
+  line-height: 1.02;
+}
+
+.outcome-grid p {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: .87rem;
+}
+
+.outcome-grid svg {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}

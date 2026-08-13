@@ -1,0 +1,16 @@
+.not-found {
+  min-height: 55vh;
+}
+
+.not-found h1 {
+  max-width: 900px;
+  margin: 18px 0;
+  color: var(--navy-900);
+  font-size: clamp(3.5rem, 7vw, 7rem);
+  line-height: .92;
+}
+
+.not-found p {
+  margin-bottom: 25px;
+  color: var(--muted);
+}

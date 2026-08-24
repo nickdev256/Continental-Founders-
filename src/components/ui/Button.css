@@ -1,53 +1,300 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS™
+   GLOBAL BUTTON SYSTEM
+
+   Premium institutional design
+   Navy / Gold / White
+   No gradients
+   ============================================================ */
+
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
 .cf-button {
-  min-height: 52px;
+  position: relative;
+
+  min-height: 50px;
+
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
-  gap: 11px;
-  padding: 0 21px;
+
+  gap: 10px;
+
+  padding: 0 20px;
+
   border: 1px solid transparent;
   border-radius: 2px;
-  font-size: .74rem;
-  font-weight: 850;
-  letter-spacing: .07em;
+
+  font-family: inherit;
+
+  font-size: 0.74rem;
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: 0.075em;
+
   text-transform: uppercase;
-  transition: transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    transform 200ms ease,
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
 }
+
+
+/* ============================================================
+   LABEL
+   ============================================================ */
+
+.cf-button__label {
+  position: relative;
+
+  z-index: 1;
+}
+
+
+/* ============================================================
+   ICON
+   ============================================================ */
+
+.cf-button__icon {
+  position: relative;
+
+  z-index: 1;
+
+  flex-shrink: 0;
+
+  transition:
+    transform 200ms ease;
+}
+
+
+/* ============================================================
+   GLOBAL HOVER
+   ============================================================ */
 
 .cf-button:hover {
   transform: translateY(-2px);
 }
 
+.cf-button:hover .cf-button__icon {
+  transform: translateX(3px);
+}
+
+
+/* ============================================================
+   DARK
+   Primary institutional CTA
+
+   Example:
+   Schedule a Meeting
+   Become a Founding Partner
+   ============================================================ */
+
 .cf-button--dark {
-  color: var(--white);
-  background: var(--navy-900);
+  color: var(--white, #ffffff);
+
+  background: var(--navy-900, #14213d);
+
+  border-color: var(--navy-900, #14213d);
 }
 
 .cf-button--dark:hover {
-  background: var(--navy-800);
+  color: var(--white, #ffffff);
+
+  background: var(--navy-800, #1c2d50);
+
+  border-color: var(--navy-800, #1c2d50);
 }
+
+
+/* ============================================================
+   LIGHT
+   For dark / navy backgrounds
+   ============================================================ */
 
 .cf-button--light {
-  color: var(--navy-900);
-  background: var(--white);
+  color: var(--navy-900, #14213d);
+
+  background: var(--white, #ffffff);
+
+  border-color: var(--white, #ffffff);
 }
 
+.cf-button--light:hover {
+  color: var(--navy-900, #14213d);
+
+  background: #f4f5f7;
+
+  border-color: #f4f5f7;
+}
+
+
+/* ============================================================
+   OUTLINE
+   Secondary CTA
+   ============================================================ */
+
 .cf-button--outline {
-  color: var(--navy-900);
-  border-color: var(--navy-900);
+  color: var(--navy-900, #14213d);
+
   background: transparent;
+
+  border-color: var(--navy-900, #14213d);
 }
 
 .cf-button--outline:hover {
-  color: var(--white);
-  background: var(--navy-900);
+  color: var(--white, #ffffff);
+
+  background: var(--navy-900, #14213d);
+
+  border-color: var(--navy-900, #14213d);
 }
 
+
+/* ============================================================
+   GOLD
+   Strategic accent CTA
+
+   Use selectively.
+   ============================================================ */
+
 .cf-button--gold {
-  color: var(--navy-950);
-  background: var(--gold-500);
+  color: var(--navy-950, #0d172b);
+
+  background: var(--gold-500, #b28a32);
+
+  border-color: var(--gold-500, #b28a32);
 }
 
 .cf-button--gold:hover {
-  background: #d3ab5c;
+  color: var(--navy-950, #0d172b);
+
+  background: #c49a43;
+
+  border-color: #c49a43;
+}
+
+
+/* ============================================================
+   GOLD OUTLINE
+   Useful on navy sections
+   ============================================================ */
+
+.cf-button--gold-outline {
+  color: var(--gold-500, #b28a32);
+
+  background: transparent;
+
+  border-color: var(--gold-500, #b28a32);
+}
+
+.cf-button--gold-outline:hover {
+  color: var(--navy-950, #0d172b);
+
+  background: var(--gold-500, #b28a32);
+
+  border-color: var(--gold-500, #b28a32);
+}
+
+
+/* ============================================================
+   BUTTON WITH UP-RIGHT ARROW
+   ============================================================ */
+
+.cf-button:hover .cf-button__icon[data-lucide="arrow-up-right"] {
+  transform: translate(2px, -2px);
+}
+
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+
+.cf-button:focus-visible {
+  outline: 3px solid rgba(178, 138, 50, 0.3);
+
+  outline-offset: 4px;
+}
+
+
+/* ============================================================
+   ACTIVE
+   ============================================================ */
+
+.cf-button:active {
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   DISABLED
+   ============================================================ */
+
+.cf-button[aria-disabled="true"],
+.cf-button:disabled {
+  opacity: 0.55;
+
+  pointer-events: none;
+
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .cf-button {
+    min-height: 48px;
+
+    padding: 0 18px;
+
+    font-size: 0.71rem;
+
+    letter-spacing: 0.065em;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 380px) {
+  .cf-button {
+    min-height: 46px;
+
+    padding: 0 16px;
+
+    font-size: 0.69rem;
+  }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-button,
+  .cf-button__icon {
+    transition: none;
+  }
 }

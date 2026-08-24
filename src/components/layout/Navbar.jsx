@@ -1,50 +1,179 @@
-import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  Menu,
+  X,
+  ArrowUpRight,
+  ChevronRight,
+} from "lucide-react";
+import {
+  Link,
+  NavLink,
+  useLocation,
+} from "react-router-dom";
+
 import { navigation } from "../../data/navigation";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  const close = () => setOpen(false);
+  const closeMenu = () => {
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("nav-open");
+    } else {
+      document.body.classList.remove("nav-open");
+    }
+
+    return () => {
+      document.body.classList.remove("nav-open");
+    };
+  }, [open]);
 
   return (
     <header className="navbar">
-      <div className="container navbar__inner">
-        <Link className="navbar__brand" to="/" onClick={close} aria-label="Continental Founders home">
-          <img src="/assets/continental-founders-logo.png" alt="Continental Founders™" />
+
+      {/* =====================================================
+          NAVBAR INNER
+      ===================================================== */}
+
+      <div className="navbar__inner">
+
+        {/* ===================================================
+            BRAND
+        =================================================== */}
+
+        <Link
+          to="/"
+          className="navbar__brand"
+          aria-label="Continental Founders home"
+          onClick={closeMenu}
+        >
+
+          <img
+            src="/assets/continental-founders-logo.png"
+            alt="Continental Founders"
+            className="navbar__logo"
+          />
+
         </Link>
 
-        <button
-          className="navbar__toggle"
-          onClick={() => setOpen((value) => !value)}
-          aria-expanded={open}
-          aria-controls="primary-navigation"
-          aria-label={open ? "Close navigation" : "Open navigation"}
-        >
-          {open ? <X size={23} /> : <Menu size={23} />}
-        </button>
 
-        <nav id="primary-navigation" className={`navbar__nav ${open ? "is-open" : ""}`}>
+        {/* ===================================================
+            DESKTOP NAVIGATION
+        =================================================== */}
+
+        <nav
+          id="primary-navigation"
+          className={`navbar__nav ${
+            open ? "is-open" : ""
+          }`}
+          aria-label="Primary navigation"
+        >
+
           <div className="navbar__links">
+
             {navigation.map((item) => (
+
               <NavLink
                 key={item.path}
                 to={item.path}
-                className={({ isActive }) => isActive ? "navbar__link is-active" : "navbar__link"}
-                onClick={close}
+                end={item.path === "/"}
+                className={({ isActive }) =>
+                  `navbar__link ${
+                    isActive ? "is-active" : ""
+                  }`
+                }
+                onClick={closeMenu}
               >
-                {item.label}
+
+                <span>
+                  {item.label}
+                </span>
+
+                {/* Mobile arrow */}
+                <ChevronRight
+                  className="navbar__mobile-arrow"
+                  size={17}
+                  strokeWidth={1.5}
+                />
+
               </NavLink>
+
             ))}
+
           </div>
 
-          <Link className="button button--nav" to="/contact" onClick={close}>
-            Partner With Us <ArrowUpRight size={16} />
+
+          {/* =================================================
+              SCHEDULE A MEETING
+          ================================================= */}
+
+          <Link
+            to="/contact"
+            className="navbar__cta"
+            onClick={closeMenu}
+          >
+
+            <span>
+              Schedule a Meeting
+            </span>
+
+            <ArrowUpRight
+              size={17}
+              strokeWidth={1.6}
+            />
+
           </Link>
+
         </nav>
+
+
+        {/* ===================================================
+            MOBILE MENU BUTTON
+        =================================================== */}
+
+        <button
+          type="button"
+          className={`navbar__toggle ${
+            open ? "is-open" : ""
+          }`}
+          onClick={() =>
+            setOpen((current) => !current)
+          }
+          aria-expanded={open}
+          aria-controls="primary-navigation"
+          aria-label={
+            open
+              ? "Close navigation menu"
+              : "Open navigation menu"
+          }
+        >
+
+          {open ? (
+            <X
+              size={24}
+              strokeWidth={1.5}
+            />
+          ) : (
+            <Menu
+              size={24}
+              strokeWidth={1.5}
+            />
+          )}
+
+        </button>
+
       </div>
+
     </header>
   );
 }

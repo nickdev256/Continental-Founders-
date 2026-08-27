@@ -6,12 +6,14 @@ import {
   Linkedin,
   Instagram,
   Youtube,
+  Mail,
+  Globe2,
 } from "lucide-react";
 
 import "./Footer.css";
 
 /* ============================================================
-   FOOTER NAVIGATION
+   NAVIGATION
 ============================================================ */
 
 const navigation = {
@@ -58,7 +60,6 @@ const navigation = {
   ],
 };
 
-
 /* ============================================================
    SOCIAL MEDIA
 ============================================================ */
@@ -81,75 +82,77 @@ const socials = [
   },
 ];
 
-
 /* ============================================================
-   FOOTER COMPONENT
+   FOOTER
 ============================================================ */
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="site-footer">
+    <footer className="cf-footer">
 
       {/* ======================================================
           MAIN FOOTER
       ======================================================= */}
 
-      <div className="site-footer__main">
+      <section className="cf-footer__main">
 
-        <div className="site-footer__container">
+        <div className="cf-footer__container">
 
-          <div className="site-footer__grid">
-
+          <div className="cf-footer__top">
 
             {/* ==================================================
                 BRAND
             =================================================== */}
 
-            <div className="site-footer__brand">
+            <div className="cf-footer__brand">
 
               <Link
                 to="/"
-                className="site-footer__logo"
+                className="cf-footer__logo"
                 aria-label="Continental Founders home"
               >
-
                 <img
                   src="/assets/continental-founders-logo.png"
                   alt="Continental Founders"
                 />
-
               </Link>
 
-
-              <div className="site-footer__tagline">
+              <div className="cf-footer__tagline">
                 CONNECT. COLLABORATE. CREATE IMPACT.
               </div>
 
-
-              <p className="site-footer__description">
-                Building strategic partnerships between
-                universities in the United States and Africa
-                through entrepreneurship, innovation, and
-                leadership development.
+              <p className="cf-footer__description">
+                Continental Founders builds strategic partnerships
+                between universities in the United States and Africa
+                through entrepreneurship, innovation, and leadership
+                development.
               </p>
 
+              <div className="cf-footer__location">
+                <div className="cf-footer__location-icon">
+                  <Globe2 size={18} strokeWidth={1.7} />
+                </div>
+
+                <div>
+                  <span>GLOBAL NETWORK</span>
+                  <strong>United States × Africa</strong>
+                </div>
+              </div>
 
               <Link
                 to="/contact"
-                className="site-footer__meeting"
+                className="cf-footer__meeting"
               >
+                <span>Schedule a Meeting</span>
 
-                <span>
-                  Schedule a Meeting
+                <span className="cf-footer__meeting-icon">
+                  <ArrowUpRight
+                    size={20}
+                    strokeWidth={1.8}
+                  />
                 </span>
-
-                <ArrowUpRight
-                  size={23}
-                  strokeWidth={1.5}
-                />
-
               </Link>
 
             </div>
@@ -159,41 +162,32 @@ export default function Footer() {
                 EXPLORE
             =================================================== */}
 
-            <div className="site-footer__column">
+            <div className="cf-footer__column">
 
-              <h3>
-                Explore
-              </h3>
+              <span className="cf-footer__column-label">
+                01
+              </span>
 
-              <span className="site-footer__column-line" />
-
+              <h3>Explore</h3>
 
               <nav
-                className="site-footer__links"
+                className="cf-footer__links"
                 aria-label="Explore"
               >
-
                 {navigation.explore.map((item) => (
-
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="site-footer__link"
+                    className="cf-footer__link"
                   >
-
-                    <span>
-                      {item.label}
-                    </span>
+                    <span>{item.label}</span>
 
                     <ChevronRight
-                      size={18}
-                      strokeWidth={1.5}
+                      size={17}
+                      strokeWidth={1.7}
                     />
-
                   </Link>
-
                 ))}
-
               </nav>
 
             </div>
@@ -203,115 +197,70 @@ export default function Footer() {
                 RESOURCES
             =================================================== */}
 
-            <div className="site-footer__column">
+            <div className="cf-footer__column">
 
-              <h3>
-                Resources
-              </h3>
+              <span className="cf-footer__column-label">
+                02
+              </span>
 
-              <span className="site-footer__column-line" />
-
+              <h3>Resources</h3>
 
               <nav
-                className="site-footer__links"
+                className="cf-footer__links"
                 aria-label="Resources"
               >
-
                 {navigation.resources.map((item) => (
-
                   <Link
                     key={item.path}
                     to={item.path}
-                    className="site-footer__link"
+                    className="cf-footer__link"
                   >
-
-                    <span>
-                      {item.label}
-                    </span>
+                    <span>{item.label}</span>
 
                     <ChevronRight
-                      size={18}
-                      strokeWidth={1.5}
+                      size={17}
+                      strokeWidth={1.7}
                     />
-
                   </Link>
-
                 ))}
-
               </nav>
 
             </div>
 
 
             {/* ==================================================
-                OUR FOCUS
+                FOCUS
             =================================================== */}
 
-            <div className="site-footer__column site-footer__focus">
+            <div className="cf-footer__column cf-footer__focus">
 
-              <h3>
-                Our Focus
-              </h3>
-
-              <span className="site-footer__column-line" />
-
-
-              <div className="site-footer__focus-list">
-
-                <p>
-                  Entrepreneurship
-                </p>
-
-                <p>
-                  Innovation
-                </p>
-
-                <p>
-                  Leadership Development
-                </p>
-
-                <p>
-                  U.S.–Africa University Partnerships
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* ======================================================
-          INSTITUTIONAL STATEMENT
-      ======================================================= */}
-
-      <section className="site-footer__statement">
-
-        <div className="site-footer__statement-container">
-
-
-          {/* MAP / CONNECTION VISUAL */}
-
-          <div className="site-footer__map">
-
-            <div className="site-footer__map-inner">
-
-              <span className="site-footer__map-label usa">
-                USA
+              <span className="cf-footer__column-label">
+                03
               </span>
 
-              <span className="site-footer__map-label africa">
-                AFRICA
-              </span>
+              <h3>Our Focus</h3>
 
+              <div className="cf-footer__focus-list">
 
-              <div className="site-footer__map-arc">
+                <div className="cf-footer__focus-item">
+                  <span>01</span>
+                  <p>Entrepreneurship</p>
+                </div>
 
-                <span />
+                <div className="cf-footer__focus-item">
+                  <span>02</span>
+                  <p>Innovation</p>
+                </div>
+
+                <div className="cf-footer__focus-item">
+                  <span>03</span>
+                  <p>Leadership Development</p>
+                </div>
+
+                <div className="cf-footer__focus-item">
+                  <span>04</span>
+                  <p>U.S.–Africa University Partnerships</p>
+                </div>
 
               </div>
 
@@ -320,42 +269,44 @@ export default function Footer() {
           </div>
 
 
-          {/* VERTICAL DIVIDER */}
+          {/* ==================================================
+              PARTNERSHIP CTA
+          =================================================== */}
 
-          <div className="site-footer__statement-divider" />
+          <div className="cf-footer__cta">
 
+            <div className="cf-footer__cta-content">
 
-          {/* STATEMENT */}
-
-          <div className="site-footer__statement-content">
-
-            <div className="site-footer__statement-label">
-
-              <span className="site-footer__statement-dot" />
-
-              <span>
-                UNITED STATES × AFRICA
+              <span className="cf-footer__cta-label">
+                BUILD WITH US
               </span>
+
+              <h2>
+                Let's create meaningful
+                <em> opportunity together.</em>
+              </h2>
+
+              <p>
+                Whether you represent a university, organization,
+                sponsor, government institution, or innovation
+                ecosystem, we would love to explore how we can
+                work together.
+              </p>
 
             </div>
 
+            <Link
+              to="/contact"
+              className="cf-footer__cta-button"
+            >
+              <span>Start a Conversation</span>
 
-            <h2>
-              Connecting institutions.
-              <br />
-              Creating opportunity.
-            </h2>
+              <ArrowUpRight
+                size={21}
+                strokeWidth={1.8}
+              />
+            </Link>
 
-          </div>
-
-
-          {/* BACKGROUND GLOBE */}
-
-          <div className="site-footer__globe">
-            <div className="site-footer__globe-line globe-line-1" />
-            <div className="site-footer__globe-line globe-line-2" />
-            <div className="site-footer__globe-line globe-line-3" />
-            <div className="site-footer__globe-line globe-line-4" />
           </div>
 
         </div>
@@ -364,103 +315,150 @@ export default function Footer() {
 
 
       {/* ======================================================
-          BOTTOM FOOTER
+          GLOBAL STATEMENT
       ======================================================= */}
 
-      <div className="site-footer__bottom">
+      <section className="cf-footer__statement">
 
-        <div className="site-footer__bottom-container">
+        <div className="cf-footer__statement-glow" />
 
+        <div className="cf-footer__statement-container">
 
-          {/* COPYRIGHT */}
+          <div className="cf-footer__statement-content">
 
-          <div className="site-footer__copyright">
-
-            <div>
-              <span className="copyright-symbol">
-                ©
-              </span>
+            <div className="cf-footer__statement-label">
+              <span className="cf-footer__pulse" />
 
               <span>
-                {year} Continental Founders™
+                UNITED STATES × AFRICA
               </span>
             </div>
 
-            <span className="site-footer__rights">
-              All rights reserved.
-            </span>
+            <h2>
+              Connecting institutions.
+              <br />
+              <span>Creating opportunity.</span>
+            </h2>
+
+            <p>
+              Building bridges between ideas, institutions,
+              entrepreneurs, and future leaders across continents.
+            </p>
 
           </div>
 
 
-          {/* LEGAL */}
+          <div className="cf-footer__statement-mark">
 
-          <nav
-            className="site-footer__legal"
-            aria-label="Legal"
-          >
+            <div className="cf-footer__continent usa">
+              USA
+            </div>
 
-            <Link to="/privacy">
-              Privacy
-            </Link>
+            <div className="cf-footer__connection">
+              <span />
+              <span />
+            </div>
 
-            <span>
-              /
-            </span>
-
-            <Link to="/terms">
-              Terms
-            </Link>
-
-            <span>
-              /
-            </span>
-
-            <Link to="/accessibility">
-              Accessibility
-            </Link>
-
-          </nav>
-
-
-          {/* SOCIALS */}
-
-          <div
-            className="site-footer__socials"
-            aria-label="Social media"
-          >
-
-            {socials.map((social) => {
-
-              const Icon = social.icon;
-
-              return (
-
-                <a
-                  key={social.label}
-                  href={social.url}
-                  className="site-footer__social"
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-
-                  <Icon
-                    size={24}
-                    strokeWidth={1.5}
-                  />
-
-                </a>
-
-              );
-
-            })}
+            <div className="cf-footer__continent africa">
+              AFRICA
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+      </section>
+
+
+      {/* ======================================================
+          BOTTOM
+      ======================================================= */}
+
+      <section className="cf-footer__bottom">
+
+        <div className="cf-footer__container">
+
+          <div className="cf-footer__bottom-content">
+
+            {/* COPYRIGHT */}
+
+            <div className="cf-footer__copyright">
+
+              <span className="cf-footer__copyright-symbol">
+                ©
+              </span>
+
+              <div>
+                <strong>
+                  {year} Continental Founders™
+                </strong>
+
+                <span>
+                  All rights reserved.
+                </span>
+              </div>
+
+            </div>
+
+
+            {/* LEGAL */}
+
+            <nav
+              className="cf-footer__legal"
+              aria-label="Legal"
+            >
+
+              <Link to="/privacy">
+                Privacy
+              </Link>
+
+              <Link to="/terms">
+                Terms
+              </Link>
+
+              <Link to="/accessibility">
+                Accessibility
+              </Link>
+
+            </nav>
+
+
+            {/* SOCIAL */}
+
+            <div
+              className="cf-footer__socials"
+              aria-label="Social media"
+            >
+
+              {socials.map((social) => {
+
+                const Icon = social.icon;
+
+                return (
+                  <a
+                    key={social.label}
+                    href={social.url}
+                    className="cf-footer__social"
+                    aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Icon
+                      size={20}
+                      strokeWidth={1.7}
+                    />
+                  </a>
+                );
+
+              })}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
 
     </footer>
   );

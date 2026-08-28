@@ -134,8 +134,7 @@ export default function About() {
           <div className="about-hero__main">
 
             <div className="about-kicker about-kicker--light">
-              <span />
-              About Continental Founders™
+            About Continental Founders
             </div>
 
             <h1>
@@ -147,8 +146,8 @@ export default function About() {
             </h1>
 
             <div className="about-hero__number">
-              <span>01</span>
-              <i />
+              
+              
             </div>
 
           </div>
@@ -210,7 +209,7 @@ export default function About() {
             <div className="about-purpose__copy">
 
               <p>
-                Continental Founders™ connects universities and emerging
+                Continental Founders connects universities and emerging
                 entrepreneurs across Africa and America through experiential
                 entrepreneurship, innovation, leadership development, and
                 cross-cultural collaboration.
@@ -273,7 +272,7 @@ export default function About() {
             </h2>
 
             <p>
-              The idea behind Continental Founders™ began with a simple
+              The idea behind Continental Founders began with a simple
               observation: the next generation of founders should have
               the opportunity to learn from both.
             </p>
@@ -293,7 +292,7 @@ export default function About() {
             </p>
 
             <p>
-              Continental Founders™ was created to help bridge that divide.
+              Continental Founders was created to help bridge that divide.
             </p>
 
             <p>
@@ -313,15 +312,16 @@ export default function About() {
               solutions, test business concepts, engage with mentors and
               industry professionals, and build relationships that extend
               beyond the classroom.
-            </p>
-
+             </p>
+             
 
             {/* PHILOSOPHY */}
 
             <div className="about-story__quote">
 
               <div className="about-kicker about-kicker--gold">
-                <span />
+
+                              
                 Our philosophy
               </div>
 
@@ -343,7 +343,7 @@ export default function About() {
             </p>
 
             <p>
-              Continental Founders™ is therefore designed around what
+              Continental Founders is therefore designed around what
               happens before and after the pitch: validating the
               opportunity, understanding the market, conducting due
               diligence, developing a viable business model, building
@@ -431,7 +431,7 @@ export default function About() {
                 </div>
 
                 <p>
-                  Continental Founders™ helps create that pathway through
+                  Continental Founders helps create that pathway through
                   strategic relationship building, institutional partnerships,
                   knowledge exchange, convenings, entrepreneurship,
                   innovation, and programs designed around shared goals.
@@ -742,7 +742,7 @@ export default function About() {
               </h3>
 
               <p>
-                Continental Founders™ brings together leadership
+                Continental Founders brings together leadership
                 perspectives from education, nonprofit development,
                 operations, strategic relations, research,
                 entrepreneurship, and institutional partnership.

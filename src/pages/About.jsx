@@ -6,6 +6,11 @@ import {
   Users,
   Lightbulb,
   Handshake,
+  GraduationCap,
+  Building2,
+  Landmark,
+  TrendingUp,
+  Rocket,
 } from "lucide-react";
 
 import CTASection from "../components/sections/CTASection";
@@ -55,7 +60,6 @@ const team = [
     bio:
       "Amb. Dr. Karen L. Booker brings more than four decades of experience across management services, education, outreach, policy analysis, operational diagnosis, and organizational leadership. Her career includes program development, policy work, housing and real property operations, and educational and environmental health initiatives.",
   },
-
   {
     name: "Sharneise Allen",
     role: "Vice Chair, Operations",
@@ -63,7 +67,6 @@ const team = [
     bio:
       "Sharneise Allen is an education leader, entrepreneur, and youth development strategist with extensive experience designing transformational programs for students, educators, athletes, and communities. She works across entrepreneurship, financial literacy, leadership, SEL, workforce readiness, and sports-based mentorship.",
   },
-
   {
     name: "Dr. Zaneta Brown-Ingles",
     role: "Vice Chair, Strategic Relations",
@@ -71,7 +74,6 @@ const team = [
     bio:
       "Dr. Zaneta Brown-Ingles, Ed.D., is an educational leader, author, consultant, strategist, and advocate with more than 20 years of experience in K–12 education, literacy, leadership development, and strategic partnerships.",
   },
-
   {
     name: "Ashley Robinson-Spann, PhD",
     role: "Treasurer",
@@ -89,24 +91,28 @@ const opportunity = [
   {
     number: "01",
     title: "Education",
+    icon: <GraduationCap size={26} strokeWidth={1.4} />,
     text:
       "Creating opportunities for students, educators, researchers, and institutions to exchange knowledge and develop cross-cultural learning experiences.",
   },
   {
     number: "02",
     title: "Entrepreneurship",
+    icon: <Rocket size={26} strokeWidth={1.4} />,
     text:
       "Helping students and emerging entrepreneurs explore ideas, identify opportunities, and develop practical ventures across markets.",
   },
   {
     number: "03",
     title: "Innovation",
+    icon: <Lightbulb size={26} strokeWidth={1.4} />,
     text:
       "Encouraging collaboration around technology, research, creativity, and solutions to real-world challenges.",
   },
   {
     number: "04",
     title: "Leadership",
+    icon: <Users size={26} strokeWidth={1.4} />,
     text:
       "Supporting globally minded leaders equipped to work across cultures, institutions, disciplines, and markets.",
   },
@@ -126,17 +132,22 @@ export default function About() {
 
       <section className="about-hero">
 
-        <div className="about-hero__line about-hero__line--left" />
-        <div className="about-hero__line about-hero__line--right" />
+        <div className="about-hero__background">
+          <img
+            src="/assets/images/about-hero.jpg"
+            alt=""
+          />
+        </div>
+
+        <div className="about-hero__overlay" />
 
         <div className="container about-hero__inner">
 
-          <div className="about-hero__main">
+          <div className="about-hero__content">
 
-            <div className="about-kicker about-kicker--light">
-              <span />
-              About Continental Founders™
-            </div>
+            <span className="about-kicker about-kicker--light">
+              ABOUT CONTINENTAL FOUNDERS™
+            </span>
 
             <h1>
               Building bridges.
@@ -146,23 +157,51 @@ export default function About() {
               Across continents.
             </h1>
 
-            <div className="about-hero__number">
-              <span>01</span>
-              <i />
-            </div>
-
-          </div>
-
-          <div className="about-hero__aside">
-
-            <div className="gold-rule" />
-
             <p>
               Continental Founders™ is a nonprofit initiative building
               strategic relationships between universities, institutions,
               entrepreneurs, leaders, and communities across the United
               States and Africa.
             </p>
+
+            <div className="about-hero__actions">
+
+              <Link
+                to="/contact"
+                className="about-button about-button--gold"
+              >
+                Connect With Us
+                <ArrowUpRight size={17} />
+              </Link>
+
+              <a
+                href="#mission"
+                className="about-button about-button--light"
+              >
+                Explore Our Story
+                <ArrowUpRight size={17} />
+              </a>
+
+            </div>
+
+          </div>
+
+          <div className="about-hero__visual">
+
+            <div className="about-hero__number">
+              01
+            </div>
+
+            <div className="about-hero__globe">
+              <Globe2
+                size={250}
+                strokeWidth={0.35}
+              />
+            </div>
+
+            <span>
+              AFRICA × UNITED STATES
+            </span>
 
           </div>
 
@@ -175,29 +214,38 @@ export default function About() {
           02 — MISSION
       ====================================================== */}
 
-      <section className="about-purpose about-mission">
+      <section
+        id="mission"
+        className="about-purpose about-mission"
+      >
 
         <div className="container about-purpose__grid">
 
-          <div className="about-section-label">
+          <div className="about-purpose__visual">
 
-            <div className="about-kicker">
-              <span />
-              Our mission
+            <div className="about-number">
+              02
             </div>
 
             <div className="purpose-globe">
-              <Globe2 size={92} strokeWidth={0.7} />
+              <Globe2
+                size={170}
+                strokeWidth={0.45}
+              />
             </div>
 
-            <span className="section-number">
-              02
+            <span className="about-visual-label">
+              OUR MISSION
             </span>
 
           </div>
 
 
           <div className="about-purpose__content">
+
+            <span className="about-kicker">
+              OUR MISSION
+            </span>
 
             <h2>
               Connecting universities and
@@ -249,16 +297,24 @@ export default function About() {
 
         <div className="container about-story__grid">
 
-          <div className="about-story__label">
+          <div className="about-story__intro">
 
-            <div className="about-kicker">
-              <span />
-              Our story
-            </div>
+            <span className="about-kicker">
+              OUR STORY
+            </span>
 
-            <span className="about-story__number">
+            <span className="about-number">
               03
             </span>
+
+            <div className="about-story__image">
+
+              <img
+                src="/assets/images/about-story.jpg"
+                alt="Students and leaders collaborating"
+              />
+
+            </div>
 
           </div>
 
@@ -316,14 +372,11 @@ export default function About() {
             </p>
 
 
-            {/* PHILOSOPHY */}
-
             <div className="about-story__quote">
 
-              <div className="about-kicker about-kicker--gold">
-                <span />
-                Our philosophy
-              </div>
+              <span className="about-kicker about-kicker--gold">
+                OUR PHILOSOPHY
+              </span>
 
               <blockquote>
                 We don't teach students to pitch.
@@ -384,14 +437,17 @@ export default function About() {
 
       <section className="about-approach">
 
-        <div className="container about-approach__grid">
+        <div className="container">
 
-          <div className="about-approach__content">
+          <div className="about-section-heading">
 
-            <div className="about-kicker">
-              <span />
-              Our approach
-            </div>
+            <span className="about-kicker">
+              OUR APPROACH
+            </span>
+
+            <span className="about-number">
+              04
+            </span>
 
             <h2>
               A relationship can
@@ -399,76 +455,57 @@ export default function About() {
               become an ecosystem.
             </h2>
 
-            <div className="approach-points">
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Users
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Africa and the United States are home to extraordinary
-                  universities, educators, researchers, entrepreneurs,
-                  institutions, and communities. Yet the right people and
-                  organizations do not always have a clear pathway to one
-                  another.
-                </p>
-
-              </div>
-
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Handshake
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Continental Founders™ helps create that pathway through
-                  strategic relationship building, institutional partnerships,
-                  knowledge exchange, convenings, entrepreneurship,
-                  innovation, and programs designed around shared goals.
-                </p>
-
-              </div>
-
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Globe2
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Our approach is intentionally reciprocal. African and
-                  American institutions can learn from one another, build
-                  together, and create opportunities that extend beyond
-                  traditional forms of international engagement.
-                </p>
-
-              </div>
-
-            </div>
-
           </div>
 
 
-          <div className="about-approach__image">
+          <div className="about-approach__grid">
 
-            <img
-              src="/assets/images/about-campus.jpg"
-              alt="University campus representing international education and partnership"
-            />
+            <div className="about-approach__image">
+
+              <img
+                src="/assets/images/about-campus.jpg"
+                alt="University campus representing international education"
+              />
+
+            </div>
+
+
+            <div className="about-approach__content">
+
+              <ApproachItem
+                icon={<Users />}
+                title="Bring the right people together"
+              >
+                Africa and the United States are home to extraordinary
+                universities, educators, researchers, entrepreneurs,
+                institutions, and communities. Yet the right people and
+                organizations do not always have a clear pathway to one
+                another.
+              </ApproachItem>
+
+
+              <ApproachItem
+                icon={<Handshake />}
+                title="Create meaningful pathways"
+              >
+                Continental Founders™ helps create that pathway through
+                strategic relationship building, institutional partnerships,
+                knowledge exchange, convenings, entrepreneurship,
+                innovation, and programs designed around shared goals.
+              </ApproachItem>
+
+
+              <ApproachItem
+                icon={<Globe2 />}
+                title="Build reciprocally"
+              >
+                Our approach is intentionally reciprocal. African and
+                American institutions can learn from one another, build
+                together, and create opportunities that extend beyond
+                traditional forms of international engagement.
+              </ApproachItem>
+
+            </div>
 
           </div>
 
@@ -487,28 +524,37 @@ export default function About() {
 
           <div className="about-belief__visual">
 
-            <div className="about-belief__circle">
+            <span className="about-number">
+              05
+            </span>
+
+            <div className="belief-orbit">
               <Globe2
-                size={86}
-                strokeWidth={0.7}
+                size={130}
+                strokeWidth={0.4}
               />
             </div>
 
-            <div className="about-belief__line" />
+            <strong>
+              EDUCATION
+            </strong>
 
-            <span>
-              Education × Opportunity × Perspective
-            </span>
+            <strong>
+              OPPORTUNITY
+            </strong>
+
+            <strong>
+              PERSPECTIVE
+            </strong>
 
           </div>
 
 
           <div className="about-belief__content">
 
-            <div className="about-kicker about-kicker--gold">
-              <span />
-              Our belief
-            </div>
+            <span className="about-kicker about-kicker--gold">
+              OUR BELIEF
+            </span>
 
             <h2>
               Education should not end
@@ -521,18 +567,27 @@ export default function About() {
               more than academic knowledge.
             </p>
 
-            <p className="about-belief__large">
-              They gain perspective.
-            </p>
+            <div className="belief-statements">
 
-            <p className="about-belief__large">
-              They gain networks.
-            </p>
+              <div>
+                <span>01</span>
+                <strong>They gain perspective.</strong>
+              </div>
 
-            <p className="about-belief__large">
-              They gain the ability to see opportunities that may not
-              be visible from a single vantage point.
-            </p>
+              <div>
+                <span>02</span>
+                <strong>They gain networks.</strong>
+              </div>
+
+              <div>
+                <span>03</span>
+                <strong>
+                  They gain the ability to see opportunities that may
+                  not be visible from a single vantage point.
+                </strong>
+              </div>
+
+            </div>
 
             <p>
               And, most importantly, they gain the opportunity to build
@@ -558,16 +613,20 @@ export default function About() {
 
         <div className="container">
 
-          <div className="about-centered-heading">
+          <div className="about-section-heading about-section-heading--center">
 
-            <div className="about-kicker about-kicker--gold">
-              <span />
-              What we believe
-              <span />
-            </div>
+            <span className="about-kicker about-kicker--gold">
+              WHAT WE BELIEVE
+            </span>
+
+            <span className="about-number">
+              06
+            </span>
 
             <h2>
-              The standards we bring to partnership.
+              The standards we bring
+              <br />
+              to partnership.
             </h2>
 
             <p>
@@ -587,37 +646,23 @@ export default function About() {
                 key={principle.number}
               >
 
-                <div className="principle-card__top">
+                <span className="principle-card__number">
+                  {principle.number}
+                </span>
 
-                  <div>
+                <ArrowUpRight
+                  className="principle-card__arrow"
+                  size={25}
+                  strokeWidth={1.2}
+                />
 
-                    <span className="principle-number">
-                      {principle.number}
-                    </span>
+                <h3>
+                  {principle.title}
+                </h3>
 
-                    <span className="principle-dash" />
-
-                  </div>
-
-                  <ArrowUpRight
-                    size={28}
-                    strokeWidth={1.2}
-                  />
-
-                </div>
-
-
-                <div>
-
-                  <h3>
-                    {principle.title}
-                  </h3>
-
-                  <p>
-                    {principle.text}
-                  </p>
-
-                </div>
+                <p>
+                  {principle.text}
+                </p>
 
               </article>
 
@@ -638,20 +683,20 @@ export default function About() {
 
         <div className="container">
 
-          <div className="leadership-heading">
+          <div className="about-section-heading">
 
-            <div className="about-kicker about-kicker--gold">
-              <span />
-              Leadership
-            </div>
+            <span className="about-kicker about-kicker--gold">
+              LEADERSHIP
+            </span>
 
-            <span className="section-number">
+            <span className="about-number">
               07
             </span>
 
             <h2>
-              Experienced leaders helping shape
-              what comes next.
+              Experienced leaders helping
+              <br />
+              shape what comes next.
             </h2>
 
             <p>
@@ -681,13 +726,8 @@ export default function About() {
                     loading={index === 0 ? "eager" : "lazy"}
                   />
 
-                  <div className="leader-card__arrow">
-
-                    <ArrowUpRight
-                      size={18}
-                      strokeWidth={1.4}
-                    />
-
+                  <div className="leader-card__number">
+                    0{index + 1}
                   </div>
 
                 </div>
@@ -724,13 +764,16 @@ export default function About() {
           </div>
 
 
-          {/* LEADERSHIP PHILOSOPHY */}
-
           <div className="leadership-closing">
 
-            <div className="about-kicker">
-              <span />
-              Leadership philosophy
+            <div>
+              <span className="about-kicker">
+                LEADERSHIP PHILOSOPHY
+              </span>
+
+              <span className="about-number">
+                07A
+              </span>
             </div>
 
             <div>
@@ -761,120 +804,64 @@ export default function About() {
 
 
       {/* ======================================================
-          08 — OUR NETWORK / OPPORTUNITY / VISION
+          08 — NETWORK / OPPORTUNITY / VISION
       ====================================================== */}
 
       <section className="about-three-columns">
 
-        <div className="container three-columns-grid">
+        <div className="container">
+
+          <div className="about-section-heading about-section-heading--center">
+
+            <span className="about-kicker">
+              THE BIGGER PICTURE
+            </span>
+
+            <span className="about-number">
+              08
+            </span>
+
+            <h2>
+              Connection is only
+              <br />
+              the beginning.
+            </h2>
+
+          </div>
 
 
-          {/* NETWORK */}
+          <div className="three-columns-grid">
 
-          <article className="three-column-card">
-
-            <div className="three-column-card__icon">
-              <Users
-                size={22}
-                strokeWidth={1.4}
-              />
-            </div>
-
-            <div className="about-kicker">
-              <span />
-              Our network
-            </div>
-
-            <h3>
-              Partnership extends
-              beyond institutions.
-            </h3>
-
-            <p>
-              We are building a diverse ecosystem of universities,
-              students, entrepreneurs, researchers, industry leaders,
-              nonprofit organizations, government stakeholders,
-              sponsors, and strategic partners.
-            </p>
-
-            <Link to="/network">
-              Learn more about our network
-              <ArrowUpRight size={15} />
-            </Link>
-
-          </article>
+            <ThreeColumnCard
+              icon={<Users />}
+              eyebrow="OUR NETWORK"
+              title="Partnership extends beyond institutions."
+              text="We are building a diverse ecosystem of universities, students, entrepreneurs, researchers, industry leaders, nonprofit organizations, government stakeholders, sponsors, and strategic partners."
+              link="/network"
+              linkText="Learn more about our network"
+            />
 
 
-          {/* OPPORTUNITY */}
-
-          <article className="three-column-card">
-
-            <div className="three-column-card__icon">
-              <Lightbulb
-                size={22}
-                strokeWidth={1.4}
-              />
-            </div>
-
-            <div className="about-kicker">
-              <span />
-              The opportunity
-            </div>
-
-            <h3>
-              Moving from connection
-              to meaningful collaboration.
-            </h3>
-
-            <p>
-              Through education, entrepreneurship, innovation,
-              and leadership, we help relationships develop into
-              programs, ventures, research initiatives, and
-              practical opportunities.
-            </p>
-
-            <Link to="/our-model">
-              Explore our approach
-              <ArrowUpRight size={15} />
-            </Link>
-
-          </article>
+            <ThreeColumnCard
+              icon={<Lightbulb />}
+              eyebrow="THE OPPORTUNITY"
+              title="Moving from connection to meaningful collaboration."
+              text="Through education, entrepreneurship, innovation, and leadership, we help relationships develop into programs, ventures, research initiatives, and practical opportunities."
+              link="/our-model"
+              linkText="Explore our approach"
+            />
 
 
-          {/* VISION */}
+            <ThreeColumnCard
+              icon={<Globe2 />}
+              eyebrow="OUR VISION"
+              title="A connected global ecosystem without borders."
+              text="We envision a future where universities, entrepreneurs, investors, and institutions across Africa and America collaborate to develop globally minded founders, innovators, and leaders."
+              link="/vision"
+              linkText="Read our full vision"
+            />
 
-          <article className="three-column-card">
-
-            <div className="three-column-card__icon">
-              <Globe2
-                size={22}
-                strokeWidth={1.4}
-              />
-            </div>
-
-            <div className="about-kicker">
-              <span />
-              Our vision
-            </div>
-
-            <h3>
-              A connected global
-              ecosystem without borders.
-            </h3>
-
-            <p>
-              We envision a future where universities, entrepreneurs,
-              investors, and institutions across Africa and America
-              collaborate to develop globally minded founders,
-              innovators, and leaders.
-            </p>
-
-            <Link to="/vision">
-              Read our full vision
-              <ArrowUpRight size={15} />
-            </Link>
-
-          </article>
+          </div>
 
         </div>
 
@@ -889,26 +876,21 @@ export default function About() {
 
         <div className="container">
 
-          <div className="opportunity-heading">
+          <div className="about-section-heading">
 
-            <div>
+            <span className="about-kicker about-kicker--gold">
+              THE OPPORTUNITY
+            </span>
 
-              <div className="about-kicker about-kicker--gold">
-                <span />
-                The opportunity
-              </div>
+            <span className="about-number">
+              09
+            </span>
 
-              <span className="section-number">
-                09
-              </span>
-
-              <h2>
-                Moving from connection
-                <br />
-                to meaningful collaboration.
-              </h2>
-
-            </div>
+            <h2>
+              Moving from connection
+              <br />
+              to meaningful collaboration.
+            </h2>
 
           </div>
 
@@ -922,9 +904,17 @@ export default function About() {
                 key={item.number}
               >
 
-                <span className="opportunity-number">
-                  {item.number}
-                </span>
+                <div className="opportunity-card__top">
+
+                  <span>
+                    {item.number}
+                  </span>
+
+                  <div className="opportunity-card__icon">
+                    {item.icon}
+                  </div>
+
+                </div>
 
                 <h3>
                   {item.title}
@@ -933,6 +923,11 @@ export default function About() {
                 <p>
                   {item.text}
                 </p>
+
+                <Link to="/programs">
+                  Explore
+                  <ArrowUpRight size={15} />
+                </Link>
 
               </article>
 
@@ -951,18 +946,24 @@ export default function About() {
 
       <section className="about-vision">
 
-        <div className="about-vision__glow" />
+        <div className="about-vision__background">
+
+          <Globe2
+            size={600}
+            strokeWidth={0.18}
+          />
+
+        </div>
 
         <div className="container about-vision__grid">
 
-          <div>
+          <div className="about-vision__intro">
 
-            <div className="about-kicker about-kicker--light">
-              <span />
-              Our vision
-            </div>
+            <span className="about-kicker about-kicker--light">
+              OUR VISION
+            </span>
 
-            <span className="about-vision__number">
+            <span className="about-number about-number--light">
               10
             </span>
 
@@ -991,6 +992,14 @@ export default function About() {
               and shared prosperity.
             </p>
 
+            <Link
+              to="/vision"
+              className="about-button about-button--gold"
+            >
+              Explore Our Vision
+              <ArrowUpRight size={17} />
+            </Link>
+
           </div>
 
         </div>
@@ -1006,14 +1015,27 @@ export default function About() {
 
         <div className="container about-founding__grid">
 
-          <div>
+          <div className="about-founding__visual">
 
-            <div className="about-kicker about-kicker--light">
-              <span />
-              Founding partners
-            </div>
+            <Globe2
+              size={290}
+              strokeWidth={0.3}
+            />
 
-            <span className="section-number section-number--light">
+            <span>
+              AFRICA × AMERICA
+            </span>
+
+          </div>
+
+
+          <div className="about-founding__content">
+
+            <span className="about-kicker about-kicker--gold">
+              FOUNDING PARTNERS
+            </span>
+
+            <span className="about-number">
               11
             </span>
 
@@ -1022,11 +1044,6 @@ export default function About() {
               <br />
               from the ground up.
             </h2>
-
-          </div>
-
-
-          <div>
 
             <p>
               Continental Founders™ is intentionally engaging
@@ -1044,21 +1061,11 @@ export default function About() {
 
             <Link
               to="/contact"
-              className="gold-button"
+              className="about-button about-button--gold"
             >
-              Become a founding partner
-              <ArrowUpRight size={16} />
+              Become a Founding Partner
+              <ArrowUpRight size={17} />
             </Link>
-
-          </div>
-
-
-          <div className="founding-map">
-
-            <Globe2
-              size={210}
-              strokeWidth={0.45}
-            />
 
           </div>
 
@@ -1073,52 +1080,45 @@ export default function About() {
 
       <section className="about-final-cta">
 
-        <div className="container about-final-cta__grid">
+        <div className="container about-final-cta__inner">
 
           <div className="final-cta-icon">
 
             <Handshake
-              size={42}
+              size={48}
               strokeWidth={1}
             />
 
           </div>
 
+          <span className="about-kicker about-kicker--gold">
+            LET'S BUILD TOGETHER
+          </span>
 
-          <div>
+          <span className="about-number">
+            12
+          </span>
 
-            <div className="about-kicker about-kicker--gold">
-              <span />
-              Let's build together
-            </div>
+          <h2>
+            Stronger together.
+            <br />
+            Better for both continents.
+          </h2>
 
-            <h2>
-              Stronger together.
-              <br />
-              Better for both continents.
-            </h2>
+          <p>
+            Whether you represent a university, organization,
+            or community, we invite you to partner with us in
+            building opportunity, creating impact, and preparing
+            the next generation of leaders.
+          </p>
 
-          </div>
-
-
-          <div>
-
-            <p>
-              Whether you represent a university, organization,
-              or community, we invite you to partner with us in
-              building opportunity, creating impact, and preparing
-              the next generation of leaders.
-            </p>
-
-            <Link
-              to="/contact"
-              className="outline-button"
-            >
-              Connect with our team
-              <ArrowUpRight size={16} />
-            </Link>
-
-          </div>
+          <Link
+            to="/contact"
+            className="about-button about-button--gold"
+          >
+            Connect With Our Team
+            <ArrowUpRight size={17} />
+          </Link>
 
         </div>
 
@@ -1132,5 +1132,79 @@ export default function About() {
       <CTASection />
 
     </main>
+  );
+}
+
+
+/* ============================================================
+   APPROACH ITEM
+============================================================ */
+
+function ApproachItem({
+  icon,
+  title,
+  children,
+}) {
+  return (
+    <article className="approach-item">
+
+      <div className="approach-item__icon">
+        {icon}
+      </div>
+
+      <div>
+
+        <h3>
+          {title}
+        </h3>
+
+        <p>
+          {children}
+        </p>
+
+      </div>
+
+    </article>
+  );
+}
+
+
+/* ============================================================
+   THREE COLUMN CARD
+============================================================ */
+
+function ThreeColumnCard({
+  icon,
+  eyebrow,
+  title,
+  text,
+  link,
+  linkText,
+}) {
+  return (
+    <article className="three-column-card">
+
+      <div className="three-column-card__icon">
+        {icon}
+      </div>
+
+      <span className="about-kicker">
+        {eyebrow}
+      </span>
+
+      <h3>
+        {title}
+      </h3>
+
+      <p>
+        {text}
+      </p>
+
+      <Link to={link}>
+        {linkText}
+        <ArrowUpRight size={15} />
+      </Link>
+
+    </article>
   );
 }

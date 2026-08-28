@@ -145,9 +145,15 @@ export default function About() {
 
           <div className="about-hero__content">
 
+<<<<<<< HEAD
             <span className="about-kicker about-kicker--light">
               ABOUT CONTINENTAL FOUNDERS™
             </span>
+=======
+            <div className="about-kicker about-kicker--light">
+            About Continental Founders
+            </div>
+>>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
 
             <h1>
               Building bridges.
@@ -157,8 +163,22 @@ export default function About() {
               Across continents.
             </h1>
 
+<<<<<<< HEAD
+=======
+            <div className="about-hero__number">
+              
+              
+            </div>
+
+          </div>
+
+          <div className="about-hero__aside">
+
+            <div className="gold-rule" />
+
+>>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
             <p>
-              Continental Founders™ is a nonprofit initiative building
+              Continental Founders is a nonprofit initiative building
               strategic relationships between universities, institutions,
               entrepreneurs, leaders, and communities across the United
               States and Africa.
@@ -258,7 +278,7 @@ export default function About() {
             <div className="about-purpose__copy">
 
               <p>
-                Continental Founders™ connects universities and emerging
+                Continental Founders connects universities and emerging
                 entrepreneurs across Africa and America through experiential
                 entrepreneurship, innovation, leadership development, and
                 cross-cultural collaboration.
@@ -267,7 +287,7 @@ export default function About() {
               <p>
                 Our mission is to create opportunities for participants to
                 move beyond learning about entrepreneurship to actually
-                building—developing ideas into validated business concepts,
+                building developing ideas into validated business concepts,
                 strengthening their ability to execute, and creating the
                 relationships, skills, and resources necessary to participate
                 in the global economy.
@@ -329,7 +349,7 @@ export default function About() {
             </h2>
 
             <p>
-              The idea behind Continental Founders™ began with a simple
+              The idea behind Continental Founders began with a simple
               observation: the next generation of founders should have
               the opportunity to learn from both.
             </p>
@@ -349,7 +369,7 @@ export default function About() {
             </p>
 
             <p>
-              Continental Founders™ was created to help bridge that divide.
+              Continental Founders was created to help bridge that divide.
             </p>
 
             <p>
@@ -365,18 +385,26 @@ export default function About() {
 
             <p>
               Through cross-continental collaboration, participants have
-              the opportunity to explore real-world problems, develop
+              the opportunity to explore real world problems, develop
               solutions, test business concepts, engage with mentors and
               industry professionals, and build relationships that extend
               beyond the classroom.
-            </p>
-
+             </p>
+             
 
             <div className="about-story__quote">
 
+<<<<<<< HEAD
               <span className="about-kicker about-kicker--gold">
                 OUR PHILOSOPHY
               </span>
+=======
+              <div className="about-kicker about-kicker--gold">
+
+                              
+                Our philosophy
+              </div>
+>>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
 
               <blockquote>
                 We don't teach students to pitch.
@@ -392,11 +420,11 @@ export default function About() {
 
 
             <p>
-              Investors don't fund ideas—they fund founders who can execute.
+              Investors don't fund ideas they fund founders who can execute.
             </p>
 
             <p>
-              Continental Founders™ is therefore designed around what
+              Continental Founders is therefore designed around what
               happens before and after the pitch: validating the
               opportunity, understanding the market, conducting due
               diligence, developing a viable business model, building
@@ -455,6 +483,70 @@ export default function About() {
               become an ecosystem.
             </h2>
 
+<<<<<<< HEAD
+=======
+            <div className="approach-points">
+
+              <div className="approach-point">
+
+                <div className="approach-point__icon">
+                  <Users
+                    size={19}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <p>
+                  Africa and the United States are home to extraordinary
+                  universities, educators, researchers, entrepreneurs,
+                  institutions, and communities. Yet the right people and
+                  organizations do not always have a clear pathway to one
+                  another.
+                </p>
+
+              </div>
+
+
+              <div className="approach-point">
+
+                <div className="approach-point__icon">
+                  <Handshake
+                    size={19}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <p>
+                  Continental Founders helps create that pathway through
+                  strategic relationship building, institutional partnerships,
+                  knowledge exchange, convenings, entrepreneurship,
+                  innovation, and programs designed around shared goals.
+                </p>
+
+              </div>
+
+
+              <div className="approach-point">
+
+                <div className="approach-point__icon">
+                  <Globe2
+                    size={19}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                <p>
+                  Our approach is intentionally reciprocal. African and
+                  American institutions can learn from one another, build
+                  together, and create opportunities that extend beyond
+                  traditional forms of international engagement.
+                </p>
+
+              </div>
+
+            </div>
+
+>>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
           </div>
 
 
@@ -785,7 +877,7 @@ export default function About() {
               </h3>
 
               <p>
-                Continental Founders™ brings together leadership
+                Continental Founders brings together leadership
                 perspectives from education, nonprofit development,
                 operations, strategic relations, research,
                 entrepreneurship, and institutional partnership.

@@ -158,7 +158,7 @@ export default function About() {
             <div className="gold-rule" />
 
             <p>
-              Continental Founders™ is a nonprofit initiative building
+              Continental Founders is a nonprofit initiative building
               strategic relationships between universities, institutions,
               entrepreneurs, leaders, and communities across the United
               States and Africa.
@@ -219,7 +219,7 @@ export default function About() {
               <p>
                 Our mission is to create opportunities for participants to
                 move beyond learning about entrepreneurship to actually
-                building—developing ideas into validated business concepts,
+                building developing ideas into validated business concepts,
                 strengthening their ability to execute, and creating the
                 relationships, skills, and resources necessary to participate
                 in the global economy.
@@ -309,7 +309,7 @@ export default function About() {
 
             <p>
               Through cross-continental collaboration, participants have
-              the opportunity to explore real-world problems, develop
+              the opportunity to explore real world problems, develop
               solutions, test business concepts, engage with mentors and
               industry professionals, and build relationships that extend
               beyond the classroom.
@@ -339,7 +339,7 @@ export default function About() {
 
 
             <p>
-              Investors don't fund ideas—they fund founders who can execute.
+              Investors don't fund ideas they fund founders who can execute.
             </p>
 
             <p>

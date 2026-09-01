@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   ArrowUpRight,
-  ArrowDown,
   Play,
   Pause,
   Volume2,
@@ -39,10 +38,14 @@ export default function Home() {
   const [volume, setVolume] = useState(1);
   const [previousVolume, setPreviousVolume] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
-  /* ============================================================
-     VIDEO EVENTS
-  ============================================================ */
+  /*
+  ============================================================
+  VIDEO EVENTS
+  ============================================================
+  */
 
   useEffect(() => {
     const video = videoRef.current;
@@ -52,21 +55,38 @@ export default function Home() {
     video.volume = 1;
     video.muted = false;
 
-    const handlePlay = () => setIsPlaying(true);
+    const handlePlay = () => {
+      setIsPlaying(true);
+    };
 
-    const handlePause = () => setIsPlaying(false);
+    const handlePause = () => {
+      setIsPlaying(false);
+    };
 
-    const handleEnded = () => setIsPlaying(false);
+    const handleEnded = () => {
+      setIsPlaying(false);
+    };
 
-    const handleVolume = () => {
+    const handleTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+    };
+
+    const handleLoadedMetadata = () => {
+      setDuration(video.duration || 0);
+    };
+
+    const handleVolumeChange = () => {
       setVolume(video.volume);
 
       setIsMuted(
         video.muted ||
-        video.volume === 0
+          video.volume === 0
       );
 
-      if (video.volume > 0) {
+      if (
+        !video.muted &&
+        video.volume > 0
+      ) {
         setPreviousVolume(video.volume);
       }
     };
@@ -75,7 +95,7 @@ export default function Home() {
       setIsFullscreen(
         Boolean(
           document.fullscreenElement ||
-          document.webkitFullscreenElement
+            document.webkitFullscreenElement
         )
       );
     };
@@ -96,8 +116,18 @@ export default function Home() {
     );
 
     video.addEventListener(
+      "timeupdate",
+      handleTimeUpdate
+    );
+
+    video.addEventListener(
+      "loadedmetadata",
+      handleLoadedMetadata
+    );
+
+    video.addEventListener(
       "volumechange",
-      handleVolume
+      handleVolumeChange
     );
 
     document.addEventListener(
@@ -127,8 +157,18 @@ export default function Home() {
       );
 
       video.removeEventListener(
+        "timeupdate",
+        handleTimeUpdate
+      );
+
+      video.removeEventListener(
+        "loadedmetadata",
+        handleLoadedMetadata
+      );
+
+      video.removeEventListener(
         "volumechange",
-        handleVolume
+        handleVolumeChange
       );
 
       document.removeEventListener(
@@ -143,10 +183,11 @@ export default function Home() {
     };
   }, []);
 
-
-  /* ============================================================
-     VIDEO PLAY / PAUSE
-  ============================================================ */
+  /*
+  ============================================================
+  VIDEO PLAY / PAUSE
+  ============================================================
+  */
 
   const toggleVideo = async () => {
     const video = videoRef.current;
@@ -160,14 +201,18 @@ export default function Home() {
         video.pause();
       }
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Unable to control video:",
+        error
+      );
     }
   };
 
-
-  /* ============================================================
-     VIDEO MUTE
-  ============================================================ */
+  /*
+  ============================================================
+  VIDEO MUTE
+  ============================================================
+  */
 
   const toggleMute = () => {
     const video = videoRef.current;
@@ -197,10 +242,11 @@ export default function Home() {
     }
   };
 
-
-  /* ============================================================
-     VIDEO VOLUME
-  ============================================================ */
+  /*
+  ============================================================
+  VIDEO VOLUME
+  ============================================================
+  */
 
   const changeVolume = (event) => {
     const value = Number(
@@ -232,10 +278,31 @@ export default function Home() {
     setVolume(safeValue);
   };
 
+  /*
+  ============================================================
+  VIDEO SEEK
+  ============================================================
+  */
 
-  /* ============================================================
-     VIDEO FULLSCREEN
-  ============================================================ */
+  const changeVideoTime = (event) => {
+    const value = Number(
+      event.target.value
+    );
+
+    const video = videoRef.current;
+
+    if (!video) return;
+
+    video.currentTime = value;
+
+    setCurrentTime(value);
+  };
+
+  /*
+  ============================================================
+  FULLSCREEN
+  ============================================================
+  */
 
   const toggleFullscreen = async () => {
     const video = videoRef.current;
@@ -245,70 +312,96 @@ export default function Home() {
 
     try {
       if (!document.fullscreenElement) {
-
-        if (frame?.requestFullscreen) {
+        if (
+          frame &&
+          frame.requestFullscreen
+        ) {
           await frame.requestFullscreen();
           return;
         }
 
-        if (video.webkitEnterFullscreen) {
+        if (
+          video.webkitEnterFullscreen
+        ) {
           video.webkitEnterFullscreen();
-          return;
         }
-
       } else if (
         document.exitFullscreen
       ) {
         await document.exitFullscreen();
       }
-
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Fullscreen error:",
+        error
+      );
     }
   };
 
+  /*
+  ============================================================
+  FORMAT VIDEO TIME
+  ============================================================
+  */
+
+  const formatTime = (time) => {
+    if (!Number.isFinite(time)) {
+      return "0:00";
+    }
+
+    const minutes = Math.floor(
+      time / 60
+    );
+
+    const seconds = Math.floor(
+      time % 60
+    )
+      .toString()
+      .padStart(2, "0");
+
+    return `${minutes}:${seconds}`;
+  };
 
   return (
     <main className="cf-home">
 
-      {/* ==========================================================
+      {/* =========================================================
           01 — HERO
-      ========================================================== */}
+      ========================================================= */}
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-hero
-        "
-      >
+      <section className="cf-home-hero">
 
-        <div className="cf-hero">
+        <div className="cf-container cf-home-hero__container">
 
-          <div className="cf-hero__background" />
+          <div className="cf-home-hero__main">
 
-          <div className="cf-hero__overlay" />
+            {/* =================================================
+                HERO CONTENT
+            ================================================= */}
 
-          <div className="cf-container cf-hero__content">
+            <div className="cf-home-hero__content">
 
-            <div className="cf-hero__copy">
+              <div className="cf-section-marker">
 
-              <div className="cf-label cf-label--gold">
+                <span>01</span>
 
-                <span />
+                <i />
 
-                A Cross-Continental Initiative
+                <strong>
+                  A CROSS-CONTINENTAL INITIATIVE
+                </strong>
 
               </div>
 
-              <h1>
 
+              <h1>
                 Connecting Africa
                 <br />
 
                 and America through
                 <br />
 
-                education,
+                <span>education,</span>
                 <br />
 
                 entrepreneurship,
@@ -316,230 +409,213 @@ export default function Home() {
 
                 innovation, and{" "}
 
-                <span>
-                  opportunity.
-                </span>
-
+                <em>opportunity.</em>
               </h1>
 
-              <p>
-                Continental Founders™ is a
-                newly established nonprofit
-                building strategic partnerships
-                between universities in Africa
-                and the United States through
+
+              <p className="cf-home-hero__lead">
+                Continental Founders™ is a newly
+                established nonprofit building
+                strategic partnerships between
+                universities in Africa and the
+                United States through
                 entrepreneurship, innovation,
                 leadership development, and
                 meaningful collaboration.
               </p>
 
-              <div className="cf-hero__buttons">
+
+              <div className="cf-actions">
 
                 <Link
                   to="/contact"
                   className="cf-button cf-button--gold"
                 >
-                  Schedule a Meeting
-                  <CalendarDays size={16} />
+                  <span>
+                    Schedule a Meeting
+                  </span>
+
+                  <CalendarDays
+                    size={18}
+                    strokeWidth={1.7}
+                  />
                 </Link>
+
 
                 <Link
                   to="/our-model"
-                  className="cf-button cf-button--outline"
+                  className="cf-button cf-button--outline-dark"
                 >
-                  Explore Our Model
-                  <ArrowUpRight size={16} />
+                  <span>
+                    Explore Our Model
+                  </span>
+
+                  <ArrowRight
+                    size={18}
+                    strokeWidth={1.7}
+                  />
                 </Link>
 
               </div>
 
             </div>
 
-          </div>
 
+            {/* =================================================
+                HERO IMAGE
+            ================================================= */}
 
-          {/* HERO BOTTOM */}
+            <div className="cf-home-hero__visual">
 
-          <div className="cf-hero__bottom">
+              <div className="cf-home-hero__image">
 
-            <div className="cf-container cf-hero__bottom-grid">
-
-              <div className="cf-hero-stat">
-
-                <span>01</span>
-
-                <div>
-
-                  <strong>
-                    University Partnerships
-                  </strong>
-
-                  <small>
-                    Africa × United States
-                  </small>
-
-                </div>
+                <img
+                  src="/assets/images/hero-partnership.jpg"
+                  alt="Africa and America connected through a global network"
+                />
 
               </div>
 
 
-              <div className="cf-hero-stat">
+              <div className="cf-home-hero__visual-caption">
 
-                <span>02</span>
+                <span>
+                  AFRICA
+                </span>
 
-                <div>
+                <i />
 
-                  <strong>
-                    Innovation & Entrepreneurship
-                  </strong>
-
-                  <small>
-                    Ideas into practical opportunities
-                  </small>
-
-                </div>
-
-              </div>
-
-
-              <div className="cf-hero-stat">
-
-                <span>03</span>
-
-                <div>
-
-                  <strong>
-                    Leadership Development
-                  </strong>
-
-                  <small>
-                    Preparing the next generation
-                  </small>
-
-                </div>
+                <span>
+                  UNITED STATES
+                </span>
 
               </div>
 
             </div>
 
           </div>
-
-
-          <a
-            href="#introduction"
-            className="cf-hero__scroll"
-            aria-label="Scroll to introduction"
-          >
-            <ArrowDown size={16} />
-          </a>
 
         </div>
 
       </section>
 
 
+      {/* =========================================================
+          QUICK HIGHLIGHTS
+      ========================================================= */}
 
-      {/* ==========================================================
-          02 — INTRODUCTION
-      ========================================================== */}
+      <div className="cf-quick-bar">
 
-      <section
-        id="introduction"
-        className="
-          cf-stack-section
-          cf-stack-introduction
-        "
-      >
+        <div className="cf-container cf-quick-bar__grid">
 
-        <div className="cf-introduction">
+          <QuickHighlight
+            number="01"
+            icon={<GraduationCap />}
+            title="University Partnerships"
+            text="Africa × United States"
+          />
 
-          <div className="cf-container cf-introduction__grid">
+          <QuickHighlight
+            number="02"
+            icon={<Lightbulb />}
+            title="Innovation & Entrepreneurship"
+            text="Ideas into practical opportunities"
+          />
 
+          <QuickHighlight
+            number="03"
+            icon={<Users />}
+            title="Leadership Development"
+            text="Preparing the next generation"
+          />
 
-            <aside className="cf-introduction__aside">
+        </div>
 
-              <div className="cf-section-index">
-
-                <span>
-                  01
-                </span>
-
-                <div className="cf-index-accent" />
-
-              </div>
-
-
-              <div className="cf-map">
-
-                <img
-                  src="/assets/images/africa-america-map.png"
-                  alt="Africa and America connected through partnership"
-                />
-
-              </div>
-
-            </aside>
+      </div>
 
 
-            <div className="cf-introduction__content">
+      {/* =========================================================
+          02 — WHO WE ARE
+      ========================================================= */}
+
+      <section className="cf-section cf-section-white">
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <SectionNumber number="02" />
+
+            <div>
 
               <span className="cf-eyebrow">
                 WHO WE ARE
               </span>
 
               <h2>
-                Building strategic partnerships
-                that create opportunity in both
+                Building strategic
+                partnerships that create{" "}
+                <em>opportunity</em> in both
                 directions.
               </h2>
 
+            </div>
 
-              <div className="cf-introduction__copy">
+          </div>
 
-                <p>
-                  Continental Founders™ brings
-                  universities, students,
-                  entrepreneurs, researchers,
-                  businesses, government leaders,
-                  investors, and other strategic
-                  partners together across Africa
-                  and the United States.
-                </p>
 
-                <p>
-                  We are developing a collaborative
-                  platform where institutions can
-                  exchange knowledge, develop
-                  entrepreneurial ideas, strengthen
-                  leadership capacity, and create
-                  practical pathways for meaningful
-                  international collaboration.
-                </p>
+          <div className="cf-who-grid">
 
-                <p>
-                  At the heart of the initiative is
-                  a simple principle: partnership
-                  should create value for everyone
-                  involved.
-                </p>
+            <div className="cf-who-visual">
 
-              </div>
+              <img
+                src="/assets/images/africa-america-map.png"
+                alt="Africa and America connected through partnership"
+                loading="lazy"
+              />
+
+            </div>
+
+
+            <div className="cf-who-content">
+
+              <p>
+                Continental Founders™ brings
+                universities, students,
+                entrepreneurs, researchers,
+                businesses, government leaders,
+                investors, and other strategic
+                partners together across Africa
+                and the United States.
+              </p>
+
+              <p>
+                We are developing a collaborative
+                platform where institutions can
+                exchange knowledge, develop
+                entrepreneurial ideas, strengthen
+                leadership capacity, and create
+                practical pathways for meaningful
+                international collaboration.
+              </p>
+
+              <p>
+                At the heart of the initiative is
+                a simple principle: partnership
+                should create value for everyone
+                involved.
+              </p>
 
 
               <Link
                 to="/about"
                 className="cf-text-link"
               >
-
                 <span>
                   Discover Our Story
                 </span>
 
-                <ArrowUpRight
-                  size={17}
-                  strokeWidth={1.6}
-                />
-
+                <ArrowRight size={17} />
               </Link>
 
             </div>
@@ -551,404 +627,352 @@ export default function Home() {
       </section>
 
 
-
-      {/* ==========================================================
+      {/* =========================================================
           03 — WHAT WE DO
-      ========================================================== */}
+      ========================================================= */}
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-program
-        "
-      >
+      <section className="cf-section cf-section-soft">
 
-        <div className="cf-program">
+        <div className="cf-container">
 
-          <div className="cf-container">
+          <div className="cf-section-header">
 
+            <SectionNumber number="03" />
 
-            <div className="cf-program__intro">
+            <div>
 
-              <div className="cf-program__index">
-
-                <span>
-                  02
-                </span>
-
-                <div className="cf-program__index-line">
-                  <i />
-                </div>
-
-              </div>
-
-
-              <div className="cf-program__intro-content">
-
-                <span className="cf-eyebrow">
-                  WHAT WE DO
-                </span>
-
-                <h2>
-                  Creating pathways for
-                  <em>
-                    {" "}institutions, ideas,
-                  </em>
-                  {" "}and people to work
-                  across borders.
-                </h2>
-
-                <p>
-                  We connect universities,
-                  entrepreneurs, businesses,
-                  investors, government leaders,
-                  and emerging leaders to create
-                  meaningful opportunities between
-                  Africa and the United States.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="cf-program__cards">
-
-              <ProgramCard
-                number="01"
-                icon={
-                  <GraduationCap
-                    size={30}
-                    strokeWidth={1.5}
-                  />
-                }
-                title="University Partnerships"
-                text="We work with universities to build meaningful institutional relationships between Africa and the United States."
-              />
-
-
-              <ProgramCard
-                number="02"
-                icon={
-                  <Lightbulb
-                    size={30}
-                    strokeWidth={1.5}
-                  />
-                }
-                title="Innovation & Entrepreneurship"
-                text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
-              />
-
-
-              <ProgramCard
-                number="03"
-                icon={
-                  <Handshake
-                    size={30}
-                    strokeWidth={1.5}
-                  />
-                }
-                title="Strategic Collaboration"
-                text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
-              />
-
-
-              <ProgramCard
-                number="04"
-                icon={
-                  <Globe2
-                    size={30}
-                    strokeWidth={1.5}
-                  />
-                }
-                title="Leadership Development"
-                text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
-              />
-
-            </div>
-
-
-            <div className="cf-program__footer">
-
-              <Link
-                to="/programs"
-                className="cf-text-link"
-              >
-
-                <span>
-                  Explore Our Programs
-                </span>
-
-                <ArrowUpRight
-                  size={18}
-                  strokeWidth={1.5}
-                />
-
-              </Link>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-
-      {/* ==========================================================
-          04 — VISION
-      ========================================================== */}
-
-      <section
-        className="
-          cf-stack-section
-          cf-stack-vision
-        "
-      >
-
-        <section className="cf-vision">
-
-          <div className="cf-vision__content">
-
-            <div className="cf-vision__copy">
-
-              <div className="cf-label cf-label--gold">
-
-                <span />
-
-                Our Vision
-
-              </div>
-
-              <span className="cf-vision__number">
-                03
+              <span className="cf-eyebrow">
+                WHAT WE DO
               </span>
 
               <h2>
-
-                A stronger
-                <br />
-
-                relationship between
-                <br />
-
-                Africa and America.
-
+                Creating pathways for{" "}
+                <em>
+                  institutions, ideas,
+                </em>{" "}
+                and people to work across
+                borders.
               </h2>
 
-              <p>
-                We envision a future where
-                universities and institutions
-                across both continents work
-                together as equal partners to
-                expand education, innovation,
-                entrepreneurship, leadership,
-                and opportunity.
+              <p className="cf-section-intro">
+                We connect universities,
+                entrepreneurs, businesses,
+                investors, government leaders,
+                and emerging leaders to create
+                meaningful opportunities between
+                Africa and the United States.
               </p>
-
-              <p>
-                Continental Founders™ seeks to
-                create relationships that move
-                beyond traditional exchanges
-                toward practical collaboration
-                and long-term institutional
-                impact.
-              </p>
-
-              <Link
-                to="/about"
-                className="cf-vision__link"
-              >
-
-                Learn More About Our Vision
-
-                <ArrowUpRight size={15} />
-
-              </Link>
-
-            </div>
-
-
-            <div
-              className="cf-video"
-              ref={videoFrameRef}
-            >
-
-              <video
-                ref={videoRef}
-                playsInline
-                preload="metadata"
-                className="cf-video__player"
-              >
-
-                <source
-                  src="/assets/intro 1.mp4"
-                  type="video/mp4"
-                />
-
-              </video>
-
-
-              {!isPlaying && (
-
-                <button
-                  type="button"
-                  className="cf-video__center-play"
-                  onClick={toggleVideo}
-                  aria-label="Play Continental Founders promotional video"
-                >
-
-                  <Play
-                    size={29}
-                    fill="currentColor"
-                  />
-
-                </button>
-
-              )}
-
-
-              <div className="cf-video__controls">
-
-                <button
-                  type="button"
-                  onClick={toggleVideo}
-                >
-
-                  {isPlaying ? (
-                    <Pause size={17} />
-                  ) : (
-                    <Play
-                      size={17}
-                      fill="currentColor"
-                    />
-                  )}
-
-                </button>
-
-
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                >
-
-                  {isMuted ? (
-                    <VolumeX size={18} />
-                  ) : (
-                    <Volume2 size={18} />
-                  )}
-
-                </button>
-
-
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.01"
-                  value={
-                    isMuted
-                      ? 0
-                      : volume
-                  }
-                  onChange={changeVolume}
-                />
-
-
-                <span className="cf-video__time">
-                  0:00 / 1:38
-                </span>
-
-
-                <button
-                  type="button"
-                  onClick={toggleFullscreen}
-                >
-
-                  {isFullscreen ? (
-                    <Minimize size={17} />
-                  ) : (
-                    <Maximize size={17} />
-                  )}
-
-                </button>
-
-              </div>
 
             </div>
 
           </div>
 
-        </section>
+
+          <div className="cf-program-grid">
+
+            <ProgramCard
+              number="01"
+              icon={<GraduationCap />}
+              title="University Partnerships"
+              text="We work with universities to build meaningful institutional relationships between Africa and the United States."
+            />
+
+            <ProgramCard
+              number="02"
+              icon={<Lightbulb />}
+              title="Innovation & Entrepreneurship"
+              text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
+            />
+
+            <ProgramCard
+              number="03"
+              icon={<Handshake />}
+              title="Strategic Collaboration"
+              text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
+            />
+
+            <ProgramCard
+              number="04"
+              icon={<Globe2 />}
+              title="Leadership Development"
+              text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
+            />
+
+          </div>
+
+
+          <div className="cf-centered-link">
+
+            <Link
+              to="/programs"
+              className="cf-text-link"
+            >
+              <span>
+                Explore Our Programs
+              </span>
+
+              <ArrowRight size={17} />
+            </Link>
+
+          </div>
+
+        </div>
 
       </section>
 
 
+      {/* =========================================================
+          04 — VISION + VIDEO
+      ========================================================= */}
 
-      {/* ==========================================================
-          05 — OUR MODEL
-      ========================================================== */}
+      <section className="cf-vision-section">
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-model
-        "
-      >
+        <div className="cf-container cf-vision-grid">
 
-        <section className="cf-model">
+          <div className="cf-vision-content">
 
-          <div className="cf-container cf-model__grid">
+            <div className="cf-section-marker cf-section-marker--light">
 
-            <div className="cf-model__intro">
+              <span>04</span>
 
-              <span>
-                04
-              </span>
+              <i />
 
-              <div className="cf-index-line">
-                <i />
-              </div>
-
-              <h3>
-                Our Model
-              </h3>
-
-              <p>
-                From shared purpose
-                <br />
-                to practical
-                <br />
-                collaboration.
-              </p>
+              <strong>
+                OUR VISION
+              </strong>
 
             </div>
 
 
+            <h2>
+              A stronger relationship
+              between Africa and America.
+            </h2>
+
+
+            <p>
+              We envision a future where
+              universities and institutions
+              across both continents work
+              together as equal partners to
+              expand education, innovation,
+              entrepreneurship, leadership,
+              and opportunity.
+            </p>
+
+
+            <p>
+              Continental Founders™ seeks to
+              create relationships that move
+              beyond traditional exchanges
+              toward practical collaboration
+              and long-term institutional
+              impact.
+            </p>
+
+
+            <Link
+              to="/about"
+              className="cf-vision-link"
+            >
+              <span>
+                Learn More About Our Vision
+              </span>
+
+              <ArrowRight size={17} />
+            </Link>
+
+          </div>
+
+
+          {/* VIDEO */}
+
+          <div
+            className="cf-video"
+            ref={videoFrameRef}
+          >
+
+            <video
+              ref={videoRef}
+              playsInline
+              preload="metadata"
+              className="cf-video__player"
+            >
+              <source
+                src="/assets/intro 1.mp4"
+                type="video/mp4"
+              />
+
+              Your browser does not
+              support HTML5 video.
+            </video>
+
+
+            {!isPlaying && (
+              <button
+                type="button"
+                className="cf-video__play"
+                onClick={toggleVideo}
+                aria-label="Play video"
+              >
+                <Play
+                  size={34}
+                  fill="currentColor"
+                />
+              </button>
+            )}
+
+
+            <div className="cf-video__controls">
+
+              <button
+                type="button"
+                onClick={toggleVideo}
+                aria-label={
+                  isPlaying
+                    ? "Pause video"
+                    : "Play video"
+                }
+              >
+                {isPlaying ? (
+                  <Pause size={17} />
+                ) : (
+                  <Play
+                    size={17}
+                    fill="currentColor"
+                  />
+                )}
+              </button>
+
+
+              <button
+                type="button"
+                onClick={toggleMute}
+                aria-label={
+                  isMuted
+                    ? "Unmute video"
+                    : "Mute video"
+                }
+              >
+                {isMuted ? (
+                  <VolumeX size={18} />
+                ) : (
+                  <Volume2 size={18} />
+                )}
+              </button>
+
+
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={
+                  isMuted
+                    ? 0
+                    : volume
+                }
+                onChange={changeVolume}
+                aria-label="Volume"
+              />
+
+
+              <input
+                type="range"
+                className="cf-video__progress"
+                min="0"
+                max={duration || 0}
+                step="0.01"
+                value={currentTime}
+                onChange={changeVideoTime}
+                aria-label="Video progress"
+              />
+
+
+              <span>
+                {formatTime(currentTime)}
+                {" / "}
+                {formatTime(duration)}
+              </span>
+
+
+              <button
+                type="button"
+                onClick={toggleFullscreen}
+                aria-label="Fullscreen"
+              >
+                {isFullscreen ? (
+                  <Minimize size={17} />
+                ) : (
+                  <Maximize size={17} />
+                )}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================
+          05 — OUR MODEL
+      ========================================================= */}
+
+      <section className="cf-section cf-section-white">
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <SectionNumber number="05" />
+
+            <div>
+
+              <span className="cf-eyebrow">
+                OUR MODEL
+              </span>
+
+              <h2>
+                From shared purpose to{" "}
+                <em>
+                  practical collaboration.
+                </em>
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div className="cf-model-grid">
+
             <ModelStep
-              icon={<Users size={24} />}
+              number="01"
+              icon={<Users />}
               title="CONNECT"
               text="Universities and strategic partners connect around shared goals, expertise, and opportunity."
             />
 
-
             <ModelStep
-              icon={<Search size={24} />}
+              number="02"
+              icon={<Search />}
               title="EXPLORE"
               text="Students and institutions explore challenges, ideas, markets, research, and opportunities."
             />
 
-
             <ModelStep
-              icon={<Lightbulb size={24} />}
+              number="03"
+              icon={<Lightbulb />}
               title="BUILD"
               text="Teams develop practical ideas through entrepreneurship, innovation, mentorship, and collaboration."
             />
 
-
             <ModelStep
-              icon={<Rocket size={24} />}
+              number="04"
+              icon={<Rocket />}
               title="ADVANCE"
               text="Promising initiatives move forward through partnerships, resources, networks, and institutional support."
             />
@@ -956,64 +980,62 @@ export default function Home() {
           </div>
 
 
-          <div className="cf-container cf-model__footer">
+          <div className="cf-centered-link">
 
             <Link
               to="/our-model"
-              className="cf-text-link cf-text-link--light"
+              className="cf-text-link"
             >
+              <span>
+                Understand Our Model
+              </span>
 
-              Understand Our Model
-
-              <ArrowUpRight size={15} />
-
+              <ArrowRight size={17} />
             </Link>
 
           </div>
 
-        </section>
+        </div>
 
       </section>
 
 
-
-      {/* ==========================================================
+      {/* =========================================================
           06 — WHY IT MATTERS
-      ========================================================== */}
+      ========================================================= */}
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-matters
-        "
-      >
+      <section className="cf-section cf-section-soft">
 
-        <section className="cf-matters">
+        <div className="cf-container">
 
-          <div className="cf-container cf-matters__grid">
+          <div className="cf-section-header">
 
-            <div className="cf-matters__intro">
+            <SectionNumber number="06" />
 
-              <span>
-                05
+            <div>
+
+              <span className="cf-eyebrow">
+                WHY IT MATTERS
               </span>
 
-              <div className="cf-index-line">
-                <i />
-              </div>
+              <h2>
+                Partnership should create{" "}
+                <em>
+                  lasting value.
+                </em>
+              </h2>
 
-              <h3>
-                Why It Matters
-              </h3>
-
-              <p>
-                Partnership should create
-                lasting value, not simply
-                another institutional connection.
+              <p className="cf-section-intro">
+                Not simply another institutional
+                connection.
               </p>
 
             </div>
 
+          </div>
+
+
+          <div className="cf-matters-grid">
 
             <Matter
               number="01"
@@ -1021,20 +1043,17 @@ export default function Home() {
               text="African and American institutions bring knowledge, expertise, perspective, networks, and opportunity to one another."
             />
 
-
             <Matter
               number="02"
               title="PRACTICAL"
               text="The initiative focuses on practical collaboration, entrepreneurship, innovation, research, leadership, and measurable outcomes."
             />
 
-
             <Matter
               number="03"
               title="INCLUSIVE"
               text="Universities, businesses, government, investors, researchers, entrepreneurs, and students can each contribute to the ecosystem."
             />
-
 
             <Matter
               number="04"
@@ -1044,157 +1063,120 @@ export default function Home() {
 
           </div>
 
-        </section>
+        </div>
 
       </section>
 
 
-
-      {/* ==========================================================
+      {/* =========================================================
           07 — UNIVERSITY PARTNERSHIPS
-      ========================================================== */}
+      ========================================================= */}
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-founding
-        "
-      >
+      <section className="cf-partnership-section">
 
-        <section className="cf-founding">
+        <div className="cf-container cf-partnership-grid">
 
-          <div className="cf-container cf-founding__grid">
+          <div className="cf-partnership-image">
 
-            <div className="cf-founding__globe">
+            <img
+              src="/assets/images/global-network-globe.png"
+              alt="Global university partnership network"
+              loading="lazy"
+            />
 
-              <img
-                src="/assets/images/global-network-globe.png"
-                alt="Global network representing Continental Founders partnerships"
-              />
+          </div>
+
+
+          <div className="cf-partnership-content">
+
+            <div className="cf-section-marker">
+
+              <span>07</span>
+
+              <i />
+
+              <strong>
+                UNIVERSITY PARTNERSHIPS
+              </strong>
 
             </div>
 
 
-            <div className="cf-founding__content">
+            <h2>
+              Help shape the initiative
+              from the ground up.
+            </h2>
 
+
+            <p>
+              Continental Founders™ is currently
+              in its partnership development phase
+              and is intentionally engaging
+              universities interested in shaping
+              the future of the initiative.
+            </p>
+
+
+            <p>
+              Founding university partners will
+              have an opportunity to contribute
+              perspective, expertise, institutional
+              context, and ideas as the academic
+              framework and student experience
+              continue to develop.
+            </p>
+
+
+            <Link
+              to="/university-partnerships"
+              className="cf-button cf-button--gold"
+            >
               <span>
-                06
+                Become a University Partner
               </span>
 
-              <div className="cf-index-line">
-                <i />
-              </div>
+              <ArrowRight size={17} />
+            </Link>
 
-              <h3>
-                University Partnerships
-              </h3>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================
+          08 — ECOSYSTEM
+      ========================================================= */}
+
+      <section className="cf-section cf-section-white">
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <SectionNumber number="08" />
+
+            <div>
+
+              <span className="cf-eyebrow">
+                OUR PARTNERSHIP ECOSYSTEM
+              </span>
 
               <h2>
-                Help shape the initiative
-                <br />
-                from the ground up.
+                A global network of
+                institutions working toward{" "}
+                <em>
+                  shared opportunity.
+                </em>
               </h2>
-
-            </div>
-
-
-            <div className="cf-founding__copy">
-
-              <p>
-                Continental Founders™ is currently
-                in its partnership development
-                phase and is intentionally engaging
-                universities interested in shaping
-                the future of the initiative.
-              </p>
-
-              <p>
-                Founding university partners will
-                have an opportunity to contribute
-                perspective, expertise, institutional
-                context, and ideas as the academic
-                framework and student experience
-                continue to develop.
-              </p>
-
-            </div>
-
-
-            <div className="cf-founding__action">
-
-              <Link
-                to="/university-partnerships"
-                className="cf-button cf-button--gold"
-              >
-
-                Become a University Partner
-
-                <ArrowUpRight size={15} />
-
-              </Link>
 
             </div>
 
           </div>
 
-        </section>
 
-      </section>
-
-
-
-      {/* ==========================================================
-          08 — PARTNERSHIP ECOSYSTEM
-      ========================================================== */}
-
-      <section
-        className="
-          cf-stack-section
-          cf-stack-ecosystem
-        "
-      >
-
-        <section className="cf-ecosystem">
-
-          <div className="cf-container cf-ecosystem__grid">
-
-            <div className="cf-ecosystem__intro">
-
-              <span>
-                07
-              </span>
-
-              <div className="cf-index-line">
-                <i />
-              </div>
-
-              <h3>
-                Our Partnership
-                <br />
-                Ecosystem
-              </h3>
-
-              <p>
-                A global network of institutions
-                and organizations working toward
-                shared opportunity.
-              </p>
-
-              <Link
-                to="/strategic-partners"
-                className="cf-text-link"
-              >
-
-                <span>
-                  Explore Strategic Partnerships
-                </span>
-
-                <ArrowUpRight size={15} />
-
-              </Link>
-
-            </div>
-
+          <div className="cf-ecosystem-grid">
 
             <EcosystemCard
               icon={<GraduationCap />}
@@ -1202,13 +1184,11 @@ export default function Home() {
               text="Academic institutions across Africa and the United States."
             />
 
-
             <EcosystemCard
               icon={<Building2 />}
               title="Businesses"
               text="Corporate partners supporting innovation, mentorship, and growth."
             />
-
 
             <EcosystemCard
               icon={<Landmark />}
@@ -1216,20 +1196,17 @@ export default function Home() {
               text="Public sector leaders supporting policy, collaboration, and opportunity."
             />
 
-
             <EcosystemCard
               icon={<TrendingUp />}
               title="Investors"
               text="Partners supporting promising ventures, entrepreneurs, and innovation."
             />
 
-
             <EcosystemCard
               icon={<BriefcaseBusiness />}
               title="Entrepreneurs"
               text="Founders and innovators developing solutions and building opportunity."
             />
-
 
             <EcosystemCard
               icon={<Microscope />}
@@ -1239,319 +1216,238 @@ export default function Home() {
 
           </div>
 
-        </section>
+
+          <div className="cf-centered-link">
+
+            <Link
+              to="/strategic-partners"
+              className="cf-text-link"
+            >
+              <span>
+                Explore Strategic Partnerships
+              </span>
+
+              <ArrowRight size={17} />
+            </Link>
+
+          </div>
+
+        </div>
 
       </section>
 
 
-
-      {/* ==========================================================
+      {/* =========================================================
           09 — STRATEGIC PARTNERS
-      ========================================================== */}
+      ========================================================= */}
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-partners
-        "
-      >
+      <section className="cf-strategic-section">
 
-        <section className="cf-partners">
+        <div className="cf-container cf-strategic-grid">
 
-          <div className="cf-container cf-partners__grid">
+          <div className="cf-strategic-content">
 
+            <div className="cf-section-marker cf-section-marker--light">
 
-            <div className="cf-partners__visual">
+              <span>09</span>
 
-              <div className="cf-partners__visual-frame">
+              <i />
 
-                <img
-                  src="/assets/images/ecosystem-globe.png"
-                  alt="Continental Founders global partnership ecosystem"
-                />
-
-              </div>
+              <strong>
+                SPONSORS & STRATEGIC PARTNERS
+              </strong>
 
             </div>
 
 
-            <div className="cf-partners__content">
+            <h2>
+              Invest in a new generation
+              of{" "}
+              <em>
+                cross-continental opportunity.
+              </em>
+            </h2>
 
-              <div className="cf-partners__number">
 
+            <p>
+              Continental Founders™ brings
+              universities, businesses,
+              government, investors, and
+              innovation leaders together to
+              create meaningful opportunities
+              across Africa and the United States.
+            </p>
+
+
+            <p>
+              Strategic partners can contribute
+              expertise, funding, networks,
+              mentorship, technology, research,
+              and other resources that help
+              strengthen the Continental Founders™
+              ecosystem.
+            </p>
+
+
+            <div className="cf-actions">
+
+              <Link
+                to="/strategic-partners"
+                className="cf-button cf-button--gold"
+              >
                 <span>
-                  08
-                </span>
-
-                <div className="cf-index-line">
-                  <i />
-                </div>
-
-              </div>
-
-
-              <div className="cf-eyebrow">
-                SPONSORS &amp; STRATEGIC PARTNERS
-              </div>
-
-
-              <h2>
-
-                Invest in a new
-                generation of
-                <span>
-                  cross-continental
-                  opportunity.
-                </span>
-
-              </h2>
-
-
-              <p className="cf-partners__lead">
-
-                Continental Founders™ brings
-                universities, businesses,
-                government, investors, and
-                innovation leaders together to
-                create meaningful opportunities
-                across Africa and the United States.
-
-              </p>
-
-
-              <p className="cf-partners__description">
-
-                Strategic partners can contribute
-                expertise, funding, networks,
-                mentorship, technology, research,
-                and other resources that help
-                strengthen the Continental Founders™
-                ecosystem.
-
-              </p>
-
-
-              <div className="cf-partners__actions">
-
-                <Link
-                  to="/strategic-partners"
-                  className="cf-button cf-button--gold"
-                >
-
                   Become a Strategic Partner
+                </span>
 
-                  <ArrowUpRight size={15} />
+                <ArrowUpRight size={17} />
+              </Link>
 
-                </Link>
 
-
-                <Link
-                  to="/strategic-partners"
-                  className="cf-text-link"
-                >
-
+              <Link
+                to="/strategic-partners"
+                className="cf-vision-link"
+              >
+                <span>
                   Partnership Opportunities
-
-                  <ArrowRight size={15} />
-
-                </Link>
-
-              </div>
-
-
-              <div className="cf-partners__types">
-
-                <span>
-                  Expertise
                 </span>
 
-                <span>
-                  Funding
-                </span>
-
-                <span>
-                  Networks
-                </span>
-
-                <span>
-                  Mentorship
-                </span>
-
-                <span>
-                  Research
-                </span>
-
-              </div>
+                <ArrowRight size={17} />
+              </Link>
 
             </div>
 
           </div>
 
-        </section>
 
-      </section>
+          <div className="cf-strategic-visual">
 
-
-
-      {/* ==========================================================
-          10 — CONFERENCE
-      ========================================================== */}
-
-      <section
-        className="
-          cf-stack-section
-          cf-stack-conference
-        "
-      >
-
-        <section className="cf-conference">
-
-          <div className="cf-conference__globe">
-
-            <Globe2
-              size={320}
-              strokeWidth={0.25}
+            <img
+              src="/assets/images/ecosystem-globe.png"
+              alt="Continental Founders partnership ecosystem"
+              loading="lazy"
             />
 
           </div>
 
+        </div>
 
-          <div className="cf-container cf-conference__grid">
-
-            <div className="cf-conference__label">
-
-              <span>
-                09
-              </span>
-
-              <div className="cf-index-line">
-                <i />
-              </div>
-
-              <small>
-                Conference & Events
-              </small>
-
-            </div>
+      </section>
 
 
-            <div className="cf-conference__title">
+      {/* =========================================================
+          10 — CONFERENCE
+      ========================================================= */}
 
-              <h2>
+      <section className="cf-conference-section">
 
-                USA–AFRICA
-                <br />
-                CONFERENCE
+        <div className="cf-container cf-conference-grid">
 
-              </h2>
+          <div className="cf-conference-info">
 
-              <p>
-                UNGA WEEK · NEW YORK CITY
-              </p>
+            <div className="cf-section-marker">
 
-              <span>
+              <span>10</span>
 
-                Join the conversation as
-                Continental Founders™ introduces
-                its vision for a new generation of
-                cross-continental education,
-                entrepreneurship, leadership,
-                commerce, and innovation.
-
-              </span>
-
-            </div>
-
-
-            <div className="cf-conference__date">
+              <i />
 
               <strong>
-                23
+                CONFERENCE & EVENTS
               </strong>
 
-              <div>
-
-                <span>
-                  SEPTEMBER
-                </span>
-
-                <span>
-                  2026
-                </span>
-
-              </div>
+            </div>
 
 
-              <Link
-                to="/events"
-                className="cf-button cf-button--gold"
-              >
+            <h2>
+              USA–AFRICA
+              <br />
+              <em>
+                CONFERENCE
+              </em>
+            </h2>
 
+
+            <span className="cf-conference-location">
+              UNGA WEEK · NEW YORK CITY
+            </span>
+
+
+            <p>
+              Join the conversation as
+              Continental Founders™ introduces
+              its vision for a new generation of
+              cross-continental education,
+              entrepreneurship, leadership,
+              commerce, and innovation.
+            </p>
+
+
+            <Link
+              to="/events"
+              className="cf-button cf-button--gold"
+            >
+              <span>
                 Event Information
+              </span>
 
-                <ArrowUpRight size={15} />
+              <ArrowUpRight size={17} />
+            </Link>
 
-              </Link>
+          </div>
+
+
+          <div className="cf-conference-date">
+
+            <strong>
+              23
+            </strong>
+
+            <span>
+              SEPTEMBER
+            </span>
+
+            <span>
+              2026
+            </span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================
+          11 — NEWS
+      ========================================================= */}
+
+      <section className="cf-section cf-section-soft">
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <SectionNumber number="11" />
+
+            <div>
+
+              <span className="cf-eyebrow">
+                NEWS & UPDATES
+              </span>
+
+              <h2>
+                Announcements,
+                developments, and{" "}
+                <em>
+                  milestones.
+                </em>
+              </h2>
 
             </div>
 
           </div>
 
-        </section>
 
-      </section>
-
-
-
-      {/* ==========================================================
-          11 — NEWS & UPDATES
-      ========================================================== */}
-
-      <section
-        className="
-          cf-stack-section
-          cf-stack-insights
-        "
-      >
-
-        <section className="cf-insights">
-
-          <div className="cf-container cf-insights__grid">
-
-            <div className="cf-insights__intro">
-
-              <span>
-                10
-              </span>
-
-              <div className="cf-index-line">
-                <i />
-              </div>
-
-              <h3>
-                News & Updates
-              </h3>
-
-              <p>
-                Announcements,
-                developments,
-                partnerships,
-                and milestones.
-              </p>
-
-              <Link
-                to="/insights"
-                className="cf-text-link"
-              >
-
-                View All Insights
-
-                <ArrowUpRight size={15} />
-
-              </Link>
-
-            </div>
-
+          <div className="cf-news-grid">
 
             <Insight
               image="/assets/images/university-partnerships.jpg"
@@ -1561,7 +1457,6 @@ export default function Home() {
               text="The initiative begins conversations with institutions interested in shaping a new model for Africa–United States collaboration."
             />
 
-
             <Insight
               image="/assets/images/innovation-entrepreneurship.jpg"
               category="INSIGHT"
@@ -1569,7 +1464,6 @@ export default function Home() {
               title="Why Cross-Continental Collaboration Matters"
               text="Exploring the opportunities created when universities and institutions work together across continents."
             />
-
 
             <Insight
               image="/assets/images/leadership-collaboration.jpg"
@@ -1581,143 +1475,143 @@ export default function Home() {
 
           </div>
 
-        </section>
 
-      </section>
+          <div className="cf-centered-link">
 
-
-
-      {/* ==========================================================
-          12 — MATERIALS
-      ========================================================== */}
-
-      <section
-        className="
-          cf-stack-section
-          cf-stack-materials
-        "
-      >
-
-        <section className="cf-materials">
-
-          <div className="cf-container cf-materials__grid">
-
-            <div>
-
+            <Link
+              to="/insights"
+              className="cf-text-link"
+            >
               <span>
-                PARTNERSHIP MATERIALS
+                View All Insights
               </span>
 
-              <h2>
-                Explore the opportunity
-                to work with us.
-              </h2>
-
-            </div>
-
-
-            <p>
-
-              Access information about
-              Continental Founders™, our
-              partnership approach, and
-              opportunities for universities,
-              sponsors, and strategic partners.
-
-            </p>
-
-
-            <a
-              href="/assets/documents/continental-founders-partnership.pdf"
-              className="cf-button cf-button--gold"
-              target="_blank"
-              rel="noreferrer"
-            >
-
-              Download Partnership Materials
-
-              <Download size={16} />
-
-            </a>
+              <ArrowRight size={17} />
+            </Link>
 
           </div>
 
-        </section>
+        </div>
 
       </section>
 
 
+      {/* =========================================================
+          PARTNERSHIP MATERIALS
+      ========================================================= */}
 
-      {/* ==========================================================
-          13 — FINAL CTA
-      ========================================================== */}
+      <section className="cf-materials-section">
 
-      <section
-        className="
-          cf-stack-section
-          cf-stack-final
-        "
-      >
+        <div className="cf-container cf-materials-grid">
 
-        <section className="cf-final">
+          <div>
 
-          <div className="cf-container">
-
-            <span>
-              11
+            <span className="cf-eyebrow">
+              PARTNERSHIP MATERIALS
             </span>
 
-            <div className="cf-index-line">
-              <i />
-            </div>
-
             <h2>
-              Let's Build Together
+              Explore the opportunity
+              to work with us.
             </h2>
-
-            <p>
-
-              Stronger institutions.
-              <br />
-
-              Greater opportunity.
-              <br />
-
-              One shared direction.
-
-            </p>
-
-
-            <div className="cf-final__actions">
-
-              <Link
-                to="/contact"
-                className="cf-button cf-button--gold"
-              >
-
-                Schedule a Meeting
-
-                <CalendarDays size={16} />
-
-              </Link>
-
-
-              <Link
-                to="/contact"
-                className="cf-button cf-button--outline"
-              >
-
-                Contact Continental Founders™
-
-                <Mail size={16} />
-
-              </Link>
-
-            </div>
 
           </div>
 
-        </section>
+
+          <p>
+            Access information about
+            Continental Founders™, our
+            partnership approach, and
+            opportunities for universities,
+            sponsors, and strategic partners.
+          </p>
+
+
+          <a
+            href="/assets/documents/continental-founders-partnership.pdf"
+            className="cf-button cf-button--gold"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>
+              Download Partnership Materials
+            </span>
+
+            <Download size={17} />
+          </a>
+
+        </div>
+
+      </section>
+
+
+      {/* =========================================================
+          12 — FINAL CTA
+      ========================================================= */}
+
+      <section className="cf-final-section">
+
+        <div className="cf-container">
+
+          <div className="cf-section-marker cf-section-marker--light">
+
+            <span>12</span>
+
+            <i />
+
+            <strong>
+              CONTINENTAL FOUNDERS™
+            </strong>
+
+          </div>
+
+
+          <h2>
+            Let's Build
+            <br />
+            <em>
+              Together.
+            </em>
+          </h2>
+
+
+          <p>
+            Stronger institutions.
+            <br />
+            Greater opportunity.
+            <br />
+            One shared direction.
+          </p>
+
+
+          <div className="cf-actions">
+
+            <Link
+              to="/contact"
+              className="cf-button cf-button--gold"
+            >
+              <span>
+                Schedule a Meeting
+              </span>
+
+              <CalendarDays size={17} />
+            </Link>
+
+
+            <Link
+              to="/contact"
+              className="cf-button cf-button--outline-light"
+            >
+              <span>
+                Contact Continental Founders™
+              </span>
+
+              <Mail size={17} />
+            </Link>
+
+          </div>
+
+        </div>
 
       </section>
 
@@ -1725,6 +1619,64 @@ export default function Home() {
   );
 }
 
+
+/* ============================================================
+   QUICK HIGHLIGHT
+============================================================ */
+
+function QuickHighlight({
+  number,
+  icon,
+  title,
+  text,
+}) {
+  return (
+    <div className="cf-quick-item">
+
+      <div className="cf-quick-icon">
+        {icon}
+      </div>
+
+      <span className="cf-quick-number">
+        {number}
+      </span>
+
+      <div className="cf-quick-content">
+
+        <strong>
+          {title}
+        </strong>
+
+        <small>
+          {text}
+        </small>
+
+      </div>
+
+    </div>
+  );
+}
+
+
+/* ============================================================
+   SECTION NUMBER
+============================================================ */
+
+function SectionNumber({
+  number,
+}) {
+  return (
+    <div className="cf-section-number">
+
+      <span>
+        {number}
+      </span>
+
+      <i />
+
+    </div>
+  );
+}
 
 
 /* ============================================================
@@ -1740,26 +1692,36 @@ function ProgramCard({
   return (
     <article className="cf-program-card">
 
-      <div className="cf-program-card__icon">
-        {icon}
+      <div className="cf-card-top">
+
+        <div className="cf-card-icon">
+          {icon}
+        </div>
+
+        <span>
+          {number}
+        </span>
+
       </div>
 
-      <span className="cf-program-card__number">
-        {number}
-      </span>
 
       <h3>
         {title}
       </h3>
 
+
       <p>
         {text}
       </p>
 
+
+      <span className="cf-card-arrow">
+        <ArrowUpRight size={17} />
+      </span>
+
     </article>
   );
 }
-
 
 
 /* ============================================================
@@ -1767,6 +1729,7 @@ function ProgramCard({
 ============================================================ */
 
 function ModelStep({
+  number,
   icon,
   title,
   text,
@@ -1774,17 +1737,23 @@ function ModelStep({
   return (
     <article className="cf-model-step">
 
-      <div className="cf-model-step__icon">
-        {icon}
+      <div className="cf-model-step__top">
+
+        <span>
+          {number}
+        </span>
+
+        <div className="cf-model-icon">
+          {icon}
+        </div>
+
       </div>
 
-      <span className="cf-model-step__arrow">
-        →
-      </span>
 
-      <h4>
+      <h3>
         {title}
-      </h4>
+      </h3>
+
 
       <p>
         {text}
@@ -1793,7 +1762,6 @@ function ModelStep({
     </article>
   );
 }
-
 
 
 /* ============================================================
@@ -1808,13 +1776,15 @@ function Matter({
   return (
     <article className="cf-matter">
 
-      <span>
+      <span className="cf-matter-number">
         {number}
       </span>
+
 
       <h3>
         {title}
       </h3>
+
 
       <p>
         {text}
@@ -1823,7 +1793,6 @@ function Matter({
     </article>
   );
 }
-
 
 
 /* ============================================================
@@ -1838,13 +1807,15 @@ function EcosystemCard({
   return (
     <article className="cf-ecosystem-card">
 
-      <div className="cf-ecosystem-card__icon">
+      <div className="cf-ecosystem-icon">
         {icon}
       </div>
+
 
       <h3>
         {title}
       </h3>
+
 
       <p>
         {text}
@@ -1855,9 +1826,8 @@ function EcosystemCard({
 }
 
 
-
 /* ============================================================
-   INSIGHT
+   INSIGHT / NEWS CARD
 ============================================================ */
 
 function Insight({
@@ -1868,9 +1838,9 @@ function Insight({
   text,
 }) {
   return (
-    <article className="cf-insight">
+    <article className="cf-news-card">
 
-      <div className="cf-insight__image">
+      <div className="cf-news-image">
 
         <img
           src={image}
@@ -1881,7 +1851,7 @@ function Insight({
       </div>
 
 
-      <div className="cf-insight__meta">
+      <div className="cf-news-meta">
 
         <span>
           {category}
@@ -1906,13 +1876,13 @@ function Insight({
 
       <Link
         to="/insights"
-        className="cf-insight__link"
+        className="cf-text-link"
       >
+        <span>
+          Read More
+        </span>
 
-        Read More
-
-        <ArrowUpRight size={14} />
-
+        <ArrowUpRight size={16} />
       </Link>
 
     </article>

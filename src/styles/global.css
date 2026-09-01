@@ -1,15 +1,27 @@
 /* ============================================================
    GLOBAL TYPOGRAPHY & LAYOUT
+   Continental Founders™
 ============================================================ */
 
+html {
+  font-size: 20px;
+  scroll-behavior: smooth;
+}
+
 body {
+  margin: 0;
   color: var(--ink);
   background: var(--white);
+
   font-family: "Times New Roman", Times, serif;
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: 18px;
+  line-height: 1.72;
+
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+
+  overflow-x: hidden;
 }
 
 body,
@@ -30,8 +42,12 @@ select {
   overflow-x: clip;
 }
 
+/* ============================================================
+   GLOBAL CONTAINER
+============================================================ */
+
 .container {
-  width: min(calc(100% - 48px), var(--container));
+  width: min(calc(100% - 64px), var(--container));
   margin-inline: auto;
 }
 
@@ -47,7 +63,51 @@ select {
 .display {
   font-family: "Times New Roman", Times, serif;
   font-weight: 400;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
+}
+
+
+/* ============================================================
+   GLOBAL HEADINGS
+============================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: 400;
+  color: var(--navy-900);
+}
+
+h1 {
+  font-size: clamp(3.5rem, 6vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+h2 {
+  font-size: clamp(2.7rem, 4.5vw, 5rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+
+h3 {
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  line-height: 1.12;
+}
+
+h4 {
+  font-size: clamp(1.3rem, 1.8vw, 1.8rem);
+  line-height: 1.2;
+}
+
+p {
+  font-size: clamp(1.05rem, 1.15vw, 1.22rem);
+  line-height: 1.75;
 }
 
 
@@ -58,21 +118,21 @@ select {
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 
   color: var(--gold-600);
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .eyebrow::before {
   content: "";
 
-  width: 30px;
+  width: 34px;
   height: 1px;
 
   background: currentColor;
@@ -84,11 +144,11 @@ select {
 ============================================================ */
 
 .section {
-  padding: 120px 0;
+  padding: 128px 0;
 }
 
 .section--compact {
-  padding: 84px 0;
+  padding: 88px 0;
 }
 
 .section--dark {
@@ -106,20 +166,20 @@ select {
 ============================================================ */
 
 .section-heading {
-  max-width: 780px;
-  margin-bottom: 56px;
+  max-width: 820px;
+  margin-bottom: 60px;
 }
 
 .section-heading h2 {
-  margin-top: 16px;
+  margin-top: 18px;
 
   color: var(--navy-900);
 
   font-family: "Times New Roman", Times, serif;
-  font-size: clamp(2.6rem, 4.5vw, 4.5rem);
+  font-size: clamp(2.8rem, 4.7vw, 5rem);
   font-weight: 400;
   line-height: 1.04;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
 }
 
 .section--dark .section-heading h2 {
@@ -127,14 +187,14 @@ select {
 }
 
 .section-heading p {
-  max-width: 700px;
-  margin-top: 22px;
+  max-width: 720px;
+  margin-top: 24px;
 
   color: var(--muted);
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 1.18rem;
-  line-height: 1.75;
+  font-size: clamp(1.08rem, 1.2vw, 1.25rem);
+  line-height: 1.78;
 }
 
 .section--dark .section-heading p {
@@ -149,14 +209,14 @@ select {
 .text-link {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
 
   color: var(--navy-900);
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.035em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 
   transition:
@@ -166,7 +226,7 @@ select {
 
 .text-link:hover {
   color: var(--gold-600);
-  gap: 13px;
+  gap: 15px;
 }
 
 
@@ -178,39 +238,44 @@ select {
   color: var(--white);
   background: var(--navy-900);
 
-  padding: 120px 0 112px;
+  padding: 132px 0 120px;
 }
 
 .page-hero__inner {
   display: grid;
-  grid-template-columns: 1.25fr 0.75fr;
-  gap: 76px;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(280px, 0.75fr);
+
+  gap: 80px;
   align-items: end;
 }
 
 .page-hero h1 {
-  margin-top: 20px;
+  margin-top: 22px;
+  max-width: 920px;
 
-  max-width: 900px;
+  color: var(--white);
 
   font-family: "Times New Roman", Times, serif;
-  font-size: clamp(3.8rem, 7.5vw, 7rem);
+  font-size: clamp(4rem, 7.5vw, 7.2rem);
   font-weight: 400;
   line-height: 0.96;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.05em;
 }
 
 .page-hero p {
   color: #ccd6dd;
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 1.18rem;
-  line-height: 1.75;
+  font-size: clamp(1.1rem, 1.25vw, 1.3rem);
+  line-height: 1.78;
 }
 
 .page-hero__aside {
   border-left: 1px solid rgba(255, 255, 255, 0.22);
-  padding-left: 30px;
+  padding-left: 32px;
 }
 
 
@@ -232,40 +297,39 @@ select {
 }
 
 .prose h2 {
-  font-size: 2.8rem;
-  margin: 64px 0 20px;
+  font-size: clamp(2.6rem, 4vw, 4rem);
+  margin: 68px 0 22px;
 }
 
 .prose h3 {
-  font-size: 2rem;
-  margin: 42px 0 16px;
+  font-size: clamp(1.9rem, 2.5vw, 2.5rem);
+  margin: 46px 0 18px;
 }
 
 .prose p {
   color: #46515a;
 
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 1.15rem;
-  line-height: 1.8;
+  font-size: clamp(1.08rem, 1.15vw, 1.25rem);
+  line-height: 1.82;
 }
 
 .prose ul {
-  margin: 26px 0;
-  padding-left: 28px;
-
+  margin: 28px 0;
+  padding-left: 30px;
   list-style: disc;
 }
 
 .prose li {
   color: #46515a;
 
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 1.1rem;
-  line-height: 1.7;
+  font-size: clamp(1.05rem, 1.1vw, 1.2rem);
+  line-height: 1.75;
 }
 
 
@@ -277,9 +341,9 @@ select {
   color: #a62b2b;
 
   font-family: "Times New Roman", Times, serif;
-  font-size: 0.95rem;
+  font-size: 1rem;
 
-  margin-top: 7px;
+  margin-top: 8px;
 }
 
 
@@ -307,39 +371,119 @@ select {
 
 
 /* ============================================================
-   RESPONSIVE TYPOGRAPHY
+   LARGE DESKTOP
 ============================================================ */
 
-@media (max-width: 900px) {
+@media (min-width: 1400px) {
 
-  body {
-    font-size: 16.5px;
+  html {
+    font-size: 18px;
+  }
+
+  .container {
+    width: min(calc(100% - 96px), var(--container));
   }
 
   .section {
-    padding: 90px 0;
+    padding: 144px 0;
   }
 
   .page-hero {
-    padding: 90px 0;
+    padding: 150px 0 135px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET / SMALL LAPTOP
+============================================================ */
+
+@media (max-width: 1100px) {
+
+  .container {
+    width: min(calc(100% - 52px), var(--container));
   }
 
   .page-hero__inner {
     grid-template-columns: 1fr;
-    gap: 42px;
+    gap: 48px;
   }
 
   .page-hero h1 {
-    font-size: clamp(3.2rem, 10vw, 5.5rem);
+    font-size: clamp(3.6rem, 8vw, 6rem);
+  }
+
+  .section {
+    padding: 105px 0;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+  html {
+    font-size: 17px;
+  }
+
+  body {
+    font-size: 17px;
+  }
+
+  .container {
+    width: min(calc(100% - 44px), var(--container));
+  }
+
+  .section {
+    padding: 92px 0;
+  }
+
+  .section--compact {
+    padding: 70px 0;
+  }
+
+  .eyebrow {
+    font-size: 0.82rem;
+  }
+
+  .section-heading {
+    margin-bottom: 48px;
   }
 
   .section-heading h2 {
-    font-size: clamp(2.4rem, 7vw, 3.8rem);
+    font-size: clamp(2.5rem, 7vw, 4.2rem);
+  }
+
+  .section-heading p {
+    font-size: 1.1rem;
+  }
+
+  .page-hero {
+    padding: 100px 0 92px;
+  }
+
+  .page-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(3.3rem, 10vw, 5.8rem);
+  }
+
+  .page-hero p {
+    font-size: 1.1rem;
   }
 
   .prose p {
-    font-size: 1.1rem;
+    font-size: 1.08rem;
   }
+
 }
 
 
@@ -348,6 +492,10 @@ select {
 ============================================================ */
 
 @media (max-width: 600px) {
+
+  html {
+    font-size: 16px;
+  }
 
   body {
     font-size: 16px;
@@ -367,26 +515,37 @@ select {
   }
 
   .eyebrow {
+    gap: 8px;
+
     font-size: 0.74rem;
-    letter-spacing: 0.11em;
+    letter-spacing: 0.105em;
+  }
+
+  .eyebrow::before {
+    width: 24px;
   }
 
   .section-heading {
-    margin-bottom: 42px;
+    margin-bottom: 40px;
   }
 
   .section-heading h2 {
-    font-size: clamp(2.2rem, 10vw, 3.2rem);
+    font-size: clamp(2.3rem, 10vw, 3.5rem);
     line-height: 1.06;
   }
 
   .section-heading p {
-    font-size: 1.08rem;
-    line-height: 1.7;
+    font-size: 1.05rem;
+    line-height: 1.72;
+  }
+
+  .text-link {
+    font-size: 0.88rem;
+    gap: 8px;
   }
 
   .page-hero {
-    padding: 76px 0 72px;
+    padding: 78px 0 74px;
   }
 
   .page-hero h1 {
@@ -395,23 +554,64 @@ select {
   }
 
   .page-hero p {
-    font-size: 1.08rem;
+    font-size: 1.05rem;
+    line-height: 1.72;
+  }
+
+  .page-hero__aside {
+    padding-left: 22px;
   }
 
   .prose h2 {
-    font-size: 2.35rem;
+    font-size: 2.45rem;
   }
 
   .prose h3 {
-    font-size: 1.8rem;
+    font-size: 1.85rem;
   }
 
   .prose p {
-    font-size: 1.08rem;
+    font-size: 1.05rem;
     line-height: 1.78;
   }
 
   .prose li {
-    font-size: 1.05rem;
+    font-size: 1.03rem;
   }
+
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 380px) {
+
+  .container {
+    width: min(calc(100% - 26px), var(--container));
+  }
+
+  .section {
+    padding: 64px 0;
+  }
+
+  .page-hero {
+    padding: 68px 0 64px;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(2.65rem, 14vw, 4rem);
+  }
+
+  .section-heading h2 {
+    font-size: clamp(2.15rem, 11vw, 3rem);
+  }
+
+  .section-heading p,
+  .page-hero p,
+  .prose p {
+    font-size: 1rem;
+  }
+
 }

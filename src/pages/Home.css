@@ -73,8 +73,20 @@
 ============================================================ */
 
 .cf-container {
-  width: min(calc(100% - 96px), 1440px);
+  width: min(100% - 48px, 1440px);
   margin-inline: auto;
+}
+
+@media (min-width: 1600px) {
+  .cf-container {
+    width: min(100% - 80px, 1600px);
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-container {
+    width: calc(100% - 32px);
+  }
 }
 
 /* ============================================================
@@ -84,13 +96,33 @@
 .cf-home-hero {
   position: relative;
   width: 100%;
-  background: var(--cf-white);
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.95) 0%,
+      rgba(0, 18, 45, 0.75) 35%,
+      rgba(0, 18, 45, 0.25) 60%,
+      rgba(0, 18, 45, 0) 80%
+    ),
+    url('/assets/images/hero-partnership.jpg') center / cover no-repeat;
   overflow: hidden;
 }
 
-.cf-home-hero .cf-container {
-  width: min(calc(100% - 80px), 1440px);
+.cf-container {
+  width: min(100% - 48px, 1440px);
   margin-inline: auto;
+}
+
+@media (min-width: 1600px) {
+  .cf-container {
+    width: min(100% - 80px, 1600px);
+  }
+}
+
+@media (max-width: 768px) {
+  .cf-container {
+    width: calc(100% - 32px);
+  }
 }
 
 /* ============================================================
@@ -182,7 +214,7 @@
 
   max-width: 760px;
 
-  color: var(--cf-navy);
+  color: white;
 
   font-family:
     "Times New Roman",
@@ -213,7 +245,7 @@
 
   margin: 28px 0 0;
 
-  color: var(--cf-muted);
+ color: #929da7;
 
   font-family:
     Arial,

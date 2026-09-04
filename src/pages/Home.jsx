@@ -414,7 +414,7 @@ export default function Home() {
 
 
               <p className="cf-home-hero__lead">
-                Continental Founders™ is a newly
+                Continental Founders is a newly
                 established nonprofit building
                 strategic partnerships between
                 universities in Africa and the
@@ -465,16 +465,7 @@ export default function Home() {
                 HERO IMAGE
             ================================================= */}
 
-            <div className="cf-home-hero__visual">
-
-              <div className="cf-home-hero__image">
-
-                <img
-                  src="/assets/images/hero-partnership.jpg"
-                  alt="Africa and America connected through a global network"
-                />
-
-              </div>
+          
 
 
               <div className="cf-home-hero__visual-caption">
@@ -495,7 +486,7 @@ export default function Home() {
 
           </div>
 
-        </div>
+        
 
       </section>
 

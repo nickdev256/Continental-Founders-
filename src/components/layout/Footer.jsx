@@ -314,61 +314,7 @@ export default function Footer() {
       </section>
 
 
-      {/* ======================================================
-          GLOBAL STATEMENT
-      ======================================================= */}
-
-      <section className="cf-footer__statement">
-
-        <div className="cf-footer__statement-glow" />
-
-        <div className="cf-footer__statement-container">
-
-          <div className="cf-footer__statement-content">
-
-            <div className="cf-footer__statement-label">
-              <span className="cf-footer__pulse" />
-
-              <span>
-                UNITED STATES × AFRICA
-              </span>
-            </div>
-
-            <h2>
-              Connecting institutions.
-              <br />
-              <span>Creating opportunity.</span>
-            </h2>
-
-            <p>
-              Building bridges between ideas, institutions,
-              entrepreneurs, and future leaders across continents.
-            </p>
-
-          </div>
-
-
-          <div className="cf-footer__statement-mark">
-
-            <div className="cf-footer__continent usa">
-              USA
-            </div>
-
-            <div className="cf-footer__connection">
-              <span />
-              <span />
-            </div>
-
-            <div className="cf-footer__continent africa">
-              AFRICA
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
+    
 
       {/* ======================================================
           BOTTOM

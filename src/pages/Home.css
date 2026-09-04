@@ -323,16 +323,15 @@
 }
 
 .cf-home-hero .cf-button--outline-dark {
-  color: var(--cf-navy);
-
+  color: var(--cf-white);
   background: transparent;
-
-  border: 1px solid var(--cf-navy);
+  border: 1px solid var(--cf-white);
 }
 
 .cf-home-hero .cf-button--outline-dark:hover {
-  color: var(--cf-white);
-  background: var(--cf-navy);
+  color: var(--cf-navy);
+  background: var(--cf-white);
+  border-color: var(--cf-white);
 }
 
 /* ============================================================
@@ -382,20 +381,22 @@
   max-width: 100%;
 }
 
+
 /* ============================================================
    IMAGE CAPTION
 ============================================================ */
 
 .cf-home-hero__visual-caption {
   width: min(100%, 560px);
-
   display: flex;
   align-items: center;
-
   gap: 16px;
 
-  margin-top: -10px;
+  position: absolute;
+  left: 0;
+  bottom: 20px;
 
+  margin-left: 1300px;
   padding: 12px 0;
 
   font-family:
@@ -405,17 +406,16 @@
 
   font-size: 0.72rem;
   font-weight: 700;
-
   letter-spacing: 0.14em;
 
-  color: var(--cf-navy);
+  color: var(--cf-white);
+
+  z-index: 10;
 }
 
 .cf-home-hero__visual-caption i {
   flex: 1;
-
   height: 1px;
-
   background: var(--cf-gold);
 }
 

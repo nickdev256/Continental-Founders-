@@ -132,6 +132,7 @@ export default function About() {
 
       <section className="about-hero">
 
+
         <div className="about-hero__background">
           <img
             src="/assets/images/about-hero.jpg"
@@ -141,19 +142,22 @@ export default function About() {
 
         <div className="about-hero__overlay" />
 
+        {/* <div className="about-hero__line about-hero__line--left" />
+        <div className="about-hero__line about-hero__line--right" /> */}
+
         <div className="container about-hero__inner">
 
           <div className="about-hero__content">
 
-<<<<<<< HEAD
+
             <span className="about-kicker about-kicker--light">
               ABOUT CONTINENTAL FOUNDERS™
             </span>
-=======
+
             <div className="about-kicker about-kicker--light">
             About Continental Founders
             </div>
->>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
+
 
             <h1>
               Building bridges.
@@ -163,8 +167,8 @@ export default function About() {
               Across continents.
             </h1>
 
-<<<<<<< HEAD
-=======
+
+
             <div className="about-hero__number">
               
               
@@ -176,7 +180,7 @@ export default function About() {
 
             <div className="gold-rule" />
 
->>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
+
             <p>
               Continental Founders is a nonprofit initiative building
               strategic relationships between universities, institutions,
@@ -394,17 +398,17 @@ export default function About() {
 
             <div className="about-story__quote">
 
-<<<<<<< HEAD
+
               <span className="about-kicker about-kicker--gold">
                 OUR PHILOSOPHY
               </span>
-=======
+
               <div className="about-kicker about-kicker--gold">
 
                               
                 Our philosophy
               </div>
->>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
+
 
               <blockquote>
                 We don't teach students to pitch.
@@ -483,8 +487,8 @@ export default function About() {
               become an ecosystem.
             </h2>
 
-<<<<<<< HEAD
-=======
+
+
             <div className="approach-points">
 
               <div className="approach-point">
@@ -546,7 +550,7 @@ export default function About() {
 
             </div>
 
->>>>>>> e9975937365242d7030ca7627fe0370a632a1be5
+
           </div>
 
 

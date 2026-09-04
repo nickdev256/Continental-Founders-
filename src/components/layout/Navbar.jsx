@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
   Menu,
   X,
@@ -14,20 +15,106 @@ import {
 } from "react-router-dom";
 
 import { navigation } from "../../data/navigation";
+
 import "./Navbar.css";
 
 export default function Navbar() {
+  // =========================
+  // MOBILE MENU
+  // =========================
   const [open, setOpen] = useState(false);
+
+  // =========================
+  // SEARCH
+  // =========================
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const location = useLocation();
 
+  // =========================
+  // CONTINENTAL FOUNDERS
+  // WEBSITE SEARCH CONTENT
+  // =========================
+  const searchItems = [
+    {
+      title: "About Us",
+      description:
+        "Learn more about Continental Founders, our mission, vision, and purpose.",
+      url: "/about",
+    },
+    {
+      title: "Our Founders",
+      description:
+        "Meet the founders and people building the Continental Founders community.",
+      url: "/founders",
+    },
+    {
+      title: "Our Community",
+      description:
+        "Discover our community, network, members, and opportunities.",
+      url: "/community",
+    },
+    {
+      title: "Programs",
+      description:
+        "Explore Continental Founders programs, initiatives, and opportunities.",
+      url: "/programs",
+    },
+    {
+      title: "Events",
+      description:
+        "Discover upcoming events, gatherings, conferences, and founder activities.",
+      url: "/events",
+    },
+    {
+      title: "Resources",
+      description:
+        "Access resources, insights, tools, and information for founders.",
+      url: "/resources",
+    },
+    {
+      title: "Contact Us",
+      description:
+        "Get in touch with Continental Founders.",
+      url: "/contact",
+    },
+  ];
+
+  // =========================
+  // FILTER SEARCH RESULTS
+  // =========================
+  const filteredResults = searchItems.filter((item) => {
+    const query = searchQuery.toLowerCase().trim();
+
+    if (!query) {
+      return false;
+    }
+
+    return (
+      item.title.toLowerCase().includes(query) ||
+      item.description.toLowerCase().includes(query)
+    );
+  });
+
+  // =========================
+  // CLOSE MOBILE MENU
+  // =========================
   const closeMenu = () => {
     setOpen(false);
   };
 
+  // =========================
+  // CLOSE MENU WHEN PAGE CHANGES
+  // =========================
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
 
+  // =========================
+  // PREVENT BODY SCROLL WHEN
+  // MOBILE MENU IS OPEN
+  // =========================
   useEffect(() => {
     if (open) {
       document.body.classList.add("nav-open");
@@ -39,6 +126,14 @@ export default function Navbar() {
       document.body.classList.remove("nav-open");
     };
   }, [open]);
+
+  // =========================
+  // CLOSE SEARCH
+  // =========================
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
 
   return (
     <header className="navbar">
@@ -181,15 +276,16 @@ export default function Navbar() {
             <div className="navbar__actions">
 
               <button
-                type="button"
-                className="navbar__search"
-                aria-label="Search"
-              >
-                <Search
-                  size={18}
-                  strokeWidth={1.6}
-                />
-              </button>
+  type="button"
+  className="navbar__search"
+  aria-label="Search"
+  onClick={() => setSearchOpen(true)}
+>
+  <Search
+    size={18}
+    strokeWidth={1.6}
+  />
+</button>
 
 
               <Link
@@ -252,6 +348,123 @@ export default function Navbar() {
         </div>
 
       </div>
+
+      {searchOpen && (
+  <div
+    className="search-overlay"
+    onClick={closeSearch}
+  >
+    <div
+      className="search-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="search-header">
+
+        <div className="search-input-wrapper">
+          <Search
+            size={21}
+            strokeWidth={1.7}
+          />
+
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) =>
+              setSearchQuery(e.target.value)
+            }
+            placeholder="Search Continental Founders..."
+            autoFocus
+            aria-label="Search website"
+          />
+        </div>
+
+        <button
+          type="button"
+          className="search-close"
+          onClick={closeSearch}
+          aria-label="Close search"
+        >
+          <X
+            size={22}
+            strokeWidth={1.7}
+          />
+        </button>
+
+      </div>
+
+      <div className="search-results">
+
+        {!searchQuery.trim() && (
+          <div className="search-empty">
+
+            <Search
+              size={34}
+              strokeWidth={1.4}
+            />
+
+            <h3>
+              Search Continental Founders...
+            </h3>
+
+            <p>
+              Search our services and solutions.
+            </p>
+
+          </div>
+        )}
+
+        {searchQuery.trim() &&
+          filteredResults.length === 0 && (
+            <div className="search-empty">
+
+              <h3>
+                No results found
+              </h3>
+
+              <p>
+                No results found for "
+                {searchQuery}".
+              </p>
+
+            </div>
+          )}
+
+        {filteredResults.length > 0 && (
+          <div className="search-result-list">
+
+            {filteredResults.map((item) => (
+              <Link
+                key={item.title}
+                to={item.url}
+                className="search-result"
+                onClick={closeSearch}
+              >
+
+                <div className="search-result-icon">
+                  <Search
+                    size={17}
+                    strokeWidth={1.6}
+                  />
+                </div>
+
+                <div>
+                  <h4>{item.title}</h4>
+
+                  <p>
+                    {item.description}
+                  </p>
+                </div>
+
+              </Link>
+            ))}
+
+          </div>
+        )}
+
+      </div>
+    </div>
+  </div>
+)}
 
     </header>
   );

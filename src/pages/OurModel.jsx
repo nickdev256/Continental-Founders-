@@ -85,7 +85,7 @@ export default function OurModel() {
         </div>
       </section>
 
-      <CTASection />
+      
     </>
   );
 }

@@ -16,7 +16,7 @@ export default function CTASection({
           <h2>{title}</h2>
           <p>{text}</p>
         </div>
-        <Button to="/contact" variant="gold" icon="up">Partner With Us</Button>
+       
       </div>
     </section>
   );

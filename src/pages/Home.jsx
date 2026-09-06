@@ -1536,75 +1536,9 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
-          12 — FINAL CTA
-      ========================================================= */}
+      
 
-      <section className="cf-final-section">
-
-        <div className="cf-container">
-
-          <div className="cf-section-marker cf-section-marker--light">
-
-            <span>12</span>
-
-            <i />
-
-            <strong>
-              CONTINENTAL FOUNDERS™
-            </strong>
-
-          </div>
-
-
-          <h2>
-            Let's Build
-            <br />
-            <em>
-              Together.
-            </em>
-          </h2>
-
-
-          <p>
-            Stronger institutions.
-            <br />
-            Greater opportunity.
-            <br />
-            One shared direction.
-          </p>
-
-
-          <div className="cf-actions">
-
-            <Link
-              to="/contact"
-              className="cf-button cf-button--gold"
-            >
-              <span>
-                Schedule a Meeting
-              </span>
-
-              <CalendarDays size={17} />
-            </Link>
-
-
-            <Link
-              to="/contact"
-              className="cf-button cf-button--outline-light"
-            >
-              <span>
-                Contact Continental Founders™
-              </span>
-
-              <Mail size={17} />
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
+    
 
     </main>
   );

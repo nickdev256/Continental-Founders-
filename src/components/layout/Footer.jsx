@@ -269,45 +269,7 @@ export default function Footer() {
           </div>
 
 
-          {/* ==================================================
-              PARTNERSHIP CTA
-          =================================================== */}
-
-          <div className="cf-footer__cta">
-
-            <div className="cf-footer__cta-content">
-
-              <span className="cf-footer__cta-label">
-                BUILD WITH US
-              </span>
-
-              <h2>
-                Let's create meaningful
-                <em> opportunity together.</em>
-              </h2>
-
-              <p>
-                Whether you represent a university, organization,
-                sponsor, government institution, or innovation
-                ecosystem, we would love to explore how we can
-                work together.
-              </p>
-
-            </div>
-
-            <Link
-              to="/contact"
-              className="cf-footer__cta-button"
-            >
-              <span>Start a Conversation</span>
-
-              <ArrowUpRight
-                size={21}
-                strokeWidth={1.8}
-              />
-            </Link>
-
-          </div>
+          
 
         </div>
 

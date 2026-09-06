@@ -1225,7 +1225,7 @@ export default function About() {
           GLOBAL CTA
       ====================================================== */}
 
-      <CTASection />
+      
 
     </main>
   );

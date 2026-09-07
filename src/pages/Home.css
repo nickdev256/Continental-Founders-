@@ -96,16 +96,9 @@
 .cf-home-hero {
   position: relative;
   width: 100%;
-  background:
-    linear-gradient(
-      to right,
-      rgba(0, 18, 45, 0.95) 0%,
-      rgba(0, 18, 45, 0.75) 35%,
-      rgba(0, 18, 45, 0.25) 60%,
-      rgba(0, 18, 45, 0) 80%
-    ),
-    url('/assets/images/hero-partnership.jpg') center / cover no-repeat;
+  min-height: 850px;
   overflow: hidden;
+  background: #00122d;
 }
 
 .cf-container {
@@ -130,19 +123,10 @@
 ============================================================ */
 
 .cf-home-hero__main {
-  min-height: 650px;
-
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(420px, 0.95fr);
-
-  align-items: center;
-
-  gap: clamp(40px, 6vw, 100px);
-
-  padding: 70px 0 50px;
+  position: relative;
+  min-height: 850px;
+  display: block;
+  padding: 0;
 }
 
 /* ============================================================
@@ -150,8 +134,11 @@
 ============================================================ */
 
 .cf-home-hero__content {
-  min-width: 0;
+  position: relative;
+  z-index: 10;
+  width: 55%;
   max-width: 720px;
+  padding-top: 75px;
 }
 
 /* ============================================================
@@ -277,6 +264,7 @@
 
 .cf-home-hero .cf-button {
   min-height: 50px;
+  margin-bottom: 60px;
 
   display: inline-flex;
   align-items: center;
@@ -332,6 +320,7 @@
   color: var(--cf-navy);
   background: var(--cf-white);
   border-color: var(--cf-white);
+ 
 }
 
 /* ============================================================
@@ -339,46 +328,64 @@
 ============================================================ */
 
 .cf-home-hero__visual {
-  position: relative;
-
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
+  position: absolute;
+  top: 0px;
+  right: -160px;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
 }
 
 /* ============================================================
    IMAGE FRAME
 ============================================================ */
 
-.cf-home-hero__image {
-  position: relative;
-
+.cf-home-hero__slides {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  max-width: 680px;
-
-  aspect-ratio: 1 / 0.88;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  height: 100%;
   overflow: hidden;
 }
 
-.cf-home-hero__image img {
-  display: block;
-
+.cf-home-hero__slide {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 1.5s ease-in-out,
+    transform 7s ease;
+  pointer-events: none;
+}
 
-  max-width: 100%;
+.cf-home-hero__slide--active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cf-home-hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 1) 0%,
+      rgba(0, 18, 45, 0.98) 10%,
+      rgba(0, 18, 45, 0.92) 25%,
+      rgba(0, 18, 45, 0.78) 38%,
+      rgba(0, 18, 45, 0.50) 52%,
+      rgba(0, 18, 45, 0.20) 68%,
+      rgba(0, 18, 45, 0) 100%
+    );
 }
 
 
@@ -387,36 +394,64 @@
 ============================================================ */
 
 .cf-home-hero__visual-caption {
-  width: min(100%, 560px);
+  position: absolute;
+  right: 60px;
+  bottom: 45px;
+  z-index: 5;
   display: flex;
   align-items: center;
-  gap: 16px;
-
-  position: absolute;
-  left: 0;
-  bottom: 20px;
-
-  margin-left: 1300px;
-  padding: 12px 0;
-
+  gap: 18px;
+  color: var(--cf-white);
   font-family:
     Arial,
     Helvetica,
     sans-serif;
-
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-
-  color: var(--cf-white);
-
-  z-index: 10;
 }
 
 .cf-home-hero__visual-caption i {
-  flex: 1;
+  display: block;
+  width: 45px;
   height: 1px;
   background: var(--cf-gold);
+}
+
+.cf-home-hero__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 45px;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-home-hero__dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition:
+    width 0.3s ease,
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.cf-home-hero__dots button:hover {
+  transform: scale(1.2);
+}
+
+.cf-home-hero__dots button.active {
+  width: 28px;
+  border-radius: 10px;
+  background: var(--cf-gold);
+  
 }
 
 /* ============================================================
@@ -432,6 +467,7 @@
   border-bottom: 1px solid var(--cf-border);
 
   margin-bottom: 35px;
+  
 }
 
 /* ============================================================
@@ -449,6 +485,7 @@
   min-height: 88px;
 
   padding: 18px 28px;
+ 
 
   border-right: 1px solid var(--cf-border);
 }
@@ -1847,17 +1884,13 @@
   }
 
   .cf-home-hero__content {
+    width: 58%;
     padding-right: 35px;
   }
 
   .cf-home-hero__main {
-    grid-template-columns:
-      minmax(0, 1fr)
-      minmax(360px, 0.85fr);
-
-    gap: 50px;
-
-    min-height: 600px;
+    min-height: 760px;
+    display: block;
   }
 
   .cf-home-hero h1 {
@@ -1897,18 +1930,17 @@
   /* HERO */
 
   .cf-home-hero__main {
-    grid-template-columns: 1fr;
-
-    min-height: auto;
-
-    gap: 30px;
-
-    padding: 70px 0 40px;
+    min-height: 700px;
+    display: block;
+    padding: 0;
   }
 
   .cf-home-hero__content {
+    position: relative;
+    z-index: 10;
+    width: 75%;
     max-width: 760px;
-
+    padding-top: 70px;
     padding-right: 0;
   }
 
@@ -1919,13 +1951,15 @@
   }
 
   .cf-home-hero__visual {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-
-    max-width: 700px;
-
-    min-height: 470px;
-
-    margin-inline: auto;
+    height: 100%;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
   }
 
   /* HERO FEATURES */
@@ -2129,13 +2163,16 @@
   }
 
   .cf-home-hero__main {
-    padding: 48px 0 30px;
-
-    gap: 38px;
+    min-height: 760px;
+    padding: 0;
   }
 
   .cf-home-hero__content {
-    padding: 0;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: none;
+    padding-top: 48px;
   }
 
   /* MARKER */
@@ -2197,23 +2234,40 @@
   /* IMAGE */
 
   .cf-home-hero__visual {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-
-    min-height: 320px;
-  }
-
-  .cf-home-hero__image {
-    width: 100%;
-
-    aspect-ratio: 1 / 0.9;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
   }
 
   .cf-home-hero__visual-caption {
-    width: 100%;
-
-    font-size: 0.64rem;
-
+    right: 20px;
+    bottom: 25px;
+    width: auto;
+    font-size: 0.58rem;
     gap: 10px;
+  }
+
+  .cf-home-hero__visual-caption i {
+    width: 28px;
+  }
+
+  .cf-home-hero__dots {
+    bottom: 25px;
+    gap: 6px;
+  }
+
+  .cf-home-hero__dots button {
+    width: 6px;
+    height: 6px;
+  }
+
+  .cf-home-hero__dots button.active {
+    width: 20px;
   }
 
   /* FEATURES */

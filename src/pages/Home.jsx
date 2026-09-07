@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
+
 import {
   ArrowRight,
   ArrowUpRight,
@@ -40,6 +41,36 @@ export default function Home() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+
+
+    /*
+  ============================================================
+  HERO IMAGE SLIDER
+  ============================================================
+  */
+
+  const heroImages = [
+    "/assets/images/hero-partnership.jpg",
+    "/assets/images/hero-community.jpg",
+    "/assets/images/hero-education.jpg",
+    "/assets/images/hero-innovation.jpg",
+    "/assets/images/hero-opportunity.jpg",
+  ];
+
+  const [currentHero, setCurrentHero] = useState(0);
+
+  useEffect(() => {
+    const heroInterval = setInterval(() => {
+      setCurrentHero(
+        (previous) =>
+          (previous + 1) % heroImages.length
+      );
+    }, 5000);
+
+    return () => {
+      clearInterval(heroInterval);
+    };
+  }, []);
 
   /*
   ============================================================
@@ -365,130 +396,179 @@ export default function Home() {
   return (
     <main className="cf-home">
 
-      {/* =========================================================
-          01 — HERO
-      ========================================================= */}
+    {/* =========================================================
+    01 — HERO
+========================================================= */}
 
-      <section className="cf-home-hero">
+<section className="cf-home-hero">
 
-        <div className="cf-container cf-home-hero__container">
+  <div className="cf-container cf-home-hero__container">
 
-          <div className="cf-home-hero__main">
+    <div className="cf-home-hero__main">
 
-            {/* =================================================
-                HERO CONTENT
-            ================================================= */}
+      {/* =================================================
+          HERO CONTENT
+      ================================================= */}
 
-            <div className="cf-home-hero__content">
+      <div className="cf-home-hero__content">
 
-              <div className="cf-section-marker">
+        <div className="cf-section-marker">
 
-                <span>01</span>
+          <span>01</span>
 
-                <i />
+          <i />
 
-                <strong>
-                  A CROSS-CONTINENTAL INITIATIVE
-                </strong>
+          <strong>
+            A CROSS-CONTINENTAL INITIATIVE
+          </strong>
 
-              </div>
-
-
-              <h1>
-                Connecting Africa
-                <br />
-
-                and America through
-                <br />
-
-                <span>education,</span>
-                <br />
-
-                entrepreneurship,
-                <br />
-
-                innovation, and{" "}
-
-                <em>opportunity.</em>
-              </h1>
+        </div>
 
 
-              <p className="cf-home-hero__lead">
-                Continental Founders is a newly
-                established nonprofit building
-                strategic partnerships between
-                universities in Africa and the
-                United States through
-                entrepreneurship, innovation,
-                leadership development, and
-                meaningful collaboration.
-              </p>
+        <h1>
+          Bridging Africa
+          <br />
 
+          and America through
+          <br />
 
-              <div className="cf-actions">
-
-                <Link
-                  to="/contact"
-                  className="cf-button cf-button--gold"
-                >
-                  <span>
-                    Schedule a Meeting
-                  </span>
-
-                  <CalendarDays
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                </Link>
-
-
-                <Link
-                  to="/our-model"
-                  className="cf-button cf-button--outline-dark"
-                >
-                  <span>
-                    Explore Our Model
-                  </span>
-
-                  <ArrowRight
-                    size={18}
-                    strokeWidth={1.7}
-                  />
-                </Link>
-
-              </div>
-
-            </div>
-
-
-            {/* =================================================
-                HERO IMAGE
-            ================================================= */}
-
+          <span>education,</span>
           
 
-
-              <div className="cf-home-hero__visual-caption">
-
-                <span>
-                  AFRICA
-                </span>
-
-                <i />
-
-                <span>
-                  UNITED STATES
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
         
+          <br />
 
-      </section>
+          innovation, &{" "}
+
+          <em>opportunity.</em>
+        </h1>
+
+
+        <p className="cf-home-hero__lead">
+          Continental Founders is a newly
+          established nonprofit building
+          strategic partnerships between
+          universities in Africa and the
+          United States through
+          entrepreneurship, innovation,
+          leadership development, and
+          meaningful collaboration.
+        </p>
+
+
+        <div className="cf-actions">
+
+          <Link
+            to="/contact"
+            className="cf-button cf-button--gold"
+          >
+            <span>
+              Schedule a Meeting
+            </span>
+
+            <CalendarDays
+              size={18}
+              strokeWidth={1.7}
+            />
+          </Link>
+
+
+          <Link
+            to="/our-model"
+            className="cf-button cf-button--outline-dark"
+          >
+            <span>
+              Explore Our Model
+            </span>
+
+            <ArrowRight
+              size={18}
+              strokeWidth={1.7}
+            />
+          </Link>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          HERO IMAGE SLIDER
+      ================================================= */}
+
+      <div className="cf-home-hero__visual">
+
+        {/* HERO SLIDES */}
+
+        <div className="cf-home-hero__slides">
+
+          {heroImages.map((image, index) => (
+            <img
+              key={image}
+              src={image}
+              alt="Continental Founders"
+              className={
+                index === currentHero
+                  ? "cf-home-hero__slide cf-home-hero__slide--active"
+                  : "cf-home-hero__slide"
+              }
+            />
+          ))}
+
+        </div>
+
+
+        {/* NAVY GRADIENT */}
+
+        <div className="cf-home-hero__overlay" />
+
+
+        {/* AFRICA / UNITED STATES */}
+
+        <div className="cf-home-hero__visual-caption">
+
+          <span>
+            AFRICA
+          </span>
+
+          <i />
+
+          <span>
+            UNITED STATES
+          </span>
+
+        </div>
+
+
+        {/* SLIDER DOTS */}
+
+        <div className="cf-home-hero__dots">
+
+          {heroImages.map((_, index) => (
+
+            <button
+              key={index}
+              type="button"
+              className={
+                index === currentHero
+                  ? "active"
+                  : ""
+              }
+              onClick={() => setCurrentHero(index)}
+              aria-label={`Go to hero slide ${index + 1}`}
+            />
+
+          ))}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 
       {/* =========================================================
@@ -1441,7 +1521,7 @@ export default function Home() {
           <div className="cf-news-grid">
 
             <Insight
-              image="/assets/images/university-partnerships.jpg"
+              image="/assets/images/insights/university-partnerships.jpg"
               category="ANNOUNCEMENT"
               date="MAY 21, 2026"
               title="Continental Founders™ Begins University Partnership Development"
@@ -1449,7 +1529,7 @@ export default function Home() {
             />
 
             <Insight
-              image="/assets/images/innovation-entrepreneurship.jpg"
+              image="/assets/images/insights/innovation-entrepreneurship.jpg"
               category="INSIGHT"
               date="APRIL 26, 2026"
               title="Why Cross-Continental Collaboration Matters"
@@ -1457,7 +1537,7 @@ export default function Home() {
             />
 
             <Insight
-              image="/assets/images/leadership-collaboration.jpg"
+              image="/assets/images/insights/leadership-collaboration.jpg"
               category="PROGRAM UPDATE"
               date="APRIL 10, 2026"
               title="Building the Continental Founders™ Framework"

@@ -1,0 +1,3315 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   VENTURE DETAILS PAGE
+   FULL RESPONSIVE STYLESHEET
+============================================================ */
+
+
+/* ============================================================
+   PAGE VARIABLES
+============================================================ */
+
+.venture-details-page {
+  --venture-navy: #0d2238;
+  --venture-navy-deep: #08182a;
+  --venture-navy-soft: #12304c;
+
+  --venture-gold: #b8882c;
+  --venture-gold-dark: #9f741f;
+  --venture-gold-soft: #d4b46f;
+
+  --venture-text: #182331;
+  --venture-muted: #69737d;
+
+  --venture-line: #dedbd3;
+  --venture-line-soft: #ebe8e1;
+
+  --venture-cream: #f6f3ec;
+  --venture-cream-light: #fbfaf7;
+
+  --venture-white: #ffffff;
+
+  --venture-shadow:
+    0 24px 60px rgba(13, 34, 56, 0.08);
+
+  --venture-section-space:
+    clamp(80px, 8vw, 140px);
+
+  width: 100%;
+  max-width: 100%;
+
+  overflow-x: clip;
+
+  background: var(--venture-white);
+  color: var(--venture-text);
+}
+
+
+/* ============================================================
+   RESET / SAFETY
+============================================================ */
+
+.venture-details-page *,
+.venture-details-page *::before,
+.venture-details-page *::after {
+  box-sizing: border-box;
+}
+
+
+.venture-details-page img {
+  display: block;
+
+  max-width: 100%;
+}
+
+
+.venture-details-page a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+.venture-details-page button,
+.venture-details-page input,
+.venture-details-page textarea,
+.venture-details-page select {
+  font: inherit;
+}
+
+
+/* ============================================================
+   CONTAINER
+============================================================ */
+
+.venture-details-container {
+  width: min(1420px, calc(100% - 96px));
+
+  margin-inline: auto;
+}
+
+
+/* ============================================================
+   GRID OVERFLOW SAFETY
+============================================================ */
+
+.venture-details-hero__content,
+.venture-details-hero__profile,
+
+.venture-details-section-heading > *,
+
+.venture-details-overview__grid > *,
+
+.venture-details-services__grid > *,
+
+.venture-details-founder__grid > *,
+.venture-details-founders__grid > *,
+
+.venture-details-contact__grid > *,
+
+.venture-details-looking__grid > *,
+
+.venture-details-ecosystem__grid > *,
+
+.venture-details-final__grid > * {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   TYPOGRAPHY SAFETY
+============================================================ */
+
+.venture-details-page h1,
+.venture-details-page h2,
+.venture-details-page h3,
+.venture-details-page p,
+.venture-details-page strong,
+.venture-details-page span {
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   EYEBROWS
+============================================================ */
+
+.venture-details-eyebrow {
+  display: inline-block;
+
+  color: var(--venture-gold);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-eyebrow--light {
+  color: var(--venture-gold-soft);
+}
+
+
+/* ============================================================
+   SECTION NUMBER
+============================================================ */
+
+.venture-details-section-number {
+  display: inline-block;
+
+  margin-right: 16px;
+
+  color: var(--venture-gold);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.venture-details-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  min-height: 52px;
+
+  padding: 0 24px;
+
+  border: 1px solid transparent;
+  border-radius: 0;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+  line-height: 1;
+
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.venture-details-button:hover {
+  transform: translateY(-2px);
+}
+
+
+.venture-details-button svg {
+  flex: 0 0 auto;
+
+  transition: transform 0.25s ease;
+}
+
+
+.venture-details-button:hover svg {
+  transform: translateX(4px);
+}
+
+
+/* ============================================================
+   GOLD BUTTON
+============================================================ */
+
+.venture-details-button--gold {
+  background: var(--venture-gold);
+
+  border-color: var(--venture-gold);
+
+  color: #fff;
+}
+
+
+.venture-details-button--gold:hover {
+  background: var(--venture-gold-dark);
+
+  border-color: var(--venture-gold-dark);
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   DARK OUTLINE BUTTON
+============================================================ */
+
+.venture-details-button--outline {
+  background: transparent;
+
+  border-color: var(--venture-navy);
+
+  color: var(--venture-navy);
+}
+
+
+.venture-details-button--outline:hover {
+  background: var(--venture-navy);
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   LIGHT OUTLINE BUTTON
+============================================================ */
+
+.venture-details-button--outline-light {
+  background: transparent;
+
+  border-color: rgba(255, 255, 255, 0.52);
+
+  color: #fff;
+}
+
+
+.venture-details-button--outline-light:hover {
+  background: #fff;
+
+  border-color: #fff;
+
+  color: var(--venture-navy);
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.venture-details-hero {
+  position: relative;
+
+  min-height: 760px;
+
+  overflow: hidden;
+
+  background: var(--venture-navy-deep);
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   HERO BACKGROUND
+============================================================ */
+
+.venture-details-hero__background {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 0;
+
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  transform: scale(1.015);
+}
+
+
+/* ============================================================
+   HERO OVERLAY
+============================================================ */
+
+.venture-details-hero__overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 17, 29, 0.99) 0%,
+      rgba(5, 17, 29, 0.94) 30%,
+      rgba(5, 17, 29, 0.76) 58%,
+      rgba(5, 17, 29, 0.42) 100%
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   HERO INNER
+============================================================ */
+
+.venture-details-hero__inner {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(340px, 0.8fr);
+
+  gap: clamp(50px, 6vw, 90px);
+
+  align-items: end;
+
+  min-height: 760px;
+
+  padding-top: 130px;
+  padding-bottom: 85px;
+}
+
+
+/* ============================================================
+   BACK LINK
+============================================================ */
+
+.venture-details-back-link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 38px;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition: color 0.2s ease;
+}
+
+
+.venture-details-back-link:hover {
+  color: #fff;
+}
+
+
+/* ============================================================
+   HERO META
+============================================================ */
+
+.venture-details-hero__meta {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+
+  gap: 10px;
+
+  color: var(--venture-gold-soft);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-meta-dot {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+
+/* ============================================================
+   HERO TITLE
+============================================================ */
+
+.venture-details-hero__content h1 {
+  max-width: 900px;
+
+  margin: 22px 0 0;
+
+  color: #fff;
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(4rem, 6.5vw, 7.2rem);
+
+  font-weight: 400;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.05em;
+
+  text-wrap: balance;
+}
+
+
+/* ============================================================
+   HERO DESCRIPTION
+============================================================ */
+
+.venture-details-hero__description {
+  max-width: 680px;
+
+  margin: 30px 0 0;
+
+  color: rgba(255, 255, 255, 0.76);
+
+  font-size: 1.05rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   HERO ACTIONS
+============================================================ */
+
+.venture-details-hero__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 36px;
+}
+
+
+/* ============================================================
+   HERO PROFILE
+============================================================ */
+
+.venture-details-hero__profile {
+  width: 100%;
+
+  max-width: 470px;
+
+  margin-left: auto;
+
+  padding: 34px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.16);
+
+  background:
+    rgba(7, 24, 40, 0.76);
+
+  box-shadow:
+    0 28px 70px rgba(0, 0, 0, 0.14);
+
+  backdrop-filter: blur(16px);
+
+  -webkit-backdrop-filter: blur(16px);
+}
+
+
+/* ============================================================
+   HERO LOGO
+============================================================ */
+
+.venture-details-logo {
+  display: flex;
+
+  align-items: center;
+
+  min-height: 100px;
+
+  margin-bottom: 30px;
+}
+
+
+.venture-details-logo img {
+  width: auto;
+
+  max-width: 220px;
+  max-height: 90px;
+
+  object-fit: contain;
+  object-position: left center;
+}
+
+
+.venture-details-logo-placeholder {
+  display: grid;
+
+  place-items: center;
+
+  width: 82px;
+  height: 82px;
+
+  margin-bottom: 30px;
+
+  border-radius: 50%;
+
+  background: var(--venture-gold);
+
+  color: #fff;
+
+  font-size: 1.15rem;
+  font-weight: 800;
+
+  letter-spacing: 0.05em;
+}
+
+
+/* ============================================================
+   HERO PROFILE GRID
+============================================================ */
+
+.venture-details-hero__profile-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.15);
+
+  border-left:
+    1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+.venture-details-hero__profile-grid > div {
+  min-width: 0;
+
+  min-height: 108px;
+
+  padding: 20px;
+
+  border-right:
+    1px solid rgba(255, 255, 255, 0.15);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.15);
+}
+
+
+.venture-details-hero__profile-grid span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--venture-gold-soft);
+
+  font-size: 0.64rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-hero__profile-grid strong {
+  display: block;
+
+  color: #fff;
+
+  font-size: 0.85rem;
+
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   SHARED SECTION HEADING
+============================================================ */
+
+.venture-details-section-heading {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 0.65fr)
+    minmax(0, 1.35fr);
+
+  gap: 70px;
+
+  align-items: start;
+}
+
+
+.venture-details-section-heading h2 {
+  max-width: 920px;
+
+  margin: 0;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3rem, 5vw, 5.6rem);
+
+  font-weight: 400;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+}
+
+
+.venture-details-section-heading--light h2 {
+  color: #fff;
+}
+
+
+/* ============================================================
+   OVERVIEW
+============================================================ */
+
+.venture-details-overview {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: #fff;
+}
+
+
+.venture-details-overview__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(300px, 0.75fr);
+
+  gap: clamp(55px, 7vw, 90px);
+
+  margin-top: 75px;
+
+  align-items: start;
+}
+
+
+/* ============================================================
+   OVERVIEW MAIN
+============================================================ */
+
+.venture-details-overview__main {
+  max-width: 790px;
+}
+
+
+.venture-details-overview__main h3 {
+  margin: 0 0 26px;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(2.3rem, 4vw, 3.8rem);
+
+  font-weight: 400;
+
+  line-height: 1;
+
+  letter-spacing: -0.035em;
+}
+
+
+.venture-details-overview__main p {
+  margin: 0;
+
+  color: var(--venture-muted);
+
+  font-size: 1rem;
+
+  line-height: 1.82;
+}
+
+
+.venture-details-overview__main p + p {
+  margin-top: 24px;
+}
+
+
+/* ============================================================
+   FACTS
+============================================================ */
+
+.venture-details-facts {
+  border-top:
+    1px solid var(--venture-line);
+}
+
+
+.venture-details-fact {
+  display: grid;
+
+  grid-template-columns:
+    40px
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  align-items: start;
+
+  padding: 22px 0;
+
+  border-bottom:
+    1px solid var(--venture-line);
+}
+
+
+.venture-details-fact svg {
+  margin-top: 2px;
+
+  color: var(--venture-gold);
+}
+
+
+.venture-details-fact span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--venture-muted);
+
+  font-size: 0.66rem;
+  font-weight: 750;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-fact strong {
+  display: block;
+
+  color: var(--venture-navy);
+
+  font-size: 0.88rem;
+
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   SERVICES
+============================================================ */
+
+.venture-details-services {
+  padding:
+    var(--venture-section-space) 0;
+
+  background:
+    var(--venture-cream-light);
+
+  border-top:
+    1px solid var(--venture-line-soft);
+
+  border-bottom:
+    1px solid var(--venture-line-soft);
+}
+
+
+/* ============================================================
+   SERVICES GRID
+============================================================ */
+
+.venture-details-services__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin-top: 70px;
+}
+
+
+/* ============================================================
+   SERVICE CARD
+============================================================ */
+
+.venture-details-service-card {
+  position: relative;
+
+  min-width: 0;
+  min-height: 240px;
+
+  padding: 28px;
+
+  overflow: hidden;
+
+  border:
+    1px solid var(--venture-line);
+
+  background: #fff;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.venture-details-service-card:hover {
+  transform: translateY(-4px);
+
+  border-color:
+    rgba(184, 136, 44, 0.5);
+
+  box-shadow:
+    0 20px 45px
+    rgba(13, 34, 56, 0.08);
+}
+
+
+.venture-details-service-card__icon {
+  display: grid;
+
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  margin-bottom: 52px;
+
+  background: var(--venture-navy);
+
+  color: var(--venture-gold-soft);
+}
+
+
+.venture-details-service-card__number {
+  position: absolute;
+
+  top: 30px;
+  right: 28px;
+
+  color: var(--venture-gold);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+
+.venture-details-service-card h3 {
+  max-width: 300px;
+
+  margin: 0;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 1.5rem;
+  font-weight: 400;
+
+  line-height: 1.2;
+}
+
+
+/* ============================================================
+   SERVICE DESCRIPTION
+   Works if you later add <p> to service cards
+============================================================ */
+
+.venture-details-service-card p {
+  margin: 16px 0 0;
+
+  color: var(--venture-muted);
+
+  font-size: 0.86rem;
+
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   OPPORTUNITY
+============================================================ */
+
+.venture-details-opportunity {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: var(--venture-cream);
+
+  border-top:
+    1px solid var(--venture-line);
+
+  border-bottom:
+    1px solid var(--venture-line);
+}
+
+
+/* ============================================================
+   OPPORTUNITY GRID
+============================================================ */
+
+.venture-opportunity-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  margin-top: 70px;
+
+  border-top:
+    1px solid var(--venture-line);
+
+  border-left:
+    1px solid var(--venture-line);
+}
+
+
+/* ============================================================
+   OPPORTUNITY CARD
+============================================================ */
+
+.venture-opportunity-card {
+  min-width: 0;
+
+  min-height: 300px;
+
+  padding: 28px;
+
+  border-right:
+    1px solid var(--venture-line);
+
+  border-bottom:
+    1px solid var(--venture-line);
+
+  background:
+    rgba(255, 255, 255, 0.62);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.venture-opportunity-card:hover {
+  background: #fff;
+}
+
+
+.venture-opportunity-card__number {
+  display: inline-block;
+
+  color: var(--venture-gold);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+
+.venture-opportunity-card h3 {
+  margin: 70px 0 16px;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 1.7rem;
+  font-weight: 400;
+
+  line-height: 1.2;
+}
+
+
+.venture-opportunity-card p {
+  margin: 0;
+
+  color: var(--venture-muted);
+
+  font-size: 0.88rem;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   FOUNDER SECTION
+============================================================ */
+
+.venture-details-founder {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: #fff;
+}
+
+
+.venture-details-founder__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(180px, 0.65fr)
+    minmax(0, 1.35fr);
+
+  gap: 70px;
+
+  align-items: start;
+}
+
+
+/* ============================================================
+   FOUNDER CONTENT
+============================================================ */
+
+.venture-details-founder__content {
+  min-width: 0;
+}
+
+
+.venture-details-founder__content h2 {
+  max-width: 900px;
+
+  margin: 0 0 55px;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3rem, 5vw, 5.6rem);
+
+  font-weight: 400;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+}
+
+
+/* ============================================================
+   FOUNDERS GRID
+============================================================ */
+
+.venture-details-founders__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 26px;
+
+  width: 100%;
+}
+
+
+/* ============================================================
+   FOUNDER CARD
+============================================================ */
+
+.venture-details-founder__card {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 100%;
+
+  overflow: hidden;
+
+  border:
+    1px solid var(--venture-line);
+
+  background: var(--venture-white);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.venture-details-founder__card:hover {
+  transform: translateY(-4px);
+
+  border-color:
+    rgba(184, 136, 44, 0.5);
+
+  box-shadow:
+    0 22px 50px
+    rgba(13, 34, 56, 0.08);
+}
+
+
+/* ============================================================
+   FOUNDER AVATAR
+============================================================ */
+
+.venture-details-founder__avatar {
+  position: relative;
+
+  display: grid;
+
+  place-items: center;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 3;
+
+  overflow: hidden;
+
+  background: var(--venture-navy);
+
+  color: #fff;
+}
+
+
+.venture-details-founder__avatar::after {
+  content: "";
+
+  position: absolute;
+
+  inset: auto 0 0;
+
+  height: 38%;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(8, 24, 42, 0.28)
+    );
+
+  pointer-events: none;
+}
+
+
+.venture-details-founder__avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  object-position: center top;
+}
+
+
+.venture-details-founder__avatar span {
+  position: relative;
+
+  z-index: 1;
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 4rem;
+}
+
+
+/* ============================================================
+   FOUNDER INFO
+============================================================ */
+
+.venture-details-founder__info {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 28px;
+}
+
+
+.venture-details-founder__card h3 {
+  margin: 0;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 2rem;
+  font-weight: 400;
+
+  line-height: 1.05;
+}
+
+
+.venture-details-founder__role {
+  display: block;
+
+  margin-top: 10px;
+
+  color: var(--venture-gold);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+
+  line-height: 1.5;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-founder__card p {
+  margin: 22px 0 0;
+
+  color: var(--venture-muted);
+
+  font-size: 0.92rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   CONTACT SECTION
+============================================================ */
+
+.venture-details-contact {
+  padding:
+    var(--venture-section-space) 0;
+
+  background:
+    var(--venture-cream-light);
+
+  border-top:
+    1px solid var(--venture-line-soft);
+
+  border-bottom:
+    1px solid var(--venture-line-soft);
+}
+
+
+/* ============================================================
+   CONTACT GRID
+============================================================ */
+
+.venture-details-contact__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  margin-top: 70px;
+}
+
+
+/* ============================================================
+   CONTACT CARD
+============================================================ */
+
+.venture-details-contact__card {
+  display: grid;
+
+  grid-template-columns:
+    48px
+    minmax(0, 1fr)
+    auto;
+
+  gap: 18px;
+
+  align-items: center;
+
+  min-width: 0;
+  min-height: 110px;
+
+  padding: 22px 24px;
+
+  border:
+    1px solid var(--venture-line);
+
+  background: #fff;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.venture-details-contact__card:hover {
+  transform: translateY(-3px);
+
+  border-color:
+    rgba(184, 136, 44, 0.55);
+
+  box-shadow:
+    0 18px 40px
+    rgba(13, 34, 56, 0.07);
+}
+
+
+.venture-details-contact__card > svg:first-child {
+  display: grid;
+
+  width: 46px;
+  height: 46px;
+
+  padding: 12px;
+
+  background: var(--venture-navy);
+
+  color: var(--venture-gold-soft);
+}
+
+
+.venture-details-contact__card > svg:last-child {
+  color: var(--venture-gold);
+}
+
+
+.venture-details-contact__card span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--venture-muted);
+
+  font-size: 0.64rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.venture-details-contact__card strong {
+  display: block;
+
+  color: var(--venture-navy);
+
+  font-size: 0.9rem;
+
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   JOURNEY
+============================================================ */
+
+.venture-details-journey {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: var(--venture-navy);
+}
+
+
+/* ============================================================
+   JOURNEY GRID
+============================================================ */
+
+.venture-details-journey__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  margin-top: 70px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.14);
+
+  border-left:
+    1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.venture-details-journey__step {
+  min-width: 0;
+  min-height: 180px;
+
+  padding: 28px;
+
+  border-right:
+    1px solid rgba(255, 255, 255, 0.14);
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.venture-details-journey__step span {
+  display: block;
+
+  color: var(--venture-gold-soft);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+
+.venture-details-journey__step strong {
+  display: block;
+
+  margin-top: 76px;
+
+  color: #fff;
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 1.45rem;
+  font-weight: 400;
+
+  line-height: 1.2;
+}
+
+
+/* ============================================================
+   LOOKING FOR
+============================================================ */
+
+.venture-details-looking {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: var(--venture-cream);
+}
+
+
+.venture-details-looking__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(360px, 1.1fr);
+
+  gap: clamp(55px, 7vw, 100px);
+
+  align-items: start;
+}
+
+
+/* ============================================================
+   LOOKING CONTENT
+============================================================ */
+
+.venture-details-looking__content h2 {
+  max-width: 680px;
+
+  margin: 22px 0 26px;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3rem, 5vw, 5.4rem);
+
+  font-weight: 400;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+}
+
+
+.venture-details-looking__content p {
+  max-width: 600px;
+
+  margin: 0;
+
+  color: var(--venture-muted);
+
+  font-size: 1rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   LOOKING LIST
+============================================================ */
+
+.venture-details-looking__list {
+  border-top:
+    1px solid var(--venture-line);
+}
+
+
+.venture-details-looking__item {
+  display: grid;
+
+  grid-template-columns:
+    58px
+    minmax(0, 1fr);
+
+  gap: 20px;
+
+  align-items: center;
+
+  min-height: 84px;
+
+  border-bottom:
+    1px solid var(--venture-line);
+}
+
+
+.venture-details-looking__item span {
+  color: var(--venture-gold);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+}
+
+
+.venture-details-looking__item strong {
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size: 1.35rem;
+  font-weight: 400;
+
+  line-height: 1.3;
+}
+
+
+/* ============================================================
+   ECOSYSTEM
+============================================================ */
+
+.venture-details-ecosystem {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: var(--venture-navy-deep);
+}
+
+
+.venture-details-ecosystem__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(400px, 1.1fr);
+
+  gap: clamp(55px, 6vw, 90px);
+
+  align-items: center;
+}
+
+
+/* ============================================================
+   ECOSYSTEM CONTENT
+============================================================ */
+
+.venture-details-ecosystem h2 {
+  max-width: 650px;
+
+  margin: 18px 0 24px;
+
+  color: #fff;
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3.1rem, 5vw, 5.6rem);
+
+  font-weight: 400;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+}
+
+
+.venture-details-ecosystem p {
+  max-width: 550px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.66);
+
+  font-size: 1rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   ECOSYSTEM ITEMS
+============================================================ */
+
+.venture-details-ecosystem__items {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  background:
+    rgba(255, 255, 255, 0.12);
+}
+
+
+.venture-details-ecosystem__items > div {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+  min-height: 170px;
+
+  padding: 24px 16px;
+
+  background: var(--venture-navy);
+
+  color: #fff;
+
+  text-align: center;
+
+  transition:
+    background-color 0.2s ease;
+}
+
+
+.venture-details-ecosystem__items > div:hover {
+  background: var(--venture-navy-soft);
+}
+
+
+.venture-details-ecosystem__items svg {
+  flex-shrink: 0;
+
+  margin-bottom: 14px;
+
+  color: var(--venture-gold-soft);
+}
+
+
+.venture-details-ecosystem__items span {
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  line-height: 1.4;
+
+  letter-spacing: 0.03em;
+}
+
+
+/* ============================================================
+   FINAL CTA
+============================================================ */
+
+.venture-details-final {
+  padding:
+    var(--venture-section-space) 0;
+
+  background: #fff;
+}
+
+
+.venture-details-final__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: clamp(55px, 7vw, 90px);
+
+  align-items: end;
+}
+
+
+/* ============================================================
+   FINAL HEADING
+============================================================ */
+
+.venture-details-final h2 {
+  max-width: 700px;
+
+  margin: 16px 0 0;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3.2rem, 5.3vw, 5.8rem);
+
+  font-weight: 400;
+
+  line-height: 0.94;
+
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+}
+
+
+/* ============================================================
+   FINAL CONTENT
+============================================================ */
+
+.venture-details-final__content {
+  max-width: 650px;
+}
+
+
+.venture-details-final__content p {
+  margin: 0;
+
+  color: var(--venture-muted);
+
+  font-size: 1rem;
+
+  line-height: 1.75;
+}
+
+
+.venture-details-final__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+
+/* ============================================================
+   NOT FOUND
+============================================================ */
+
+.venture-details-not-found {
+  display: flex;
+
+  align-items: center;
+
+  min-height: 70vh;
+
+  padding: 120px 0;
+
+  background: var(--venture-cream);
+}
+
+
+.venture-details-not-found h1 {
+  max-width: 700px;
+
+  margin: 20px 0 24px;
+
+  color: var(--venture-navy);
+
+  font-family:
+    var(--font-display, Georgia, serif);
+
+  font-size:
+    clamp(3rem, 6vw, 5.5rem);
+
+  font-weight: 400;
+
+  line-height: 0.95;
+
+  letter-spacing: -0.045em;
+}
+
+
+.venture-details-not-found p {
+  max-width: 600px;
+
+  margin: 0 0 32px;
+
+  color: var(--venture-muted);
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+   1600PX+
+============================================================ */
+
+@media (min-width: 1600px) {
+
+  .venture-details-container {
+    width:
+      min(1480px, calc(100% - 120px));
+  }
+
+
+  .venture-details-hero__inner {
+    gap: 100px;
+  }
+
+}
+
+
+/* ============================================================
+   ULTRA WIDE
+   1920PX+
+============================================================ */
+
+@media (min-width: 1920px) {
+
+  .venture-details-container {
+    width:
+      min(1540px, calc(100% - 140px));
+  }
+
+
+  .venture-details-hero,
+  .venture-details-hero__inner {
+    min-height: 820px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(5.5rem, 5.8vw, 8rem);
+  }
+
+}
+
+
+/* ============================================================
+   LAPTOP
+   <= 1300PX
+============================================================ */
+
+@media (max-width: 1300px) {
+
+  .venture-details-container {
+    width:
+      min(100% - 64px, 1320px);
+  }
+
+
+  .venture-details-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.1fr)
+      minmax(320px, 0.9fr);
+
+    gap: 55px;
+  }
+
+
+  .venture-details-section-heading,
+  .venture-details-founder__grid {
+    gap: 50px;
+  }
+
+
+  .venture-details-overview__grid {
+    gap: 60px;
+  }
+
+
+  .venture-details-looking__grid,
+  .venture-details-ecosystem__grid,
+  .venture-details-final__grid {
+    gap: 60px;
+  }
+
+}
+
+
+/* ============================================================
+   MEDIUM LAPTOP
+   <= 1150PX
+============================================================ */
+
+@media (max-width: 1150px) {
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(3.8rem, 6vw, 6rem);
+  }
+
+
+  .venture-opportunity-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .venture-details-services__grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .venture-details-founder__grid {
+    grid-template-columns:
+      minmax(140px, 0.4fr)
+      minmax(0, 1.6fr);
+  }
+
+
+  .venture-details-ecosystem__grid {
+    grid-template-columns:
+      minmax(0, 0.9fr)
+      minmax(360px, 1.1fr);
+  }
+
+}
+
+
+/* ============================================================
+   1024PX / SMALL LAPTOP
+============================================================ */
+
+@media (max-width: 1050px) {
+
+  .venture-details-founders__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-founder__card {
+    display: grid;
+
+    grid-template-columns:
+      minmax(220px, 0.55fr)
+      minmax(0, 1fr);
+  }
+
+
+  .venture-details-founder__avatar {
+    height: 100%;
+
+    min-height: 330px;
+
+    aspect-ratio: auto;
+  }
+
+
+  .venture-details-founder__info {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    padding: 34px;
+  }
+
+
+  .venture-details-contact__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-ecosystem__items > div {
+    min-height: 150px;
+  }
+
+}
+
+
+/* ============================================================
+   SHORT LAPTOP
+============================================================ */
+
+@media (min-width: 901px)
+       and (max-height: 820px) {
+
+  .venture-details-hero,
+  .venture-details-hero__inner {
+    min-height: 620px;
+  }
+
+
+  .venture-details-hero__inner {
+    padding-top: 95px;
+
+    padding-bottom: 55px;
+  }
+
+
+  .venture-details-back-link {
+    margin-bottom: 24px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(3.8rem, 5.8vw, 5.8rem);
+  }
+
+
+  .venture-details-hero__description {
+    margin-top: 22px;
+  }
+
+
+  .venture-details-hero__actions {
+    margin-top: 26px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+   <= 900PX
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .venture-details-page {
+    --venture-section-space: 90px;
+  }
+
+
+  .venture-details-container {
+    width:
+      min(100% - 40px, 100%);
+  }
+
+
+  /* HERO */
+
+  .venture-details-hero {
+    min-height: auto;
+  }
+
+
+  .venture-details-hero__inner {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    min-height: auto;
+
+    padding-top: 110px;
+
+    padding-bottom: 65px;
+  }
+
+
+  .venture-details-hero__profile {
+    max-width: 620px;
+
+    margin-left: 0;
+  }
+
+
+  /* SHARED HEADINGS */
+
+  .venture-details-section-heading,
+  .venture-details-founder__grid {
+    grid-template-columns: 1fr;
+
+    gap: 28px;
+  }
+
+
+  /* OVERVIEW */
+
+  .venture-details-overview__grid {
+    grid-template-columns: 1fr;
+
+    gap: 55px;
+  }
+
+
+  .venture-details-overview__main {
+    max-width: 760px;
+  }
+
+
+  /* FOUNDER */
+
+  .venture-details-founders__grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .venture-details-founder__card {
+    display: flex;
+  }
+
+
+  .venture-details-founder__avatar {
+    height: auto;
+
+    min-height: 0;
+
+    aspect-ratio: 4 / 3;
+  }
+
+
+  .venture-details-founder__info {
+    display: block;
+
+    padding: 28px;
+  }
+
+
+  /* JOURNEY */
+
+  .venture-details-journey__grid {
+    grid-template-columns: 1fr;
+
+    border-left: 0;
+  }
+
+
+  .venture-details-journey__step {
+    display: grid;
+
+    grid-template-columns:
+      70px
+      minmax(0, 1fr);
+
+    align-items: center;
+
+    gap: 18px;
+
+    min-height: 92px;
+
+    border-left:
+      1px solid rgba(255, 255, 255, 0.14);
+  }
+
+
+  .venture-details-journey__step strong {
+    margin-top: 0;
+  }
+
+
+  /* LOOKING */
+
+  .venture-details-looking__grid {
+    grid-template-columns: 1fr;
+
+    gap: 55px;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .venture-details-ecosystem__grid {
+    grid-template-columns: 1fr;
+
+    gap: 55px;
+  }
+
+
+  .venture-details-ecosystem__items {
+    max-width: 720px;
+  }
+
+
+  /* FINAL */
+
+  .venture-details-final__grid {
+    grid-template-columns: 1fr;
+
+    gap: 38px;
+  }
+
+
+  .venture-details-final__content {
+    max-width: 700px;
+  }
+
+}
+
+
+/* ============================================================
+   LARGE MOBILE / SMALL TABLET
+   <= 768PX
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .venture-details-page {
+    --venture-section-space: 80px;
+  }
+
+
+  .venture-details-section-heading h2,
+  .venture-details-founder__content h2,
+  .venture-details-looking__content h2,
+  .venture-details-ecosystem h2,
+  .venture-details-final h2 {
+    font-size:
+      clamp(2.9rem, 8vw, 4.4rem);
+  }
+
+
+  .venture-details-founders__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-founder__card {
+    max-width: 620px;
+  }
+
+
+  .venture-details-contact__grid {
+    margin-top: 55px;
+  }
+
+
+  .venture-details-ecosystem__items {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   <= 620PX
+============================================================ */
+
+@media (max-width: 620px) {
+
+  .venture-details-page {
+    --venture-section-space: 72px;
+  }
+
+
+  .venture-details-container {
+    width:
+      min(100% - 28px, 100%);
+  }
+
+
+  /* HERO */
+
+  .venture-details-hero__background {
+    background-position:
+      62% center;
+  }
+
+
+  .venture-details-hero__overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(5, 17, 29, 0.48) 0%,
+        rgba(5, 17, 29, 0.72) 34%,
+        rgba(5, 17, 29, 0.99) 100%
+      );
+  }
+
+
+  .venture-details-hero__inner {
+    gap: 36px;
+
+    padding-top: 100px;
+
+    padding-bottom: 44px;
+  }
+
+
+  .venture-details-back-link {
+    margin-bottom: 24px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    max-width: 100%;
+
+    font-size:
+      clamp(3rem, 14vw, 4.7rem);
+
+    line-height: 0.92;
+  }
+
+
+  .venture-details-hero__description {
+    margin-top: 24px;
+
+    font-size: 0.94rem;
+
+    line-height: 1.65;
+  }
+
+
+  .venture-details-hero__actions {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    margin-top: 30px;
+  }
+
+
+  .venture-details-button {
+    width: 100%;
+
+    min-height: 54px;
+  }
+
+
+  .venture-details-hero__profile {
+    max-width: none;
+
+    padding: 24px;
+  }
+
+
+  /* HEADINGS */
+
+  .venture-details-section-heading h2,
+  .venture-details-founder__content h2,
+  .venture-details-looking__content h2,
+  .venture-details-ecosystem h2,
+  .venture-details-final h2 {
+    font-size:
+      clamp(2.7rem, 12vw, 4rem);
+
+    line-height: 0.97;
+  }
+
+
+  /* OVERVIEW */
+
+  .venture-details-overview__grid {
+    margin-top: 48px;
+  }
+
+
+  /* SERVICES */
+
+  .venture-details-services__grid {
+    grid-template-columns: 1fr;
+
+    gap: 14px;
+
+    margin-top: 48px;
+  }
+
+
+  .venture-details-service-card {
+    min-height: 190px;
+
+    padding: 26px;
+  }
+
+
+  .venture-details-service-card__icon {
+    margin-bottom: 42px;
+  }
+
+
+  /* OPPORTUNITY */
+
+  .venture-opportunity-grid {
+    grid-template-columns: 1fr;
+
+    margin-top: 48px;
+
+    border-left:
+      1px solid var(--venture-line);
+  }
+
+
+  .venture-opportunity-card {
+    min-height: auto;
+  }
+
+
+  .venture-opportunity-card h3 {
+    margin-top: 42px;
+  }
+
+
+  /* FOUNDER */
+
+  .venture-details-founder__content h2 {
+    margin-bottom: 38px;
+  }
+
+
+  .venture-details-founders__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-founder__card {
+    width: 100%;
+
+    max-width: none;
+  }
+
+
+  .venture-details-founder__avatar {
+    aspect-ratio: 4 / 3;
+  }
+
+
+  .venture-details-founder__card h3 {
+    font-size: 1.8rem;
+  }
+
+
+  /* CONTACT */
+
+  .venture-details-contact__grid {
+    grid-template-columns: 1fr;
+
+    margin-top: 48px;
+  }
+
+
+  .venture-details-contact__card {
+    grid-template-columns:
+      46px
+      minmax(0, 1fr);
+
+    gap: 16px;
+
+    min-height: 100px;
+
+    padding: 20px;
+  }
+
+
+  .venture-details-contact__card > svg:last-child {
+    display: none;
+  }
+
+
+  /* JOURNEY */
+
+  .venture-details-journey__grid {
+    margin-top: 48px;
+  }
+
+
+  .venture-details-journey__step {
+    grid-template-columns:
+      50px
+      minmax(0, 1fr);
+
+    min-height: 82px;
+
+    padding: 22px;
+  }
+
+
+  .venture-details-journey__step strong {
+    font-size: 1.3rem;
+  }
+
+
+  /* LOOKING */
+
+  .venture-details-looking__grid {
+    gap: 45px;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .venture-details-ecosystem__items {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .venture-details-ecosystem__items > div {
+    min-height: 140px;
+
+    padding: 20px 12px;
+  }
+
+
+  /* FINAL */
+
+  .venture-details-final__actions {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   <= 480PX
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .venture-details-container {
+    width:
+      min(100% - 24px, 100%);
+  }
+
+
+  /* HERO */
+
+  .venture-details-hero__inner {
+    padding-top: 88px;
+
+    padding-bottom: 36px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(2.8rem, 13.5vw, 3.9rem);
+  }
+
+
+  .venture-details-hero__profile {
+    padding: 20px;
+  }
+
+
+  .venture-details-hero__profile-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-hero__profile-grid > div {
+    min-height: auto;
+
+    padding: 16px;
+  }
+
+
+  .venture-details-logo {
+    min-height: 78px;
+
+    margin-bottom: 24px;
+  }
+
+
+  .venture-details-logo img {
+    max-width: 180px;
+    max-height: 72px;
+  }
+
+
+  /* TYPOGRAPHY */
+
+  .venture-details-section-heading h2,
+  .venture-details-founder__content h2,
+  .venture-details-looking__content h2,
+  .venture-details-ecosystem h2,
+  .venture-details-final h2 {
+    font-size:
+      clamp(2.55rem, 12vw, 3.5rem);
+  }
+
+
+  .venture-details-overview__main h3 {
+    font-size:
+      clamp(2.1rem, 10vw, 3rem);
+  }
+
+
+  /* SERVICE */
+
+  .venture-details-service-card {
+    padding: 24px;
+  }
+
+
+  .venture-details-service-card__number {
+    top: 25px;
+
+    right: 24px;
+  }
+
+
+  /* FOUNDER */
+
+  .venture-details-founder__avatar {
+    aspect-ratio: 1 / 1;
+  }
+
+
+  .venture-details-founder__info {
+    padding: 24px;
+  }
+
+
+  .venture-details-founder__avatar span {
+    font-size: 3rem;
+  }
+
+
+  /* LOOKING */
+
+  .venture-details-looking__item {
+    grid-template-columns:
+      44px
+      minmax(0, 1fr);
+
+    gap: 14px;
+  }
+
+
+  .venture-details-looking__item strong {
+    font-size: 1.16rem;
+  }
+
+
+  /* CONTACT */
+
+  .venture-details-contact__card {
+    padding: 18px;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .venture-details-ecosystem__items > div {
+    min-height: 125px;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+   <= 420PX
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .venture-details-page {
+    --venture-section-space: 64px;
+  }
+
+
+  .venture-details-container {
+    width:
+      min(100% - 22px, 100%);
+  }
+
+
+  /* HERO */
+
+  .venture-details-hero__inner {
+    gap: 28px;
+
+    padding-top: 82px;
+
+    padding-bottom: 32px;
+  }
+
+
+  .venture-details-back-link {
+    margin-bottom: 20px;
+
+    font-size: 0.66rem;
+  }
+
+
+  .venture-details-hero__meta {
+    font-size: 0.65rem;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(2.65rem, 14vw, 3.65rem);
+  }
+
+
+  .venture-details-hero__description {
+    font-size: 0.9rem;
+  }
+
+
+  .venture-details-hero__profile {
+    padding: 18px;
+  }
+
+
+  .venture-details-logo img {
+    max-width: 165px;
+  }
+
+
+  /* SECTION LABELS */
+
+  .venture-details-section-number {
+    margin-right: 10px;
+  }
+
+
+  .venture-details-eyebrow {
+    font-size: 0.64rem;
+  }
+
+
+  /* SERVICES */
+
+  .venture-details-service-card {
+    min-height: 180px;
+
+    padding: 22px;
+  }
+
+
+  .venture-details-service-card__icon {
+    margin-bottom: 36px;
+  }
+
+
+  .venture-details-service-card h3 {
+    font-size: 1.4rem;
+  }
+
+
+  /* FOUNDER */
+
+  .venture-details-founder__info {
+    padding: 22px;
+  }
+
+
+  .venture-details-founder__card h3 {
+    font-size: 1.65rem;
+  }
+
+
+  .venture-details-founder__card p {
+    font-size: 0.88rem;
+  }
+
+
+  /* CONTACT */
+
+  .venture-details-contact__card strong {
+    font-size: 0.82rem;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .venture-details-ecosystem__items {
+    grid-template-columns: 1fr;
+  }
+
+
+  .venture-details-ecosystem__items > div {
+    min-height: 110px;
+  }
+
+}
+
+
+/* ============================================================
+   360PX MOBILE
+============================================================ */
+
+@media (max-width: 360px) {
+
+  .venture-details-container {
+    width:
+      calc(100% - 20px);
+  }
+
+
+  .venture-details-hero__inner {
+    padding-top: 78px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size: 2.55rem;
+  }
+
+
+  .venture-details-section-heading h2,
+  .venture-details-founder__content h2,
+  .venture-details-looking__content h2,
+  .venture-details-ecosystem h2,
+  .venture-details-final h2 {
+    font-size: 2.4rem;
+  }
+
+
+  .venture-details-founder__info {
+    padding: 20px;
+  }
+
+
+  .venture-details-founder__card h3 {
+    font-size: 1.55rem;
+  }
+
+
+  .venture-details-contact__card {
+    grid-template-columns:
+      40px
+      minmax(0, 1fr);
+
+    gap: 13px;
+
+    padding: 16px;
+  }
+
+
+  .venture-details-contact__card > svg:first-child {
+    width: 40px;
+    height: 40px;
+
+    padding: 10px;
+  }
+
+
+  .venture-details-looking__item {
+    grid-template-columns:
+      38px
+      minmax(0, 1fr);
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+   <= 340PX
+============================================================ */
+
+@media (max-width: 340px) {
+
+  .venture-details-container {
+    width:
+      calc(100% - 16px);
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size: 2.35rem;
+  }
+
+
+  .venture-details-section-heading h2,
+  .venture-details-founder__content h2,
+  .venture-details-looking__content h2,
+  .venture-details-ecosystem h2,
+  .venture-details-final h2 {
+    font-size: 2.2rem;
+  }
+
+
+  .venture-details-button {
+    padding-inline: 16px;
+
+    font-size: 0.66rem;
+  }
+
+
+  .venture-details-hero__profile {
+    padding: 16px;
+  }
+
+
+  .venture-details-service-card,
+  .venture-opportunity-card {
+    padding: 20px;
+  }
+
+
+  .venture-details-contact__card {
+    padding: 14px;
+  }
+
+}
+
+
+/* ============================================================
+   LANDSCAPE PHONES
+============================================================ */
+
+@media (max-width: 900px)
+       and (max-height: 520px)
+       and (orientation: landscape) {
+
+  .venture-details-hero {
+    min-height: 520px;
+  }
+
+
+  .venture-details-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.2fr)
+      minmax(250px, 0.8fr);
+
+    gap: 35px;
+
+    align-items: center;
+
+    min-height: 520px;
+
+    padding-top: 60px;
+
+    padding-bottom: 35px;
+  }
+
+
+  .venture-details-back-link {
+    margin-bottom: 16px;
+  }
+
+
+  .venture-details-hero__content h1 {
+    font-size:
+      clamp(2.5rem, 6vw, 3.8rem);
+  }
+
+
+  .venture-details-hero__description {
+    margin-top: 16px;
+
+    font-size: 0.82rem;
+
+    line-height: 1.5;
+  }
+
+
+  .venture-details-hero__actions {
+    margin-top: 18px;
+  }
+
+
+  .venture-details-hero__profile {
+    padding: 20px;
+  }
+
+
+  .venture-details-logo {
+    min-height: 65px;
+
+    margin-bottom: 18px;
+  }
+
+
+  .venture-details-logo img {
+    max-height: 55px;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (hover: none) {
+
+  .venture-details-button:hover {
+    transform: none;
+  }
+
+
+  .venture-details-button:hover svg {
+    transform: none;
+  }
+
+
+  .venture-opportunity-card:hover {
+    background:
+      rgba(255, 255, 255, 0.62);
+  }
+
+
+  .venture-details-service-card:hover,
+  .venture-details-founder__card:hover,
+  .venture-details-contact__card:hover {
+    transform: none;
+
+    box-shadow: none;
+  }
+
+
+  .venture-details-ecosystem__items > div:hover {
+    background:
+      var(--venture-navy);
+  }
+
+}
+
+
+/* ============================================================
+   KEYBOARD ACCESSIBILITY
+============================================================ */
+
+.venture-details-button:focus-visible,
+.venture-details-back-link:focus-visible,
+.venture-details-contact__card:focus-visible {
+  outline:
+    2px solid var(--venture-gold);
+
+  outline-offset: 4px;
+}
+
+
+/* ============================================================
+   HIGH CONTRAST
+============================================================ */
+
+@media (prefers-contrast: more) {
+
+  .venture-details-service-card,
+  .venture-opportunity-card,
+  .venture-details-founder__card,
+  .venture-details-contact__card {
+    border-color:
+      var(--venture-navy);
+  }
+
+
+  .venture-details-hero__overlay {
+    background:
+      rgba(5, 17, 29, 0.9);
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .venture-details-page *,
+  .venture-details-page *::before,
+  .venture-details-page *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    scroll-behavior:
+      auto !important;
+  }
+
+
+  .venture-details-button,
+  .venture-details-button svg,
+  .venture-opportunity-card,
+  .venture-details-service-card,
+  .venture-details-founder__card,
+  .venture-details-contact__card,
+  .venture-details-ecosystem__items > div {
+    transition: none;
+  }
+
+
+  .venture-details-hero__background {
+    transform: none;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  .venture-details-page {
+    background: #fff;
+
+    color: #000;
+
+    overflow: visible;
+  }
+
+
+  .venture-details-container {
+    width: 100%;
+
+    max-width: none;
+  }
+
+
+  .venture-details-hero {
+    min-height: auto;
+
+    background: #fff;
+  }
+
+
+  .venture-details-hero__background,
+  .venture-details-hero__overlay {
+    display: none;
+  }
+
+
+  .venture-details-hero__inner {
+    display: block;
+
+    min-height: auto;
+
+    padding: 40px 0;
+  }
+
+
+  .venture-details-hero__content h1,
+  .venture-details-hero__description,
+  .venture-details-hero__meta,
+  .venture-details-back-link {
+    color: #000;
+  }
+
+
+  .venture-details-hero__profile {
+    max-width: none;
+
+    margin-top: 30px;
+
+    margin-left: 0;
+
+    background: #fff;
+
+    border-color: #ccc;
+
+    box-shadow: none;
+  }
+
+
+  .venture-details-hero__profile-grid {
+    border-color: #ccc;
+  }
+
+
+  .venture-details-hero__profile-grid > div {
+    border-color: #ccc;
+  }
+
+
+  .venture-details-hero__profile-grid span,
+  .venture-details-hero__profile-grid strong {
+    color: #000;
+  }
+
+
+  .venture-details-services,
+  .venture-details-contact,
+  .venture-details-opportunity,
+  .venture-details-looking {
+    background: #fff;
+  }
+
+
+  .venture-details-service-card,
+  .venture-opportunity-card,
+  .venture-details-founder__card,
+  .venture-details-contact__card {
+    break-inside: avoid;
+
+    box-shadow: none;
+  }
+
+
+  .venture-details-journey,
+  .venture-details-ecosystem {
+    background: #fff;
+  }
+
+
+  .venture-details-section-heading--light h2,
+  .venture-details-ecosystem h2,
+  .venture-details-ecosystem p {
+    color: #000;
+  }
+
+
+  .venture-details-journey__step {
+    border-color: #ccc;
+  }
+
+
+  .venture-details-journey__step span,
+  .venture-details-journey__step strong {
+    color: #000;
+  }
+
+
+  .venture-details-ecosystem__items {
+    border-color: #ccc;
+
+    background: #ccc;
+  }
+
+
+  .venture-details-ecosystem__items > div {
+    background: #fff;
+
+    color: #000;
+  }
+
+
+  .venture-details-button {
+    display: none;
+  }
+
+}

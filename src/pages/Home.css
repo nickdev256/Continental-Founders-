@@ -817,6 +817,7 @@
 .cf-text-link {
   display: inline-flex;
   align-items: center;
+  margin-left: 27px;
 
   gap: 10px;
 
@@ -1494,6 +1495,7 @@
 
 .cf-strategic-content {
   padding: 80px 70px 80px 0;
+ 
 }
 
 .cf-strategic-content .cf-section-marker span {
@@ -1524,6 +1526,7 @@
 
 .cf-strategic-content p {
   max-width: 720px;
+margin-bottom: 20px;
 
   color: #e0e7ec;
 

@@ -25,6 +25,11 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   // =========================
+  // MOBILE DROPDOWN
+  // =========================
+  const [mobileDropdown, setMobileDropdown] = useState(null);
+
+  // =========================
   // SEARCH
   // =========================
   const [searchOpen, setSearchOpen] = useState(false);
@@ -33,7 +38,6 @@ export default function Navbar() {
   const location = useLocation();
 
   // =========================
-  // CONTINENTAL FOUNDERS
   // WEBSITE SEARCH CONTENT
   // =========================
   const searchItems = [
@@ -44,22 +48,22 @@ export default function Navbar() {
       url: "/about",
     },
     {
-      title: "Our Founders",
+      title: "Our Model",
       description:
-        "Meet the founders and people building the Continental Founders community.",
-      url: "/founders",
+        "Explore how Continental Founders connects universities, founders, partners, and institutions.",
+      url: "/our-model",
     },
     {
-      title: "Our Community",
+      title: "University Partnerships",
       description:
-        "Discover our community, network, members, and opportunities.",
-      url: "/community",
+        "Learn about university collaborations and institutional partnerships.",
+      url: "/university-partnerships",
     },
     {
-      title: "Programs",
+      title: "Sponsors & Partners",
       description:
-        "Explore Continental Founders programs, initiatives, and opportunities.",
-      url: "/programs",
+        "Explore Continental Founders sponsors, strategic partners, and collaborators.",
+      url: "/strategic-partners",
     },
     {
       title: "Events",
@@ -68,10 +72,10 @@ export default function Navbar() {
       url: "/events",
     },
     {
-      title: "Resources",
+      title: "Insights",
       description:
-        "Access resources, insights, tools, and information for founders.",
-      url: "/resources",
+        "Read Continental Founders insights, ideas, updates, and thought leadership.",
+      url: "/insights",
     },
     {
       title: "Contact Us",
@@ -102,6 +106,7 @@ export default function Navbar() {
   // =========================
   const closeMenu = () => {
     setOpen(false);
+    setMobileDropdown(null);
   };
 
   // =========================
@@ -109,11 +114,11 @@ export default function Navbar() {
   // =========================
   useEffect(() => {
     setOpen(false);
+    setMobileDropdown(null);
   }, [location.pathname]);
 
   // =========================
-  // PREVENT BODY SCROLL WHEN
-  // MOBILE MENU IS OPEN
+  // PREVENT BODY SCROLL
   // =========================
   useEffect(() => {
     if (open) {
@@ -135,42 +140,40 @@ export default function Navbar() {
     setSearchQuery("");
   };
 
+  // =========================
+  // TOGGLE MOBILE DROPDOWN
+  // =========================
+  const toggleMobileDropdown = (label) => {
+    setMobileDropdown((current) =>
+      current === label ? null : label
+    );
+  };
+
   return (
     <header className="navbar">
-
       {/* =====================================================
           TOP INSTITUTIONAL BAR
       ===================================================== */}
 
       <div className="navbar__top">
-
         <div className="navbar__top-inner">
-
           <div className="navbar__top-left">
-            <span>
-              Africa
-            </span>
+            <span>Africa</span>
 
             <span className="navbar__top-divider">
               |
             </span>
 
-            <span>
-              United States
-            </span>
+            <span>United States</span>
 
             <span className="navbar__top-divider">
               |
             </span>
 
-            <span>
-              Global Partnerships
-            </span>
+            <span>Global Partnerships</span>
           </div>
 
-
           <div className="navbar__top-right">
-
             <Link to="/contact">
               Contact
             </Link>
@@ -182,22 +185,16 @@ export default function Navbar() {
             <Link to="/university-partnerships">
               Universities
             </Link>
-
           </div>
-
         </div>
-
       </div>
-
 
       {/* =====================================================
           MAIN NAVIGATION
       ===================================================== */}
 
       <div className="navbar__main">
-
         <div className="navbar__inner">
-
           {/* =================================================
               BRAND
           ================================================= */}
@@ -208,18 +205,15 @@ export default function Navbar() {
             aria-label="Continental Founders home"
             onClick={closeMenu}
           >
-
             <img
               src="/assets/continental-founders-logo.png"
               alt="Continental Founders"
               className="navbar__logo"
             />
-
           </Link>
 
-
           {/* =================================================
-              DESKTOP NAVIGATION
+              DESKTOP / MOBILE NAVIGATION
           ================================================= */}
 
           <nav
@@ -229,71 +223,157 @@ export default function Navbar() {
             }`}
             aria-label="Primary navigation"
           >
-
             <div className="navbar__links">
+              {navigation.map((item) => {
+                // =========================================
+                // DROPDOWN ITEM
+                // =========================================
 
-              {navigation.map((item) => (
+                if (item.children) {
+                  const isOpen =
+                    mobileDropdown === item.label;
 
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  end={item.path === "/"}
-                  className={({ isActive }) =>
-                    `navbar__link ${
-                      isActive ? "is-active" : ""
-                    }`
-                  }
-                  onClick={closeMenu}
-                >
+                  return (
+                    <div
+                      key={item.path}
+                      className={`navbar__dropdown ${
+                        isOpen
+                          ? "is-mobile-open"
+                          : ""
+                      }`}
+                    >
+                      <div className="navbar__dropdown-heading">
+                        <NavLink
+                          to={item.path}
+                          className={({ isActive }) =>
+                            `navbar__link navbar__dropdown-trigger ${
+                              isActive
+                                ? "is-active"
+                                : ""
+                            }`
+                          }
+                          onClick={() => {
+                            if (
+                              window.innerWidth <= 900
+                            ) {
+                              return;
+                            }
 
-                  <span>
-                    {item.label}
-                  </span>
+                            closeMenu();
+                          }}
+                        >
+                          <span>
+                            {item.label}
+                          </span>
 
-                  <ChevronDown
-                    className="navbar__desktop-arrow"
-                    size={13}
-                    strokeWidth={1.7}
-                  />
+                          <ChevronDown
+                            className="navbar__dropdown-arrow"
+                            size={14}
+                            strokeWidth={1.7}
+                          />
+                        </NavLink>
 
-                  <ChevronDown
-                    className="navbar__mobile-arrow"
-                    size={17}
-                    strokeWidth={1.5}
-                  />
+                        <button
+                          type="button"
+                          className="navbar__mobile-dropdown-toggle"
+                          onClick={() =>
+                            toggleMobileDropdown(
+                              item.label
+                            )
+                          }
+                          aria-expanded={isOpen}
+                          aria-label={`Toggle ${item.label} submenu`}
+                        >
+                          <ChevronDown
+                            size={18}
+                            strokeWidth={1.6}
+                          />
+                        </button>
+                      </div>
 
-                </NavLink>
+                      <div className="navbar__dropdown-menu">
+                        {item.children.map(
+                          (child) => (
+                            <NavLink
+                              key={child.path}
+                              to={child.path}
+                              className={({
+                                isActive,
+                              }) =>
+                                `navbar__dropdown-link ${
+                                  isActive
+                                    ? "is-active"
+                                    : ""
+                                }`
+                              }
+                              onClick={closeMenu}
+                            >
+                              <span>
+                                {child.label}
+                              </span>
 
-              ))}
+                              <ArrowUpRight
+                                size={14}
+                                strokeWidth={1.6}
+                              />
+                            </NavLink>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
 
+                // =========================================
+                // NORMAL ITEM
+                // =========================================
+
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    end={item.path === "/"}
+                    className={({ isActive }) =>
+                      `navbar__link ${
+                        isActive
+                          ? "is-active"
+                          : ""
+                      }`
+                    }
+                    onClick={closeMenu}
+                  >
+                    <span>
+                      {item.label}
+                    </span>
+                  </NavLink>
+                );
+              })}
             </div>
-
 
             {/* =================================================
                 NAVIGATION ACTIONS
             ================================================= */}
 
             <div className="navbar__actions">
-
               <button
-  type="button"
-  className="navbar__search"
-  aria-label="Search"
-  onClick={() => setSearchOpen(true)}
->
-  <Search
-    size={18}
-    strokeWidth={1.6}
-  />
-</button>
-
+                type="button"
+                className="navbar__search"
+                aria-label="Search"
+                onClick={() =>
+                  setSearchOpen(true)
+                }
+              >
+                <Search
+                  size={18}
+                  strokeWidth={1.6}
+                />
+              </button>
 
               <Link
                 to="/contact"
                 className="navbar__cta"
                 onClick={closeMenu}
               >
-
                 <span>
                   Schedule a Meeting
                 </span>
@@ -302,13 +382,9 @@ export default function Navbar() {
                   size={16}
                   strokeWidth={1.7}
                 />
-
               </Link>
-
             </div>
-
           </nav>
-
 
           {/* =================================================
               MOBILE MENU BUTTON
@@ -330,7 +406,6 @@ export default function Navbar() {
                 : "Open navigation menu"
             }
           >
-
             {open ? (
               <X
                 size={25}
@@ -342,130 +417,132 @@ export default function Navbar() {
                 strokeWidth={1.5}
               />
             )}
-
           </button>
-
         </div>
-
       </div>
+
+      {/* =====================================================
+          SEARCH MODAL
+      ===================================================== */}
 
       {searchOpen && (
-  <div
-    className="search-overlay"
-    onClick={closeSearch}
-  >
-    <div
-      className="search-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="search-header">
-
-        <div className="search-input-wrapper">
-          <Search
-            size={21}
-            strokeWidth={1.7}
-          />
-
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) =>
-              setSearchQuery(e.target.value)
-            }
-            placeholder="Search Continental Founders..."
-            autoFocus
-            aria-label="Search website"
-          />
-        </div>
-
-        <button
-          type="button"
-          className="search-close"
+        <div
+          className="search-overlay"
           onClick={closeSearch}
-          aria-label="Close search"
         >
-          <X
-            size={22}
-            strokeWidth={1.7}
-          />
-        </button>
+          <div
+            className="search-modal"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+            <div className="search-header">
+              <div className="search-input-wrapper">
+                <Search
+                  size={21}
+                  strokeWidth={1.7}
+                />
 
-      </div>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) =>
+                    setSearchQuery(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Search Continental Founders..."
+                  autoFocus
+                  aria-label="Search website"
+                />
+              </div>
 
-      <div className="search-results">
-
-        {!searchQuery.trim() && (
-          <div className="search-empty">
-
-            <Search
-              size={34}
-              strokeWidth={1.4}
-            />
-
-            <h3>
-              Search Continental Founders...
-            </h3>
-
-            <p>
-              Search our services and solutions.
-            </p>
-
-          </div>
-        )}
-
-        {searchQuery.trim() &&
-          filteredResults.length === 0 && (
-            <div className="search-empty">
-
-              <h3>
-                No results found
-              </h3>
-
-              <p>
-                No results found for "
-                {searchQuery}".
-              </p>
-
-            </div>
-          )}
-
-        {filteredResults.length > 0 && (
-          <div className="search-result-list">
-
-            {filteredResults.map((item) => (
-              <Link
-                key={item.title}
-                to={item.url}
-                className="search-result"
+              <button
+                type="button"
+                className="search-close"
                 onClick={closeSearch}
+                aria-label="Close search"
               >
+                <X
+                  size={22}
+                  strokeWidth={1.7}
+                />
+              </button>
+            </div>
 
-                <div className="search-result-icon">
+            <div className="search-results">
+              {!searchQuery.trim() && (
+                <div className="search-empty">
                   <Search
-                    size={17}
-                    strokeWidth={1.6}
+                    size={34}
+                    strokeWidth={1.4}
                   />
-                </div>
 
-                <div>
-                  <h4>{item.title}</h4>
+                  <h3>
+                    Search Continental Founders
+                  </h3>
 
                   <p>
-                    {item.description}
+                    Search our programs,
+                    partnerships, events,
+                    insights, and more.
                   </p>
                 </div>
+              )}
 
-              </Link>
-            ))}
+              {searchQuery.trim() &&
+                filteredResults.length ===
+                  0 && (
+                  <div className="search-empty">
+                    <h3>
+                      No results found
+                    </h3>
 
+                    <p>
+                      No results found for "
+                      {searchQuery}".
+                    </p>
+                  </div>
+                )}
+
+              {filteredResults.length >
+                0 && (
+                <div className="search-result-list">
+                  {filteredResults.map(
+                    (item) => (
+                      <Link
+                        key={item.title}
+                        to={item.url}
+                        className="search-result"
+                        onClick={closeSearch}
+                      >
+                        <div className="search-result-icon">
+                          <Search
+                            size={17}
+                            strokeWidth={1.6}
+                          />
+                        </div>
+
+                        <div>
+                          <h4>
+                            {item.title}
+                          </h4>
+
+                          <p>
+                            {
+                              item.description
+                            }
+                          </p>
+                        </div>
+                      </Link>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        )}
-
-      </div>
-    </div>
-  </div>
-)}
-
+        </div>
+      )}
     </header>
   );
 }

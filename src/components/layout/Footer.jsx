@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
 import {
   ArrowUpRight,
   ChevronRight,
   Linkedin,
   Instagram,
-  Youtube,
-  Mail,
   Globe2,
 } from "lucide-react";
 
 import "./Footer.css";
+
 
 /* ============================================================
    NAVIGATION
@@ -60,27 +60,24 @@ const navigation = {
   ],
 };
 
+
 /* ============================================================
    SOCIAL MEDIA
 ============================================================ */
 
 const socials = [
   {
+    label: "Instagram",
+    icon: Instagram,
+    url: "https://www.instagram.com/continentalfounderstm/",
+  },
+  {
     label: "LinkedIn",
     icon: Linkedin,
     url: "https://www.linkedin.com/",
   },
-  {
-    label: "Instagram",
-    icon: Instagram,
-    url: "https://www.instagram.com/",
-  },
-  {
-    label: "YouTube",
-    icon: Youtube,
-    url: "https://www.youtube.com/",
-  },
 ];
+
 
 /* ============================================================
    FOOTER
@@ -102,6 +99,7 @@ export default function Footer() {
 
           <div className="cf-footer__top">
 
+
             {/* ==================================================
                 BRAND
             =================================================== */}
@@ -119,9 +117,11 @@ export default function Footer() {
                 />
               </Link>
 
+
               <div className="cf-footer__tagline">
                 CONNECT. COLLABORATE. CREATE IMPACT.
               </div>
+
 
               <p className="cf-footer__description">
                 Continental Founders builds strategic partnerships
@@ -130,22 +130,40 @@ export default function Footer() {
                 development.
               </p>
 
+
+              {/* LOCATION */}
+
               <div className="cf-footer__location">
+
                 <div className="cf-footer__location-icon">
-                  <Globe2 size={18} strokeWidth={1.7} />
+                  <Globe2
+                    size={18}
+                    strokeWidth={1.7}
+                  />
                 </div>
 
                 <div>
-                  <span>GLOBAL NETWORK</span>
-                  <strong>United States × Africa</strong>
+                  <span>
+                    GLOBAL NETWORK
+                  </span>
+
+                  <strong>
+                    United States × Africa
+                  </strong>
                 </div>
+
               </div>
+
+
+              {/* MEETING CTA */}
 
               <Link
                 to="/contact"
                 className="cf-footer__meeting"
               >
-                <span>Schedule a Meeting</span>
+                <span>
+                  Schedule a Meeting
+                </span>
 
                 <span className="cf-footer__meeting-icon">
                   <ArrowUpRight
@@ -168,26 +186,36 @@ export default function Footer() {
                 01
               </span>
 
-              <h3>Explore</h3>
+              <h3>
+                Explore
+              </h3>
 
               <nav
                 className="cf-footer__links"
                 aria-label="Explore"
               >
+
                 {navigation.explore.map((item) => (
+
                   <Link
                     key={item.path}
                     to={item.path}
                     className="cf-footer__link"
                   >
-                    <span>{item.label}</span>
+
+                    <span>
+                      {item.label}
+                    </span>
 
                     <ChevronRight
                       size={17}
                       strokeWidth={1.7}
                     />
+
                   </Link>
+
                 ))}
+
               </nav>
 
             </div>
@@ -203,33 +231,43 @@ export default function Footer() {
                 02
               </span>
 
-              <h3>Resources</h3>
+              <h3>
+                Resources
+              </h3>
 
               <nav
                 className="cf-footer__links"
                 aria-label="Resources"
               >
+
                 {navigation.resources.map((item) => (
+
                   <Link
                     key={item.path}
                     to={item.path}
                     className="cf-footer__link"
                   >
-                    <span>{item.label}</span>
+
+                    <span>
+                      {item.label}
+                    </span>
 
                     <ChevronRight
                       size={17}
                       strokeWidth={1.7}
                     />
+
                   </Link>
+
                 ))}
+
               </nav>
 
             </div>
 
 
             {/* ==================================================
-                FOCUS
+                OUR FOCUS
             =================================================== */}
 
             <div className="cf-footer__column cf-footer__focus">
@@ -238,29 +276,64 @@ export default function Footer() {
                 03
               </span>
 
-              <h3>Our Focus</h3>
+              <h3>
+                Our Focus
+              </h3>
 
               <div className="cf-footer__focus-list">
 
-                <div className="cf-footer__focus-item">
-                  <span>01</span>
-                  <p>Entrepreneurship</p>
-                </div>
 
                 <div className="cf-footer__focus-item">
-                  <span>02</span>
-                  <p>Innovation</p>
+
+                  <span>
+                    01
+                  </span>
+
+                  <p>
+                    Entrepreneurship
+                  </p>
+
                 </div>
 
-                <div className="cf-footer__focus-item">
-                  <span>03</span>
-                  <p>Leadership Development</p>
-                </div>
 
                 <div className="cf-footer__focus-item">
-                  <span>04</span>
-                  <p>U.S.–Africa University Partnerships</p>
+
+                  <span>
+                    02
+                  </span>
+
+                  <p>
+                    Innovation
+                  </p>
+
                 </div>
+
+
+                <div className="cf-footer__focus-item">
+
+                  <span>
+                    03
+                  </span>
+
+                  <p>
+                    Leadership Development
+                  </p>
+
+                </div>
+
+
+                <div className="cf-footer__focus-item">
+
+                  <span>
+                    04
+                  </span>
+
+                  <p>
+                    U.S.–Africa University Partnerships
+                  </p>
+
+                </div>
+
 
               </div>
 
@@ -268,18 +341,13 @@ export default function Footer() {
 
           </div>
 
-
-          
-
         </div>
 
       </section>
 
 
-    
-
       {/* ======================================================
-          BOTTOM
+          BOTTOM FOOTER
       ======================================================= */}
 
       <section className="cf-footer__bottom">
@@ -288,7 +356,10 @@ export default function Footer() {
 
           <div className="cf-footer__bottom-content">
 
-            {/* COPYRIGHT */}
+
+            {/* ==================================================
+                COPYRIGHT
+            =================================================== */}
 
             <div className="cf-footer__copyright">
 
@@ -297,6 +368,7 @@ export default function Footer() {
               </span>
 
               <div>
+
                 <strong>
                   {year} Continental Founders™
                 </strong>
@@ -304,12 +376,15 @@ export default function Footer() {
                 <span>
                   All rights reserved.
                 </span>
+
               </div>
 
             </div>
 
 
-            {/* LEGAL */}
+            {/* ==================================================
+                LEGAL
+            =================================================== */}
 
             <nav
               className="cf-footer__legal"
@@ -331,7 +406,9 @@ export default function Footer() {
             </nav>
 
 
-            {/* SOCIAL */}
+            {/* ==================================================
+                SOCIAL MEDIA
+            =================================================== */}
 
             <div
               className="cf-footer__socials"
@@ -343,19 +420,24 @@ export default function Footer() {
                 const Icon = social.icon;
 
                 return (
+
                   <a
                     key={social.label}
                     href={social.url}
                     className="cf-footer__social"
-                    aria-label={social.label}
+                    aria-label={`Visit Continental Founders on ${social.label}`}
+                    title={social.label}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
+
                     <Icon
                       size={20}
                       strokeWidth={1.7}
                     />
+
                   </a>
+
                 );
 
               })}

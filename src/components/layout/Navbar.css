@@ -25,8 +25,7 @@
     sans-serif;
 
   box-shadow:
-    0 2px 10px
-    rgba(18, 53, 91, 0.08);
+    0 2px 10px rgba(18, 53, 91, 0.08);
 }
 
 body {
@@ -46,16 +45,11 @@ body {
   color: #ffffff;
 
   border-bottom:
-    1px solid
-    rgba(255, 255, 255, 0.1);
+    1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar__top-inner {
-  width: min(
-    calc(100% - 80px),
-    1480px
-  );
-
+  width: min(calc(100% - 80px), 1480px);
   min-height: 34px;
 
   margin-inline: auto;
@@ -84,7 +78,7 @@ body {
     Times,
     serif;
 
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   line-height: 1;
 
   text-decoration: none;
@@ -133,12 +127,8 @@ body {
 }
 
 .navbar__inner {
-  width: min(
-    calc(100% - 80px),
-    1480px
-  );
-
-  min-height: 86px;
+  width: min(calc(100% - 80px), 1480px);
+  min-height: 88px;
 
   margin-inline: auto;
 
@@ -146,7 +136,7 @@ body {
   align-items: center;
   justify-content: space-between;
 
-  gap: 34px;
+  gap: 28px;
 }
 
 
@@ -160,7 +150,7 @@ body {
   display: inline-flex;
   align-items: center;
 
-  min-width: 180px;
+  min-width: 170px;
 
   text-decoration: none;
 }
@@ -169,15 +159,15 @@ body {
   display: block;
 
   width: auto;
-  height: 110px;
+  height: 76px;
 
-  max-width: 445px;
+  max-width: 240px;
 
-  margin-top: 10px;
+  margin: 0;
 
   object-fit: contain;
 
-  transform: translateX(-100px);
+  transform: none;
 }
 
 
@@ -192,14 +182,14 @@ body {
   align-items: center;
   justify-content: flex-end;
 
-  gap: 25px;
+  gap: 18px;
 }
 
 .navbar__links {
   display: flex;
   align-items: center;
 
-  gap: 3px;
+  gap: 2px;
 }
 
 
@@ -218,9 +208,7 @@ body {
 
   min-height: 76px;
 
-  padding:
-    0
-    14px;
+  padding: 0 12px;
 
   color: #12355b;
 
@@ -230,7 +218,7 @@ body {
     Arial,
     sans-serif;
 
-  font-size: 0.9rem;
+  font-size: 0.93rem;
   font-weight: 600;
 
   letter-spacing: 0.01em;
@@ -250,11 +238,8 @@ body {
 }
 
 .navbar__link:focus-visible {
-  outline:
-    2px solid #0a6e8a;
-
+  outline: 2px solid #0a6e8a;
   outline-offset: 4px;
-
   border-radius: 4px;
 }
 
@@ -268,8 +253,8 @@ body {
 
   position: absolute;
 
-  left: 12px;
-  right: 12px;
+  left: 10px;
+  right: 10px;
   bottom: 0;
 
   height: 3px;
@@ -277,11 +262,9 @@ body {
   background: #c99a2e;
 
   transform: scaleX(0);
-
   transform-origin: center;
 
-  transition:
-    transform 180ms ease;
+  transition: transform 180ms ease;
 }
 
 .navbar__link:hover::after,
@@ -295,7 +278,7 @@ body {
 
 
 /* ============================================================
-   NORMAL NAV ARROWS
+   NAV ARROWS
 ============================================================ */
 
 .navbar__desktop-arrow {
@@ -312,7 +295,7 @@ body {
 
 
 /* ============================================================
-   UNIVERSITY PARTNERSHIPS DROPDOWN
+   PARTNERS DROPDOWN
 ============================================================ */
 
 .navbar__dropdown {
@@ -366,14 +349,12 @@ body {
   background: #ffffff;
 
   border:
-    1px solid
-    rgba(18, 53, 91, 0.1);
+    1px solid rgba(18, 53, 91, 0.1);
 
   border-radius: 7px;
 
   box-shadow:
-    0 20px 50px
-    rgba(7, 26, 45, 0.16);
+    0 20px 50px rgba(7, 26, 45, 0.16);
 
   opacity: 0;
   visibility: hidden;
@@ -415,16 +396,12 @@ body {
     0
     0;
 
-  transform:
-    translateX(-50%);
+  transform: translateX(-50%);
 }
 
 
 /* ============================================================
    DROPDOWN HOVER BRIDGE
-
-   Prevents dropdown closing while moving
-   mouse from navbar link to dropdown.
 ============================================================ */
 
 .navbar__dropdown-menu::after {
@@ -463,8 +440,7 @@ body {
 .navbar__dropdown-arrow,
 .navbar__dropdown:focus-within
 .navbar__dropdown-arrow {
-  transform:
-    rotate(180deg);
+  transform: rotate(180deg);
 
   opacity: 1;
 }
@@ -485,9 +461,7 @@ body {
 
   width: 100%;
 
-  padding:
-    14px
-    15px;
+  padding: 14px 15px;
 
   color: #12355b;
 
@@ -497,7 +471,7 @@ body {
     Arial,
     sans-serif;
 
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
 
   line-height: 1.35;
@@ -519,8 +493,7 @@ body {
 
   opacity: 0;
 
-  transform:
-    translate(-4px, 4px);
+  transform: translate(-4px, 4px);
 
   transition:
     opacity 180ms ease,
@@ -538,8 +511,7 @@ body {
 .navbar__dropdown-link:hover svg {
   opacity: 1;
 
-  transform:
-    translate(0, 0);
+  transform: translate(0, 0);
 }
 
 .navbar__dropdown-link.is-active {
@@ -552,8 +524,6 @@ body {
 
 /* ============================================================
    MOBILE DROPDOWN BUTTON
-
-   Hidden on desktop.
 ============================================================ */
 
 .navbar__mobile-dropdown-toggle {
@@ -569,7 +539,7 @@ body {
   display: flex;
   align-items: center;
 
-  gap: 16px;
+  gap: 12px;
 
   flex-shrink: 0;
 }
@@ -614,13 +584,11 @@ body {
   border-color: #12355b;
 
   box-shadow:
-    0 4px 12px
-    rgba(18, 53, 91, 0.15);
+    0 4px 12px rgba(18, 53, 91, 0.15);
 }
 
 .navbar__search:active {
-  transform:
-    translateY(1px);
+  transform: translateY(1px);
 }
 
 
@@ -631,9 +599,7 @@ body {
 .navbar__cta {
   min-height: 45px;
 
-  padding:
-    0
-    20px;
+  padding: 0 18px;
 
   display: inline-flex;
   align-items: center;
@@ -677,8 +643,7 @@ body {
   border-color: #a97d1e;
 
   box-shadow:
-    0 4px 12px
-    rgba(18, 53, 91, 0.15);
+    0 4px 12px rgba(18, 53, 91, 0.15);
 }
 
 
@@ -709,43 +674,105 @@ body {
 
 
 /* ============================================================
-   LARGE LAPTOP
+   ULTRA-WIDE DESKTOP
 ============================================================ */
 
-@media (max-width: 1350px) {
+@media (min-width: 1800px) {
 
   .navbar__top-inner,
   .navbar__inner {
-    width: min(
-      calc(100% - 60px),
-      1280px
-    );
+    width: min(calc(100% - 120px), 1540px);
   }
 
   .navbar__inner {
-    gap: 24px;
+    min-height: 94px;
   }
 
   .navbar__logo {
-    height: 56px;
-
-    transform: none;
-
-    margin-top: 0;
+    height: 82px;
+    max-width: 260px;
   }
 
   .navbar__brand {
-    min-width: 150px;
+    min-width: 200px;
   }
 
   .navbar__nav {
-    gap: 16px;
+    gap: 24px;
+  }
+
+  .navbar__link {
+    font-size: 0.96rem;
+    padding-inline: 14px;
+  }
+
+  .navbar__cta {
+    min-height: 47px;
+    font-size: 0.94rem;
+  }
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+============================================================ */
+
+@media (min-width: 1400px) and (max-width: 1799px) {
+
+  .navbar__top-inner,
+  .navbar__inner {
+    width: min(calc(100% - 96px), 1480px);
+  }
+
+  .navbar__logo {
+    height: 76px;
+    max-width: 240px;
+  }
+
+  .navbar__brand {
+    min-width: 185px;
+  }
+
+  .navbar__link {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* ============================================================
+   LARGE LAPTOP
+============================================================ */
+
+@media (max-width: 1399px) {
+
+  .navbar__top-inner,
+  .navbar__inner {
+    width: min(calc(100% - 64px), 1280px);
+  }
+
+  .navbar__inner {
+    gap: 22px;
+  }
+
+  .navbar__logo {
+    height: 62px;
+    max-width: 210px;
+
+    transform: none;
+  }
+
+  .navbar__brand {
+    min-width: 155px;
+  }
+
+  .navbar__nav {
+    gap: 12px;
   }
 
   .navbar__link {
     padding-inline: 9px;
 
-    font-size: 0.84rem;
+    font-size: 0.82rem;
   }
 
   .navbar__link::after {
@@ -754,38 +781,41 @@ body {
   }
 
   .navbar__cta {
-    padding-inline: 16px;
+    min-height: 42px;
 
-    font-size: 0.86rem;
+    padding-inline: 14px;
+
+    font-size: 0.82rem;
+  }
+
+  .navbar__search {
+    width: 40px;
+    height: 40px;
   }
 
   .navbar__dropdown-menu {
-    width: 260px;
+    width: 255px;
   }
-
 }
 
 
 /* ============================================================
-   TABLET / SMALL LAPTOP
+   SMALL LAPTOP / TABLET LANDSCAPE
 ============================================================ */
 
-@media (max-width: 1120px) {
+@media (max-width: 1180px) {
 
   .navbar__top-inner,
   .navbar__inner {
-    width: min(
-      calc(100% - 48px),
-      1000px
-    );
+    width: min(calc(100% - 48px), 1080px);
   }
 
   .navbar__top-left {
-    gap: 10px;
+    gap: 9px;
   }
 
   .navbar__top-right {
-    gap: 13px;
+    gap: 12px;
   }
 
   .navbar__top-left span,
@@ -794,17 +824,16 @@ body {
   }
 
   .navbar__brand {
-    min-width: 135px;
+    min-width: 140px;
   }
 
   .navbar__logo {
+    height: 54px;
     max-width: 180px;
-
-    height: 52px;
   }
 
   .navbar__nav {
-    gap: 8px;
+    gap: 6px;
   }
 
   .navbar__links {
@@ -814,7 +843,7 @@ body {
   .navbar__link {
     padding-inline: 7px;
 
-    font-size: 0.77rem;
+    font-size: 0.76rem;
   }
 
   .navbar__link::after {
@@ -822,35 +851,31 @@ body {
     right: 7px;
   }
 
-  .navbar__desktop-arrow {
-    display: none;
-  }
-
   .navbar__actions {
     gap: 7px;
   }
 
   .navbar__search {
-    width: 38px;
-    height: 38px;
+    width: 37px;
+    height: 37px;
   }
 
   .navbar__cta {
-    min-height: 42px;
+    min-height: 40px;
 
-    padding-inline: 12px;
+    padding-inline: 10px;
 
-    font-size: 0.77rem;
+    font-size: 0.74rem;
   }
-
 }
 
 
 /* ============================================================
    MOBILE NAVIGATION
+   TABLETS + SMALL LAPTOPS
 ============================================================ */
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
 
   .navbar__top {
     display: none;
@@ -861,14 +886,11 @@ body {
   }
 
   .navbar__inner {
-    width: min(
-      calc(100% - 36px),
-      760px
-    );
+    width: min(calc(100% - 36px), 900px);
 
     min-height: 76px;
 
-    gap: 20px;
+    gap: 18px;
   }
 
   .navbar__brand {
@@ -880,9 +902,9 @@ body {
 
     height: 56px;
 
-    max-width: 205px;
+    max-width: 195px;
 
-    margin-top: 0;
+    margin: 0;
 
     transform: none;
   }
@@ -911,15 +933,15 @@ body {
       0;
 
     width: 100%;
+    height: calc(100dvh - 76px);
 
     padding:
       28px
       max(
-        18px,
-        calc(
-          (100vw - 760px) / 2
-        )
-      );
+        20px,
+        calc((100vw - 900px) / 2)
+      )
+      40px;
 
     background: #ffffff;
 
@@ -927,6 +949,7 @@ body {
       1px solid #e6e7e5;
 
     overflow-y: auto;
+    overscroll-behavior: contain;
 
     display: flex;
     flex-direction: column;
@@ -942,7 +965,7 @@ body {
     pointer-events: none;
 
     transform:
-      translateY(-12px);
+      translateY(-10px);
 
     transition:
       opacity 220ms ease,
@@ -981,11 +1004,9 @@ body {
   .navbar__link {
     width: 100%;
 
-    min-height: 62px;
+    min-height: 64px;
 
-    padding:
-      0
-      4px;
+    padding: 0 4px;
 
     justify-content: space-between;
 
@@ -994,9 +1015,9 @@ body {
 
     color: #071a2d;
 
-    font-size: 1.05rem;
+    font-size: 1.06rem;
 
-    letter-spacing: 0.025em;
+    letter-spacing: 0.02em;
   }
 
   .navbar__link::after {
@@ -1004,7 +1025,7 @@ body {
     right: auto;
     bottom: -1px;
 
-    width: 70px;
+    width: 72px;
     height: 2px;
 
     transform-origin: left;
@@ -1028,7 +1049,7 @@ body {
 
 
   /* ----------------------------------------------------------
-     MOBILE PARTNERSHIP DROPDOWN
+     MOBILE PARTNERS DROPDOWN
   ---------------------------------------------------------- */
 
   .navbar__dropdown {
@@ -1068,8 +1089,8 @@ body {
   ---------------------------------------------------------- */
 
   .navbar__mobile-dropdown-toggle {
-    width: 52px;
-    height: 62px;
+    width: 54px;
+    height: 64px;
 
     display: inline-flex;
     align-items: center;
@@ -1077,7 +1098,7 @@ body {
 
     flex-shrink: 0;
 
-    margin-left: -52px;
+    margin-left: -54px;
 
     border: none;
 
@@ -1147,28 +1168,28 @@ body {
 
   .navbar__dropdown.is-mobile-open
   .navbar__dropdown-menu {
-    max-height: 220px;
+    max-height: 240px;
 
     padding:
-      7px
+      8px
       0
-      9px;
+      10px;
 
     pointer-events: auto;
   }
 
   .navbar__dropdown-link {
-    min-height: 49px;
+    min-height: 50px;
 
     padding:
-      11px
+      12px
       18px
-      11px
-      25px;
+      12px
+      26px;
 
     color: #12355b;
 
-    font-size: 0.92rem;
+    font-size: 0.96rem;
 
     border-left:
       3px solid transparent;
@@ -1177,7 +1198,7 @@ body {
   }
 
   .navbar__dropdown-link:hover {
-    padding-left: 29px;
+    padding-left: 30px;
 
     color: #b28422;
 
@@ -1234,32 +1255,88 @@ body {
 
     font-size: 1rem;
   }
-
 }
 
 
 /* ============================================================
-   SMALL PHONES
+   TABLET PORTRAIT
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .navbar__inner {
+    width: calc(100% - 32px);
+
+    min-height: 72px;
+  }
+
+  .navbar__logo {
+    height: 52px;
+
+    max-width: 185px;
+  }
+
+  .navbar__toggle {
+    width: 44px;
+    height: 44px;
+  }
+
+  .navbar__nav {
+    inset:
+      72px
+      0
+      0;
+
+    height:
+      calc(100dvh - 72px);
+
+    padding:
+      22px
+      16px
+      34px;
+  }
+
+  .navbar__link {
+    min-height: 60px;
+
+    font-size: 1.03rem;
+  }
+
+  .navbar__mobile-dropdown-toggle {
+    width: 52px;
+    height: 60px;
+
+    margin-left: -52px;
+  }
+
+  .navbar__dropdown-link {
+    font-size: 0.94rem;
+  }
+}
+
+
+/* ============================================================
+   NORMAL PHONES
 ============================================================ */
 
 @media (max-width: 600px) {
 
   .navbar__inner {
     width:
-      calc(100% - 28px);
+      calc(100% - 26px);
 
     min-height: 70px;
   }
 
   .navbar__logo {
-    height: 50px;
+    height: 49px;
 
-    max-width: 185px;
+    max-width: 170px;
   }
 
   .navbar__toggle {
-    width: 43px;
-    height: 43px;
+    width: 42px;
+    height: 42px;
   }
 
   .navbar__nav {
@@ -1268,34 +1345,53 @@ body {
       0
       0;
 
+    height:
+      calc(100dvh - 70px);
+
     padding:
-      20px
-      14px
-      32px;
+      18px
+      13px
+      28px;
   }
 
   .navbar__link {
-    min-height: 59px;
+    min-height: 58px;
 
     font-size: 1rem;
   }
 
   .navbar__mobile-dropdown-toggle {
-    height: 59px;
+    width: 50px;
+    height: 58px;
+
+    margin-left: -50px;
   }
 
   .navbar__dropdown-link {
+    min-height: 48px;
+
+    padding:
+      11px
+      15px
+      11px
+      22px;
+
     font-size: 0.9rem;
   }
 
+  .navbar__cta {
+    min-height: 52px;
+
+    font-size: 0.97rem;
+  }
 }
 
 
 /* ============================================================
-   VERY SMALL PHONES
+   SMALL PHONES
 ============================================================ */
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
 
   .navbar__inner {
     width:
@@ -1305,7 +1401,7 @@ body {
   .navbar__logo {
     height: 46px;
 
-    max-width: 165px;
+    max-width: 155px;
   }
 
   .navbar__toggle {
@@ -1314,22 +1410,61 @@ body {
   }
 
   .navbar__nav {
-    inset:
-      70px
-      0
-      0;
-
-    padding-inline: 12px;
+    padding:
+      16px
+      11px
+      26px;
   }
 
   .navbar__link {
-    font-size: 0.95rem;
+    min-height: 56px;
+
+    font-size: 0.97rem;
+  }
+
+  .navbar__mobile-dropdown-toggle {
+    height: 56px;
   }
 
   .navbar__dropdown-link {
-    font-size: 0.86rem;
+    font-size: 0.88rem;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL PHONES
+============================================================ */
+
+@media (max-width: 340px) {
+
+  .navbar__inner {
+    width:
+      calc(100% - 18px);
   }
 
+  .navbar__logo {
+    height: 43px;
+
+    max-width: 145px;
+  }
+
+  .navbar__toggle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .navbar__link {
+    font-size: 0.93rem;
+  }
+
+  .navbar__dropdown-link {
+    font-size: 0.85rem;
+  }
+
+  .navbar__cta {
+    font-size: 0.93rem;
+  }
 }
 
 
@@ -1344,8 +1479,7 @@ body {
 .navbar__search:focus-visible,
 .navbar__toggle:focus-visible {
   outline:
-    3px solid
-    rgba(201, 154, 46, 0.45);
+    3px solid rgba(201, 154, 46, 0.45);
 
   outline-offset: 3px;
 }
@@ -1364,9 +1498,7 @@ body.nav-open {
    REDUCED MOTION
 ============================================================ */
 
-@media (
-  prefers-reduced-motion: reduce
-) {
+@media (prefers-reduced-motion: reduce) {
 
   .navbar__link,
   .navbar__link::after,
@@ -1380,7 +1512,6 @@ body.nav-open {
   .navbar__nav {
     transition: none;
   }
-
 }
 
 
@@ -1425,8 +1556,7 @@ body.nav-open {
   border-radius: 10px;
 
   box-shadow:
-    0 20px 60px
-    rgba(7, 26, 45, 0.25);
+    0 20px 60px rgba(7, 26, 45, 0.25);
 }
 
 
@@ -1462,9 +1592,7 @@ body.nav-open {
 .search-input-wrapper input {
   width: 100%;
 
-  padding:
-    5px
-    0;
+  padding: 5px 0;
 
   border: none;
 
@@ -1483,8 +1611,7 @@ body.nav-open {
   font-size: 1rem;
 }
 
-.search-input-wrapper
-input::placeholder {
+.search-input-wrapper input::placeholder {
   color: #94a3b8;
 }
 
@@ -1526,9 +1653,7 @@ input::placeholder {
 
 .search-results {
   max-height:
-    calc(
-      75vh - 80px
-    );
+    calc(75vh - 80px);
 
   overflow-y: auto;
 }
@@ -1561,7 +1686,7 @@ input::placeholder {
     Arial,
     sans-serif;
 
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   font-weight: 600;
 }
 
@@ -1575,7 +1700,7 @@ input::placeholder {
     Arial,
     sans-serif;
 
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .search-result-list {
@@ -1635,7 +1760,7 @@ input::placeholder {
     Arial,
     sans-serif;
 
-  font-size: 0.95rem;
+  font-size: 0.98rem;
   font-weight: 600;
 }
 
@@ -1649,7 +1774,7 @@ input::placeholder {
     Arial,
     sans-serif;
 
-  font-size: 0.84rem;
+  font-size: 0.87rem;
 
   line-height: 1.5;
 }
@@ -1662,18 +1787,27 @@ input::placeholder {
 @media (max-width: 600px) {
 
   .search-overlay {
-    padding-top: 80px;
+    padding-top: 76px;
   }
 
   .search-modal {
     width:
-      calc(
-        100% - 20px
-      );
+      calc(100% - 20px);
+
+    max-height:
+      calc(100dvh - 96px);
   }
 
   .search-header {
     padding: 14px;
   }
 
+  .search-input-wrapper input {
+    font-size: 0.95rem;
+  }
+
+  .search-results {
+    max-height:
+      calc(100dvh - 160px);
+  }
 }

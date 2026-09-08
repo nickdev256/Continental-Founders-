@@ -1,51 +1,1715 @@
+/* ============================================================
+   OUR MODEL PAGE
+============================================================ */
+
+.our-model-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.our-model-page *,
+.our-model-page *::before,
+.our-model-page *::after {
+  box-sizing: border-box;
+}
+
+.our-model-page img {
+  display: block;
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   OUR MODEL HERO
+============================================================ */
+
+.model-hero {
+  position: relative;
+  isolation: isolate;
+
+  min-height: 760px;
+
+  display: flex;
+  align-items: stretch;
+
+  overflow: hidden;
+
+  background-color: #08182a;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   HERO OVERLAY
+============================================================ */
+
+.model-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 17, 30, 0.96) 0%,
+      rgba(5, 17, 30, 0.9) 24%,
+      rgba(5, 17, 30, 0.73) 43%,
+      rgba(5, 17, 30, 0.35) 64%,
+      rgba(5, 17, 30, 0.08) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(5, 17, 30, 0.1) 0%,
+      rgba(5, 17, 30, 0.05) 55%,
+      rgba(5, 17, 30, 0.42) 100%
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   HERO INNER
+============================================================ */
+
+.model-hero__inner {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 760px;
+
+  padding-top: clamp(85px, 8vw, 130px);
+  padding-bottom: clamp(65px, 7vw, 100px);
+}
+
+
+/* ============================================================
+   HERO CONTENT
+============================================================ */
+
+.model-hero__content {
+  width: min(680px, 55%);
+  min-width: 0;
+}
+
+
+/* ============================================================
+   HERO EYEBROW
+============================================================ */
+
+.model-hero__eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  width: min(100%, 520px);
+
+  margin-bottom: 36px;
+}
+
+.model-hero__eyebrow {
+  flex-shrink: 0;
+
+  color: var(--gold-600);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1;
+
+  text-transform: uppercase;
+}
+
+.model-hero__eyebrow-line {
+  display: block;
+
+  width: 100%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--gold-600),
+      rgba(184, 136, 44, 0.15)
+    );
+}
+
+
+/* ============================================================
+   HERO HEADING
+============================================================ */
+
+.model-hero h1 {
+  max-width: 670px;
+
+  margin: 0;
+
+  color: #fff;
+
+  font-family: var(--font-display);
+  font-size: clamp(3.6rem, 5.5vw, 6.4rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   HERO DESCRIPTION
+============================================================ */
+
+.model-hero__description {
+  max-width: 590px;
+
+  margin: 30px 0 0;
+
+  color: rgba(255, 255, 255, 0.84);
+
+  font-size: 1.04rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   HERO THEMES
+============================================================ */
+
+.model-hero__themes {
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+
+  gap: clamp(28px, 3.5vw, 55px);
+
+  margin-top: 48px;
+}
+
+.model-hero__theme {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.model-hero__theme span {
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 0.67rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+}
+
+.model-hero__theme-line {
+  width: 48px;
+  height: 2px;
+
+  margin-top: 15px;
+
+  background: var(--gold-600);
+}
+
+
+/* ============================================================
+   HERO STATEMENT
+============================================================ */
+
+.model-hero__statement {
+  margin: 36px 0 0;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1.6;
+
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   MODEL INTRO
+============================================================ */
+
 .model-intro__grid {
   display: grid;
-  grid-template-columns: .55fr 1.45fr;
+  grid-template-columns: 0.55fr 1.45fr;
   gap: 80px;
+
+  align-items: start;
+}
+
+.model-intro__label {
+  padding-top: 8px;
+}
+
+.model-intro__content {
+  max-width: 980px;
+  min-width: 0;
 }
 
 .model-intro h2 {
   max-width: 900px;
+
+  margin: 0;
+
   font-size: clamp(3rem, 5.5vw, 6rem);
-  line-height: .95;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+
+  overflow-wrap: break-word;
 }
 
 .model-intro p {
   max-width: 720px;
+
   margin-top: 28px;
+
   color: var(--muted);
+
   font-size: 1.08rem;
+  line-height: 1.75;
 }
+
+
+/* ============================================================
+   MEDIA SPLIT / PARTNERSHIP DESIGN
+============================================================ */
+
+.our-model-page .media-split {
+  position: relative;
+
+  overflow: hidden;
+}
+
+.our-model-page .media-split__grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  align-items: stretch;
+}
+
+.our-model-page .media-split__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  min-height: 620px;
+  min-width: 0;
+
+  padding: clamp(70px, 8vw, 120px);
+
+  background: #fff;
+}
+
+.our-model-page .media-split__content .eyebrow {
+  margin-bottom: 24px;
+}
+
+.our-model-page .media-split__content h2 {
+  max-width: 720px;
+
+  margin: 0;
+
+  color: var(--navy-900);
+
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5vw, 5.5rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+
+  overflow-wrap: break-word;
+}
+
+.our-model-page .media-split__content p {
+  max-width: 650px;
+
+  margin: 28px 0 0;
+
+  color: var(--muted);
+
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
+.our-model-page .media-split__media {
+  position: relative;
+
+  min-height: 620px;
+  min-width: 0;
+
+  overflow: hidden;
+
+  background: var(--navy-900);
+}
+
+.our-model-page .media-split__media img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  transition: transform 0.7s ease;
+}
+
+.our-model-page .media-split__media:hover img {
+  transform: scale(1.025);
+}
+
+.our-model-page .media-split__media::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 24, 42, 0.02),
+      rgba(8, 24, 42, 0.16)
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   FOUR LENSES
+============================================================ */
 
 .model-lenses {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+
+  margin-top: 56px;
+
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
 }
 
 .model-lenses article {
+  position: relative;
+
   min-height: 280px;
+  min-width: 0;
+
   padding: 28px;
+
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.model-lenses article:hover {
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .model-lenses span {
+  display: inline-block;
+
   color: var(--gold-600);
-  font-size: .7rem;
+
+  font-size: 0.7rem;
   font-weight: 850;
+  letter-spacing: 0.12em;
 }
 
 .model-lenses h3 {
+  max-width: 420px;
+
   margin-top: 88px;
+  margin-bottom: 0;
+
   color: var(--navy-900);
+
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: clamp(1.7rem, 2.4vw, 2rem);
   font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+
+  overflow-wrap: break-word;
 }
 
 .model-lenses p {
+  max-width: 500px;
+
   margin-top: 12px;
+  margin-bottom: 0;
+
   color: var(--muted);
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   COMPANIES / FOUNDERS CTA
+============================================================ */
+
+.model-companies-cta {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: clamp(90px, 10vw, 150px) 0;
+
+  background: var(--navy-900);
+
+  color: #fff;
+}
+
+.model-companies-cta::before {
+  content: "";
+
+  position: absolute;
+
+  top: -280px;
+  right: -180px;
+
+  width: 650px;
+  height: 650px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.model-companies-cta::after {
+  content: "";
+
+  position: absolute;
+
+  right: 130px;
+  bottom: -330px;
+
+  width: 560px;
+  height: 560px;
+
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.model-companies-cta .container {
+  position: relative;
+
+  z-index: 2;
+}
+
+.model-companies-cta__inner {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(320px, 0.85fr);
+
+  gap: clamp(70px, 9vw, 140px);
+
+  align-items: start;
+}
+
+
+/* ============================================================
+   COMPANIES CTA — LEFT
+============================================================ */
+
+.model-companies-cta__content {
+  max-width: 760px;
+  min-width: 0;
+}
+
+.model-companies-cta__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 30px;
+
+  color: var(--gold-600);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+.model-companies-cta__eyebrow::before {
+  content: "";
+
+  width: 36px;
+  height: 1px;
+
+  background: var(--gold-600);
+}
+
+.model-companies-cta__content h2 {
+  max-width: 760px;
+
+  margin: 0;
+
+  color: #fff;
+
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5.5vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+
+  overflow-wrap: break-word;
+}
+
+.model-companies-cta__content > p {
+  max-width: 660px;
+
+  margin: 30px 0 0;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 1.03rem;
+  line-height: 1.8;
+}
+
+.model-companies-cta__content > p + p {
+  margin-top: 18px;
+}
+
+
+/* ============================================================
+   COMPANIES CTA BUTTON
+============================================================ */
+
+.model-companies-cta__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  min-height: 54px;
+
+  margin-top: 38px;
+
+  padding: 0 24px;
+
+  border: 1px solid var(--gold-600);
+
+  background: var(--gold-600);
+
+  color: var(--navy-900);
+
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.model-companies-cta__button:hover {
+  background: transparent;
+
+  color: #fff;
+
+  transform: translateY(-2px);
+}
+
+.model-companies-cta__button svg {
+  flex-shrink: 0;
+
+  transition: transform 0.25s ease;
+}
+
+.model-companies-cta__button:hover svg {
+  transform: translateX(4px);
+}
+
+
+/* ============================================================
+   COMPANIES CTA — PURPOSE STATEMENT
+============================================================ */
+
+.model-companies-cta__statement {
+  position: relative;
+
+  min-width: 0;
+
+  margin-top: 12px;
+
+  padding: 42px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.model-companies-cta__statement > span {
+  display: block;
+
+  margin-bottom: 28px;
+
+  color: var(--gold-600);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.model-companies-cta__statement strong {
+  display: block;
+
+  color: #fff;
+
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 3.7vw, 4rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+
+  overflow-wrap: break-word;
+}
+
+.model-companies-cta__line {
+  width: 64px;
+  height: 2px;
+
+  margin: 32px 0;
+
+  background: var(--gold-600);
+}
+
+.model-companies-cta__statement p {
+  max-width: 470px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   FINAL CTA
+============================================================ */
+
+.model-final-cta {
+  position: relative;
+
+  padding: clamp(90px, 10vw, 150px) 0;
+
+  background: #fff;
+}
+
+.model-final-cta__inner {
+  display: grid;
+  grid-template-columns: 0.55fr 1.45fr;
+
+  gap: 80px;
+
+  align-items: start;
+}
+
+.model-final-cta__content {
+  max-width: 900px;
+  min-width: 0;
+}
+
+.model-final-cta__content h2 {
+  max-width: 880px;
+
+  margin: 0;
+
+  color: var(--navy-900);
+
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 5vw, 5.4rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+
+  overflow-wrap: break-word;
+}
+
+.model-final-cta__content p {
+  max-width: 680px;
+
+  margin: 28px 0 0;
+
+  color: var(--muted);
+
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   FINAL CTA BUTTON
+============================================================ */
+
+.model-final-cta__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  min-height: 54px;
+
+  margin-top: 34px;
+
+  padding: 0 24px;
+
+  background: var(--navy-900);
+
+  border: 1px solid var(--navy-900);
+
+  color: #fff;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.model-final-cta__button:hover {
+  background: transparent;
+
+  color: var(--navy-900);
+
+  transform: translateY(-2px);
+}
+
+.model-final-cta__button svg {
+  flex-shrink: 0;
+
+  transition: transform 0.25s ease;
+}
+
+.model-final-cta__button:hover svg {
+  transform: translateX(4px);
+}
+
+
+/* ============================================================
+   ULTRA-WIDE / 2K / 4K
+============================================================ */
+
+@media (min-width: 1920px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: min(880px, 82vh);
+  }
+
+  .model-hero {
+    background-position: center 42%;
+  }
+
+  .model-hero__content {
+    width: min(760px, 48%);
+  }
+
+  .model-hero h1 {
+    font-size: clamp(5rem, 5vw, 7rem);
+  }
+
+}
+
+
+/* ============================================================
+   VERY LARGE DESKTOP
+============================================================ */
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 800px;
+  }
+
+  .model-hero__content {
+    width: min(720px, 52%);
+  }
+
+}
+
+
+/* ============================================================
+   LARGE TABLET / LAPTOP
+============================================================ */
+
+@media (max-width: 1200px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 700px;
+  }
+
+  .model-hero {
+    background-position: 58% center;
+  }
+
+  .model-hero__content {
+    width: min(620px, 60%);
+  }
+
+  .model-hero h1 {
+    font-size: clamp(3.4rem, 6vw, 5.5rem);
+  }
+
+  .model-hero__themes {
+    gap: 28px;
+  }
+
+  .our-model-page .media-split__content {
+    padding: 70px 55px;
+  }
+
+  .our-model-page .media-split__content h2 {
+    font-size: clamp(2.8rem, 4.8vw, 4.8rem);
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 1024px) {
+
+  .model-intro__grid,
+  .model-final-cta__inner {
+    grid-template-columns: 0.4fr 1.6fr;
+
+    gap: 50px;
+  }
+
+  .model-companies-cta__inner {
+    grid-template-columns: 1fr 0.8fr;
+
+    gap: 55px;
+  }
+
+  .model-companies-cta__statement {
+    padding: 34px 24px;
+  }
+
+  .our-model-page .media-split__content,
+  .our-model-page .media-split__media {
+    min-height: 540px;
+  }
+
+  .our-model-page .media-split__content {
+    padding: 60px 42px;
+  }
+
+}
+
+
+/* ============================================================
+   SHORT LAPTOP SCREENS
+============================================================ */
+
+@media (min-width: 769px) and (max-height: 820px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 620px;
+  }
+
+  .model-hero__inner {
+    padding-top: 80px;
+    padding-bottom: 55px;
+  }
+
+  .model-hero__eyebrow-row {
+    margin-bottom: 24px;
+  }
+
+  .model-hero h1 {
+    font-size: clamp(3.2rem, 5vw, 5rem);
+  }
+
+  .model-hero__description {
+    margin-top: 22px;
+
+    line-height: 1.6;
+  }
+
+  .model-hero__themes {
+    margin-top: 30px;
+  }
+
+  .model-hero__statement {
+    margin-top: 24px;
+  }
+
+}
+
+
+/* ============================================================
+   HERO TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .model-hero {
+    min-height: 680px;
+
+    background-position: 62% center;
+  }
+
+  .model-hero__inner {
+    min-height: 680px;
+
+    align-items: flex-end;
+
+    padding-top: 110px;
+    padding-bottom: 60px;
+  }
+
+  .model-hero__overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(5, 17, 30, 0.94) 0%,
+        rgba(5, 17, 30, 0.83) 52%,
+        rgba(5, 17, 30, 0.35) 100%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(5, 17, 30, 0.92) 0%,
+        rgba(5, 17, 30, 0.45) 48%,
+        rgba(5, 17, 30, 0.16) 100%
+      );
+  }
+
+  .model-hero__content {
+    width: min(650px, 82%);
+  }
+
+  .model-hero h1 {
+    font-size: clamp(3.2rem, 8vw, 5rem);
+  }
+
+  .model-hero__themes {
+    grid-template-columns: repeat(2, max-content);
+
+    gap: 26px 55px;
+  }
+
+}
+
+
+/* ============================================================
+   MEDIUM TABLET SAFETY
+============================================================ */
+
+@media (max-width: 850px) {
+
+  .model-intro__grid,
+  .model-final-cta__inner {
+    grid-template-columns: 1fr;
+
+    gap: 36px;
+  }
+
+  .model-intro__label {
+    padding-top: 0;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE / SMALL TABLET
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .model-intro__grid,
+  .model-final-cta__inner,
+  .model-companies-cta__inner {
+    grid-template-columns: 1fr;
+
+    gap: 38px;
+  }
+
+  .model-intro h2 {
+    font-size: clamp(2.7rem, 12vw, 4.5rem);
+    line-height: 0.98;
+  }
+
+  .model-intro p {
+    margin-top: 22px;
+
+    font-size: 1rem;
+  }
+
+  .our-model-page .media-split__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .our-model-page .media-split__content {
+    min-height: auto;
+
+    padding: 64px 28px;
+  }
+
+  .our-model-page .media-split__content h2 {
+    font-size: clamp(2.8rem, 11vw, 4.4rem);
+  }
+
+  .our-model-page .media-split__content p {
+    font-size: 0.98rem;
+  }
+
+  .our-model-page .media-split__media {
+    min-height: 420px;
+  }
+
+  .our-model-page .media-split__media img {
+    object-position: center center;
+  }
+
+  .model-lenses {
+    grid-template-columns: 1fr;
+
+    margin-top: 40px;
+  }
+
+  .model-lenses article {
+    min-height: 240px;
+
+    padding: 24px;
+  }
+
+  .model-lenses h3 {
+    margin-top: 62px;
+  }
+
+  .model-companies-cta {
+    padding: 80px 0;
+  }
+
+  .model-companies-cta__content h2 {
+    font-size: clamp(2.8rem, 12vw, 4.6rem);
+  }
+
+  .model-companies-cta__content > p {
+    font-size: 1rem;
+  }
+
+  .model-companies-cta__statement {
+    margin-top: 20px;
+
+    padding: 34px 0;
+  }
+
+  .model-companies-cta__statement strong {
+    font-size: clamp(2.4rem, 10vw, 3.5rem);
+  }
+
+  .model-final-cta {
+    padding: 80px 0;
+  }
+
+  .model-final-cta__content h2 {
+    font-size: clamp(2.7rem, 11vw, 4.4rem);
+  }
+
+}
+
+
+/* ============================================================
+   HERO MOBILE
+============================================================ */
+
+@media (max-width: 620px) {
+
+  .model-hero {
+    min-height: 690px;
+    height: auto;
+
+    background-position: 62% center;
+  }
+
+  .model-hero__inner {
+    min-height: 690px;
+    height: auto;
+
+    align-items: flex-end;
+
+    padding-top: 100px;
+    padding-bottom: 42px;
+  }
+
+  .model-hero__overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(5, 17, 30, 0.32) 0%,
+        rgba(5, 17, 30, 0.48) 30%,
+        rgba(5, 17, 30, 0.86) 62%,
+        rgba(5, 17, 30, 0.98) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(5, 17, 30, 0.75) 0%,
+        rgba(5, 17, 30, 0.3) 100%
+      );
+  }
+
+  .model-hero__content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .model-hero__eyebrow-row {
+    max-width: 100%;
+
+    gap: 14px;
+
+    margin-bottom: 24px;
+  }
+
+  .model-hero__eyebrow {
+    font-size: 0.64rem;
+  }
+
+  .model-hero h1 {
+    max-width: 520px;
+
+    font-size: clamp(2.8rem, 12vw, 4.2rem);
+    line-height: 0.96;
+  }
+
+  .model-hero__description {
+    max-width: 500px;
+
+    margin-top: 22px;
+
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .model-hero__themes {
+    width: 100%;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 22px 20px;
+
+    margin-top: 32px;
+  }
+
+  .model-hero__theme span {
+    font-size: 0.61rem;
+  }
+
+  .model-hero__theme-line {
+    width: 38px;
+
+    margin-top: 10px;
+  }
+
+  .model-hero__statement {
+    max-width: 400px;
+
+    margin-top: 28px;
+
+    font-size: 0.59rem;
+    letter-spacing: 0.16em;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+============================================================ */
+
+@media (max-width: 520px) {
+
+  .model-intro__grid {
+    gap: 28px;
+  }
+
+  .our-model-page .media-split__content {
+    padding: 54px 20px;
+  }
+
+  .our-model-page .media-split__content .eyebrow {
+    margin-bottom: 18px;
+  }
+
+  .our-model-page .media-split__content h2 {
+    font-size: clamp(2.55rem, 12vw, 3.7rem);
+    line-height: 0.98;
+  }
+
+  .our-model-page .media-split__content p {
+    margin-top: 22px;
+
+    line-height: 1.7;
+  }
+
+  .our-model-page .media-split__media {
+    min-height: 330px;
+  }
+
+  .our-model-page .media-split__media img {
+    object-position: 50% center;
+  }
+
+  .model-lenses article {
+    min-height: auto;
+
+    padding: 24px 20px 30px;
+  }
+
+  .model-lenses h3 {
+    margin-top: 48px;
+
+    font-size: 1.75rem;
+  }
+
+  .model-companies-cta {
+    padding: 68px 0;
+  }
+
+  .model-companies-cta__eyebrow {
+    margin-bottom: 24px;
+
+    font-size: 0.65rem;
+  }
+
+  .model-companies-cta__eyebrow::before {
+    width: 25px;
+  }
+
+  .model-companies-cta__content h2 {
+    font-size: clamp(2.6rem, 13vw, 3.8rem);
+  }
+
+  .model-companies-cta__content > p {
+    margin-top: 24px;
+
+    line-height: 1.7;
+  }
+
+  .model-companies-cta__content > p + p {
+    margin-top: 16px;
+  }
+
+  .model-companies-cta__button,
+  .model-final-cta__button {
+    width: 100%;
+
+    min-height: 56px;
+  }
+
+  .model-companies-cta__statement {
+    padding: 30px 0;
+  }
+
+  .model-companies-cta__statement > span {
+    margin-bottom: 22px;
+  }
+
+  .model-companies-cta__line {
+    margin: 26px 0;
+  }
+
+  .model-final-cta__inner {
+    gap: 30px;
+  }
+
+  .model-final-cta__content h2 {
+    font-size: clamp(2.5rem, 12vw, 3.7rem);
+  }
+
+}
+
+
+/* ============================================================
+   480PX MOBILE
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .model-hero__themes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .model-intro h2,
+  .model-companies-cta__content h2,
+  .model-final-cta__content h2 {
+    overflow-wrap: anywhere;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 650px;
+  }
+
+  .model-hero {
+    background-position: 64% center;
+  }
+
+  .model-hero__inner {
+    padding-top: 90px;
+    padding-bottom: 34px;
+  }
+
+  .model-hero h1 {
+    font-size: clamp(2.55rem, 12vw, 3.45rem);
+  }
+
+  .model-hero__description {
+    font-size: 0.88rem;
+  }
+
+  .model-hero__themes {
+    margin-top: 26px;
+  }
+
+  .model-hero__statement {
+    margin-top: 24px;
+  }
+
+  .our-model-page .media-split__content {
+    padding: 48px 18px;
+  }
+
+  .our-model-page .media-split__media {
+    min-height: 300px;
+  }
+
+  .model-companies-cta__content h2,
+  .model-final-cta__content h2 {
+    font-size: 2.45rem;
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL
+============================================================ */
+
+@media (max-width: 360px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 630px;
+  }
+
+  .model-hero__inner {
+    padding-bottom: 30px;
+  }
+
+  .model-hero h1 {
+    font-size: 2.4rem;
+  }
+
+  .model-hero__themes {
+    gap: 18px 14px;
+  }
+
+  .model-hero__statement {
+    font-size: 0.55rem;
+  }
+
+  .our-model-page .media-split__content {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+}
+
+
+/* ============================================================
+   320PX / VERY NARROW PHONES
+============================================================ */
+
+@media (max-width: 340px) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 610px;
+  }
+
+  .model-hero__inner {
+    padding-top: 78px;
+    padding-bottom: 28px;
+  }
+
+  .model-hero h1 {
+    font-size: 2.15rem;
+    line-height: 0.98;
+  }
+
+  .model-hero__description {
+    font-size: 0.84rem;
+  }
+
+  .model-hero__themes {
+    gap: 16px 10px;
+  }
+
+  .model-hero__theme span {
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+  }
+
+  .model-hero__theme-line {
+    width: 30px;
+  }
+
+  .model-intro h2,
+  .our-model-page .media-split__content h2 {
+    font-size: 2.25rem;
+  }
+
+  .model-companies-cta__content h2,
+  .model-final-cta__content h2 {
+    font-size: 2.15rem;
+  }
+
+  .model-companies-cta__statement strong {
+    font-size: 2rem;
+  }
+
+  .model-companies-cta__button,
+  .model-final-cta__button {
+    padding-left: 16px;
+    padding-right: 16px;
+
+    font-size: 0.68rem;
+  }
+
+}
+
+
+/* ============================================================
+   LANDSCAPE PHONES
+============================================================ */
+
+@media (max-width: 900px)
+       and (max-height: 520px)
+       and (orientation: landscape) {
+
+  .model-hero,
+  .model-hero__inner {
+    min-height: 520px;
+  }
+
+  .model-hero {
+    background-position: 65% center;
+  }
+
+  .model-hero__inner {
+    align-items: center;
+
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+
+  .model-hero__content {
+    width: min(560px, 72%);
+  }
+
+  .model-hero__eyebrow-row {
+    margin-bottom: 18px;
+  }
+
+  .model-hero h1 {
+    font-size: clamp(2.5rem, 7vw, 3.8rem);
+  }
+
+  .model-hero__description {
+    margin-top: 16px;
+
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .model-hero__themes {
+    grid-template-columns: repeat(4, max-content);
+
+    gap: 22px;
+
+    margin-top: 20px;
+  }
+
+  .model-hero__theme-line {
+    margin-top: 8px;
+  }
+
+  .model-hero__statement {
+    margin-top: 18px;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (hover: none) {
+
+  .our-model-page .media-split__media:hover img {
+    transform: none;
+  }
+
+  .model-lenses article:hover {
+    background: transparent;
+  }
+
+  .model-companies-cta__button:hover,
+  .model-final-cta__button:hover {
+    transform: none;
+  }
+
+}
+
+
+/* ============================================================
+   HIGH CONTRAST
+============================================================ */
+
+@media (prefers-contrast: more) {
+
+  .model-hero__description,
+  .model-hero__statement,
+  .model-companies-cta__content > p,
+  .model-companies-cta__statement p {
+    color: #fff;
+  }
+
+}
+
+
+/* ============================================================
+   ACCESSIBILITY / REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .our-model-page *,
+  .our-model-page *::before,
+  .our-model-page *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .our-model-page .media-split__media img,
+  .model-lenses article,
+  .model-companies-cta__button,
+  .model-companies-cta__button svg,
+  .model-final-cta__button,
+  .model-final-cta__button svg {
+    transition: none;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  .model-hero {
+    min-height: auto;
+
+    background-image: none !important;
+    background: #fff !important;
+
+    color: #000;
+  }
+
+  .model-hero__overlay {
+    display: none;
+  }
+
+  .model-hero__inner {
+    min-height: auto;
+
+    padding: 40px 0;
+  }
+
+  .model-hero h1,
+  .model-hero__description,
+  .model-hero__statement,
+  .model-hero__theme span {
+    color: #000;
+  }
+
+  .model-companies-cta {
+    background: #fff;
+
+    color: #000;
+  }
+
+  .model-companies-cta__content h2,
+  .model-companies-cta__statement strong,
+  .model-companies-cta__content > p,
+  .model-companies-cta__statement p {
+    color: #000;
+  }
+
 }

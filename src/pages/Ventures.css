@@ -1,0 +1,2042 @@
+/* ============================================================
+   VENTURES PAGE
+============================================================ */
+
+.ventures-page {
+  --ventures-navy: #0d2238;
+  --ventures-navy-deep: #08182a;
+  --ventures-gold: #b8882c;
+  --ventures-gold-soft: #d4b46f;
+  --ventures-text: #182331;
+  --ventures-muted: #69737d;
+  --ventures-line: #dedbd3;
+  --ventures-cream: #f6f3ec;
+  --ventures-white: #ffffff;
+
+  width: 100%;
+  overflow-x: hidden;
+
+  background: var(--ventures-white);
+  color: var(--ventures-text);
+}
+
+.ventures-page *,
+.ventures-page *::before,
+.ventures-page *::after {
+  box-sizing: border-box;
+}
+
+.ventures-page img {
+  display: block;
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   CONTAINER
+============================================================ */
+
+.ventures-container {
+  width: min(1420px, calc(100% - 96px));
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   GLOBAL RESPONSIVE SAFETY
+============================================================ */
+
+.ventures-hero__content,
+.ventures-hero__belief,
+.ventures-section-header > *,
+.ventures-journey__heading > *,
+.ventures-ecosystem__content,
+.ventures-ecosystem__network,
+.ventures-final__grid > *,
+.venture-card,
+.venture-journey-step {
+  min-width: 0;
+}
+
+.ventures-hero__content h1,
+.ventures-hero__belief strong,
+.ventures-section-header h2,
+.venture-card h3,
+.ventures-journey__heading h2,
+.venture-journey-step h3,
+.ventures-ecosystem__content h2,
+.ventures-final h2 {
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   EYEBROW
+============================================================ */
+
+.ventures-eyebrow {
+  display: inline-block;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+
+  text-transform: uppercase;
+}
+
+.ventures-eyebrow--light {
+  color: var(--ventures-gold-soft);
+}
+
+
+/* ============================================================
+   SECTION NUMBER
+============================================================ */
+
+.ventures-section-number {
+  display: inline-block;
+
+  margin-right: 16px;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.ventures-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  min-height: 52px;
+
+  padding: 0 24px;
+
+  border: 1px solid transparent;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.ventures-button:hover {
+  transform: translateY(-2px);
+}
+
+.ventures-button svg {
+  flex-shrink: 0;
+
+  transition: transform 0.25s ease;
+}
+
+.ventures-button:hover svg {
+  transform: translateX(4px);
+}
+
+.ventures-button--gold {
+  background: var(--ventures-gold);
+  border-color: var(--ventures-gold);
+
+  color: #fff;
+}
+
+.ventures-button--gold:hover {
+  background: #9f741f;
+  border-color: #9f741f;
+}
+
+.ventures-button--outline {
+  background: transparent;
+
+  border-color: var(--ventures-navy);
+
+  color: var(--ventures-navy);
+}
+
+.ventures-button--outline:hover {
+  background: var(--ventures-navy);
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.ventures-hero {
+  position: relative;
+
+  display: flex;
+  align-items: stretch;
+
+  min-height: 720px;
+
+  overflow: hidden;
+
+  background: var(--ventures-navy-deep);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+/* ============================================================
+   HERO BACKGROUND
+============================================================ */
+
+.ventures-hero__background {
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+
+  background-image: url("/assets/venture.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  transform: scale(1.01);
+}
+
+
+/* ============================================================
+   HERO OVERLAY
+============================================================ */
+
+.ventures-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(6, 20, 34, 0.96) 0%,
+      rgba(6, 20, 34, 0.9) 27%,
+      rgba(6, 20, 34, 0.72) 48%,
+      rgba(6, 20, 34, 0.34) 72%,
+      rgba(6, 20, 34, 0.12) 100%
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   HERO INNER
+============================================================ */
+
+.ventures-hero__inner {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(300px, 0.8fr);
+
+  gap: 80px;
+
+  align-items: end;
+
+  width: 100%;
+
+  padding-top: 125px;
+  padding-bottom: 80px;
+}
+
+
+/* ============================================================
+   HERO CONTENT
+============================================================ */
+
+.ventures-hero__content {
+  max-width: 830px;
+}
+
+.ventures-hero__content h1 {
+  max-width: 850px;
+
+  margin: 22px 0 0;
+
+  color: #fff;
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(4rem, 6.5vw, 7.3rem);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+
+  text-wrap: balance;
+}
+
+.ventures-hero__content p {
+  max-width: 590px;
+
+  margin: 30px 0 36px;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   HERO BELIEF
+============================================================ */
+
+.ventures-hero__belief {
+  max-width: 390px;
+
+  margin-left: auto;
+
+  padding: 30px 0 8px 32px;
+
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.ventures-hero__belief > span {
+  display: block;
+
+  margin-bottom: 18px;
+
+  color: var(--ventures-gold-soft);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+.ventures-hero__belief strong {
+  display: block;
+
+  color: #fff;
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.ventures-hero__belief p {
+  max-width: 320px;
+
+  margin: 22px 0 0;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   DIRECTORY
+============================================================ */
+
+.ventures-directory {
+  padding: clamp(80px, 8vw, 130px) 0;
+
+  background: #fff;
+}
+
+
+/* ============================================================
+   DIRECTORY HEADER
+============================================================ */
+
+.ventures-section-header {
+  display: grid;
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 70px;
+
+  align-items: start;
+}
+
+.ventures-section-header h2 {
+  max-width: 900px;
+
+  margin: 0;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 5vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.ventures-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+
+  margin-top: 60px;
+  margin-bottom: 30px;
+
+  padding-top: 24px;
+
+  border-top: 1px solid var(--ventures-line);
+}
+
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+.ventures-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  min-width: 0;
+}
+
+.venture-filter {
+  min-height: 40px;
+
+  padding: 0 17px;
+
+  border: 1px solid var(--ventures-line);
+  border-radius: 999px;
+
+  background: #fff;
+
+  color: var(--ventures-text);
+
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.venture-filter:hover {
+  border-color: var(--ventures-navy);
+}
+
+.venture-filter.active {
+  background: var(--ventures-navy);
+  border-color: var(--ventures-navy);
+
+  color: #fff;
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.ventures-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex: 0 0 260px;
+
+  width: 260px;
+  min-height: 42px;
+
+  padding: 0 14px;
+
+  border: 1px solid var(--ventures-line);
+
+  background: #fff;
+
+  color: var(--ventures-muted);
+
+  transition: border-color 0.2s ease;
+}
+
+.ventures-search:focus-within {
+  border-color: var(--ventures-gold);
+}
+
+.ventures-search svg {
+  flex-shrink: 0;
+}
+
+.ventures-search input {
+  width: 100%;
+  min-width: 0;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+
+  color: var(--ventures-text);
+
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.ventures-search input::placeholder {
+  color: #969da4;
+}
+
+
+/* ============================================================
+   VENTURES GRID
+============================================================ */
+
+.ventures-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
+}
+
+
+/* ============================================================
+   VENTURE CARD
+============================================================ */
+
+.venture-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 470px;
+
+  padding: 26px;
+
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+
+  background: #fff;
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.venture-card:hover {
+  background: #fbfaf7;
+
+  box-shadow:
+    0 14px 30px rgba(13, 34, 56, 0.06);
+}
+
+
+/* ============================================================
+   CARD TOP
+============================================================ */
+
+.venture-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+}
+
+.venture-card__number {
+  color: var(--ventures-navy);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.venture-card__sector {
+  color: var(--ventures-gold);
+
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-align: right;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   CARD LOGO
+============================================================ */
+
+.venture-card__logo {
+  display: flex;
+  align-items: center;
+
+  min-height: 105px;
+
+  margin-top: 20px;
+}
+
+.venture-card__logo img {
+  display: block;
+
+  max-width: 165px;
+  max-height: 70px;
+
+  object-fit: contain;
+}
+
+.venture-card__logo-placeholder {
+  display: grid;
+  place-items: center;
+
+  width: 70px;
+  height: 70px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: var(--ventures-navy);
+
+  color: #fff;
+
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+
+/* ============================================================
+   CARD TITLE
+============================================================ */
+
+.venture-card h3 {
+  margin: 0;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.9rem;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+
+/* ============================================================
+   CARD LOCATION
+============================================================ */
+
+.venture-card__location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 11px;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.76rem;
+}
+
+.venture-card__location svg {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   CARD DESCRIPTION
+============================================================ */
+
+.venture-card__description {
+  flex: 1;
+
+  margin: 24px 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   CARD DETAILS
+============================================================ */
+
+.venture-card__footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid var(--ventures-line);
+}
+
+.venture-card__footer div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  min-width: 0;
+}
+
+.venture-card__footer span {
+  color: var(--ventures-muted);
+
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+
+  text-transform: uppercase;
+}
+
+.venture-card__footer strong {
+  color: var(--ventures-navy);
+
+  font-size: 0.76rem;
+  font-weight: 750;
+
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   CARD LINK
+============================================================ */
+
+.venture-card__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-top: 22px;
+  padding-top: 18px;
+
+  border-top: 1px solid var(--ventures-gold-soft);
+
+  color: var(--ventures-navy);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.venture-card__link svg {
+  flex-shrink: 0;
+
+  transition: transform 0.2s ease;
+}
+
+.venture-card__link:hover svg {
+  transform: translateX(5px);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.ventures-empty {
+  padding: 70px 20px;
+
+  border: 1px solid var(--ventures-line);
+
+  text-align: center;
+}
+
+.ventures-empty h3 {
+  margin: 0;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.ventures-empty p {
+  margin: 12px 0 0;
+
+  color: var(--ventures-muted);
+}
+
+
+/* ============================================================
+   JOURNEY
+============================================================ */
+
+.ventures-journey {
+  padding: clamp(80px, 8vw, 125px) 0;
+
+  background: var(--ventures-cream);
+
+  border-top: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+}
+
+
+/* ============================================================
+   JOURNEY HEADING
+============================================================ */
+
+.ventures-journey__heading {
+  display: grid;
+  grid-template-columns: 0.65fr 1.35fr;
+  gap: 70px;
+
+  align-items: start;
+}
+
+.ventures-journey__heading h2 {
+  margin: 0;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 5vw, 5.6rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+
+/* ============================================================
+   JOURNEY GRID
+============================================================ */
+
+.venture-journey-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+
+  margin-top: 60px;
+
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
+}
+
+
+/* ============================================================
+   JOURNEY STEP
+============================================================ */
+
+.venture-journey-step {
+  position: relative;
+
+  min-height: 220px;
+
+  padding: 26px;
+
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+
+  background: rgba(255, 255, 255, 0.62);
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.venture-journey-step:hover {
+  background: #fff;
+}
+
+.venture-journey-step__number {
+  display: grid;
+  place-items: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: var(--ventures-gold);
+
+  color: #fff;
+
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.venture-journey-step h3 {
+  margin: 52px 0 10px;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.venture-journey-step p {
+  margin: 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.venture-journey-step__arrow {
+  position: absolute;
+
+  top: 37px;
+  right: 20px;
+
+  color: var(--ventures-gold);
+}
+
+
+/* ============================================================
+   ECOSYSTEM
+============================================================ */
+
+.ventures-ecosystem {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: var(--ventures-navy);
+}
+
+
+/* ============================================================
+   ECOSYSTEM GRID
+============================================================ */
+
+.ventures-ecosystem__grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(430px, 1.1fr);
+
+  gap: 90px;
+
+  align-items: center;
+}
+
+
+/* ============================================================
+   ECOSYSTEM CONTENT
+============================================================ */
+
+.ventures-ecosystem__content {
+  max-width: 650px;
+}
+
+.ventures-ecosystem__content .ventures-section-number {
+  color: var(--ventures-gold-soft);
+}
+
+.ventures-ecosystem__content h2 {
+  margin: 18px 0 24px;
+
+  color: #fff;
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3.2rem, 5vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.ventures-ecosystem__content p {
+  max-width: 520px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.67);
+
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   TEXT LINK
+============================================================ */
+
+.ventures-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 32px;
+
+  color: var(--ventures-gold-soft);
+
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ventures-text-link svg {
+  flex-shrink: 0;
+
+  transition: transform 0.25s ease;
+}
+
+.ventures-text-link:hover svg {
+  transform: translateX(5px);
+}
+
+
+/* ============================================================
+   ECOSYSTEM NETWORK
+============================================================ */
+
+.ventures-ecosystem__network {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* ============================================================
+   CENTER BLOCK
+============================================================ */
+
+.ecosystem-network__center {
+  display: grid;
+  place-items: center;
+
+  min-height: 190px;
+
+  padding: 25px;
+
+  background: var(--ventures-gold);
+
+  color: #fff;
+
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   NETWORK ITEM
+============================================================ */
+
+.ecosystem-network__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 190px;
+  min-width: 0;
+
+  padding: 25px;
+
+  background: var(--ventures-navy-deep);
+
+  color: #fff;
+
+  text-align: center;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ecosystem-network__item:hover {
+  background: #102a44;
+}
+
+.ecosystem-network__item svg {
+  flex-shrink: 0;
+
+  margin-bottom: 14px;
+
+  color: var(--ventures-gold-soft);
+}
+
+.ecosystem-network__item span {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   FINAL CTA
+============================================================ */
+
+.ventures-final {
+  padding: clamp(85px, 8vw, 125px) 0;
+
+  background: #fff;
+}
+
+
+/* ============================================================
+   FINAL GRID
+============================================================ */
+
+.ventures-final__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 90px;
+
+  align-items: end;
+}
+
+
+/* ============================================================
+   FINAL HEADING
+============================================================ */
+
+.ventures-final h2 {
+  max-width: 700px;
+
+  margin: 16px 0 0;
+
+  color: var(--ventures-navy);
+
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3.3rem, 5.3vw, 6rem);
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+
+/* ============================================================
+   FINAL CONTENT
+============================================================ */
+
+.ventures-final__content {
+  max-width: 600px;
+}
+
+.ventures-final__content p {
+  margin: 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   FINAL ACTIONS
+============================================================ */
+
+.ventures-final__actions {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+
+/* ============================================================
+   ULTRA-WIDE / 2K / 4K
+============================================================ */
+
+@media (min-width: 1920px) {
+
+  .ventures-container {
+    width: min(1540px, calc(100% - 140px));
+  }
+
+  .ventures-hero {
+    min-height: min(860px, 82vh);
+  }
+
+  .ventures-hero__inner {
+    padding-top: 145px;
+    padding-bottom: 100px;
+  }
+
+  .ventures-hero__content {
+    max-width: 920px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: clamp(5.5rem, 5.8vw, 8rem);
+  }
+
+  .ventures-hero__background {
+    background-position: center 45%;
+  }
+
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+============================================================ */
+
+@media (min-width: 1600px) and (max-width: 1919px) {
+
+  .ventures-hero {
+    min-height: 760px;
+  }
+
+  .ventures-hero__content {
+    max-width: 870px;
+  }
+
+}
+
+
+/* ============================================================
+   LARGE TABLET / LAPTOP
+============================================================ */
+
+@media (max-width: 1200px) {
+
+  .ventures-container {
+    width: min(100% - 64px, 1320px);
+  }
+
+  .ventures-hero {
+    min-height: 680px;
+  }
+
+  .ventures-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.15fr)
+      minmax(280px, 0.85fr);
+
+    gap: 50px;
+  }
+
+  .ventures-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .ventures-ecosystem__grid {
+    grid-template-columns:
+      minmax(0, 0.8fr)
+      minmax(0, 1.2fr);
+
+    gap: 55px;
+  }
+
+}
+
+
+/* ============================================================
+   SHORT LAPTOP SCREENS
+   1366x768 / 1440x800 style displays
+============================================================ */
+
+@media (min-width: 901px) and (max-height: 820px) {
+
+  .ventures-hero {
+    min-height: 610px;
+  }
+
+  .ventures-hero__inner {
+    padding-top: 90px;
+    padding-bottom: 55px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: clamp(3.7rem, 5.7vw, 5.7rem);
+  }
+
+  .ventures-hero__content p {
+    margin-top: 22px;
+    margin-bottom: 28px;
+
+    line-height: 1.6;
+  }
+
+  .ventures-hero__belief {
+    padding-top: 24px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .ventures-container {
+    width: min(100% - 40px, 100%);
+  }
+
+
+  /* HERO */
+
+  .ventures-hero {
+    min-height: 700px;
+  }
+
+  .ventures-hero__background {
+    background-position: 62% center;
+  }
+
+  .ventures-hero__overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(6, 20, 34, 0.96) 0%,
+        rgba(6, 20, 34, 0.86) 52%,
+        rgba(6, 20, 34, 0.48) 100%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(6, 20, 34, 0.72) 0%,
+        rgba(6, 20, 34, 0.1) 65%
+      );
+  }
+
+  .ventures-hero__inner {
+    grid-template-columns: 1fr;
+
+    gap: 48px;
+
+    align-items: end;
+
+    padding-top: 105px;
+    padding-bottom: 60px;
+  }
+
+  .ventures-hero__content {
+    max-width: 760px;
+  }
+
+  .ventures-hero__belief {
+    max-width: 540px;
+
+    margin-left: 0;
+
+    padding: 24px 0 0;
+
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .ventures-hero__belief p {
+    max-width: 450px;
+  }
+
+
+  /* HEADERS */
+
+  .ventures-section-header,
+  .ventures-journey__heading {
+    grid-template-columns: 1fr;
+
+    gap: 24px;
+  }
+
+
+  /* TOOLBAR */
+
+  .ventures-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 22px;
+  }
+
+  .ventures-search {
+    flex: none;
+
+    width: 100%;
+  }
+
+
+  /* JOURNEY */
+
+  .venture-journey-grid {
+    grid-template-columns: 1fr;
+
+    border-left: 0;
+  }
+
+  .venture-journey-step {
+    min-height: auto;
+
+    border-left: 1px solid var(--ventures-line);
+  }
+
+  .venture-journey-step__arrow {
+    display: none;
+  }
+
+  .venture-journey-step h3 {
+    margin-top: 38px;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .ventures-ecosystem__grid {
+    grid-template-columns: 1fr;
+
+    gap: 60px;
+  }
+
+
+  /* FINAL */
+
+  .ventures-final__grid {
+    grid-template-columns: 1fr;
+
+    gap: 36px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 620px) {
+
+  .ventures-container {
+    width: min(100% - 28px, 100%);
+  }
+
+
+  /* HERO */
+
+  .ventures-hero {
+    min-height: 700px;
+    height: auto;
+  }
+
+  .ventures-hero__background {
+    background-position: 64% center;
+  }
+
+  .ventures-hero__overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgba(6, 20, 34, 0.52) 0%,
+        rgba(6, 20, 34, 0.7) 38%,
+        rgba(6, 20, 34, 0.96) 100%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(6, 20, 34, 0.48) 0%,
+        rgba(6, 20, 34, 0.1) 100%
+      );
+  }
+
+  .ventures-hero__inner {
+    align-content: end;
+
+    gap: 36px;
+
+    padding-top: 100px;
+    padding-bottom: 42px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: clamp(3.2rem, 14vw, 4.8rem);
+    line-height: 0.92;
+  }
+
+  .ventures-hero__content p {
+    max-width: 100%;
+
+    margin-top: 24px;
+    margin-bottom: 28px;
+
+    font-size: 0.94rem;
+  }
+
+  .ventures-hero__belief {
+    max-width: 100%;
+  }
+
+  .ventures-hero__belief strong {
+    font-size: clamp(2.1rem, 10vw, 3rem);
+  }
+
+
+  /* DIRECTORY */
+
+  .ventures-directory {
+    padding: 70px 0;
+  }
+
+  .ventures-section-header h2,
+  .ventures-journey__heading h2 {
+    font-size: clamp(2.8rem, 12vw, 4rem);
+  }
+
+  .ventures-toolbar {
+    margin-top: 42px;
+  }
+
+  .ventures-categories {
+    width: 100%;
+  }
+
+  .venture-filter {
+    flex: 1 1 auto;
+  }
+
+  .ventures-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .venture-card {
+    min-height: auto;
+
+    padding: 24px;
+  }
+
+
+  /* JOURNEY */
+
+  .ventures-journey {
+    padding: 70px 0;
+  }
+
+
+  /* ECOSYSTEM */
+
+  .ventures-ecosystem {
+    padding: 75px 0;
+  }
+
+  .ventures-ecosystem__content h2 {
+    font-size: clamp(3rem, 12vw, 4.2rem);
+  }
+
+  .ventures-ecosystem__network {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    min-height: 150px;
+  }
+
+
+  /* FINAL */
+
+  .ventures-final {
+    padding: 70px 0;
+  }
+
+  .ventures-final h2 {
+    font-size: clamp(3rem, 12vw, 4.3rem);
+  }
+
+  .ventures-final__actions {
+    flex-direction: column;
+  }
+
+  .ventures-button {
+    width: 100%;
+  }
+
+}
+
+
+/* ============================================================
+   480PX MOBILE
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .ventures-hero__content h1,
+  .ventures-section-header h2,
+  .ventures-journey__heading h2,
+  .ventures-ecosystem__content h2,
+  .ventures-final h2 {
+    overflow-wrap: anywhere;
+  }
+
+  .venture-card__top {
+    align-items: flex-start;
+  }
+
+  .venture-card__footer {
+    gap: 12px;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .ventures-container {
+    width: min(100% - 22px, 100%);
+  }
+
+  .ventures-hero {
+    min-height: 680px;
+  }
+
+  .ventures-hero__inner {
+    gap: 28px;
+
+    padding-top: 88px;
+    padding-bottom: 34px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: clamp(2.9rem, 14vw, 4rem);
+  }
+
+  .ventures-hero__content p {
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .ventures-hero__belief {
+    padding-top: 20px;
+  }
+
+  .ventures-hero__belief p {
+    margin-top: 16px;
+  }
+
+  .ventures-ecosystem__network {
+    grid-template-columns: 1fr;
+  }
+
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    min-height: 130px;
+  }
+
+}
+
+
+/* ============================================================
+   360PX MOBILE
+============================================================ */
+
+@media (max-width: 360px) {
+
+  .ventures-container {
+    width: calc(100% - 20px);
+  }
+
+  .ventures-hero {
+    min-height: 650px;
+  }
+
+  .ventures-hero__inner {
+    padding-top: 82px;
+    padding-bottom: 30px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: 2.65rem;
+  }
+
+  .ventures-hero__belief strong {
+    font-size: 2rem;
+  }
+
+  .venture-card {
+    padding: 20px;
+  }
+
+  .venture-card h3 {
+    font-size: 1.7rem;
+  }
+
+  .ventures-section-header h2,
+  .ventures-journey__heading h2,
+  .ventures-ecosystem__content h2,
+  .ventures-final h2 {
+    font-size: 2.55rem;
+  }
+
+}
+
+
+/* ============================================================
+   320PX / EXTRA NARROW MOBILE
+============================================================ */
+
+@media (max-width: 340px) {
+
+  .ventures-container {
+    width: calc(100% - 18px);
+  }
+
+  .ventures-hero {
+    min-height: 630px;
+  }
+
+  .ventures-hero__inner {
+    gap: 24px;
+
+    padding-top: 76px;
+    padding-bottom: 26px;
+  }
+
+  .ventures-eyebrow {
+    font-size: 0.62rem;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: 2.4rem;
+  }
+
+  .ventures-hero__content p {
+    margin-top: 18px;
+    margin-bottom: 22px;
+
+    font-size: 0.84rem;
+  }
+
+  .ventures-hero__belief > span {
+    margin-bottom: 12px;
+
+    font-size: 0.61rem;
+  }
+
+  .ventures-hero__belief strong {
+    font-size: 1.85rem;
+  }
+
+  .ventures-hero__belief p {
+    font-size: 0.82rem;
+  }
+
+  .venture-card__top {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .venture-card__sector {
+    text-align: left;
+  }
+
+  .venture-card__footer {
+    grid-template-columns: 1fr;
+  }
+
+  .ventures-section-header h2,
+  .ventures-journey__heading h2,
+  .ventures-ecosystem__content h2,
+  .ventures-final h2 {
+    font-size: 2.3rem;
+  }
+
+  .ventures-button {
+    min-height: 54px;
+
+    padding: 0 16px;
+
+    font-size: 0.66rem;
+  }
+
+}
+
+
+/* ============================================================
+   LANDSCAPE PHONES
+============================================================ */
+
+@media (max-width: 900px)
+       and (max-height: 520px)
+       and (orientation: landscape) {
+
+  .ventures-hero {
+    min-height: 520px;
+  }
+
+  .ventures-hero__background {
+    background-position: 67% center;
+  }
+
+  .ventures-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.3fr)
+      minmax(220px, 0.7fr);
+
+    gap: 35px;
+
+    align-items: center;
+
+    padding-top: 55px;
+    padding-bottom: 35px;
+  }
+
+  .ventures-hero__content h1 {
+    margin-top: 12px;
+
+    font-size: clamp(2.5rem, 6vw, 3.8rem);
+  }
+
+  .ventures-hero__content p {
+    margin-top: 14px;
+    margin-bottom: 18px;
+
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .ventures-hero__belief {
+    margin-left: auto;
+
+    padding: 20px 0 8px 22px;
+
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.35);
+  }
+
+  .ventures-hero__belief strong {
+    font-size: 1.8rem;
+  }
+
+  .ventures-hero__belief p {
+    margin-top: 14px;
+
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (hover: none) {
+
+  .ventures-button:hover {
+    transform: none;
+  }
+
+  .ventures-button:hover svg,
+  .venture-card__link:hover svg,
+  .ventures-text-link:hover svg {
+    transform: none;
+  }
+
+  .venture-card:hover {
+    background: #fff;
+
+    box-shadow: none;
+  }
+
+  .venture-journey-step:hover {
+    background: rgba(255, 255, 255, 0.62);
+  }
+
+  .ecosystem-network__item:hover {
+    background: var(--ventures-navy-deep);
+  }
+
+}
+
+
+/* ============================================================
+   KEYBOARD FOCUS
+============================================================ */
+
+.ventures-button:focus-visible,
+.venture-filter:focus-visible,
+.ventures-search:focus-within,
+.venture-card__link:focus-visible,
+.ventures-text-link:focus-visible {
+  outline: 2px solid var(--ventures-gold);
+  outline-offset: 3px;
+}
+
+
+/* ============================================================
+   HIGH CONTRAST
+============================================================ */
+
+@media (prefers-contrast: more) {
+
+  .ventures-hero__content p,
+  .ventures-hero__belief p,
+  .ventures-ecosystem__content p {
+    color: #fff;
+  }
+
+  .ventures-muted {
+    color: var(--ventures-text);
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .ventures-page *,
+  .ventures-page *::before,
+  .ventures-page *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .ventures-button,
+  .ventures-button svg,
+  .venture-filter,
+  .venture-card,
+  .venture-card__link svg,
+  .venture-journey-step,
+  .ventures-text-link svg,
+  .ecosystem-network__item {
+    transition: none;
+  }
+
+  .ventures-hero__background {
+    transform: none;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  .ventures-page {
+    background: #fff;
+
+    color: #000;
+  }
+
+  .ventures-hero {
+    min-height: auto;
+
+    background: #fff;
+
+    border-bottom: 1px solid #ccc;
+  }
+
+  .ventures-hero__background,
+  .ventures-hero__overlay {
+    display: none;
+  }
+
+  .ventures-hero__inner {
+    display: block;
+
+    padding: 40px 0;
+  }
+
+  .ventures-hero__content h1,
+  .ventures-hero__content p,
+  .ventures-hero__belief strong,
+  .ventures-hero__belief p {
+    color: #000;
+  }
+
+  .ventures-hero__belief {
+    margin: 30px 0 0;
+    padding: 20px 0 0;
+
+    border-left: 0;
+    border-top: 1px solid #ccc;
+  }
+
+  .ventures-toolbar {
+    display: none;
+  }
+
+  .ventures-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ventures-ecosystem {
+    background: #fff;
+  }
+
+  .ventures-ecosystem__content h2,
+  .ventures-ecosystem__content p {
+    color: #000;
+  }
+
+  .ventures-ecosystem__network {
+    border-color: #ccc;
+
+    background: #ccc;
+  }
+
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    background: #fff;
+
+    color: #000;
+  }
+
+  .venture-card,
+  .venture-journey-step {
+    break-inside: avoid;
+  }
+
+}

@@ -1,5 +1,4 @@
 export const navigation = [
-
   {
     label: "About",
     path: "/about",
@@ -11,17 +10,17 @@ export const navigation = [
   },
 
   {
-    label: "University Partnerships",
+    label: "Partners",
     path: "/university-partnerships",
 
     children: [
       {
-        label: "University Partnerships",
+        label: "University Partners",
         path: "/university-partnerships",
       },
 
       {
-        label: "Sponsors & Partners",
+        label: "Strategic Partners",
         path: "/strategic-partners",
       },
     ],
@@ -41,5 +40,4 @@ export const navigation = [
     label: "Contact",
     path: "/contact",
   },
-
 ];

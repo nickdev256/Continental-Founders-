@@ -19,19 +19,37 @@
 .about-page {
   width: 100%;
   max-width: 100%;
+
   overflow-x: hidden;
+
   background: #f7f5ef;
+
   color: #10243e;
-  font-family: inherit;
+
+  font-family:
+    "Times New Roman",
+    Times,
+    serif;
+
+  font-size: 19px;
+  line-height: 1.72;
+}
+
+.about-page img,
+.about-page video,
+.about-page svg {
+  display: block;
+
+  max-width: 100%;
 }
 
 .about-page img {
-  display: block;
-  max-width: 100%;
+  height: auto;
 }
 
 .about-page a {
   color: inherit;
+
   text-decoration: none;
 }
 
@@ -46,7 +64,10 @@
 .about-page h1,
 .about-page h2,
 .about-page h3,
-.about-page h4 {
+.about-page h4,
+.about-page span,
+.about-page strong,
+.about-page a {
   overflow-wrap: break-word;
 }
 
@@ -56,32 +77,13 @@
 ============================================================ */
 
 .about-page .container {
-  width: min(100% - 64px, 1320px);
+  width:
+    min(
+      calc(100% - 64px),
+      1320px
+    );
+
   margin-inline: auto;
-}
-
-@media (min-width: 1600px) {
-  .about-page .container {
-    width: min(100% - 96px, 1440px);
-  }
-}
-
-@media (max-width: 1100px) {
-  .about-page .container {
-    width: min(100% - 48px, 1100px);
-  }
-}
-
-@media (max-width: 700px) {
-  .about-page .container {
-    width: calc(100% - 40px);
-  }
-}
-
-@media (max-width: 420px) {
-  .about-page .container {
-    width: calc(100% - 32px);
-  }
 }
 
 
@@ -92,20 +94,25 @@
 .about-kicker {
   display: inline-flex;
   align-items: center;
+
   gap: 10px;
 
   color: #10243e;
 
-  font-size: 11px;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+
+  letter-spacing: 0.14em;
+
   line-height: 1.2;
+
   text-transform: uppercase;
 }
 
 .about-kicker > span:first-child {
   width: 22px;
   height: 1px;
+
   flex: 0 0 22px;
 
   background: #b89548;
@@ -122,6 +129,7 @@
 .gold-rule {
   width: 42px;
   height: 2px;
+
   background: #c4a15a;
 }
 
@@ -130,9 +138,10 @@
 
   color: #b89548;
 
-  font-size: 12px;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+
+  letter-spacing: 0.14em;
 }
 
 .section-number--light {
@@ -147,12 +156,20 @@
 .about-hero {
   position: relative;
 
-  min-height: 760px;
+  min-height:
+    clamp(
+      680px,
+      76vh,
+      820px
+    );
 
   display: flex;
   align-items: center;
 
-  padding: 150px 0 120px;
+  padding:
+    clamp(120px, 9vw, 165px)
+    0
+    clamp(95px, 8vw, 130px);
 
   background:
     linear-gradient(
@@ -167,55 +184,70 @@
   overflow: hidden;
 }
 
-
-/*
-  The JSX contains these decorative lines.
-  We intentionally hide them so the layout
-  remains clean and uninterrupted.
-*/
-
 .about-hero__line {
   display: none;
 }
 
-
 .about-hero__inner {
   position: relative;
+
   z-index: 2;
 
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
-  gap: 100px;
+
+  grid-template-columns:
+    minmax(0, 1.35fr)
+    minmax(300px, 0.65fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: end;
 }
 
 
-/* HERO MAIN */
+/* ============================================================
+   HERO MAIN
+============================================================ */
 
 .about-hero__main {
   min-width: 0;
 }
 
-.about-hero__main .about-kicker {
+.about-hero__main
+.about-kicker {
   margin-bottom: 34px;
 }
 
 .about-hero h1 {
-  max-width: 900px;
+  max-width: 920px;
+
   margin: 0;
 
   color: #ffffff;
 
-  font-size: clamp(54px, 6.2vw, 98px);
+  font-size:
+    clamp(
+      3.5rem,
+      6vw,
+      6.2rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.055em;
+
+  letter-spacing: -0.05em;
+
   line-height: 0.98;
 }
 
 .about-hero__number {
   display: flex;
   align-items: center;
+
   gap: 16px;
 
   margin-top: 55px;
@@ -224,8 +256,9 @@
 .about-hero__number span {
   color: #d0ae64;
 
-  font-size: 12px;
+  font-size: 0.78rem;
   font-weight: 700;
+
   letter-spacing: 0.14em;
 }
 
@@ -239,27 +272,41 @@
 }
 
 
-/* HERO ASIDE */
+/* ============================================================
+   HERO ASIDE
+============================================================ */
 
 .about-hero__aside {
   align-self: end;
 
-  max-width: 390px;
+  max-width: 400px;
 
   padding-bottom: 5px;
 }
 
-.about-hero__aside .gold-rule {
+.about-hero__aside
+.gold-rule {
   margin-bottom: 25px;
 }
 
 .about-hero__aside p {
   margin: 0;
 
-  color: rgba(255, 255, 255, 0.76);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.78
+    );
 
-  font-size: 17px;
-  font-weight: 400;
+  font-size:
+    clamp(
+      1rem,
+      1.05vw,
+      1.12rem
+    );
+
   line-height: 1.8;
 }
 
@@ -271,15 +318,26 @@
 .about-purpose {
   position: relative;
 
-  padding: 145px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #f7f5ef;
 }
 
 .about-purpose__grid {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 100px;
+
+  grid-template-columns:
+    280px
+    minmax(0, 1fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: start;
 }
@@ -290,61 +348,89 @@
   min-width: 0;
 }
 
-.about-section-label .about-kicker {
+.about-section-label
+.about-kicker {
   margin-bottom: 45px;
 }
 
 .purpose-globe {
+  width: 150px;
+  height: 150px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 150px;
-  height: 150px;
 
   border-radius: 50%;
 
   color: #b89548;
 
-  background: rgba(184, 149, 72, 0.07);
+  background:
+    rgba(
+      184,
+      149,
+      72,
+      0.07
+    );
 }
 
 .purpose-globe svg {
   max-width: 70%;
 }
 
-.about-section-label .section-number {
+.about-section-label
+.section-number {
   margin-top: 45px;
 }
 
-
 .about-purpose__content {
   min-width: 0;
-  max-width: 850px;
+
+  max-width: 880px;
 }
 
 .about-purpose__content h2 {
-  margin: 0 0 50px;
+  margin:
+    0
+    0
+    50px;
 
   color: #10243e;
 
-  font-size: clamp(40px, 4.4vw, 68px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.3vw,
+      4.5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.04;
 }
 
 .about-purpose__copy {
-  max-width: 760px;
+  max-width: 780px;
 }
 
 .about-purpose__copy p {
-  margin: 0 0 24px;
+  margin:
+    0
+    0
+    24px;
 
   color: #536173;
 
-  font-size: 17px;
-  line-height: 1.85;
+  font-size:
+    clamp(
+      1rem,
+      1.05vw,
+      1.13rem
+    );
+
+  line-height: 1.82;
 }
 
 .about-purpose__copy p:last-child {
@@ -357,15 +443,26 @@
 ============================================================ */
 
 .about-story {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #ffffff;
 }
 
 .about-story__grid {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 100px;
+
+  grid-template-columns:
+    280px
+    minmax(0, 1fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: start;
 }
@@ -374,7 +471,8 @@
   min-width: 0;
 }
 
-.about-story__label .about-kicker {
+.about-story__label
+.about-kicker {
   margin-bottom: 45px;
 }
 
@@ -383,56 +481,82 @@
 
   color: #b89548;
 
-  font-size: 12px;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
-}
 
+  letter-spacing: 0.14em;
+}
 
 .about-story__content {
   min-width: 0;
-  max-width: 850px;
+
+  max-width: 880px;
 }
 
 .about-story__content h2 {
-  margin: 0 0 48px;
+  margin:
+    0
+    0
+    48px;
 
   color: #10243e;
 
-  font-size: clamp(40px, 4.2vw, 68px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.2vw,
+      4.5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.05;
 }
 
 .about-story__content > p {
-  max-width: 790px;
+  max-width: 800px;
 
-  margin: 0 0 25px;
+  margin:
+    0
+    0
+    25px;
 
   color: #536173;
 
-  font-size: 17px;
-  line-height: 1.9;
+  font-size:
+    clamp(
+      1rem,
+      1.05vw,
+      1.13rem
+    );
+
+  line-height: 1.85;
 }
 
 .about-story__content > p:last-child {
   margin-bottom: 0;
 }
 
-
 .about-story__emphasis {
   margin-top: 45px !important;
+
   margin-bottom: 45px !important;
 
   color: #10243e !important;
 
-  font-size: clamp(24px, 2.5vw, 34px) !important;
+  font-size:
+    clamp(
+      1.6rem,
+      2.4vw,
+      2.2rem
+    ) !important;
+
   font-weight: 500;
 
   line-height: 1.35 !important;
 }
-
 
 .about-story__closing {
   margin-top: 50px !important;
@@ -443,38 +567,76 @@
 }
 
 
-/* STORY PHILOSOPHY */
+/* ============================================================
+   STORY PHILOSOPHY
+============================================================ */
 
 .about-story__quote {
-  margin: 70px 0;
+  margin:
+    clamp(
+      50px,
+      5vw,
+      70px
+    )
+    0;
 
-  padding: 55px 60px;
+  padding:
+    clamp(
+      35px,
+      4vw,
+      55px
+    )
+    clamp(
+      28px,
+      4vw,
+      60px
+    );
 
   background: #10243e;
+
   color: #ffffff;
 }
 
-.about-story__quote .about-kicker {
+.about-story__quote
+.about-kicker {
   margin-bottom: 25px;
 }
 
 .about-story__quote blockquote {
-  margin: 0 0 20px;
+  margin:
+    0
+    0
+    20px;
 
   color: #ffffff;
 
-  font-size: clamp(30px, 3.2vw, 48px);
+  font-size:
+    clamp(
+      2rem,
+      3.1vw,
+      3.1rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.035em;
+
+  letter-spacing: -0.03em;
+
   line-height: 1.15;
 }
 
 .about-story__quote p {
   margin: 0;
 
-  color: rgba(255, 255, 255, 0.65);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.7
+    );
 
-  font-size: 15px;
+  font-size: 0.95rem;
+
   line-height: 1.7;
 }
 
@@ -484,15 +646,26 @@
 ============================================================ */
 
 .about-approach {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #f0eee7;
 }
 
 .about-approach__grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  gap: 100px;
+
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(0, 1.05fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: center;
 }
@@ -501,45 +674,68 @@
   min-width: 0;
 }
 
-.about-approach__content .about-kicker {
+.about-approach__content
+.about-kicker {
   margin-bottom: 30px;
 }
 
 .about-approach__content h2 {
-  margin: 0 0 55px;
+  margin:
+    0
+    0
+    55px;
 
   color: #10243e;
 
-  font-size: clamp(42px, 4.5vw, 68px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.4vw,
+      4.5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.02;
 }
-
 
 .approach-points {
   display: flex;
   flex-direction: column;
+
   gap: 35px;
 }
 
 .approach-point {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
+
+  grid-template-columns:
+    50px
+    minmax(0, 1fr);
+
   gap: 20px;
 
   align-items: start;
 }
 
 .approach-point__icon {
+  width: 50px;
+  height: 50px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 48px;
-  height: 48px;
-
-  border: 1px solid rgba(184, 149, 72, 0.35);
+  border:
+    1px solid
+    rgba(
+      184,
+      149,
+      72,
+      0.35
+    );
 
   border-radius: 50%;
 
@@ -553,13 +749,19 @@
 
   color: #536173;
 
-  font-size: 16px;
-  line-height: 1.8;
-}
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
 
+  line-height: 1.78;
+}
 
 .about-approach__image {
   width: 100%;
+
   min-width: 0;
 
   overflow: hidden;
@@ -567,16 +769,23 @@
 
 .about-approach__image img {
   width: 100%;
-  height: 620px;
+  height:
+    clamp(
+      500px,
+      45vw,
+      640px
+    );
 
   object-fit: cover;
   object-position: center;
 
-  transition: transform 0.6s ease;
+  transition:
+    transform 0.6s ease;
 }
 
 .about-approach__image:hover img {
-  transform: scale(1.025);
+  transform:
+    scale(1.025);
 }
 
 
@@ -585,39 +794,70 @@
 ============================================================ */
 
 .about-belief {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #ffffff;
 }
 
 .about-belief__grid {
   display: grid;
-  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
-  gap: 100px;
+
+  grid-template-columns:
+    minmax(280px, 0.8fr)
+    minmax(0, 1.2fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: center;
 }
 
 .about-belief__visual {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  min-width: 0;
-
-  padding: 50px 20px;
+  padding:
+    50px
+    20px;
 }
 
 .about-belief__circle {
+  width:
+    clamp(
+      220px,
+      20vw,
+      270px
+    );
+
+  height:
+    clamp(
+      220px,
+      20vw,
+      270px
+    );
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 260px;
-  height: 260px;
-
-  border: 1px solid rgba(184, 149, 72, 0.35);
+  border:
+    1px solid
+    rgba(
+      184,
+      149,
+      72,
+      0.35
+    );
 
   border-radius: 50%;
 
@@ -630,61 +870,93 @@
   width: 1px;
   height: 70px;
 
-  margin: 20px 0;
+  margin:
+    20px
+    0;
 
   background: #d8d2c4;
 }
 
 .about-belief__visual > span {
-  max-width: 240px;
+  max-width: 250px;
 
   color: #536173;
 
-  font-size: 11px;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+
+  letter-spacing: 0.11em;
+
   line-height: 1.5;
+
   text-align: center;
+
   text-transform: uppercase;
 }
-
 
 .about-belief__content {
   min-width: 0;
 }
 
-.about-belief__content .about-kicker {
+.about-belief__content
+.about-kicker {
   margin-bottom: 30px;
 }
 
 .about-belief__content h2 {
-  max-width: 720px;
+  max-width: 740px;
 
-  margin: 0 0 45px;
+  margin:
+    0
+    0
+    45px;
 
   color: #10243e;
 
-  font-size: clamp(42px, 4.5vw, 70px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.5vw,
+      4.6rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.03;
 }
 
 .about-belief__content > p {
-  max-width: 730px;
+  max-width: 760px;
 
-  margin: 0 0 24px;
+  margin:
+    0
+    0
+    24px;
 
   color: #536173;
 
-  font-size: 17px;
-  line-height: 1.85;
+  font-size:
+    clamp(
+      1rem,
+      1.05vw,
+      1.13rem
+    );
+
+  line-height: 1.82;
 }
 
 .about-belief__large {
   color: #10243e !important;
 
-  font-size: clamp(24px, 2.4vw, 35px) !important;
+  font-size:
+    clamp(
+      1.55rem,
+      2.3vw,
+      2.25rem
+    ) !important;
+
   font-weight: 500;
 
   line-height: 1.35 !important;
@@ -704,76 +976,121 @@
 ============================================================ */
 
 .about-principles {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #f0eee7;
 }
 
 .about-centered-heading {
-  max-width: 760px;
+  max-width: 800px;
 
-  margin: 0 auto 80px;
+  margin:
+    0
+    auto
+    clamp(
+      55px,
+      6vw,
+      80px
+    );
 
   text-align: center;
 }
 
-.about-centered-heading .about-kicker {
+.about-centered-heading
+.about-kicker {
   justify-content: center;
 
   margin-bottom: 25px;
 }
 
 .about-centered-heading h2 {
-  margin: 0 0 22px;
+  margin:
+    0
+    0
+    22px;
 
   color: #10243e;
 
-  font-size: clamp(40px, 4vw, 60px);
+  font-size:
+    clamp(
+      2.8rem,
+      4vw,
+      4rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.04em;
+
+  letter-spacing: -0.035em;
+
   line-height: 1.05;
 }
 
 .about-centered-heading p {
-  max-width: 600px;
+  max-width: 650px;
 
   margin: 0 auto;
 
   color: #657182;
 
-  font-size: 16px;
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
+
   line-height: 1.75;
 }
 
-
 .principles-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
 
   gap: 18px;
 }
 
 .principle-card {
   min-width: 0;
+
   min-height: 390px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  padding: 35px 32px;
+  padding:
+    35px
+    32px;
 
   background: #ffffff;
 
   transition:
     transform 0.3s ease,
-    background 0.3s ease;
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .principle-card:hover {
-  transform: translateY(-7px);
+  transform:
+    translateY(-7px);
 
   background: #10243e;
+
+  box-shadow:
+    0 16px 35px
+    rgba(
+      16,
+      36,
+      62,
+      0.12
+    );
 }
 
 .principle-card__top {
@@ -787,9 +1104,10 @@
 .principle-number {
   color: #b89548;
 
-  font-size: 11px;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+
+  letter-spacing: 0.13em;
 }
 
 .principle-dash {
@@ -812,12 +1130,22 @@
 }
 
 .principle-card h3 {
-  margin: 0 0 17px;
+  margin:
+    0
+    0
+    17px;
 
   color: #10243e;
 
-  font-size: 25px;
+  font-size:
+    clamp(
+      1.45rem,
+      1.7vw,
+      1.7rem
+    );
+
   font-weight: 500;
+
   letter-spacing: -0.02em;
 }
 
@@ -826,7 +1154,13 @@
 
   color: #657182;
 
-  font-size: 15px;
+  font-size:
+    clamp(
+      0.95rem,
+      0.95vw,
+      1.04rem
+    );
+
   line-height: 1.75;
 }
 
@@ -835,10 +1169,17 @@
 }
 
 .principle-card:hover p {
-  color: rgba(255, 255, 255, 0.68);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
 }
 
-.principle-card:hover .principle-card__top svg {
+.principle-card:hover
+.principle-card__top svg {
   color: #d0ae64;
 }
 
@@ -848,55 +1189,88 @@
 ============================================================ */
 
 .about-leadership {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #ffffff;
 }
 
 .leadership-heading {
-  max-width: 800px;
+  max-width: 830px;
 
-  margin-bottom: 80px;
+  margin-bottom:
+    clamp(
+      55px,
+      6vw,
+      80px
+    );
 }
 
-.leadership-heading .about-kicker {
+.leadership-heading
+.about-kicker {
   margin-bottom: 20px;
 }
 
-.leadership-heading .section-number {
+.leadership-heading
+.section-number {
   display: block;
 
   margin-bottom: 25px;
 }
 
 .leadership-heading h2 {
-  margin: 0 0 24px;
+  margin:
+    0
+    0
+    24px;
 
   color: #10243e;
 
-  font-size: clamp(42px, 4.5vw, 68px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.5vw,
+      4.5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.03;
 }
 
 .leadership-heading p {
-  max-width: 700px;
+  max-width: 720px;
 
   margin: 0;
 
   color: #657182;
 
-  font-size: 16px;
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
+
   line-height: 1.8;
 }
 
 
-/* LEADERS */
+/* ============================================================
+   LEADERS
+============================================================ */
 
 .leadership-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
 
   gap: 24px;
 }
@@ -909,6 +1283,7 @@
   position: relative;
 
   width: 100%;
+
   aspect-ratio: 0.82;
 
   overflow: hidden;
@@ -923,24 +1298,28 @@
   object-fit: cover;
   object-position: center top;
 
-  transition: transform 0.55s ease;
+  transition:
+    transform 0.55s ease;
 }
 
-.leader-card:hover .leader-card__image img {
-  transform: scale(1.035);
+.leader-card:hover
+.leader-card__image img {
+  transform:
+    scale(1.035);
 }
 
 .leader-card__arrow {
   position: absolute;
+
   right: 16px;
   bottom: 16px;
+
+  width: 42px;
+  height: 42px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 42px;
-  height: 42px;
 
   color: #10243e;
 
@@ -958,36 +1337,61 @@
 
   color: #b89548;
 
-  font-size: 10px;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
+
+  letter-spacing: 0.12em;
+
   text-transform: uppercase;
 }
 
 .leader-card h3 {
-  margin: 0 0 15px;
+  margin:
+    0
+    0
+    15px;
 
   color: #10243e;
 
-  font-size: 22px;
+  font-size:
+    clamp(
+      1.3rem,
+      1.5vw,
+      1.55rem
+    );
+
   font-weight: 500;
+
   letter-spacing: -0.02em;
+
   line-height: 1.2;
 }
 
 .leader-card p {
-  margin: 0 0 20px;
+  margin:
+    0
+    0
+    20px;
 
   color: #657182;
 
-  font-size: 14px;
-  line-height: 1.75;
+  font-size:
+    clamp(
+      0.95rem,
+      0.9vw,
+      1rem
+    );
+
+  line-height: 1.72;
 }
 
 .leader-card__link {
   display: inline-flex;
   align-items: center;
+
   gap: 8px;
+
+  min-height: 40px;
 
   padding: 0;
 
@@ -999,7 +1403,7 @@
 
   cursor: pointer;
 
-  font-size: 12px;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
@@ -1008,42 +1412,78 @@
 }
 
 
-/* LEADERSHIP CLOSING */
+/* ============================================================
+   LEADERSHIP CLOSING
+============================================================ */
 
 .leadership-closing {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 100px;
 
-  margin-top: 120px;
+  grid-template-columns:
+    280px
+    minmax(0, 1fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
+
+  margin-top:
+    clamp(
+      85px,
+      8vw,
+      120px
+    );
+
   padding-top: 55px;
 
-  border-top: 1px solid #ddd9cf;
+  border-top:
+    1px solid #ddd9cf;
 }
 
-.leadership-closing .about-kicker {
+.leadership-closing
+.about-kicker {
   align-self: start;
 }
 
 .leadership-closing h3 {
-  margin: 0 0 20px;
+  margin:
+    0
+    0
+    20px;
 
   color: #10243e;
 
-  font-size: clamp(32px, 3vw, 48px);
+  font-size:
+    clamp(
+      2rem,
+      3vw,
+      3.1rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.035em;
+
+  letter-spacing: -0.03em;
+
   line-height: 1.08;
 }
 
 .leadership-closing p {
-  max-width: 750px;
+  max-width: 760px;
 
   margin: 0;
 
   color: #657182;
 
-  font-size: 16px;
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
+
   line-height: 1.8;
 }
 
@@ -1053,14 +1493,21 @@
 ============================================================ */
 
 .about-three-columns {
-  padding: 130px 0;
+  padding:
+    clamp(85px, 8vw, 135px)
+    0;
 
   background: #f0eee7;
 }
 
 .three-columns-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
 
   gap: 18px;
 }
@@ -1068,28 +1515,41 @@
 .three-column-card {
   min-width: 0;
 
-  padding: 42px 38px;
+  padding:
+    42px
+    38px;
 
   background: #ffffff;
 
   transition:
     transform 0.3s ease,
-    background 0.3s ease;
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .three-column-card:hover {
-  transform: translateY(-6px);
+  transform:
+    translateY(-6px);
 
   background: #10243e;
+
+  box-shadow:
+    0 16px 35px
+    rgba(
+      16,
+      36,
+      62,
+      0.12
+    );
 }
 
 .three-column-card__icon {
+  width: 54px;
+  height: 54px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-
-  width: 52px;
-  height: 52px;
 
   margin-bottom: 35px;
 
@@ -1100,38 +1560,62 @@
   background: #f3efe5;
 }
 
-.three-column-card .about-kicker {
+.three-column-card
+.about-kicker {
   margin-bottom: 20px;
 }
 
 .three-column-card h3 {
-  margin: 0 0 20px;
+  margin:
+    0
+    0
+    20px;
 
   color: #10243e;
 
-  font-size: 27px;
+  font-size:
+    clamp(
+      1.5rem,
+      1.8vw,
+      1.8rem
+    );
+
   font-weight: 500;
+
   letter-spacing: -0.025em;
+
   line-height: 1.18;
 }
 
 .three-column-card p {
-  margin: 0 0 30px;
+  margin:
+    0
+    0
+    30px;
 
   color: #657182;
 
-  font-size: 15px;
-  line-height: 1.8;
+  font-size:
+    clamp(
+      0.95rem,
+      0.95vw,
+      1.04rem
+    );
+
+  line-height: 1.78;
 }
 
 .three-column-card > a {
   display: inline-flex;
   align-items: center;
+
   gap: 8px;
+
+  min-height: 40px;
 
   color: #10243e;
 
-  font-size: 12px;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
@@ -1145,7 +1629,13 @@
 }
 
 .three-column-card:hover p {
-  color: rgba(255, 255, 255, 0.68);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
 }
 
 
@@ -1154,48 +1644,70 @@
 ============================================================ */
 
 .about-opportunity {
-  padding: 150px 0;
+  padding:
+    clamp(90px, 9vw, 150px)
+    0;
 
   background: #ffffff;
 }
 
 .opportunity-heading {
-  margin-bottom: 80px;
+  margin-bottom:
+    clamp(
+      55px,
+      6vw,
+      80px
+    );
 }
 
-.opportunity-heading .about-kicker {
+.opportunity-heading
+.about-kicker {
   margin-bottom: 20px;
 }
 
-.opportunity-heading .section-number {
+.opportunity-heading
+.section-number {
   display: block;
 
   margin-bottom: 25px;
 }
 
 .opportunity-heading h2 {
-  max-width: 820px;
+  max-width: 840px;
 
   margin: 0;
 
   color: #10243e;
 
-  font-size: clamp(44px, 4.5vw, 70px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.5vw,
+      4.6rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.02;
 }
 
-
 .opportunity-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
 
   gap: 18px;
 }
 
 .opportunity-card {
   min-width: 0;
+
   min-height: 360px;
 
   display: flex;
@@ -1208,13 +1720,24 @@
 
   transition:
     transform 0.3s ease,
-    background 0.3s ease;
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .opportunity-card:hover {
-  transform: translateY(-6px);
+  transform:
+    translateY(-6px);
 
   background: #10243e;
+
+  box-shadow:
+    0 16px 35px
+    rgba(
+      16,
+      36,
+      62,
+      0.12
+    );
 }
 
 .opportunity-number {
@@ -1222,17 +1745,27 @@
 
   color: #b89548;
 
-  font-size: 11px;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+
+  letter-spacing: 0.13em;
 }
 
 .opportunity-card h3 {
-  margin: 0 0 15px;
+  margin:
+    0
+    0
+    15px;
 
   color: #10243e;
 
-  font-size: 28px;
+  font-size:
+    clamp(
+      1.55rem,
+      1.9vw,
+      1.9rem
+    );
+
   font-weight: 500;
 }
 
@@ -1241,7 +1774,13 @@
 
   color: #657182;
 
-  font-size: 15px;
+  font-size:
+    clamp(
+      0.95rem,
+      0.95vw,
+      1.04rem
+    );
+
   line-height: 1.75;
 }
 
@@ -1250,7 +1789,13 @@
 }
 
 .opportunity-card:hover p {
-  color: rgba(255, 255, 255, 0.68);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
 }
 
 
@@ -1261,7 +1806,9 @@
 .about-vision {
   position: relative;
 
-  padding: 160px 0;
+  padding:
+    clamp(100px, 10vw, 165px)
+    0;
 
   background: #10243e;
 
@@ -1272,6 +1819,7 @@
 
 .about-vision__glow {
   position: absolute;
+
   top: -200px;
   right: -200px;
 
@@ -1280,18 +1828,34 @@
 
   border-radius: 50%;
 
-  background: rgba(184, 149, 72, 0.07);
+  background:
+    rgba(
+      184,
+      149,
+      72,
+      0.07
+    );
 
   pointer-events: none;
 }
 
 .about-vision__grid {
   position: relative;
+
   z-index: 1;
 
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  gap: 100px;
+
+  grid-template-columns:
+    280px
+    minmax(0, 1fr);
+
+  gap:
+    clamp(
+      55px,
+      7vw,
+      100px
+    );
 
   align-items: start;
 }
@@ -1303,43 +1867,84 @@
 
   color: #d0ae64;
 
-  font-size: 12px;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+
+  letter-spacing: 0.14em;
 }
 
 .about-vision__content {
   min-width: 0;
-  max-width: 900px;
+
+  max-width: 920px;
 }
 
 .about-vision__content h2 {
-  margin: 0 0 40px;
+  margin:
+    0
+    0
+    40px;
 
   color: #ffffff;
 
-  font-size: clamp(44px, 5vw, 76px);
+  font-size:
+    clamp(
+      3rem,
+      5vw,
+      5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.05em;
+
+  letter-spacing: -0.045em;
+
   line-height: 1.02;
 }
 
 .about-vision__content p {
-  max-width: 790px;
+  max-width: 800px;
 
-  margin: 0 0 25px;
+  margin:
+    0
+    0
+    25px;
 
-  color: rgba(255, 255, 255, 0.67);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
 
-  font-size: 17px;
-  line-height: 1.85;
+  font-size:
+    clamp(
+      1rem,
+      1.05vw,
+      1.13rem
+    );
+
+  line-height: 1.82;
 }
 
-.about-vision__content .about-vision__lead {
-  color: rgba(255, 255, 255, 0.88);
+.about-vision__content
+.about-vision__lead {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.9
+    );
 
-  font-size: 20px;
-  line-height: 1.75;
+  font-size:
+    clamp(
+      1.2rem,
+      1.4vw,
+      1.35rem
+    );
+
+  line-height: 1.7;
 }
 
 
@@ -1348,7 +1953,9 @@
 ============================================================ */
 
 .about-founding {
-  padding: 150px 0;
+  padding:
+    clamp(95px, 9vw, 150px)
+    0;
 
   background: #0b1d31;
 
@@ -1359,71 +1966,118 @@
   position: relative;
 
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.75fr);
-  gap: 90px;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(300px, 0.75fr);
+
+  gap:
+    clamp(
+      50px,
+      7vw,
+      90px
+    );
 
   align-items: center;
 }
 
-.about-founding__grid > div:first-child {
+.about-founding__grid
+> div:first-child {
   min-width: 0;
 }
 
 .about-founding h2 {
-  margin: 30px 0 0;
+  margin:
+    30px
+    0
+    0;
 
   color: #ffffff;
 
-  font-size: clamp(44px, 4.8vw, 72px);
+  font-size:
+    clamp(
+      3rem,
+      4.8vw,
+      4.8rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.05em;
+
+  letter-spacing: -0.045em;
+
   line-height: 1.02;
 }
 
-.about-founding__grid > div:nth-child(2) {
+.about-founding__grid
+> div:nth-child(2) {
   position: relative;
+
   z-index: 2;
 
   min-width: 0;
 }
 
-.about-founding__grid > div:nth-child(2) p {
-  margin: 0 0 25px;
+.about-founding__grid
+> div:nth-child(2) p {
+  margin:
+    0
+    0
+    25px;
 
-  color: rgba(255, 255, 255, 0.67);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.72
+    );
 
-  font-size: 16px;
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
+
   line-height: 1.8;
 }
 
 .gold-button {
+  min-height: 52px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 10px;
 
-  min-height: 52px;
+  padding:
+    14px
+    22px;
 
-  padding: 14px 22px;
-
-  border: 1px solid #c5a35e;
+  border:
+    1px solid #c5a35e;
 
   color: #10243e;
 
   background: #c5a35e;
 
-  font-size: 12px;
+  font-size: 0.84rem;
   font-weight: 700;
+
   letter-spacing: 0.02em;
 
+  cursor: pointer;
+
   transition:
-    background 0.25s ease,
+    background-color 0.25s ease,
     color 0.25s ease,
     transform 0.25s ease;
 }
 
 .gold-button:hover {
-  transform: translateY(-2px);
+  transform:
+    translateY(-2px);
 
   color: #ffffff;
 
@@ -1436,14 +2090,20 @@
   right: -30px;
   bottom: -70px;
 
+  width: 260px;
+  height: 260px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 260px;
-  height: 260px;
-
-  color: rgba(200, 167, 95, 0.18);
+  color:
+    rgba(
+      200,
+      167,
+      95,
+      0.18
+    );
 
   pointer-events: none;
 }
@@ -1454,28 +2114,47 @@
 ============================================================ */
 
 .about-final-cta {
-  padding: 130px 0;
+  padding:
+    clamp(85px, 8vw, 135px)
+    0;
 
   background: #f7f5ef;
 }
 
 .about-final-cta__grid {
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) minmax(280px, 0.75fr);
-  gap: 50px;
+
+  grid-template-columns:
+    80px
+    minmax(0, 1fr)
+    minmax(280px, 0.75fr);
+
+  gap:
+    clamp(
+      35px,
+      4vw,
+      50px
+    );
 
   align-items: start;
 }
 
 .final-cta-icon {
+  width: 70px;
+  height: 70px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 70px;
-  height: 70px;
-
-  border: 1px solid rgba(184, 149, 72, 0.35);
+  border:
+    1px solid
+    rgba(
+      184,
+      149,
+      72,
+      0.35
+    );
 
   border-radius: 50%;
 
@@ -1483,56 +2162,85 @@
 }
 
 .about-final-cta h2 {
-  margin: 25px 0 0;
+  margin:
+    25px
+    0
+    0;
 
   color: #10243e;
 
-  font-size: clamp(42px, 4.5vw, 68px);
+  font-size:
+    clamp(
+      2.8rem,
+      4.5vw,
+      4.5rem
+    );
+
   font-weight: 500;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.04em;
+
   line-height: 1.02;
 }
 
-.about-final-cta__grid > div:last-child {
+.about-final-cta__grid
+> div:last-child {
   min-width: 0;
 }
 
-.about-final-cta__grid > div:last-child p {
-  margin: 0 0 30px;
+.about-final-cta__grid
+> div:last-child p {
+  margin:
+    0
+    0
+    30px;
 
   color: #657182;
 
-  font-size: 16px;
+  font-size:
+    clamp(
+      1rem,
+      1vw,
+      1.08rem
+    );
+
   line-height: 1.8;
 }
 
 .outline-button {
+  min-height: 52px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   gap: 10px;
 
-  min-height: 52px;
+  padding:
+    13px
+    20px;
 
-  padding: 13px 20px;
-
-  border: 1px solid #10243e;
+  border:
+    1px solid #10243e;
 
   color: #10243e;
 
   background: transparent;
 
-  font-size: 12px;
+  font-size: 0.84rem;
   font-weight: 700;
 
+  cursor: pointer;
+
   transition:
-    background 0.25s ease,
+    background-color 0.25s ease,
     color 0.25s ease,
     transform 0.25s ease;
 }
 
 .outline-button:hover {
-  transform: translateY(-2px);
+  transform:
+    translateY(-2px);
 
   color: #ffffff;
 
@@ -1544,9 +2252,12 @@
    16. CTA SAFETY
 ============================================================ */
 
-.about-page .cf-button,
-.about-page .gold-button,
-.about-page .outline-button {
+.about-page
+.cf-button,
+.about-page
+.gold-button,
+.about-page
+.outline-button {
   max-width: 100%;
 
   white-space: normal;
@@ -1556,96 +2267,153 @@
 
 
 /* ============================================================
-   17. LARGE DESKTOP
+   17. ULTRA-WIDE DESKTOP
+   1800px+
 ============================================================ */
 
-@media (min-width: 1500px) {
+@media (min-width: 1800px) {
+
+  .about-page {
+    font-size: 20px;
+  }
+
+  .about-page
+  .container {
+    width:
+      min(
+        calc(100% - 120px),
+        1500px
+      );
+  }
 
   .about-hero {
-    min-height: 820px;
+    min-height: 860px;
   }
 
-  .about-purpose,
-  .about-story,
-  .about-approach,
-  .about-belief,
-  .about-principles,
-  .about-leadership,
-  .about-opportunity {
-    padding-top: 175px;
-    padding-bottom: 175px;
-  }
-
-  .about-vision,
-  .about-founding {
-    padding-top: 185px;
-    padding-bottom: 185px;
+  .about-hero h1 {
+    font-size: 6.3rem;
   }
 
 }
 
 
 /* ============================================================
-   18. TABLET / SMALL LAPTOP
+   18. LARGE DESKTOP
 ============================================================ */
 
-@media (max-width: 1100px) {
+@media (
+  min-width: 1400px
+)
+and
+(
+  max-width: 1799px
+) {
 
-  .about-hero {
-    min-height: 700px;
+  .about-page
+  .container {
+    width:
+      min(
+        calc(100% - 88px),
+        1400px
+      );
+  }
 
-    padding-top: 130px;
-    padding-bottom: 100px;
+}
+
+
+/* ============================================================
+   19. LARGE LAPTOP
+============================================================ */
+
+@media (max-width: 1200px) {
+
+  .about-page
+  .container {
+    width:
+      min(
+        calc(100% - 58px),
+        1120px
+      );
   }
 
   .about-hero__inner {
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns:
+      minmax(0, 1fr)
+      320px;
 
-    gap: 60px;
+    gap: 55px;
   }
-
-  .about-hero h1 {
-    font-size: clamp(50px, 7vw, 76px);
-  }
-
 
   .about-purpose__grid,
   .about-story__grid,
   .about-vision__grid {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns:
+      220px
+      minmax(0, 1fr);
 
     gap: 60px;
   }
-
 
   .about-approach__grid,
   .about-belief__grid {
     gap: 60px;
   }
 
-
-  .principles-grid,
-  .opportunity-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-
-  .leadership-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-    gap: 45px 25px;
-  }
-
-
   .leadership-closing {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns:
+      220px
+      minmax(0, 1fr);
 
     gap: 60px;
   }
 
+}
+
+
+/* ============================================================
+   20. SMALL LAPTOP / TABLET LANDSCAPE
+============================================================ */
+
+@media (max-width: 1050px) {
+
+  .about-page {
+    font-size: 18px;
+  }
+
+  .principles-grid,
+  .opportunity-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .leadership-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+
+    gap:
+      48px
+      26px;
+  }
+
+  .three-columns-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
 
   .about-final-cta__grid {
-    grid-template-columns: 70px minmax(0, 1fr) minmax(240px, 0.7fr);
+    grid-template-columns:
+      70px
+      minmax(0, 1fr)
+      minmax(240px, 0.7fr);
 
     gap: 35px;
   }
@@ -1654,15 +2422,31 @@
 
 
 /* ============================================================
-   19. TABLET
+   21. TABLET
+   <= 900px
 ============================================================ */
 
-@media (max-width: 820px) {
+@media (max-width: 900px) {
+
+  .about-page
+  .container {
+    width:
+      min(
+        calc(100% - 44px),
+        820px
+      );
+  }
+
+
+  /* HERO */
 
   .about-hero {
     min-height: auto;
 
-    padding: 120px 0 90px;
+    padding:
+      110px
+      0
+      90px;
   }
 
   .about-hero__inner {
@@ -1670,31 +2454,22 @@
   }
 
   .about-hero__aside {
-    max-width: 600px;
+    max-width: 620px;
 
-    margin-top: 65px;
-  }
-
-  .about-hero__main .about-kicker {
-    margin-bottom: 28px;
+    margin-top: 60px;
   }
 
   .about-hero h1 {
-    font-size: clamp(46px, 9vw, 68px);
+    font-size:
+      clamp(
+        3.1rem,
+        8vw,
+        4.6rem
+      );
   }
 
 
-  .about-purpose,
-  .about-story,
-  .about-approach,
-  .about-belief,
-  .about-principles,
-  .about-leadership,
-  .about-opportunity,
-  .about-three-columns {
-    padding: 100px 0;
-  }
-
+  /* TWO COLUMN TEXT SECTIONS */
 
   .about-purpose__grid,
   .about-story__grid,
@@ -1702,64 +2477,53 @@
     display: block;
   }
 
-
   .about-section-label,
   .about-story__label {
-    margin-bottom: 60px;
+    margin-bottom: 55px;
   }
 
 
-  .purpose-globe {
-    width: 120px;
-    height: 120px;
-  }
+  /* APPROACH */
 
-
-  .about-purpose__content h2,
-  .about-story__content h2,
-  .about-approach__content h2,
-  .about-belief__content h2,
-  .leadership-heading h2,
-  .opportunity-heading h2 {
-    max-width: 720px;
-  }
-
-
-  .about-approach__grid,
-  .about-belief__grid {
+  .about-approach__grid {
     grid-template-columns: 1fr;
   }
-
 
   .about-approach__image {
     order: 2;
   }
 
   .about-approach__image img {
-    height: 500px;
+    height:
+      clamp(
+        400px,
+        60vw,
+        520px
+      );
   }
 
+
+  /* BELIEF */
+
+  .about-belief__grid {
+    grid-template-columns: 1fr;
+  }
 
   .about-belief__visual {
     order: 2;
+
+    padding-bottom: 0;
   }
 
 
-  .about-belief__circle {
-    width: 220px;
-    height: 220px;
-  }
-
+  /* THREE COLUMNS */
 
   .three-columns-grid {
     grid-template-columns: 1fr;
   }
 
 
-  .three-column-card {
-    padding: 38px;
-  }
-
+  /* FOUNDING */
 
   .about-founding__grid {
     grid-template-columns: 1fr;
@@ -1772,6 +2536,8 @@
   }
 
 
+  /* FINAL CTA */
+
   .about-final-cta__grid {
     grid-template-columns: 1fr;
 
@@ -1782,69 +2548,133 @@
 
 
 /* ============================================================
-   20. MOBILE
+   22. LARGE PHONES / SMALL TABLETS
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .about-page
+  .container {
+    width:
+      calc(100% - 36px);
+  }
+
+  .principles-grid,
+  .opportunity-grid,
+  .leadership-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leadership-grid {
+    gap: 52px;
+  }
+
+  .leadership-closing {
+    display: block;
+  }
+
+  .leadership-closing
+  .about-kicker {
+    margin-bottom: 30px;
+  }
+
+}
+
+
+/* ============================================================
+   23. MOBILE
+   <= 600px
 ============================================================ */
 
 @media (max-width: 600px) {
 
-  .about-page .container {
-    width: calc(100% - 40px);
+  .about-page {
+    font-size: 18px;
+  }
+
+  .about-page
+  .container {
+    width:
+      calc(100% - 30px);
   }
 
 
   /* HERO */
 
   .about-hero {
-    padding: 105px 0 75px;
+    padding:
+      88px
+      0
+      72px;
+  }
+
+  .about-hero__main
+  .about-kicker {
+    margin-bottom: 24px;
   }
 
   .about-hero h1 {
-    font-size: clamp(40px, 12vw, 58px);
-
-    letter-spacing: -0.045em;
+    font-size:
+      clamp(
+        2.7rem,
+        11vw,
+        3.8rem
+      );
 
     line-height: 1;
+
+    letter-spacing: -0.04em;
   }
 
   .about-hero__aside {
-    margin-top: 50px;
+    margin-top: 48px;
   }
 
   .about-hero__aside p {
-    font-size: 15px;
-    line-height: 1.75;
+    font-size: 1rem;
+
+    line-height: 1.72;
   }
 
   .about-hero__number {
-    margin-top: 40px;
+    margin-top: 38px;
   }
 
 
-  /* GENERAL SECTIONS */
+  /* KICKERS */
 
-  .about-purpose,
-  .about-story,
-  .about-approach,
-  .about-belief,
-  .about-principles,
-  .about-leadership,
-  .about-opportunity,
-  .about-three-columns {
-    padding: 80px 0;
+  .about-kicker {
+    font-size: 0.72rem;
+
+    letter-spacing: 0.11em;
+  }
+
+  .section-number {
+    font-size: 0.72rem;
   }
 
 
-  /* MISSION */
+  /* LABELS */
 
   .about-section-label,
   .about-story__label {
-    margin-bottom: 45px;
+    margin-bottom: 42px;
   }
 
-  .about-section-label .about-kicker,
-  .about-story__label .about-kicker {
-    margin-bottom: 30px;
+  .about-section-label
+  .about-kicker,
+  .about-story__label
+  .about-kicker {
+    margin-bottom: 28px;
   }
+
+  .purpose-globe {
+    width: 118px;
+    height: 118px;
+  }
+
+
+  /* HEADINGS */
 
   .about-purpose__content h2,
   .about-story__content h2,
@@ -1852,41 +2682,69 @@
   .about-belief__content h2,
   .leadership-heading h2,
   .opportunity-heading h2 {
-    margin-bottom: 35px;
+    margin-bottom: 32px;
 
-    font-size: clamp(36px, 10vw, 50px);
+    font-size:
+      clamp(
+        2.35rem,
+        9.5vw,
+        3.25rem
+      );
   }
 
 
+  /* BODY COPY */
+
   .about-purpose__copy p,
   .about-story__content > p,
-  .about-belief__content > p {
-    font-size: 15px;
-    line-height: 1.8;
+  .about-belief__content > p,
+  .approach-point p,
+  .leadership-heading p,
+  .leader-card p,
+  .leadership-closing p,
+  .three-column-card p,
+  .opportunity-card p,
+  .about-vision__content p,
+  .about-founding__grid
+  > div:nth-child(2) p,
+  .about-final-cta__grid
+  > div:last-child p {
+    font-size: 1rem;
+
+    line-height: 1.72;
   }
 
 
   /* STORY */
 
   .about-story__quote {
-    margin: 50px 0;
+    margin:
+      45px
+      0;
 
-    padding: 35px 25px;
+    padding:
+      32px
+      22px;
   }
 
   .about-story__quote blockquote {
-    font-size: 31px;
+    font-size:
+      clamp(
+        1.8rem,
+        8vw,
+        2.3rem
+      );
   }
 
   .about-story__emphasis {
-    font-size: 25px !important;
+    font-size: 1.55rem !important;
   }
 
 
   /* APPROACH */
 
   .about-approach__content h2 {
-    margin-bottom: 40px;
+    margin-bottom: 38px;
   }
 
   .approach-points {
@@ -1894,30 +2752,35 @@
   }
 
   .approach-point {
-    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-columns:
+      44px
+      minmax(0, 1fr);
 
     gap: 15px;
   }
 
   .approach-point__icon {
-    width: 42px;
-    height: 42px;
-  }
-
-  .approach-point p {
-    font-size: 14px;
-    line-height: 1.75;
+    width: 44px;
+    height: 44px;
   }
 
   .about-approach__image img {
-    height: 390px;
+    height:
+      clamp(
+        300px,
+        85vw,
+        410px
+      );
   }
 
 
   /* BELIEF */
 
   .about-belief__visual {
-    padding: 20px 0 55px;
+    padding:
+      20px
+      0
+      45px;
   }
 
   .about-belief__circle {
@@ -1930,242 +2793,238 @@
   }
 
   .about-belief__large {
-    font-size: 24px !important;
+    font-size: 1.5rem !important;
   }
 
 
   /* PRINCIPLES */
 
   .about-centered-heading {
-    margin-bottom: 50px;
+    margin-bottom: 48px;
   }
 
   .about-centered-heading h2 {
-    font-size: 38px;
+    font-size:
+      clamp(
+        2.3rem,
+        9vw,
+        3rem
+      );
   }
 
   .about-centered-heading p {
-    font-size: 15px;
-  }
-
-  .principles-grid {
-    grid-template-columns: 1fr;
-
-    gap: 14px;
+    font-size: 1rem;
   }
 
   .principle-card {
-    min-height: 330px;
+    min-height: auto;
 
-    padding: 30px 26px;
+    padding:
+      30px
+      25px;
   }
 
   .principle-card h3 {
-    font-size: 25px;
+    font-size: 1.55rem;
+  }
+
+  .principle-card p {
+    font-size: 1rem;
   }
 
 
   /* LEADERSHIP */
 
   .leadership-heading {
-    margin-bottom: 55px;
-  }
-
-  .leadership-heading h2 {
-    font-size: 38px;
-  }
-
-  .leadership-heading p {
-    font-size: 15px;
-  }
-
-  .leadership-grid {
-    grid-template-columns: 1fr;
-
-    gap: 55px;
+    margin-bottom: 52px;
   }
 
   .leader-card__image {
-    aspect-ratio: 0.9;
+    aspect-ratio: 0.88;
   }
 
   .leader-card h3 {
-    font-size: 22px;
+    font-size: 1.45rem;
   }
 
   .leader-card p {
-    font-size: 14px;
+    font-size: 1rem;
   }
 
+  .leader-card__link {
+    min-height: 44px;
+
+    font-size: 0.88rem;
+  }
 
   .leadership-closing {
-    display: block;
+    margin-top: 75px;
 
-    margin-top: 80px;
-    padding-top: 40px;
-  }
-
-  .leadership-closing .about-kicker {
-    margin-bottom: 30px;
+    padding-top: 38px;
   }
 
   .leadership-closing h3 {
-    font-size: 34px;
+    font-size:
+      clamp(
+        2rem,
+        8vw,
+        2.7rem
+      );
   }
 
 
   /* THREE COLUMNS */
 
   .three-column-card {
-    padding: 32px 26px;
+    padding:
+      32px
+      25px;
   }
 
   .three-column-card h3 {
-    font-size: 25px;
+    font-size: 1.55rem;
   }
 
   .three-column-card p {
-    font-size: 14px;
+    font-size: 1rem;
   }
 
 
   /* OPPORTUNITY */
 
-  .about-opportunity {
-    padding: 80px 0;
-  }
-
   .opportunity-heading {
-    margin-bottom: 50px;
-  }
-
-  .opportunity-grid {
-    grid-template-columns: 1fr;
-
-    gap: 14px;
+    margin-bottom: 48px;
   }
 
   .opportunity-card {
-    min-height: 300px;
+    min-height: auto;
 
-    padding: 30px 26px;
+    padding:
+      32px
+      25px;
   }
 
   .opportunity-card h3 {
-    font-size: 27px;
+    font-size: 1.65rem;
   }
 
   .opportunity-card p {
-    font-size: 14px;
+    font-size: 1rem;
   }
 
 
   /* VISION */
 
   .about-vision {
-    padding: 95px 0;
-  }
-
-  .about-vision__grid {
-    display: block;
+    padding:
+      88px
+      0;
   }
 
   .about-vision__content h2 {
-    margin-top: 40px;
+    margin-top: 38px;
 
-    font-size: clamp(38px, 10vw, 52px);
+    font-size:
+      clamp(
+        2.5rem,
+        10vw,
+        3.5rem
+      );
   }
 
-  .about-vision__content .about-vision__lead {
-    font-size: 17px;
-  }
-
-  .about-vision__content p {
-    font-size: 15px;
-    line-height: 1.8;
+  .about-vision__content
+  .about-vision__lead {
+    font-size: 1.15rem;
   }
 
 
   /* FOUNDING */
 
   .about-founding {
-    padding: 90px 0;
+    padding:
+      82px
+      0;
   }
 
   .about-founding h2 {
-    font-size: clamp(40px, 10vw, 54px);
-  }
-
-  .about-founding__grid > div:nth-child(2) p {
-    font-size: 15px;
+    font-size:
+      clamp(
+        2.5rem,
+        10vw,
+        3.6rem
+      );
   }
 
   .gold-button {
     width: 100%;
+
+    min-height: 54px;
+
+    font-size: 0.9rem;
   }
 
 
   /* FINAL CTA */
 
   .about-final-cta {
-    padding: 85px 0;
+    padding:
+      78px
+      0;
   }
 
   .final-cta-icon {
-    width: 60px;
-    height: 60px;
+    width: 62px;
+    height: 62px;
   }
 
   .about-final-cta h2 {
-    font-size: clamp(38px, 10vw, 52px);
-  }
-
-  .about-final-cta__grid > div:last-child p {
-    font-size: 15px;
+    font-size:
+      clamp(
+        2.5rem,
+        10vw,
+        3.5rem
+      );
   }
 
   .outline-button {
     width: 100%;
+
+    min-height: 54px;
+
+    font-size: 0.9rem;
   }
 
 }
 
 
 /* ============================================================
-   21. SMALL PHONES
+   24. SMALL PHONES
+   <= 420px
 ============================================================ */
 
 @media (max-width: 420px) {
 
-  .about-page .container {
-    width: calc(100% - 32px);
+  .about-page
+  .container {
+    width:
+      calc(100% - 26px);
   }
 
-
   .about-hero {
-    padding: 90px 0 65px;
+    padding:
+      78px
+      0
+      62px;
   }
 
   .about-hero h1 {
-    font-size: 39px;
+    font-size:
+      clamp(
+        2.45rem,
+        11vw,
+        3.15rem
+      );
   }
-
-  .about-hero__aside p {
-    font-size: 14px;
-  }
-
-
-  .about-purpose,
-  .about-story,
-  .about-approach,
-  .about-belief,
-  .about-principles,
-  .about-leadership,
-  .about-opportunity,
-  .about-three-columns {
-    padding: 70px 0;
-  }
-
 
   .about-purpose__content h2,
   .about-story__content h2,
@@ -2173,78 +3032,62 @@
   .about-belief__content h2,
   .leadership-heading h2,
   .opportunity-heading h2 {
-    font-size: 35px;
+    font-size:
+      clamp(
+        2.15rem,
+        9.5vw,
+        2.75rem
+      );
   }
 
-
   .about-story__quote {
-    padding: 30px 20px;
+    padding:
+      28px
+      19px;
   }
 
   .about-story__quote blockquote {
-    font-size: 27px;
+    font-size: 1.75rem;
   }
-
 
   .about-approach__image img {
-    height: 330px;
+    height: 320px;
   }
-
 
   .about-belief__circle {
     width: 170px;
     height: 170px;
   }
 
-
-  .principle-card {
-    min-height: 310px;
-
-    padding: 27px 23px;
-  }
-
-
-  .three-column-card {
-    padding: 28px 22px;
-  }
-
-
+  .principle-card,
+  .three-column-card,
   .opportunity-card {
-    min-height: 280px;
-
-    padding: 27px 23px;
-  }
-
-
-  .about-vision {
-    padding: 80px 0;
-  }
-
-
-  .about-founding {
-    padding: 75px 0;
-  }
-
-
-  .about-final-cta {
-    padding: 70px 0;
+    padding-left: 22px;
+    padding-right: 22px;
   }
 
 }
 
 
 /* ============================================================
-   22. VERY LARGE TEXT SAFETY
+   25. VERY SMALL PHONES
+   <= 360px
 ============================================================ */
 
 @media (max-width: 360px) {
 
-  .about-page .container {
-    width: calc(100% - 28px);
+  .about-page {
+    font-size: 17px;
+  }
+
+  .about-page
+  .container {
+    width:
+      calc(100% - 22px);
   }
 
   .about-hero h1 {
-    font-size: 35px;
+    font-size: 2.35rem;
   }
 
   .about-purpose__content h2,
@@ -2252,54 +3095,160 @@
   .about-approach__content h2,
   .about-belief__content h2,
   .leadership-heading h2,
-  .opportunity-heading h2 {
-    font-size: 32px;
-  }
-
+  .opportunity-heading h2,
   .about-vision__content h2,
   .about-founding h2,
   .about-final-cta h2 {
-    font-size: 32px;
+    font-size: 2.1rem;
+  }
+
+  .about-kicker {
+    font-size: 0.66rem;
+
+    letter-spacing: 0.09em;
+  }
+
+  .about-purpose__copy p,
+  .about-story__content > p,
+  .about-belief__content > p,
+  .approach-point p,
+  .leader-card p,
+  .three-column-card p,
+  .opportunity-card p {
+    font-size: 0.98rem;
   }
 
 }
 
 
 /* ============================================================
-   23. REDUCED MOTION
+   26. EXTRA SMALL DEVICES
+   <= 320px
 ============================================================ */
 
-@media (prefers-reduced-motion: reduce) {
+@media (max-width: 320px) {
 
-  .about-page *,
-  .about-page *::before,
-  .about-page *::after {
-    scroll-behavior: auto !important;
-    transition: none !important;
-    animation: none !important;
+  .about-page
+  .container {
+    width:
+      calc(100% - 18px);
+  }
+
+  .about-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .about-purpose__content h2,
+  .about-story__content h2,
+  .about-approach__content h2,
+  .about-belief__content h2,
+  .leadership-heading h2,
+  .opportunity-heading h2,
+  .about-vision__content h2,
+  .about-founding h2,
+  .about-final-cta h2 {
+    font-size: 1.95rem;
+  }
+
+  .principle-card h3,
+  .three-column-card h3,
+  .opportunity-card h3 {
+    font-size: 1.4rem;
   }
 
 }
 
 
 /* ============================================================
-   24. LANDSCAPE MOBILE
+   27. LANDSCAPE / SHORT SCREENS
 ============================================================ */
 
-@media (max-height: 600px) and (orientation: landscape) {
+@media
+(
+  max-height: 600px
+)
+and
+(
+  min-width: 700px
+) {
 
   .about-hero {
     min-height: auto;
 
-    padding-top: 90px;
-    padding-bottom: 70px;
+    padding:
+      80px
+      0
+      65px;
+  }
+
+  .about-hero h1 {
+    font-size:
+      clamp(
+        3rem,
+        6vw,
+        4.4rem
+      );
+  }
+
+  .about-hero__number {
+    margin-top: 35px;
   }
 
 }
 
 
 /* ============================================================
-   25. PRINT
+   28. ACCESSIBILITY
+============================================================ */
+
+.about-page button,
+.about-page a {
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+.about-page button:focus-visible,
+.about-page a:focus-visible,
+.about-page input:focus-visible,
+.about-page textarea:focus-visible,
+.about-page select:focus-visible {
+  outline:
+    3px solid #c4a15a;
+
+  outline-offset: 3px;
+}
+
+
+/* ============================================================
+   29. REDUCED MOTION
+============================================================ */
+
+@media
+(
+  prefers-reduced-motion: reduce
+) {
+
+  .about-page *,
+  .about-page *::before,
+  .about-page *::after {
+    scroll-behavior:
+      auto !important;
+
+    transition-duration:
+      0.01ms !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+  }
+
+}
+
+
+/* ============================================================
+   30. PRINT
 ============================================================ */
 
 @media print {
@@ -2312,6 +3261,7 @@
   .about-vision,
   .about-founding {
     color: #000000;
+
     background: #ffffff;
   }
 
@@ -2319,7 +3269,8 @@
   .about-page h2,
   .about-page h3,
   .about-page p {
-    color: #000000 !important;
+    color:
+      #000000 !important;
   }
 
 }

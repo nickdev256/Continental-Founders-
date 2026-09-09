@@ -1,3 +1,44 @@
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  background: var(--navy-900);
+  isolation: isolate;
+}
+
+.page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background-image: url("/assets/kk.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background: linear-gradient(
+    90deg,
+    rgba(3, 23, 47, 1.00) 0%,
+    rgba(3, 23, 47, 0.90) 20%,
+    rgba(3, 23, 47, 0.60) 42%,
+    rgba(3, 23, 47, 0.25) 68%,
+    rgba(3, 23, 47, 0.05) 100%
+  );
+}
+
+.page-hero__inner {
+  position: relative;
+  z-index: 2;
+}
+
 .contact-grid {
   display: grid;
   grid-template-columns: .8fr 1.2fr;

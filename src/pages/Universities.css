@@ -1,0 +1,1289 @@
+/* ============================================================
+   UNIVERSITIES PAGE
+============================================================ */
+
+.universities-hero,
+.university-opening,
+.universities-outcomes,
+.universities-participation,
+.universities-fellowship,
+.universities-ecosystem {
+  --uni-navy: #071a2d;
+  --uni-navy-2: #0d2944;
+  --uni-navy-3: #123a5e;
+
+  --uni-gold: #c79a45;
+  --uni-gold-light: #e7c878;
+
+  --uni-cream: #f7f4ed;
+  --uni-paper: #fcfbf8;
+
+  --uni-text: #22364a;
+  --uni-muted: #687887;
+
+  --uni-border: #e4e1da;
+  --uni-white: #ffffff;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.universities-hero {
+  position: relative;
+  overflow: hidden;
+
+  padding:
+    clamp(6.5rem, 11vw, 9rem)
+    0
+    clamp(5.5rem, 9vw, 7.5rem);
+
+  background:
+    linear-gradient(
+      125deg,
+      #061421 0%,
+      #09243c 52%,
+      #123a5e 100%
+    );
+
+  color: var(--uni-white);
+}
+
+
+.universities-hero::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 72px 72px;
+
+  pointer-events: none;
+}
+
+
+.universities-hero::after {
+  content: "";
+
+  position: absolute;
+
+  width: 620px;
+  height: 620px;
+
+  right: -210px;
+  top: -260px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(199, 154, 69, 0.23),
+      rgba(199, 154, 69, 0) 70%
+    );
+
+  pointer-events: none;
+}
+
+
+.universities-hero .page-hero__inner {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    360px;
+
+  gap:
+    clamp(3rem, 7vw, 7rem);
+
+  align-items: end;
+}
+
+
+.universities-hero__content {
+  max-width: 900px;
+}
+
+
+.universities-hero .eyebrow--light {
+  display: inline-flex;
+
+  margin-bottom: 1.5rem;
+
+  color: var(--uni-gold-light);
+
+  font-weight: 800;
+
+  letter-spacing: 0.15em;
+
+  text-transform: uppercase;
+}
+
+
+.universities-hero h1 {
+  margin: 0;
+
+  max-width: 930px;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(3rem, 6vw, 5.8rem);
+
+  line-height: 1.01;
+
+  letter-spacing: -0.05em;
+
+  font-weight: 750;
+
+  text-wrap: balance;
+
+  text-shadow:
+    0 4px 20px
+    rgba(0, 0, 0, 0.2);
+}
+
+
+.universities-hero .page-hero__aside {
+  padding-left: 1.8rem;
+
+  border-left:
+    1px solid
+    rgba(255, 255, 255, 0.22);
+}
+
+
+.universities-hero .page-hero__aside p {
+  margin:
+    0
+    0
+    1.4rem;
+
+  color:
+    rgba(255, 255, 255, 0.87);
+
+  font-size: 1rem;
+
+  line-height: 1.75;
+}
+
+
+.universities-hero__link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.55rem;
+
+  color: var(--uni-gold-light);
+
+  font-size: 0.88rem;
+
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    gap 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.universities-hero__link:hover {
+  gap: 0.8rem;
+
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   OPENING
+============================================================ */
+
+.university-opening {
+  padding:
+    clamp(5.5rem, 9vw, 8rem)
+    0;
+
+  background: var(--uni-paper);
+}
+
+
+.university-opening__grid {
+  display: grid;
+
+  grid-template-columns:
+    220px
+    minmax(0, 820px);
+
+  justify-content: space-between;
+
+  gap:
+    clamp(2.5rem, 6vw, 6rem);
+}
+
+
+.university-opening__label {
+  padding-top: 0.4rem;
+}
+
+
+.university-opening__content h2 {
+  max-width: 820px;
+
+  margin:
+    0
+    0
+    2rem;
+
+  color: var(--uni-navy);
+
+  font-size:
+    clamp(2.2rem, 4vw, 4rem);
+
+  line-height: 1.07;
+
+  letter-spacing: -0.04em;
+}
+
+
+.university-opening__content p {
+  max-width: 720px;
+
+  margin:
+    0
+    0
+    1.4rem;
+
+  color: var(--uni-muted);
+
+  font-size:
+    clamp(1rem, 1.3vw, 1.1rem);
+
+  line-height: 1.85;
+}
+
+
+/* ============================================================
+   POTENTIAL OUTCOMES
+============================================================ */
+
+.universities-outcomes {
+  position: relative;
+
+  overflow: hidden;
+
+  padding:
+    clamp(6rem, 9vw, 8.5rem)
+    0;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f4f1e9 0%,
+      #faf8f3 100%
+    );
+}
+
+
+.universities-outcomes::before {
+  content: "";
+
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  left: -260px;
+  top: -240px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(199, 154, 69, 0.12),
+      rgba(199, 154, 69, 0) 70%
+    );
+
+  pointer-events: none;
+}
+
+
+.universities-outcomes::after {
+  content: "";
+
+  position: absolute;
+
+  width: 430px;
+  height: 430px;
+
+  right: -180px;
+  bottom: -210px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(18, 58, 94, 0.08),
+      rgba(18, 58, 94, 0) 70%
+    );
+
+  pointer-events: none;
+}
+
+
+.universities-outcomes .container {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ============================================================
+   OUTCOMES API STATUS
+============================================================ */
+
+.universities-outcomes__status {
+  display: inline-flex;
+
+  align-items: center;
+
+  margin-top: 2rem;
+
+  padding:
+    0.85rem
+    1rem;
+
+  border:
+    1px solid
+    rgba(199, 154, 69, 0.18);
+
+  border-left:
+    3px solid
+    var(--uni-gold);
+
+  border-radius: 6px;
+
+  background:
+    rgba(255, 255, 255, 0.68);
+
+  color: var(--uni-muted);
+
+  font-size: 0.83rem;
+
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+
+.universities-outcomes__status--error {
+  border-left-color: #a66c3b;
+
+  background:
+    rgba(166, 108, 59, 0.06);
+
+  color: #78543a;
+}
+
+
+/* ============================================================
+   OUTCOME GRID
+============================================================ */
+
+.outcome-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1.4rem;
+
+  margin-top:
+    clamp(3rem, 5vw, 4.5rem);
+}
+
+
+/* ============================================================
+   OUTCOME CARD
+============================================================ */
+
+.university-outcome-card {
+  position: relative;
+
+  overflow: hidden;
+
+  min-height: 315px;
+
+  padding:
+    2rem
+    2rem
+    2.2rem;
+
+  border:
+    1px solid
+    rgba(7, 26, 45, 0.09);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  box-shadow:
+    0 14px 40px
+    rgba(7, 26, 45, 0.055);
+
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+
+.university-outcome-card::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 4px;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--uni-gold),
+      var(--uni-gold-light)
+    );
+
+  opacity: 0;
+
+  transition:
+    opacity 0.25s ease;
+}
+
+
+.university-outcome-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 220px;
+  height: 220px;
+
+  right: -110px;
+  bottom: -130px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(199, 154, 69, 0.11),
+      rgba(199, 154, 69, 0)
+    );
+
+  pointer-events: none;
+}
+
+
+.university-outcome-card:hover {
+  transform: translateY(-7px);
+
+  border-color:
+    rgba(199, 154, 69, 0.32);
+
+  box-shadow:
+    0 24px 60px
+    rgba(7, 26, 45, 0.1);
+}
+
+
+.university-outcome-card:hover::before {
+  opacity: 1;
+}
+
+
+/* ============================================================
+   OUTCOME CARD TOP
+============================================================ */
+
+.university-outcome-card__top {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 3rem;
+}
+
+
+.university-outcome-card__number {
+  color:
+    rgba(7, 26, 45, 0.38);
+
+  font-size: 0.76rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+}
+
+
+.university-outcome-card__icon {
+  display: grid;
+
+  place-items: center;
+
+  width: 46px;
+  height: 46px;
+
+  border:
+    1px solid
+    rgba(199, 154, 69, 0.25);
+
+  border-radius: 50%;
+
+  background:
+    rgba(199, 154, 69, 0.08);
+
+  color: var(--uni-gold);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.university-outcome-card:hover
+.university-outcome-card__icon {
+  transform:
+    rotate(-6deg)
+    scale(1.03);
+
+  background: var(--uni-navy);
+
+  color: var(--uni-gold-light);
+}
+
+
+/* ============================================================
+   OUTCOME CARD CONTENT
+============================================================ */
+
+.university-outcome-card h3 {
+  position: relative;
+  z-index: 2;
+
+  max-width: 390px;
+
+  margin:
+    0
+    0
+    1rem;
+
+  color: var(--uni-navy);
+
+  font-size:
+    clamp(1.35rem, 2vw, 1.7rem);
+
+  line-height: 1.16;
+
+  letter-spacing: -0.025em;
+}
+
+
+.university-outcome-card p {
+  position: relative;
+  z-index: 2;
+
+  max-width: 440px;
+
+  margin: 0;
+
+  padding-right: 1rem;
+
+  color: var(--uni-muted);
+
+  font-size: 0.96rem;
+
+  line-height: 1.72;
+}
+
+
+.university-outcome-card__arrow {
+  position: absolute;
+
+  right: 1.8rem;
+  bottom: 1.8rem;
+
+  z-index: 2;
+
+  color:
+    rgba(7, 26, 45, 0.3);
+
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+
+.university-outcome-card:hover
+.university-outcome-card__arrow {
+  color: var(--uni-gold);
+
+  transform:
+    translate(3px, -3px);
+}
+
+
+/* ============================================================
+   PARTICIPATION
+============================================================ */
+
+.universities-participation {
+  padding:
+    clamp(6rem, 9vw, 8rem)
+    0;
+
+  background: #ffffff;
+}
+
+
+.universities-participation__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap:
+    0
+    3.5rem;
+
+  margin-top:
+    clamp(3rem, 5vw, 4.5rem);
+
+  border-top:
+    1px solid
+    var(--uni-border);
+}
+
+
+.universities-participation__item {
+  display: grid;
+
+  grid-template-columns:
+    70px
+    1fr;
+
+  gap: 1rem;
+
+  padding:
+    2.2rem
+    0;
+
+  border-bottom:
+    1px solid
+    var(--uni-border);
+
+  transition:
+    transform 0.2s ease;
+}
+
+
+.universities-participation__item:hover {
+  transform: translateX(5px);
+}
+
+
+.universities-participation__number {
+  color: var(--uni-gold);
+
+  font-size: 0.75rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.13em;
+}
+
+
+.universities-participation__content h3 {
+  margin:
+    0
+    0
+    0.7rem;
+
+  color: var(--uni-navy);
+
+  font-size: 1.2rem;
+
+  letter-spacing: -0.02em;
+}
+
+
+.universities-participation__content p {
+  margin: 0;
+
+  color: var(--uni-muted);
+
+  font-size: 0.94rem;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   FOUNDER ENGAGEMENT
+============================================================ */
+
+.universities-fellowship {
+  position: relative;
+
+  overflow: hidden;
+
+  padding:
+    clamp(6rem, 9vw, 8rem)
+    0;
+
+  background:
+    linear-gradient(
+      125deg,
+      #061523,
+      #0b2b48
+    );
+
+  color: #ffffff;
+}
+
+
+.universities-fellowship::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px
+    );
+
+  background-size: 70px 70px;
+}
+
+
+.universities-fellowship::after {
+  content: "";
+
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  right: -170px;
+  bottom: -250px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(199, 154, 69, 0.19),
+      rgba(199, 154, 69, 0)
+    );
+}
+
+
+.universities-fellowship__grid {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    240px
+    minmax(0, 780px);
+
+  justify-content: space-between;
+
+  gap:
+    clamp(3rem, 7vw, 7rem);
+}
+
+
+.universities-fellowship__label {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  gap: 2rem;
+}
+
+
+.universities-fellowship__icon {
+  display: grid;
+
+  place-items: center;
+
+  width: 70px;
+  height: 70px;
+
+  border:
+    1px solid
+    rgba(231, 200, 120, 0.3);
+
+  border-radius: 50%;
+
+  color: var(--uni-gold-light);
+
+  background:
+    rgba(231, 200, 120, 0.07);
+}
+
+
+.universities-fellowship__content h2 {
+  max-width: 720px;
+
+  margin:
+    0
+    0
+    1.5rem;
+
+  color: #ffffff;
+
+  font-size:
+    clamp(2.2rem, 4vw, 4rem);
+
+  line-height: 1.07;
+
+  letter-spacing: -0.04em;
+}
+
+
+.universities-fellowship__content > p {
+  max-width: 680px;
+
+  margin:
+    0
+    0
+    2.5rem;
+
+  color:
+    rgba(255, 255, 255, 0.78);
+
+  font-size: 1rem;
+
+  line-height: 1.8;
+}
+
+
+/* ============================================================
+   JOURNEY
+============================================================ */
+
+.universities-fellowship__journey {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+
+  gap: 0.8rem;
+
+  margin-bottom: 2rem;
+
+  padding:
+    1.1rem
+    1.3rem;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.12);
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+
+.universities-fellowship__journey span {
+  color: #ffffff;
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+}
+
+
+.universities-fellowship__journey svg {
+  color: var(--uni-gold-light);
+}
+
+
+/* ============================================================
+   TEXT LINKS
+============================================================ */
+
+.universities-text-link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.55rem;
+
+  color: var(--uni-gold);
+
+  font-size: 0.88rem;
+
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    gap 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.universities-fellowship
+.universities-text-link {
+  color: var(--uni-gold-light);
+}
+
+
+.universities-text-link:hover {
+  gap: 0.8rem;
+}
+
+
+/* ============================================================
+   ECOSYSTEM
+============================================================ */
+
+.universities-ecosystem {
+  padding:
+    clamp(6rem, 9vw, 8rem)
+    0;
+
+  background: var(--uni-paper);
+}
+
+
+.universities-ecosystem__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 1.2rem;
+
+  margin-top:
+    clamp(3rem, 5vw, 4rem);
+}
+
+
+.universities-ecosystem__card {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-height: 310px;
+
+  padding: 1.8rem;
+
+  border:
+    1px solid
+    var(--uni-border);
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: inherit;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.universities-ecosystem__card:hover {
+  transform: translateY(-5px);
+
+  border-color:
+    rgba(199, 154, 69, 0.32);
+
+  box-shadow:
+    0 20px 50px
+    rgba(7, 26, 45, 0.08);
+}
+
+
+.universities-ecosystem__number {
+  margin-bottom: 3rem;
+
+  color: var(--uni-gold);
+
+  font-size: 0.72rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.14em;
+}
+
+
+.universities-ecosystem__card h3 {
+  margin:
+    0
+    0
+    0.9rem;
+
+  color: var(--uni-navy);
+
+  font-size: 1.35rem;
+
+  line-height: 1.22;
+
+  letter-spacing: -0.025em;
+}
+
+
+.universities-ecosystem__card p {
+  margin:
+    0
+    0
+    1.5rem;
+
+  color: var(--uni-muted);
+
+  font-size: 0.92rem;
+
+  line-height: 1.7;
+}
+
+
+.universities-ecosystem__link {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-top: auto;
+
+  color: var(--uni-navy);
+
+  font-size: 0.78rem;
+
+  font-weight: 800;
+}
+
+
+.universities-ecosystem__card:hover
+.universities-ecosystem__link {
+  color: var(--uni-gold);
+}
+
+
+.universities-ecosystem__all {
+  margin-top: 2.5rem;
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 960px) {
+
+  .universities-hero .page-hero__inner {
+    grid-template-columns: 1fr;
+  }
+
+
+  .universities-hero .page-hero__aside {
+    max-width: 620px;
+  }
+
+
+  .university-opening__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .outcome-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+
+  .universities-fellowship__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .universities-ecosystem__grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 680px) {
+
+  .universities-hero {
+    padding:
+      5rem
+      0
+      4.8rem;
+  }
+
+
+  .universities-hero h1 {
+    font-size:
+      clamp(2.6rem, 11vw, 3.8rem);
+  }
+
+
+  .universities-hero .page-hero__aside {
+    padding-left: 1.2rem;
+  }
+
+
+  .outcome-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .university-outcome-card {
+    min-height: 280px;
+  }
+
+
+  .universities-participation__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .universities-participation__item {
+    grid-template-columns:
+      52px
+      1fr;
+  }
+
+
+  .universities-fellowship__journey {
+    gap: 0.55rem;
+  }
+
+
+  .universities-fellowship__journey svg {
+    width: 13px;
+  }
+
+
+  .universities-ecosystem__grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL SCREENS
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .universities-hero h1 {
+    font-size: 2.35rem;
+  }
+
+
+  .university-outcome-card {
+    padding:
+      1.6rem
+      1.4rem
+      2rem;
+  }
+
+
+  .university-outcome-card__top {
+    margin-bottom: 2.3rem;
+  }
+
+
+  .universities-fellowship__journey {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+
+  .universities-fellowship__journey svg {
+    transform: rotate(90deg);
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .university-outcome-card,
+  .university-outcome-card__icon,
+  .university-outcome-card__arrow,
+  .universities-participation__item,
+  .universities-ecosystem__card,
+  .universities-hero__link,
+  .universities-text-link {
+    transition: none;
+  }
+
+}

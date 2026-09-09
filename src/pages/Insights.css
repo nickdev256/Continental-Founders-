@@ -1,61 +1,290 @@
+/* ============================================================
+   INSIGHTS PAGE
+============================================================ */
+
 .insights-page {
-  background: var(--white);
+  padding: 100px 0 120px;
+  background: #ffffff;
 }
+
+
+/* ============================================================
+   CONTROLS
+============================================================ */
 
 .insights-controls {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 25px;
-  margin-bottom: 72px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
+  gap: 30px;
+  margin-bottom: 75px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(13, 34, 56, 0.12);
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.insights-controls label {
+  position: relative;
+  display: block;
+  width: min(100%, 360px);
 }
 
 .insights-controls input {
-  width: min(360px, 100%);
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid var(--line);
+  width: 100%;
+  height: 52px;
+  padding: 0 18px;
+  border: 1px solid rgba(13, 34, 56, 0.16);
   border-radius: 2px;
-  color: var(--navy-900);
-  outline: 0;
+
+  background: #ffffff;
+  color: #0d2238;
+
+  font-family: inherit;
+  font-size: 0.95rem;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.insights-controls input::placeholder {
+  color: #7a838d;
 }
 
 .insights-controls input:focus {
-  border-color: var(--navy-900);
+  border-color: #b8882c;
+  box-shadow: 0 0 0 3px rgba(184, 136, 44, 0.1);
 }
+
+
+/* ============================================================
+   CATEGORY FILTERS
+============================================================ */
 
 .insights-filters {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 7px;
+  gap: 8px;
 }
 
 .insights-filters button {
-  padding: 9px 11px;
-  border: 1px solid var(--line);
+  padding: 10px 16px;
+
+  border: 1px solid rgba(13, 34, 56, 0.14);
+  border-radius: 100px;
+
   background: transparent;
-  color: var(--muted);
-  font-size: .7rem;
-  font-weight: 800;
+  color: #4e5a66;
+
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.insights-filters button.is-active,
 .insights-filters button:hover {
-  color: var(--white);
-  background: var(--navy-900);
-  border-color: var(--navy-900);
+  border-color: #b8882c;
+  color: #0d2238;
+  transform: translateY(-1px);
 }
+
+.insights-filters button.is-active {
+  background: #0d2238;
+  border-color: #0d2238;
+  color: #ffffff;
+}
+
+
+/* ============================================================
+   INSIGHTS GRID
+============================================================ */
 
 .insights-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 35px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 48px;
 }
 
+
+/* ============================================================
+   LOADING / STATUS
+============================================================ */
+
+.insights-status {
+  min-height: 280px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 50px 20px;
+
+  color: #68727d;
+
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.insights-error {
+  margin: 30px 0;
+  padding: 22px 24px;
+
+  border-left: 3px solid #b8882c;
+
+  background: #f8f5ed;
+  color: #0d2238;
+
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
 .insights-empty {
-  padding: 50px 0;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  margin-top: 45px;
+  padding: 55px 30px;
+
+  border: 1px solid rgba(13, 34, 56, 0.12);
+
+  background: #f8f8f6;
+  color: #68727d;
+
+  font-size: 0.96rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+
+/* ============================================================
+   SCREEN READER ONLY
+============================================================ */
+
+.sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+
+  border: 0;
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .insights-page {
+    padding: 80px 0 100px;
+  }
+
+  .insights-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 22px;
+    margin-bottom: 60px;
+  }
+
+  .insights-controls label {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .insights-filters {
+    justify-content: flex-start;
+  }
+
+  .insights-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+============================================================ */
+
+@media (max-width: 680px) {
+
+  .insights-page {
+    padding: 65px 0 80px;
+  }
+
+  .insights-controls {
+    margin-bottom: 45px;
+    padding-bottom: 22px;
+  }
+
+  .insights-controls label {
+    max-width: none;
+  }
+
+  .insights-controls input {
+    height: 50px;
+  }
+
+  .insights-filters {
+    width: 100%;
+    gap: 7px;
+  }
+
+  .insights-filters button {
+    padding: 9px 13px;
+    font-size: 0.78rem;
+  }
+
+  .insights-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-top: 35px;
+  }
+
+  .insights-empty {
+    margin-top: 30px;
+    padding: 40px 20px;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL SCREENS
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .insights-filters button {
+    flex: 1 1 auto;
+  }
 }

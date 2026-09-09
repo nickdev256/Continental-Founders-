@@ -73,7 +73,7 @@ const socials = [
   {
     label: "Instagram",
     icon: Instagram,
-    url: "https://www.instagram.com/",
+    url: "https://www.instagram.com/continentalfounderstm/?hl=en",
   },
   {
     label: "YouTube",

@@ -11,17 +11,27 @@ export const navigation = [
 
   {
     label: "Partners",
-    path: "/university-partnerships",
+    path: "/strategic-partners",
 
     children: [
       {
-        label: "University Partners",
-        path: "/university-partnerships",
+        label: "U.S.–Africa Trade & Business Network",
+        path: "/partners/us-africa-trade-network",
       },
 
       {
-        label: "Strategic Partners",
-        path: "/strategic-partners",
+        label: "Universities",
+        path: "/partners/universities",
+      },
+
+      {
+        label: "Corporate Partners",
+        path: "/partners/corporate",
+      },
+
+      {
+        label: "Government & Development Institutions",
+        path: "/partners/government-development",
       },
     ],
   },

@@ -16,8 +16,16 @@ import VentureDetails from "./pages/VentureDetails";
 
 import OurModel from "./pages/OurModel";
 
-import UniversityPartnerships from "./pages/UniversityPartnerships";
 import StrategicPartners from "./pages/StrategicPartners";
+
+/* ============================================================
+   PARTNER SUBPAGES
+============================================================ */
+
+import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
+import Universities from "./pages/Universities";
+import CorporatePartners from "./pages/CorporatePartners";
+import GovernmentDevelopment from "./pages/GovernmentDevelopment";
 
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
@@ -58,23 +66,9 @@ export default function App() {
   return (
     <div className="site-shell">
 
-      {/* ======================================================
-          SCROLL RESTORATION
-      ====================================================== */}
-
       <ScrollToTop />
 
-
-      {/* ======================================================
-          GLOBAL NAVIGATION
-      ====================================================== */}
-
       <Navbar />
-
-
-      {/* ======================================================
-          MAIN CONTENT
-      ====================================================== */}
 
       <main id="main-content">
 
@@ -126,17 +120,32 @@ export default function App() {
 
 
           {/* ==================================================
-              PARTNERSHIPS
+              PARTNERS
           ================================================== */}
-
-          <Route
-            path="/university-partnerships"
-            element={<UniversityPartnerships />}
-          />
 
           <Route
             path="/strategic-partners"
             element={<StrategicPartners />}
+          />
+
+          <Route
+            path="/partners/us-africa-trade-network"
+            element={<USAfricaTradeNetwork />}
+          />
+
+          <Route
+            path="/partners/universities"
+            element={<Universities />}
+          />
+
+          <Route
+            path="/partners/corporate"
+            element={<CorporatePartners />}
+          />
+
+          <Route
+            path="/partners/government-development"
+            element={<GovernmentDevelopment />}
           />
 
 
@@ -191,7 +200,7 @@ export default function App() {
 
 
           {/* ==================================================
-              404 / UNKNOWN ROUTES
+              404
           ================================================== */}
 
           <Route
@@ -202,11 +211,6 @@ export default function App() {
         </Routes>
 
       </main>
-
-
-      {/* ======================================================
-          GLOBAL FOOTER
-      ====================================================== */}
 
       <Footer />
 

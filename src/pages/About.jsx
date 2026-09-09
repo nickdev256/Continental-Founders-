@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+
 import {
   ArrowUpRight,
   Globe2,
@@ -7,15 +8,11 @@ import {
   Lightbulb,
   Handshake,
   GraduationCap,
-  Building2,
-  Landmark,
-  TrendingUp,
   Rocket,
 } from "lucide-react";
 
-import CTASection from "../components/sections/CTASection";
-
 import "./About.css";
+
 
 /* ============================================================
    PRINCIPLES
@@ -26,7 +23,7 @@ const principles = [
     number: "01",
     title: "Reciprocity",
     text:
-      "Partnership should create meaningful value for institutions, people, and communities on both sides of the relationship.",
+      "Partnership should create meaningful value for institutions, founders, professionals, and communities across the relationship.",
   },
   {
     number: "02",
@@ -47,6 +44,7 @@ const principles = [
       "Strong partnerships evolve. We create space for reflection, adaptation, knowledge exchange, and continuous improvement.",
   },
 ];
+
 
 /* ============================================================
    LEADERSHIP
@@ -83,6 +81,7 @@ const team = [
   },
 ];
 
+
 /* ============================================================
    OPPORTUNITY AREAS
 ============================================================ */
@@ -91,32 +90,53 @@ const opportunity = [
   {
     number: "01",
     title: "Education",
-    icon: <GraduationCap size={26} strokeWidth={1.4} />,
+    icon: (
+      <GraduationCap
+        size={26}
+        strokeWidth={1.4}
+      />
+    ),
     text:
-      "Creating opportunities for students, educators, researchers, and institutions to exchange knowledge and develop cross-cultural learning experiences.",
+      "Creating opportunities for founders, students, educators, researchers, and institutions to exchange knowledge and develop meaningful cross-cultural learning experiences.",
   },
   {
     number: "02",
     title: "Entrepreneurship",
-    icon: <Rocket size={26} strokeWidth={1.4} />,
+    icon: (
+      <Rocket
+        size={26}
+        strokeWidth={1.4}
+      />
+    ),
     text:
-      "Helping students and emerging entrepreneurs explore ideas, identify opportunities, and develop practical ventures across markets.",
+      "Helping emerging entrepreneurs explore opportunities, develop practical ventures, validate business ideas, and strengthen their ability to execute.",
   },
   {
     number: "03",
     title: "Innovation",
-    icon: <Lightbulb size={26} strokeWidth={1.4} />,
+    icon: (
+      <Lightbulb
+        size={26}
+        strokeWidth={1.4}
+      />
+    ),
     text:
-      "Encouraging collaboration around technology, research, creativity, and solutions to real-world challenges.",
+      "Encouraging collaboration around technology, research, creativity, market needs, and solutions to real-world challenges.",
   },
   {
     number: "04",
     title: "Leadership",
-    icon: <Users size={26} strokeWidth={1.4} />,
+    icon: (
+      <Users
+        size={26}
+        strokeWidth={1.4}
+      />
+    ),
     text:
-      "Supporting globally minded leaders equipped to work across cultures, institutions, disciplines, and markets.",
+      "Supporting globally minded leaders equipped to work across cultures, institutions, industries, disciplines, and markets.",
   },
 ];
+
 
 /* ============================================================
    ABOUT PAGE
@@ -132,7 +152,6 @@ export default function About() {
 
       <section className="about-hero">
 
-
         <div className="about-hero__background">
           <img
             src="/assets/images/about-hero.jpg"
@@ -142,22 +161,13 @@ export default function About() {
 
         <div className="about-hero__overlay" />
 
-        {/* <div className="about-hero__line about-hero__line--left" />
-        <div className="about-hero__line about-hero__line--right" /> */}
-
         <div className="container about-hero__inner">
 
           <div className="about-hero__content">
 
-
             <span className="about-kicker about-kicker--light">
               ABOUT CONTINENTAL FOUNDERS™
             </span>
-
-            <div className="about-kicker about-kicker--light">
-            About Continental Founders
-            </div>
-
 
             <h1>
               Building bridges.
@@ -167,26 +177,20 @@ export default function About() {
               Across continents.
             </h1>
 
-
-
-            <div className="about-hero__number">
-              
-              
-            </div>
-
           </div>
+
 
           <div className="about-hero__aside">
 
             <div className="gold-rule" />
 
-
             <p>
               Continental Founders is a nonprofit initiative building
-              strategic relationships between universities, institutions,
-              entrepreneurs, leaders, and communities across the United
-              States and Africa.
+              strategic relationships between founders, universities,
+              institutions, businesses, investors, leaders, and communities
+              across Africa and the United States.
             </p>
+
 
             <div className="about-hero__actions">
 
@@ -195,20 +199,28 @@ export default function About() {
                 className="about-button about-button--gold"
               >
                 Connect With Us
-                <ArrowUpRight size={17} />
+
+                <ArrowUpRight
+                  size={17}
+                />
               </Link>
+
 
               <a
                 href="#mission"
                 className="about-button about-button--light"
               >
                 Explore Our Story
-                <ArrowUpRight size={17} />
+
+                <ArrowUpRight
+                  size={17}
+                />
               </a>
 
             </div>
 
           </div>
+
 
           <div className="about-hero__visual">
 
@@ -252,10 +264,12 @@ export default function About() {
             </div>
 
             <div className="purpose-globe">
+
               <Globe2
                 size={170}
                 strokeWidth={0.45}
               />
+
             </div>
 
             <span className="about-visual-label">
@@ -272,35 +286,38 @@ export default function About() {
             </span>
 
             <h2>
-              Connecting universities and
+              Connecting founders,
               <br />
-              emerging entrepreneurs across
+              institutions, and opportunity
               <br />
-              Africa and America.
+              across continents.
             </h2>
+
 
             <div className="about-purpose__copy">
 
               <p>
-                Continental Founders connects universities and emerging
-                entrepreneurs across Africa and America through experiential
-                entrepreneurship, innovation, leadership development, and
-                cross-cultural collaboration.
+                Continental Founders connects founders, universities,
+                entrepreneurs, professionals, businesses, and strategic
+                institutions across Africa and the United States through
+                entrepreneurship, innovation, leadership development,
+                knowledge exchange, and commercial collaboration.
               </p>
 
               <p>
                 Our mission is to create opportunities for participants to
                 move beyond learning about entrepreneurship to actually
-                building developing ideas into validated business concepts,
-                strengthening their ability to execute, and creating the
-                relationships, skills, and resources necessary to participate
-                in the global economy.
+                building ventures—developing ideas into validated business
+                concepts, strengthening their ability to execute, and creating
+                the relationships, skills, and resources necessary to
+                participate in the global economy.
               </p>
 
               <p>
                 We work with universities, businesses, investors, government
-                leaders, and strategic partners to create meaningful pathways
-                between education, entrepreneurship, investment, and economic
+                leaders, mentors, industry professionals, and strategic
+                partners to create meaningful pathways between education,
+                entrepreneurship, markets, investment, and economic
                 opportunity.
               </p>
 
@@ -331,11 +348,12 @@ export default function About() {
               03
             </span>
 
+
             <div className="about-story__image">
 
               <img
                 src="/assets/images/about-story.jpg"
-                alt="Students and leaders collaborating"
+                alt="Founders, students, and leaders collaborating"
               />
 
             </div>
@@ -347,15 +365,16 @@ export default function About() {
 
             <h2>
               The next generation of founders
-              should not have to choose between
-              learning from Africa and learning
-              from America.
+              should have access to the strengths
+              of both Africa and America.
             </h2>
 
             <p>
-              The idea behind Continental Founders began with a simple
-              observation: the next generation of founders should have
-              the opportunity to learn from both.
+              Continental Founders began with a simple observation:
+              talent, ambition, knowledge, and ideas exist everywhere,
+              but access to the right relationships, markets, expertise,
+              research, capital pathways, and opportunity is not always
+              equally distributed.
             </p>
 
             <p>
@@ -363,8 +382,12 @@ export default function About() {
               complementary strengths. Africa represents one of the
               world's most dynamic emerging markets and is home to a
               young generation of entrepreneurs, innovators, and future
-              leaders. The United States offers extensive university,
-              business, technology, investment, and entrepreneurial
+              leaders.
+            </p>
+
+            <p>
+              The United States offers extensive university, business,
+              technology, investment, research, and entrepreneurial
               ecosystems.
             </p>
 
@@ -377,43 +400,41 @@ export default function About() {
             </p>
 
             <p>
-              We are developing a new model of university collaboration
-              that moves beyond traditional student exchange. The goal
-              is not simply to send students across borders to study.
-            </p>
-
-            <p className="about-story__emphasis">
-              The goal is to bring students, universities, businesses,
-              and ecosystems together to build.
+              We are developing a model of cross-continental collaboration
+              that moves beyond traditional exchange, networking, and
+              classroom-based entrepreneurship.
             </p>
 
             <p>
-              Through cross-continental collaboration, participants have
-              the opportunity to explore real world problems, develop
-              solutions, test business concepts, engage with mentors and
-              industry professionals, and build relationships that extend
-              beyond the classroom.
-             </p>
-             
+              The goal is not simply to bring people across borders or
+              place institutions in the same room.
+            </p>
+
+            <p className="about-story__emphasis">
+              The goal is to bring founders, universities, businesses,
+              expertise, markets, and opportunity networks together
+              to build.
+            </p>
+
+            <p>
+              Through cross-continental collaboration, founders and
+              participants can explore real-world problems, develop
+              solutions, validate opportunities, engage mentors and
+              industry professionals, access research and expertise,
+              and build relationships that extend beyond the classroom.
+            </p>
+
 
             <div className="about-story__quote">
-
 
               <span className="about-kicker about-kicker--gold">
                 OUR PHILOSOPHY
               </span>
 
-              <div className="about-kicker about-kicker--gold">
-
-                              
-                Our philosophy
-              </div>
-
-
               <blockquote>
-                We don't teach students to pitch.
+                We don't teach founders to pitch.
                 <br />
-                We teach them to build.
+                We help them learn to build.
               </blockquote>
 
               <p>
@@ -423,37 +444,39 @@ export default function About() {
             </div>
 
 
-            <p>
-              Investors don't fund ideas they fund founders who can execute.
+            <p className="about-story__emphasis">
+              Investors do not simply fund ideas. They back founders
+              who can demonstrate the ability to execute.
             </p>
 
             <p>
               Continental Founders is therefore designed around what
               happens before and after the pitch: validating the
               opportunity, understanding the market, conducting due
-              diligence, developing a viable business model, building
-              an investor-ready foundation, and developing the confidence
-              and capability to execute.
+              diligence, developing a viable business model, strengthening
+              execution, building an investor-ready foundation, and
+              developing the confidence and capability to move forward.
             </p>
 
             <p>
               We are intentionally building Continental Founders™ with
-              university and strategic partners rather than assuming
-              that a single institution can design the future alone.
+              university, corporate, institutional, and strategic partners
+              rather than assuming that a single organization can design
+              the future alone.
             </p>
 
             <p>
               Our founding-stage approach creates an opportunity for
-              universities in Africa and America to shape the academic
-              experience, partnership model, entrepreneurial framework,
-              and long-term impact together.
+              institutions across Africa and the United States to help
+              shape the founder experience, partnership model,
+              entrepreneurial framework, and long-term impact together.
             </p>
 
             <p className="about-story__closing">
               The result we are working toward is more than an exchange.
               It is a cross-continental ecosystem for developing founders,
-              creating opportunity, strengthening institutions, and
-              connecting talent to the global economy.
+              creating opportunity, strengthening institutions, supporting
+              business growth, and connecting talent to the global economy.
             </p>
 
           </div>
@@ -487,70 +510,6 @@ export default function About() {
               become an ecosystem.
             </h2>
 
-
-
-            <div className="approach-points">
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Users
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Africa and the United States are home to extraordinary
-                  universities, educators, researchers, entrepreneurs,
-                  institutions, and communities. Yet the right people and
-                  organizations do not always have a clear pathway to one
-                  another.
-                </p>
-
-              </div>
-
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Handshake
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Continental Founders helps create that pathway through
-                  strategic relationship building, institutional partnerships,
-                  knowledge exchange, convenings, entrepreneurship,
-                  innovation, and programs designed around shared goals.
-                </p>
-
-              </div>
-
-
-              <div className="approach-point">
-
-                <div className="approach-point__icon">
-                  <Globe2
-                    size={19}
-                    strokeWidth={1.5}
-                  />
-                </div>
-
-                <p>
-                  Our approach is intentionally reciprocal. African and
-                  American institutions can learn from one another, build
-                  together, and create opportunities that extend beyond
-                  traditional forms of international engagement.
-                </p>
-
-              </div>
-
-            </div>
-
-
           </div>
 
 
@@ -560,7 +519,7 @@ export default function About() {
 
               <img
                 src="/assets/images/about-campus.jpg"
-                alt="University campus representing international education"
+                alt="University and institutional environment"
               />
 
             </div>
@@ -573,10 +532,10 @@ export default function About() {
                 title="Bring the right people together"
               >
                 Africa and the United States are home to extraordinary
-                universities, educators, researchers, entrepreneurs,
-                institutions, and communities. Yet the right people and
-                organizations do not always have a clear pathway to one
-                another.
+                founders, universities, educators, researchers,
+                entrepreneurs, investors, businesses, institutions,
+                and communities. Yet the right people and organizations
+                do not always have a clear pathway to one another.
               </ApproachItem>
 
 
@@ -584,10 +543,10 @@ export default function About() {
                 icon={<Handshake />}
                 title="Create meaningful pathways"
               >
-                Continental Founders™ helps create that pathway through
+                Continental Founders™ creates structured pathways through
                 strategic relationship building, institutional partnerships,
-                knowledge exchange, convenings, entrepreneurship,
-                innovation, and programs designed around shared goals.
+                mentorship, entrepreneurship, innovation, convenings,
+                market access, and programs designed around shared goals.
               </ApproachItem>
 
 
@@ -596,9 +555,10 @@ export default function About() {
                 title="Build reciprocally"
               >
                 Our approach is intentionally reciprocal. African and
-                American institutions can learn from one another, build
-                together, and create opportunities that extend beyond
-                traditional forms of international engagement.
+                American institutions, businesses, professionals, and
+                founders can learn from one another, build together,
+                and create opportunities that move beyond traditional
+                forms of international engagement.
               </ApproachItem>
 
             </div>
@@ -625,14 +585,16 @@ export default function About() {
             </span>
 
             <div className="belief-orbit">
+
               <Globe2
                 size={130}
                 strokeWidth={0.4}
               />
+
             </div>
 
             <strong>
-              EDUCATION
+              KNOWLEDGE
             </strong>
 
             <strong>
@@ -640,7 +602,7 @@ export default function About() {
             </strong>
 
             <strong>
-              PERSPECTIVE
+              ACCESS
             </strong>
 
           </div>
@@ -653,45 +615,65 @@ export default function About() {
             </span>
 
             <h2>
-              Education should not end
-              at the classroom door.
+              Talent is everywhere.
+              <br />
+              Access is not.
             </h2>
 
             <p>
-              When students have access to different markets, cultures,
-              institutions, mentors, investors, and ideas, they gain
-              more than academic knowledge.
+              Building a successful venture takes more than ambition.
+              Founders need access to knowledge, markets, experienced
+              professionals, research, mentorship, relationships,
+              capital pathways, and opportunity.
             </p>
+
 
             <div className="belief-statements">
 
               <div>
-                <span>01</span>
-                <strong>They gain perspective.</strong>
-              </div>
+                <span>
+                  01
+                </span>
 
-              <div>
-                <span>02</span>
-                <strong>They gain networks.</strong>
-              </div>
-
-              <div>
-                <span>03</span>
                 <strong>
-                  They gain the ability to see opportunities that may
-                  not be visible from a single vantage point.
+                  Access expands perspective.
+                </strong>
+              </div>
+
+
+              <div>
+                <span>
+                  02
+                </span>
+
+                <strong>
+                  Relationships expand possibility.
+                </strong>
+              </div>
+
+
+              <div>
+                <span>
+                  03
+                </span>
+
+                <strong>
+                  Execution turns potential into evidence.
                 </strong>
               </div>
 
             </div>
 
+
             <p>
-              And, most importantly, they gain the opportunity to build
-              something that can travel beyond borders.
+              When founders are surrounded by the right expertise,
+              relationships, markets, and resources, they are better
+              positioned to move from potential to preparation,
+              execution, evidence, and opportunity.
             </p>
 
             <p className="about-belief__closing">
-              Continental Founders™ exists to help make that possible.
+              Continental Founders™ exists to help build that ecosystem.
             </p>
 
           </div>
@@ -726,8 +708,8 @@ export default function About() {
             </h2>
 
             <p>
-              The way a partnership is built matters as much as the
-              outcome it seeks.
+              The way a partnership is built matters as much as
+              the opportunity it seeks to create.
             </p>
 
           </div>
@@ -819,11 +801,15 @@ export default function About() {
                   <img
                     src={member.image}
                     alt={`${member.name} — ${member.role}`}
-                    loading={index === 0 ? "eager" : "lazy"}
+                    loading={
+                      index === 0
+                        ? "eager"
+                        : "lazy"
+                    }
                   />
 
                   <div className="leader-card__number">
-                    0{index + 1}
+                    {String(index + 1).padStart(2, "0")}
                   </div>
 
                 </div>
@@ -848,7 +834,10 @@ export default function About() {
                     className="leader-card__link"
                   >
                     View full biography
-                    <ArrowUpRight size={15} />
+
+                    <ArrowUpRight
+                      size={15}
+                    />
                   </button>
 
                 </div>
@@ -863,6 +852,7 @@ export default function About() {
           <div className="leadership-closing">
 
             <div>
+
               <span className="about-kicker">
                 LEADERSHIP PHILOSOPHY
               </span>
@@ -870,7 +860,9 @@ export default function About() {
               <span className="about-number">
                 07A
               </span>
+
             </div>
+
 
             <div>
 
@@ -900,7 +892,7 @@ export default function About() {
 
 
       {/* ======================================================
-          08 — NETWORK / OPPORTUNITY / VISION
+          08 — ECOSYSTEM / OPPORTUNITY / VISION
       ====================================================== */}
 
       <section className="about-three-columns">
@@ -930,11 +922,11 @@ export default function About() {
 
             <ThreeColumnCard
               icon={<Users />}
-              eyebrow="OUR NETWORK"
+              eyebrow="OUR ECOSYSTEM"
               title="Partnership extends beyond institutions."
-              text="We are building a diverse ecosystem of universities, students, entrepreneurs, researchers, industry leaders, nonprofit organizations, government stakeholders, sponsors, and strategic partners."
-              link="/network"
-              linkText="Learn more about our network"
+              text="We are building a diverse ecosystem of founders, universities, researchers, industry leaders, investors, businesses, government institutions, sponsors, mentors, and strategic partners."
+              link="/strategic-partners"
+              linkText="Explore our partner ecosystem"
             />
 
 
@@ -942,19 +934,19 @@ export default function About() {
               icon={<Lightbulb />}
               eyebrow="THE OPPORTUNITY"
               title="Moving from connection to meaningful collaboration."
-              text="Through education, entrepreneurship, innovation, and leadership, we help relationships develop into programs, ventures, research initiatives, and practical opportunities."
+              text="We create pathways for relationships to develop into founder support, research, mentorship, commercial opportunities, innovation, market relationships, and practical collaboration."
               link="/our-model"
-              linkText="Explore our approach"
+              linkText="Explore our model"
             />
 
 
             <ThreeColumnCard
               icon={<Globe2 />}
               eyebrow="OUR VISION"
-              title="A connected global ecosystem without borders."
-              text="We envision a future where universities, entrepreneurs, investors, and institutions across Africa and America collaborate to develop globally minded founders, innovators, and leaders."
-              link="/vision"
-              linkText="Read our full vision"
+              title="A connected global ecosystem where opportunity can move."
+              text="We envision universities, founders, investors, businesses, and institutions across Africa and the United States collaborating to build stronger ventures, relationships, and markets."
+              link="/our-model"
+              linkText="See how the model works"
             />
 
           </div>
@@ -1012,6 +1004,7 @@ export default function About() {
 
                 </div>
 
+
                 <h3>
                   {item.title}
                 </h3>
@@ -1020,9 +1013,14 @@ export default function About() {
                   {item.text}
                 </p>
 
-                <Link to="/programs">
+                <Link to="/our-model">
+
                   Explore
-                  <ArrowUpRight size={15} />
+
+                  <ArrowUpRight
+                    size={15}
+                  />
+
                 </Link>
 
               </article>
@@ -1051,6 +1049,7 @@ export default function About() {
 
         </div>
 
+
         <div className="container about-vision__grid">
 
           <div className="about-vision__intro">
@@ -1069,31 +1068,37 @@ export default function About() {
           <div className="about-vision__content">
 
             <h2>
-              Building a connected global ecosystem
-              where opportunity knows no borders.
+              Building a global ecosystem
+              where opportunity is not limited
+              by geography.
             </h2>
 
             <p className="about-vision__lead">
-              To build a connected global ecosystem where universities,
-              entrepreneurs, investors, and institutions across Africa
-              and America collaborate to develop the next generation
-              of globally minded founders, innovators, and leaders.
+              We envision universities, founders, investors,
+              companies, professionals, and institutions across
+              Africa and the United States collaborating to develop
+              stronger ventures, globally minded leaders, and
+              meaningful commercial opportunity.
             </p>
 
             <p>
-              We envision a future where geographic borders do not limit
-              access to knowledge, opportunity, capital, or meaningful
-              business relationships—and where cross-continental
-              collaboration becomes a catalyst for economic growth
-              and shared prosperity.
+              Our vision is a future where geographic borders do not
+              unnecessarily limit access to knowledge, relationships,
+              markets, expertise, capital pathways, or opportunity—and
+              where cross-continental collaboration can become a catalyst
+              for stronger businesses, institutions, and economies.
             </p>
 
+
             <Link
-              to="/vision"
+              to="/our-model"
               className="about-button about-button--gold"
             >
-              Explore Our Vision
-              <ArrowUpRight size={17} />
+              Explore Our Model
+
+              <ArrowUpRight
+                size={17}
+              />
             </Link>
 
           </div>
@@ -1119,7 +1124,7 @@ export default function About() {
             />
 
             <span>
-              AFRICA × AMERICA
+              AFRICA × UNITED STATES
             </span>
 
           </div>
@@ -1143,24 +1148,29 @@ export default function About() {
 
             <p>
               Continental Founders™ is intentionally engaging
-              universities and strategic organizations during
-              the development phase of the initiative.
+              universities, businesses, professionals, and strategic
+              institutions during the development of the initiative.
             </p>
 
             <p>
-              Rather than presenting a finished model, we are
-              inviting institutions and leaders whose expertise,
-              context, and vision can help shape the framework,
-              student experience, partnership structure, and
-              long-term direction of the initiative.
+              Rather than assuming that one organization should shape
+              the ecosystem alone, we are inviting institutions and
+              leaders whose expertise, relationships, context, and
+              perspective can help strengthen the partnership model,
+              founder experience, commercial pathways, and long-term
+              direction of Continental Founders.
             </p>
+
 
             <Link
               to="/contact"
               className="about-button about-button--gold"
             >
               Become a Founding Partner
-              <ArrowUpRight size={17} />
+
+              <ArrowUpRight
+                size={17}
+              />
             </Link>
 
           </div>
@@ -1196,16 +1206,17 @@ export default function About() {
           </span>
 
           <h2>
-            Stronger together.
+            Stronger relationships.
             <br />
-            Better for both continents.
+            Greater opportunity.
           </h2>
 
           <p>
-            Whether you represent a university, organization,
-            or community, we invite you to partner with us in
-            building opportunity, creating impact, and preparing
-            the next generation of leaders.
+            Whether you represent a university, company,
+            investment network, public institution, foundation,
+            professional community, or entrepreneurial ecosystem,
+            there may be a meaningful role for you in what
+            Continental Founders is building.
           </p>
 
           <Link
@@ -1213,19 +1224,15 @@ export default function About() {
             className="about-button about-button--gold"
           >
             Connect With Our Team
-            <ArrowUpRight size={17} />
+
+            <ArrowUpRight
+              size={17}
+            />
           </Link>
 
         </div>
 
       </section>
-
-
-      {/* ======================================================
-          GLOBAL CTA
-      ====================================================== */}
-
-      
 
     </main>
   );
@@ -1297,8 +1304,13 @@ function ThreeColumnCard({
       </p>
 
       <Link to={link}>
+
         {linkText}
-        <ArrowUpRight size={15} />
+
+        <ArrowUpRight
+          size={15}
+        />
+
       </Link>
 
     </article>

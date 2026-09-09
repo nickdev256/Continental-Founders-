@@ -1,18 +1,1652 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   EVENTS PAGE
+============================================================ */
+
+.events-page {
+  --events-navy: #0d2238;
+  --events-navy-deep: #071827;
+  --events-navy-soft: #17364f;
+
+  --events-gold: #b88a2e;
+  --events-gold-dark: #946d20;
+  --events-gold-light: #ddc68e;
+
+  --events-white: #ffffff;
+  --events-cream: #f5f2eb;
+  --events-cream-light: #faf9f6;
+
+  --events-text: #172633;
+  --events-muted: #68747d;
+
+  --events-border: #dedbd4;
+  --events-border-dark: rgba(13, 34, 56, 0.14);
+
+  --events-shadow:
+    0 22px 55px rgba(7, 24, 39, 0.09);
+
+  width: 100%;
+
+  background: var(--events-white);
+
+  color: var(--events-text);
+}
+
+
+/* ============================================================
+   GLOBAL PAGE RULES
+============================================================ */
+
+.events-page *,
+.events-page *::before,
+.events-page *::after {
+  box-sizing: border-box;
+}
+
+
+.events-page img {
+  display: block;
+
+  max-width: 100%;
+}
+
+
+.events-page h1,
+.events-page h2,
+.events-page h3,
+.events-page p {
+  overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   PAGE HERO
+============================================================ */
+
+.events-page .page-hero {
+  position: relative;
+
+  min-height: 590px;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 78% 30%,
+      rgba(184, 138, 46, 0.16),
+      transparent 32%
+    ),
+    linear-gradient(
+      120deg,
+      var(--events-navy-deep) 0%,
+      var(--events-navy) 55%,
+      #163a55 100%
+    );
+
+  color: var(--events-white);
+}
+
+
+/* Decorative grid */
+
+.events-page .page-hero::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  opacity: 0.08;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.12) 1px,
+      transparent 1px
+    );
+
+  background-size: 74px 74px;
+
+  pointer-events: none;
+}
+
+
+/* Gold architectural line */
+
+.events-page .page-hero::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 10%;
+
+  width: 1px;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      rgba(221, 198, 142, 0.45),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+.events-page .page-hero__inner {
+  position: relative;
+
+  z-index: 2;
+
+  width: 100%;
+
+  padding-top: 155px;
+  padding-bottom: 105px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.45fr)
+    minmax(300px, 0.55fr);
+
+  gap:
+    clamp(
+      70px,
+      10vw,
+      160px
+    );
+
+  align-items: end;
+}
+
+
+/* ============================================================
+   HERO EYEBROW
+============================================================ */
+
+.events-page .page-hero .eyebrow {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 28px;
+
+  color: var(--events-gold-light);
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+
+  line-height: 1.3;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+}
+
+
+.events-page .page-hero .eyebrow::before {
+  content: "";
+
+  width: 38px;
+  height: 1px;
+
+  background: var(--events-gold);
+}
+
+
+/* ============================================================
+   HERO TITLE
+============================================================ */
+
+.events-page .page-hero h1 {
+  max-width: 940px;
+
+  margin: 0;
+
+  color: var(--events-white);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      3.6rem,
+      6vw,
+      7rem
+    );
+
+  font-weight: 400;
+
+  line-height: 0.97;
+
+  letter-spacing: -0.048em;
+}
+
+
+/* ============================================================
+   HERO ASIDE
+============================================================ */
+
+.events-page .page-hero__aside {
+  position: relative;
+
+  max-width: 430px;
+
+  padding:
+    30px
+    0
+    10px
+    30px;
+
+  border-left:
+    1px solid rgba(255, 255, 255, 0.23);
+}
+
+
+.events-page .page-hero__aside::before {
+  content: "CONVENE";
+
+  display: block;
+
+  margin-bottom: 18px;
+
+  color: var(--events-gold-light);
+
+  font-size: 0.62rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.2em;
+}
+
+
+.events-page .page-hero__aside p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size:
+    clamp(
+      0.98rem,
+      1.25vw,
+      1.1rem
+    );
+
+  line-height: 1.85;
+}
+
+
+/* ============================================================
+   GENERAL SECTIONS
+============================================================ */
+
+.events-page .section {
+  padding:
+    clamp(90px, 9vw, 145px)
+    0;
+}
+
+
+.events-page .section--light {
+  background: var(--events-cream-light);
+}
+
+
+/* ============================================================
+   INTRODUCTION
+============================================================ */
+
+.events-intro {
+  position: relative;
+
+  background: var(--events-white);
+}
+
+
 .events-intro__grid {
   display: grid;
-  grid-template-columns: .55fr 1.45fr;
-  gap: 80px;
+
+  grid-template-columns:
+    minmax(160px, 0.35fr)
+    minmax(0, 1.65fr);
+
+  gap:
+    clamp(
+      60px,
+      10vw,
+      150px
+    );
+
+  align-items: start;
 }
 
-.events-intro h2 {
-  max-width: 920px;
-  font-size: clamp(3rem, 5.5vw, 6rem);
-  line-height: .95;
+
+/* ============================================================
+   INTRO EYEBROW
+============================================================ */
+
+.events-intro__grid > .eyebrow {
+  position: relative;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding-top: 10px;
+
+  color: var(--events-gold-dark);
+
+  font-size: 0.69rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.17em;
+
+  text-transform: uppercase;
 }
 
-.events-intro p {
-  max-width: 720px;
-  margin-top: 28px;
-  color: var(--muted);
-  font-size: 1.08rem;
+
+.events-intro__grid > .eyebrow::before {
+  content: "01";
+
+  display: block;
+
+  margin-right: 7px;
+
+  color: var(--events-navy);
+
+  font-size: 0.67rem;
+
+  letter-spacing: 0.14em;
+}
+
+
+/* ============================================================
+   INTRO TITLE
+============================================================ */
+
+.events-intro .display {
+  max-width: 1050px;
+
+  margin:
+    0
+    0
+    38px;
+
+  color: var(--events-navy);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.8rem,
+      4.6vw,
+      5.4rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1.02;
+
+  letter-spacing: -0.043em;
+}
+
+
+/* ============================================================
+   INTRO TEXT
+============================================================ */
+
+.events-intro__grid > div > p {
+  max-width: 730px;
+
+  margin:
+    0
+    0
+    0
+    auto;
+
+  padding-left: 32px;
+
+  border-left:
+    2px solid var(--events-gold);
+
+  color: var(--events-muted);
+
+  font-size:
+    clamp(
+      1rem,
+      1.3vw,
+      1.13rem
+    );
+
+  line-height: 1.85;
+}
+
+
+/* ============================================================
+   CALENDAR SECTION
+============================================================ */
+
+.events-page .section--light {
+  position: relative;
+
+  overflow: hidden;
+
+  border-top:
+    1px solid var(--events-border);
+}
+
+
+/* subtle large decoration */
+
+.events-page .section--light::before {
+  content: "EVENTS";
+
+  position: absolute;
+
+  top: 35px;
+  right: -25px;
+
+  color: rgba(13, 34, 56, 0.025);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7rem,
+      15vw,
+      15rem
+    );
+
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: -0.06em;
+
+  pointer-events: none;
+}
+
+
+.events-page .section--light > .container {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+/* ============================================================
+   SECTION HEADING SUPPORT
+============================================================ */
+
+.events-page .section--light .section-heading {
+  margin-bottom: 60px;
+}
+
+
+.events-page .section--light
+.section-heading__eyebrow,
+.events-page .section--light
+.eyebrow {
+  color: var(--events-gold-dark);
+}
+
+
+.events-page .section--light
+.section-heading h2,
+.events-page .section--light
+.section-heading__title {
+  max-width: 900px;
+
+  color: var(--events-navy);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.6rem,
+      4.2vw,
+      4.8rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1.03;
+
+  letter-spacing: -0.04em;
+}
+
+
+/* ============================================================
+   EVENT LIST
+   Generic support for existing EventList component
+============================================================ */
+
+.events-page .event-list {
+  width: 100%;
+
+  margin-top: 20px;
+
+  border-top:
+    1px solid var(--events-border);
+}
+
+
+/* ============================================================
+   EVENT ITEM
+============================================================ */
+
+.events-page .event-item,
+.events-page .event-card {
+  position: relative;
+
+  width: 100%;
+
+  padding:
+    38px
+    26px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(120px, 0.25fr)
+    minmax(0, 1.2fr)
+    minmax(180px, 0.45fr)
+    auto;
+
+  gap: 32px;
+
+  align-items: center;
+
+  border-bottom:
+    1px solid var(--events-border);
+
+  background: transparent;
+
+  transition:
+    background-color 0.25s ease,
+    padding-left 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.events-page .event-item::before,
+.events-page .event-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  width: 3px;
+
+  transform: scaleY(0);
+
+  transform-origin: bottom;
+
+  background: var(--events-gold);
+
+  transition: transform 0.25s ease;
+}
+
+
+.events-page .event-item:hover,
+.events-page .event-card:hover {
+  padding-left: 38px;
+
+  background: var(--events-white);
+
+  box-shadow:
+    0 14px 40px rgba(7, 24, 39, 0.055);
+}
+
+
+.events-page .event-item:hover::before,
+.events-page .event-card:hover::before {
+  transform: scaleY(1);
+}
+
+
+/* ============================================================
+   EVENT DATE
+============================================================ */
+
+.events-page .event-date,
+.events-page .event-card__date {
+  color: var(--events-gold-dark);
+
+  font-size: 0.73rem;
+
+  font-weight: 700;
+
+  line-height: 1.5;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+
+/* Large day number if EventList has one */
+
+.events-page .event-date strong,
+.events-page .event-card__date strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--events-navy);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2rem,
+      3vw,
+      3.2rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1;
+}
+
+
+/* ============================================================
+   EVENT CONTENT
+============================================================ */
+
+.events-page .event-item h3,
+.events-page .event-card h3,
+.events-page .event-card__title {
+  margin:
+    0
+    0
+    10px;
+
+  color: var(--events-navy);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      1.45rem,
+      2vw,
+      2rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.02em;
+}
+
+
+.events-page .event-item p,
+.events-page .event-card p,
+.events-page .event-card__description {
+  max-width: 650px;
+
+  margin: 0;
+
+  color: var(--events-muted);
+
+  font-size: 0.92rem;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   EVENT META
+============================================================ */
+
+.events-page .event-meta,
+.events-page .event-card__meta {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  color: var(--events-muted);
+
+  font-size: 0.78rem;
+
+  line-height: 1.55;
+}
+
+
+.events-page .event-meta span,
+.events-page .event-card__meta span {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+/* ============================================================
+   EVENT LINKS
+============================================================ */
+
+.events-page .event-item a,
+.events-page .event-card a,
+.events-page .event-card__link {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  min-height: 43px;
+
+  padding:
+    0
+    18px;
+
+  border:
+    1px solid var(--events-navy);
+
+  color: var(--events-navy);
+
+  text-decoration: none;
+
+  font-size: 0.74rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.05em;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.events-page .event-item a:hover,
+.events-page .event-card a:hover,
+.events-page .event-card__link:hover {
+  transform: translateY(-2px);
+
+  border-color: var(--events-navy);
+
+  background: var(--events-navy);
+
+  color: var(--events-white);
+}
+
+
+/* ============================================================
+   LOADING / ERROR / EMPTY STATES
+============================================================ */
+
+.events-status {
+  position: relative;
+
+  min-height: 310px;
+
+  padding:
+    70px
+    40px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+  border:
+    1px solid var(--events-border);
+
+  background: var(--events-white);
+
+  text-align: center;
+}
+
+
+.events-status::before {
+  content: "";
+
+  width: 42px;
+  height: 2px;
+
+  margin-bottom: 28px;
+
+  background: var(--events-gold);
+}
+
+
+.events-status h3 {
+  max-width: 650px;
+
+  margin:
+    0
+    0
+    13px;
+
+  color: var(--events-navy);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      1.6rem,
+      2.5vw,
+      2.3rem
+    );
+
+  font-weight: 400;
+
+  line-height: 1.2;
+}
+
+
+.events-status p {
+  max-width: 570px;
+
+  margin: 0;
+
+  color: var(--events-muted);
+
+  font-size: 0.95rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   LOADING STATE
+============================================================ */
+
+.events-status:not(.events-status--error)
+p:first-child:last-child {
+  position: relative;
+
+  padding-top: 45px;
+}
+
+
+.events-status:not(.events-status--error)
+p:first-child:last-child::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 50%;
+
+  width: 25px;
+  height: 25px;
+
+  margin-left: -12.5px;
+
+  border:
+    2px solid rgba(13, 34, 56, 0.15);
+
+  border-top-color:
+    var(--events-gold);
+
+  border-radius: 50%;
+
+  animation:
+    events-loading-spin
+    0.8s
+    linear
+    infinite;
+}
+
+
+@keyframes events-loading-spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* ============================================================
+   ERROR STATE
+============================================================ */
+
+.events-status--error {
+  border-color:
+    rgba(140, 58, 58, 0.2);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #fdfafa
+    );
+}
+
+
+.events-status--error::before {
+  background: #9b5555;
+}
+
+
+.events-status--error button {
+  min-height: 46px;
+
+  margin-top: 26px;
+
+  padding:
+    0
+    23px;
+
+  border:
+    1px solid var(--events-navy);
+
+  background: var(--events-navy);
+
+  color: var(--events-white);
+
+  cursor: pointer;
+
+  font: inherit;
+
+  font-size: 0.78rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+
+.events-status--error button:hover {
+  transform: translateY(-2px);
+
+  background: var(--events-navy-soft);
+}
+
+
+/* ============================================================
+   CTA SECTION
+   Scoped enhancements for existing CTASection
+============================================================ */
+
+.events-page .cta-section {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      120deg,
+      var(--events-navy-deep),
+      var(--events-navy)
+    );
+
+  color: var(--events-white);
+}
+
+
+.events-page .cta-section::before {
+  content: "";
+
+  position: absolute;
+
+  top: -250px;
+  right: -200px;
+
+  width: 580px;
+  height: 580px;
+
+  border:
+    1px solid rgba(184, 138, 46, 0.22);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+
+.events-page .cta-section::after {
+  content: "";
+
+  position: absolute;
+
+  right: 15%;
+  bottom: -240px;
+
+  width: 450px;
+  height: 450px;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+
+.events-page .cta-section .container {
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.events-page .cta-section h2 {
+  color: var(--events-white);
+}
+
+
+.events-page .cta-section p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+
+/* ============================================================
+   SECTION HEADING FALLBACK
+============================================================ */
+
+.events-page .section-heading {
+  position: relative;
+}
+
+
+.events-page .section-heading .eyebrow {
+  display: inline-block;
+
+  margin-bottom: 20px;
+
+  color: var(--events-gold-dark);
+
+  font-size: 0.7rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.17em;
+
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   LARGE SCREENS
+============================================================ */
+
+@media (min-width: 1600px) {
+
+  .events-page .page-hero {
+    min-height: 650px;
+  }
+
+
+  .events-page .page-hero__inner {
+    padding-bottom: 120px;
+  }
+
+}
+
+
+/* ============================================================
+   LAPTOP — 1200PX
+============================================================ */
+
+@media (max-width: 1200px) {
+
+  .events-page .page-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.3fr)
+      minmax(270px, 0.7fr);
+
+    gap: 70px;
+  }
+
+
+  .events-intro__grid {
+    grid-template-columns:
+      minmax(140px, 0.3fr)
+      minmax(0, 1.7fr);
+
+    gap: 70px;
+  }
+
+
+  .events-page .event-item,
+  .events-page .event-card {
+    grid-template-columns:
+      110px
+      minmax(0, 1fr)
+      minmax(150px, 0.4fr)
+      auto;
+
+    gap: 24px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET — 900PX
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .events-page .page-hero {
+    min-height: 570px;
+  }
+
+
+  .events-page .page-hero__inner {
+    padding-top: 130px;
+    padding-bottom: 80px;
+
+    grid-template-columns: 1fr;
+
+    gap: 48px;
+  }
+
+
+  .events-page .page-hero h1 {
+    max-width: 780px;
+  }
+
+
+  .events-page .page-hero__aside {
+    max-width: 600px;
+
+    padding:
+      24px
+      0
+      0;
+
+    border-top:
+      1px solid rgba(255, 255, 255, 0.2);
+
+    border-left: 0;
+  }
+
+
+  .events-intro__grid {
+    grid-template-columns: 1fr;
+
+    gap: 35px;
+  }
+
+
+  .events-intro__grid > div > p {
+    margin-left: 0;
+
+    max-width: 720px;
+  }
+
+
+  .events-page .event-item,
+  .events-page .event-card {
+    grid-template-columns:
+      100px
+      minmax(0, 1fr)
+      auto;
+  }
+
+
+  .events-page .event-meta,
+  .events-page .event-card__meta {
+    grid-column: 2 / 3;
+
+    margin-top: -10px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL TABLET — 768PX
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .events-page .section {
+    padding:
+      82px
+      0;
+  }
+
+
+  .events-page .page-hero h1 {
+    font-size:
+      clamp(
+        3rem,
+        9vw,
+        5rem
+      );
+  }
+
+
+  .events-intro .display {
+    font-size:
+      clamp(
+        2.5rem,
+        7vw,
+        4rem
+      );
+  }
+
+
+  .events-page .event-item,
+  .events-page .event-card {
+    padding:
+      30px
+      20px;
+
+    grid-template-columns:
+      85px
+      minmax(0, 1fr);
+
+    gap:
+      18px
+      24px;
+  }
+
+
+  .events-page .event-item:hover,
+  .events-page .event-card:hover {
+    padding-left: 26px;
+  }
+
+
+  .events-page .event-meta,
+  .events-page .event-card__meta {
+    grid-column: 2;
+  }
+
+
+  .events-page .event-item > a,
+  .events-page .event-card > a,
+  .events-page .event-card__link {
+    grid-column: 2;
+
+    justify-self: start;
+  }
+
+
+  .events-status {
+    min-height: 280px;
+
+    padding:
+      55px
+      28px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE — 620PX
+============================================================ */
+
+@media (max-width: 620px) {
+
+  /* HERO */
+
+  .events-page .page-hero {
+    min-height: 530px;
+  }
+
+
+  .events-page .page-hero__inner {
+    padding-top: 105px;
+    padding-bottom: 65px;
+
+    gap: 38px;
+  }
+
+
+  .events-page .page-hero h1 {
+    font-size:
+      clamp(
+        2.65rem,
+        12vw,
+        4rem
+      );
+
+    line-height: 1;
+  }
+
+
+  .events-page .page-hero .eyebrow {
+    margin-bottom: 22px;
+
+    font-size: 0.64rem;
+  }
+
+
+  .events-page .page-hero__aside p {
+    font-size: 0.94rem;
+
+    line-height: 1.7;
+  }
+
+
+  /* SECTIONS */
+
+  .events-page .section {
+    padding:
+      70px
+      0;
+  }
+
+
+  /* INTRO */
+
+  .events-intro__grid {
+    gap: 30px;
+  }
+
+
+  .events-intro .display {
+    margin-bottom: 30px;
+
+    font-size:
+      clamp(
+        2.25rem,
+        10vw,
+        3.4rem
+      );
+  }
+
+
+  .events-intro__grid > div > p {
+    padding-left: 20px;
+
+    font-size: 0.96rem;
+
+    line-height: 1.75;
+  }
+
+
+  /* CALENDAR */
+
+  .events-page .section--light::before {
+    top: 15px;
+
+    font-size: 7rem;
+  }
+
+
+  .events-page .section--light
+  .section-heading {
+    margin-bottom: 42px;
+  }
+
+
+  .events-page .section--light
+  .section-heading h2,
+  .events-page .section--light
+  .section-heading__title {
+    font-size:
+      clamp(
+        2.25rem,
+        10vw,
+        3.4rem
+      );
+  }
+
+
+  /* EVENT ITEMS */
+
+  .events-page .event-item,
+  .events-page .event-card {
+    padding:
+      28px
+      0;
+
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+
+    background: transparent;
+  }
+
+
+  .events-page .event-item:hover,
+  .events-page .event-card:hover {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+
+  .events-page .event-date,
+  .events-page .event-card__date {
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 10px;
+  }
+
+
+  .events-page .event-date strong,
+  .events-page .event-card__date strong {
+    margin: 0;
+
+    font-size: 2rem;
+  }
+
+
+  .events-page .event-meta,
+  .events-page .event-card__meta {
+    grid-column: auto;
+
+    margin: 0;
+  }
+
+
+  .events-page .event-item > a,
+  .events-page .event-card > a,
+  .events-page .event-card__link {
+    grid-column: auto;
+
+    width: fit-content;
+  }
+
+
+  /* STATUS */
+
+  .events-status {
+    min-height: 250px;
+
+    padding:
+      45px
+      22px;
+  }
+
+
+  .events-status h3 {
+    font-size: 1.65rem;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE — 420PX
+============================================================ */
+
+@media (max-width: 420px) {
+
+  .events-page .page-hero {
+    min-height: 500px;
+  }
+
+
+  .events-page .page-hero h1 {
+    font-size:
+      clamp(
+        2.45rem,
+        12vw,
+        3.2rem
+      );
+  }
+
+
+  .events-page .page-hero__aside::before {
+    font-size: 0.57rem;
+  }
+
+
+  .events-intro .display,
+  .events-page .section--light
+  .section-heading h2,
+  .events-page .section--light
+  .section-heading__title {
+    font-size:
+      clamp(
+        2.1rem,
+        10vw,
+        3rem
+      );
+  }
+
+
+  .events-status {
+    padding:
+      40px
+      18px;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (hover: none) {
+
+  .events-page .event-item:hover,
+  .events-page .event-card:hover {
+    padding-left: 26px;
+
+    background: transparent;
+
+    box-shadow: none;
+  }
+
+
+  .events-page .event-item:hover::before,
+  .events-page .event-card:hover::before {
+    transform: scaleY(0);
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .events-page *,
+  .events-page *::before,
+  .events-page *::after {
+    scroll-behavior: auto !important;
+
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  .events-page .page-hero {
+    min-height: auto;
+
+    background: #ffffff !important;
+
+    color: #000000 !important;
+  }
+
+
+  .events-page .page-hero::before,
+  .events-page .page-hero::after,
+  .events-page .section--light::before {
+    display: none;
+  }
+
+
+  .events-page .page-hero h1,
+  .events-page .page-hero p,
+  .events-page .page-hero .eyebrow {
+    color: #000000 !important;
+  }
+
+
+  .events-page .event-item,
+  .events-page .event-card,
+  .events-status {
+    break-inside: avoid;
+
+    box-shadow: none;
+  }
+
 }

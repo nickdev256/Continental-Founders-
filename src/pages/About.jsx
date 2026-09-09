@@ -11,7 +11,7 @@ import {
   Landmark,
   TrendingUp,
   Rocket,
-} from "lucide-react";
+} from "lucide-react"; 
 
 import CTASection from "../components/sections/CTASection";
 
@@ -130,108 +130,69 @@ export default function About() {
           01 — HERO
       ====================================================== */}
 
-      <section className="about-hero">
+   <section className="about-hero">
 
+  {/* Background */}
+  <div className="about-hero__background" aria-hidden="true" />
+  <div className="about-hero__overlay" aria-hidden="true" />
 
-        <div className="about-hero__background">
-          <img
-            src="/assets/images/about-hero.jpg"
-            alt=""
-          />
-        </div>
+  <div className="container about-hero__inner">
 
-        <div className="about-hero__overlay" />
+    <div className="about-hero__content">
 
-        {/* <div className="about-hero__line about-hero__line--left" />
-        <div className="about-hero__line about-hero__line--right" /> */}
+      <div className="about-hero__eyebrow">
+        <span className="about-hero__eyebrow-line" />
+        <span>ABOUT CONTINENTAL FOUNDERS</span>
+      </div>
 
-        <div className="container about-hero__inner">
+      <h1>
+        Building bridges.
+        <br />
+        Creating opportunity.
+        <br />
+        <span>Across continents.</span>
+      </h1>
 
-          <div className="about-hero__content">
+      <p className="about-hero__lead">
+        Connecting universities, entrepreneurs, leaders, and communities
+        across Africa and America to create meaningful opportunities,
+        build relationships, and shape the future together.
+      </p>
 
+      <div className="about-hero__actions">
 
-            <span className="about-kicker about-kicker--light">
-              ABOUT CONTINENTAL FOUNDERS™
-            </span>
+        <Link
+          to="/contact"
+          className="about-button about-button--gold"
+        >
+          Connect With Us
+          <ArrowUpRight size={17} />
+        </Link>
 
-            <div className="about-kicker about-kicker--light">
-            About Continental Founders
-            </div>
+        <a
+          href="#mission"
+          className="about-button about-button--glass"
+        >
+          Discover Our Story
+          <ArrowUpRight size={17} />
+        </a>
 
+      </div>
 
-            <h1>
-              Building bridges.
-              <br />
-              Creating opportunity.
-              <br />
-              Across continents.
-            </h1>
+    </div>
 
+  </div>
 
+  <a
+    href="#mission"
+    className="about-hero__scroll"
+    aria-label="Scroll to mission"
+  >
+    <span>SCROLL TO EXPLORE</span>
+    <i />
+  </a>
 
-            <div className="about-hero__number">
-              
-              
-            </div>
-
-          </div>
-
-          <div className="about-hero__aside">
-
-            <div className="gold-rule" />
-
-
-            <p>
-              Continental Founders is a nonprofit initiative building
-              strategic relationships between universities, institutions,
-              entrepreneurs, leaders, and communities across the United
-              States and Africa.
-            </p>
-
-            <div className="about-hero__actions">
-
-              <Link
-                to="/contact"
-                className="about-button about-button--gold"
-              >
-                Connect With Us
-                <ArrowUpRight size={17} />
-              </Link>
-
-              <a
-                href="#mission"
-                className="about-button about-button--light"
-              >
-                Explore Our Story
-                <ArrowUpRight size={17} />
-              </a>
-
-            </div>
-
-          </div>
-
-          <div className="about-hero__visual">
-
-            <div className="about-hero__number">
-              01
-            </div>
-
-            <div className="about-hero__globe">
-              <Globe2
-                size={250}
-                strokeWidth={0.35}
-              />
-            </div>
-
-            <span>
-              AFRICA × UNITED STATES
-            </span>
-
-          </div>
-
-        </div>
-
-      </section>
+</section>
 
 
       {/* ======================================================
@@ -248,18 +209,18 @@ export default function About() {
           <div className="about-purpose__visual">
 
             <div className="about-number">
-              02
+              OUR MISSION
             </div>
 
-            <div className="purpose-globe">
-              <Globe2
-                size={170}
-                strokeWidth={0.45}
-              />
-            </div>
+          <div className="">
+  <img
+    src="/assets/w.png"
+    alt="Continental collaboration"
+  />
+</div>
 
             <span className="about-visual-label">
-              OUR MISSION
+              
             </span>
 
           </div>
@@ -268,7 +229,7 @@ export default function About() {
           <div className="about-purpose__content">
 
             <span className="about-kicker">
-              OUR MISSION
+              
             </span>
 
             <h2>
@@ -319,148 +280,244 @@ export default function About() {
 
       <section className="about-story">
 
-        <div className="container about-story__grid">
+  <div className="container about-story__grid">
 
-          <div className="about-story__intro">
+    {/* LEFT STORY PANEL */}
+    <aside className="about-story__aside">
 
-            <span className="about-kicker">
-              OUR STORY
-            </span>
+      <div className="about-story__aside-inner">
 
-            <span className="about-number">
-              03
-            </span>
+        <div className="about-story__meta">
+          <span className="about-kicker">
+            OUR STORY
+          </span>
 
-            <div className="about-story__image">
+          <span className="about-story__number">
+            03
+          </span>
+        </div>
 
-              <img
-                src="/assets/images/about-story.jpg"
-                alt="Students and leaders collaborating"
-              />
+        <div className="about-story__image">
+          <img
+            src="/assets/oo.png"
+            alt="Students and leaders collaborating"
+          />
+        </div>
 
-            </div>
+        <div className="about-story__caption">
+          
+         
+        </div>
 
-          </div>
+      </div>
 
-
-          <div className="about-story__content">
-
-            <h2>
-              The next generation of founders
-              should not have to choose between
-              learning from Africa and learning
-              from America.
-            </h2>
-
-            <p>
-              The idea behind Continental Founders began with a simple
-              observation: the next generation of founders should have
-              the opportunity to learn from both.
-            </p>
-
-            <p>
-              Africa and the United States possess extraordinary and
-              complementary strengths. Africa represents one of the
-              world's most dynamic emerging markets and is home to a
-              young generation of entrepreneurs, innovators, and future
-              leaders. The United States offers extensive university,
-              business, technology, investment, and entrepreneurial
-              ecosystems.
-            </p>
-
-            <p>
-              Yet too often, these ecosystems operate independently.
-            </p>
-
-            <p>
-              Continental Founders was created to help bridge that divide.
-            </p>
-
-            <p>
-              We are developing a new model of university collaboration
-              that moves beyond traditional student exchange. The goal
-              is not simply to send students across borders to study.
-            </p>
-
-            <p className="about-story__emphasis">
-              The goal is to bring students, universities, businesses,
-              and ecosystems together to build.
-            </p>
-
-            <p>
-              Through cross-continental collaboration, participants have
-              the opportunity to explore real world problems, develop
-              solutions, test business concepts, engage with mentors and
-              industry professionals, and build relationships that extend
-              beyond the classroom.
-             </p>
-             
-
-            <div className="about-story__quote">
+    </aside>
 
 
-              <span className="about-kicker about-kicker--gold">
-                OUR PHILOSOPHY
-              </span>
+    {/* MAIN CONTENT */}
+    <div className="about-story__content">
 
-              <div className="about-kicker about-kicker--gold">
+      <div className="about-story__header">
 
-                              
-                Our philosophy
-              </div>
+        <span className="about-story__eyebrow">
+          THE BEGINNING
+        </span>
 
+        <h2>
+          The next generation of founders
+          should not have to choose between
+          learning from Africa and learning
+          from America.
+        </h2>
 
-              <blockquote>
-                We don't teach students to pitch.
-                <br />
-                We teach them to build.
-              </blockquote>
-
-              <p>
-                Because a compelling pitch is only the beginning.
-              </p>
-
-            </div>
+      </div>
 
 
-            <p>
-              Investors don't fund ideas they fund founders who can execute.
-            </p>
+      <div className="about-story__body">
 
-            <p>
-              Continental Founders is therefore designed around what
-              happens before and after the pitch: validating the
-              opportunity, understanding the market, conducting due
-              diligence, developing a viable business model, building
-              an investor-ready foundation, and developing the confidence
-              and capability to execute.
-            </p>
+        <div className="about-story__block">
 
-            <p>
-              We are intentionally building Continental Founders™ with
-              university and strategic partners rather than assuming
-              that a single institution can design the future alone.
-            </p>
+          <span className="about-story__label">
+            THE IDEA
+          </span>
 
-            <p>
-              Our founding-stage approach creates an opportunity for
-              universities in Africa and America to shape the academic
-              experience, partnership model, entrepreneurial framework,
-              and long-term impact together.
-            </p>
-
-            <p className="about-story__closing">
-              The result we are working toward is more than an exchange.
-              It is a cross-continental ecosystem for developing founders,
-              creating opportunity, strengthening institutions, and
-              connecting talent to the global economy.
-            </p>
-
-          </div>
+          <p>
+            The idea behind Continental Founders began with a simple
+            observation: the next generation of founders should have
+            the opportunity to learn from both.
+          </p>
 
         </div>
 
-      </section>
+
+        <div className="about-story__block">
+
+          <span className="about-story__label">
+            TWO CONTINENTS. COMPLEMENTARY STRENGTHS.
+          </span>
+
+          <p>
+            Africa and the United States possess extraordinary and
+            complementary strengths. Africa represents one of the
+            world's most dynamic emerging markets and is home to a
+            young generation of entrepreneurs, innovators, and future
+            leaders.
+          </p>
+
+          <p>
+            The United States offers extensive university, business,
+            technology, investment, and entrepreneurial ecosystems.
+          </p>
+
+          <p className="about-story__short">
+            Yet too often, these ecosystems operate independently.
+          </p>
+
+        </div>
+
+
+        <div className="about-story__statement">
+
+          <span>
+            WHY CONTINENTAL FOUNDERS
+          </span>
+
+          <h3>
+            We are building the bridge
+            between these ecosystems.
+          </h3>
+
+        </div>
+
+
+        <div className="about-story__block">
+
+          <span className="about-story__label">
+            A NEW MODEL OF COLLABORATION
+          </span>
+
+          <p>
+            Continental Founders was created to help bridge that divide.
+          </p>
+
+          <p>
+            We are developing a new model of university collaboration
+            that moves beyond traditional student exchange. The goal
+            is not simply to send students across borders to study.
+          </p>
+
+          <p className="about-story__emphasis">
+            The goal is to bring students, universities, businesses,
+            and ecosystems together to build.
+          </p>
+
+          <p>
+            Through cross-continental collaboration, participants have
+            the opportunity to explore real-world problems, develop
+            solutions, test business concepts, engage with mentors and
+            industry professionals, and build relationships that extend
+            beyond the classroom.
+          </p>
+
+        </div>
+
+
+        {/* PHILOSOPHY */}
+        <div className="about-story__philosophy">
+
+          <div className="about-story__philosophy-top">
+
+            <span className="about-kicker about-kicker--gold">
+              OUR PHILOSOPHY
+            </span>
+
+            <span className="about-story__philosophy-mark">
+              “
+            </span>
+
+          </div>
+
+          <blockquote>
+            We don't teach students to pitch.
+            <br />
+            <strong>We teach them to build.</strong>
+          </blockquote>
+
+          <p>
+            Because a compelling pitch is only the beginning.
+          </p>
+
+        </div>
+
+
+        <div className="about-story__block">
+
+          <span className="about-story__label">
+            BUILDING BEYOND THE PITCH
+          </span>
+
+          <p>
+            Investors don't fund ideas. They fund founders who can
+            execute.
+          </p>
+
+          <p>
+            Continental Founders is therefore designed around what
+            happens before and after the pitch: validating the
+            opportunity, understanding the market, conducting due
+            diligence, developing a viable business model, building
+            an investor-ready foundation, and developing the confidence
+            and capability to execute.
+          </p>
+
+        </div>
+
+
+        <div className="about-story__block">
+
+          <span className="about-story__label">
+            BUILDING TOGETHER
+          </span>
+
+          <p>
+            We are intentionally building Continental Founders™ with
+            university and strategic partners rather than assuming
+            that a single institution can design the future alone.
+          </p>
+
+          <p>
+            Our founding-stage approach creates an opportunity for
+            universities in Africa and America to shape the academic
+            experience, partnership model, entrepreneurial framework,
+            and long-term impact together.
+          </p>
+
+        </div>
+
+
+        {/* CLOSING */}
+        <div className="about-story__closing">
+
+          <span className="about-story__label">
+            WHERE WE ARE GOING
+          </span>
+
+          <p>
+            The result we are working toward is more than an exchange.
+            It is a cross-continental ecosystem for developing founders,
+            creating opportunity, strengthening institutions, and
+            connecting talent to the global economy.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 
       {/* ======================================================

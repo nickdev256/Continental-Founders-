@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import NetworkBackground from "../components/ui/NetworkBackground";
 
 
 import {
@@ -402,6 +403,8 @@ export default function Home() {
 
 <section className="cf-home-hero">
 
+  <NetworkBackground />
+
   <div className="cf-container cf-home-hero__container">
 
     <div className="cf-home-hero__main">
@@ -414,9 +417,9 @@ export default function Home() {
 
         <div className="cf-section-marker">
 
-          <span>01</span>
+          
 
-          <i />
+          
 
           <strong>
             A CROSS-CONTINENTAL INITIATIVE
@@ -613,26 +616,22 @@ export default function Home() {
 
         <div className="cf-container">
 
-          <div className="cf-section-header">
+        <div className="cf-section-header">
 
-            <SectionNumber number="02" />
+  <div>
+    <span className="cf-eyebrow">
+      WHO WE ARE
+    </span>
 
-            <div>
+    <h2>
+      Building strategic
+      partnerships that create{" "}
+      <em>opportunity</em> in both
+      directions.
+    </h2>
+  </div>
 
-              <span className="cf-eyebrow">
-                WHO WE ARE
-              </span>
-
-              <h2>
-                Building strategic
-                partnerships that create{" "}
-                <em>opportunity</em> in both
-                directions.
-              </h2>
-
-            </div>
-
-          </div>
+</div>
 
 
           <div className="cf-who-grid">
@@ -708,7 +707,7 @@ export default function Home() {
 
           <div className="cf-section-header">
 
-            <SectionNumber number="03" />
+            
 
             <div>
 
@@ -733,6 +732,7 @@ export default function Home() {
                 meaningful opportunities between
                 Africa and the United States.
               </p>
+              <br />
 
             </div>
 
@@ -804,9 +804,9 @@ export default function Home() {
 
             <div className="cf-section-marker cf-section-marker--light">
 
-              <span>04</span>
+              
 
-              <i />
+              
 
               <strong>
                 OUR VISION
@@ -833,7 +833,7 @@ export default function Home() {
 
 
             <p>
-              Continental Founders™ seeks to
+              Continental Founders seeks to
               create relationships that move
               beyond traditional exchanges
               toward practical collaboration
@@ -998,8 +998,7 @@ export default function Home() {
 
           <div className="cf-section-header">
 
-            <SectionNumber number="05" />
-
+            
             <div>
 
               <span className="cf-eyebrow">
@@ -1016,6 +1015,7 @@ export default function Home() {
             </div>
 
           </div>
+          <br />
 
 
           <div className="cf-model-grid">
@@ -1081,7 +1081,7 @@ export default function Home() {
 
           <div className="cf-section-header">
 
-            <SectionNumber number="06" />
+            
 
             <div>
 
@@ -1104,6 +1104,7 @@ export default function Home() {
             </div>
 
           </div>
+          <br />
 
 
           <div className="cf-matters-grid">
@@ -1134,7 +1135,7 @@ export default function Home() {
 
           </div>
 
-        </div>
+        </div> 
 
       </section>
 
@@ -1162,9 +1163,7 @@ export default function Home() {
 
             <div className="cf-section-marker">
 
-              <span>07</span>
-
-              <i />
+             
 
               <strong>
                 UNIVERSITY PARTNERSHIPS
@@ -1226,7 +1225,7 @@ export default function Home() {
 
           <div className="cf-section-header">
 
-            <SectionNumber number="08" />
+           
 
             <div>
 
@@ -1245,6 +1244,7 @@ export default function Home() {
             </div>
 
           </div>
+          <br />
 
 
           <div className="cf-ecosystem-grid">
@@ -1320,9 +1320,7 @@ export default function Home() {
 
             <div className="cf-section-marker cf-section-marker--light">
 
-              <span>09</span>
-
-              <i />
+              
 
               <strong>
                 SPONSORS & STRATEGIC PARTNERS
@@ -1335,9 +1333,10 @@ export default function Home() {
               Invest in a new generation
               of{" "}
               <em>
-                cross-continental opportunity.
+                cross continental opportunity.
               </em>
             </h2>
+            <br />
 
 
             <p>
@@ -1374,16 +1373,7 @@ export default function Home() {
               </Link>
 
 
-              <Link
-                to="/strategic-partners"
-                className="cf-vision-link"
-              >
-                <span>
-                  Partnership Opportunities
-                </span>
-
-                <ArrowRight size={17} />
-              </Link>
+              
 
             </div>
 
@@ -1417,10 +1407,9 @@ export default function Home() {
 
             <div className="cf-section-marker">
 
-              <span>10</span>
+              
 
-              <i />
-
+              
               <strong>
                 CONFERENCE & EVENTS
               </strong>
@@ -1450,6 +1439,7 @@ export default function Home() {
               entrepreneurship, leadership,
               commerce, and innovation.
             </p>
+            <br />
 
 
             <Link
@@ -1497,7 +1487,7 @@ export default function Home() {
 
           <div className="cf-section-header">
 
-            <SectionNumber number="11" />
+            
 
             <div>
 
@@ -1516,6 +1506,7 @@ export default function Home() {
             </div>
 
           </div>
+          <br />
 
 
           <div className="cf-news-grid">
@@ -1591,7 +1582,7 @@ export default function Home() {
 
           <p>
             Access information about
-            Continental Founders™, our
+            Continental Founders, our
             partnership approach, and
             opportunities for universities,
             sponsors, and strategic partners.

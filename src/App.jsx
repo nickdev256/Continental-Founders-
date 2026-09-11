@@ -7,6 +7,7 @@ import {
 
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import PageTransition from "./components/layout/PageTransition";
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -72,143 +73,147 @@ export default function App() {
 
       <main id="main-content">
 
-        <Routes>
+        <PageTransition>
 
-          {/* ==================================================
-              HOME
-          ================================================== */}
+          <Routes>
 
-          <Route
-            path="/"
-            element={<Home />}
-          />
+            {/* ==================================================
+                HOME
+            ================================================== */}
 
-
-          {/* ==================================================
-              ABOUT
-          ================================================== */}
-
-          <Route
-            path="/about"
-            element={<About />}
-          />
+            <Route
+              path="/"
+              element={<Home />}
+            />
 
 
-          {/* ==================================================
-              VENTURES
-          ================================================== */}
+            {/* ==================================================
+                ABOUT
+            ================================================== */}
 
-          <Route
-            path="/ventures"
-            element={<Ventures />}
-          />
-
-          <Route
-            path="/ventures/:slug"
-            element={<VentureDetails />}
-          />
+            <Route
+              path="/about"
+              element={<About />}
+            />
 
 
-          {/* ==================================================
-              OUR MODEL
-          ================================================== */}
+            {/* ==================================================
+                VENTURES
+            ================================================== */}
 
-          <Route
-            path="/our-model"
-            element={<OurModel />}
-          />
+            <Route
+              path="/ventures"
+              element={<Ventures />}
+            />
 
-
-          {/* ==================================================
-              PARTNERS
-          ================================================== */}
-
-          <Route
-            path="/strategic-partners"
-            element={<StrategicPartners />}
-          />
-
-          <Route
-            path="/partners/us-africa-trade-network"
-            element={<USAfricaTradeNetwork />}
-          />
-
-          <Route
-            path="/partners/universities"
-            element={<Universities />}
-          />
-
-          <Route
-            path="/partners/corporate"
-            element={<CorporatePartners />}
-          />
-
-          <Route
-            path="/partners/government-development"
-            element={<GovernmentDevelopment />}
-          />
+            <Route
+              path="/ventures/:slug"
+              element={<VentureDetails />}
+            />
 
 
-          {/* ==================================================
-              PROGRAMS / IMPACT
-          ================================================== */}
+            {/* ==================================================
+                OUR MODEL
+            ================================================== */}
 
-          <Route
-            path="/programs"
-            element={<Programs />}
-          />
-
-          <Route
-            path="/impact"
-            element={<Impact />}
-          />
+            <Route
+              path="/our-model"
+              element={<OurModel />}
+            />
 
 
-          {/* ==================================================
-              EVENTS
-          ================================================== */}
+            {/* ==================================================
+                PARTNERS
+            ================================================== */}
 
-          <Route
-            path="/events"
-            element={<Events />}
-          />
+            <Route
+              path="/strategic-partners"
+              element={<StrategicPartners />}
+            />
 
+            <Route
+              path="/partners/us-africa-trade-network"
+              element={<USAfricaTradeNetwork />}
+            />
 
-          {/* ==================================================
-              INSIGHTS
-          ================================================== */}
+            <Route
+              path="/partners/universities"
+              element={<Universities />}
+            />
 
-          <Route
-            path="/insights"
-            element={<Insights />}
-          />
+            <Route
+              path="/partners/corporate"
+              element={<CorporatePartners />}
+            />
 
-          <Route
-            path="/insights/:slug"
-            element={<InsightDetails />}
-          />
-
-
-          {/* ==================================================
-              CONTACT
-          ================================================== */}
-
-          <Route
-            path="/contact"
-            element={<Contact />}
-          />
+            <Route
+              path="/partners/government-development"
+              element={<GovernmentDevelopment />}
+            />
 
 
-          {/* ==================================================
-              404
-          ================================================== */}
+            {/* ==================================================
+                PROGRAMS / IMPACT
+            ================================================== */}
 
-          <Route
-            path="*"
-            element={<NotFound />}
-          />
+            <Route
+              path="/programs"
+              element={<Programs />}
+            />
 
-        </Routes>
+            <Route
+              path="/impact"
+              element={<Impact />}
+            />
+
+
+            {/* ==================================================
+                EVENTS
+            ================================================== */}
+
+            <Route
+              path="/events"
+              element={<Events />}
+            />
+
+
+            {/* ==================================================
+                INSIGHTS
+            ================================================== */}
+
+            <Route
+              path="/insights"
+              element={<Insights />}
+            />
+
+            <Route
+              path="/insights/:slug"
+              element={<InsightDetails />}
+            />
+
+
+            {/* ==================================================
+                CONTACT
+            ================================================== */}
+
+            <Route
+              path="/contact"
+              element={<Contact />}
+            />
+
+
+            {/* ==================================================
+                404
+            ================================================== */}
+
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
+
+          </Routes>
+
+        </PageTransition>
 
       </main>
 

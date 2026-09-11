@@ -2,20 +2,36 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 
 
 // ============================================================
 // ROUTES
 // ============================================================
 
-const authRoutes = require("./routes/authRoutes");
-const contactRoutes = require("./routes/contactRoutes");
-const partnershipRoutes = require("./routes/partnershipRoutes");
-const newsletterRoutes = require("./routes/newsletterRoutes");
-const dashboardRoutes = require("./routes/dashboardRoutes");
-const eventsRoutes = require("./routes/eventsRoutes");
-const insightsRoutes = require("./routes/insightsRoutes");
-const universityRoutes = require("./routes/universityRoutes");
+const authRoutes =
+  require("./routes/authRoutes");
+
+const contactRoutes =
+  require("./routes/contactRoutes");
+
+const partnershipRoutes =
+  require("./routes/partnershipRoutes");
+
+const newsletterRoutes =
+  require("./routes/newsletterRoutes");
+
+const dashboardRoutes =
+  require("./routes/dashboardRoutes");
+
+const eventsRoutes =
+  require("./routes/eventsRoutes");
+
+const insightsRoutes =
+  require("./routes/insightsRoutes");
+
+const universityRoutes =
+  require("./routes/universityRoutes");
 
 
 // ============================================================
@@ -28,6 +44,10 @@ const {
 } = require("./middleware/error");
 
 
+// ============================================================
+// APP
+// ============================================================
+
 const app = express();
 
 
@@ -35,11 +55,14 @@ const app = express();
 // TRUST PROXY
 // ============================================================
 
-app.set("trust proxy", 1);
+app.set(
+  "trust proxy",
+  1
+);
 
 
 // ============================================================
-// SECURITY
+// SECURITY HEADERS
 // ============================================================
 
 app.use(
@@ -56,24 +79,38 @@ const allowedOrigins = (
   "http://localhost:5173"
 )
   .split(",")
-  .map((url) => url.trim())
+  .map((url) =>
+    url.trim()
+  )
   .filter(Boolean);
 
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: (
+      origin,
+      callback
+    ) => {
 
-      // Allow Postman, curl, server-to-server requests
       if (!origin) {
-        return callback(null, true);
+        return callback(
+          null,
+          true
+        );
       }
+
 
       if (
-        allowedOrigins.includes(origin)
+        allowedOrigins.includes(
+          origin
+        )
       ) {
-        return callback(null, true);
+        return callback(
+          null,
+          true
+        );
       }
+
 
       return callback(
         new Error(
@@ -83,6 +120,20 @@ app.use(
     },
 
     credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
 
@@ -107,6 +158,15 @@ app.use(
 
 
 // ============================================================
+// COOKIE PARSER
+// ============================================================
+
+app.use(
+  cookieParser()
+);
+
+
+// ============================================================
 // RATE LIMITERS
 // ============================================================
 
@@ -123,8 +183,29 @@ const publicFormLimiter =
 
     message: {
       success: false,
+
       message:
         "Too many requests. Please try again shortly.",
+    },
+  });
+
+
+const newsletterLimiter =
+  rateLimit({
+    windowMs:
+      15 * 60 * 1000,
+
+    limit: 20,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+    message: {
+      success: false,
+
+      message:
+        "Too many newsletter requests. Please try again shortly.",
     },
   });
 
@@ -135,33 +216,55 @@ const publicFormLimiter =
 
 app.get(
   "/api/health",
-  (req, res) => {
+  (
+    req,
+    res
+  ) => {
 
-    return res.status(200).json({
-      success: true,
+    return res
+      .status(200)
+      .json({
+        success: true,
 
-      message:
-        "Continental Founders API is running",
+        message:
+          "Continental Founders API is running",
 
-      environment:
-        process.env.NODE_ENV ||
-        "development",
+        environment:
+          process.env.NODE_ENV ||
+          "development",
 
-      database:
-        "Supabase",
+        database:
+          "Supabase",
 
-      services: {
-        auth: "/api/auth",
-        contact: "/api/contact",
-        partnerships: "/api/partnerships",
-        newsletter: "/api/newsletter",
-        events: "/api/events",
-        insights: "/api/insights",
-        universities: "/api/universities",
-        adminDashboard:
-          "/api/admin/dashboard",
-      },
-    });
+        services: {
+          auth:
+            "/api/auth",
+
+          contact:
+            "/api/contact",
+
+          partnerships:
+            "/api/partnerships",
+
+          newsletter:
+            "/api/newsletter",
+
+          newsletterSubscribe:
+            "/api/newsletter/subscribe",
+
+          events:
+            "/api/events",
+
+          insights:
+            "/api/insights",
+
+          universities:
+            "/api/universities",
+
+          adminDashboard:
+            "/api/admin/dashboard",
+        },
+      });
   }
 );
 
@@ -204,18 +307,13 @@ app.use(
 
 app.use(
   "/api/newsletter",
-  publicFormLimiter,
+  newsletterLimiter,
   newsletterRoutes
 );
 
 
 // ============================================================
 // EVENTS
-// ============================================================
-//
-// GET /api/events
-// GET /api/events/:slug
-//
 // ============================================================
 
 app.use(
@@ -227,11 +325,6 @@ app.use(
 // ============================================================
 // INSIGHTS
 // ============================================================
-//
-// GET /api/insights
-// GET /api/insights/:slug
-//
-// ============================================================
 
 app.use(
   "/api/insights",
@@ -241,12 +334,6 @@ app.use(
 
 // ============================================================
 // UNIVERSITIES
-// ============================================================
-//
-// GET /api/universities
-//
-// Returns the Universities page content from Supabase.
-//
 // ============================================================
 
 app.use(
@@ -266,9 +353,59 @@ app.use(
 
 
 // ============================================================
+// API ROOT
+// ============================================================
+
+app.get(
+  "/api",
+  (
+    req,
+    res
+  ) => {
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        name:
+          "Continental Founders API",
+
+        status:
+          "online",
+
+        endpoints: {
+          health:
+            "/api/health",
+
+          auth:
+            "/api/auth",
+
+          contact:
+            "/api/contact",
+
+          partnerships:
+            "/api/partnerships",
+
+          newsletter:
+            "/api/newsletter",
+
+          events:
+            "/api/events",
+
+          insights:
+            "/api/insights",
+
+          universities:
+            "/api/universities",
+        },
+      });
+  }
+);
+
+
+// ============================================================
 // 404 HANDLER
-//
-// Must stay after all routes
 // ============================================================
 
 app.use(
@@ -278,8 +415,6 @@ app.use(
 
 // ============================================================
 // GLOBAL ERROR HANDLER
-//
-// Must stay last
 // ============================================================
 
 app.use(
@@ -288,7 +423,7 @@ app.use(
 
 
 // ============================================================
-// EXPORT APP
+// EXPORT
 // ============================================================
 
 module.exports = app;

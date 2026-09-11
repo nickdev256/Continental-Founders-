@@ -1,5 +1,11 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, {
+  useState,
+} from "react";
+
+import {
+  Link,
+} from "react-router-dom";
+
 import {
   ArrowUpRight,
   ChevronRight,
@@ -10,6 +16,7 @@ import {
 } from "lucide-react";
 
 import "./Footer.css";
+
 
 /* ============================================================
    NAVIGATION
@@ -26,8 +33,8 @@ const navigation = {
       path: "/our-model",
     },
     {
-      label: "University Partnerships",
-      path: "/university-partnerships",
+      label: "Universities",
+      path: "/partners/universities",
     },
     {
       label: "Sponsors & Partners",
@@ -68,16 +75,23 @@ const socials = [
   {
     label: "LinkedIn",
     icon: Linkedin,
+
+    // Replace with official Continental Founders
+    // LinkedIn URL when available.
     url: "https://www.linkedin.com/",
   },
   {
     label: "Instagram",
     icon: Instagram,
-    url: "https://www.instagram.com/continentalfounderstm/?hl=en",
+    url:
+      "https://www.instagram.com/continentalfounderstm/?hl=en",
   },
   {
     label: "YouTube",
     icon: Youtube,
+
+    // Replace with official Continental Founders
+    // YouTube URL when available.
     url: "https://www.youtube.com/",
   },
 ];
@@ -91,7 +105,7 @@ const focusAreas = [
   "Entrepreneurship",
   "Innovation",
   "Leadership Development",
-  "U.S.–Africa University Partnerships",
+  "U.S.–Africa Partnerships",
 ];
 
 
@@ -100,21 +114,232 @@ const focusAreas = [
 ============================================================ */
 
 export default function Footer() {
-  const year = new Date().getFullYear();
+  const year =
+    new Date().getFullYear();
+
+
+  /* ==========================================================
+     NEWSLETTER STATE
+  ========================================================== */
+
+  const [
+    email,
+    setEmail,
+  ] =
+    useState("");
+
+
+  const [
+    submitting,
+    setSubmitting,
+  ] =
+    useState(false);
+
+
+  const [
+    newsletterMessage,
+    setNewsletterMessage,
+  ] =
+    useState("");
+
+
+  const [
+    newsletterError,
+    setNewsletterError,
+  ] =
+    useState("");
+
+
+  /* ==========================================================
+     API
+  ========================================================== */
+
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000";
+
+
+  /* ==========================================================
+     NEWSLETTER SUBMIT
+  ========================================================== */
+
+  async function handleNewsletterSubmit(
+    event
+  ) {
+    event.preventDefault();
+
+
+    /* --------------------------------------------------------
+       CLEAN EMAIL
+    -------------------------------------------------------- */
+
+    const cleanEmail =
+      email
+        .trim()
+        .toLowerCase();
+
+
+    if (!cleanEmail) {
+      setNewsletterMessage("");
+
+      setNewsletterError(
+        "Please enter your email address."
+      );
+
+      return;
+    }
+
+
+    /* --------------------------------------------------------
+       BASIC EMAIL VALIDATION
+    -------------------------------------------------------- */
+
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (
+      !emailPattern.test(
+        cleanEmail
+      )
+    ) {
+      setNewsletterMessage("");
+
+      setNewsletterError(
+        "Please enter a valid email address."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setSubmitting(true);
+
+      setNewsletterMessage("");
+
+      setNewsletterError("");
+
+
+      /* ------------------------------------------------------
+         SEND TO BACKEND
+      ------------------------------------------------------ */
+
+      const response =
+        await fetch(
+          `${API_URL}/api/newsletter/subscribe`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                email:
+                  cleanEmail,
+              }),
+          }
+        );
+
+
+      /* ------------------------------------------------------
+         READ RESPONSE SAFELY
+      ------------------------------------------------------ */
+
+      let result = {};
+
+
+      try {
+        result =
+          await response.json();
+      } catch {
+        result = {};
+      }
+
+
+      /* ------------------------------------------------------
+         BACKEND ERROR
+      ------------------------------------------------------ */
+
+      if (!response.ok) {
+        throw new Error(
+          result.message ||
+          "We could not complete your subscription."
+        );
+      }
+
+
+      /* ------------------------------------------------------
+         SUCCESS
+      ------------------------------------------------------ */
+
+      setNewsletterMessage(
+        result.message ||
+        "Thank you for subscribing to Continental Founders."
+      );
+
+
+      setEmail("");
+
+    } catch (error) {
+
+      console.error(
+        "Newsletter subscription error:",
+        error
+      );
+
+
+      /* ------------------------------------------------------
+         CONNECTION ERROR
+      ------------------------------------------------------ */
+
+      if (
+        error instanceof TypeError &&
+        error.message ===
+          "Failed to fetch"
+      ) {
+        setNewsletterError(
+          "We could not connect to the subscription service. Please try again shortly."
+        );
+      } else {
+        setNewsletterError(
+          error.message ||
+          "We could not complete your subscription. Please try again."
+        );
+      }
+
+    } finally {
+
+      setSubmitting(false);
+
+    }
+  }
+
+
+  /* ==========================================================
+     FOOTER
+  ========================================================== */
 
   return (
     <footer className="cf-footer">
 
       {/* ======================================================
           BACKGROUND
-      ======================================================= */}
+      ====================================================== */}
 
-      <div className="cf-footer__background" aria-hidden="true" />
+      <div
+        className="cf-footer__background"
+        aria-hidden="true"
+      />
 
 
       {/* ======================================================
           MAIN FOOTER
-      ======================================================= */}
+      ====================================================== */}
 
       <section className="cf-footer__main">
 
@@ -133,10 +358,12 @@ export default function Footer() {
                 className="cf-footer__logo"
                 aria-label="Continental Founders home"
               >
+
                 <img
                   src="/assets/continental-founders-logo.png"
                   alt="Continental Founders"
                 />
+
               </Link>
 
 
@@ -146,23 +373,29 @@ export default function Footer() {
 
 
               <p className="cf-footer__description">
-                Continental Founders builds strategic partnerships
-                between universities in the United States and Africa
-                through entrepreneurship, innovation, and leadership
-                development.
+                Continental Founders builds strategic
+                relationships around founders,
+                universities, businesses, professionals,
+                institutions, and opportunity networks
+                across Africa and the United States.
               </p>
 
 
-              {/* GLOBAL NETWORK */}
+              {/* ==============================================
+                  GLOBAL NETWORK
+              =============================================== */}
 
               <div className="cf-footer__location">
 
                 <span className="cf-footer__location-icon">
+
                   <Globe2
                     size={20}
                     strokeWidth={1.6}
                   />
+
                 </span>
+
 
                 <div>
 
@@ -179,7 +412,9 @@ export default function Footer() {
               </div>
 
 
-              {/* CTA */}
+              {/* ==============================================
+                  CTA
+              =============================================== */}
 
               <Link
                 to="/contact"
@@ -191,10 +426,12 @@ export default function Footer() {
                 </span>
 
                 <span className="cf-footer__meeting-arrow">
+
                   <ArrowUpRight
                     size={22}
                     strokeWidth={1.8}
                   />
+
                 </span>
 
               </Link>
@@ -208,7 +445,9 @@ export default function Footer() {
 
             <div className="cf-footer__navigation">
 
-              {/* EXPLORE */}
+              {/* ==============================================
+                  EXPLORE
+              =============================================== */}
 
               <div className="cf-footer__column">
 
@@ -222,38 +461,43 @@ export default function Footer() {
 
                 <div className="cf-footer__gold-line" />
 
+
                 <nav
                   className="cf-footer__links"
                   aria-label="Explore"
                 >
 
-                  {navigation.explore.map((item) => (
+                  {navigation.explore.map(
+                    (item) => (
 
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="cf-footer__link"
-                    >
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="cf-footer__link"
+                      >
 
-                      <span>
-                        {item.label}
-                      </span>
+                        <span>
+                          {item.label}
+                        </span>
 
-                      <ChevronRight
-                        size={17}
-                        strokeWidth={1.5}
-                      />
+                        <ChevronRight
+                          size={17}
+                          strokeWidth={1.5}
+                        />
 
-                    </Link>
+                      </Link>
 
-                  ))}
+                    )
+                  )}
 
                 </nav>
 
               </div>
 
 
-              {/* RESOURCES */}
+              {/* ==============================================
+                  RESOURCES
+              =============================================== */}
 
               <div className="cf-footer__column">
 
@@ -267,38 +511,43 @@ export default function Footer() {
 
                 <div className="cf-footer__gold-line" />
 
+
                 <nav
                   className="cf-footer__links"
                   aria-label="Resources"
                 >
 
-                  {navigation.resources.map((item) => (
+                  {navigation.resources.map(
+                    (item) => (
 
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="cf-footer__link"
-                    >
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="cf-footer__link"
+                      >
 
-                      <span>
-                        {item.label}
-                      </span>
+                        <span>
+                          {item.label}
+                        </span>
 
-                      <ChevronRight
-                        size={17}
-                        strokeWidth={1.5}
-                      />
+                        <ChevronRight
+                          size={17}
+                          strokeWidth={1.5}
+                        />
 
-                    </Link>
+                      </Link>
 
-                  ))}
+                    )
+                  )}
 
                 </nav>
 
               </div>
 
 
-              {/* OUR FOCUS */}
+              {/* ==============================================
+                  OUR FOCUS
+              =============================================== */}
 
               <div className="cf-footer__column">
 
@@ -312,26 +561,37 @@ export default function Footer() {
 
                 <div className="cf-footer__gold-line" />
 
+
                 <div className="cf-footer__focus">
 
-                  {focusAreas.map((area, index) => (
+                  {focusAreas.map(
+                    (
+                      area,
+                      index
+                    ) => (
 
-                    <div
-                      className="cf-footer__focus-item"
-                      key={area}
-                    >
+                      <div
+                        className="cf-footer__focus-item"
+                        key={area}
+                      >
 
-                      <span>
-                        0{index + 1}
-                      </span>
+                        <span>
+                          {String(
+                            index + 1
+                          ).padStart(
+                            2,
+                            "0"
+                          )}
+                        </span>
 
-                      <p>
-                        {area}
-                      </p>
+                        <p>
+                          {area}
+                        </p>
 
-                    </div>
+                      </div>
 
-                  ))}
+                    )
+                  )}
 
                 </div>
 
@@ -339,63 +599,135 @@ export default function Footer() {
 
             </div>
 
+
             {/* ==================================================
-    NEWSLETTER
-=================================================== */}
+                NEWSLETTER
+            =================================================== */}
 
-<div className="cf-footer__newsletter">
+            <div className="cf-footer__newsletter">
 
-  <div className="cf-footer__newsletter-content">
+              <div className="cf-footer__newsletter-content">
 
-    <span className="cf-footer__newsletter-label">
-      STAY CONNECTED
-    </span>
+                <span className="cf-footer__newsletter-label">
+                  STAY CONNECTED
+                </span>
 
-    <h3>
-      Subscribe for More Information
-    </h3>
+                <h3>
+                  Subscribe for More Information
+                </h3>
 
-    <p>
-      Get updates on programs, partnerships, events, and
-      opportunities connecting Africa and the United States.
-    </p>
+                <p>
+                  Get updates on programs,
+                  partnerships, events, insights,
+                  and opportunities across the
+                  Continental Founders ecosystem.
+                </p>
 
-  </div>
+              </div>
 
 
-  <form className="cf-footer__newsletter-form">
+              <form
+                className="cf-footer__newsletter-form"
+                onSubmit={
+                  handleNewsletterSubmit
+                }
+                noValidate
+              >
 
-    <div className="cf-footer__input-wrap">
+                <div className="cf-footer__input-wrap">
 
-      <span className="cf-footer__input-icon">
-        
-      </span>
+                  <input
+                    type="email"
+                    name="newsletterEmail"
+                    value={email}
+                    placeholder="Enter your email"
+                    aria-label="Email address"
+                    autoComplete="email"
+                    disabled={submitting}
+                    onChange={(event) => {
 
-      <input
-        type="email"
-        placeholder="Enter your email"
-        aria-label="Email address"
-        required
-      />
+                      setEmail(
+                        event.target.value
+                      );
 
-    </div>
+                      if (
+                        newsletterError
+                      ) {
+                        setNewsletterError(
+                          ""
+                        );
+                      }
 
-    <button type="submit">
-      <span>Subscribe</span>
+                    }}
+                    required
+                  />
 
-      <ArrowUpRight
-        size={19}
-        strokeWidth={1.8}
-      />
-    </button>
+                </div>
 
-  </form>
 
-</div>
+                <button
+                  type="submit"
+                  disabled={
+                    submitting ||
+                    !email.trim()
+                  }
+                  aria-busy={
+                    submitting
+                  }
+                >
+
+                  <span>
+                    {submitting
+                      ? "Subscribing..."
+                      : "Subscribe"}
+                  </span>
+
+                  <ArrowUpRight
+                    size={19}
+                    strokeWidth={1.8}
+                  />
+
+                </button>
+
+
+                {/* ============================================
+                    SUCCESS MESSAGE
+                ============================================= */}
+
+                {newsletterMessage && (
+
+                  <p
+                    className="cf-footer__newsletter-success"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {newsletterMessage}
+                  </p>
+
+                )}
+
+
+                {/* ============================================
+                    ERROR MESSAGE
+                ============================================= */}
+
+                {newsletterError && (
+
+                  <p
+                    className="cf-footer__newsletter-error"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    {newsletterError}
+                  </p>
+
+                )}
+
+              </form>
+
+            </div>
 
           </div>
-
-          
 
 
           {/* ==================================================
@@ -417,12 +749,9 @@ export default function Footer() {
       </section>
 
 
-      
-
-
       {/* ======================================================
           BOTTOM BAR
-      ======================================================= */}
+      ====================================================== */}
 
       <section className="cf-footer__bottom">
 
@@ -430,7 +759,9 @@ export default function Footer() {
 
           <div className="cf-footer__bottom-inner">
 
-            {/* COPYRIGHT */}
+            {/* ================================================
+                COPYRIGHT
+            ================================================= */}
 
             <div className="cf-footer__copyright">
 
@@ -449,7 +780,9 @@ export default function Footer() {
             </div>
 
 
-            {/* LEGAL */}
+            {/* ================================================
+                LEGAL
+            ================================================= */}
 
             <nav
               className="cf-footer__legal"
@@ -471,53 +804,84 @@ export default function Footer() {
             </nav>
 
 
-            {/* SOCIAL */}
+            {/* ================================================
+                SOCIAL MEDIA
+            ================================================= */}
 
             <div
               className="cf-footer__socials"
               aria-label="Social media"
             >
 
-              {socials.map((social) => {
+              {socials.map(
+                (social) => {
 
-                const Icon = social.icon;
+                  const Icon =
+                    social.icon;
 
-                return (
-                  <a
-                    key={social.label}
-                    href={social.url}
-                    className="cf-footer__social"
-                    aria-label={social.label}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  return (
+                    <a
+                      key={
+                        social.label
+                      }
+                      href={
+                        social.url
+                      }
+                      className="cf-footer__social"
+                      aria-label={
+                        social.label
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
 
-                    <Icon
-                      size={19}
-                      strokeWidth={1.6}
-                    />
+                      <Icon
+                        size={19}
+                        strokeWidth={1.6}
+                      />
 
-                  </a>
-                );
+                    </a>
+                  );
 
-              })}
+                }
+              )}
 
             </div>
 
-            
 
-
-            {/* BRAND PHRASE */}
+            {/* ================================================
+                BRAND PHRASE
+            ================================================= */}
 
             <div className="cf-footer__phrase">
 
-              <span>IDEAS</span>
-              <b>|</b>
-              <span>PEOPLE</span>
-              <b>|</b>
-              <span>OPPORTUNITIES</span>
-              <b>|</b>
-              <span>IMPACT</span>
+              <span>
+                IDEAS
+              </span>
+
+              <b>
+                |
+              </b>
+
+              <span>
+                PEOPLE
+              </span>
+
+              <b>
+                |
+              </b>
+
+              <span>
+                OPPORTUNITIES
+              </span>
+
+              <b>
+                |
+              </b>
+
+              <span>
+                IMPACT
+              </span>
 
             </div>
 
@@ -528,14 +892,5 @@ export default function Footer() {
       </section>
 
     </footer>
-
-
-
-
   );
-
 }
-
-
-
-

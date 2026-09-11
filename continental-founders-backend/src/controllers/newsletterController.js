@@ -1,36 +1,242 @@
-const { z } = require('zod');
-const Subscriber = require('../models/Subscriber');
+const supabase = require("../config/supabase");
 
-const subscribeSchema = z.object({
-  email: z.string().email(),
-  firstName: z.string().max(80).optional().default(''),
-});
+
+/* ============================================================
+   SUBSCRIBE
+============================================================ */
 
 async function subscribe(req, res) {
-  const { email, firstName } = subscribeSchema.parse(req.body);
+  try {
+    let {
+      email,
+    } = req.body;
 
-  const existing = await Subscriber.findOne({ email: email.toLowerCase() });
-  if (existing) {
-    existing.active = true;
-    if (firstName) existing.firstName = firstName;
-    await existing.save();
-    return res.json({ success: true, message: 'You are subscribed to Continental Founders updates.' });
+
+    /* --------------------------------------------------------
+       VALIDATE EMAIL
+    -------------------------------------------------------- */
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email address is required.",
+      });
+    }
+
+
+    email =
+      String(email)
+        .trim()
+        .toLowerCase();
+
+
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (!emailPattern.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
+      });
+    }
+
+
+    /* --------------------------------------------------------
+       CHECK EXISTING SUBSCRIBER
+    -------------------------------------------------------- */
+
+    const {
+      data: existingSubscriber,
+      error: existingError,
+    } =
+      await supabase
+        .from("newsletter_subscribers")
+        .select(
+          "id, email, status"
+        )
+        .eq("email", email)
+        .maybeSingle();
+
+
+    if (existingError) {
+      throw existingError;
+    }
+
+
+    /* --------------------------------------------------------
+       ALREADY SUBSCRIBED
+    -------------------------------------------------------- */
+
+    if (
+      existingSubscriber &&
+      existingSubscriber.status ===
+        "subscribed"
+    ) {
+      return res.status(200).json({
+        success: true,
+        message:
+          "You are already subscribed to Continental Founders updates.",
+      });
+    }
+
+
+    /* --------------------------------------------------------
+       RE-SUBSCRIBE
+    -------------------------------------------------------- */
+
+    if (
+      existingSubscriber &&
+      existingSubscriber.status ===
+        "unsubscribed"
+    ) {
+      const {
+        data,
+        error,
+      } =
+        await supabase
+          .from(
+            "newsletter_subscribers"
+          )
+          .update({
+            status: "subscribed",
+            subscribed_at:
+              new Date().toISOString(),
+            updated_at:
+              new Date().toISOString(),
+          })
+          .eq(
+            "id",
+            existingSubscriber.id
+          )
+          .select()
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      return res.status(200).json({
+        success: true,
+        message:
+          "Welcome back. Your subscription has been restored.",
+        subscriber: data,
+      });
+    }
+
+
+    /* --------------------------------------------------------
+       CREATE SUBSCRIBER
+    -------------------------------------------------------- */
+
+    const {
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "newsletter_subscribers"
+        )
+        .insert([
+          {
+            email,
+            status: "subscribed",
+            source:
+              "website_footer",
+          },
+        ])
+        .select()
+        .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return res.status(201).json({
+      success: true,
+      message:
+        "Thank you for subscribing to Continental Founders.",
+      subscriber: data,
+    });
+
+  } catch (error) {
+    console.error(
+      "Newsletter subscribe error:",
+      error
+    );
+
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "We could not complete your subscription. Please try again.",
+    });
   }
-
-  await Subscriber.create({ email, firstName, source: 'website' });
-  res.status(201).json({ success: true, message: 'You are subscribed to Continental Founders updates.' });
 }
 
-async function unsubscribe(req, res) {
-  const schema = z.object({ email: z.string().email() });
-  const { email } = schema.parse(req.body);
-  await Subscriber.findOneAndUpdate({ email: email.toLowerCase() }, { active: false });
-  res.json({ success: true, message: 'You have been unsubscribed.' });
+
+/* ============================================================
+   GET SUBSCRIBERS
+   ADMIN USE LATER
+============================================================ */
+
+async function getSubscribers(
+  req,
+  res
+) {
+  try {
+    const {
+      data,
+      error,
+    } =
+      await supabase
+        .from(
+          "newsletter_subscribers"
+        )
+        .select("*")
+        .order(
+          "subscribed_at",
+          {
+            ascending: false,
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return res.status(200).json({
+      success: true,
+      subscribers: data || [],
+    });
+
+  } catch (error) {
+    console.error(
+      "Get newsletter subscribers error:",
+      error
+    );
+
+
+    return res.status(500).json({
+      success: false,
+      message:
+        "Failed to load newsletter subscribers.",
+    });
+  }
 }
 
-async function listSubscribers(req, res) {
-  const items = await Subscriber.find().sort({ createdAt: -1 });
-  res.json({ success: true, items });
-}
 
-module.exports = { subscribe, unsubscribe, listSubscribers };
+/* ============================================================
+   EXPORT
+============================================================ */
+
+module.exports = {
+  subscribe,
+  getSubscribers,
+};

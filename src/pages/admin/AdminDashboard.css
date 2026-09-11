@@ -1,0 +1,198 @@
+.admin-dashboard {
+  width: 100%;
+}
+
+
+.admin-dashboard__header {
+  margin-bottom: 32px;
+
+  padding:
+    34px;
+
+  border:
+    1px solid
+    #e0e5ea;
+
+  border-radius: 16px;
+
+  background:
+    #ffffff;
+}
+
+
+.admin-dashboard__eyebrow {
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 0.66rem;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+
+  color:
+    #b18e4d;
+}
+
+
+.admin-dashboard__header h2 {
+  margin:
+    0 0 12px;
+
+  max-width: 760px;
+
+  color:
+    #091d32;
+
+  font-size:
+    clamp(
+      1.7rem,
+      3vw,
+      2.5rem
+    );
+
+  line-height: 1.12;
+}
+
+
+.admin-dashboard__header p {
+  max-width: 690px;
+
+  margin: 0;
+
+  color:
+    #6a7480;
+
+  line-height: 1.7;
+}
+
+
+.admin-dashboard__cards {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 18px;
+}
+
+
+.admin-dashboard__card {
+  min-height: 150px;
+
+  padding: 24px;
+
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr auto;
+
+  align-items: start;
+
+  gap: 18px;
+
+  border:
+    1px solid
+    #e0e5ea;
+
+  border-radius: 14px;
+
+  background:
+    #ffffff;
+
+  text-decoration: none;
+
+  color:
+    inherit;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.admin-dashboard__card:hover {
+  transform:
+    translateY(-3px);
+
+  border-color:
+    #cbb27a;
+
+  box-shadow:
+    0 14px 30px
+    rgba(
+      7,
+      24,
+      43,
+      0.07
+    );
+}
+
+
+.admin-dashboard__card-icon {
+  width: 46px;
+  height: 46px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background:
+    #0b2239;
+
+  color:
+    #d2b673;
+}
+
+
+.admin-dashboard__card-copy h3 {
+  margin:
+    2px 0 8px;
+
+  color:
+    #0b2035;
+
+  font-size: 1rem;
+}
+
+
+.admin-dashboard__card-copy p {
+  margin: 0;
+
+  color:
+    #707b87;
+
+  font-size: 0.82rem;
+
+  line-height: 1.6;
+}
+
+
+.admin-dashboard__card-arrow {
+  color:
+    #b18e4d;
+}
+
+
+@media (
+  max-width: 760px
+) {
+
+  .admin-dashboard__cards {
+    grid-template-columns: 1fr;
+  }
+
+
+  .admin-dashboard__header {
+    padding: 24px;
+  }
+
+}

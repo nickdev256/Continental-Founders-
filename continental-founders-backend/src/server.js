@@ -2,127 +2,44 @@ require("dotenv").config();
 
 const app = require("./app");
 
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
 const PORT =
-  process.env.PORT || 5000;
+  Number(process.env.PORT) ||
+  5000;
+
+const HOST =
+  process.env.HOST ||
+  "0.0.0.0";
+
+const NODE_ENV =
+  process.env.NODE_ENV ||
+  "development";
 
 
 // ============================================================
 // START SERVER
 // ============================================================
 
-function start() {
+function startServer() {
 
   const server =
     app.listen(
       PORT,
+      HOST,
       () => {
 
-        console.log("");
-        console.log(
-          "============================================================"
-        );
+        printStartupMessage();
 
-        console.log(
-          " CONTINENTAL FOUNDERS API"
-        );
-
-        console.log(
-          "============================================================"
-        );
-
-        console.log("");
-
-        console.log(
-          `API Server:     http://localhost:${PORT}`
-        );
-
-        console.log(
-          `Health Check:   http://localhost:${PORT}/api/health`
-        );
-
-        console.log("");
-
-        console.log(
-          "PUBLIC APIs"
-        );
-
-        console.log(
-          "------------------------------------------------------------"
-        );
-
-        console.log(
-          `Events:         http://localhost:${PORT}/api/events`
-        );
-
-        console.log(
-          `Insights:       http://localhost:${PORT}/api/insights`
-        );
-
-        console.log(
-          `Universities:   http://localhost:${PORT}/api/universities`
-        );
-
-        console.log(
-          `Partnerships:   http://localhost:${PORT}/api/partnerships`
-        );
-
-        console.log(
-          `Contact:        http://localhost:${PORT}/api/contact`
-        );
-
-        console.log(
-          `Newsletter:     http://localhost:${PORT}/api/newsletter`
-        );
-
-        console.log("");
-
-        console.log(
-          "AUTH / ADMIN"
-        );
-
-        console.log(
-          "------------------------------------------------------------"
-        );
-
-        console.log(
-          `Authentication: http://localhost:${PORT}/api/auth`
-        );
-
-        console.log(
-          `Dashboard:      http://localhost:${PORT}/api/admin/dashboard`
-        );
-
-        console.log("");
-
-        console.log(
-          `Database:       Supabase`
-        );
-
-        console.log(
-          `Environment:    ${process.env.NODE_ENV || "development"}`
-        );
-
-        console.log("");
-
-        console.log(
-          "============================================================"
-        );
-
-        console.log(
-          " Server started successfully"
-        );
-
-        console.log(
-          "============================================================"
-        );
-
-        console.log("");
       }
     );
 
 
   // ==========================================================
-  // SERVER ERROR
+  // SERVER ERROR HANDLER
   // ==========================================================
 
   server.on(
@@ -135,16 +52,44 @@ function start() {
       );
 
       console.error(
-        " SERVER ERROR"
+        " CONTINENTAL FOUNDERS SERVER ERROR"
       );
 
       console.error(
         "============================================================"
       );
 
-      console.error(
-        error
-      );
+
+      if (
+        error.code ===
+        "EADDRINUSE"
+      ) {
+
+        console.error(
+          `Port ${PORT} is already in use.`
+        );
+
+        console.error(
+          "Stop the process using this port or use another PORT in your .env file."
+        );
+
+      } else if (
+        error.code ===
+        "EACCES"
+      ) {
+
+        console.error(
+          `Permission denied while trying to use port ${PORT}.`
+        );
+
+      } else {
+
+        console.error(
+          error
+        );
+
+      }
+
 
       console.error(
         "============================================================"
@@ -153,6 +98,7 @@ function start() {
       console.error("");
 
       process.exit(1);
+
     }
   );
 
@@ -161,12 +107,41 @@ function start() {
   // GRACEFUL SHUTDOWN
   // ==========================================================
 
-  function shutdown(signal) {
+  let shuttingDown =
+    false;
+
+
+  function shutdown(
+    signal
+  ) {
+
+    if (
+      shuttingDown
+    ) {
+      return;
+    }
+
+
+    shuttingDown =
+      true;
+
 
     console.log("");
 
     console.log(
-      `${signal} received. Shutting down Continental Founders API...`
+      "============================================================"
+    );
+
+    console.log(
+      ` ${signal} RECEIVED`
+    );
+
+    console.log(
+      "============================================================"
+    );
+
+    console.log(
+      "Shutting down Continental Founders API..."
     );
 
 
@@ -174,17 +149,44 @@ function start() {
       () => {
 
         console.log(
-          "Server stopped successfully."
+          "HTTP server closed successfully."
         );
 
+        console.log(
+          "Continental Founders API stopped successfully."
+        );
+
+        console.log(
+          "============================================================"
+        );
+
+        console.log("");
+
         process.exit(0);
+
       }
     );
+
+
+    // Force shutdown if open connections
+    // prevent the server from closing.
+    setTimeout(
+      () => {
+
+        console.error(
+          "Forced shutdown after timeout."
+        );
+
+        process.exit(1);
+
+      },
+      10000
+    ).unref();
 
   }
 
 
-  process.on(
+  process.once(
     "SIGINT",
     () =>
       shutdown(
@@ -193,7 +195,7 @@ function start() {
   );
 
 
-  process.on(
+  process.once(
     "SIGTERM",
     () =>
       shutdown(
@@ -201,7 +203,248 @@ function start() {
       )
   );
 
+
+  return server;
+
 }
+
+
+// ============================================================
+// STARTUP MESSAGE
+// ============================================================
+
+function printStartupMessage() {
+
+  const localBaseUrl =
+    `http://localhost:${PORT}`;
+
+
+  console.log("");
+
+  console.log(
+    "============================================================"
+  );
+
+  console.log(
+    " CONTINENTAL FOUNDERS API"
+  );
+
+  console.log(
+    "============================================================"
+  );
+
+  console.log("");
+
+
+  // ==========================================================
+  // SERVER
+  // ==========================================================
+
+  console.log(
+    "SERVER"
+  );
+
+  console.log(
+    "------------------------------------------------------------"
+  );
+
+  console.log(
+    `API Server:          ${localBaseUrl}`
+  );
+
+  console.log(
+    `Health Check:        ${localBaseUrl}/api/health`
+  );
+
+  console.log(
+    `API Root:            ${localBaseUrl}/api`
+  );
+
+  console.log("");
+
+
+  // ==========================================================
+  // PUBLIC APIs
+  // ==========================================================
+
+  console.log(
+    "PUBLIC APIs"
+  );
+
+  console.log(
+    "------------------------------------------------------------"
+  );
+
+  console.log(
+    `Events:              ${localBaseUrl}/api/events`
+  );
+
+  console.log(
+    `Insights:            ${localBaseUrl}/api/insights`
+  );
+
+  console.log(
+    `Universities:        ${localBaseUrl}/api/universities`
+  );
+
+  console.log(
+    `Partnerships:        ${localBaseUrl}/api/partnerships`
+  );
+
+  console.log(
+    `Contact:             ${localBaseUrl}/api/contact`
+  );
+
+  console.log(
+    `Newsletter:          ${localBaseUrl}/api/newsletter`
+  );
+
+  console.log(
+    `Newsletter Subscribe:${localBaseUrl}/api/newsletter/subscribe`
+  );
+
+  console.log("");
+
+
+  // ==========================================================
+  // AUTH / ADMIN
+  // ==========================================================
+
+  console.log(
+    "AUTH / ADMIN"
+  );
+
+  console.log(
+    "------------------------------------------------------------"
+  );
+
+  console.log(
+    `Authentication:      ${localBaseUrl}/api/auth`
+  );
+
+  console.log(
+    `Dashboard:           ${localBaseUrl}/api/admin/dashboard`
+  );
+
+  console.log("");
+
+
+  // ==========================================================
+  // SYSTEM
+  // ==========================================================
+
+  console.log(
+    "SYSTEM"
+  );
+
+  console.log(
+    "------------------------------------------------------------"
+  );
+
+  console.log(
+    "Database:            Supabase"
+  );
+
+  console.log(
+    `Environment:         ${NODE_ENV}`
+  );
+
+  console.log(
+    `Port:                ${PORT}`
+  );
+
+  console.log(
+    `Host:                ${HOST}`
+  );
+
+  console.log("");
+
+
+  console.log(
+    "============================================================"
+  );
+
+  console.log(
+    " Server started successfully"
+  );
+
+  console.log(
+    "============================================================"
+  );
+
+  console.log("");
+
+}
+
+
+// ============================================================
+// PROCESS ERROR HANDLING
+// ============================================================
+
+process.on(
+  "uncaughtException",
+  (error) => {
+
+    console.error("");
+    console.error(
+      "============================================================"
+    );
+
+    console.error(
+      " UNCAUGHT EXCEPTION"
+    );
+
+    console.error(
+      "============================================================"
+    );
+
+    console.error(
+      error
+    );
+
+    console.error(
+      "============================================================"
+    );
+
+    console.error("");
+
+    process.exit(1);
+
+  }
+);
+
+
+process.on(
+  "unhandledRejection",
+  (reason) => {
+
+    console.error("");
+    console.error(
+      "============================================================"
+    );
+
+    console.error(
+      " UNHANDLED PROMISE REJECTION"
+    );
+
+    console.error(
+      "============================================================"
+    );
+
+    console.error(
+      reason
+    );
+
+    console.error(
+      "============================================================"
+    );
+
+    console.error("");
+
+    process.exit(1);
+
+  }
+);
 
 
 // ============================================================
@@ -210,14 +453,32 @@ function start() {
 
 try {
 
-  start();
+  startServer();
 
 } catch (error) {
 
+  console.error("");
   console.error(
-    "Failed to start Continental Founders API:",
+    "============================================================"
+  );
+
+  console.error(
+    " FAILED TO START CONTINENTAL FOUNDERS API"
+  );
+
+  console.error(
+    "============================================================"
+  );
+
+  console.error(
     error
   );
+
+  console.error(
+    "============================================================"
+  );
+
+  console.error("");
 
   process.exit(1);
 

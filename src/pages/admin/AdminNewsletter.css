@@ -1,0 +1,579 @@
+/* ============================================================
+   ADMIN NEWSLETTER
+============================================================ */
+
+.admin-newsletter {
+  width: 100%;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.admin-newsletter__header {
+  margin-bottom: 28px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+
+.admin-newsletter__eyebrow {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #b18e4d;
+
+  font-size: 0.66rem;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+}
+
+
+.admin-newsletter__header h2 {
+  margin: 0 0 9px;
+
+  color: #091d32;
+
+  font-size:
+    clamp(
+      1.7rem,
+      3vw,
+      2.4rem
+    );
+
+  line-height: 1.12;
+}
+
+
+.admin-newsletter__header p {
+  margin: 0;
+
+  max-width: 650px;
+
+  color: #6b7580;
+
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   HEADER ACTIONS
+============================================================ */
+
+.admin-newsletter__header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+
+.admin-newsletter__button {
+  min-height: 43px;
+
+  padding:
+    0 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border-radius: 8px;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    all 0.2s ease;
+}
+
+
+.admin-newsletter__button--primary {
+  border:
+    1px solid #0a2036;
+
+  background:
+    #0a2036;
+
+  color:
+    #ffffff;
+}
+
+
+.admin-newsletter__button--primary:hover {
+  background:
+    #102d49;
+}
+
+
+.admin-newsletter__button--secondary {
+  border:
+    1px solid #dce2e7;
+
+  background:
+    #ffffff;
+
+  color:
+    #16263a;
+}
+
+
+.admin-newsletter__button--secondary:hover {
+  border-color:
+    #c6aa6a;
+}
+
+
+.admin-newsletter__button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.5;
+}
+
+
+/* ============================================================
+   STATS
+============================================================ */
+
+.admin-newsletter__stats {
+  margin-bottom: 22px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 16px;
+}
+
+
+.admin-newsletter__stat {
+  padding: 21px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  border:
+    1px solid #e0e5ea;
+
+  border-radius: 12px;
+
+  background:
+    #ffffff;
+}
+
+
+.admin-newsletter__stat-icon {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  background:
+    #0a2036;
+
+  color:
+    #d2b56f;
+}
+
+
+.admin-newsletter__stat div:last-child {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.admin-newsletter__stat span {
+  color:
+    #707b86;
+
+  font-size: 0.72rem;
+}
+
+
+.admin-newsletter__stat strong {
+  margin-top: 4px;
+
+  color:
+    #0a2036;
+
+  font-size: 1.45rem;
+}
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.admin-newsletter__toolbar {
+  margin-bottom: 16px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+
+.admin-newsletter__search {
+  min-height: 44px;
+
+  width:
+    min(
+      440px,
+      100%
+    );
+
+  padding:
+    0 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border:
+    1px solid #dfe4e9;
+
+  border-radius: 9px;
+
+  background:
+    #ffffff;
+
+  color:
+    #87909a;
+}
+
+
+.admin-newsletter__search input {
+  width: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background:
+    transparent;
+
+  color:
+    #15263a;
+
+  font: inherit;
+
+  font-size: 0.8rem;
+}
+
+
+.admin-newsletter__toolbar select {
+  min-width: 180px;
+
+  min-height: 44px;
+
+  padding:
+    0 13px;
+
+  border:
+    1px solid #dfe4e9;
+
+  border-radius: 9px;
+
+  outline: 0;
+
+  background:
+    #ffffff;
+
+  color:
+    #18283a;
+
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   TABLE CARD
+============================================================ */
+
+.admin-newsletter__table-card {
+  overflow: hidden;
+
+  border:
+    1px solid #e0e5ea;
+
+  border-radius: 12px;
+
+  background:
+    #ffffff;
+}
+
+
+.admin-newsletter__table-wrap {
+  width: 100%;
+
+  overflow-x: auto;
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.admin-newsletter__table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 760px;
+}
+
+
+.admin-newsletter__table th {
+  padding:
+    15px 18px;
+
+  text-align: left;
+
+  background:
+    #f5f7f9;
+
+  border-bottom:
+    1px solid #e0e5ea;
+
+  color:
+    #687481;
+
+  font-size: 0.67rem;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+
+.admin-newsletter__table td {
+  padding:
+    17px 18px;
+
+  border-bottom:
+    1px solid #edf0f3;
+
+  color:
+    #465261;
+
+  font-size: 0.79rem;
+}
+
+
+.admin-newsletter__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+.admin-newsletter__table tbody tr:hover {
+  background:
+    #fbfbfa;
+}
+
+
+/* ============================================================
+   SUBSCRIBER
+============================================================ */
+
+.admin-newsletter__subscriber {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  color:
+    #14263a;
+
+  font-weight: 600;
+}
+
+
+.admin-newsletter__subscriber-icon {
+  width: 35px;
+  height: 35px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 8px;
+
+  background:
+    #f0eadc;
+
+  color:
+    #a98543;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.admin-newsletter__status {
+  display: inline-flex;
+
+  padding:
+    6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  text-transform: capitalize;
+}
+
+
+.admin-newsletter__status--subscribed {
+  background:
+    #edf6f0;
+
+  color:
+    #39714f;
+}
+
+
+.admin-newsletter__status--unsubscribed {
+  background:
+    #f8eeee;
+
+  color:
+    #9a5151;
+}
+
+
+/* ============================================================
+   STATES
+============================================================ */
+
+.admin-newsletter__state {
+  min-height: 320px;
+
+  padding: 30px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color:
+    #6d7883;
+}
+
+
+.admin-newsletter__state svg {
+  margin-bottom: 14px;
+
+  color:
+    #b18e4d;
+}
+
+
+.admin-newsletter__state h3 {
+  margin:
+    0 0 8px;
+
+  color:
+    #0b2137;
+
+  font-size: 1.05rem;
+}
+
+
+.admin-newsletter__state p {
+  margin:
+    0 0 18px;
+
+  max-width: 420px;
+
+  line-height: 1.65;
+
+  font-size: 0.8rem;
+}
+
+
+.admin-newsletter__loading-icon {
+  animation:
+    adminNewsletterSpin
+    1s linear infinite;
+}
+
+
+@keyframes adminNewsletterSpin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (
+  max-width: 850px
+) {
+
+  .admin-newsletter__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+
+  .admin-newsletter__header-actions {
+    width: 100%;
+  }
+
+
+  .admin-newsletter__button {
+    flex: 1;
+  }
+
+
+  .admin-newsletter__stats {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (
+  max-width: 620px
+) {
+
+  .admin-newsletter__toolbar {
+    flex-direction: column;
+  }
+
+
+  .admin-newsletter__search,
+  .admin-newsletter__toolbar select {
+    width: 100%;
+    max-width: none;
+  }
+
+}

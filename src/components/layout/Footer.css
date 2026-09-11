@@ -1562,7 +1562,32 @@
     font-size: 15px;
   }
 }
+/* ============================================================
+   NEWSLETTER FEEDBACK
+============================================================ */
 
+.cf-footer__newsletter-success,
+.cf-footer__newsletter-error {
+  width: 100%;
+  margin: 12px 0 0;
+
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.cf-footer__newsletter-success {
+  color: #d8c185;
+}
+
+.cf-footer__newsletter-error {
+  color: #ffb5b5;
+}
+
+.cf-footer__newsletter-form button:disabled,
+.cf-footer__newsletter-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
 
 /* ============================================================
    REDUCED MOTION

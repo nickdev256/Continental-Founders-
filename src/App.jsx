@@ -1,15 +1,29 @@
-import React, { useEffect } from "react";
+import React, {
+  useEffect,
+} from "react";
+
 import {
   Route,
   Routes,
   useLocation,
 } from "react-router-dom";
 
+
+// ============================================================
+// PUBLIC LAYOUT
+// ============================================================
+
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import PageTransition from "./components/layout/PageTransition";
 
+
+// ============================================================
+// PUBLIC PAGES
+// ============================================================
+
 import Home from "./pages/Home";
+
 import About from "./pages/About";
 
 import Ventures from "./pages/Ventures";
@@ -19,59 +33,170 @@ import OurModel from "./pages/OurModel";
 
 import StrategicPartners from "./pages/StrategicPartners";
 
-/* ============================================================
-   PARTNER SUBPAGES
-============================================================ */
+
+// ============================================================
+// PARTNER SUBPAGES
+// ============================================================
 
 import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
+
 import Universities from "./pages/Universities";
+
 import CorporatePartners from "./pages/CorporatePartners";
+
 import GovernmentDevelopment from "./pages/GovernmentDevelopment";
 
+
+// ============================================================
+// OTHER PUBLIC PAGES
+// ============================================================
+
 import Programs from "./pages/Programs";
+
 import Impact from "./pages/Impact";
 
 import Events from "./pages/Events";
 
 import Insights from "./pages/Insights";
+
 import InsightDetails from "./pages/InsightDetails";
 
 import Contact from "./pages/Contact";
+
 import NotFound from "./pages/NotFound";
 
 
-/* ============================================================
-   SCROLL TO TOP ON ROUTE CHANGE
-============================================================ */
+// ============================================================
+// ADMIN AUTH PAGES
+// ============================================================
+
+import AdminLogin from "./pages/admin/AdminLogin";
+
+import AdminRegister from "./pages/admin/AdminRegister";
+
+import AdminOtp from "./pages/admin/AdminOtp";
+
+
+// ============================================================
+// ADMIN / CMS PAGES
+// ============================================================
+
+import AdminLayout from "./pages/admin/AdminLayout";
+
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
+import AdminEvents from "./pages/admin/AdminEvents";
+
+import AdminInsights from "./pages/admin/AdminInsights";
+
+import AdminUniversities from "./pages/admin/AdminUniversities";
+
+import AdminNewsletter from "./pages/admin/AdminNewsletter";
+
+import AdminContacts from "./pages/admin/AdminContacts";
+
+import AdminAbout from "./pages/admin/AdminAbout";
+
+import AdminLeadership from "./pages/admin/AdminLeadership";
+
+
+// ============================================================
+// ADMIN PROTECTION
+// ============================================================
+
+import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
+
+
+// ============================================================
+// SCROLL TO TOP ON ROUTE CHANGE
+// ============================================================
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
 
-  useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant",
-    });
-  }, [pathname]);
+  const {
+    pathname,
+  } =
+    useLocation();
+
+
+  useEffect(
+    () => {
+
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant",
+      });
+
+    },
+    [
+      pathname,
+    ]
+  );
+
 
   return null;
+
 }
 
 
-/* ============================================================
-   APP
-============================================================ */
+// ============================================================
+// APP
+// ============================================================
 
 export default function App() {
+
+  const {
+    pathname,
+  } =
+    useLocation();
+
+
+  // ==========================================================
+  // ADMIN ROUTE CHECK
+  // ==========================================================
+
+  const isAdminRoute =
+    pathname === "/admin" ||
+    pathname.startsWith(
+      "/admin/"
+    );
+
+
   return (
-    <div className="site-shell">
+
+    <div
+      className={
+        isAdminRoute
+          ? "site-shell site-shell--admin"
+          : "site-shell"
+      }
+    >
 
       <ScrollToTop />
 
-      <Navbar />
 
-      <main id="main-content">
+      {/* ======================================================
+          PUBLIC NAVBAR
+      ====================================================== */}
+
+      {!isAdminRoute && (
+        <Navbar />
+      )}
+
+
+      {/* ======================================================
+          ROUTES
+      ====================================================== */}
+
+      <main
+        id="main-content"
+        className={
+          isAdminRoute
+            ? "main-content main-content--admin"
+            : "main-content"
+        }
+      >
 
         <PageTransition>
 
@@ -83,7 +208,9 @@ export default function App() {
 
             <Route
               path="/"
-              element={<Home />}
+              element={
+                <Home />
+              }
             />
 
 
@@ -93,7 +220,9 @@ export default function App() {
 
             <Route
               path="/about"
-              element={<About />}
+              element={
+                <About />
+              }
             />
 
 
@@ -103,12 +232,17 @@ export default function App() {
 
             <Route
               path="/ventures"
-              element={<Ventures />}
+              element={
+                <Ventures />
+              }
             />
+
 
             <Route
               path="/ventures/:slug"
-              element={<VentureDetails />}
+              element={
+                <VentureDetails />
+              }
             />
 
 
@@ -118,7 +252,9 @@ export default function App() {
 
             <Route
               path="/our-model"
-              element={<OurModel />}
+              element={
+                <OurModel />
+              }
             />
 
 
@@ -128,42 +264,65 @@ export default function App() {
 
             <Route
               path="/strategic-partners"
-              element={<StrategicPartners />}
+              element={
+                <StrategicPartners />
+              }
             />
+
 
             <Route
               path="/partners/us-africa-trade-network"
-              element={<USAfricaTradeNetwork />}
+              element={
+                <USAfricaTradeNetwork />
+              }
             />
+
 
             <Route
               path="/partners/universities"
-              element={<Universities />}
+              element={
+                <Universities />
+              }
             />
+
 
             <Route
               path="/partners/corporate"
-              element={<CorporatePartners />}
+              element={
+                <CorporatePartners />
+              }
             />
+
 
             <Route
               path="/partners/government-development"
-              element={<GovernmentDevelopment />}
+              element={
+                <GovernmentDevelopment />
+              }
             />
 
 
             {/* ==================================================
-                PROGRAMS / IMPACT
+                PROGRAMS
             ================================================== */}
 
             <Route
               path="/programs"
-              element={<Programs />}
+              element={
+                <Programs />
+              }
             />
+
+
+            {/* ==================================================
+                IMPACT
+            ================================================== */}
 
             <Route
               path="/impact"
-              element={<Impact />}
+              element={
+                <Impact />
+              }
             />
 
 
@@ -173,7 +332,9 @@ export default function App() {
 
             <Route
               path="/events"
-              element={<Events />}
+              element={
+                <Events />
+              }
             />
 
 
@@ -183,12 +344,17 @@ export default function App() {
 
             <Route
               path="/insights"
-              element={<Insights />}
+              element={
+                <Insights />
+              }
             />
+
 
             <Route
               path="/insights/:slug"
-              element={<InsightDetails />}
+              element={
+                <InsightDetails />
+              }
             />
 
 
@@ -198,8 +364,131 @@ export default function App() {
 
             <Route
               path="/contact"
-              element={<Contact />}
+              element={
+                <Contact />
+              }
             />
+
+
+            {/* ==================================================
+                ADMIN REGISTER
+            ================================================== */}
+
+            <Route
+              path="/admin/register"
+              element={
+                <AdminRegister />
+              }
+            />
+
+
+            {/* ==================================================
+                ADMIN LOGIN
+            ================================================== */}
+
+            <Route
+              path="/admin/login"
+              element={
+                <AdminLogin />
+              }
+            />
+
+
+            {/* ==================================================
+                ADMIN OTP
+            ================================================== */}
+
+            <Route
+              path="/admin/verify-otp"
+              element={
+                <AdminOtp />
+              }
+            />
+
+
+            {/* ==================================================
+                PROTECTED ADMIN ROUTES
+            ================================================== */}
+
+            <Route
+              element={
+                <ProtectedAdminRoute />
+              }
+            >
+
+              <Route
+                path="/admin"
+                element={
+                  <AdminLayout />
+                }
+              >
+
+                <Route
+                  index
+                  element={
+                    <AdminDashboard />
+                  }
+                />
+
+
+                <Route
+                  path="events"
+                  element={
+                    <AdminEvents />
+                  }
+                />
+
+
+                <Route
+                  path="insights"
+                  element={
+                    <AdminInsights />
+                  }
+                />
+
+
+                <Route
+                  path="universities"
+                  element={
+                    <AdminUniversities />
+                  }
+                />
+
+
+                <Route
+                  path="newsletter"
+                  element={
+                    <AdminNewsletter />
+                  }
+                />
+
+
+                <Route
+                  path="contacts"
+                  element={
+                    <AdminContacts />
+                  }
+                />
+
+
+                <Route
+                  path="about"
+                  element={
+                    <AdminAbout />
+                  }
+                />
+
+
+                <Route
+                  path="leadership"
+                  element={
+                    <AdminLeadership />
+                  }
+                />
+
+              </Route>
+
+            </Route>
 
 
             {/* ==================================================
@@ -208,7 +497,9 @@ export default function App() {
 
             <Route
               path="*"
-              element={<NotFound />}
+              element={
+                <NotFound />
+              }
             />
 
           </Routes>
@@ -217,8 +508,17 @@ export default function App() {
 
       </main>
 
-      <Footer />
+
+      {/* ======================================================
+          PUBLIC FOOTER
+      ====================================================== */}
+
+      {!isAdminRoute && (
+        <Footer />
+      )}
 
     </div>
+
   );
+
 }

@@ -1,202 +1,368 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import SectionHeading from "../components/ui/SectionHeading";
 import InsightCard from "../components/sections/InsightCard";
 
 import "./Insights.css";
 
+
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   PUBLIC INSIGHTS PAGE
+============================================================ */
+
 export default function Insights() {
-  const [insights, setInsights] = useState([]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("All");
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
-  /* ============================================================
+  const [
+    insights,
+    setInsights,
+  ] =
+    useState([]);
+
+
+  const [
+    query,
+    setQuery,
+  ] =
+    useState("");
+
+
+  const [
+    category,
+    setCategory,
+  ] =
+    useState("All");
+
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+
+  const [
+    error,
+    setError,
+  ] =
+    useState("");
+
+
+  /* ==========================================================
      BACKEND URL
-  ============================================================ */
+  ========================================================== */
 
   const API_BASE_URL =
     import.meta.env.VITE_API_URL ||
     "http://localhost:5000";
 
-  /* ============================================================
-     LOAD INSIGHTS FROM BACKEND
-  ============================================================ */
 
-  useEffect(() => {
-    let active = true;
+  /* ==========================================================
+     LOAD PUBLISHED INSIGHTS
+  ========================================================== */
 
-    async function loadInsights() {
-      try {
-        setLoading(true);
-        setError("");
+  useEffect(
+    () => {
 
-        const response = await fetch(
-          `${API_BASE_URL}/api/insights`,
-          {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-            },
-          }
-        );
+      let active =
+        true;
 
-        const contentType =
-          response.headers.get("content-type") || "";
 
-        if (!response.ok) {
-          throw new Error(
-            `Unable to load insights. Status: ${response.status}`
+      async function loadInsights() {
+
+        try {
+
+          setLoading(
+            true
           );
-        }
 
-        if (
-          !contentType.includes("application/json")
+
+          setError("");
+
+
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/insights/published`,
+              {
+                method:
+                  "GET",
+
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+
+          const contentType =
+            response.headers.get(
+              "content-type"
+            ) || "";
+
+
+          if (
+            !response.ok
+          ) {
+
+            throw new Error(
+              `Unable to load insights. Status: ${response.status}`
+            );
+
+          }
+
+
+          if (
+            !contentType.includes(
+              "application/json"
+            )
+          ) {
+
+            const responseText =
+              await response.text();
+
+
+            console.error(
+              "Expected JSON but received:",
+              responseText.slice(
+                0,
+                200
+              )
+            );
+
+
+            throw new Error(
+              "The server returned an invalid response."
+            );
+
+          }
+
+
+          const data =
+            await response.json();
+
+
+          if (
+            !active
+          ) {
+
+            return;
+
+          }
+
+
+          const items =
+            Array.isArray(
+              data
+            )
+              ? data
+              : Array.isArray(
+                  data.insights
+                )
+                ? data.insights
+                : [];
+
+
+          /*
+            Extra protection:
+            public page should display
+            published content only.
+          */
+
+          const publishedItems =
+            items.filter(
+              (
+                item
+              ) =>
+                String(
+                  item.status ||
+                  "published"
+                )
+                  .trim()
+                  .toLowerCase() ===
+                "published"
+            );
+
+
+          setInsights(
+            publishedItems
+          );
+
+        } catch (
+          err
         ) {
-          const responseText =
-            await response.text();
+
+          if (
+            !active
+          ) {
+
+            return;
+
+          }
+
 
           console.error(
-            "Expected JSON but received:",
-            responseText.slice(0, 200)
+            "Insights loading error:",
+            err
           );
 
-          throw new Error(
-            "The server returned an invalid response."
+
+          setError(
+            "We could not load insights at the moment. Please try again shortly."
           );
-        }
 
-        const data =
-          await response.json();
+        } finally {
 
-        if (!active) return;
+          if (
+            active
+          ) {
 
-        /*
-          Supports:
+            setLoading(
+              false
+            );
 
-          [
-            {...},
-            {...}
-          ]
-
-          OR
-
-          {
-            success: true,
-            insights: [...]
           }
-        */
 
-        const items =
-          Array.isArray(data)
-            ? data
-            : Array.isArray(data.insights)
-            ? data.insights
-            : [];
-
-        setInsights(items);
-
-      } catch (err) {
-        if (!active) return;
-
-        console.error(
-          "Insights loading error:",
-          err
-        );
-
-        setError(
-          "We could not load insights at the moment. Please try again shortly."
-        );
-
-      } finally {
-        if (active) {
-          setLoading(false);
         }
+
       }
-    }
 
-    loadInsights();
 
-    return () => {
-      active = false;
-    };
-  }, [API_BASE_URL]);
+      loadInsights();
 
-  /* ============================================================
+
+      return () => {
+
+        active =
+          false;
+
+      };
+
+    },
+    [
+      API_BASE_URL,
+    ]
+  );
+
+
+  /* ==========================================================
      CATEGORIES
-  ============================================================ */
+  ========================================================== */
 
   const categories =
-    useMemo(() => {
-      const uniqueCategories =
-        insights
-          .map(
-            (item) =>
-              item.category
-          )
-          .filter(Boolean);
+    useMemo(
+      () => {
 
-      return [
-        "All",
-        ...new Set(
-          uniqueCategories
-        ),
-      ];
-    }, [insights]);
+        const uniqueCategories =
+          insights
+            .map(
+              (
+                item
+              ) =>
+                item.category
+            )
+            .filter(
+              Boolean
+            );
 
-  /* ============================================================
+
+        return [
+          "All",
+          ...new Set(
+            uniqueCategories
+          ),
+        ];
+
+      },
+      [
+        insights,
+      ]
+    );
+
+
+  /* ==========================================================
      SEARCH + FILTER
-  ============================================================ */
+  ========================================================== */
 
   const filtered =
-    useMemo(() => {
-      const q =
-        query
-          .trim()
-          .toLowerCase();
+    useMemo(
+      () => {
 
-      return insights.filter(
-        (item) => {
+        const q =
+          query
+            .trim()
+            .toLowerCase();
 
-          const categoryMatch =
-            category === "All" ||
-            item.category === category;
 
-          const searchableText = `
-            ${item.title || ""}
-            ${item.excerpt || ""}
-            ${item.category || ""}
-            ${item.author || ""}
-          `.toLowerCase();
+        return insights.filter(
+          (
+            item
+          ) => {
 
-          const queryMatch =
-            !q ||
-            searchableText.includes(q);
+            const categoryMatch =
+              category ===
+                "All" ||
+              item.category ===
+                category;
 
-          return (
-            categoryMatch &&
-            queryMatch
-          );
-        }
-      );
 
-    }, [
-      insights,
-      query,
-      category,
-    ]);
+            const searchableText = [
+              item.title,
+              item.excerpt,
+              item.category,
+              item.author,
+              item.author_name,
+            ]
+              .filter(
+                Boolean
+              )
+              .join(" ")
+              .toLowerCase();
 
-  /* ============================================================
+
+            const queryMatch =
+              !q ||
+              searchableText.includes(
+                q
+              );
+
+
+            return (
+              categoryMatch &&
+              queryMatch
+            );
+
+          }
+        );
+
+      },
+      [
+        insights,
+        query,
+        category,
+      ]
+    );
+
+
+  /* ==========================================================
      RENDER
-  ============================================================ */
+  ========================================================== */
 
   return (
+
     <>
-      {/* ========================================================
+
+      {/* ======================================================
           HERO
-      ======================================================== */}
+      ====================================================== */}
 
       <section className="page-hero">
 
@@ -207,6 +373,7 @@ export default function Insights() {
             <span className="eyebrow eyebrow--light">
               Insights
             </span>
+
 
             <h1>
               Ideas for a more connected world.
@@ -232,17 +399,17 @@ export default function Insights() {
       </section>
 
 
-      {/* ========================================================
+      {/* ======================================================
           INSIGHTS
-      ======================================================== */}
+      ====================================================== */}
 
       <section className="section insights-page">
 
         <div className="container">
 
-          {/* ====================================================
+          {/* ==================================================
               SEARCH + FILTERS
-          ==================================================== */}
+          ================================================== */}
 
           <div className="insights-controls">
 
@@ -252,14 +419,18 @@ export default function Insights() {
                 Search insights
               </span>
 
+
               <input
                 type="search"
-                value={query}
-                onChange={
-                  (e) =>
-                    setQuery(
-                      e.target.value
-                    )
+                value={
+                  query
+                }
+                onChange={(
+                  event
+                ) =>
+                  setQuery(
+                    event.target.value
+                  )
                 }
                 placeholder="Search insights"
                 aria-label="Search insights"
@@ -271,21 +442,30 @@ export default function Insights() {
             <div className="insights-filters">
 
               {categories.map(
-                (item) => (
+                (
+                  item
+                ) => (
 
                   <button
-                    key={item}
+                    key={
+                      item
+                    }
                     type="button"
                     className={
-                      category === item
+                      category ===
+                      item
                         ? "is-active"
                         : ""
                     }
                     onClick={() =>
-                      setCategory(item)
+                      setCategory(
+                        item
+                      )
                     }
                   >
+
                     {item}
+
                   </button>
 
                 )
@@ -296,41 +476,47 @@ export default function Insights() {
           </div>
 
 
-          {/* ====================================================
+          {/* ==================================================
               LOADING
-          ==================================================== */}
+          ================================================== */}
 
           {loading && (
 
             <div className="insights-status">
+
               Loading insights...
+
             </div>
 
           )}
 
 
-          {/* ====================================================
+          {/* ==================================================
               ERROR
-          ==================================================== */}
+          ================================================== */}
 
-          {!loading && error && (
+          {!loading &&
+            error && (
 
-            <div
-              className="insights-error"
-              role="alert"
-            >
-              {error}
-            </div>
+              <div
+                className="insights-error"
+                role="alert"
+              >
 
-          )}
+                {error}
+
+              </div>
+
+            )}
 
 
-          {/* ====================================================
+          {/* ==================================================
               CONTENT
-          ==================================================== */}
+          ================================================== */}
 
           {!loading &&
             !error && (
+
               <>
 
                 <SectionHeading
@@ -344,42 +530,54 @@ export default function Insights() {
                 />
 
 
-                <div className="insights-grid">
+                {filtered.length >
+                0 ? (
 
-                  {filtered.map(
-                    (insight) => (
+                  <div className="insights-grid">
 
-                      <InsightCard
-                        key={
-                          insight.id ||
-                          insight.slug
-                        }
-                        insight={
-                          insight
-                        }
-                      />
+                    {filtered.map(
+                      (
+                        insight
+                      ) => (
 
-                    )
-                  )}
+                        <InsightCard
+                          key={
+                            insight.id ||
+                            insight.slug
+                          }
+                          insight={
+                            insight
+                          }
+                        />
 
-                </div>
+                      )
+                    )}
 
+                  </div>
 
-                {!filtered.length && (
+                ) : (
 
                   <div className="insights-empty">
-                    No insights match your search.
-                    Try another keyword or category.
+
+                    {insights.length ===
+                    0
+                      ? "No published insights are available yet."
+                      : "No insights match your search. Try another keyword or category."}
+
                   </div>
 
                 )}
 
               </>
+
             )}
 
         </div>
 
       </section>
+
     </>
+
   );
+
 }

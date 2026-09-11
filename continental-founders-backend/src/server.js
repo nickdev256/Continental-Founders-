@@ -8,12 +8,15 @@ const app = require("./app");
 // ============================================================
 
 const PORT =
-  Number(process.env.PORT) ||
-  5000;
+  Number(
+    process.env.PORT
+  ) || 5000;
+
 
 const HOST =
   process.env.HOST ||
   "0.0.0.0";
+
 
 const NODE_ENV =
   process.env.NODE_ENV ||
@@ -47,6 +50,7 @@ function startServer() {
     (error) => {
 
       console.error("");
+
       console.error(
         "============================================================"
       );
@@ -118,7 +122,9 @@ function startServer() {
     if (
       shuttingDown
     ) {
+
       return;
+
     }
 
 
@@ -168,8 +174,6 @@ function startServer() {
     );
 
 
-    // Force shutdown if open connections
-    // prevent the server from closing.
     setTimeout(
       () => {
 
@@ -249,15 +253,15 @@ function printStartupMessage() {
   );
 
   console.log(
-    `API Server:          ${localBaseUrl}`
+    `API Server:            ${localBaseUrl}`
   );
 
   console.log(
-    `Health Check:        ${localBaseUrl}/api/health`
+    `Health Check:          ${localBaseUrl}/api/health`
   );
 
   console.log(
-    `API Root:            ${localBaseUrl}/api`
+    `API Root:              ${localBaseUrl}/api`
   );
 
   console.log("");
@@ -276,42 +280,46 @@ function printStartupMessage() {
   );
 
   console.log(
-    `Events:              ${localBaseUrl}/api/events`
+    `Published Events:      ${localBaseUrl}/api/events/published`
   );
 
   console.log(
-    `Insights:            ${localBaseUrl}/api/insights`
+    `Published Insights:    ${localBaseUrl}/api/insights/published`
   );
 
   console.log(
-    `Universities:        ${localBaseUrl}/api/universities`
+    `Insight Details:       ${localBaseUrl}/api/insights/:slug`
   );
 
   console.log(
-    `Partnerships:        ${localBaseUrl}/api/partnerships`
+    `Universities:          ${localBaseUrl}/api/universities`
   );
 
   console.log(
-    `Contact:             ${localBaseUrl}/api/contact`
+    `Partnerships:          ${localBaseUrl}/api/partnerships`
   );
 
   console.log(
-    `Newsletter:          ${localBaseUrl}/api/newsletter`
+    `Contact:               ${localBaseUrl}/api/contact`
   );
 
   console.log(
-    `Newsletter Subscribe:${localBaseUrl}/api/newsletter/subscribe`
+    `Newsletter:            ${localBaseUrl}/api/newsletter`
+  );
+
+  console.log(
+    `Newsletter Subscribe:  ${localBaseUrl}/api/newsletter/subscribe`
   );
 
   console.log("");
 
 
   // ==========================================================
-  // AUTH / ADMIN
+  // ADMIN CMS APIs
   // ==========================================================
 
   console.log(
-    "AUTH / ADMIN"
+    "ADMIN CMS APIs"
   );
 
   console.log(
@@ -319,11 +327,54 @@ function printStartupMessage() {
   );
 
   console.log(
-    `Authentication:      ${localBaseUrl}/api/auth`
+    `Events CMS:            ${localBaseUrl}/api/events`
   );
 
   console.log(
-    `Dashboard:           ${localBaseUrl}/api/admin/dashboard`
+    `Insights CMS:          ${localBaseUrl}/api/insights`
+  );
+
+  console.log(
+    `Dashboard:             ${localBaseUrl}/api/admin/dashboard`
+  );
+
+  console.log("");
+
+
+  // ==========================================================
+  // AUTHENTICATION
+  // ==========================================================
+
+  console.log(
+    "AUTHENTICATION"
+  );
+
+  console.log(
+    "------------------------------------------------------------"
+  );
+
+  console.log(
+    `Auth API:              ${localBaseUrl}/api/auth`
+  );
+
+  console.log(
+    `Login:                 ${localBaseUrl}/api/auth/login`
+  );
+
+  console.log(
+    `Register:              ${localBaseUrl}/api/auth/register`
+  );
+
+  console.log(
+    `Verify OTP:            ${localBaseUrl}/api/auth/verify-otp`
+  );
+
+  console.log(
+    `Current Admin:         ${localBaseUrl}/api/auth/me`
+  );
+
+  console.log(
+    `Logout:                ${localBaseUrl}/api/auth/logout`
   );
 
   console.log("");
@@ -342,19 +393,19 @@ function printStartupMessage() {
   );
 
   console.log(
-    "Database:            Supabase"
+    "Database:              Supabase"
   );
 
   console.log(
-    `Environment:         ${NODE_ENV}`
+    `Environment:           ${NODE_ENV}`
   );
 
   console.log(
-    `Port:                ${PORT}`
+    `Port:                  ${PORT}`
   );
 
   console.log(
-    `Host:                ${HOST}`
+    `Host:                  ${HOST}`
   );
 
   console.log("");
@@ -386,6 +437,7 @@ process.on(
   (error) => {
 
     console.error("");
+
     console.error(
       "============================================================"
     );
@@ -419,6 +471,7 @@ process.on(
   (reason) => {
 
     console.error("");
+
     console.error(
       "============================================================"
     );
@@ -455,9 +508,12 @@ try {
 
   startServer();
 
-} catch (error) {
+} catch (
+  error
+) {
 
   console.error("");
+
   console.error(
     "============================================================"
   );

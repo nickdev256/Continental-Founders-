@@ -48,7 +48,8 @@ const {
 // APP
 // ============================================================
 
-const app = express();
+const app =
+  express();
 
 
 // ============================================================
@@ -92,11 +93,19 @@ app.use(
       callback
     ) => {
 
+      /*
+        Allow tools such as Postman,
+        server-to-server requests,
+        and same-origin requests.
+      */
+
       if (!origin) {
+
         return callback(
           null,
           true
         );
+
       }
 
 
@@ -105,10 +114,12 @@ app.use(
           origin
         )
       ) {
+
         return callback(
           null,
           true
         );
+
       }
 
 
@@ -117,9 +128,11 @@ app.use(
           `Origin ${origin} is not allowed by CORS`
         )
       );
+
     },
 
-    credentials: true,
+    credentials:
+      true,
 
     methods: [
       "GET",
@@ -144,15 +157,19 @@ app.use(
 
 app.use(
   express.json({
-    limit: "1mb",
+    limit:
+      "1mb",
   })
 );
 
 
 app.use(
   express.urlencoded({
-    extended: true,
-    limit: "1mb",
+    extended:
+      true,
+
+    limit:
+      "1mb",
   })
 );
 
@@ -175,14 +192,18 @@ const publicFormLimiter =
     windowMs:
       15 * 60 * 1000,
 
-    limit: 30,
+    limit:
+      30,
 
-    standardHeaders: true,
+    standardHeaders:
+      true,
 
-    legacyHeaders: false,
+    legacyHeaders:
+      false,
 
     message: {
-      success: false,
+      success:
+        false,
 
       message:
         "Too many requests. Please try again shortly.",
@@ -195,14 +216,18 @@ const newsletterLimiter =
     windowMs:
       15 * 60 * 1000,
 
-    limit: 20,
+    limit:
+      20,
 
-    standardHeaders: true,
+    standardHeaders:
+      true,
 
-    legacyHeaders: false,
+    legacyHeaders:
+      false,
 
     message: {
-      success: false,
+      success:
+        false,
 
       message:
         "Too many newsletter requests. Please try again shortly.",
@@ -224,7 +249,8 @@ app.get(
     return res
       .status(200)
       .json({
-        success: true,
+        success:
+          true,
 
         message:
           "Continental Founders API is running",
@@ -237,6 +263,7 @@ app.get(
           "Supabase",
 
         services: {
+
           auth:
             "/api/auth",
 
@@ -255,8 +282,14 @@ app.get(
           events:
             "/api/events",
 
+          publishedEvents:
+            "/api/events/published",
+
           insights:
             "/api/insights",
+
+          publishedInsights:
+            "/api/insights/published",
 
           universities:
             "/api/universities",
@@ -265,6 +298,7 @@ app.get(
             "/api/admin/dashboard",
         },
       });
+
   }
 );
 
@@ -366,7 +400,8 @@ app.get(
     return res
       .status(200)
       .json({
-        success: true,
+        success:
+          true,
 
         name:
           "Continental Founders API",
@@ -375,6 +410,7 @@ app.get(
           "online",
 
         endpoints: {
+
           health:
             "/api/health",
 
@@ -393,13 +429,23 @@ app.get(
           events:
             "/api/events",
 
+          publishedEvents:
+            "/api/events/published",
+
           insights:
             "/api/insights",
 
+          publishedInsights:
+            "/api/insights/published",
+
           universities:
             "/api/universities",
+
+          adminDashboard:
+            "/api/admin/dashboard",
         },
       });
+
   }
 );
 
@@ -426,4 +472,5 @@ app.use(
 // EXPORT
 // ============================================================
 
-module.exports = app;
+module.exports =
+  app;

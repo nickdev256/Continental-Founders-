@@ -769,3 +769,32 @@ p {
     font-size: 1.05rem;
   }
 }
+
+
+/* ============================================================
+   GLOBAL PAGE TRANSITION
+============================================================ */
+
+.page-transition {
+  animation: cf-page-enter 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cf-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect users who prefer reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .page-transition {
+    animation: none;
+  }
+}

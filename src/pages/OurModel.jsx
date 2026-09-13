@@ -13,7 +13,7 @@ import "./OurModel.css";
    FOUR LENSES DATA
 ============================================================ */
 
-const lenses = [
+const lenses = [ 
   [
     "Institutional fit",
     "We consider whether the relationship aligns with real priorities, capabilities, and institutional interests.",
@@ -53,12 +53,14 @@ export default function OurModel() {
           HERO
       ========================================================= */}
 
-      <section
-        className="model-hero"
-        style={{
-          backgroundImage: 'url("/assets/hero.png")',
-        }}
-      >
+     <section className="model-hero">
+
+  <div className="model-hero__background" aria-hidden="true">
+    <img
+      // src="/assets/hero.png"
+      alt=""
+    />
+  </div>
         <div
           className="model-hero__overlay"
           aria-hidden="true"
@@ -134,42 +136,70 @@ export default function OurModel() {
 
 
       {/* ========================================================
-          HOW WE THINK
-      ========================================================= */}
+    HOW WE THINK
+======================================================== */}
 
-      <section className="section model-intro">
+<section className="section model-intro">
 
-        <div className="container model-intro__grid">
+  <div className="container model-intro__grid">
 
-          <div className="model-intro__label">
+    {/* LEFT COLUMN */}
+    <div className="model-intro__visual">
 
-            <span className="eyebrow">
-              How we think
-            </span>
+      <div className="model-intro__label">
+        <span className="eyebrow">
+          How we think
+        </span>
+      </div>
+      
 
-          </div>
+      <div className="model-intro__image">
+
+        <img
+          src="/assets/n.png"
+          alt="Students and university leaders building meaningful relationships"
+        />
+
+        <div className="model-intro__image-overlay" />
+
+       
+
+      </div>
+
+    </div>
 
 
-          <div className="model-intro__content">
+    {/* RIGHT COLUMN */}
+    <div className="model-intro__content">
 
-            <h2 className="display">
-              We focus on the architecture behind meaningful
-              relationships.
-            </h2>
+      <span className="model-intro__number">
+        
+      </span>
 
-            <p>
-              Our model gives partners a common language for moving
-              from an initial point of connection to practical
-              collaboration. It is structured enough to create clarity,
-              while flexible enough to respect the context of each
-              institution.
-            </p>
+      <h2 className="display">
+        We focus on the architecture behind meaningful
+        relationships.
+      </h2>
 
-          </div>
+      <p>
+        Our model gives partners a common language for moving
+        from an initial point of connection to practical
+        collaboration. It is structured enough to create clarity,
+        while flexible enough to respect the context of each
+        institution.
+      </p>
 
-        </div>
+      <div className="model-intro__rule" />
 
-      </section>
+      <span className="model-intro__statement">
+        Building relationships that create lasting opportunity.
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
 
 
 
@@ -353,56 +383,76 @@ export default function OurModel() {
 
 
       {/* ========================================================
-          FINAL CTA
-      ========================================================= */}
+    FINAL CTA
+======================================================== */}
 
-      <section className="model-final-cta">
+<section className="model-final-cta">
 
-        <div className="container">
+  <div className="container">
 
-          <div className="model-final-cta__inner">
+    <div className="model-final-cta__inner">
 
-            <span className="eyebrow">
-              Build with us
-            </span>
+      {/* LEFT COLUMN */}
+      <div className="model-final-cta__visual">
 
+        <span className="eyebrow">
+          Build with us
+        </span>
 
-            <div className="model-final-cta__content">
+        <div className="model-final-cta__image">
 
-              <h2>
-                Strong ecosystems are built through
-                meaningful collaboration.
-              </h2>
+          <img
+            src="/assets/c.png"
+            alt="Building meaningful collaboration across communities"
+          />
 
+          <div className="model-final-cta__image-overlay" />
 
-              <p>
-                Whether you represent a university, investor, company,
-                institution, sponsor, or strategic organization,
-                Continental Founders creates pathways to work together
-                around founders, innovation, and shared opportunity.
-              </p>
-
-
-              <Link
-                to="/contact"
-                className="model-final-cta__button"
-              >
-                Start a Conversation
-
-                <ArrowRight
-                  size={18}
-                  aria-hidden="true"
-                />
-              </Link>
-
-            </div>
-
-          </div>
+         
 
         </div>
 
-      </section>
+      </div>
 
+
+      {/* RIGHT COLUMN */}
+      <div className="model-final-cta__content">
+
+        <span className="model-final-cta__number">
+          
+        </span>
+
+        <h2>
+          Strong ecosystems are built through
+          meaningful collaboration.
+        </h2>
+
+        <p>
+          Whether you represent a university, investor, company,
+          institution, sponsor, or strategic organization,
+          Continental Founders creates pathways to work together
+          around founders, innovation, and shared opportunity.
+        </p>
+
+        <Link
+          to="/contact"
+          className="model-final-cta__button"
+        >
+          Start a Conversation
+
+          <ArrowRight
+            size={18}
+            aria-hidden="true"
+          />
+        </Link>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
     </main>
   );
 }

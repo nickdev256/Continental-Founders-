@@ -1,4 +1,39 @@
 /* ============================================================
+   OUR MODEL — FONT SYSTEM
+============================================================ */
+
+.our-model-page {
+  --font-primary: "Trajan Pro", "Trajan Pro 3", Georgia, serif;
+  --font-secondary: "Montserrat", Arial, sans-serif;
+
+  font-family: var(--font-secondary);
+}
+
+/* Trajan Pro — primary/display font */
+.our-model-page h1,
+.our-model-page h2,
+.our-model-page h3,
+.our-model-page h4,
+.our-model-page h5,
+.our-model-page h6,
+.our-model-page .display {
+  font-family: var(--font-primary);
+}
+
+/* Montserrat — secondary/body font */
+.our-model-page p,
+.our-model-page span,
+.our-model-page a,
+.our-model-page button,
+.our-model-page li,
+.our-model-page label {
+  font-family: var(--font-secondary);
+}
+
+
+
+
+/* ============================================================
    OUR MODEL PAGE
 ============================================================ */
 
@@ -26,20 +61,52 @@
 .model-hero {
   position: relative;
   isolation: isolate;
-
   min-height: 760px;
-
   display: flex;
   align-items: stretch;
-
   overflow: hidden;
-
-  background-color: #08182a;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-
+  background: #08182a;
   color: #fff;
+}
+
+
+/* ============================================================
+   HERO BACKGROUND — SAME EFFECT AS ABOUT
+============================================================ */
+
+.model-hero__background {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+}
+
+.model-hero__background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+
+  transform: scale(1.03);
+
+  animation: modelHeroImage 16s ease-out forwards;
+}
+
+
+/* ============================================================
+   HERO IMAGE MOTION
+============================================================ */
+
+@keyframes modelHeroImage {
+
+  from {
+    transform: scale(1.03);
+  }
+
+  to {
+    transform: scale(1);
+  }
+
 }
 
 
@@ -50,21 +117,21 @@
 .model-hero__overlay {
   position: absolute;
   inset: 0;
-
-  z-index: 0;
+  z-index: -2;
 
   background:
     linear-gradient(
       90deg,
       rgba(5, 17, 30, 0.96) 0%,
-      rgba(5, 17, 30, 0.9) 24%,
+      rgba(5, 17, 30, 0.90) 24%,
       rgba(5, 17, 30, 0.73) 43%,
       rgba(5, 17, 30, 0.35) 64%,
       rgba(5, 17, 30, 0.08) 100%
     ),
+
     linear-gradient(
       180deg,
-      rgba(5, 17, 30, 0.1) 0%,
+      rgba(5, 17, 30, 0.10) 0%,
       rgba(5, 17, 30, 0.05) 55%,
       rgba(5, 17, 30, 0.42) 100%
     );
@@ -142,6 +209,11 @@
       rgba(184, 136, 44, 0.15)
     );
 }
+.model-intro__label .eyebrow::before,
+.model-intro__label .eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
 
 
 /* ============================================================
@@ -155,7 +227,7 @@
 
   color: #fff;
 
-  font-family: var(--font-display);
+  font-family: var(--font-primary);
   font-size: clamp(3.6rem, 5.5vw, 6.4rem);
   font-weight: 400;
   line-height: 0.96;
@@ -164,6 +236,13 @@
   text-wrap: balance;
   overflow-wrap: break-word;
 }
+
+.section--dark .eyebrow::before,
+.section--dark .eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
+
 
 
 /* ============================================================
@@ -179,6 +258,12 @@
 
   font-size: 1.04rem;
   line-height: 1.75;
+}
+
+.media-split .eyebrow::before,
+.media-split .eyebrow::after {
+  display: none !important;
+  content: none !important;
 }
 
 
@@ -220,6 +305,13 @@
   background: var(--gold-600);
 }
 
+
+
+.section--light .eyebrow::before,
+.section--light .eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
 
 /* ============================================================
    HERO STATEMENT
@@ -390,79 +482,267 @@
   pointer-events: none;
 }
 
+.model-companies-cta__eyebrow::before,
+.model-companies-cta__eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
+
 
 /* ============================================================
    FOUR LENSES
+============================================================ */
+
+/* ============================================================
+   FOUR LENSES — PREMIUM FRAMEWORK
 ============================================================ */
 
 .model-lenses {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
 
-  margin-top: 56px;
+  margin-top: 70px;
 
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
 }
 
+
+/* ============================================================
+   LENS CARD
+============================================================ */
+
 .model-lenses article {
   position: relative;
 
-  min-height: 280px;
+  min-height: 330px;
   min-width: 0;
 
-  padding: 28px;
+  padding: 34px 36px 38px;
 
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 
+  background: transparent;
+
+  overflow: hidden;
+
   transition:
-    background-color 0.25s ease,
-    transform 0.25s ease;
+    background-color 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+
+/* subtle gold accent */
+
+.model-lenses article::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  bottom: 0;
+
+  width: 0;
+  height: 3px;
+
+  background: var(--gold-600);
+
+  transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* large background number */
+
+.model-lenses article::after {
+  content: attr(data-number);
+
+  position: absolute;
+
+  right: 24px;
+  top: 18px;
+
+  font-family: var(--font-primary);
+
+  font-size: clamp(5rem, 9vw, 8rem);
+  line-height: 1;
+
+  color: rgba(6, 26, 47, 0.035);
+
+  pointer-events: none;
+
+  transition:
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.4s ease;
+}
+
+
+/* ============================================================
+   HOVER
+============================================================ */
 
 .model-lenses article:hover {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.72);
+
+  transform: translateY(-4px);
 }
 
+.model-lenses article:hover::before {
+  width: 100%;
+}
+
+.model-lenses article:hover::after {
+  color: rgba(6, 26, 47, 0.055);
+  transform: translateY(-8px);
+}
+
+
+/* ============================================================
+   NUMBER
+============================================================ */
+
 .model-lenses span {
-  display: inline-block;
+  position: relative;
+
+  z-index: 2;
+
+  display: inline-flex;
+  align-items: center;
 
   color: var(--gold-600);
 
-  font-size: 0.7rem;
-  font-weight: 850;
-  letter-spacing: 0.12em;
+  font-family: var(--font-secondary);
+
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+
+  line-height: 1;
 }
 
+
+/* ============================================================
+   TITLE
+============================================================ */
+
 .model-lenses h3 {
+  position: relative;
+
+  z-index: 2;
+
   max-width: 420px;
 
-  margin-top: 88px;
+  margin-top: 105px;
   margin-bottom: 0;
 
   color: var(--navy-900);
 
-  font-family: var(--font-display);
-  font-size: clamp(1.7rem, 2.4vw, 2rem);
+  font-family: var(--font-primary);
+
+  font-size: clamp(1.8rem, 2.7vw, 2.5rem);
+
   font-weight: 400;
-  line-height: 1.05;
+
+  line-height: 0.98;
+
   letter-spacing: -0.025em;
 
   overflow-wrap: break-word;
+
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.model-lenses article:hover h3 {
+  transform: translateX(5px);
+}
+
+
+/* ============================================================
+   DESCRIPTION
+============================================================ */
+
 .model-lenses p {
+  position: relative;
+
+  z-index: 2;
+
   max-width: 500px;
 
-  margin-top: 12px;
+  margin-top: 18px;
   margin-bottom: 0;
 
   color: var(--muted);
 
-  line-height: 1.7;
+  font-family: var(--font-secondary);
+
+  font-size: 0.98rem;
+
+  line-height: 1.75;
 }
 
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .model-lenses {
+    margin-top: 55px;
+  }
+
+  .model-lenses article {
+    min-height: 300px;
+    padding: 30px;
+  }
+
+  .model-lenses h3 {
+    margin-top: 90px;
+    font-size: clamp(1.7rem, 4vw, 2.2rem);
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .model-lenses {
+    grid-template-columns: 1fr;
+
+    margin-top: 45px;
+  }
+
+  .model-lenses article {
+    min-height: 270px;
+
+    padding: 28px 26px 34px;
+  }
+
+  .model-lenses h3 {
+    margin-top: 70px;
+
+    font-size: clamp(1.8rem, 9vw, 2.6rem);
+  }
+
+  .model-lenses p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .model-lenses article::after {
+    font-size: 6rem;
+
+    right: 18px;
+    top: 15px;
+  }
+
+}
 
 /* ============================================================
    COMPANIES / FOUNDERS CTA
@@ -721,7 +1001,7 @@
 
 
 /* ============================================================
-   FINAL CTA
+   FINAL CTA — PREMIUM CLOSING SECTION
 ============================================================ */
 
 .model-final-cta {
@@ -730,21 +1010,186 @@
   padding: clamp(90px, 10vw, 150px) 0;
 
   background: #fff;
+
+  overflow: hidden;
 }
+
+
+/* ============================================================
+   LAYOUT
+============================================================ */
 
 .model-final-cta__inner {
   display: grid;
-  grid-template-columns: 0.55fr 1.45fr;
 
-  gap: 80px;
+  grid-template-columns: 0.72fr 1.28fr;
+
+  gap: 90px;
 
   align-items: start;
 }
 
-.model-final-cta__content {
-  max-width: 900px;
+
+/* ============================================================
+   LEFT VISUAL
+============================================================ */
+
+.model-final-cta__visual {
   min-width: 0;
 }
+
+.model-final-cta__visual .eyebrow {
+  display: block;
+
+  margin-bottom: 28px;
+
+  font-family: var(--font-secondary);
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  color: var(--gold-600);
+}
+
+
+/* ============================================================
+   IMAGE
+============================================================ */
+
+.model-final-cta__image {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 5;
+
+  overflow: hidden;
+
+  background: var(--navy-900);
+}
+
+.model-final-cta__image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+  object-position: center;
+
+  transform: scale(1.02);
+
+  transition:
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.model-final-cta__image:hover img {
+  transform: scale(1.07);
+}
+
+
+/* ============================================================
+   IMAGE OVERLAY
+============================================================ */
+
+.model-final-cta__image-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 20, 39, 0.04) 0%,
+      rgba(3, 20, 39, 0.12) 45%,
+      rgba(3, 20, 39, 0.86) 100%
+    );
+    
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   IMAGE CAPTION
+============================================================ */
+
+.model-final-cta__image-caption {
+  position: absolute;
+
+  left: 28px;
+  right: 28px;
+  bottom: 26px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  z-index: 2;
+
+  color: #fff;
+
+  font-family: var(--font-secondary);
+
+  font-size: 0.62rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.15em;
+}
+
+.model-final-cta__image-line {
+  width: 35px;
+
+  height: 1px;
+
+  flex-shrink: 0;
+
+  background: var(--gold-600);
+}
+
+
+/* ============================================================
+   RIGHT CONTENT
+============================================================ */
+
+.model-final-cta__content {
+  max-width: 900px;
+
+  min-width: 0;
+
+  padding-top: 65px;
+}
+
+
+/* Small section number */
+
+.model-final-cta__number {
+  display: block;
+
+  margin-bottom: 28px;
+
+  font-family: var(--font-secondary);
+
+  font-size: 0.7rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.2em;
+
+  color: var(--gold-600);
+}
+
+
+/* ============================================================
+   HEADING
+============================================================ */
 
 .model-final-cta__content h2 {
   max-width: 880px;
@@ -753,78 +1198,183 @@
 
   color: var(--navy-900);
 
-  font-family: var(--font-display);
+  font-family: var(--font-primary);
+
   font-size: clamp(2.8rem, 5vw, 5.4rem);
+
   font-weight: 400;
+
   line-height: 0.98;
+
   letter-spacing: -0.04em;
 
   overflow-wrap: break-word;
 }
 
+
+/* ============================================================
+   DESCRIPTION
+============================================================ */
+
 .model-final-cta__content p {
   max-width: 680px;
 
-  margin: 28px 0 0;
+  margin: 30px 0 0;
 
   color: var(--muted);
 
+  font-family: var(--font-secondary);
+
   font-size: 1.05rem;
+
   line-height: 1.75;
 }
 
 
 /* ============================================================
-   FINAL CTA BUTTON
+   BUTTON
 ============================================================ */
 
 .model-final-cta__button {
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 14px;
 
   min-height: 54px;
 
-  margin-top: 34px;
+  margin-top: 36px;
 
-  padding: 0 24px;
+  padding: 0 26px;
 
-  background: var(--navy-900);
+  background: var(--gold-600);
 
-  border: 1px solid var(--navy-900);
+  border: 1px solid var(--gold-600);
 
   color: #fff;
 
+  font-family: var(--font-secondary);
+
   font-size: 0.78rem;
+
   font-weight: 800;
+
   letter-spacing: 0.08em;
 
   text-decoration: none;
+
   text-transform: uppercase;
 
   transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    transform 0.25s ease;
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .model-final-cta__button:hover {
   background: transparent;
 
-  color: var(--navy-900);
+  color: var(--gold-600);
 
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 .model-final-cta__button svg {
   flex-shrink: 0;
 
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.3s ease;
 }
 
 .model-final-cta__button:hover svg {
-  transform: translateX(4px);
+  transform: translateX(5px);
+}
+
+
+/* ============================================================
+   REMOVE DECORATIVE GOLD LINES
+============================================================ */
+
+.model-final-cta .eyebrow::before,
+.model-final-cta .eyebrow::after {
+  display: none !important;
+
+  content: none !important;
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 900px) {
+
+  .model-final-cta__inner {
+    grid-template-columns: 0.8fr 1.2fr;
+
+    gap: 55px;
+  }
+
+  .model-final-cta__content {
+    padding-top: 45px;
+  }
+
+  .model-final-cta__content h2 {
+    font-size: clamp(2.7rem, 6vw, 4.8rem);
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .model-final-cta {
+    padding: 80px 0;
+  }
+
+  .model-final-cta__inner {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+  }
+
+  .model-final-cta__visual .eyebrow {
+    margin-bottom: 22px;
+  }
+
+  .model-final-cta__image {
+    aspect-ratio: 16 / 10;
+  }
+
+  .model-final-cta__content {
+    padding-top: 0;
+  }
+
+  .model-final-cta__content h2 {
+    font-size: clamp(2.6rem, 11vw, 4rem);
+
+    line-height: 0.98;
+  }
+
+  .model-final-cta__content p {
+    margin-top: 26px;
+
+    font-size: 1rem;
+
+    line-height: 1.7;
+  }
+
+  .model-final-cta__button {
+    margin-top: 30px;
+  }
+
 }
 
 
@@ -1710,6 +2260,87 @@
   .model-companies-cta__content > p,
   .model-companies-cta__statement p {
     color: #000;
+  }
+
+}
+
+
+/* ============================================================
+   OUR MODEL HERO — BACKGROUND SLIDE
+============================================================ */
+
+.model-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 760px;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  background-color: #08182a;
+  color: #fff;
+}
+
+/* Animated background image */
+
+.model-hero::before {
+  content: "";
+  position: absolute;
+  inset: -5%;
+
+  z-index: -1;
+
+  background-image: url("/assets/hero.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
+  animation: modelHeroBackgroundSlide 1.8s
+    cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+
+/* Actual visible movement */
+
+@keyframes modelHeroBackgroundSlide {
+
+  from {
+    transform: translateX(180px) scale(1.08);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.7;
+  }
+
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+
+}
+
+
+/* Overlay stays above image */
+
+.model-hero__overlay {
+  z-index: 1;
+}
+
+
+/* Content stays above everything */
+
+.model-hero__inner {
+  position: relative;
+  z-index: 2;
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .model-hero::before {
+    animation: none;
+    transform: none;
+    opacity: 1;
   }
 
 }

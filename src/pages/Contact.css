@@ -5,7 +5,7 @@
   background: var(--navy-900);
   isolation: isolate;
 }
-
+ 
 .page-hero::before {
   content: "";
   position: absolute;
@@ -32,6 +32,12 @@
     rgba(3, 23, 47, 0.25) 68%,
     rgba(3, 23, 47, 0.05) 100%
   );
+}
+
+.page-hero .eyebrow--light::before,
+.page-hero .eyebrow--light::after {
+  display: none !important;
+  content: none !important;
 }
 
 .page-hero__inner {
@@ -189,4 +195,10 @@
   background: transparent;
   color: var(--navy-900);
   font-weight: 800;
+}
+
+.contact-page .eyebrow::before,
+.contact-page .eyebrow::after {
+  display: none !important;
+  content: none !important;
 }

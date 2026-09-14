@@ -86,11 +86,7 @@ export default function StrategicPartners() {
         </div>
       </section>
 
-      <CTASection
-        eyebrow="For strategic organizations"
-        title="Where could your capabilities create shared value?"
-        text="Tell us about your organization, what you bring, and the type of institutional or programmatic opportunity you want to explore."
-      />
+     
     </>
   );
 }

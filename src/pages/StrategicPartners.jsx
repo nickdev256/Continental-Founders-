@@ -19,20 +19,21 @@ const contributions = [
 export default function StrategicPartners() {
   return (
     <>
-      <section className="page-hero">
-        <div className="container page-hero__inner">
-          <div>
-            <span className="eyebrow eyebrow--light">Strategic partners</span>
-            <h1>Bring capability, networks, and purpose together.</h1>
-          </div>
-          <div className="page-hero__aside">
-            <p>
-              We connect institutions with organizations whose expertise, resources, and
-              networks can strengthen shared priorities.
-            </p>
-          </div>
-        </div>
-      </section>
+<section className="strategic-partners-hero">
+  <div className="container strategic-partners-hero__inner">
+    <div>
+      <span className="eyebrow eyebrow--light">Strategic partners</span>
+      <h1>Bring capability, networks, and purpose together.</h1>
+    </div>
+
+    <div className="strategic-partners-hero__aside">
+      <p>
+        We connect institutions with organizations whose expertise, resources, and
+        networks can strengthen shared priorities.
+      </p>
+    </div>
+  </div>
+</section>
 
       <section className="section strategic-opening">
         <div className="container strategic-opening__grid">
@@ -56,7 +57,7 @@ export default function StrategicPartners() {
           "Foundations, nonprofits, corporations, research institutions, professional networks, and other organizations can contribute resources or expertise that universities cannot create alone.",
           "We look for alignment between what a partner can contribute and what the wider collaboration is trying to accomplish."
         ]}
-        image="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1500&q=85"
+        image="/assets/x.png"
         imageAlt="Strategic partners collaborating around a table"
       />
 

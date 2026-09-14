@@ -110,7 +110,7 @@ export default function Contact() {
     <>
       <section className="page-hero">
         <div className="container page-hero__inner">
-          <div>
+          <div> 
             <span className="eyebrow eyebrow--light">
               Contact
             </span>

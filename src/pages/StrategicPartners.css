@@ -1,48 +1,799 @@
+/* =========================================================
+   STRATEGIC PARTNERS HERO
+   ========================================================= */
+
+.strategic-partners-hero {
+  position: relative;
+  min-height: 690px;
+  height: 690px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  background: none;
+}
+
+.strategic-partners-hero::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+
+  background:
+    linear-gradient(
+      90deg,
+       rgba(3, 20, 36, 0.97) 0%,
+    rgba(3, 20, 36, 0.88) 25%,
+    rgba(3, 20, 36, 0.62) 48%,
+    rgba(3, 20, 36, 0.28) 72%,
+    rgba(3, 20, 36, 0.12) 100%
+    ),
+    url("/assets/m.png") center center / cover no-repeat;
+
+  z-index: -1;
+
+  transform: scale(1.12);
+  transform-origin: center center;
+
+  animation: strategicHeroZoomOut 5s ease-out forwards;
+}
+
+@keyframes strategicHeroZoomOut {
+  from {
+    transform: scale(1.12);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+.strategic-partners-hero__inner {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1.25fr 0.55fr;
+
+  gap: 80px;
+
+  align-items: flex-end;
+
+  padding-top: 70px;
+  padding-bottom: 110px;
+}
+
+
+/* HERO EYEBROW */
+
+.strategic-partners-hero .eyebrow {
+  display: inline-flex;
+
+  margin-bottom: 24px;
+
+  color: var(--gold-600) !important;
+
+  font-family: var(--font-secondary) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+
+/* HERO HEADING */
+
+.strategic-partners-hero h1 {
+  max-width: 900px;
+
+  margin: 0;
+
+  color: #ffffff !important;
+
+  font-family: var(--font-primary) !important;
+  font-size: clamp(4rem, 6vw, 6.5rem) !important;
+  font-weight: 400 !important;
+
+  line-height: 0.94 !important;
+  letter-spacing: -0.045em !important;
+}
+
+
+/* HERO DESCRIPTION */
+
+.strategic-partners-hero__aside {
+  position: relative;
+
+  padding-left: 30px;
+}
+
+.strategic-partners-hero__aside::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 1px;
+  height: 100%;
+
+  background: rgba(201, 157, 64, 0.75);
+}
+
+.strategic-partners-hero__aside p {
+  max-width: 390px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.88) !important;
+
+  font-family: var(--font-secondary) !important;
+  font-size: 1rem !important;
+  line-height: 1.8 !important;
+}
+
+.strategic-opening .eyebrow::before,
+.strategic-opening .eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
+
+.strategic-partners-hero .eyebrow--light::before,
+.strategic-partners-hero .eyebrow--light::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .strategic-partners-hero {
+    min-height: 650px;
+    height: 650px;
+  }
+
+  .strategic-partners-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+  .strategic-partners-hero {
+    min-height: 650px;
+    height: 650px;
+
+    background-position: 55% center;
+  }
+
+  .strategic-partners-hero h1 {
+    font-size: clamp(3rem, 13vw, 4.5rem) !important;
+  }
+
+  .strategic-partners-hero__aside {
+    padding-left: 22px;
+  }
+}
+
+
+/* =========================================================
+   OPENING SECTION
+   ========================================================= */
+
+.strategic-opening {
+  padding-top: 100px !important;
+  padding-bottom: 110px !important;
+}
+
 .strategic-opening__grid {
   display: grid;
-  grid-template-columns: .55fr 1.45fr;
+
+  grid-template-columns: 0.48fr 1.52fr;
+
   gap: 80px;
+
+  align-items: start;
 }
 
 .strategic-opening h2 {
-  max-width: 920px;
-  font-size: clamp(3rem, 5.5vw, 6rem);
-  line-height: .95;
+  max-width: 900px;
+
+  margin: 0 !important;
+
+  color: var(--navy-900) !important;
+
+  font-family: var(--font-primary) !important;
+  font-size: clamp(3.3rem, 5vw, 5.5rem) !important;
+  font-weight: 400 !important;
+
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
 }
 
 .strategic-opening p {
-  max-width: 720px;
-  margin-top: 28px;
-  color: var(--muted);
-  font-size: 1.08rem;
+  max-width: 700px;
+
+  margin-top: 30px !important;
+
+  color: var(--muted) !important;
+
+  font-family: var(--font-secondary) !important;
+  font-size: 1rem !important;
+  line-height: 1.85 !important;
 }
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .strategic-partners-hero {
+    min-height: 650px !important;
+    height: 650px;
+  }
+
+  .strategic-partners-hero__inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .strategic-partners-hero h1 {
+    max-width: 800px;
+  }
+
+  .strategic-partners-hero__aside {
+    max-width: 500px;
+  }
+
+  .strategic-opening__grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .strategic-partners-hero {
+    min-height: 650px !important;
+    height: 650px;
+
+    background-position: 55% center !important;
+  }
+
+  .strategic-partners-hero__inner {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+
+  .strategic-partners-hero h1 {
+    font-size: clamp(3rem, 13vw, 4.5rem) !important;
+  }
+
+  .strategic-partners-hero__aside {
+    padding-left: 22px;
+  }
+
+  .strategic-opening {
+    padding-top: 80px !important;
+    padding-bottom: 85px !important;
+  }
+
+  .strategic-opening h2 {
+    font-size: clamp(2.8rem, 11vw, 4.2rem) !important;
+  }
+}
+
+
+
+/* =========================================================
+   CONTRIBUTION GRID — PREMIUM COLOUR VERSION
+   ========================================================= */
 
 .contribution-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  border-top: 1px solid var(--line);
-  border-left: 1px solid var(--line);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  margin-top: 65px;
+
+  border-top: 1px solid rgba(3, 20, 36, 0.14);
+  border-left: 1px solid rgba(3, 20, 36, 0.14);
 }
 
-.contribution-grid div {
-  display: grid;
-  grid-template-columns: 45px 1fr;
-  gap: 20px;
-  min-height: 105px;
-  align-items: center;
-  padding: 22px;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+
+/* =========================================================
+   CONTRIBUTION CARD
+   ========================================================= */
+
+.contribution-grid > div {
+  position: relative;
+
+  min-height: 205px;
+
+  padding: 30px 30px 34px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background: #f8f6f0;
+
+  border-right: 1px solid rgba(3, 20, 36, 0.14);
+  border-bottom: 1px solid rgba(3, 20, 36, 0.14);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.4s ease,
+    background 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
-.contribution-grid span {
+
+/* =========================================================
+   ALTERNATING COLOUR
+   ========================================================= */
+
+.contribution-grid > div:nth-child(2),
+.contribution-grid > div:nth-child(5),
+.contribution-grid > div:nth-child(8) {
+  background: #eef3f5;
+}
+
+.contribution-grid > div:nth-child(3),
+.contribution-grid > div:nth-child(6) {
+  background: #ffffff;
+}
+
+.contribution-grid > div:nth-child(4),
+.contribution-grid > div:nth-child(7) {
+  background: #f3eee3;
+}
+
+
+/* =========================================================
+   NUMBER
+   ========================================================= */
+
+.contribution-grid > div span {
+  position: relative;
+  z-index: 2;
+
   color: var(--gold-600);
-  font-size: .7rem;
-  font-weight: 850;
+
+  font-family: var(--font-secondary);
+
+  font-size: 0.72rem;
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
 }
 
-.contribution-grid p {
+
+/* =========================================================
+   CONTRIBUTION TEXT
+   ========================================================= */
+
+.contribution-grid > div p {
+  position: relative;
+  z-index: 2;
+
+  max-width: 240px;
+
+  margin: 55px 0 0;
+
   color: var(--navy-900);
-  font-family: var(--font-display);
-  font-size: 1.35rem;
+
+  font-family: var(--font-secondary);
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   LARGE BACKGROUND NUMBER
+   ========================================================= */
+
+.contribution-grid > div::before {
+  content: "";
+
+  position: absolute;
+
+  right: -18px;
+  bottom: -42px;
+
+  font-family: var(--font-primary);
+
+  font-size: 8rem;
+
+  line-height: 1;
+
+  color: rgba(3, 20, 36, 0.035);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   GOLD ACCENT
+   ========================================================= */
+
+.contribution-grid > div::after {
+  content: "";
+
+  position: absolute;
+
+  left: 30px;
+  bottom: 0;
+
+  width: 45px;
+  height: 3px;
+
+  background: var(--gold-600);
+
+  transition: width 0.4s ease;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.contribution-grid > div:hover {
+  transform: translateY(-7px);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 22px 50px rgba(3, 20, 36, 0.10);
+
+  z-index: 3;
+}
+
+.contribution-grid > div:hover::after {
+  width: 75px;
+}
+
+
+/* =========================================================
+   SUBTLE NAVY ACCENT ON HOVER
+   ========================================================= */
+
+.contribution-grid > div:hover span {
+  color: var(--navy-900);
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .contribution-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 50px;
+  }
+
+  .contribution-grid > div {
+    min-height: 185px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .contribution-grid {
+    grid-template-columns: 1fr;
+    margin-top: 40px;
+  }
+
+  .contribution-grid > div {
+    min-height: 165px;
+    padding: 25px;
+  }
+
+  .contribution-grid > div p {
+    margin-top: 35px;
+  }
+
+  .contribution-grid > div::after {
+    left: 25px;
+  }
+}
+
+
+
+/* =========================================================
+   PARTNER ECOSYSTEM — FINAL SECTION
+   ========================================================= */
+
+.strategic-partners-hero ~ .section:not(.section--light) {
+  position: relative;
+
+  background: #031424;
+
+  overflow: hidden;
+}
+
+
+/* SUBTLE BACKGROUND DETAIL */
+
+.strategic-partners-hero ~ .section:not(.section--light)::before {
+  content: "";
+
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  right: -180px;
+  top: -180px;
+
+  border: 1px solid rgba(201, 157, 64, 0.16);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light)::after {
+  content: "";
+
+  position: absolute;
+
+  width: 360px;
+  height: 360px;
+
+  right: -100px;
+  top: -100px;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+
+/* KEEP CONTENT ABOVE BACKGROUND */
+
+.strategic-partners-hero ~ .section:not(.section--light) .container {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.strategic-partners-hero ~ .section:not(.section--light) .section-heading {
+  max-width: 950px;
+
+  margin-bottom: 70px;
+}
+
+
+/* REMOVE GOLDEN DECORATIVE LINES */
+
+.strategic-partners-hero ~ .section:not(.section--light) .eyebrow::before,
+.strategic-partners-hero ~ .section:not(.section--light) .eyebrow::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* EYEBROW */
+
+.strategic-partners-hero ~ .section:not(.section--light) .eyebrow {
+  color: var(--gold-600) !important;
+
+  font-family: var(--font-secondary) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+
+/* MAIN TITLE */
+
+.strategic-partners-hero ~ .section:not(.section--light) .section-heading h2 {
+  max-width: 900px;
+
+  margin-top: 20px !important;
+
+  color: #ffffff !important;
+
+  font-family: var(--font-primary) !important;
+  font-size: clamp(3.3rem, 5.5vw, 6rem) !important;
+  font-weight: 400 !important;
+
+  line-height: 0.96 !important;
+  letter-spacing: -0.045em !important;
+}
+
+
+/* =========================================================
+   PARTNER TYPE GRID
+   ========================================================= */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 1px;
+
+  background: rgba(255, 255, 255, 0.16);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+
+/* =========================================================
+   PARTNER CARD
+   ========================================================= */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > * {
+  position: relative;
+
+  min-height: 230px;
+
+  padding: 32px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  background: #f5f1e8;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.4s ease,
+    background 0.4s ease;
+}
+
+
+/* ALTERNATING COLOUR */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(2n) {
+  background: #e9f0f3;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(3n) {
+  background: #ffffff;
+}
+
+
+/* CARD HOVER */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:hover {
+  transform: translateY(-6px);
+
+  background: #ffffff;
+
+  z-index: 3;
+}
+
+
+/* GOLD BOTTOM ACCENT */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *::after {
+  content: "";
+
+  position: absolute;
+
+  left: 32px;
+  bottom: 0;
+
+  width: 42px;
+  height: 3px;
+
+  background: var(--gold-600);
+
+  transition: width 0.4s ease;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:hover::after {
+  width: 75px;
+}
+
+
+/* =========================================================
+   TEXT INSIDE PARTNER CARDS
+   ========================================================= */
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid h3 {
+  position: relative;
+  z-index: 2;
+
+  color: var(--navy-900) !important;
+
+  font-family: var(--font-primary) !important;
+  font-size: 1.65rem !important;
+  font-weight: 400 !important;
+
+  line-height: 1.15;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid p {
+  position: relative;
+  z-index: 2;
+
+  margin-top: 14px;
+
+  color: #617080 !important;
+
+  font-family: var(--font-secondary) !important;
+
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .strategic-partners-hero ~ .section:not(.section--light) .section-heading {
+    margin-bottom: 55px;
+  }
+
+  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .strategic-partners-hero ~ .section:not(.section--light) .section-heading h2 {
+    font-size: clamp(2.8rem, 11vw, 4.2rem) !important;
+  }
+
+  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > * {
+    min-height: 190px;
+
+    padding: 26px;
+  }
+
+  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *::after {
+    left: 26px;
+  }
 }

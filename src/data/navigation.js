@@ -15,7 +15,7 @@ export const navigation = [
 
     children: [
       {
-        label: "U.S.–Africa Trade & Business Network",
+        label: "US Africa Trade & Business Network",
         path: "/partners/us-africa-trade-network",
       },
 

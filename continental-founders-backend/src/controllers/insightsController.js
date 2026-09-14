@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const {
   z,
 } = require("zod");
@@ -5,6 +7,14 @@ const {
 const {
   supabaseAdmin,
 } = require("../config/supabase");
+
+
+/* ============================================================
+   CONFIG
+============================================================ */
+
+const INSIGHT_IMAGE_BUCKET =
+  "insight-images";
 
 
 /* ============================================================
@@ -91,11 +101,270 @@ const insightSchema =
         .optional()
         .nullable(),
 
+    removeImage:
+      z
+        .string()
+        .optional()
+        .nullable(),
+
   });
 
 
 const updateInsightSchema =
   insightSchema.partial();
+
+
+/* ============================================================
+   IMAGE HELPERS
+============================================================ */
+
+function getImageExtension(
+  file
+) {
+
+  const extensions = {
+    "image/jpeg":
+      "jpg",
+
+    "image/jpg":
+      "jpg",
+
+    "image/png":
+      "png",
+
+    "image/webp":
+      "webp",
+  };
+
+
+  return (
+    extensions[
+      file?.mimetype
+    ] ||
+    "jpg"
+  );
+
+}
+
+
+/* ============================================================
+   UPLOAD INSIGHT IMAGE
+============================================================ */
+
+async function uploadInsightImage(
+  file
+) {
+
+  if (!file) {
+    return null;
+  }
+
+
+  const extension =
+    getImageExtension(
+      file
+    );
+
+
+  const filePath =
+    `insights/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+
+  const {
+    error:
+      uploadError,
+  } =
+    await supabaseAdmin
+      .storage
+      .from(
+        INSIGHT_IMAGE_BUCKET
+      )
+      .upload(
+        filePath,
+        file.buffer,
+        {
+          contentType:
+            file.mimetype,
+
+          cacheControl:
+            "3600",
+
+          upsert:
+            false,
+        }
+      );
+
+
+  if (
+    uploadError
+  ) {
+
+    throw uploadError;
+
+  }
+
+
+  const {
+    data:
+      publicUrlData,
+  } =
+    supabaseAdmin
+      .storage
+      .from(
+        INSIGHT_IMAGE_BUCKET
+      )
+      .getPublicUrl(
+        filePath
+      );
+
+
+  return {
+    path:
+      filePath,
+
+    url:
+      publicUrlData
+        ?.publicUrl ||
+      null,
+  };
+
+}
+
+
+/* ============================================================
+   GET STORAGE PATH FROM PUBLIC URL
+============================================================ */
+
+function getStoragePathFromUrl(
+  imageUrl
+) {
+
+  if (!imageUrl) {
+    return null;
+  }
+
+
+  try {
+
+    const marker =
+      `/storage/v1/object/public/${INSIGHT_IMAGE_BUCKET}/`;
+
+
+    const markerIndex =
+      imageUrl.indexOf(
+        marker
+      );
+
+
+    if (
+      markerIndex === -1
+    ) {
+
+      return null;
+
+    }
+
+
+    const encodedPath =
+      imageUrl.substring(
+        markerIndex +
+        marker.length
+      );
+
+
+    return decodeURIComponent(
+      encodedPath
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.warn(
+      "Could not parse insight image URL:",
+      error.message
+    );
+
+
+    return null;
+
+  }
+
+}
+
+
+/* ============================================================
+   DELETE IMAGE FROM STORAGE
+============================================================ */
+
+async function deleteInsightImage(
+  imageUrl
+) {
+
+  const path =
+    getStoragePathFromUrl(
+      imageUrl
+    );
+
+
+  if (!path) {
+
+    return {
+      success:
+        false,
+
+      skipped:
+        true,
+    };
+
+  }
+
+
+  const {
+    error,
+  } =
+    await supabaseAdmin
+      .storage
+      .from(
+        INSIGHT_IMAGE_BUCKET
+      )
+      .remove([
+        path,
+      ]);
+
+
+  if (
+    error
+  ) {
+
+    console.warn(
+      "Insight image deletion failed:",
+      error
+    );
+
+
+    return {
+      success:
+        false,
+
+      skipped:
+        false,
+
+      error,
+    };
+
+  }
+
+
+  return {
+    success:
+      true,
+
+    skipped:
+      false,
+  };
+
+}
 
 
 /* ============================================================
@@ -106,12 +375,8 @@ function normalizeInsight(
   insight
 ) {
 
-  if (
-    !insight
-  ) {
-
+  if (!insight) {
     return null;
-
   }
 
 
@@ -141,17 +406,35 @@ function normalizeInsight(
     status:
       insight.status,
 
+
+    /* IMAGE */
+
+    image_url:
+      insight.image_url,
+
+    imageUrl:
+      insight.image_url,
+
+
+    /* PUBLISHING */
+
     published_at:
       insight.published_at,
 
     publishedAt:
       insight.published_at,
 
+
+    /* CREATED */
+
     created_at:
       insight.created_at,
 
     createdAt:
       insight.created_at,
+
+
+    /* UPDATED */
 
     updated_at:
       insight.updated_at,
@@ -166,7 +449,7 @@ function normalizeInsight(
 
 /* ============================================================
    GET ALL INSIGHTS
-   ADMIN / CMS
+   ADMIN CMS
 ============================================================ */
 
 async function getInsights(
@@ -184,9 +467,7 @@ async function getInsights(
         .from(
           "insights"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .order(
           "created_at",
           {
@@ -241,6 +522,7 @@ async function getInsights(
           false,
 
         message:
+          error?.message ||
           "Failed to load insights.",
 
       });
@@ -252,7 +534,6 @@ async function getInsights(
 
 /* ============================================================
    GET PUBLISHED INSIGHTS
-   PUBLIC WEBSITE
 ============================================================ */
 
 async function getPublishedInsights(
@@ -270,9 +551,7 @@ async function getPublishedInsights(
         .from(
           "insights"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "status",
           "published"
@@ -331,6 +610,7 @@ async function getPublishedInsights(
           false,
 
         message:
+          error?.message ||
           "Failed to load published insights.",
 
       });
@@ -341,8 +621,7 @@ async function getPublishedInsights(
 
 
 /* ============================================================
-   GET SINGLE INSIGHT BY SLUG
-   PUBLIC WEBSITE
+   GET SINGLE PUBLISHED INSIGHT
 ============================================================ */
 
 async function getInsightBySlug(
@@ -366,12 +645,14 @@ async function getInsightBySlug(
         .from(
           "insights"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "slug",
           slug
+        )
+        .eq(
+          "status",
+          "published"
         )
         .maybeSingle();
 
@@ -436,6 +717,7 @@ async function getInsightBySlug(
           false,
 
         message:
+          error?.message ||
           "Failed to load insight.",
 
       });
@@ -453,6 +735,10 @@ async function createInsight(
   req,
   res
 ) {
+
+  let uploadedImage =
+    null;
+
 
   try {
 
@@ -515,6 +801,10 @@ async function createInsight(
     }
 
 
+    /* ========================================================
+       PUBLICATION DATE
+    ======================================================== */
+
     const now =
       new Date()
         .toISOString();
@@ -573,6 +863,26 @@ async function createInsight(
     }
 
 
+    /* ========================================================
+       UPLOAD FEATURED IMAGE
+    ======================================================== */
+
+    if (
+      req.file
+    ) {
+
+      uploadedImage =
+        await uploadInsightImage(
+          req.file
+        );
+
+    }
+
+
+    /* ========================================================
+       INSERT DATABASE ROW
+    ======================================================== */
+
     const {
       data,
       error,
@@ -607,6 +917,11 @@ async function createInsight(
           status:
             input.status,
 
+          image_url:
+            uploadedImage
+              ?.url ||
+            null,
+
           published_at:
             publishedAt,
 
@@ -617,15 +932,25 @@ async function createInsight(
             now,
 
         })
-        .select(
-          "*"
-        )
+        .select("*")
         .single();
 
 
     if (
       error
     ) {
+
+      if (
+        uploadedImage
+          ?.url
+      ) {
+
+        await deleteInsightImage(
+          uploadedImage.url
+        );
+
+      }
+
 
       throw error;
 
@@ -652,6 +977,21 @@ async function createInsight(
   } catch (
     error
   ) {
+
+    /* Cleanup if upload succeeded
+       but another operation failed */
+
+    if (
+      uploadedImage
+        ?.url
+    ) {
+
+      await deleteInsightImage(
+        uploadedImage.url
+      );
+
+    }
+
 
     if (
       error?.name ===
@@ -707,6 +1047,10 @@ async function updateInsight(
   res
 ) {
 
+  let uploadedImage =
+    null;
+
+
   try {
 
     const {
@@ -721,10 +1065,17 @@ async function updateInsight(
       );
 
 
+    const wantsImageRemoval =
+      input.removeImage ===
+      "true";
+
+
     if (
       Object.keys(
         input
-      ).length === 0
+      ).length === 0 &&
+      !req.file &&
+      !wantsImageRemoval
     ) {
 
       return res
@@ -757,9 +1108,7 @@ async function updateInsight(
         .from(
           "insights"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "id",
           id
@@ -860,6 +1209,10 @@ async function updateInsight(
     }
 
 
+    /* ========================================================
+       BUILD UPDATE
+    ======================================================== */
+
     const updates = {
 
       updated_at:
@@ -937,6 +1290,10 @@ async function updateInsight(
 
     }
 
+
+    /* ========================================================
+       STATUS AND PUBLISH DATE
+    ======================================================== */
 
     if (
       input.status !==
@@ -1053,6 +1410,45 @@ async function updateInsight(
     }
 
 
+    /* ========================================================
+       NEW IMAGE
+    ======================================================== */
+
+    if (
+      req.file
+    ) {
+
+      uploadedImage =
+        await uploadInsightImage(
+          req.file
+        );
+
+
+      updates.image_url =
+        uploadedImage.url;
+
+    }
+
+
+    /* ========================================================
+       REMOVE EXISTING IMAGE
+    ======================================================== */
+
+    if (
+      wantsImageRemoval &&
+      !req.file
+    ) {
+
+      updates.image_url =
+        null;
+
+    }
+
+
+    /* ========================================================
+       UPDATE DATABASE
+    ======================================================== */
+
     const {
       data,
       error,
@@ -1068,9 +1464,7 @@ async function updateInsight(
           "id",
           id
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .single();
 
 
@@ -1078,7 +1472,43 @@ async function updateInsight(
       error
     ) {
 
+      /* Delete newly uploaded image
+         because DB update failed */
+
+      if (
+        uploadedImage
+          ?.url
+      ) {
+
+        await deleteInsightImage(
+          uploadedImage.url
+        );
+
+      }
+
+
       throw error;
+
+    }
+
+
+    /* ========================================================
+       DELETE OLD IMAGE AFTER DATABASE SUCCESS
+    ======================================================== */
+
+    if (
+      existingInsight
+        .image_url &&
+      (
+        req.file ||
+        wantsImageRemoval
+      )
+    ) {
+
+      await deleteInsightImage(
+        existingInsight
+          .image_url
+      );
 
     }
 
@@ -1103,6 +1533,18 @@ async function updateInsight(
   } catch (
     error
   ) {
+
+    if (
+      uploadedImage
+        ?.url
+    ) {
+
+      await deleteInsightImage(
+        uploadedImage.url
+      );
+
+    }
+
 
     if (
       error?.name ===
@@ -1166,36 +1608,42 @@ async function deleteInsight(
       req.params;
 
 
+    /* ========================================================
+       FIND INSIGHT FIRST
+    ======================================================== */
+
     const {
-      data,
-      error,
+      data:
+        existingInsight,
+
+      error:
+        existingError,
     } =
       await supabaseAdmin
         .from(
           "insights"
         )
-        .delete()
+        .select(
+          "id, title, image_url"
+        )
         .eq(
           "id",
           id
-        )
-        .select(
-          "id"
         )
         .maybeSingle();
 
 
     if (
-      error
+      existingError
     ) {
 
-      throw error;
+      throw existingError;
 
     }
 
 
     if (
-      !data
+      !existingInsight
     ) {
 
       return res
@@ -1213,12 +1661,102 @@ async function deleteInsight(
     }
 
 
+    /* ========================================================
+       DELETE DATABASE ROW
+    ======================================================== */
+
+    const {
+      data:
+        deletedInsight,
+
+      error:
+        deleteError,
+    } =
+      await supabaseAdmin
+        .from(
+          "insights"
+        )
+        .delete()
+        .eq(
+          "id",
+          id
+        )
+        .select(
+          "id, title"
+        )
+        .maybeSingle();
+
+
+    if (
+      deleteError
+    ) {
+
+      throw deleteError;
+
+    }
+
+
+    if (
+      !deletedInsight
+    ) {
+
+      return res
+        .status(500)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "Unable to confirm insight deletion.",
+
+        });
+
+    }
+
+
+    /* ========================================================
+       DELETE IMAGE AFTER DATABASE DELETE
+    ======================================================== */
+
+    let imageDeleted =
+      false;
+
+
+    if (
+      existingInsight
+        .image_url
+    ) {
+
+      const result =
+        await deleteInsightImage(
+          existingInsight
+            .image_url
+        );
+
+
+      imageDeleted =
+        result.success;
+
+    }
+
+
     return res
       .status(200)
       .json({
 
         success:
           true,
+
+        deletedInsight: {
+          id:
+            deletedInsight.id,
+
+          title:
+            deletedInsight.title,
+        },
+
+        imageDeleted,
 
         message:
           "Insight deleted successfully.",
@@ -1243,6 +1781,7 @@ async function deleteInsight(
           false,
 
         message:
+          error?.message ||
           "Failed to delete insight.",
 
       });

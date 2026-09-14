@@ -1,50 +1,105 @@
 /* ============================================================
+   CONTINENTAL FOUNDERS
    U.S.–AFRICA TRADE & BUSINESS NETWORK
 ============================================================ */
 
 .us-africa-page {
-  --navy: #0d2238;
-  --navy-deep: #08182a;
-  --navy-soft: #163653;
-  --gold: #b8882c;
-  --gold-light: #d4ac57;
-  --cream: #f7f5ef;
-  --white: #ffffff;
-  --text: #1f2a35;
-  --muted: #68727d;
-  --border: rgba(13, 34, 56, 0.12);
+  --trade-navy: #071d31;
+  --trade-navy-deep: #041522;
+  --trade-teal: #083f45;
+  --trade-gold: #d7a84e;
+  --trade-gold-soft: #f1cc81;
+  --trade-cream: #f7f2e8;
+  --trade-white: #ffffff;
+  --trade-text: #10263b;
+  --trade-muted: #697682;
+  --trade-line: rgba(15, 37, 58, 0.13);
 
-  background: var(--white);
-  color: var(--text);
+  background: var(--trade-white);
+  color: var(--trade-text);
 }
 
 
 /* ============================================================
-   SHARED CONTAINER
+   GENERAL
 ============================================================ */
 
-.us-africa-page .container {
-  width: min(1180px, calc(100% - 40px));
-  margin: 0 auto;
-}
-
-
-/* ============================================================
-   EYEBROW
-============================================================ */
-
-.us-africa-page .eyebrow {
+.trade-eyebrow {
   display: inline-block;
-  margin-bottom: 18px;
-  font-size: 0.76rem;
+
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gold);
+
+  color: #b9862f;
+
+  margin-bottom: 1rem;
 }
 
-.us-africa-page .eyebrow--light {
-  color: var(--gold-light);
+.trade-eyebrow--gold {
+  color: var(--trade-gold-soft);
+}
+
+.trade-button {
+  min-height: 52px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+
+  padding: 0 1.6rem;
+
+  border-radius: 999px;
+
+  text-decoration: none;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.trade-button:hover {
+  transform: translateY(-2px);
+}
+
+.trade-button--gold {
+  background:
+    linear-gradient(
+      135deg,
+      #f5d58f,
+      #dca94f
+    );
+
+  color: #081c2f;
+
+  box-shadow:
+    0 14px 34px rgba(215, 168, 78, 0.22);
+}
+
+.trade-button--outline {
+  color: #ffffff;
+
+  border:
+    1px solid
+    rgba(234, 193, 110, 0.7);
+
+  background:
+    rgba(255, 255, 255, 0.03);
+
+  backdrop-filter: blur(8px);
+}
+
+.trade-button--soft {
+  color: var(--trade-navy);
+
+  background: #f3d58e;
 }
 
 
@@ -52,288 +107,600 @@
    HERO
 ============================================================ */
 
-.us-africa-page .page-hero {
+.trade-hero {
   position: relative;
+
+  min-height: 760px;
+
   overflow: hidden;
+
+  display: flex;
+  align-items: stretch;
+
   background:
-    radial-gradient(
-      circle at top right,
-      rgba(184, 136, 44, 0.16),
-      transparent 30%
-    ),
-    linear-gradient(
-      135deg,
-      var(--navy-deep) 0%,
-      var(--navy) 55%,
-      #102d49 100%
-    );
-  color: var(--white);
+    var(--trade-navy-deep);
 }
 
-.us-africa-page .page-hero::before {
-  content: "";
+.trade-hero__media {
   position: absolute;
   inset: 0;
+}
+
+.trade-hero__media img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+}
+
+.trade-hero__overlay {
+  position: absolute;
+  inset: 0;
+
   background:
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px
+      rgba(4, 20, 35, 0.98) 0%,
+      rgba(4, 20, 35, 0.86) 34%,
+      rgba(4, 20, 35, 0.35) 65%,
+      rgba(4, 20, 35, 0.12) 100%
     );
-  background-size: 70px 70px;
-  pointer-events: none;
 }
 
-.us-africa-page .page-hero__inner {
+.trade-hero__glow {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 71% 43%,
+      rgba(219, 171, 79, 0.18),
+      transparent 32%
+    );
+}
+
+.trade-hero__inner {
   position: relative;
-  z-index: 1;
-  min-height: 560px;
-  display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
-  gap: 80px;
+  z-index: 2;
+
+  width: 100%;
+
+  display: flex;
   align-items: center;
-  padding: 100px 0 90px;
+  justify-content: space-between;
+
+  padding-top: 7rem;
+  padding-bottom: 5rem;
 }
 
-.us-africa-page .page-hero__content {
-  max-width: 760px;
+.trade-hero__content {
+  max-width: 680px;
 }
 
-.us-africa-page .page-hero h1 {
+.trade-hero h1 {
   margin: 0;
-  max-width: 820px;
-  font-size: clamp(3rem, 6vw, 5.7rem);
-  line-height: 0.98;
+
+  color: #ffffff;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      3.3rem,
+      6vw,
+      6.6rem
+    );
+
+  line-height: 0.95;
+
   letter-spacing: -0.045em;
-  font-weight: 700;
 }
 
-.us-africa-page .page-hero__aside {
-  align-self: end;
-  padding-bottom: 25px;
+.trade-hero h1 span {
+  color: var(--trade-gold-soft);
 }
 
-.us-africa-page .page-hero__aside p {
-  margin: 0;
-  padding-left: 26px;
-  border-left: 2px solid var(--gold);
-  font-size: 1.06rem;
+.trade-hero__content > p {
+  max-width: 610px;
+
+  margin:
+    2rem
+    0
+    0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  font-size: 1.08rem;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.76);
+}
+
+.trade-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  margin-top: 2rem;
+}
+
+.trade-hero__highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+
+  margin-top: 2.7rem;
+}
+
+.trade-hero__highlights > div {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  color: #ffffff;
+}
+
+.trade-hero__highlights svg {
+  color: var(--trade-gold);
+}
+
+.trade-hero__highlights span {
+  font-size: 0.68rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+
+  line-height: 1.45;
+}
+
+.trade-hero__side-message {
+  align-self: center;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+
+  padding-left: 1.2rem;
+
+  border-left:
+    2px solid
+    rgba(231, 190, 101, 0.75);
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.7
+    );
+
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
 }
 
 
 /* ============================================================
-   INTRO
+   TRUST STRIP
 ============================================================ */
 
-.us-africa-page .trade-intro {
-  padding: 110px 0;
-  background: var(--white);
+.trade-trust {
+  background: #ffffff;
+
+  border-bottom:
+    1px solid
+    var(--trade-line);
 }
 
-.us-africa-page .trade-intro__grid {
+.trade-trust .container {
+  padding-top: 1.4rem;
+  padding-bottom: 1.4rem;
+}
+
+.trade-trust__label {
+  margin-bottom: 1rem;
+
+  color: #7b8288;
+
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.trade-trust__logos {
   display: grid;
-  grid-template-columns: 1fr 0.8fr;
-  gap: 95px;
-  align-items: start;
+
+  grid-template-columns:
+    repeat(
+      6,
+      minmax(0, 1fr)
+    );
+
+  gap: 1rem;
 }
 
-.us-africa-page .trade-intro h2 {
-  margin: 0;
-  max-width: 720px;
-  font-size: clamp(2.4rem, 4vw, 4.15rem);
-  line-height: 1.07;
-  letter-spacing: -0.04em;
-  color: var(--navy-deep);
-}
+.trade-trust__logos > div {
+  min-height: 54px;
 
-.us-africa-page .trade-intro__copy {
-  padding-top: 40px;
-}
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-.us-africa-page .trade-intro__copy p {
-  margin: 0 0 22px;
-  font-size: 1.03rem;
-  line-height: 1.85;
-  color: var(--muted);
-}
+  color: #6c747b;
 
-.us-africa-page .trade-intro__copy p:last-child {
-  margin-bottom: 0;
-}
+  border-right:
+    1px solid
+    rgba(15, 37, 58, 0.09);
 
+  font-size: 0.82rem;
+  font-weight: 600;
 
-/* ============================================================
-   SECTION HEADING
-============================================================ */
-
-.us-africa-page .section-heading {
-  max-width: 760px;
-  margin-bottom: 55px;
-}
-
-.us-africa-page .section-heading--center {
-  margin-left: auto;
-  margin-right: auto;
   text-align: center;
 }
 
-.us-africa-page .section-heading h2 {
-  margin: 0;
-  font-size: clamp(2.2rem, 3.7vw, 3.8rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-  color: var(--navy-deep);
-}
-
 
 /* ============================================================
-   OPPORTUNITIES
+   CROSS BORDER OPPORTUNITY
 ============================================================ */
 
-.us-africa-page .trade-opportunities {
-  padding: 110px 0;
-  background: var(--cream);
-}
-
-.us-africa-page .trade-opportunities__grid {
+.trade-opportunity {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--border);
-  border-left: 1px solid var(--border);
+
+  grid-template-columns:
+    minmax(280px, 1fr)
+    minmax(420px, 1.45fr)
+    minmax(250px, 0.75fr);
+
+  min-height: 520px;
+
+  background:
+    #fbfaf7;
 }
 
-.us-africa-page .trade-card {
-  min-height: 320px;
-  padding: 42px;
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.7);
-  transition:
-    transform 0.3s ease,
-    background 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.us-africa-page .trade-card:hover {
-  transform: translateY(-4px);
-  background: var(--white);
-  box-shadow: 0 18px 45px rgba(13, 34, 56, 0.08);
-}
-
-.us-africa-page .trade-card__number {
-  display: block;
-  margin-bottom: 56px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  color: var(--gold);
-}
-
-.us-africa-page .trade-card h3 {
-  margin: 0 0 14px;
-  font-size: 1.55rem;
-  color: var(--navy-deep);
-}
-
-.us-africa-page .trade-card p {
-  margin: 0;
-  max-width: 490px;
-  line-height: 1.75;
-  color: var(--muted);
-}
-
-
-/* ============================================================
-   NETWORK MODEL
-============================================================ */
-
-.us-africa-page .network-model {
+.trade-opportunity__image {
   position: relative;
   overflow: hidden;
-  padding: 120px 0;
+}
+
+.trade-opportunity__image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.trade-opportunity__image-caption {
+  position: absolute;
+
+  left: 2rem;
+  bottom: 2rem;
+
+  max-width: 140px;
+
+  color: #ffffff;
+
+  font-size: 0.67rem;
+  font-weight: 700;
+
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.trade-opportunity__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding:
+    5rem
+    4rem;
+}
+
+.trade-opportunity__content h2 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.6rem,
+      4vw,
+      4.3rem
+    );
+
+  line-height: 1;
+
+  letter-spacing: -0.035em;
+
+  color: var(--trade-navy);
+}
+
+.trade-opportunity__content p {
+  max-width: 640px;
+
+  margin:
+    1.4rem
+    0
+    0;
+
+  line-height: 1.75;
+
+  color: #4f5e6a;
+}
+
+.trade-opportunity__content .trade-button {
+  margin-top: 1.8rem;
+
+  align-self: flex-start;
+}
+
+.trade-opportunity__stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.9rem;
+
+  padding:
+    3rem
+    2rem;
+
+  border-left:
+    1px solid
+    var(--trade-line);
+}
+
+.trade-stat {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trade-stat svg {
+  color: var(--trade-gold);
+}
+
+.trade-stat div {
+  display: flex;
+  flex-direction: column;
+}
+
+.trade-stat strong {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.55rem;
+
+  color: var(--trade-navy);
+}
+
+.trade-stat span {
+  margin-top: 0.1rem;
+
+  color: var(--trade-muted);
+
+  font-size: 0.84rem;
+}
+
+
+/* ============================================================
+   NETWORK ENABLES
+============================================================ */
+
+.trade-enables {
+  position: relative;
+
+  overflow: hidden;
+
   background:
     linear-gradient(
       135deg,
-      var(--navy-deep),
-      var(--navy)
+      #07373d,
+      #07313a 45%,
+      #082e37
     );
-  color: var(--white);
+
+  color: #ffffff;
+
+  padding:
+    5.5rem
+    0;
 }
 
-.us-africa-page .network-model::after {
+.trade-enables::after {
   content: "";
+
   position: absolute;
-  width: 420px;
-  height: 420px;
-  right: -120px;
-  bottom: -180px;
-  border: 1px solid rgba(184, 136, 44, 0.28);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 60px rgba(184, 136, 44, 0.04),
-    0 0 0 120px rgba(184, 136, 44, 0.025);
+
+  right: -100px;
+  top: 0;
+
+  width: 520px;
+  height: 520px;
+
+  opacity: 0.1;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.35),
+      transparent 70%
+    );
 }
 
-.us-africa-page .network-model__grid {
+.trade-enables__top {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+
   display: grid;
-  grid-template-columns: 0.9fr 1fr;
-  gap: 110px;
-  align-items: start;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 3rem;
+
+  align-items: end;
 }
 
-.us-africa-page .network-model__content h2 {
-  margin: 0 0 28px;
-  max-width: 620px;
-  font-size: clamp(2.7rem, 4.5vw, 4.8rem);
+.trade-enables__top h2 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.7rem,
+      4vw,
+      4.4rem
+    );
+
   line-height: 1;
-  letter-spacing: -0.045em;
+
+  letter-spacing: -0.03em;
 }
 
-.us-africa-page .network-model__content p {
+.trade-enables__top > p {
+  max-width: 580px;
+
   margin: 0;
-  max-width: 570px;
-  font-size: 1rem;
-  line-height: 1.85;
-  color: rgba(255, 255, 255, 0.72);
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.79
+    );
+
+  line-height: 1.75;
 }
 
-.us-africa-page .network-model__steps {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
+.trade-enables__grid {
+  position: relative;
+  z-index: 2;
 
-.us-africa-page .network-step {
   display: grid;
-  grid-template-columns: 65px 1fr;
-  gap: 24px;
-  padding: 28px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 1rem;
+
+  margin-top: 3rem;
 }
 
-.us-africa-page .network-step > span {
-  padding-top: 4px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--gold-light);
+.trade-enable-card {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  color: var(--trade-text);
+
+  box-shadow:
+    0 18px 46px
+    rgba(0, 0, 0, 0.18);
 }
 
-.us-africa-page .network-step h3 {
-  margin: 0 0 8px;
-  font-size: 1.42rem;
+.trade-enable-card__image {
+  height: 165px;
+
+  overflow: hidden;
 }
 
-.us-africa-page .network-step p {
+.trade-enable-card__image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform
+    400ms
+    ease;
+}
+
+.trade-enable-card:hover
+.trade-enable-card__image img {
+  transform: scale(1.05);
+}
+
+.trade-enable-card__icon {
+  position: absolute;
+
+  top: 140px;
+  left: 1.4rem;
+
+  width: 52px;
+  height: 52px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: var(--trade-gold-soft);
+
+  background: var(--trade-navy);
+
+  border:
+    3px solid
+    #ffffff;
+}
+
+.trade-enable-card__body {
+  padding:
+    2.3rem
+    1.4rem
+    1.6rem;
+}
+
+.trade-enable-card h3 {
   margin: 0;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.64);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 1.28rem;
+
+  color: var(--trade-navy);
+}
+
+.trade-enable-card p {
+  margin:
+    0.8rem
+    0
+    0;
+
+  color: #5c6973;
+
+  line-height: 1.6;
+
+  font-size: 0.9rem;
 }
 
 
@@ -341,101 +708,179 @@
    WHO WE WORK WITH
 ============================================================ */
 
-.us-africa-page .network-partners {
-  padding: 110px 0;
-  background: var(--white);
+.trade-network {
+  padding:
+    4rem
+    0;
+
+  background: #ffffff;
 }
 
-.us-africa-page .network-partners__grid {
+.trade-network .container {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+
+  grid-template-columns:
+    280px
+    1fr;
+
+  gap: 4rem;
+
+  align-items: center;
 }
 
-.us-africa-page .network-partners__grid > div {
+.trade-network__intro h2 {
+  margin: 0;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  color: var(--trade-navy);
+
+  font-size: 2.4rem;
+
+  line-height: 1;
+}
+
+.trade-network__intro p {
+  color: var(--trade-muted);
+
+  line-height: 1.65;
+}
+
+.trade-network__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      6,
+      minmax(0, 1fr)
+    );
+}
+
+.trade-network__item {
   min-height: 130px;
+
   display: flex;
-  align-items: flex-end;
-  padding: 28px;
-  border: 1px solid var(--border);
-  background: #fbfbf9;
-  font-size: 1.04rem;
-  font-weight: 600;
-  color: var(--navy-deep);
-  transition:
-    transform 0.3s ease,
-    border-color 0.3s ease,
-    background 0.3s ease;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.8rem;
+
+  padding:
+    1.2rem;
+
+  text-align: center;
+
+  border-left:
+    1px solid
+    var(--trade-line);
 }
 
-.us-africa-page .network-partners__grid > div:hover {
-  transform: translateY(-3px);
-  border-color: rgba(184, 136, 44, 0.5);
-  background: var(--cream);
+.trade-network__item svg {
+  color: var(--trade-navy);
+}
+
+.trade-network__item span {
+  color: var(--trade-navy);
+
+  font-size: 0.84rem;
+  font-weight: 600;
+
+  line-height: 1.4;
 }
 
 
 /* ============================================================
-   CTA
+   FINAL CTA
 ============================================================ */
 
-.us-africa-page .trade-cta {
-  padding: 100px 0;
-  background: var(--gold);
-  color: var(--navy-deep);
-}
+.trade-final-cta {
+  position: relative;
 
-.us-africa-page .trade-cta__inner {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 70px;
-  align-items: end;
-}
+  overflow: hidden;
 
-.us-africa-page .trade-cta .eyebrow {
-  color: rgba(8, 24, 42, 0.72);
-}
+  min-height: 320px;
 
-.us-africa-page .trade-cta h2 {
-  margin: 0 0 22px;
-  max-width: 800px;
-  font-size: clamp(2.4rem, 4vw, 4.2rem);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
-}
-
-.us-africa-page .trade-cta p {
-  margin: 0;
-  max-width: 660px;
-  font-size: 1rem;
-  line-height: 1.75;
-  color: rgba(8, 24, 42, 0.74);
-}
-
-.us-africa-page .trade-cta__button {
-  min-width: 220px;
-  display: inline-flex;
-  justify-content: space-between;
+  display: flex;
   align-items: center;
-  gap: 28px;
-  padding: 18px 22px;
-  background: var(--navy-deep);
-  color: var(--white);
-  text-decoration: none;
-  font-size: 0.92rem;
-  font-weight: 700;
-  transition:
-    transform 0.25s ease,
-    background 0.25s ease;
 }
 
-.us-africa-page .trade-cta__button:hover {
-  transform: translateY(-2px);
-  background: var(--navy-soft);
+.trade-final-cta__image {
+  position: absolute;
+  inset: 0;
 }
 
-.us-africa-page .trade-cta__button span {
-  font-size: 1.25rem;
+.trade-final-cta__image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.trade-final-cta__image div {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(6, 28, 45, 0.95),
+      rgba(6, 28, 45, 0.74),
+      rgba(6, 28, 45, 0.56)
+    );
+}
+
+.trade-final-cta__inner {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    1.05fr
+    1fr
+    auto;
+
+  gap: 3rem;
+
+  align-items: center;
+}
+
+.trade-final-cta h2 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      2.3rem,
+      4vw,
+      4rem
+    );
+
+  line-height: 1;
+}
+
+.trade-final-cta p {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.8
+    );
+
+  line-height: 1.7;
 }
 
 
@@ -443,124 +888,220 @@
    RESPONSIVE
 ============================================================ */
 
-@media (max-width: 1000px) {
+@media (max-width: 1180px) {
 
-  .us-africa-page .page-hero__inner,
-  .us-africa-page .trade-intro__grid,
-  .us-africa-page .network-model__grid,
-  .us-africa-page .trade-cta__inner {
+  .trade-enables__grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .trade-network .container {
     grid-template-columns: 1fr;
   }
 
-  .us-africa-page .page-hero__inner {
-    min-height: auto;
-    gap: 50px;
-    padding: 90px 0 70px;
+  .trade-network__grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
   }
 
-  .us-africa-page .page-hero__aside {
-    max-width: 650px;
-    padding-bottom: 0;
-  }
-
-  .us-africa-page .trade-intro__grid {
-    gap: 30px;
-  }
-
-  .us-africa-page .trade-intro__copy {
-    max-width: 680px;
-    padding-top: 0;
-  }
-
-  .us-africa-page .network-model__grid {
-    gap: 70px;
-  }
-
-  .us-africa-page .trade-cta__inner {
-    gap: 45px;
-  }
-
-  .us-africa-page .trade-cta__button {
-    width: fit-content;
-  }
 }
 
+@media (max-width: 960px) {
 
-@media (max-width: 760px) {
-
-  .us-africa-page .container {
-    width: min(100% - 28px, 1180px);
+  .trade-hero {
+    min-height: 720px;
   }
 
-  .us-africa-page .page-hero__inner {
-    padding: 75px 0 60px;
+  .trade-hero__side-message {
+    display: none;
   }
 
-  .us-africa-page .page-hero h1 {
-    font-size: clamp(2.55rem, 12vw, 4rem);
-  }
-
-  .us-africa-page .trade-intro,
-  .us-africa-page .trade-opportunities,
-  .us-africa-page .network-partners {
-    padding: 80px 0;
-  }
-
-  .us-africa-page .network-model {
-    padding: 85px 0;
-  }
-
-  .us-africa-page .trade-opportunities__grid {
+  .trade-opportunity {
     grid-template-columns: 1fr;
   }
 
-  .us-africa-page .trade-card {
-    min-height: auto;
-    padding: 32px 26px;
+  .trade-opportunity__image {
+    min-height: 380px;
   }
 
-  .us-africa-page .trade-card__number {
-    margin-bottom: 35px;
+  .trade-opportunity__stats {
+    display: grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+
+    border-left: none;
+
+    border-top:
+      1px solid
+      var(--trade-line);
   }
 
-  .us-africa-page .network-partners__grid {
-    grid-template-columns: 1fr 1fr;
+  .trade-trust__logos {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
   }
 
-  .us-africa-page .trade-cta {
-    padding: 75px 0;
+  .trade-enables__top {
+    grid-template-columns: 1fr;
   }
+
+  .trade-final-cta__inner {
+    grid-template-columns: 1fr;
+
+    padding:
+      4rem
+      0;
+  }
+
 }
 
+@media (max-width: 720px) {
 
-@media (max-width: 520px) {
-
-  .us-africa-page .page-hero__aside p {
-    padding-left: 18px;
-    font-size: 0.96rem;
+  .trade-hero__inner {
+    padding-top: 6rem;
+    padding-bottom: 3.5rem;
   }
 
-  .us-africa-page .trade-intro h2,
-  .us-africa-page .section-heading h2,
-  .us-africa-page .network-model__content h2,
-  .us-africa-page .trade-cta h2 {
-    letter-spacing: -0.03em;
+  .trade-hero h1 {
+    font-size:
+      clamp(
+        3rem,
+        14vw,
+        4.4rem
+      );
   }
 
-  .us-africa-page .network-step {
-    grid-template-columns: 45px 1fr;
-    gap: 14px;
+  .trade-hero__highlights {
+    gap: 1.2rem;
   }
 
-  .us-africa-page .network-partners__grid {
+  .trade-trust__logos {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .trade-opportunity__content {
+    padding:
+      4rem
+      1.4rem;
+  }
+
+  .trade-opportunity__stats {
+    grid-template-columns: 1fr;
+
+    padding:
+      2rem
+      1.4rem;
+  }
+
+  .trade-enables {
+    padding:
+      4rem
+      0;
+  }
+
+  .trade-enables__grid {
     grid-template-columns: 1fr;
   }
 
-  .us-africa-page .network-partners__grid > div {
-    min-height: 105px;
+  .trade-network__grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
   }
 
-  .us-africa-page .trade-cta__button {
+  .trade-network__item {
+    border:
+      1px solid
+      var(--trade-line);
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .trade-hero__actions {
+    flex-direction: column;
+  }
+
+  .trade-button {
     width: 100%;
   }
+
+  .trade-network__grid {
+    grid-template-columns: 1fr;
+  }
+
+}/* ============================================================
+   CMS STATUS
+============================================================ */
+
+.trade-cms-status {
+  position: fixed;
+
+  right: 1rem;
+  bottom: 1rem;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  padding:
+    0.65rem
+    0.85rem;
+
+  border-radius: 8px;
+
+  background:
+    rgba(7, 29, 49, 0.92);
+
+  color: #ffffff;
+
+  font-size: 0.76rem;
+
+  box-shadow:
+    0 8px 24px
+    rgba(0, 0, 0, 0.16);
+}
+
+.trade-cms-status svg {
+  animation:
+    tradeCmsSpin
+    1s
+    linear
+    infinite;
+}
+
+.trade-cms-status--error {
+  background:
+    rgba(115, 35, 35, 0.94);
+}
+
+@keyframes tradeCmsSpin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
 }

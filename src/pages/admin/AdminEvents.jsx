@@ -7,6 +7,8 @@ import React, {
 } from "react";
 
 import {
+  ArrowLeft,
+  ArrowRight,
   CalendarDays,
   ChevronRight,
   Clock3,
@@ -14,7 +16,6 @@ import {
   MapPin,
   Plus,
   RefreshCw,
-  Save,
   Search,
   Trash2,
   Upload,
@@ -35,7 +36,7 @@ const API_URL =
 
 
 /* ============================================================
-   IMAGE SETTINGS
+   SETTINGS
 ============================================================ */
 
 const MAX_IMAGE_SIZE =
@@ -45,6 +46,32 @@ const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
+];
+
+const EVENTS_PER_PAGE = 6;
+
+
+/* ============================================================
+   FORM STEPS
+============================================================ */
+
+const FORM_STEPS = [
+  {
+    id: 1,
+    label: "Basic Information",
+  },
+  {
+    id: 2,
+    label: "Event Image",
+  },
+  {
+    id: 3,
+    label: "Schedule & Location",
+  },
+  {
+    id: 4,
+    label: "Content & Publishing",
+  },
 ];
 
 
@@ -65,8 +92,7 @@ const initialForm = {
 
 
 /* ============================================================
-   CONTINENTAL FOUNDERS
-   ADMIN EVENTS
+   COMPONENT
 ============================================================ */
 
 export default function AdminEvents() {
@@ -81,13 +107,17 @@ export default function AdminEvents() {
   ] =
     useState("");
 
-
   const [
     selectedEvent,
     setSelectedEvent,
   ] =
     useState(null);
 
+  const [
+    detailStep,
+    setDetailStep,
+  ] =
+    useState(1);
 
   const [
     events,
@@ -95,13 +125,11 @@ export default function AdminEvents() {
   ] =
     useState([]);
 
-
   const [
     loading,
     setLoading,
   ] =
     useState(true);
-
 
   const [
     error,
@@ -109,6 +137,11 @@ export default function AdminEvents() {
   ] =
     useState("");
 
+  const [
+    currentPage,
+    setCurrentPage,
+  ] =
+    useState(1);
 
   const [
     formOpen,
@@ -116,13 +149,17 @@ export default function AdminEvents() {
   ] =
     useState(false);
 
-
   const [
     editingEvent,
     setEditingEvent,
   ] =
     useState(null);
 
+  const [
+    formStep,
+    setFormStep,
+  ] =
+    useState(1);
 
   const [
     form,
@@ -130,13 +167,11 @@ export default function AdminEvents() {
   ] =
     useState(initialForm);
 
-
   const [
     formError,
     setFormError,
   ] =
     useState("");
-
 
   const [
     saving,
@@ -144,13 +179,11 @@ export default function AdminEvents() {
   ] =
     useState(false);
 
-
   const [
     deleting,
     setDeleting,
   ] =
     useState(false);
-
 
   const [
     imagePreview,
@@ -165,7 +198,6 @@ export default function AdminEvents() {
 
   const imageInputRef =
     useRef(null);
-
 
   const titleInputRef =
     useRef(null);
@@ -184,7 +216,6 @@ export default function AdminEvents() {
           setLoading(true);
           setError("");
 
-
           const response =
             await fetch(
               `${API_URL}/api/events`,
@@ -201,15 +232,12 @@ export default function AdminEvents() {
               }
             );
 
-
           const contentType =
             response.headers.get(
               "content-type"
             ) || "";
 
-
           let result = {};
-
 
           if (
             contentType.includes(
@@ -222,24 +250,15 @@ export default function AdminEvents() {
 
           } else {
 
-            const text =
-              await response.text();
-
-
-            console.error(
-              "Unexpected events response:",
-              text
-            );
-
-
             throw new Error(
               "The events service returned an unexpected response."
             );
 
           }
 
-
-          if (!response.ok) {
+          if (
+            !response.ok
+          ) {
 
             throw new Error(
               result.message ||
@@ -248,7 +267,6 @@ export default function AdminEvents() {
             );
 
           }
-
 
           const eventData =
             Array.isArray(
@@ -265,7 +283,6 @@ export default function AdminEvents() {
                   ? result.data.events
                   : [];
 
-
           setEvents(
             eventData
           );
@@ -279,9 +296,7 @@ export default function AdminEvents() {
             requestError
           );
 
-
           setEvents([]);
-
 
           setError(
             requestError.message ||
@@ -300,7 +315,7 @@ export default function AdminEvents() {
 
 
   /* ==========================================================
-     INITIAL LOAD
+     INITIAL LOAD ONLY
   ========================================================== */
 
   useEffect(
@@ -316,16 +331,71 @@ export default function AdminEvents() {
 
 
   /* ==========================================================
-     FOCUS TITLE WHEN FORM OPENS
+     SEARCH RESET PAGE
   ========================================================== */
 
   useEffect(
     () => {
 
-      if (!formOpen) {
-        return undefined;
+      setCurrentPage(1);
+
+    },
+    [
+      searchQuery,
+    ]
+  );
+
+
+  /* ==========================================================
+     KEEP PAGE VALID
+  ========================================================== */
+
+  useEffect(
+    () => {
+
+      const pageCount =
+        Math.max(
+          1,
+          Math.ceil(
+            events.length /
+            EVENTS_PER_PAGE
+          )
+        );
+
+      if (
+        currentPage >
+        pageCount
+      ) {
+
+        setCurrentPage(
+          pageCount
+        );
+
       }
 
+    },
+    [
+      events,
+      currentPage,
+    ]
+  );
+
+
+  /* ==========================================================
+     FOCUS TITLE
+  ========================================================== */
+
+  useEffect(
+    () => {
+
+      if (
+        !formOpen ||
+        formStep !== 1
+      ) {
+
+        return undefined;
+
+      }
 
       const timer =
         window.setTimeout(
@@ -339,7 +409,6 @@ export default function AdminEvents() {
           120
         );
 
-
       return () => {
 
         window.clearTimeout(
@@ -351,12 +420,13 @@ export default function AdminEvents() {
     },
     [
       formOpen,
+      formStep,
     ]
   );
 
 
   /* ==========================================================
-     CLEAN IMAGE PREVIEW
+     CLEAN PREVIEW
   ========================================================== */
 
   useEffect(
@@ -399,13 +469,13 @@ export default function AdminEvents() {
             .trim()
             .toLowerCase();
 
-
-        if (!query) {
+        if (
+          !query
+        ) {
 
           return events;
 
         }
-
 
         return events.filter(
           (
@@ -426,7 +496,6 @@ export default function AdminEvents() {
               .join(" ")
               .toLowerCase();
 
-
             return searchableText.includes(
               query
             );
@@ -443,49 +512,83 @@ export default function AdminEvents() {
 
 
   /* ==========================================================
+     PAGINATION
+  ========================================================== */
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredEvents.length /
+        EVENTS_PER_PAGE
+      )
+    );
+
+  const safeCurrentPage =
+    Math.min(
+      currentPage,
+      totalPages
+    );
+
+  const paginatedEvents =
+    useMemo(
+      () => {
+
+        const start =
+          (
+            safeCurrentPage - 1
+          ) *
+          EVENTS_PER_PAGE;
+
+        return filteredEvents.slice(
+          start,
+          start +
+          EVENTS_PER_PAGE
+        );
+
+      },
+      [
+        filteredEvents,
+        safeCurrentPage,
+      ]
+    );
+
+
+  /* ==========================================================
      COUNTS
   ========================================================== */
 
   const publishedCount =
     useMemo(
-      () => {
-
-        return events.filter(
+      () =>
+        events.filter(
           (
             event
           ) =>
             String(
               event.status || ""
             )
-              .trim()
               .toLowerCase() ===
             "published"
-        ).length;
-
-      },
+        ).length,
       [
         events,
       ]
     );
 
-
   const draftCount =
     useMemo(
-      () => {
-
-        return events.filter(
+      () =>
+        events.filter(
           (
             event
           ) =>
             String(
               event.status || ""
             )
-              .trim()
               .toLowerCase() ===
             "draft"
-        ).length;
-
-      },
+        ).length,
       [
         events,
       ]
@@ -493,10 +596,7 @@ export default function AdminEvents() {
 
 
   /* ==========================================================
-     CREATE SLUG
-
-     Generated automatically from whatever title the
-     admin/editor chooses.
+     HELPERS
   ========================================================== */
 
   function createSlug(
@@ -524,26 +624,22 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     DATE TO INPUT
-  ========================================================== */
-
   function toDateTimeInput(
     value
   ) {
 
-    if (!value) {
+    if (
+      !value
+    ) {
 
       return "";
 
     }
 
-
     const date =
       new Date(
         value
       );
-
 
     if (
       Number.isNaN(
@@ -555,17 +651,16 @@ export default function AdminEvents() {
 
     }
 
-
     const offset =
       date.getTimezoneOffset();
-
 
     const localDate =
       new Date(
         date.getTime() -
-        offset * 60 * 1000
+        offset *
+        60 *
+        1000
       );
-
 
     return localDate
       .toISOString()
@@ -576,10 +671,6 @@ export default function AdminEvents() {
 
   }
 
-
-  /* ==========================================================
-     EVENT DATE
-  ========================================================== */
 
   function getEventDate(
     event
@@ -597,10 +688,6 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     EVENT IMAGE
-  ========================================================== */
-
   function getEventImage(
     event
   ) {
@@ -615,26 +702,22 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     FORMAT DATE
-  ========================================================== */
-
   function formatDate(
     value
   ) {
 
-    if (!value) {
+    if (
+      !value
+    ) {
 
       return "Not scheduled";
 
     }
 
-
     const date =
       new Date(
         value
       );
-
 
     if (
       Number.isNaN(
@@ -645,7 +728,6 @@ export default function AdminEvents() {
       return value;
 
     }
-
 
     return date.toLocaleDateString(
       undefined,
@@ -664,26 +746,22 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     FORMAT TIME
-  ========================================================== */
-
   function formatTime(
     value
   ) {
 
-    if (!value) {
+    if (
+      !value
+    ) {
 
       return "Time not set";
 
     }
 
-
     const date =
       new Date(
         value
       );
-
 
     if (
       Number.isNaN(
@@ -694,7 +772,6 @@ export default function AdminEvents() {
       return "Time not set";
 
     }
-
 
     return date.toLocaleTimeString(
       undefined,
@@ -710,10 +787,6 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     LOCATION
-  ========================================================== */
-
   function getLocation(
     event
   ) {
@@ -728,10 +801,6 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     EVENT TYPE
-  ========================================================== */
-
   function getEventType(
     event
   ) {
@@ -745,10 +814,6 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     STATUS CLASS
-  ========================================================== */
-
   function getStatusClass(
     status
   ) {
@@ -760,7 +825,6 @@ export default function AdminEvents() {
         .trim()
         .toLowerCase();
 
-
     if (
       normalized ===
       "published"
@@ -769,7 +833,6 @@ export default function AdminEvents() {
       return "admin-events__status admin-events__status--published";
 
     }
-
 
     if (
       normalized ===
@@ -780,7 +843,6 @@ export default function AdminEvents() {
 
     }
 
-
     if (
       normalized ===
       "cancelled"
@@ -789,7 +851,6 @@ export default function AdminEvents() {
       return "admin-events__status admin-events__status--cancelled";
 
     }
-
 
     return "admin-events__status";
 
@@ -810,7 +871,6 @@ export default function AdminEvents() {
     } =
       event.target;
 
-
     setForm(
       (
         current
@@ -822,20 +882,13 @@ export default function AdminEvents() {
       })
     );
 
-
-    if (
-      formError
-    ) {
-
-      setFormError("");
-
-    }
+    setFormError("");
 
   }
 
 
   /* ==========================================================
-     IMAGE CHANGE
+     IMAGE
   ========================================================== */
 
   function handleImageChange(
@@ -847,13 +900,13 @@ export default function AdminEvents() {
         .target
         .files?.[0];
 
-
-    if (!file) {
+    if (
+      !file
+    ) {
 
       return;
 
     }
-
 
     if (
       !ALLOWED_IMAGE_TYPES.includes(
@@ -865,15 +918,12 @@ export default function AdminEvents() {
         "Please choose a JPG, PNG, or WebP image."
       );
 
-
       event.target.value =
         "";
-
 
       return;
 
     }
-
 
     if (
       file.size >
@@ -884,15 +934,12 @@ export default function AdminEvents() {
         "The event image must be 5 MB or smaller."
       );
 
-
       event.target.value =
         "";
-
 
       return;
 
     }
-
 
     if (
       imagePreview &&
@@ -907,12 +954,10 @@ export default function AdminEvents() {
 
     }
 
-
     const previewUrl =
       URL.createObjectURL(
         file
       );
-
 
     setForm(
       (
@@ -925,20 +970,14 @@ export default function AdminEvents() {
       })
     );
 
-
     setImagePreview(
       previewUrl
     );
-
 
     setFormError("");
 
   }
 
-
-  /* ==========================================================
-     REMOVE IMAGE
-  ========================================================== */
 
   function handleRemoveImage() {
 
@@ -955,9 +994,7 @@ export default function AdminEvents() {
 
     }
 
-
     setImagePreview("");
-
 
     setForm(
       (
@@ -972,7 +1009,6 @@ export default function AdminEvents() {
           "",
       })
     );
-
 
     if (
       imageInputRef.current
@@ -996,35 +1032,27 @@ export default function AdminEvents() {
       null
     );
 
-
     setEditingEvent(
       null
     );
-
 
     setForm({
       ...initialForm,
     });
 
-
     setImagePreview("");
-
 
     setFormError("");
 
+    setFormStep(1);
 
-    setFormOpen(
-      true
-    );
+    setFormOpen(true);
 
   }
 
 
   /* ==========================================================
      OPEN EDIT
-
-     Existing title is loaded, but the editor can replace
-     it with any title they choose.
   ========================================================== */
 
   function handleEditEvent(
@@ -1036,16 +1064,13 @@ export default function AdminEvents() {
         event
       );
 
-
     setSelectedEvent(
       null
     );
 
-
     setEditingEvent(
       event
     );
-
 
     setForm({
 
@@ -1091,24 +1116,21 @@ export default function AdminEvents() {
 
     });
 
-
     setImagePreview(
       existingImage
     );
 
-
     setFormError("");
 
+    setFormStep(1);
 
-    setFormOpen(
-      true
-    );
+    setFormOpen(true);
 
   }
 
 
   /* ==========================================================
-     RESET AND CLOSE
+     CLOSE FORM
   ========================================================== */
 
   function resetAndCloseForm() {
@@ -1126,27 +1148,19 @@ export default function AdminEvents() {
 
     }
 
+    setFormOpen(false);
 
-    setFormOpen(
-      false
-    );
-
-
-    setEditingEvent(
-      null
-    );
-
+    setEditingEvent(null);
 
     setForm({
       ...initialForm,
     });
 
+    setFormStep(1);
 
     setImagePreview("");
 
-
     setFormError("");
-
 
     if (
       imageInputRef.current
@@ -1160,10 +1174,6 @@ export default function AdminEvents() {
   }
 
 
-  /* ==========================================================
-     CLOSE FORM
-  ========================================================== */
-
   function closeForm() {
 
     if (
@@ -1175,73 +1185,200 @@ export default function AdminEvents() {
 
     }
 
-
     resetAndCloseForm();
 
   }
 
 
   /* ==========================================================
-     FOCUS TITLE FIELD
+     STEP VALIDATION
   ========================================================== */
 
-  function focusTitleField() {
+  function getStepError(
+    step
+  ) {
 
-    window.setTimeout(
-      () => {
+    if (
+      step === 1
+    ) {
 
-        titleInputRef
-          .current
-          ?.scrollIntoView({
-            behavior:
-              "smooth",
+      const cleanTitle =
+        form.title.trim();
 
-            block:
-              "center",
-          });
+      if (
+        !cleanTitle
+      ) {
 
+        return "Event title is required.";
+
+      }
+
+      if (
+        cleanTitle.length <
+        3
+      ) {
+
+        return "Event title must be at least 3 characters.";
+
+      }
+
+    }
+
+
+    if (
+      step === 2
+    ) {
+
+      if (
+        !editingEvent &&
+        !form.imageFile
+      ) {
+
+        return "Please choose an event cover image.";
+
+      }
+
+    }
+
+
+    if (
+      step === 3
+    ) {
+
+      if (
+        !form.eventDate
+      ) {
+
+        return "Event date and time are required.";
+
+      }
+
+    }
+
+
+    return "";
+
+  }
+
+
+  function validateStep(
+    step
+  ) {
+
+    const message =
+      getStepError(
+        step
+      );
+
+    if (
+      message
+    ) {
+
+      setFormError(
+        message
+      );
+
+      if (
+        step === 1 &&
+        formStep === 1
+      ) {
 
         titleInputRef
           .current
           ?.focus();
 
-      },
-      50
+      }
+
+      return false;
+
+    }
+
+
+    setFormError("");
+
+    return true;
+
+  }
+
+
+  function handleNextFormStep() {
+
+    if (
+      !validateStep(
+        formStep
+      )
+    ) {
+
+      return;
+
+    }
+
+    setFormStep(
+      (
+        current
+      ) =>
+        Math.min(
+          4,
+          current + 1
+        )
+    );
+
+  }
+
+
+  function handlePreviousFormStep() {
+
+    setFormError("");
+
+    setFormStep(
+      (
+        current
+      ) =>
+        Math.max(
+          1,
+          current - 1
+        )
     );
 
   }
 
 
   /* ==========================================================
-     SAVE EVENT
-
-     IMPORTANT:
-     The slug is recreated from the CURRENT title every time,
-     including when editing an existing event.
+     SAVE
   ========================================================== */
 
-  async function handleSaveEvent(
-    event
-  ) {
+  async function handleSaveEvent() {
 
-    event.preventDefault();
+    if (
+      formStep !== 4
+    ) {
+
+      handleNextFormStep();
+
+      return;
+
+    }
 
 
-    const cleanTitle =
-      form.title.trim();
+    const stepOneError =
+      getStepError(1);
+
+    const stepTwoError =
+      getStepError(2);
+
+    const stepThreeError =
+      getStepError(3);
 
 
     if (
-      !cleanTitle
+      stepOneError
     ) {
 
       setFormError(
-        "Event title is required."
+        stepOneError
       );
 
-
-      focusTitleField();
-
+      setFormStep(1);
 
       return;
 
@@ -1249,17 +1386,14 @@ export default function AdminEvents() {
 
 
     if (
-      cleanTitle.length <
-      3
+      stepTwoError
     ) {
 
       setFormError(
-        "Event title must be at least 3 characters."
+        stepTwoError
       );
 
-
-      focusTitleField();
-
+      setFormStep(2);
 
       return;
 
@@ -1267,28 +1401,14 @@ export default function AdminEvents() {
 
 
     if (
-      !form.eventDate
+      stepThreeError
     ) {
 
       setFormError(
-        "Event date and time are required."
+        stepThreeError
       );
 
-
-      return;
-
-    }
-
-
-    if (
-      !editingEvent &&
-      !form.imageFile
-    ) {
-
-      setFormError(
-        "Please choose an event image from your gallery."
-      );
-
+      setFormStep(3);
 
       return;
 
@@ -1297,12 +1417,13 @@ export default function AdminEvents() {
 
     try {
 
-      setSaving(
-        true
-      );
-
+      setSaving(true);
 
       setFormError("");
+
+
+      const cleanTitle =
+        form.title.trim();
 
 
       const eventDate =
@@ -1324,32 +1445,10 @@ export default function AdminEvents() {
       }
 
 
-      /* ======================================================
-         GENERATE SLUG FROM CURRENT TITLE
-
-         If editor changes:
-         Old title: Founders Forum
-         New title: Africa Investment Summit
-
-         New slug:
-         africa-investment-summit
-      ====================================================== */
-
       const slug =
         createSlug(
           cleanTitle
         );
-
-
-      if (
-        !slug
-      ) {
-
-        throw new Error(
-          "Please enter a valid event title."
-        );
-
-      }
 
 
       const formData =
@@ -1361,36 +1460,30 @@ export default function AdminEvents() {
         cleanTitle
       );
 
-
       formData.append(
         "slug",
         slug
       );
-
 
       formData.append(
         "description",
         form.description.trim()
       );
 
-
       formData.append(
         "location",
         form.location.trim()
       );
-
 
       formData.append(
         "type",
         form.type.trim()
       );
 
-
       formData.append(
         "status",
         form.status
       );
-
 
       formData.append(
         "eventDate",
@@ -1417,50 +1510,14 @@ export default function AdminEvents() {
         );
 
 
+      const editingId =
+        editingEvent?.id;
+
+
       const endpoint =
         editing
-          ? `${API_URL}/api/events/${editingEvent.id}`
+          ? `${API_URL}/api/events/${editingId}`
           : `${API_URL}/api/events`;
-
-
-      if (
-        import.meta.env.DEV
-      ) {
-
-        console.log(
-          "Saving event:",
-          {
-            editing,
-
-            title:
-              cleanTitle,
-
-            slug,
-
-            description:
-              form.description,
-
-            location:
-              form.location,
-
-            type:
-              form.type,
-
-            status:
-              form.status,
-
-            eventDate:
-              eventDate.toISOString(),
-
-            image:
-              form.imageFile
-                ?.name ||
-              form.existingImage ||
-              null,
-          }
-        );
-
-      }
 
 
       const response =
@@ -1504,22 +1561,6 @@ export default function AdminEvents() {
         result =
           await response.json();
 
-      } else {
-
-        const text =
-          await response.text();
-
-
-        console.error(
-          "Unexpected save response:",
-          text
-        );
-
-
-        throw new Error(
-          "The events service returned an unexpected response."
-        );
-
       }
 
 
@@ -1540,10 +1581,61 @@ export default function AdminEvents() {
       }
 
 
+      const savedEvent =
+        result.event ||
+        result.data?.event ||
+        result.data ||
+        null;
+
+
+      /* ========================================================
+         UPDATE LOCAL STATE
+      ======================================================== */
+
+      if (
+        savedEvent
+      ) {
+
+        if (
+          editing
+        ) {
+
+          setEvents(
+            (
+              currentEvents
+            ) =>
+              currentEvents.map(
+                (
+                  currentEvent
+                ) =>
+                  currentEvent.id ===
+                  editingId
+                    ? {
+                        ...currentEvent,
+                        ...savedEvent,
+                      }
+                    : currentEvent
+              )
+          );
+
+        } else {
+
+          setEvents(
+            (
+              currentEvents
+            ) => [
+              ...currentEvents,
+              savedEvent,
+            ]
+          );
+
+        }
+
+      }
+
+
       resetAndCloseForm();
 
-
-      await loadEvents();
 
     } catch (
       saveError
@@ -1554,7 +1646,6 @@ export default function AdminEvents() {
         saveError
       );
 
-
       setFormError(
         saveError.message ||
         "Unable to save event."
@@ -1562,9 +1653,7 @@ export default function AdminEvents() {
 
     } finally {
 
-      setSaving(
-        false
-      );
+      setSaving(false);
 
     }
 
@@ -1572,7 +1661,7 @@ export default function AdminEvents() {
 
 
   /* ==========================================================
-     DELETE EVENT
+     DELETE
   ========================================================== */
 
   async function handleDeleteEvent() {
@@ -1584,6 +1673,10 @@ export default function AdminEvents() {
       return;
 
     }
+
+
+    const deletedId =
+      editingEvent.id;
 
 
     const confirmed =
@@ -1603,17 +1696,14 @@ export default function AdminEvents() {
 
     try {
 
-      setDeleting(
-        true
-      );
-
+      setDeleting(true);
 
       setFormError("");
 
 
       const response =
         await fetch(
-          `${API_URL}/api/events/${editingEvent.id}`,
+          `${API_URL}/api/events/${deletedId}`,
           {
             method:
               "DELETE",
@@ -1629,13 +1719,13 @@ export default function AdminEvents() {
         );
 
 
+      let result = {};
+
+
       const contentType =
         response.headers.get(
           "content-type"
         ) || "";
-
-
-      let result = {};
 
 
       if (
@@ -1662,10 +1752,31 @@ export default function AdminEvents() {
       }
 
 
+      /* ========================================================
+         REMOVE LOCALLY
+      ======================================================== */
+
+      setEvents(
+        (
+          currentEvents
+        ) =>
+          currentEvents.filter(
+            (
+              currentEvent
+            ) =>
+              currentEvent.id !==
+              deletedId
+          )
+      );
+
+
+      setSelectedEvent(
+        null
+      );
+
+
       resetAndCloseForm();
 
-
-      await loadEvents();
 
     } catch (
       deleteError
@@ -1676,7 +1787,6 @@ export default function AdminEvents() {
         deleteError
       );
 
-
       setFormError(
         deleteError.message ||
         "Unable to delete event."
@@ -1684,11 +1794,26 @@ export default function AdminEvents() {
 
     } finally {
 
-      setDeleting(
-        false
-      );
+      setDeleting(false);
 
     }
+
+  }
+
+
+  /* ==========================================================
+     OPEN DETAILS
+  ========================================================== */
+
+  function handleOpenDetails(
+    event
+  ) {
+
+    setSelectedEvent(
+      event
+    );
+
+    setDetailStep(1);
 
   }
 
@@ -1699,7 +1824,7 @@ export default function AdminEvents() {
 
   return (
 
-    <div className="admin-events">
+    <div className="admin-events admin-page">
 
       {/* ======================================================
           HEADER
@@ -1718,9 +1843,8 @@ export default function AdminEvents() {
           </h1>
 
           <p>
-            Manage Continental Founders events,
-            conferences, gatherings, workshops,
-            and ecosystem activities.
+            Manage Continental Founders conferences,
+            workshops, gatherings and ecosystem activities.
           </p>
 
         </div>
@@ -1735,13 +1859,10 @@ export default function AdminEvents() {
         >
 
           <Plus
-            size={18}
-            strokeWidth={1.8}
+            size={17}
           />
 
-          <span>
-            Create Event
-          </span>
+          Create Event
 
         </button>
 
@@ -1756,14 +1877,9 @@ export default function AdminEvents() {
 
         <div className="admin-events__summary-card">
 
-          <div className="admin-events__summary-icon">
-
-            <CalendarDays
-              size={20}
-              strokeWidth={1.6}
-            />
-
-          </div>
+          <CalendarDays
+            size={20}
+          />
 
           <div>
 
@@ -1782,14 +1898,9 @@ export default function AdminEvents() {
 
         <div className="admin-events__summary-card">
 
-          <div className="admin-events__summary-icon">
-
-            <Clock3
-              size={20}
-              strokeWidth={1.6}
-            />
-
-          </div>
+          <Clock3
+            size={20}
+          />
 
           <div>
 
@@ -1808,14 +1919,9 @@ export default function AdminEvents() {
 
         <div className="admin-events__summary-card">
 
-          <div className="admin-events__summary-icon">
-
-            <Users
-              size={20}
-              strokeWidth={1.6}
-            />
-
-          </div>
+          <Users
+            size={20}
+          />
 
           <div>
 
@@ -1835,78 +1941,67 @@ export default function AdminEvents() {
 
 
       {/* ======================================================
-          TOOLBAR
+          PANEL
       ====================================================== */}
 
-      <div className="admin-events__toolbar">
+      <section className="admin-events__panel admin-page__body">
 
-        <div className="admin-events__search">
+        <div className="admin-events__toolbar">
 
-          <Search
-            size={18}
-            strokeWidth={1.6}
-          />
+          <div className="admin-events__search">
 
-          <input
-            type="search"
-            value={
-              searchQuery
-            }
-            placeholder="Search events..."
-            aria-label="Search events"
-            onChange={(
-              event
-            ) =>
-              setSearchQuery(
-                event.target.value
-              )
-            }
-          />
+            <Search
+              size={17}
+            />
 
-          {searchQuery && (
-
-            <button
-              type="button"
-              onClick={() =>
-                setSearchQuery("")
+            <input
+              type="search"
+              placeholder="Search events..."
+              value={
+                searchQuery
               }
-              aria-label="Clear search"
-            >
+              onChange={(
+                event
+              ) =>
+                setSearchQuery(
+                  event.target.value
+                )
+              }
+            />
 
-              <X
-                size={16}
-                strokeWidth={1.7}
-              />
 
-            </button>
+            {searchQuery && (
 
-          )}
+              <button
+                type="button"
+                onClick={() =>
+                  setSearchQuery("")
+                }
+              >
+
+                <X
+                  size={15}
+                />
+
+              </button>
+
+            )}
+
+          </div>
+
+
+          <span className="admin-events__count">
+
+            {filteredEvents.length}
+            {" "}
+            {filteredEvents.length === 1
+              ? "event"
+              : "events"}
+
+          </span>
 
         </div>
 
-
-        <div className="admin-events__count">
-
-          {!loading && (
-            <>
-              {filteredEvents.length}
-              {" "}
-              {filteredEvents.length === 1
-                ? "event"
-                : "events"}
-            </>
-          )}
-
-        </div>
-
-      </div>
-
-
-      {/* ======================================================
-          EVENTS PANEL
-      ====================================================== */}
-
-      <section className="admin-events__panel">
 
         <div className="admin-events__table-header">
 
@@ -1931,259 +2026,310 @@ export default function AdminEvents() {
         </div>
 
 
-        {loading && (
+        <div className="admin-events__panel-body">
 
-          <div className="admin-events__empty">
-
-            <div className="admin-events__empty-icon">
-
-              <RefreshCw
-                size={27}
-                strokeWidth={1.5}
-              />
-
-            </div>
-
-            <h3>
-              Loading events
-            </h3>
-
-            <p>
-              Retrieving Continental Founders event content.
-            </p>
-
-          </div>
-
-        )}
-
-
-        {!loading &&
-          error && (
+          {loading && (
 
             <div className="admin-events__empty">
 
-              <div className="admin-events__empty-icon">
-
-                <CalendarDays
-                  size={28}
-                  strokeWidth={1.5}
-                />
-
-              </div>
+              <RefreshCw
+                size={28}
+              />
 
               <h3>
-                Events could not be loaded
+                Loading events
               </h3>
 
               <p>
-                {error}
+                Retrieving Continental Founders events.
               </p>
-
-              <button
-                type="button"
-                onClick={
-                  loadEvents
-                }
-              >
-
-                <RefreshCw
-                  size={17}
-                  strokeWidth={1.8}
-                />
-
-                Try again
-
-              </button>
 
             </div>
 
           )}
 
 
-        {!loading &&
-          !error &&
-          filteredEvents.length === 0 && (
+          {!loading &&
+            error && (
 
-            <div className="admin-events__empty">
-
-              <div className="admin-events__empty-icon">
+              <div className="admin-events__empty">
 
                 <CalendarDays
                   size={28}
-                  strokeWidth={1.5}
                 />
 
-              </div>
+                <h3>
+                  Events could not be loaded
+                </h3>
 
-              <h3>
-                {searchQuery
-                  ? "No matching events"
-                  : "No events yet"}
-              </h3>
-
-              <p>
-                {searchQuery
-                  ? "Try another event name, location, type, or status."
-                  : "Create your first Continental Founders event and it will appear here."}
-              </p>
-
-              {!searchQuery && (
+                <p>
+                  {error}
+                </p>
 
                 <button
                   type="button"
                   onClick={
-                    handleCreateEvent
+                    loadEvents
                   }
                 >
-
-                  <Plus
-                    size={17}
-                    strokeWidth={1.8}
-                  />
-
-                  Create your first event
-
+                  Try again
                 </button>
 
-              )}
+              </div>
 
-            </div>
-
-          )}
+            )}
 
 
-        {!loading &&
-          !error &&
-          filteredEvents.length > 0 && (
+          {!loading &&
+            !error &&
+            paginatedEvents.length === 0 && (
 
-            <div className="admin-events__list">
+              <div className="admin-events__empty">
 
-              {filteredEvents.map(
-                (
-                  event,
-                  index
-                ) => {
+                <CalendarDays
+                  size={28}
+                />
 
-                  const eventId =
-                    event.id ||
-                    event.slug ||
-                    `${event.title || "event"}-${index}`;
+                <h3>
+                  {searchQuery
+                    ? "No matching events"
+                    : "No events yet"}
+                </h3>
+
+                <p>
+                  {searchQuery
+                    ? "Try another search."
+                    : "Create your first Continental Founders event."}
+                </p>
+
+              </div>
+
+            )}
 
 
-                  const eventDate =
-                    getEventDate(
-                      event
-                    );
+          {!loading &&
+            !error &&
+            paginatedEvents.map(
+              (
+                event,
+                index
+              ) => {
 
+                const eventDate =
+                  getEventDate(
+                    event
+                  );
 
-                  return (
+                return (
 
-                    <button
-                      key={
-                        eventId
-                      }
-                      type="button"
-                      className="admin-events__row"
-                      onClick={() =>
-                        setSelectedEvent(
-                          event
-                        )
-                      }
-                    >
+                  <button
+                    key={
+                      event.id ||
+                      event.slug ||
+                      index
+                    }
+                    type="button"
+                    className="admin-events__row"
+                    onClick={() =>
+                      handleOpenDetails(
+                        event
+                      )
+                    }
+                  >
 
-                      <div className="admin-events__event">
+                    <div className="admin-events__event">
 
-                        <div className="admin-events__event-icon">
+                      <div className="admin-events__event-icon">
 
-                          <CalendarDays
-                            size={18}
-                            strokeWidth={1.6}
-                          />
-
-                        </div>
-
-                        <div>
-
-                          <strong>
-                            {event.title ||
-                              "Untitled Event"}
-                          </strong>
-
-                          <span>
-                            {getEventType(
-                              event
-                            )}
-                          </span>
-
-                        </div>
+                        <CalendarDays
+                          size={17}
+                        />
 
                       </div>
 
-
-                      <div className="admin-events__date">
+                      <div>
 
                         <strong>
-                          {formatDate(
-                            eventDate
-                          )}
+                          {event.title ||
+                            "Untitled Event"}
                         </strong>
 
                         <span>
-                          {formatTime(
-                            eventDate
-                          )}
-                        </span>
-
-                      </div>
-
-
-                      <div className="admin-events__location">
-
-                        <MapPin
-                          size={15}
-                          strokeWidth={1.6}
-                        />
-
-                        <span>
-                          {getLocation(
+                          {getEventType(
                             event
                           )}
                         </span>
 
                       </div>
 
-
-                      <div>
-
-                        <span
-                          className={
-                            getStatusClass(
-                              event.status
-                            )
-                          }
-                        >
-                          {event.status ||
-                            "Draft"}
-                        </span>
-
-                      </div>
+                    </div>
 
 
-                      <div className="admin-events__arrow">
+                    <div className="admin-events__date">
 
-                        <ChevronRight
-                          size={17}
-                          strokeWidth={1.7}
-                        />
+                      <strong>
+                        {formatDate(
+                          eventDate
+                        )}
+                      </strong>
 
-                      </div>
+                      <span>
+                        {formatTime(
+                          eventDate
+                        )}
+                      </span>
 
-                    </button>
+                    </div>
 
-                  );
 
-                }
-              )}
+                    <div className="admin-events__location">
+
+                      <MapPin
+                        size={14}
+                      />
+
+                      <span>
+                        {getLocation(
+                          event
+                        )}
+                      </span>
+
+                    </div>
+
+
+                    <div>
+
+                      <span
+                        className={
+                          getStatusClass(
+                            event.status
+                          )
+                        }
+                      >
+
+                        {event.status ||
+                          "Draft"}
+
+                      </span>
+
+                    </div>
+
+
+                    <div className="admin-events__arrow">
+
+                      <ChevronRight
+                        size={17}
+                      />
+
+                    </div>
+
+                  </button>
+
+                );
+
+              }
+            )}
+
+        </div>
+
+
+        {/* ====================================================
+            PAGINATION
+        ==================================================== */}
+
+        {!loading &&
+          !error &&
+          filteredEvents.length > 0 && (
+
+            <div className="admin-events__pagination">
+
+              <span>
+
+                Showing{" "}
+
+                {(
+                  safeCurrentPage - 1
+                ) *
+                  EVENTS_PER_PAGE +
+                  1}
+
+                {" – "}
+
+                {Math.min(
+                  safeCurrentPage *
+                    EVENTS_PER_PAGE,
+                  filteredEvents.length
+                )}
+
+                {" of "}
+
+                {filteredEvents.length}
+
+              </span>
+
+
+              <div>
+
+                <button
+                  type="button"
+                  disabled={
+                    safeCurrentPage === 1
+                  }
+                  onClick={() =>
+                    setCurrentPage(
+                      (
+                        page
+                      ) =>
+                        Math.max(
+                          1,
+                          page - 1
+                        )
+                    )
+                  }
+                >
+
+                  <ArrowLeft
+                    size={15}
+                  />
+
+                  Previous
+
+                </button>
+
+
+                <strong>
+                  Page {safeCurrentPage} of {totalPages}
+                </strong>
+
+
+                <button
+                  type="button"
+                  disabled={
+                    safeCurrentPage ===
+                    totalPages
+                  }
+                  onClick={() =>
+                    setCurrentPage(
+                      (
+                        page
+                      ) =>
+                        Math.min(
+                          totalPages,
+                          page + 1
+                        )
+                    )
+                  }
+                >
+
+                  Next
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
 
             </div>
 
@@ -2193,7 +2339,7 @@ export default function AdminEvents() {
 
 
       {/* ======================================================
-          EVENT DETAILS
+          DETAILS DRAWER
       ====================================================== */}
 
       {selectedEvent && (
@@ -2205,11 +2351,10 @@ export default function AdminEvents() {
               null
             )
           }
-          role="presentation"
         >
 
           <aside
-            className="admin-events__drawer"
+            className="admin-events__drawer admin-events__details-drawer"
             onClick={(
               event
             ) =>
@@ -2226,8 +2371,7 @@ export default function AdminEvents() {
                 </span>
 
                 <h2>
-                  {selectedEvent.title ||
-                    "Untitled Event"}
+                  {selectedEvent.title}
                 </h2>
 
               </div>
@@ -2244,7 +2388,7 @@ export default function AdminEvents() {
               >
 
                 <X
-                  size={20}
+                  size={19}
                 />
 
               </button>
@@ -2252,146 +2396,259 @@ export default function AdminEvents() {
             </div>
 
 
-            <div className="admin-events__drawer-body">
+            <div className="admin-events__step-progress">
 
-              {getEventImage(
-                selectedEvent
-              ) && (
+              <span>
+                Step {detailStep} of 2
+              </span>
 
-                <div className="admin-events__detail-image">
+              <div className="admin-events__progress-track">
 
-                  <img
-                    src={
-                      getEventImage(
-                        selectedEvent
-                      )
-                    }
-                    alt={
-                      selectedEvent.title ||
-                      "Event"
-                    }
-                  />
+                <span
+                  style={{
+                    width:
+                      `${detailStep * 50}%`,
+                  }}
+                />
+
+              </div>
+
+            </div>
+
+
+            <div className="admin-events__drawer-step">
+
+              {detailStep === 1 && (
+
+                <div className="admin-events__detail-grid">
+
+                  <div className="admin-events__detail-card">
+
+                    <CalendarDays
+                      size={18}
+                    />
+
+                    <div>
+
+                      <span>
+                        Date
+                      </span>
+
+                      <strong>
+                        {formatDate(
+                          getEventDate(
+                            selectedEvent
+                          )
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="admin-events__detail-card">
+
+                    <Clock3
+                      size={18}
+                    />
+
+                    <div>
+
+                      <span>
+                        Time
+                      </span>
+
+                      <strong>
+                        {formatTime(
+                          getEventDate(
+                            selectedEvent
+                          )
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="admin-events__detail-card">
+
+                    <MapPin
+                      size={18}
+                    />
+
+                    <div>
+
+                      <span>
+                        Location
+                      </span>
+
+                      <strong>
+                        {getLocation(
+                          selectedEvent
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="admin-events__detail-card">
+
+                    <Users
+                      size={18}
+                    />
+
+                    <div>
+
+                      <span>
+                        Event Type
+                      </span>
+
+                      <strong>
+                        {getEventType(
+                          selectedEvent
+                        )}
+                      </strong>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="admin-events__detail-card admin-events__detail-card--wide">
+
+                    <span
+                      className={
+                        getStatusClass(
+                          selectedEvent.status
+                        )
+                      }
+                    >
+
+                      {selectedEvent.status ||
+                        "Draft"}
+
+                    </span>
+
+                  </div>
 
                 </div>
 
               )}
 
 
-              <div className="admin-events__detail-card">
+              {detailStep === 2 && (
 
-                <CalendarDays
-                  size={18}
-                />
+                <div className="admin-events__content-step">
 
-                <div>
+                  {getEventImage(
+                    selectedEvent
+                  ) ? (
 
-                  <span>
-                    Date
-                  </span>
+                    <div className="admin-events__detail-image">
 
-                  <strong>
-                    {formatDate(
-                      getEventDate(
-                        selectedEvent
-                      )
-                    )}
-                  </strong>
+                      <img
+                        src={
+                          getEventImage(
+                            selectedEvent
+                          )
+                        }
+                        alt={
+                          selectedEvent.title
+                        }
+                      />
 
-                </div>
+                    </div>
 
-              </div>
+                  ) : (
 
+                    <div className="admin-events__image-empty">
 
-              <div className="admin-events__detail-card">
+                      <ImagePlus
+                        size={28}
+                      />
 
-                <Clock3
-                  size={18}
-                />
+                      <span>
+                        No event image
+                      </span>
 
-                <div>
+                    </div>
 
-                  <span>
-                    Time
-                  </span>
-
-                  <strong>
-                    {formatTime(
-                      getEventDate(
-                        selectedEvent
-                      )
-                    )}
-                  </strong>
-
-                </div>
-
-              </div>
+                  )}
 
 
-              <div className="admin-events__detail-card">
+                  <div className="admin-events__description">
 
-                <MapPin
-                  size={18}
-                />
+                    <span>
+                      Event Description
+                    </span>
 
-                <div>
+                    <p>
+                      {selectedEvent.description ||
+                        "No description has been added for this event."}
+                    </p>
 
-                  <span>
-                    Location
-                  </span>
-
-                  <strong>
-                    {getLocation(
-                      selectedEvent
-                    )}
-                  </strong>
+                  </div>
 
                 </div>
 
-              </div>
+              )}
+
+            </div>
 
 
-              <div className="admin-events__detail-card">
+            <div className="admin-events__step-footer">
 
-                <Users
-                  size={18}
+              <button
+                type="button"
+                className="admin-events__previous"
+                disabled={
+                  detailStep === 1
+                }
+                onClick={() =>
+                  setDetailStep(
+                    1
+                  )
+                }
+              >
+
+                <ArrowLeft
+                  size={16}
                 />
 
-                <div>
+                Previous
 
-                  <span>
-                    Event Type
-                  </span>
-
-                  <strong>
-                    {getEventType(
-                      selectedEvent
-                    )}
-                  </strong>
-
-                </div>
-
-              </div>
+              </button>
 
 
-              <div className="admin-events__description">
-
-                <span>
-                  Description
-                </span>
-
-                <p>
-                  {selectedEvent.description ||
-                    "No description has been added for this event."}
-                </p>
-
-              </div>
-
-
-              <div className="admin-events__drawer-actions">
+              {detailStep === 1 ? (
 
                 <button
                   type="button"
-                  className="admin-events__edit"
+                  className="admin-events__next"
+                  onClick={() =>
+                    setDetailStep(
+                      2
+                    )
+                  }
+                >
+
+                  Next
+
+                  <ArrowRight
+                    size={16}
+                  />
+
+                </button>
+
+              ) : (
+
+                <button
+                  type="button"
+                  className="admin-events__next"
                   onClick={() =>
                     handleEditEvent(
                       selectedEvent
@@ -2403,7 +2660,7 @@ export default function AdminEvents() {
 
                 </button>
 
-              </div>
+              )}
 
             </div>
 
@@ -2415,14 +2672,13 @@ export default function AdminEvents() {
 
 
       {/* ======================================================
-          CREATE / EDIT FORM
+          CREATE / EDIT DRAWER
       ====================================================== */}
 
       {formOpen && (
 
         <div
           className="admin-events__overlay"
-          role="presentation"
           onClick={
             closeForm
           }
@@ -2466,15 +2722,10 @@ export default function AdminEvents() {
                 onClick={
                   closeForm
                 }
-                disabled={
-                  saving ||
-                  deleting
-                }
-                aria-label="Close"
               >
 
                 <X
-                  size={20}
+                  size={19}
                 />
 
               </button>
@@ -2482,168 +2733,470 @@ export default function AdminEvents() {
             </div>
 
 
-            <form
+            {/* =================================================
+                NOT A NATIVE FORM
+
+                This prevents browser form submission from
+                resetting or refreshing the wizard on Step 4.
+            ================================================= */}
+
+            <div
               className="admin-events__event-form"
-              onSubmit={
-                handleSaveEvent
-              }
-              noValidate
             >
+
+              <div className="admin-events__step-progress">
+
+                <span>
+                  Step {formStep} of 4
+                </span>
+
+                <div className="admin-events__progress-track">
+
+                  <span
+                    style={{
+                      width:
+                        `${formStep * 25}%`,
+                    }}
+                  />
+
+                </div>
+
+
+                <div className="admin-events__step-labels">
+
+                  {FORM_STEPS.map(
+                    (
+                      step
+                    ) => (
+
+                      <span
+                        key={
+                          step.id
+                        }
+                        className={
+                          formStep ===
+                          step.id
+                            ? "active"
+                            : ""
+                        }
+                      >
+
+                        {step.label}
+
+                      </span>
+
+                    )
+                  )}
+
+                </div>
+
+              </div>
+
 
               {formError && (
 
                 <div className="admin-events__form-error">
+
                   {formError}
+
                 </div>
 
               )}
 
 
-              {/* =================================================
-                  EVENT TITLE
-              ================================================= */}
+              <div className="admin-events__form-step">
 
-              <div className="admin-events__field">
+                {/* =============================================
+                    STEP 1
+                ============================================= */}
 
-                <label htmlFor="event-title">
-                  Event Title *
-                </label>
+                {formStep === 1 && (
 
-                <input
-                  ref={
-                    titleInputRef
-                  }
-                  id="event-title"
-                  name="title"
-                  type="text"
-                  value={
-                    form.title
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  placeholder="Enter the event title of your choice"
-                  maxLength={180}
-                  autoComplete="off"
-                />
+                  <div className="admin-events__step-content">
 
-                <small>
-                  You can enter or change the event title at any time.
-                </small>
+                    <div className="admin-events__step-heading">
 
-              </div>
+                      <span>
+                        BASIC INFORMATION
+                      </span>
+
+                      <h3>
+                        Event identity
+                      </h3>
+
+                      <p>
+                        Add the title and event category.
+                      </p>
+
+                    </div>
 
 
-              {/* =================================================
-                  IMAGE
-              ================================================= */}
+                    <div className="admin-events__field">
 
-              <div className="admin-events__field">
+                      <label htmlFor="event-title">
+                        Event Title *
+                      </label>
 
-                <label htmlFor="event-image">
-                  Event Cover Image *
-                </label>
-
-
-                <input
-                  ref={
-                    imageInputRef
-                  }
-                  id="event-image"
-                  className="admin-events__image-input"
-                  name="image"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={
-                    handleImageChange
-                  }
-                />
-
-
-                {!imagePreview && (
-
-                  <button
-                    type="button"
-                    className="admin-events__image-picker"
-                    onClick={() =>
-                      imageInputRef
-                        .current
-                        ?.click()
-                    }
-                  >
-
-                    <div className="admin-events__image-picker-icon">
-
-                      <ImagePlus
-                        size={28}
-                        strokeWidth={1.5}
+                      <input
+                        ref={
+                          titleInputRef
+                        }
+                        id="event-title"
+                        name="title"
+                        type="text"
+                        value={
+                          form.title
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                        placeholder="Enter event title"
                       />
 
                     </div>
 
-                    <strong>
-                      Choose Event Image
-                    </strong>
 
-                    <span>
-                      Select from your computer or phone gallery
-                    </span>
+                    <div className="admin-events__field">
 
-                    <small>
-                      JPG, PNG or WebP • Maximum 5 MB
-                    </small>
+                      <label htmlFor="event-type">
+                        Event Type
+                      </label>
 
-                  </button>
+                      <select
+                        id="event-type"
+                        name="type"
+                        value={
+                          form.type
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                      >
+
+                        <option value="">
+                          Select event type
+                        </option>
+
+                        <option value="Conference">
+                          Conference
+                        </option>
+
+                        <option value="Founder Forum">
+                          Founder Forum
+                        </option>
+
+                        <option value="Roundtable">
+                          Roundtable
+                        </option>
+
+                        <option value="Workshop">
+                          Workshop
+                        </option>
+
+                        <option value="Networking">
+                          Networking
+                        </option>
+
+                        <option value="University Engagement">
+                          University Engagement
+                        </option>
+
+                        <option value="Investor Gathering">
+                          Investor Gathering
+                        </option>
+
+                        <option value="Partner Event">
+                          Partner Event
+                        </option>
+
+                        <option value="Other">
+                          Other
+                        </option>
+
+                      </select>
+
+                    </div>
+
+                  </div>
 
                 )}
 
 
-                {imagePreview && (
+                {/* =============================================
+                    STEP 2
+                ============================================= */}
 
-                  <div className="admin-events__image-preview">
+                {formStep === 2 && (
 
-                    <img
-                      src={
-                        imagePreview
-                      }
-                      alt="Event preview"
-                    />
+                  <div className="admin-events__step-content">
+
+                    <div className="admin-events__step-heading">
+
+                      <span>
+                        EVENT IMAGE
+                      </span>
+
+                      <h3>
+                        Cover image
+                      </h3>
+
+                      <p>
+                        Add the visual shown on the public event page.
+                      </p>
+
+                    </div>
 
 
-                    <div className="admin-events__image-preview-overlay">
+                    <div className="admin-events__field">
 
-                      <button
-                        type="button"
-                        onClick={() =>
+                      <input
+                        ref={
                           imageInputRef
-                            .current
-                            ?.click()
+                        }
+                        id="event-image"
+                        className="admin-events__image-input"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={
+                          handleImageChange
+                        }
+                      />
+
+
+                      {!imagePreview ? (
+
+                        <button
+                          type="button"
+                          className="admin-events__image-picker"
+                          onClick={() =>
+                            imageInputRef
+                              .current
+                              ?.click()
+                          }
+                        >
+
+                          <ImagePlus
+                            size={31}
+                          />
+
+                          <strong>
+                            Choose Event Image
+                          </strong>
+
+                          <span>
+                            JPG, PNG or WebP • Maximum 5 MB
+                          </span>
+
+                        </button>
+
+                      ) : (
+
+                        <div className="admin-events__image-preview">
+
+                          <img
+                            src={
+                              imagePreview
+                            }
+                            alt="Event preview"
+                          />
+
+                          <div className="admin-events__image-preview-actions">
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                imageInputRef
+                                  .current
+                                  ?.click()
+                              }
+                            >
+
+                              <Upload
+                                size={16}
+                              />
+
+                              Change
+
+                            </button>
+
+
+                            <button
+                              type="button"
+                              onClick={
+                                handleRemoveImage
+                              }
+                            >
+
+                              <Trash2
+                                size={16}
+                              />
+
+                              Remove
+
+                            </button>
+
+                          </div>
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+                {/* =============================================
+                    STEP 3
+                ============================================= */}
+
+                {formStep === 3 && (
+
+                  <div className="admin-events__step-content">
+
+                    <div className="admin-events__step-heading">
+
+                      <span>
+                        SCHEDULE & LOCATION
+                      </span>
+
+                      <h3>
+                        When and where
+                      </h3>
+
+                      <p>
+                        Set the event schedule and venue.
+                      </p>
+
+                    </div>
+
+
+                    <div className="admin-events__field">
+
+                      <label htmlFor="event-date">
+                        Date & Time *
+                      </label>
+
+                      <input
+                        id="event-date"
+                        name="eventDate"
+                        type="datetime-local"
+                        value={
+                          form.eventDate
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                      />
+
+                    </div>
+
+
+                    <div className="admin-events__field">
+
+                      <label htmlFor="event-location">
+                        Location
+                      </label>
+
+                      <input
+                        id="event-location"
+                        name="location"
+                        type="text"
+                        value={
+                          form.location
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                        placeholder="e.g. Kampala, Uganda"
+                      />
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+                {/* =============================================
+                    STEP 4
+                ============================================= */}
+
+                {formStep === 4 && (
+
+                  <div className="admin-events__step-content">
+
+                    <div className="admin-events__step-heading">
+
+                      <span>
+                        CONTENT & PUBLISHING
+                      </span>
+
+                      <h3>
+                        Final event details
+                      </h3>
+
+                      <p>
+                        Add the description and publishing status.
+                      </p>
+
+                    </div>
+
+
+                    <div className="admin-events__field">
+
+                      <label htmlFor="event-description">
+                        Event Description
+                      </label>
+
+                      <textarea
+                        id="event-description"
+                        name="description"
+                        value={
+                          form.description
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                        placeholder="Describe the event, purpose, audience and expected outcomes..."
+                        rows={5}
+                      />
+
+                    </div>
+
+
+                    <div className="admin-events__field">
+
+                      <label htmlFor="event-status">
+                        Publishing Status
+                      </label>
+
+                      <select
+                        id="event-status"
+                        name="status"
+                        value={
+                          form.status
+                        }
+                        onChange={
+                          handleFormChange
                         }
                       >
 
-                        <Upload
-                          size={17}
-                        />
+                        <option value="draft">
+                          Save as Draft
+                        </option>
 
-                        Change Image
+                        <option value="published">
+                          Publish
+                        </option>
 
-                      </button>
+                        <option value="cancelled">
+                          Cancelled
+                        </option>
 
-
-                      <button
-                        type="button"
-                        onClick={
-                          handleRemoveImage
-                        }
-                      >
-
-                        <Trash2
-                          size={17}
-                        />
-
-                        Remove
-
-                      </button>
+                      </select>
 
                     </div>
 
@@ -2655,276 +3208,117 @@ export default function AdminEvents() {
 
 
               {/* =================================================
-                  DATE
+                  FOOTER
               ================================================= */}
 
-              <div className="admin-events__field">
+              <div className="admin-events__step-footer">
 
-                <label htmlFor="event-date">
-                  Date & Time *
-                </label>
+                <div>
 
-                <input
-                  id="event-date"
-                  name="eventDate"
-                  type="datetime-local"
-                  value={
-                    form.eventDate
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                />
+                  {/* DELETE ONLY ON STEP 4 */}
 
-              </div>
+                  {editingEvent &&
+                    formStep === 4 && (
 
+                      <button
+                        type="button"
+                        className="admin-events__delete"
+                        onClick={
+                          handleDeleteEvent
+                        }
+                        disabled={
+                          deleting ||
+                          saving
+                        }
+                      >
 
-              {/* =================================================
-                  LOCATION
-              ================================================= */}
+                        <Trash2
+                          size={16}
+                        />
 
-              <div className="admin-events__field">
+                        {deleting
+                          ? "Deleting..."
+                          : "Delete Event"}
 
-                <label htmlFor="event-location">
-                  Location
-                </label>
+                      </button>
 
-                <input
-                  id="event-location"
-                  name="location"
-                  type="text"
-                  value={
-                    form.location
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  placeholder="e.g. Kampala, Uganda"
-                />
+                    )}
 
-              </div>
+                </div>
 
 
-              {/* =================================================
-                  TYPE
-              ================================================= */}
-
-              <div className="admin-events__field">
-
-                <label htmlFor="event-type">
-                  Event Type
-                </label>
-
-                <select
-                  id="event-type"
-                  name="type"
-                  value={
-                    form.type
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                >
-
-                  <option value="">
-                    Select event type
-                  </option>
-
-                  <option value="Conference">
-                    Conference
-                  </option>
-
-                  <option value="Founder Forum">
-                    Founder Forum
-                  </option>
-
-                  <option value="Roundtable">
-                    Roundtable
-                  </option>
-
-                  <option value="Workshop">
-                    Workshop
-                  </option>
-
-                  <option value="Networking">
-                    Networking
-                  </option>
-
-                  <option value="University Engagement">
-                    University Engagement
-                  </option>
-
-                  <option value="Investor Gathering">
-                    Investor Gathering
-                  </option>
-
-                  <option value="Partner Event">
-                    Partner Event
-                  </option>
-
-                  <option value="Other">
-                    Other
-                  </option>
-
-                </select>
-
-              </div>
-
-
-              {/* =================================================
-                  STATUS
-              ================================================= */}
-
-              <div className="admin-events__field">
-
-                <label htmlFor="event-status">
-                  Publishing Status
-                </label>
-
-                <select
-                  id="event-status"
-                  name="status"
-                  value={
-                    form.status
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                >
-
-                  <option value="draft">
-                    Save as Draft
-                  </option>
-
-                  <option value="published">
-                    Publish
-                  </option>
-
-                  <option value="cancelled">
-                    Cancelled
-                  </option>
-
-                </select>
-
-              </div>
-
-
-              {/* =================================================
-                  DESCRIPTION
-              ================================================= */}
-
-              <div className="admin-events__field">
-
-                <label htmlFor="event-description">
-                  Event Description
-                </label>
-
-                <textarea
-                  id="event-description"
-                  name="description"
-                  value={
-                    form.description
-                  }
-                  onChange={
-                    handleFormChange
-                  }
-                  placeholder="Describe the event, its purpose, audience and what participants can expect..."
-                  rows={7}
-                />
-
-              </div>
-
-
-              {/* =================================================
-                  ACTIONS
-              ================================================= */}
-
-              <div className="admin-events__form-actions">
-
-                {editingEvent && (
+                <div className="admin-events__step-footer-right">
 
                   <button
                     type="button"
-                    className="admin-events__delete"
-                    onClick={
-                      handleDeleteEvent
-                    }
+                    className="admin-events__previous"
                     disabled={
-                      saving ||
-                      deleting
+                      formStep === 1
+                    }
+                    onClick={
+                      handlePreviousFormStep
                     }
                   >
 
-                    <Trash2
-                      size={17}
+                    <ArrowLeft
+                      size={16}
                     />
 
-                    {deleting
-                      ? "Deleting..."
-                      : "Delete"}
-
-                  </button>
-
-                )}
-
-
-                <div className="admin-events__form-actions-right">
-
-                  <button
-                    type="button"
-                    className="admin-events__cancel"
-                    onClick={
-                      closeForm
-                    }
-                    disabled={
-                      saving ||
-                      deleting
-                    }
-                  >
-
-                    Cancel
+                    Previous
 
                   </button>
 
 
-                  <button
-                    type="submit"
-                    className="admin-events__save"
-                    disabled={
-                      saving ||
-                      deleting
-                    }
-                  >
+                  {formStep < 4 ? (
 
-                    {saving
-                      ? (
-                        <RefreshCw
-                          size={17}
-                        />
-                      )
-                      : (
-                        <Save
-                          size={17}
-                        />
-                      )}
+                    <button
+                      type="button"
+                      className="admin-events__next"
+                      onClick={
+                        handleNextFormStep
+                      }
+                    >
 
+                      Next
 
-                    {saving
-                      ? "Saving..."
-                      : editingEvent
-                        ? "Save Changes"
-                        : form.status ===
-                          "published"
-                          ? "Publish Event"
-                          : "Save Event"}
+                      <ArrowRight
+                        size={16}
+                      />
 
-                  </button>
+                    </button>
+
+                  ) : (
+
+                    <button
+                      type="button"
+                      className="admin-events__next"
+                      onClick={
+                        handleSaveEvent
+                      }
+                      disabled={
+                        saving ||
+                        deleting
+                      }
+                    >
+
+                      {saving
+                        ? "Saving..."
+                        : editingEvent
+                          ? "Save Changes"
+                          : form.status ===
+                            "published"
+                            ? "Publish Event"
+                            : "Save Event"}
+
+                    </button>
+
+                  )}
 
                 </div>
 
               </div>
 
-            </form>
+            </div>
 
           </aside>
 

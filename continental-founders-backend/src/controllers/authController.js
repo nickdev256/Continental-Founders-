@@ -42,6 +42,7 @@ const registerSchema =
     email:
       z
         .string()
+        .trim()
         .email(
           "Enter a valid email address."
         ),
@@ -75,6 +76,7 @@ const loginSchema =
     email:
       z
         .string()
+        .trim()
         .email(
           "Enter a valid email address."
         ),
@@ -96,6 +98,7 @@ const otpSchema =
     email:
       z
         .string()
+        .trim()
         .email(),
 
     otp:
@@ -123,6 +126,7 @@ const resendOtpSchema =
     email:
       z
         .string()
+        .trim()
         .email(),
 
     purpose:
@@ -137,6 +141,23 @@ const resendOtpSchema =
 
 
 /* ============================================================
+   NORMALIZE EMAIL
+============================================================ */
+
+function normalizeEmail(
+  email
+) {
+
+  return String(
+    email || ""
+  )
+    .trim()
+    .toLowerCase();
+
+}
+
+
+/* ============================================================
    CREATE CMS SESSION TOKEN
 ============================================================ */
 
@@ -144,7 +165,9 @@ function createToken(
   profile
 ) {
 
-  if (!process.env.JWT_SECRET) {
+  if (
+    !process.env.JWT_SECRET
+  ) {
 
     throw new Error(
       "JWT_SECRET is missing from environment variables."
@@ -221,11 +244,9 @@ async function getProfileByEmail(
 ) {
 
   const cleanEmail =
-    String(
-      email || ""
-    )
-      .trim()
-      .toLowerCase();
+    normalizeEmail(
+      email
+    );
 
 
   const {
@@ -246,11 +267,37 @@ async function getProfileByEmail(
       .maybeSingle();
 
 
-  if (error) {
+  if (
+    error
+  ) {
 
     console.error(
-      "Profile lookup error:",
-      error
+      "\n========================================"
+    );
+
+    console.error(
+      "PROFILE LOOKUP FAILED"
+    );
+
+    console.error({
+      message:
+        error.message,
+
+      code:
+        error.code,
+
+      details:
+        error.details,
+
+      hint:
+        error.hint,
+
+      email:
+        cleanEmail,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -292,11 +339,36 @@ async function getProfileById(
       .maybeSingle();
 
 
-  if (error) {
+  if (
+    error
+  ) {
 
     console.error(
-      "Profile lookup error:",
-      error
+      "\n========================================"
+    );
+
+    console.error(
+      "PROFILE LOOKUP BY ID FAILED"
+    );
+
+    console.error({
+      message:
+        error.message,
+
+      code:
+        error.code,
+
+      details:
+        error.details,
+
+      hint:
+        error.hint,
+
+      id,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -333,9 +405,9 @@ async function register(
 
 
   const email =
-    input.email
-      .trim()
-      .toLowerCase();
+    normalizeEmail(
+      input.email
+    );
 
 
   /* ==========================================================
@@ -348,7 +420,9 @@ async function register(
     );
 
 
-  if (existingProfile) {
+  if (
+    existingProfile
+  ) {
 
     return res
       .status(409)
@@ -369,39 +443,93 @@ async function register(
      CREATE SUPABASE AUTH USER
   ========================================================== */
 
-  const {
-    data:
-      authData,
+  let authData;
+  let authError;
 
-    error:
-      authError,
-  } =
-    await supabaseAdmin
-      .auth
-      .admin
-      .createUser({
 
-        email,
+  try {
 
-        password:
-          input.password,
+    const authResult =
+      await supabaseAdmin
+        .auth
+        .admin
+        .createUser({
 
-        /*
-          Continental Founders handles its own
-          registration OTP verification.
-        */
+          email,
 
-        email_confirm:
-          true,
+          password:
+            input.password,
 
-        user_metadata: {
+          email_confirm:
+            true,
 
-          full_name:
-            fullName,
+          user_metadata: {
 
-        },
+            full_name:
+              fullName,
+
+          },
+
+        });
+
+
+    authData =
+      authResult.data;
+
+
+    authError =
+      authResult.error;
+
+  } catch (
+    unexpectedError
+  ) {
+
+    console.error(
+      "\n========================================"
+    );
+
+    console.error(
+      "SUPABASE ACCOUNT CREATION EXCEPTION"
+    );
+
+    console.error({
+      message:
+        unexpectedError?.message,
+
+      name:
+        unexpectedError?.name,
+
+      code:
+        unexpectedError?.code,
+
+      status:
+        unexpectedError?.status,
+
+      causeMessage:
+        unexpectedError?.cause?.message,
+
+      causeCode:
+        unexpectedError?.cause?.code,
+    });
+
+    console.error(
+      "========================================\n"
+    );
+
+
+    return res
+      .status(503)
+      .json({
+
+        success:
+          false,
+
+        message:
+          "The authentication service is temporarily unavailable.",
 
       });
+
+  }
 
 
   if (
@@ -410,8 +538,31 @@ async function register(
   ) {
 
     console.error(
-      "Supabase account creation error:",
-      authError
+      "\n========================================"
+    );
+
+    console.error(
+      "SUPABASE ACCOUNT CREATION FAILED"
+    );
+
+    console.error({
+      message:
+        authError?.message,
+
+      status:
+        authError?.status,
+
+      code:
+        authError?.code,
+
+      name:
+        authError?.name,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -466,17 +617,40 @@ async function register(
       });
 
 
-  if (profileError) {
+  if (
+    profileError
+  ) {
 
     console.error(
-      "Profile creation error:",
-      profileError
+      "\n========================================"
     );
 
+    console.error(
+      "PROFILE CREATION FAILED"
+    );
 
-    /* ========================================================
-       ROLLBACK AUTH USER
-    ======================================================== */
+    console.error({
+      message:
+        profileError.message,
+
+      code:
+        profileError.code,
+
+      details:
+        profileError.details,
+
+      hint:
+        profileError.hint,
+
+      userId,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
+    );
+
 
     try {
 
@@ -493,6 +667,7 @@ async function register(
 
       console.error(
         "Registration rollback error:",
+        rollbackError?.message ||
         rollbackError
       );
 
@@ -537,6 +712,7 @@ async function register(
 
     console.error(
       "Registration OTP error:",
+      otpError?.message ||
       otpError
     );
 
@@ -607,13 +783,33 @@ async function login(
 
 
   const email =
-    input.email
-      .trim()
-      .toLowerCase();
+    normalizeEmail(
+      input.email
+    );
+
+
+  console.log(
+    "\n========================================"
+  );
+
+  console.log(
+    "CMS LOGIN ATTEMPT"
+  );
+
+  console.log({
+    email,
+    time:
+      new Date()
+        .toISOString(),
+  });
+
+  console.log(
+    "========================================\n"
+  );
 
 
   /* ==========================================================
-     VERIFY EMAIL + PASSWORD THROUGH SUPABASE
+     VERIFY EMAIL + PASSWORD WITH SUPABASE
   ========================================================== */
 
   let authData =
@@ -650,32 +846,58 @@ async function login(
   ) {
 
     console.error(
-      "Unexpected Supabase login exception:",
-      {
-        message:
-          unexpectedAuthError?.message,
+      "\n========================================"
+    );
 
-        name:
-          unexpectedAuthError?.name,
+    console.error(
+      "SUPABASE LOGIN NETWORK EXCEPTION"
+    );
 
-        code:
-          unexpectedAuthError?.code,
+    console.error({
+      message:
+        unexpectedAuthError?.message,
 
-        status:
-          unexpectedAuthError?.status,
-      }
+      name:
+        unexpectedAuthError?.name,
+
+      code:
+        unexpectedAuthError?.code,
+
+      status:
+        unexpectedAuthError?.status,
+
+      causeMessage:
+        unexpectedAuthError?.cause?.message,
+
+      causeCode:
+        unexpectedAuthError?.cause?.code,
+
+      causeErrno:
+        unexpectedAuthError?.cause?.errno,
+
+      causeSyscall:
+        unexpectedAuthError?.cause?.syscall,
+
+      causeHostname:
+        unexpectedAuthError?.cause?.hostname,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
     return res
-      .status(500)
+      .status(503)
       .json({
 
         success:
           false,
 
         message:
-          "Unable to verify your login at the moment.",
+          "The authentication service is temporarily unavailable. Please try again.",
 
       });
 
@@ -683,36 +905,46 @@ async function login(
 
 
   /* ==========================================================
-     LOG REAL SUPABASE ERROR
-
-     This is intentionally backend-only.
-     Passwords and secrets are never logged.
+     SUPABASE AUTH ERROR
   ========================================================== */
 
-  if (authError) {
+  if (
+    authError
+  ) {
 
     console.error(
-      "Supabase login error:",
-      {
-        message:
-          authError.message,
+      "\n========================================"
+    );
 
-        status:
-          authError.status,
+    console.error(
+      "SUPABASE LOGIN FAILED"
+    );
 
-        code:
-          authError.code,
+    console.error({
+      message:
+        authError.message,
 
-        name:
-          authError.name,
-      }
+      status:
+        authError.status,
+
+      code:
+        authError.code,
+
+      name:
+        authError.name,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
   }
 
 
   /* ==========================================================
-     AUTHENTICATION FAILED
+     INVALID LOGIN
   ========================================================== */
 
   if (
@@ -736,41 +968,94 @@ async function login(
 
 
   /* ==========================================================
-     AUTH USER DEBUG
+     AUTH SUCCESS
   ========================================================== */
 
   console.log(
-    "Supabase login successful:",
-    {
-      userId:
-        authData.user.id,
+    "\n========================================"
+  );
 
-      email:
-        authData.user.email,
-    }
+  console.log(
+    "SUPABASE LOGIN SUCCESSFUL"
+  );
+
+  console.log({
+    userId:
+      authData.user.id,
+
+    email:
+      authData.user.email,
+  });
+
+  console.log(
+    "========================================\n"
   );
 
 
   /* ==========================================================
-     LOAD PROFILE
+     LOAD CONTINENTAL FOUNDERS PROFILE
   ========================================================== */
 
-  const profile =
-    await getProfileByEmail(
-      email
+  let profile;
+
+
+  try {
+
+    profile =
+      await getProfileByEmail(
+        email
+      );
+
+  } catch (
+    profileLookupError
+  ) {
+
+    console.error(
+      "Profile lookup after login failed:",
+      profileLookupError?.message
     );
 
 
-  if (!profile) {
+    return res
+      .status(500)
+      .json({
+
+        success:
+          false,
+
+        message:
+          "Your login was accepted, but your profile could not be loaded.",
+
+      });
+
+  }
+
+
+  /* ==========================================================
+     PROFILE NOT FOUND
+  ========================================================== */
+
+  if (
+    !profile
+  ) {
 
     console.error(
-      "Authenticated Supabase user has no Continental Founders profile:",
-      {
-        userId:
-          authData.user.id,
+      "\n========================================"
+    );
 
-        email,
-      }
+    console.error(
+      "AUTH USER HAS NO PROFILE"
+    );
+
+    console.error({
+      userId:
+        authData.user.id,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -790,25 +1075,38 @@ async function login(
 
 
   /* ==========================================================
-     VERIFY AUTH USER MATCHES PROFILE
+     AUTH / PROFILE ID MATCH
   ========================================================== */
 
   if (
-    profile.id !==
-    authData.user.id
+    String(
+      profile.id
+    ) !==
+    String(
+      authData.user.id
+    )
   ) {
 
     console.error(
-      "Auth/Profile ID mismatch:",
-      {
-        authUserId:
-          authData.user.id,
+      "\n========================================"
+    );
 
-        profileId:
-          profile.id,
+    console.error(
+      "AUTH / PROFILE ID MISMATCH"
+    );
 
-        email,
-      }
+    console.error({
+      authUserId:
+        authData.user.id,
+
+      profileId:
+        profile.id,
+
+      email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -852,9 +1150,7 @@ async function login(
 
 
   /* ==========================================================
-     PENDING EMAIL VERIFICATION
-
-     Send registration OTP again.
+     PENDING VERIFICATION
   ========================================================== */
 
   if (
@@ -883,6 +1179,7 @@ async function login(
 
       console.error(
         "Pending verification OTP error:",
+        otpError?.message ||
         otpError
       );
 
@@ -934,7 +1231,7 @@ async function login(
 
 
   /* ==========================================================
-     OTHER NON-ACTIVE STATUS
+     ACCOUNT MUST BE ACTIVE
   ========================================================== */
 
   if (
@@ -959,9 +1256,6 @@ async function login(
 
   /* ==========================================================
      SEND LOGIN OTP
-
-     IMPORTANT:
-     Final CMS access is NOT granted yet.
   ========================================================== */
 
   try {
@@ -984,8 +1278,23 @@ async function login(
   ) {
 
     console.error(
-      "Login OTP error:",
-      otpError
+      "\n========================================"
+    );
+
+    console.error(
+      "LOGIN OTP FAILED"
+    );
+
+    console.error({
+      message:
+        otpError?.message,
+
+      email:
+        profile.email,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -1014,7 +1323,7 @@ async function login(
 
 
   /* ==========================================================
-     SUCCESS
+     LOGIN PASSWORD SUCCESS
   ========================================================== */
 
   return res.json({
@@ -1055,9 +1364,9 @@ async function verifyOtpCode(
 
 
   const email =
-    input.email
-      .trim()
-      .toLowerCase();
+    normalizeEmail(
+      input.email
+    );
 
 
   /* ==========================================================
@@ -1070,7 +1379,9 @@ async function verifyOtpCode(
     );
 
 
-  if (!profile) {
+  if (
+    !profile
+  ) {
 
     return res
       .status(404)
@@ -1142,7 +1453,9 @@ async function verifyOtpCode(
     });
 
 
-  if (!result.valid) {
+  if (
+    !result.valid
+  ) {
 
     return res
       .status(400)
@@ -1162,8 +1475,6 @@ async function verifyOtpCode(
 
   /* ==========================================================
      REGISTRATION OTP
-
-     Activate founder account.
   ========================================================== */
 
   let currentProfile =
@@ -1213,7 +1524,9 @@ async function verifyOtpCode(
         .single();
 
 
-    if (updateError) {
+    if (
+      updateError
+    ) {
 
       console.error(
         "Profile activation error:",
@@ -1243,7 +1556,7 @@ async function verifyOtpCode(
 
 
   /* ==========================================================
-     CHECK ACTIVE STATUS
+     CHECK ACTIVE
   ========================================================== */
 
   if (
@@ -1267,7 +1580,7 @@ async function verifyOtpCode(
 
 
   /* ==========================================================
-     CREATE FINAL CMS SESSION
+     CREATE SESSION
   ========================================================== */
 
   const token =
@@ -1277,7 +1590,7 @@ async function verifyOtpCode(
 
 
   /* ==========================================================
-     HTTP-ONLY SESSION COOKIE
+     HTTP-ONLY COOKIE
   ========================================================== */
 
   res.cookie(
@@ -1312,7 +1625,7 @@ async function verifyOtpCode(
 
 
   /* ==========================================================
-     RETURN SAFE USER
+     SUCCESS
   ========================================================== */
 
   return res.json({
@@ -1352,9 +1665,9 @@ async function resendOtp(
 
 
   const email =
-    input.email
-      .trim()
-      .toLowerCase();
+    normalizeEmail(
+      input.email
+    );
 
 
   const profile =
@@ -1364,10 +1677,12 @@ async function resendOtp(
 
 
   /* ==========================================================
-     GENERIC RESPONSE FOR UNKNOWN EMAIL
+     GENERIC UNKNOWN EMAIL RESPONSE
   ========================================================== */
 
-  if (!profile) {
+  if (
+    !profile
+  ) {
 
     return res.json({
 
@@ -1450,17 +1765,44 @@ async function resendOtp(
      SEND OTP
   ========================================================== */
 
-  await createAndSendOtp({
+  try {
 
-    userId:
-      profile.id,
+    await createAndSendOtp({
 
-    email:
-      profile.email,
+      userId:
+        profile.id,
 
-    purpose,
+      email:
+        profile.email,
 
-  });
+      purpose,
+
+    });
+
+  } catch (
+    otpError
+  ) {
+
+    console.error(
+      "Resend OTP error:",
+      otpError?.message ||
+      otpError
+    );
+
+
+    return res
+      .status(500)
+      .json({
+
+        success:
+          false,
+
+        message:
+          "Unable to send a new verification code.",
+
+      });
+
+  }
 
 
   return res.json({
@@ -1489,6 +1831,25 @@ async function me(
   req,
   res
 ) {
+
+  if (
+    !req.admin
+  ) {
+
+    return res
+      .status(401)
+      .json({
+
+        success:
+          false,
+
+        message:
+          "No authenticated CMS session was found.",
+
+      });
+
+  }
+
 
   return res.json({
 

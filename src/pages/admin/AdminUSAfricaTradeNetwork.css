@@ -1,0 +1,967 @@
+.trade-admin-page {
+  --admin-navy: #0a243d;
+  --admin-navy-deep: #06192b;
+  --admin-gold: #c99a3c;
+  --admin-gold-soft: #f3dfb1;
+  --admin-bg: #f4f6f8;
+  --admin-card: #ffffff;
+  --admin-text: #16314a;
+  --admin-muted: #71808d;
+  --admin-border: #dde4ea;
+
+  width: 100%;
+
+  color:
+    var(--admin-text);
+
+  background:
+    var(--admin-bg);
+
+  padding:
+    2rem;
+}
+
+
+.trade-admin-page form {
+  max-width:
+    1500px;
+
+  margin:
+    0 auto;
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.trade-admin-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap:
+    2rem;
+
+  margin-bottom:
+    1.5rem;
+}
+
+
+.trade-admin-kicker {
+  display:
+    inline-block;
+
+  margin-bottom:
+    0.6rem;
+
+  color:
+    var(--admin-gold);
+
+  font-size:
+    0.75rem;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    0.12em;
+
+  text-transform:
+    uppercase;
+}
+
+
+.trade-admin-header h1 {
+  margin:
+    0;
+
+  color:
+    var(--admin-navy);
+
+  font-size:
+    clamp(
+      1.8rem,
+      3vw,
+      2.7rem
+    );
+
+  line-height:
+    1.1;
+}
+
+
+.trade-admin-header p {
+  max-width:
+    760px;
+
+  margin:
+    0.75rem
+    0
+    0;
+
+  color:
+    var(--admin-muted);
+
+  line-height:
+    1.65;
+}
+
+
+.trade-admin-header__actions {
+  display:
+    flex;
+
+  gap:
+    0.8rem;
+
+  flex-shrink:
+    0;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.trade-admin-button {
+  min-height:
+    44px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    0.55rem;
+
+  padding:
+    0
+    1.15rem;
+
+  border:
+    none;
+
+  border-radius:
+    9px;
+
+  cursor:
+    pointer;
+
+  font-size:
+    0.88rem;
+
+  font-weight:
+    700;
+
+  transition:
+    180ms ease;
+}
+
+
+.trade-admin-button:hover {
+  transform:
+    translateY(-1px);
+}
+
+
+.trade-admin-button:disabled {
+  cursor:
+    not-allowed;
+
+  opacity:
+    0.6;
+
+  transform:
+    none;
+}
+
+
+.trade-admin-button--primary {
+  color:
+    #ffffff;
+
+  background:
+    var(--admin-navy);
+}
+
+
+.trade-admin-button--secondary {
+  color:
+    var(--admin-navy);
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid
+    var(--admin-border);
+}
+
+
+.trade-admin-add-button {
+  min-height:
+    42px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    0.5rem;
+
+  margin-top:
+    1rem;
+
+  padding:
+    0
+    1rem;
+
+  border:
+    1px solid
+    #d9c18e;
+
+  border-radius:
+    8px;
+
+  color:
+    var(--admin-navy);
+
+  background:
+    #fffaf0;
+
+  cursor:
+    pointer;
+
+  font-weight:
+    700;
+}
+
+
+.trade-admin-icon-button {
+  width:
+    42px;
+
+  height:
+    42px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  flex-shrink:
+    0;
+
+  border:
+    none;
+
+  border-radius:
+    8px;
+
+  cursor:
+    pointer;
+}
+
+
+.trade-admin-icon-button--danger {
+  color:
+    #a72f2f;
+
+  background:
+    #fff1f1;
+}
+
+
+.trade-admin-delete-row {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    0.4rem;
+
+  align-self:
+    flex-start;
+
+  padding:
+    0.55rem
+    0.8rem;
+
+  border:
+    none;
+
+  border-radius:
+    7px;
+
+  color:
+    #9d3030;
+
+  background:
+    #fff1f1;
+
+  cursor:
+    pointer;
+
+  font-weight:
+    700;
+}
+
+
+/* ============================================================
+   ALERTS
+============================================================ */
+
+.trade-admin-alert {
+  margin-bottom:
+    1.2rem;
+
+  padding:
+    0.95rem
+    1rem;
+
+  border-radius:
+    9px;
+
+  font-size:
+    0.9rem;
+
+  font-weight:
+    600;
+}
+
+
+.trade-admin-alert--error {
+  color:
+    #8d2d2d;
+
+  background:
+    #fff0f0;
+
+  border:
+    1px solid
+    #f0cccc;
+}
+
+
+.trade-admin-alert--success {
+  color:
+    #1d643c;
+
+  background:
+    #edf9f2;
+
+  border:
+    1px solid
+    #c8e9d4;
+}
+
+
+/* ============================================================
+   SECTION
+============================================================ */
+
+.trade-admin-section {
+  margin-bottom:
+    1.3rem;
+
+  padding:
+    1.5rem;
+
+  border:
+    1px solid
+    var(--admin-border);
+
+  border-radius:
+    14px;
+
+  background:
+    var(--admin-card);
+
+  box-shadow:
+    0
+    5px
+    18px
+    rgba(12, 38, 60, 0.04);
+}
+
+
+.trade-admin-section__heading {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  gap:
+    0.9rem;
+
+  margin-bottom:
+    1.4rem;
+}
+
+
+.trade-admin-section__icon {
+  width:
+    42px;
+
+  height:
+    42px;
+
+  display:
+    grid;
+
+  place-items:
+    center;
+
+  flex-shrink:
+    0;
+
+  border-radius:
+    10px;
+
+  color:
+    var(--admin-gold);
+
+  background:
+    var(--admin-navy);
+}
+
+
+.trade-admin-section__heading h2 {
+  margin:
+    0;
+
+  color:
+    var(--admin-navy);
+
+  font-size:
+    1.15rem;
+}
+
+
+.trade-admin-section__heading p {
+  margin:
+    0.35rem
+    0
+    0;
+
+  color:
+    var(--admin-muted);
+
+  line-height:
+    1.55;
+
+  font-size:
+    0.88rem;
+}
+
+
+/* ============================================================
+   GRID
+============================================================ */
+
+.trade-admin-grid {
+  display:
+    grid;
+
+  gap:
+    1rem;
+}
+
+
+.trade-admin-grid--2 {
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+}
+
+
+.trade-admin-field--full {
+  grid-column:
+    1 / -1;
+}
+
+
+/* ============================================================
+   INPUTS
+============================================================ */
+
+.trade-admin-field {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    0.45rem;
+
+  margin-bottom:
+    1rem;
+}
+
+
+.trade-admin-field > span {
+  color:
+    #31475a;
+
+  font-size:
+    0.8rem;
+
+  font-weight:
+    700;
+}
+
+
+.trade-admin-field input,
+.trade-admin-field textarea,
+.trade-admin-field select,
+.trade-admin-repeat__row input {
+  width:
+    100%;
+
+  border:
+    1px solid
+    var(--admin-border);
+
+  border-radius:
+    8px;
+
+  background:
+    #ffffff;
+
+  color:
+    var(--admin-text);
+
+  font-family:
+    inherit;
+
+  font-size:
+    0.9rem;
+
+  outline:
+    none;
+
+  transition:
+    border-color
+    150ms ease,
+    box-shadow
+    150ms ease;
+}
+
+
+.trade-admin-field input,
+.trade-admin-field select,
+.trade-admin-repeat__row input {
+  min-height:
+    44px;
+
+  padding:
+    0
+    0.8rem;
+}
+
+
+.trade-admin-field textarea {
+  resize:
+    vertical;
+
+  padding:
+    0.8rem;
+
+  line-height:
+    1.6;
+}
+
+
+.trade-admin-field input:focus,
+.trade-admin-field textarea:focus,
+.trade-admin-field select:focus,
+.trade-admin-repeat__row input:focus {
+  border-color:
+    #c6a054;
+
+  box-shadow:
+    0
+    0
+    0
+    3px
+    rgba(
+      201,
+      154,
+      60,
+      0.11
+    );
+}
+
+
+/* ============================================================
+   REPEATING ITEMS
+============================================================ */
+
+.trade-admin-repeat {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    0.75rem;
+}
+
+
+.trade-admin-repeat__row {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    0.75rem;
+}
+
+
+.trade-admin-card-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap:
+    1rem;
+}
+
+
+.trade-admin-mini-card {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  padding:
+    1rem;
+
+  border:
+    1px solid
+    var(--admin-border);
+
+  border-radius:
+    10px;
+
+  background:
+    #fafbfc;
+}
+
+
+/* ============================================================
+   IMAGE PREVIEWS
+============================================================ */
+
+.trade-admin-image-preview {
+  margin-top:
+    1rem;
+
+  max-width:
+    620px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--admin-border);
+
+  border-radius:
+    12px;
+}
+
+
+.trade-admin-image-preview img {
+  width:
+    100%;
+
+  max-height:
+    340px;
+
+  display:
+    block;
+
+  object-fit:
+    cover;
+}
+
+
+.trade-admin-small-image {
+  margin-bottom:
+    1rem;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    8px;
+
+  background:
+    #e8edf1;
+}
+
+
+.trade-admin-small-image img {
+  width:
+    100%;
+
+  height:
+    160px;
+
+  display:
+    block;
+
+  object-fit:
+    cover;
+}
+
+
+/* ============================================================
+   META
+============================================================ */
+
+.trade-admin-meta {
+  margin-top:
+    0.4rem;
+
+  color:
+    var(--admin-muted);
+
+  font-size:
+    0.78rem;
+}
+
+
+/* ============================================================
+   SAVE FOOTER
+============================================================ */
+
+.trade-admin-save-footer {
+  position:
+    sticky;
+
+  bottom:
+    1rem;
+
+  z-index:
+    20;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    1rem;
+
+  margin-top:
+    1.5rem;
+
+  padding:
+    1rem
+    1.2rem;
+
+  border:
+    1px solid
+    var(--admin-border);
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.95
+    );
+
+  backdrop-filter:
+    blur(12px);
+
+  box-shadow:
+    0
+    12px
+    38px
+    rgba(
+      10,
+      36,
+      61,
+      0.1
+    );
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+.trade-admin-state {
+  min-height:
+    420px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    0.7rem;
+
+  color:
+    var(--admin-navy);
+
+  font-weight:
+    700;
+}
+
+
+.trade-admin-spin {
+  animation:
+    tradeAdminSpin
+    800ms
+    linear
+    infinite;
+}
+
+
+@keyframes tradeAdminSpin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (
+  max-width:
+    960px
+) {
+
+  .trade-admin-page {
+    padding:
+      1.2rem;
+  }
+
+
+  .trade-admin-header {
+    flex-direction:
+      column;
+  }
+
+
+  .trade-admin-header__actions {
+    width:
+      100%;
+  }
+
+
+  .trade-admin-header__actions
+  .trade-admin-button {
+    flex:
+      1;
+  }
+
+
+  .trade-admin-grid--2,
+  .trade-admin-card-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+
+
+@media (
+  max-width:
+    560px
+) {
+
+  .trade-admin-page {
+    padding:
+      0.75rem;
+  }
+
+
+  .trade-admin-section {
+    padding:
+      1rem;
+  }
+
+
+  .trade-admin-header__actions {
+    flex-direction:
+      column;
+  }
+
+
+  .trade-admin-repeat__row {
+    align-items:
+      stretch;
+  }
+
+
+  .trade-admin-save-footer {
+    flex-direction:
+      column;
+
+    align-items:
+      stretch;
+  }
+
+
+  .trade-admin-save-footer
+  .trade-admin-button {
+    width:
+      100%;
+  }
+
+}

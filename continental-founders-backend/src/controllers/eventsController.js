@@ -420,12 +420,28 @@ function getStoragePathFromUrl(
   }
 
 
-  return decodeURIComponent(
-    imageUrl.slice(
-      markerIndex +
-      marker.length
-    )
-  );
+  try {
+
+    return decodeURIComponent(
+      imageUrl.slice(
+        markerIndex +
+        marker.length
+      )
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      "Unable to decode event image storage path:",
+      error
+    );
+
+
+    return null;
+
+  }
 
 }
 
@@ -552,14 +568,23 @@ async function deleteEventImage(
       );
 
 
-    if (!imagePath) {
+    if (
+      !imagePath
+    ) {
 
-      return;
+      return {
+        success:
+          true,
+
+        skipped:
+          true,
+      };
 
     }
 
 
     const {
+      data,
       error,
     } =
       await supabaseAdmin
@@ -578,19 +603,60 @@ async function deleteEventImage(
 
       console.error(
         "Delete event image error:",
-        error
+        {
+          message:
+            error.message,
+
+          statusCode:
+            error.statusCode,
+
+          error:
+            error.error,
+
+          imagePath,
+        }
       );
 
+
+      return {
+        success:
+          false,
+
+        error,
+      };
+
     }
+
+
+    return {
+      success:
+        true,
+
+      data,
+    };
 
   } catch (
     error
   ) {
 
     console.error(
-      "Delete event image error:",
-      error
+      "Delete event image exception:",
+      {
+        message:
+          error?.message,
+
+        name:
+          error?.name,
+      }
     );
+
+
+    return {
+      success:
+        false,
+
+      error,
+    };
 
   }
 
@@ -788,6 +854,25 @@ async function getEventBySlug(
       req.params;
 
 
+    if (
+      !slug
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "Event slug is required.",
+
+        });
+
+    }
+
+
     const {
       data,
       error,
@@ -815,7 +900,9 @@ async function getEventBySlug(
     }
 
 
-    if (!data) {
+    if (
+      !data
+    ) {
 
       return res
         .status(404)
@@ -888,40 +975,10 @@ async function createEvent(
 
   try {
 
-    /* ========================================================
-       NORMALIZE MULTIPART BODY
-    ======================================================== */
-
     const rawInput =
       normalizeEventInput(
         req.body
       );
-
-
-    console.log(
-      "CREATE EVENT BODY:",
-      rawInput
-    );
-
-
-    console.log(
-      "CREATE EVENT IMAGE:",
-      req.file
-        ? {
-            fieldname:
-              req.file.fieldname,
-
-            originalname:
-              req.file.originalname,
-
-            mimetype:
-              req.file.mimetype,
-
-            size:
-              req.file.size,
-          }
-        : null
-    );
 
 
     const input =
@@ -1048,7 +1105,7 @@ async function createEvent(
 
 
     /* ========================================================
-       CREATE EVENT
+       CREATE DATABASE EVENT
     ======================================================== */
 
     const now =
@@ -1230,36 +1287,29 @@ async function updateEvent(
       req.params;
 
 
+    if (
+      !id
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "Event ID is required.",
+
+        });
+
+    }
+
+
     const rawInput =
       normalizeUpdateInput(
         req.body
       );
-
-
-    console.log(
-      "UPDATE EVENT BODY:",
-      rawInput
-    );
-
-
-    console.log(
-      "UPDATE EVENT IMAGE:",
-      req.file
-        ? {
-            fieldname:
-              req.file.fieldname,
-
-            originalname:
-              req.file.originalname,
-
-            mimetype:
-              req.file.mimetype,
-
-            size:
-              req.file.size,
-          }
-        : null
-    );
 
 
     const input =
@@ -1269,7 +1319,7 @@ async function updateEvent(
 
 
     /* ========================================================
-       CHECK EVENT
+       CHECK EXISTING EVENT
     ======================================================== */
 
     const {
@@ -1712,7 +1762,51 @@ async function deleteEvent(
 
 
     /* ========================================================
-       GET EVENT
+       VALIDATE EVENT ID
+    ======================================================== */
+
+    if (
+      !id ||
+      !String(
+        id
+      ).trim()
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "Event ID is required.",
+
+        });
+
+    }
+
+
+    console.log(
+      "\n========================================"
+    );
+
+    console.log(
+      "DELETE EVENT REQUEST"
+    );
+
+    console.log({
+      eventId:
+        id,
+    });
+
+    console.log(
+      "========================================\n"
+    );
+
+
+    /* ========================================================
+       FIND EVENT FIRST
     ======================================================== */
 
     const {
@@ -1727,7 +1821,7 @@ async function deleteEvent(
           "events"
         )
         .select(
-          "id, image_url"
+          "id, title, image_url"
         )
         .eq(
           "id",
@@ -1740,7 +1834,38 @@ async function deleteEvent(
       existingError
     ) {
 
-      throw existingError;
+      console.error(
+        "Delete event lookup error:",
+        {
+          message:
+            existingError.message,
+
+          code:
+            existingError.code,
+
+          details:
+            existingError.details,
+
+          hint:
+            existingError.hint,
+
+          eventId:
+            id,
+        }
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "Unable to find the event before deletion.",
+
+        });
 
     }
 
@@ -1748,6 +1873,15 @@ async function deleteEvent(
     if (
       !existingEvent
     ) {
+
+      console.warn(
+        "Delete event failed because event was not found:",
+        {
+          eventId:
+            id,
+        }
+      );
+
 
       return res
         .status(404)
@@ -1765,11 +1899,19 @@ async function deleteEvent(
 
 
     /* ========================================================
-       DELETE EVENT
+       DELETE DATABASE ROW
+
+       IMPORTANT:
+       select() makes Supabase return the deleted row so we
+       can confirm that the delete actually happened.
     ======================================================== */
 
     const {
-      error,
+      data:
+        deletedEvent,
+
+      error:
+        deleteError,
     } =
       await supabaseAdmin
         .from(
@@ -1779,32 +1921,147 @@ async function deleteEvent(
         .eq(
           "id",
           id
-        );
+        )
+        .select(
+          "id, title, image_url"
+        )
+        .maybeSingle();
 
 
     if (
-      error
+      deleteError
     ) {
 
-      throw error;
+      console.error(
+        "Supabase event delete error:",
+        {
+          message:
+            deleteError.message,
+
+          code:
+            deleteError.code,
+
+          details:
+            deleteError.details,
+
+          hint:
+            deleteError.hint,
+
+          eventId:
+            id,
+        }
+      );
+
+
+      return res
+        .status(500)
+        .json({
+
+          success:
+            false,
+
+          message:
+            deleteError.message ||
+            "Failed to delete event from the database.",
+
+        });
 
     }
 
 
     /* ========================================================
-       DELETE IMAGE
+       VERIFY DELETE
     ======================================================== */
 
     if (
-      existingEvent.image_url
+      !deletedEvent
     ) {
 
-      await deleteEventImage(
-        existingEvent.image_url
+      console.error(
+        "Supabase delete returned no deleted row:",
+        {
+          eventId:
+            id,
+        }
       );
+
+
+      return res
+        .status(500)
+        .json({
+
+          success:
+            false,
+
+          message:
+            "The event could not be confirmed as deleted.",
+
+        });
 
     }
 
+
+    console.log(
+      "Event deleted from database:",
+      {
+        id:
+          deletedEvent.id,
+
+        title:
+          deletedEvent.title,
+      }
+    );
+
+
+    /* ========================================================
+       DELETE IMAGE FROM STORAGE
+
+       Image cleanup must not undo successful database deletion.
+    ======================================================== */
+
+    const imageUrl =
+      deletedEvent.image_url ||
+      existingEvent.image_url;
+
+
+    let imageDeleted =
+      true;
+
+
+    if (
+      imageUrl
+    ) {
+
+      const imageResult =
+        await deleteEventImage(
+          imageUrl
+        );
+
+
+      imageDeleted =
+        imageResult.success;
+
+
+      if (
+        !imageResult.success
+      ) {
+
+        console.warn(
+          "Event was deleted, but its image could not be removed from storage.",
+          {
+            eventId:
+              deletedEvent.id,
+          }
+        );
+
+      }
+
+    }
+
+
+    /* ========================================================
+       SUCCESS
+    ======================================================== */
 
     return res
       .status(200)
@@ -1812,6 +2069,18 @@ async function deleteEvent(
 
         success:
           true,
+
+        deletedEvent: {
+
+          id:
+            deletedEvent.id,
+
+          title:
+            deletedEvent.title,
+
+        },
+
+        imageDeleted,
 
         message:
           "Event deleted successfully.",
@@ -1823,8 +2092,35 @@ async function deleteEvent(
   ) {
 
     console.error(
-      "Delete event error:",
-      error
+      "\n========================================"
+    );
+
+    console.error(
+      "DELETE EVENT EXCEPTION"
+    );
+
+    console.error({
+      message:
+        error?.message,
+
+      name:
+        error?.name,
+
+      code:
+        error?.code,
+
+      status:
+        error?.status,
+
+      details:
+        error?.details,
+
+      hint:
+        error?.hint,
+    });
+
+    console.error(
+      "========================================\n"
     );
 
 
@@ -1836,6 +2132,7 @@ async function deleteEvent(
           false,
 
         message:
+          error?.message ||
           "Failed to delete event.",
 
       });

@@ -33,6 +33,9 @@ const insightsRoutes =
 const universityRoutes =
   require("./routes/universityRoutes");
 
+const pagesRoutes =
+  require("./routes/pagesRoutes");
+
 
 // ============================================================
 // ERROR MIDDLEWARE
@@ -294,6 +297,15 @@ app.get(
           universities:
             "/api/universities",
 
+          pages:
+            "/api/pages",
+
+          publishedUSAfricaPage:
+            "/api/pages/published/us-africa-trade-network",
+
+          adminUSAfricaPage:
+            "/api/pages/admin/us-africa-trade-network",
+
           adminDashboard:
             "/api/admin/dashboard",
         },
@@ -377,6 +389,16 @@ app.use(
 
 
 // ============================================================
+// CMS PAGES
+// ============================================================
+
+app.use(
+  "/api/pages",
+  pagesRoutes
+);
+
+
+// ============================================================
 // ADMIN DASHBOARD
 // ============================================================
 
@@ -440,6 +462,15 @@ app.get(
 
           universities:
             "/api/universities",
+
+          pages:
+            "/api/pages",
+
+          publishedUSAfricaPage:
+            "/api/pages/published/us-africa-trade-network",
+
+          adminUSAfricaPage:
+            "/api/pages/admin/us-africa-trade-network",
 
           adminDashboard:
             "/api/admin/dashboard",

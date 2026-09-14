@@ -33,14 +33,14 @@ import OurModel from "./pages/OurModel";
 
 import StrategicPartners from "./pages/StrategicPartners";
 
+import Universities from "./pages/Universities";
+
 
 // ============================================================
 // PARTNER SUBPAGES
 // ============================================================
 
 import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
-
-import Universities from "./pages/Universities";
 
 import CorporatePartners from "./pages/CorporatePartners";
 
@@ -98,6 +98,17 @@ import AdminContacts from "./pages/admin/AdminContacts";
 import AdminAbout from "./pages/admin/AdminAbout";
 
 import AdminLeadership from "./pages/admin/AdminLeadership";
+
+
+// ============================================================
+// ADMIN PARTNER CMS PAGES
+// ============================================================
+
+import AdminUSAfricaTradeNetwork from "./pages/admin/AdminUSAfricaTradeNetwork";
+
+import AdminCorporatePartners from "./pages/admin/AdminCorporatePartners";
+
+import AdminGovernmentDevelopment from "./pages/admin/AdminGovernmentDevelopment";
 
 
 // ============================================================
@@ -259,6 +270,18 @@ export default function App() {
 
 
             {/* ==================================================
+                UNIVERSITIES
+            ================================================== */}
+
+            <Route
+              path="/universities"
+              element={
+                <Universities />
+              }
+            />
+
+
+            {/* ==================================================
                 PARTNERS
             ================================================== */}
 
@@ -274,14 +297,6 @@ export default function App() {
               path="/partners/us-africa-trade-network"
               element={
                 <USAfricaTradeNetwork />
-              }
-            />
-
-
-            <Route
-              path="/partners/universities"
-              element={
-                <Universities />
               }
             />
 
@@ -423,6 +438,10 @@ export default function App() {
                 }
               >
 
+                {/* ==============================================
+                    DASHBOARD
+                ============================================== */}
+
                 <Route
                   index
                   element={
@@ -430,6 +449,10 @@ export default function App() {
                   }
                 />
 
+
+                {/* ==============================================
+                    EVENTS
+                ============================================== */}
 
                 <Route
                   path="events"
@@ -439,6 +462,10 @@ export default function App() {
                 />
 
 
+                {/* ==============================================
+                    INSIGHTS
+                ============================================== */}
+
                 <Route
                   path="insights"
                   element={
@@ -446,6 +473,10 @@ export default function App() {
                   }
                 />
 
+
+                {/* ==============================================
+                    UNIVERSITIES
+                ============================================== */}
 
                 <Route
                   path="universities"
@@ -455,6 +486,38 @@ export default function App() {
                 />
 
 
+                {/* ==============================================
+                    PARTNER CMS
+                ============================================== */}
+
+                <Route
+                  path="partners/us-africa-trade-network"
+                  element={
+                    <AdminUSAfricaTradeNetwork />
+                  }
+                />
+
+
+                <Route
+                  path="partners/corporate"
+                  element={
+                    <AdminCorporatePartners />
+                  }
+                />
+
+
+                <Route
+                  path="partners/government-development"
+                  element={
+                    <AdminGovernmentDevelopment />
+                  }
+                />
+
+
+                {/* ==============================================
+                    NEWSLETTER
+                ============================================== */}
+
                 <Route
                   path="newsletter"
                   element={
@@ -462,6 +525,10 @@ export default function App() {
                   }
                 />
 
+
+                {/* ==============================================
+                    CONTACTS
+                ============================================== */}
 
                 <Route
                   path="contacts"
@@ -471,6 +538,10 @@ export default function App() {
                 />
 
 
+                {/* ==============================================
+                    ABOUT
+                ============================================== */}
+
                 <Route
                   path="about"
                   element={
@@ -478,6 +549,10 @@ export default function App() {
                   }
                 />
 
+
+                {/* ==============================================
+                    LEADERSHIP
+                ============================================== */}
 
                 <Route
                   path="leadership"

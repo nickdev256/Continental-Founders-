@@ -1,5 +1,6 @@
 import React, {
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -10,6 +11,8 @@ import {
   Building2,
   GraduationCap,
   Lightbulb,
+  Link2,
+  MapPin,
   Users,
 } from "lucide-react";
 
@@ -33,9 +36,6 @@ const API_BASE_URL =
 
 /* ============================================================
    ICON MAP
-
-   Supabase stores icon names as strings.
-   React converts those strings back into Lucide components.
 ============================================================ */
 
 const iconMap = {
@@ -48,9 +48,6 @@ const iconMap = {
 
 /* ============================================================
    FALLBACK POTENTIAL OUTCOMES
-
-   Used only when the backend is unavailable or Supabase
-   does not yet contain the section.
 ============================================================ */
 
 const fallbackPotentialOutcomes = {
@@ -197,203 +194,577 @@ const partnerEcosystem = [
 
 
 /* ============================================================
+   HELPERS
+============================================================ */
+
+function getUniversityName(
+  university
+) {
+
+  return (
+    university?.name ||
+    university?.universityName ||
+    university?.university_name ||
+    "University Partner"
+  );
+
+}
+
+
+function getUniversityShortName(
+  university
+) {
+
+  return (
+    university?.shortName ||
+    university?.short_name ||
+    ""
+  );
+
+}
+
+
+function getUniversityLogo(
+  university
+) {
+
+  return (
+    university?.logoUrl ||
+    university?.logo_url ||
+    university?.logo ||
+    ""
+  );
+
+}
+
+
+function getUniversityLocation(
+  university
+) {
+
+  const combined =
+    [
+      university?.city,
+      university?.country,
+    ]
+      .filter(Boolean)
+      .join(", ")
+      .trim();
+
+
+  return (
+    university?.location ||
+    combined ||
+    "Location not provided"
+  );
+
+}
+
+
+function getParticipationAreas(
+  university
+) {
+
+  const areas =
+    university?.participationAreas ||
+    university?.participation_areas;
+
+
+  if (
+    Array.isArray(
+      areas
+    )
+  ) {
+
+    return areas;
+
+  }
+
+
+  if (
+    typeof areas ===
+    "string"
+  ) {
+
+    try {
+
+      const parsed =
+        JSON.parse(
+          areas
+        );
+
+
+      if (
+        Array.isArray(
+          parsed
+        )
+      ) {
+
+        return parsed;
+
+      }
+
+    } catch {
+
+      return areas
+        .split(",")
+        .map(
+          (
+            item
+          ) =>
+            item.trim()
+        )
+        .filter(Boolean);
+
+    }
+
+  }
+
+
+  return [];
+
+}
+
+
+/* ============================================================
    UNIVERSITIES PAGE
 ============================================================ */
 
 export default function Universities() {
 
   /* ==========================================================
-     STATE
+     PAGE CONTENT STATE
   ========================================================== */
 
   const [
     potentialOutcomes,
     setPotentialOutcomes,
-  ] = useState(
-    fallbackPotentialOutcomes
-  );
+  ] =
+    useState(
+      fallbackPotentialOutcomes
+    );
 
 
   const [
     loadingOutcomes,
     setLoadingOutcomes,
-  ] = useState(true);
+  ] =
+    useState(true);
 
 
   const [
     outcomesError,
     setOutcomesError,
-  ] = useState("");
+  ] =
+    useState("");
 
 
   /* ==========================================================
-     LOAD UNIVERSITY CONTENT
+     UNIVERSITY PARTNERS STATE
   ========================================================== */
 
-  useEffect(() => {
-
-    let cancelled = false;
-
-
-    async function loadUniversityContent() {
-
-      try {
-
-        setLoadingOutcomes(true);
-        setOutcomesError("");
+  const [
+    universityPartners,
+    setUniversityPartners,
+  ] =
+    useState([]);
 
 
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/universities`,
-            {
-              method: "GET",
+  const [
+    loadingPartners,
+    setLoadingPartners,
+  ] =
+    useState(true);
 
-              headers: {
-                Accept:
-                  "application/json",
-              },
-            }
+
+  const [
+    partnersError,
+    setPartnersError,
+  ] =
+    useState("");
+
+
+  /* ==========================================================
+     LOAD UNIVERSITY PAGE CONTENT
+  ========================================================== */
+
+  useEffect(
+    () => {
+
+      let cancelled =
+        false;
+
+
+      async function loadUniversityContent() {
+
+        try {
+
+          setLoadingOutcomes(
+            true
+          );
+
+          setOutcomesError(
+            ""
           );
 
 
-        /* ====================================================
-           CHECK RESPONSE TYPE
-        ==================================================== */
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/universities`,
+              {
+                method:
+                  "GET",
 
-        const contentType =
-          response.headers.get(
-            "content-type"
-          );
-
-
-        if (
-          !contentType ||
-          !contentType.includes(
-            "application/json"
-          )
-        ) {
-
-          throw new Error(
-            "The Universities API did not return JSON."
-          );
-
-        }
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
 
 
-        const data =
-          await response.json();
+          const contentType =
+            response.headers.get(
+              "content-type"
+            ) || "";
 
 
-        /* ====================================================
-           CHECK RESPONSE STATUS
-        ==================================================== */
+          if (
+            !contentType.includes(
+              "application/json"
+            )
+          ) {
 
-        if (!response.ok) {
+            throw new Error(
+              "The Universities API did not return JSON."
+            );
 
-          throw new Error(
-            data?.message ||
-            "Unable to load university content."
-          );
-
-        }
-
-
-        /* ====================================================
-           GET POTENTIAL OUTCOMES
-        ==================================================== */
-
-        const backendOutcomes =
-          data?.page
-            ?.potential_outcomes;
+          }
 
 
-        if (
-          backendOutcomes &&
-          typeof backendOutcomes ===
+          const data =
+            await response.json();
+
+
+          if (
+            !response.ok
+          ) {
+
+            throw new Error(
+              data?.message ||
+              "Unable to load university content."
+            );
+
+          }
+
+
+          const backendOutcomes =
+            data?.page
+              ?.potential_outcomes;
+
+
+          if (
+            backendOutcomes &&
+            typeof backendOutcomes ===
             "object"
+          ) {
+
+            const normalizedOutcomes = {
+
+              eyebrow:
+                backendOutcomes.eyebrow ||
+                fallbackPotentialOutcomes.eyebrow,
+
+              title:
+                backendOutcomes.title ||
+                fallbackPotentialOutcomes.title,
+
+              text:
+                backendOutcomes.text ||
+                fallbackPotentialOutcomes.text,
+
+              items:
+                Array.isArray(
+                  backendOutcomes.items
+                ) &&
+                backendOutcomes.items.length
+                  ? backendOutcomes.items
+                  : fallbackPotentialOutcomes.items,
+
+            };
+
+
+            if (
+              !cancelled
+            ) {
+
+              setPotentialOutcomes(
+                normalizedOutcomes
+              );
+
+            }
+
+          }
+
+        } catch (
+          error
         ) {
 
-          const normalizedOutcomes = {
-            eyebrow:
-              backendOutcomes.eyebrow ||
-              fallbackPotentialOutcomes.eyebrow,
-
-            title:
-              backendOutcomes.title ||
-              fallbackPotentialOutcomes.title,
-
-            text:
-              backendOutcomes.text ||
-              fallbackPotentialOutcomes.text,
-
-            items:
-              Array.isArray(
-                backendOutcomes.items
-              ) &&
-              backendOutcomes.items.length
-                ? backendOutcomes.items
-                : fallbackPotentialOutcomes.items,
-          };
+          console.error(
+            "Universities API error:",
+            error
+          );
 
 
-          if (!cancelled) {
+          if (
+            !cancelled
+          ) {
+
+            setOutcomesError(
+              error?.message ||
+              "Unable to load university content."
+            );
+
 
             setPotentialOutcomes(
-              normalizedOutcomes
+              fallbackPotentialOutcomes
+            );
+
+          }
+
+        } finally {
+
+          if (
+            !cancelled
+          ) {
+
+            setLoadingOutcomes(
+              false
             );
 
           }
 
         }
 
-      } catch (error) {
+      }
 
-        console.error(
-          "Universities API error:",
+
+      loadUniversityContent();
+
+
+      return () => {
+
+        cancelled =
+          true;
+
+      };
+
+    },
+    []
+  );
+
+
+  /* ==========================================================
+     LOAD ACTIVE UNIVERSITY PARTNERS
+
+     Public endpoint:
+     GET /api/universities/partners
+  ========================================================== */
+
+  useEffect(
+    () => {
+
+      let cancelled =
+        false;
+
+
+      async function loadUniversityPartners() {
+
+        try {
+
+          setLoadingPartners(
+            true
+          );
+
+          setPartnersError(
+            ""
+          );
+
+
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/universities/partners`,
+              {
+                method:
+                  "GET",
+
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+
+          const contentType =
+            response.headers.get(
+              "content-type"
+            ) || "";
+
+
+          if (
+            !contentType.includes(
+              "application/json"
+            )
+          ) {
+
+            throw new Error(
+              "The university partners API did not return JSON."
+            );
+
+          }
+
+
+          const result =
+            await response.json();
+
+
+          if (
+            !response.ok
+          ) {
+
+            throw new Error(
+              result?.message ||
+              result?.error ||
+              "Unable to load university partners."
+            );
+
+          }
+
+
+          const items =
+            Array.isArray(
+              result?.universities
+            )
+              ? result.universities
+              : Array.isArray(
+                  result?.partners
+                )
+                ? result.partners
+                : Array.isArray(
+                    result?.data
+                  )
+                  ? result.data
+                  : [];
+
+
+          if (
+            !cancelled
+          ) {
+
+            setUniversityPartners(
+              items
+            );
+
+          }
+
+        } catch (
           error
-        );
+        ) {
 
-
-        if (!cancelled) {
-
-          setOutcomesError(
-            error.message ||
-            "Unable to load university content."
+          console.error(
+            "University partners API error:",
+            error
           );
 
 
-          /*
-           * We intentionally keep the fallback content.
-           * This prevents the page from disappearing if
-           * the API is temporarily unavailable.
-           */
+          if (
+            !cancelled
+          ) {
 
-          setPotentialOutcomes(
-            fallbackPotentialOutcomes
-          );
+            setUniversityPartners(
+              []
+            );
 
-        }
 
-      } finally {
+            setPartnersError(
+              error?.message ||
+              "Unable to load university partners."
+            );
 
-        if (!cancelled) {
-          setLoadingOutcomes(false);
+          }
+
+        } finally {
+
+          if (
+            !cancelled
+          ) {
+
+            setLoadingPartners(
+              false
+            );
+
+          }
+
         }
 
       }
 
-    }
+
+      loadUniversityPartners();
 
 
-    loadUniversityContent();
+      return () => {
+
+        cancelled =
+          true;
+
+      };
+
+    },
+    []
+  );
 
 
-    return () => {
-      cancelled = true;
-    };
+  /* ==========================================================
+     ACTIVE PARTNERS
+  ========================================================== */
 
-  }, []);
+  const activeUniversityPartners =
+    useMemo(
+      () => {
+
+        return universityPartners.filter(
+          (
+            university
+          ) => {
+
+            const status =
+              String(
+                university?.status ||
+                ""
+              )
+                .trim()
+                .toLowerCase();
+
+
+            return (
+              status ===
+                "active" ||
+              status ===
+                "published" ||
+              status ===
+                "partner"
+            );
+
+          }
+        );
+
+      },
+      [
+        universityPartners,
+      ]
+    );
 
 
   /* ==========================================================
@@ -525,17 +896,278 @@ export default function Universities() {
 
 
       {/* ======================================================
-          POTENTIAL OUTCOMES
-          DATA FROM SUPABASE / BACKEND
+          ACTIVE UNIVERSITY PARTNERS
       ====================================================== */}
 
-      <section
-        className="
-          section
-          section--light
-          universities-outcomes
-        "
-      >
+      <section className="section universities-partners">
+
+        <div className="container">
+
+          <SectionHeading
+            eyebrow="University Network"
+            title="Institutions connected to the Continental Founders ecosystem."
+            text="Explore universities participating across research, faculty engagement, student opportunity, entrepreneurship, and institutional collaboration."
+          />
+
+
+          {loadingPartners && (
+
+            <div className="universities-partners__status">
+              Loading university partners...
+            </div>
+
+          )}
+
+
+          {partnersError &&
+            import.meta.env.DEV && (
+
+              <div className="universities-partners__status universities-partners__status--error">
+                University directory unavailable.
+              </div>
+
+            )}
+
+
+          {!loadingPartners &&
+            !partnersError &&
+            activeUniversityPartners.length === 0 && (
+
+              <div className="universities-partners__empty">
+
+                <GraduationCap
+                  size={30}
+                  strokeWidth={1.4}
+                />
+
+
+                <h3>
+                  University partnerships are being developed.
+                </h3>
+
+
+                <p>
+                  Institutions participating in the Continental
+                  Founders ecosystem will appear here as
+                  partnerships are confirmed.
+                </p>
+
+              </div>
+
+            )}
+
+
+          {activeUniversityPartners.length > 0 && (
+
+            <div className="universities-partners__grid">
+
+              {activeUniversityPartners.map(
+                (
+                  university
+                ) => {
+
+                  const universityName =
+                    getUniversityName(
+                      university
+                    );
+
+
+                  const logo =
+                    getUniversityLogo(
+                      university
+                    );
+
+
+                  const participation =
+                    getParticipationAreas(
+                      university
+                    );
+
+
+                  return (
+
+                    <article
+                      key={
+                        university.id ||
+                        universityName
+                      }
+                      className="universities-partner-card"
+                    >
+
+                      <div className="universities-partner-card__top">
+
+                        <div className="universities-partner-card__logo">
+
+                          {logo ? (
+
+                            <img
+                              src={
+                                logo
+                              }
+                              alt={`${universityName} logo`}
+                            />
+
+                          ) : (
+
+                            <GraduationCap
+                              size={27}
+                              strokeWidth={1.4}
+                              aria-hidden="true"
+                            />
+
+                          )}
+
+                        </div>
+
+
+                        <div className="universities-partner-card__identity">
+
+                          {getUniversityShortName(
+                            university
+                          ) && (
+
+                            <span>
+                              {getUniversityShortName(
+                                university
+                              )}
+                            </span>
+
+                          )}
+
+
+                          <h3>
+                            {universityName}
+                          </h3>
+
+                        </div>
+
+                      </div>
+
+
+                      <div className="universities-partner-card__meta">
+
+                        <div>
+
+                          <MapPin
+                            size={15}
+                            strokeWidth={1.5}
+                            aria-hidden="true"
+                          />
+
+                          <span>
+                            {getUniversityLocation(
+                              university
+                            )}
+                          </span>
+
+                        </div>
+
+
+                        <div>
+
+                          <Building2
+                            size={15}
+                            strokeWidth={1.5}
+                            aria-hidden="true"
+                          />
+
+                          <span>
+                            {university.type ||
+                              "University"}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+
+                      {university.description && (
+
+                        <p className="universities-partner-card__description">
+                          {university.description}
+                        </p>
+
+                      )}
+
+
+                      {participation.length > 0 && (
+
+                        <div className="universities-partner-card__areas">
+
+                          {participation
+                            .slice(
+                              0,
+                              4
+                            )
+                            .map(
+                              (
+                                area
+                              ) => (
+
+                                <span
+                                  key={
+                                    area
+                                  }
+                                >
+                                  {area}
+                                </span>
+
+                              )
+                            )}
+
+                        </div>
+
+                      )}
+
+
+                      {university.website && (
+
+                        <a
+                          href={
+                            university.website
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="universities-partner-card__website"
+                        >
+
+                          <Link2
+                            size={15}
+                            aria-hidden="true"
+                          />
+
+                          Visit Institution
+
+                          <ArrowUpRight
+                            size={15}
+                            aria-hidden="true"
+                          />
+
+                        </a>
+
+                      )}
+
+                    </article>
+
+                  );
+
+                }
+              )}
+
+            </div>
+
+          )}
+
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          POTENTIAL OUTCOMES
+      ====================================================== */}
+
+      <section className="section section--light universities-outcomes">
 
         <div className="container">
 
@@ -552,41 +1184,27 @@ export default function Universities() {
           />
 
 
-          {/* ================================================
-              OPTIONAL LOADING INDICATOR
-          ================================================ */}
-
           {loadingOutcomes && (
+
             <div
               className="universities-outcomes__status"
               role="status"
             >
               Loading university opportunities...
             </div>
+
           )}
 
 
-          {/* ================================================
-              DEVELOPMENT ERROR
-          ================================================ */}
-
           {outcomesError &&
             import.meta.env.DEV && (
-              <div
-                className="
-                  universities-outcomes__status
-                  universities-outcomes__status--error
-                "
-              >
-                Backend unavailable — displaying fallback
-                content.
+
+              <div className="universities-outcomes__status universities-outcomes__status--error">
+                Backend unavailable — displaying fallback content.
               </div>
+
             )}
 
-
-          {/* ================================================
-              OUTCOMES GRID
-          ================================================ */}
 
           <div className="outcome-grid">
 
@@ -614,6 +1232,7 @@ export default function Universities() {
 
 
                 return (
+
                   <article
                     key={
                       item.title ||
@@ -633,9 +1252,7 @@ export default function Universities() {
 
                         <Icon
                           size={22}
-                          strokeWidth={
-                            1.5
-                          }
+                          strokeWidth={1.5}
                           aria-hidden="true"
                         />
 
@@ -657,14 +1274,14 @@ export default function Universities() {
                     <ArrowUpRight
                       className="university-outcome-card__arrow"
                       size={18}
-                      strokeWidth={
-                        1.6
-                      }
+                      strokeWidth={1.6}
                       aria-hidden="true"
                     />
 
                   </article>
+
                 );
+
               }
             )}
 
@@ -693,10 +1310,14 @@ export default function Universities() {
           <div className="universities-participation__grid">
 
             {participationAreas.map(
-              (item) => (
+              (
+                item
+              ) => (
 
                 <article
-                  key={item.title}
+                  key={
+                    item.title
+                  }
                   className="universities-participation__item"
                 >
 
@@ -864,11 +1485,17 @@ export default function Universities() {
           <div className="universities-ecosystem__grid">
 
             {partnerEcosystem.map(
-              (partner) => (
+              (
+                partner
+              ) => (
 
                 <Link
-                  key={partner.path}
-                  to={partner.path}
+                  key={
+                    partner.path
+                  }
+                  to={
+                    partner.path
+                  }
                   className="universities-ecosystem__card"
                 >
 
@@ -896,9 +1523,7 @@ export default function Universities() {
 
                     <ArrowUpRight
                       size={17}
-                      strokeWidth={
-                        1.6
-                      }
+                      strokeWidth={1.6}
                       aria-hidden="true"
                     />
 
@@ -947,4 +1572,5 @@ export default function Universities() {
 
     </>
   );
+
 }

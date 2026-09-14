@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 
 const {
   getInsights,
@@ -17,10 +18,134 @@ const {
 const router = express.Router();
 
 
-// ============================================================
-// PUBLIC - PUBLISHED INSIGHTS
-// GET /api/insights/published
-// ============================================================
+/* ============================================================
+   INSIGHT IMAGE UPLOAD
+============================================================ */
+
+const upload = multer({
+
+  storage:
+    multer.memoryStorage(),
+
+  limits: {
+    fileSize:
+      5 * 1024 * 1024,
+  },
+
+  fileFilter: (
+    req,
+    file,
+    callback
+  ) => {
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+
+
+    if (
+      !allowedTypes.includes(
+        file.mimetype
+      )
+    ) {
+
+      return callback(
+        new Error(
+          "Only JPG, PNG and WebP images are allowed."
+        )
+      );
+
+    }
+
+
+    callback(
+      null,
+      true
+    );
+
+  },
+
+});
+
+
+/* ============================================================
+   MULTER MIDDLEWARE
+============================================================ */
+
+function insightImageUpload(
+  req,
+  res,
+  next
+) {
+
+  upload.single(
+    "image"
+  )(
+    req,
+    res,
+    (
+      error
+    ) => {
+
+      if (!error) {
+        return next();
+      }
+
+
+      if (
+        error instanceof
+        multer.MulterError
+      ) {
+
+        if (
+          error.code ===
+          "LIMIT_FILE_SIZE"
+        ) {
+
+          return res
+            .status(400)
+            .json({
+              success: false,
+              message:
+                "Insight image must be 5MB or smaller.",
+            });
+
+        }
+
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Unable to process the insight image.",
+          });
+
+      }
+
+
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            error?.message ||
+            "Unable to upload insight image.",
+        });
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   PUBLIC
+   GET /api/insights/published
+============================================================ */
 
 router.get(
   "/published",
@@ -28,10 +153,10 @@ router.get(
 );
 
 
-// ============================================================
-// ADMIN - ALL INSIGHTS
-// GET /api/insights
-// ============================================================
+/* ============================================================
+   ADMIN
+   GET /api/insights
+============================================================ */
 
 router.get(
   "/",
@@ -40,34 +165,44 @@ router.get(
 );
 
 
-// ============================================================
-// ADMIN - CREATE INSIGHT
-// POST /api/insights
-// ============================================================
+/* ============================================================
+   ADMIN
+   POST /api/insights
+
+   Accepts:
+   multipart/form-data
+
+   image field:
+   "image"
+============================================================ */
 
 router.post(
   "/",
   requireAdmin,
+  insightImageUpload,
   createInsight
 );
 
 
-// ============================================================
-// ADMIN - UPDATE INSIGHT
-// PATCH /api/insights/:id
-// ============================================================
+/* ============================================================
+   ADMIN
+   PATCH /api/insights/:id
+
+   Supports replacing/removing image
+============================================================ */
 
 router.patch(
   "/:id",
   requireAdmin,
+  insightImageUpload,
   updateInsight
 );
 
 
-// ============================================================
-// ADMIN - DELETE INSIGHT
-// DELETE /api/insights/:id
-// ============================================================
+/* ============================================================
+   ADMIN
+   DELETE /api/insights/:id
+============================================================ */
 
 router.delete(
   "/:id",
@@ -76,13 +211,13 @@ router.delete(
 );
 
 
-// ============================================================
-// PUBLIC - SINGLE PUBLISHED INSIGHT
-// GET /api/insights/:slug
-//
-// IMPORTANT:
-// KEEP THIS ROUTE LAST.
-// ============================================================
+/* ============================================================
+   PUBLIC
+   GET /api/insights/:slug
+
+   IMPORTANT:
+   KEEP THIS ROUTE LAST
+============================================================ */
 
 router.get(
   "/:slug",

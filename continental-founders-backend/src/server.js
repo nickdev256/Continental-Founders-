@@ -253,15 +253,15 @@ function printStartupMessage() {
   );
 
   console.log(
-    `API Server:            ${localBaseUrl}`
+    `API Server:                 ${localBaseUrl}`
   );
 
   console.log(
-    `Health Check:          ${localBaseUrl}/api/health`
+    `Health Check:               ${localBaseUrl}/api/health`
   );
 
   console.log(
-    `API Root:              ${localBaseUrl}/api`
+    `API Root:                   ${localBaseUrl}/api`
   );
 
   console.log("");
@@ -280,35 +280,43 @@ function printStartupMessage() {
   );
 
   console.log(
-    `Published Events:      ${localBaseUrl}/api/events/published`
+    `Published Events:           ${localBaseUrl}/api/events/published`
   );
 
   console.log(
-    `Published Insights:    ${localBaseUrl}/api/insights/published`
+    `Published Insights:         ${localBaseUrl}/api/insights/published`
   );
 
   console.log(
-    `Insight Details:       ${localBaseUrl}/api/insights/:slug`
+    `Insight Details:            ${localBaseUrl}/api/insights/:slug`
   );
 
   console.log(
-    `Universities:          ${localBaseUrl}/api/universities`
+    `Universities:               ${localBaseUrl}/api/universities`
   );
 
   console.log(
-    `Partnerships:          ${localBaseUrl}/api/partnerships`
+    `Published CMS Page:         ${localBaseUrl}/api/pages/published/:slug`
   );
 
   console.log(
-    `Contact:               ${localBaseUrl}/api/contact`
+    `U.S.–Africa Page:           ${localBaseUrl}/api/pages/published/us-africa-trade-network`
   );
 
   console.log(
-    `Newsletter:            ${localBaseUrl}/api/newsletter`
+    `Partnerships:               ${localBaseUrl}/api/partnerships`
   );
 
   console.log(
-    `Newsletter Subscribe:  ${localBaseUrl}/api/newsletter/subscribe`
+    `Contact:                    ${localBaseUrl}/api/contact`
+  );
+
+  console.log(
+    `Newsletter:                 ${localBaseUrl}/api/newsletter`
+  );
+
+  console.log(
+    `Newsletter Subscribe:       ${localBaseUrl}/api/newsletter/subscribe`
   );
 
   console.log("");
@@ -327,15 +335,23 @@ function printStartupMessage() {
   );
 
   console.log(
-    `Events CMS:            ${localBaseUrl}/api/events`
+    `Events CMS:                 ${localBaseUrl}/api/events`
   );
 
   console.log(
-    `Insights CMS:          ${localBaseUrl}/api/insights`
+    `Insights CMS:               ${localBaseUrl}/api/insights`
   );
 
   console.log(
-    `Dashboard:             ${localBaseUrl}/api/admin/dashboard`
+    `CMS Page:                   ${localBaseUrl}/api/pages/admin/:slug`
+  );
+
+  console.log(
+    `U.S.–Africa CMS:            ${localBaseUrl}/api/pages/admin/us-africa-trade-network`
+  );
+
+  console.log(
+    `Dashboard:                  ${localBaseUrl}/api/admin/dashboard`
   );
 
   console.log("");
@@ -354,27 +370,27 @@ function printStartupMessage() {
   );
 
   console.log(
-    `Auth API:              ${localBaseUrl}/api/auth`
+    `Auth API:                   ${localBaseUrl}/api/auth`
   );
 
   console.log(
-    `Login:                 ${localBaseUrl}/api/auth/login`
+    `Login:                      ${localBaseUrl}/api/auth/login`
   );
 
   console.log(
-    `Register:              ${localBaseUrl}/api/auth/register`
+    `Register:                   ${localBaseUrl}/api/auth/register`
   );
 
   console.log(
-    `Verify OTP:            ${localBaseUrl}/api/auth/verify-otp`
+    `Verify OTP:                 ${localBaseUrl}/api/auth/verify-otp`
   );
 
   console.log(
-    `Current Admin:         ${localBaseUrl}/api/auth/me`
+    `Current Admin:              ${localBaseUrl}/api/auth/me`
   );
 
   console.log(
-    `Logout:                ${localBaseUrl}/api/auth/logout`
+    `Logout:                     ${localBaseUrl}/api/auth/logout`
   );
 
   console.log("");
@@ -393,19 +409,19 @@ function printStartupMessage() {
   );
 
   console.log(
-    "Database:              Supabase"
+    "Database:                   Supabase"
   );
 
   console.log(
-    `Environment:           ${NODE_ENV}`
+    `Environment:                ${NODE_ENV}`
   );
 
   console.log(
-    `Port:                  ${PORT}`
+    `Port:                       ${PORT}`
   );
 
   console.log(
-    `Host:                  ${HOST}`
+    `Host:                       ${HOST}`
   );
 
   console.log("");

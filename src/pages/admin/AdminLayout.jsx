@@ -1,9 +1,16 @@
 import React, {
+  useMemo,
   useState,
 } from "react";
 
 import {
+  ChevronDown,
+  Menu,
+} from "lucide-react";
+
+import {
   Outlet,
+  useLocation,
 } from "react-router-dom";
 
 import AdminSidebar from "../../components/admin/AdminSidebar";
@@ -20,6 +27,12 @@ export default function AdminLayout() {
     useState(false);
 
 
+  const {
+    pathname,
+  } =
+    useLocation();
+
+
   function openSidebar() {
     setSidebarOpen(true);
   }
@@ -30,12 +43,74 @@ export default function AdminLayout() {
   }
 
 
+  /* ==========================================================
+     CURRENT PAGE TITLE
+  ========================================================== */
+
+  const currentSection =
+    useMemo(
+      () => {
+
+        const routeTitles = {
+
+          "/admin":
+            "Dashboard",
+
+          "/admin/events":
+            "Events Management",
+
+          "/admin/insights":
+            "Insights Management",
+
+          "/admin/universities":
+            "Universities Directory",
+
+          "/admin/newsletter":
+            "Newsletter Management",
+
+          "/admin/contacts":
+            "Contact Submissions",
+
+          "/admin/about":
+            "About Page",
+
+          "/admin/leadership":
+            "Leadership Management",
+
+          "/admin/partners/us-africa-trade-network":
+            "U.S.–Africa Trade Network",
+
+          "/admin/partners/universities":
+            "Universities Page",
+
+          "/admin/partners/corporate":
+            "Corporate Partners",
+
+          "/admin/partners/government-development":
+            "Government & Development",
+
+        };
+
+
+        return (
+          routeTitles[pathname] ||
+          "Content Management System"
+        );
+
+      },
+      [
+        pathname,
+      ]
+    );
+
+
   return (
+
     <div className="admin-layout">
 
-      {/* ================================================
+      {/* ======================================================
           SIDEBAR
-      ================================================= */}
+      ======================================================= */}
 
       <AdminSidebar
         open={sidebarOpen}
@@ -43,9 +118,9 @@ export default function AdminLayout() {
       />
 
 
-      {/* ================================================
+      {/* ======================================================
           MOBILE OVERLAY
-      ================================================= */}
+      ======================================================= */}
 
       {sidebarOpen && (
 
@@ -59,16 +134,16 @@ export default function AdminLayout() {
       )}
 
 
-      {/* ================================================
-          MAIN AREA
-      ================================================= */}
+      {/* ======================================================
+          MAIN
+      ======================================================= */}
 
       <div className="admin-layout__main">
 
 
-        {/* ==============================================
+        {/* ====================================================
             TOPBAR
-        =============================================== */}
+        ===================================================== */}
 
         <header className="admin-layout__topbar">
 
@@ -80,28 +155,36 @@ export default function AdminLayout() {
               onClick={openSidebar}
               aria-label="Open admin navigation"
             >
-              <span />
-              <span />
-              <span />
+
+              <Menu
+                size={24}
+                strokeWidth={1.8}
+              />
+
             </button>
 
 
-            <div>
+            <div className="admin-layout__brand">
 
-              <span className="admin-layout__eyebrow">
+              <span>
                 CONTINENTAL FOUNDERS
               </span>
 
-              <h1 className="admin-layout__title">
-                Content Management System
-              </h1>
-
             </div>
+
+
+            <span className="admin-layout__page-title">
+              {currentSection}
+            </span>
 
           </div>
 
 
           <div className="admin-layout__topbar-right">
+
+            {/* =================================================
+                SYSTEM STATUS
+            ================================================== */}
 
             <div className="admin-layout__status">
 
@@ -114,11 +197,23 @@ export default function AdminLayout() {
             </div>
 
 
-            <div className="admin-layout__profile">
+            <div className="admin-layout__divider" />
+
+
+            {/* =================================================
+                PROFILE
+            ================================================== */}
+
+            <button
+              type="button"
+              className="admin-layout__profile"
+              aria-label="Administrator profile"
+            >
 
               <div className="admin-layout__avatar">
                 CF
               </div>
+
 
               <div className="admin-layout__profile-copy">
 
@@ -132,16 +227,23 @@ export default function AdminLayout() {
 
               </div>
 
-            </div>
+
+              <ChevronDown
+                className="admin-layout__profile-chevron"
+                size={16}
+                strokeWidth={1.8}
+              />
+
+            </button>
 
           </div>
 
         </header>
 
 
-        {/* ==============================================
+        {/* ====================================================
             PAGE CONTENT
-        =============================================== */}
+        ===================================================== */}
 
         <main className="admin-layout__content">
 
@@ -152,5 +254,7 @@ export default function AdminLayout() {
       </div>
 
     </div>
+
   );
+
 }

@@ -1,0 +1,1771 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   ADMIN UNIVERSITIES
+============================================================ */
+
+.admin-universities {
+  width: 100%;
+  min-width: 0;
+  color: #14283d;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.admin-universities__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.admin-universities__header > div {
+  min-width: 0;
+}
+
+.admin-universities__eyebrow {
+  display: inline-block;
+  margin-bottom: 5px;
+
+  color: #b68a2c;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-universities__header h1 {
+  margin: 0;
+
+  color: #0b1f35;
+
+  font-size: 29px;
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.admin-universities__header p {
+  max-width: 760px;
+  margin: 7px 0 0;
+
+  color: #627083;
+
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   CREATE BUTTON
+============================================================ */
+
+.admin-universities__create {
+  min-height: 40px;
+  padding: 0 16px;
+
+  flex-shrink: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: #0c2947;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 5px 15px rgba(11, 31, 53, 0.13);
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.admin-universities__create:hover {
+  background: #123a61;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 19px rgba(11, 31, 53, 0.17);
+}
+
+.admin-universities__create:active {
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   SUMMARY GRID
+============================================================ */
+
+.admin-universities__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+.admin-universities__summary-card {
+  min-height: 80px;
+  padding: 15px 17px;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8ee;
+  border-radius: 8px;
+
+  box-shadow:
+    0 2px 7px rgba(17, 35, 55, 0.04);
+}
+
+.admin-universities__summary-card > svg,
+.admin-universities__summary-icon {
+  width: 38px;
+  height: 38px;
+
+  flex: 0 0 38px;
+
+  display: grid;
+  place-items: center;
+
+  padding: 9px;
+
+  border-radius: 7px;
+
+  background: #fbf5e8;
+  color: #b68a2c;
+}
+
+.admin-universities__summary-icon {
+  padding: 0;
+}
+
+.admin-universities__summary-card > div:last-child {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-universities__summary-card strong {
+  color: #0b1f35;
+
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 750;
+}
+
+.admin-universities__summary-card span {
+  margin-top: 5px;
+
+  color: #6b7787;
+
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.admin-universities__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  margin-bottom: 10px;
+}
+
+.admin-universities__search {
+  width: min(390px, 100%);
+  height: 39px;
+  padding: 0 11px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce3ea;
+  border-radius: 7px;
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.admin-universities__search:focus-within {
+  border-color: #9fb0c2;
+
+  box-shadow:
+    0 0 0 3px rgba(11, 46, 78, 0.06);
+}
+
+.admin-universities__search > svg {
+  flex-shrink: 0;
+  color: #8793a0;
+}
+
+.admin-universities__search input {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: #17283b;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.admin-universities__search input::placeholder {
+  color: #9aa5b1;
+}
+
+.admin-universities__search button {
+  width: 27px;
+  height: 27px;
+  padding: 0;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 5px;
+
+  background: transparent;
+  color: #758292;
+
+  cursor: pointer;
+}
+
+.admin-universities__search button:hover {
+  background: #f1f4f7;
+  color: #17283b;
+}
+
+.admin-universities__count {
+  color: #778392;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   MAIN PANEL
+============================================================ */
+
+.admin-universities__panel {
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #dfe6ec;
+  border-radius: 8px;
+
+  box-shadow:
+    0 2px 8px rgba(18, 37, 57, 0.045);
+}
+
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.admin-universities__table-header {
+  min-height: 42px;
+  padding: 0 17px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(250px, 2.3fr)
+    minmax(150px, 1.2fr)
+    minmax(130px, 1fr)
+    105px
+    24px;
+
+  align-items: center;
+  gap: 13px;
+
+  background: #f7f9fb;
+
+  border-bottom: 1px solid #e1e7ed;
+
+  color: #778493;
+
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   UNIVERSITY ROW
+============================================================ */
+
+.admin-universities__list {
+  width: 100%;
+}
+
+.admin-universities__row {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 17px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(250px, 2.3fr)
+    minmax(150px, 1.2fr)
+    minmax(130px, 1fr)
+    105px
+    24px;
+
+  align-items: center;
+  gap: 13px;
+
+  border: 0;
+  border-bottom: 1px solid #edf1f4;
+
+  background: #ffffff;
+  color: inherit;
+
+  font-family: inherit;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease;
+}
+
+.admin-universities__row:last-child {
+  border-bottom: 0;
+}
+
+.admin-universities__row:hover {
+  background: #fafbfd;
+}
+
+.admin-universities__row > svg:last-child {
+  justify-self: end;
+  color: #9aa6b2;
+}
+
+
+/* ============================================================
+   UNIVERSITY CELL
+============================================================ */
+
+.admin-universities__university {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.admin-universities__logo {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #e0e6eb;
+  border-radius: 6px;
+
+  background: #f4f7f9;
+  color: #173956;
+}
+
+.admin-universities__logo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  padding: 4px;
+
+  background: #ffffff;
+}
+
+.admin-universities__university > div:last-child {
+  min-width: 0;
+}
+
+.admin-universities__university strong {
+  display: block;
+
+  overflow: hidden;
+
+  color: #14273b;
+
+  font-size: 13px;
+  font-weight: 720;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.admin-universities__university span {
+  display: block;
+
+  margin-top: 4px;
+
+  overflow: hidden;
+
+  color: #788492;
+
+  font-size: 11.5px;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+/* ============================================================
+   LOCATION / TYPE
+============================================================ */
+
+.admin-universities__location,
+.admin-universities__type {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  color: #657383;
+
+  font-size: 11.5px;
+}
+
+.admin-universities__location svg,
+.admin-universities__type svg {
+  flex-shrink: 0;
+  color: #8793a0;
+}
+
+.admin-universities__location span,
+.admin-universities__type span {
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.admin-universities__arrow {
+  display: grid;
+  place-items: center;
+
+  color: #9aa6b2;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.admin-universities__status {
+  min-width: 68px;
+  min-height: 25px;
+  padding: 0 9px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  background: #eef1f4;
+  color: #626c78;
+
+  border: 1px solid #dfe4e9;
+
+  font-size: 10.5px;
+  line-height: 1;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.admin-universities__status--active {
+  background: #e9f7ef;
+  color: #12663f;
+
+  border-color: #ccebd8;
+}
+
+.admin-universities__status--pending {
+  background: #fff5dc;
+  color: #805d18;
+
+  border-color: #eedda8;
+}
+
+.admin-universities__status--draft {
+  background: #eef3f8;
+  color: #425b72;
+
+  border-color: #dbe4ec;
+}
+
+.admin-universities__status--inactive {
+  background: #f0f1f3;
+  color: #69727c;
+
+  border-color: #e0e3e6;
+}
+
+
+/* ============================================================
+   EMPTY / ERROR / LOADING
+============================================================ */
+
+.admin-universities__empty {
+  min-height: 245px;
+  padding: 36px 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+.admin-universities__empty > svg,
+.admin-universities__empty-icon {
+  margin-bottom: 10px;
+  color: #8d99a5;
+}
+
+.admin-universities__empty-icon {
+  width: 50px;
+  height: 50px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 8px;
+
+  background: #f3f6f8;
+}
+
+.admin-universities__empty h3 {
+  margin: 0;
+
+  color: #193049;
+
+  font-size: 15px;
+}
+
+.admin-universities__empty p {
+  max-width: 450px;
+  margin: 7px 0 0;
+
+  color: #7b8793;
+
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.admin-universities__empty button {
+  min-height: 36px;
+  margin-top: 14px;
+  padding: 0 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border: 1px solid #d7dfe6;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #20364c;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.admin-universities__empty button:hover {
+  background: #f7f9fb;
+}
+
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.admin-universities__pagination {
+  min-height: 51px;
+  padding: 9px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+
+  border-top: 1px solid #e6ebef;
+
+  background: #fafbfd;
+}
+
+.admin-universities__pagination span {
+  color: #718090;
+
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.admin-universities__pagination button {
+  min-height: 32px;
+  padding: 0 11px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  border: 1px solid #d6dee5;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #273d53;
+
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.admin-universities__pagination button:hover:not(:disabled) {
+  border-color: #b9c4cf;
+  background: #f5f7f9;
+}
+
+.admin-universities__pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   OVERLAY
+============================================================ */
+
+.admin-universities__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+
+  display: flex;
+  justify-content: flex-end;
+
+  background: rgba(4, 16, 29, 0.44);
+
+  backdrop-filter: blur(2px);
+}
+
+
+/* ============================================================
+   DRAWER
+============================================================ */
+
+.admin-universities__drawer {
+  width: min(480px, 100%);
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  box-shadow:
+    -16px 0 40px rgba(4, 19, 33, 0.16);
+
+  animation:
+    adminUniversitiesDrawerIn 0.22s ease;
+}
+
+.admin-universities__form-drawer {
+  width: min(610px, 100%);
+}
+
+@keyframes adminUniversitiesDrawerIn {
+  from {
+    transform: translateX(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+/* ============================================================
+   DRAWER HEADER
+============================================================ */
+
+.admin-universities__drawer-header {
+  min-height: 89px;
+  padding: 18px 20px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  border-bottom: 1px solid #e4e9ee;
+
+  background: #ffffff;
+}
+
+.admin-universities__drawer-header > div {
+  min-width: 0;
+}
+
+.admin-universities__drawer-eyebrow {
+  color: #b68a2c;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+}
+
+.admin-universities__drawer-header h2 {
+  margin: 5px 0 0;
+
+  color: #0e243a;
+
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.admin-universities__drawer-close {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+
+  flex-shrink: 0;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid #dfe5eb;
+  border-radius: 6px;
+
+  background: #ffffff;
+  color: #667584;
+
+  cursor: pointer;
+}
+
+.admin-universities__drawer-close:hover:not(:disabled) {
+  background: #f4f6f8;
+  color: #173047;
+}
+
+.admin-universities__drawer-close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   DRAWER BODY
+============================================================ */
+
+.admin-universities__drawer-body {
+  min-height: 0;
+  padding: 18px 20px 22px;
+
+  flex: 1;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+
+/* ============================================================
+   UNIVERSITY PROFILE
+============================================================ */
+
+.admin-universities__profile {
+  margin-bottom: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-universities__profile-logo {
+  width: 70px;
+  height: 70px;
+
+  flex: 0 0 70px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe6ec;
+  border-radius: 8px;
+
+  background: #f5f8fa;
+  color: #173956;
+}
+
+.admin-universities__profile-logo img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  padding: 7px;
+
+  background: #ffffff;
+}
+
+.admin-universities__profile > div:last-child {
+  min-width: 0;
+}
+
+.admin-universities__profile h3 {
+  margin: 0;
+
+  color: #11283e;
+
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.admin-universities__profile p {
+  margin: 5px 0 0;
+
+  color: #73808d;
+
+  font-size: 12px;
+}
+
+
+/* ============================================================
+   DETAIL ROW
+============================================================ */
+
+.admin-universities__detail-row {
+  min-height: 45px;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border: 1px solid #e5e9ed;
+  border-radius: 6px;
+
+  background: #fafbfd;
+}
+
+.admin-universities__detail-row > span:first-child {
+  color: #6e7a87;
+
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   DETAIL CARDS
+============================================================ */
+
+.admin-universities__detail-card {
+  min-height: 63px;
+  margin-bottom: 9px;
+  padding: 12px 13px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  border: 1px solid #e5e9ed;
+  border-radius: 6px;
+
+  background: #ffffff;
+}
+
+.admin-universities__detail-card > svg {
+  flex-shrink: 0;
+
+  color: #b68a2c;
+}
+
+.admin-universities__detail-card div {
+  min-width: 0;
+}
+
+.admin-universities__detail-card span {
+  display: block;
+  margin-bottom: 3px;
+
+  color: #7f8b97;
+
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-universities__detail-card strong,
+.admin-universities__detail-card a {
+  display: block;
+
+  overflow: hidden;
+
+  color: #193047;
+
+  font-size: 12.5px;
+  font-weight: 700;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.admin-universities__detail-card a {
+  color: #1d527c;
+  text-decoration: none;
+}
+
+.admin-universities__detail-card a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   DESCRIPTION
+============================================================ */
+
+.admin-universities__description {
+  margin-top: 12px;
+  padding: 14px;
+
+  border: 1px solid #e3e8ed;
+  border-radius: 6px;
+
+  background: #fafbfd;
+}
+
+.admin-universities__description > span {
+  display: block;
+  margin-bottom: 8px;
+
+  color: #6b7785;
+
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-universities__description p {
+  margin: 0;
+
+  color: #394b5d;
+
+  font-size: 12.5px;
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+}
+
+
+/* ============================================================
+   PARTICIPATION AREAS
+============================================================ */
+
+.admin-universities__participation {
+  margin-top: 12px;
+  padding: 14px;
+
+  border: 1px solid #e3e8ed;
+  border-radius: 6px;
+
+  background: #ffffff;
+}
+
+.admin-universities__participation > span {
+  display: block;
+  margin-bottom: 10px;
+
+  color: #6b7785;
+
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-universities__participation-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.admin-universities__participation-item {
+  min-height: 29px;
+  padding: 0 9px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border: 1px solid #dde5eb;
+  border-radius: 5px;
+
+  background: #f5f8fa;
+  color: #344c62;
+
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.admin-universities__participation-empty {
+  color: #85919d;
+
+  font-size: 11.5px;
+}
+
+
+/* ============================================================
+   DRAWER ACTIONS
+============================================================ */
+
+.admin-universities__drawer-actions {
+  margin-top: 18px;
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* ============================================================
+   WIZARD STEPS
+============================================================ */
+
+.admin-universities__steps {
+  padding: 12px 20px;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+
+  background: #fafbfd;
+
+  border-bottom: 1px solid #e5eaee;
+}
+
+.admin-universities__step {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  color: #929daa;
+}
+
+.admin-universities__step:not(:last-child)::after {
+  content: "";
+
+  position: absolute;
+
+  top: 12px;
+  left: calc(50% + 16px);
+  right: calc(-50% + 16px);
+
+  height: 1px;
+
+  background: #dce3e9;
+}
+
+.admin-universities__step span {
+  position: relative;
+  z-index: 2;
+
+  width: 25px;
+  height: 25px;
+
+  display: grid;
+  place-items: center;
+
+  border: 2px solid #e6ebef;
+  border-radius: 50%;
+
+  background: #e6ebef;
+  color: #73808d;
+
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+.admin-universities__step small {
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.admin-universities__step.active span {
+  border-color: #0c2947;
+
+  background: #0c2947;
+  color: #ffffff;
+}
+
+.admin-universities__step.active small {
+  color: #173047;
+}
+
+.admin-universities__step.complete span {
+  border-color: #b68a2c;
+
+  background: #b68a2c;
+  color: #ffffff;
+}
+
+.admin-universities__step.complete small {
+  color: #736022;
+}
+
+.admin-universities__step.complete:not(:last-child)::after {
+  background: #d7c080;
+}
+
+
+/* ============================================================
+   FORM
+============================================================ */
+
+.admin-universities__form {
+  min-height: 0;
+  padding: 18px 20px 22px;
+
+  flex: 1;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.admin-universities__step-heading {
+  margin-bottom: 17px;
+}
+
+.admin-universities__step-heading h3 {
+  margin: 0;
+
+  color: #112a42;
+
+  font-size: 16px;
+}
+
+.admin-universities__step-heading p {
+  margin: 5px 0 0;
+
+  color: #788594;
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   FORM ERROR
+============================================================ */
+
+.admin-universities__form-error {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+
+  border: 1px solid #efc8c7;
+  border-radius: 6px;
+
+  background: #fff4f3;
+  color: #9a3432;
+
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   FORM GRID
+============================================================ */
+
+.admin-universities__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+
+/* ============================================================
+   FORM FIELDS
+============================================================ */
+
+.admin-universities__field {
+  margin-bottom: 15px;
+}
+
+.admin-universities__field > label {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #2d4053;
+
+  font-size: 11.5px;
+  font-weight: 750;
+}
+
+.admin-universities__field input:not([type="checkbox"]),
+.admin-universities__field select,
+.admin-universities__field textarea {
+  width: 100%;
+
+  border: 1px solid #d5dee6;
+  border-radius: 6px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #172b40;
+
+  font-family: inherit;
+  font-size: 12.5px;
+
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.admin-universities__field input:not([type="checkbox"]),
+.admin-universities__field select {
+  min-height: 40px;
+  padding: 0 11px;
+}
+
+.admin-universities__field textarea {
+  min-height: 115px;
+  padding: 10px 11px;
+
+  resize: vertical;
+
+  line-height: 1.6;
+}
+
+.admin-universities__field input:focus,
+.admin-universities__field select:focus,
+.admin-universities__field textarea:focus {
+  border-color: #8ea2b6;
+
+  box-shadow:
+    0 0 0 3px rgba(11, 46, 78, 0.06);
+}
+
+.admin-universities__field input::placeholder,
+.admin-universities__field textarea::placeholder {
+  color: #9ca6b0;
+}
+
+
+/* ============================================================
+   LOGO PREVIEW
+============================================================ */
+
+.admin-universities__logo-preview {
+  width: 100%;
+  min-height: 125px;
+  margin: -4px 0 15px;
+
+  display: grid;
+  place-items: center;
+
+  overflow: hidden;
+
+  border: 1px solid #dfe5ea;
+  border-radius: 7px;
+
+  background: #f8fafb;
+}
+
+.admin-universities__logo-preview img {
+  width: 130px;
+  height: 100px;
+
+  display: block;
+
+  object-fit: contain;
+}
+
+
+/* ============================================================
+   CHECKBOXES
+============================================================ */
+
+.admin-universities__checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-universities__checkbox {
+  min-height: 48px;
+  padding: 9px 11px;
+
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+
+  margin: 0 !important;
+
+  border: 1px solid #dde4ea;
+  border-radius: 6px;
+
+  background: #fafbfd;
+
+  color: #34495e !important;
+
+  cursor: pointer;
+}
+
+.admin-universities__checkbox:hover {
+  border-color: #bdc9d4;
+  background: #f5f8fa;
+}
+
+.admin-universities__checkbox input {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+
+  accent-color: #0c2947;
+
+  cursor: pointer;
+}
+
+.admin-universities__checkbox span {
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+
+/* ============================================================
+   REVIEW
+============================================================ */
+
+.admin-universities__review {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.admin-universities__review > div {
+  min-height: 70px;
+  padding: 11px 12px;
+
+  border: 1px solid #e2e7ec;
+  border-radius: 6px;
+
+  background: #fafbfd;
+}
+
+.admin-universities__review > div > span {
+  display: block;
+  margin-bottom: 5px;
+
+  color: #7e8995;
+
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-universities__review strong {
+  display: block;
+
+  color: #1c3248;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  word-break: break-word;
+}
+
+.admin-universities__review p {
+  margin: 0;
+
+  color: #526171;
+
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+.admin-universities__review-wide {
+  grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   REVIEW TAGS
+============================================================ */
+
+.admin-universities__review-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-universities__review-tags > span {
+  min-height: 27px;
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border: 1px solid #d9e2e9;
+  border-radius: 5px;
+
+  background: #ffffff;
+  color: #3b5268;
+
+  font-size: 10px;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+============================================================ */
+
+.admin-universities__form-actions {
+  margin-top: 19px;
+  padding-top: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  border-top: 1px solid #e3e8ed;
+}
+
+.admin-universities__form-actions-right {
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.admin-universities__save,
+.admin-universities__edit,
+.admin-universities__cancel,
+.admin-universities__delete {
+  min-height: 36px;
+  padding: 0 13px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  border-radius: 6px;
+
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    opacity 0.16s ease;
+}
+
+.admin-universities__save,
+.admin-universities__edit {
+  border: 1px solid #0c2947;
+
+  background: #0c2947;
+  color: #ffffff;
+}
+
+.admin-universities__save:hover:not(:disabled),
+.admin-universities__edit:hover:not(:disabled) {
+  border-color: #123b61;
+
+  background: #123b61;
+}
+
+.admin-universities__cancel {
+  border: 1px solid #d5dde5;
+
+  background: #ffffff;
+  color: #33495e;
+}
+
+.admin-universities__cancel:hover:not(:disabled) {
+  background: #f5f7f9;
+}
+
+.admin-universities__delete {
+  border: 1px solid #edc9c6;
+
+  background: #fff5f4;
+  color: #a23b36;
+}
+
+.admin-universities__delete:hover:not(:disabled) {
+  background: #fce9e7;
+}
+
+.admin-universities__save:disabled,
+.admin-universities__edit:disabled,
+.admin-universities__cancel:disabled,
+.admin-universities__delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ============================================================
+   RESPONSIVE - 1180
+============================================================ */
+
+@media (max-width: 1180px) {
+
+  .admin-universities__table-header,
+  .admin-universities__row {
+    grid-template-columns:
+      minmax(220px, 2fr)
+      minmax(135px, 1.1fr)
+      minmax(115px, 0.9fr)
+      95px
+      22px;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE - 980
+============================================================ */
+
+@media (max-width: 980px) {
+
+  .admin-universities__table-header {
+    display: none;
+  }
+
+  .admin-universities__row {
+    grid-template-columns:
+      minmax(0, 1fr)
+      110px
+      24px;
+
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .admin-universities__row
+  .admin-universities__location,
+  .admin-universities__row
+  .admin-universities__type {
+    display: none;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE - 760
+============================================================ */
+
+@media (max-width: 760px) {
+
+  .admin-universities__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-universities__create {
+    align-self: flex-start;
+  }
+
+  .admin-universities__summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-universities__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-universities__search {
+    width: 100%;
+  }
+
+  .admin-universities__form-grid,
+  .admin-universities__checkbox-grid,
+  .admin-universities__review {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-universities__review-wide {
+    grid-column: auto;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE - 560
+============================================================ */
+
+@media (max-width: 560px) {
+
+  .admin-universities__header h1 {
+    font-size: 25px;
+  }
+
+  .admin-universities__drawer,
+  .admin-universities__form-drawer {
+    width: 100%;
+  }
+
+  .admin-universities__drawer-header {
+    padding: 16px;
+  }
+
+  .admin-universities__drawer-body,
+  .admin-universities__form {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .admin-universities__steps {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .admin-universities__step small {
+    font-size: 8.5px;
+  }
+
+  .admin-universities__row {
+    grid-template-columns:
+      minmax(0, 1fr)
+      24px;
+  }
+
+  .admin-universities__row > div:nth-child(4) {
+    display: none;
+  }
+
+  .admin-universities__logo {
+    width: 39px;
+    height: 39px;
+
+    flex-basis: 39px;
+  }
+
+  .admin-universities__pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .admin-universities__pagination span {
+    width: 100%;
+
+    order: -1;
+
+    text-align: center;
+  }
+
+  .admin-universities__form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-universities__form-actions-right {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-universities__form-actions-right button {
+    flex: 1;
+  }
+
+  .admin-universities__delete {
+    width: 100%;
+  }
+
+}

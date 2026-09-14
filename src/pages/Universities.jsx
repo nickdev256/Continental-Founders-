@@ -9,7 +9,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Building2,
-  GraduationCap,
+  GraduationCap, 
   Lightbulb,
   Link2,
   MapPin,

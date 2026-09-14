@@ -2,10 +2,58 @@
    STRATEGIC PARTNERS HERO
    ========================================================= */
 
+/* =========================================================
+   STRATEGIC PARTNERS — FONT SYSTEM
+   ========================================================= */
+
+.strategic-partners-hero,
+.strategic-opening,
+.strategic-opening + *,
+.strategic-opening ~ * {
+  font-family: "Trajan Pro", "Trajan Pro 3", Georgia, serif;
+}
+
+
+/* PRIMARY FONT — HEADINGS */
+
+.strategic-partners-hero h1,
+.strategic-opening h2,
+.section-heading h2,
+.partner-card h3 {
+  font-family: "Trajan Pro", "Trajan Pro 3", Georgia, serif !important;
+}
+
+
+/* SECONDARY FONT — SUPPORTING TEXT */
+
+.strategic-partners-hero .eyebrow,
+.strategic-partners-hero__aside p,
+.strategic-opening p,
+.section-heading p,
+.partner-card p,
+.contribution-grid span,
+.contribution-grid p {
+  font-family: "Montserrat", Arial, sans-serif !important;
+}
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  > *::before,
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  > *::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+
 .strategic-partners-hero {
   position: relative;
   min-height: 690px;
-  height: 690px;
+  height: 90vh;
 
   display: flex;
   align-items: center;
@@ -16,6 +64,9 @@
   background: none;
 }
 
+
+
+
 .strategic-partners-hero::before {
   content: "";
   position: absolute;
@@ -23,14 +74,14 @@
 
   background:
     linear-gradient(
-      90deg,
-       rgba(3, 20, 36, 0.97) 0%,
-    rgba(3, 20, 36, 0.88) 25%,
-    rgba(3, 20, 36, 0.62) 48%,
-    rgba(3, 20, 36, 0.28) 72%,
-    rgba(3, 20, 36, 0.12) 100%
-    ),
-    url("/assets/m.png") center center / cover no-repeat;
+  90deg,
+  rgba(3, 20, 36, 0.96) 0%,
+  rgba(3, 20, 36, 0.82) 25%,
+  rgba(3, 20, 36, 0.52) 48%,
+  rgba(3, 20, 36, 0.20) 72%,
+  rgba(3, 20, 36, 0.05) 100%
+),
+    url("/assets/b.png") center center / cover no-repeat;
 
   z-index: -1;
 
@@ -90,7 +141,7 @@
 .strategic-partners-hero h1 {
   max-width: 900px;
 
-  margin: 0;
+  
 
   color: #ffffff !important;
 
@@ -109,6 +160,8 @@
   position: relative;
 
   padding-left: 30px;
+
+  transform: translateY(270px);
 }
 
 .strategic-partners-hero__aside::before {
@@ -128,12 +181,16 @@
 .strategic-partners-hero__aside p {
   max-width: 390px;
 
-  margin: 0;
+  margin: 0 !important;
+
+  transform: translateY(0px);
 
   color: rgba(255, 255, 255, 0.88) !important;
 
   font-family: var(--font-secondary) !important;
+
   font-size: 1rem !important;
+
   line-height: 1.8 !important;
 }
 
@@ -154,8 +211,8 @@
 
 @media (max-width: 1000px) {
   .strategic-partners-hero {
-    min-height: 650px;
-    height: 650px;
+    min-height: 100vh;
+    height: 100vh;
   }
 
   .strategic-partners-hero__inner {
@@ -169,14 +226,19 @@
 
 @media (max-width: 700px) {
   .strategic-partners-hero {
-    min-height: 650px;
-    height: 650px;
+    min-height: 100svh;
+    height: 100svh;
 
-    background-position: 55% center;
+    background-position: 55% center !important;
   }
 
   .strategic-partners-hero h1 {
     font-size: clamp(3rem, 13vw, 4.5rem) !important;
+  }
+
+  .strategic-partners-hero__inner {
+    padding-top: 60px;
+    padding-bottom: 60px;
   }
 
   .strategic-partners-hero__aside {
@@ -192,6 +254,9 @@
 .strategic-opening {
   padding-top: 100px !important;
   padding-bottom: 110px !important;
+
+  background: #F4F6F9 !important;
+  
 }
 
 .strategic-opening__grid {
@@ -209,10 +274,10 @@
 
   margin: 0 !important;
 
-  color: var(--navy-900) !important;
+  color: rgb(222, 174, 4) !important;
 
   font-family: var(--font-primary) !important;
-  font-size: clamp(3.3rem, 5vw, 5.5rem) !important;
+  font-size:40px;
   font-weight: 400 !important;
 
   line-height: 0.98 !important;
@@ -527,233 +592,165 @@
 
 
 /* =========================================================
-   PARTNER ECOSYSTEM — FINAL SECTION
-   ========================================================= */
-
-.strategic-partners-hero ~ .section:not(.section--light) {
-  position: relative;
-
-  background: #031424;
-
-  overflow: hidden;
-}
-
-
-/* SUBTLE BACKGROUND DETAIL */
-
-.strategic-partners-hero ~ .section:not(.section--light)::before {
-  content: "";
-
-  position: absolute;
-
-  width: 520px;
-  height: 520px;
-
-  right: -180px;
-  top: -180px;
-
-  border: 1px solid rgba(201, 157, 64, 0.16);
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-.strategic-partners-hero ~ .section:not(.section--light)::after {
-  content: "";
-
-  position: absolute;
-
-  width: 360px;
-  height: 360px;
-
-  right: -100px;
-  top: -100px;
-
-  border: 1px solid rgba(255, 255, 255, 0.05);
-
-  border-radius: 50%;
-
-  pointer-events: none;
-}
-
-
-/* KEEP CONTENT ABOVE BACKGROUND */
-
-.strategic-partners-hero ~ .section:not(.section--light) .container {
-  position: relative;
-  z-index: 2;
-}
-
-
-/* =========================================================
-   SECTION HEADING
-   ========================================================= */
-
-.strategic-partners-hero ~ .section:not(.section--light) .section-heading {
-  max-width: 950px;
-
-  margin-bottom: 70px;
-}
-
-
-/* REMOVE GOLDEN DECORATIVE LINES */
-
-.strategic-partners-hero ~ .section:not(.section--light) .eyebrow::before,
-.strategic-partners-hero ~ .section:not(.section--light) .eyebrow::after {
-  display: none !important;
-  content: none !important;
-}
-
-
-/* EYEBROW */
-
-.strategic-partners-hero ~ .section:not(.section--light) .eyebrow {
-  color: var(--gold-600) !important;
-
-  font-family: var(--font-secondary) !important;
-  font-size: 0.72rem !important;
-  font-weight: 700 !important;
-
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-
-/* MAIN TITLE */
-
-.strategic-partners-hero ~ .section:not(.section--light) .section-heading h2 {
-  max-width: 900px;
-
-  margin-top: 20px !important;
-
-  color: #ffffff !important;
-
-  font-family: var(--font-primary) !important;
-  font-size: clamp(3.3rem, 5.5vw, 6rem) !important;
-  font-weight: 400 !important;
-
-  line-height: 0.96 !important;
-  letter-spacing: -0.045em !important;
-}
-
-
-/* =========================================================
    PARTNER TYPE GRID
    ========================================================= */
 
 .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
   display: grid;
 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  gap: 1px;
+  gap: 2px;
 
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.18);
 
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 
 /* =========================================================
-   PARTNER CARD
+   PARTNER CARDS
    ========================================================= */
 
 .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > * {
   position: relative;
 
-  min-height: 230px;
+  min-height: 280px;
 
-  padding: 32px;
+  padding: 38px 36px 42px;
 
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
 
-  background: #f5f1e8;
+  background: #F5F1E8 !important;
 
   overflow: hidden;
 
+  box-sizing: border-box;
+
   transition:
-    transform 0.4s ease,
-    background 0.4s ease;
-}
-
-
-/* ALTERNATING COLOUR */
-
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(2n) {
-  background: #e9f0f3;
-}
-
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(3n) {
-  background: #ffffff;
-}
-
-
-/* CARD HOVER */
-
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:hover {
-  transform: translateY(-6px);
-
-  background: #ffffff;
-
-  z-index: 3;
-}
-
-
-/* GOLD BOTTOM ACCENT */
-
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *::after {
-  content: "";
-
-  position: absolute;
-
-  left: 32px;
-  bottom: 0;
-
-  width: 42px;
-  height: 3px;
-
-  background: var(--gold-600);
-
-  transition: width 0.4s ease;
-}
-
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:hover::after {
-  width: 75px;
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
 }
 
 
 /* =========================================================
-   TEXT INSIDE PARTNER CARDS
+   CARD COLOURS
    ========================================================= */
 
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid h3 {
-  position: relative;
-  z-index: 2;
-
-  color: var(--navy-900) !important;
-
-  font-family: var(--font-primary) !important;
-  font-size: 1.65rem !important;
-  font-weight: 400 !important;
-
-  line-height: 1.15;
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(1) {
+  background: #F5F1E8 !important;
 }
 
-.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid p {
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(2) {
+  background: #E9F0F3 !important;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(3) {
+  background: #FFFFFF !important;
+}
+
+.strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *:nth-child(4) {
+  background: #F3EEE3 !important;
+}
+
+
+/* =========================================================
+   CARD TITLE — MAKE WORDS VISIBLE
+   ========================================================= */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-card h3 {
+  color: #031424 !important;
+
+  font-family: var(--font-primary) !important;
+
+  font-weight: 400 !important;
+}
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-card p {
+  color: #424f5bd7 !important;
+
+  font-family: var(--font-secondary) !important;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION — MAKE WORDS VISIBLE
+   ========================================================= */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  p {
   position: relative;
+
   z-index: 2;
 
-  margin-top: 14px;
+  max-width: 560px;
 
-  color: #617080 !important;
+  margin: 16px 0 0 !important;
+
+  color: #526170 !important;
 
   font-family: var(--font-secondary) !important;
 
-  font-size: 0.9rem;
-  line-height: 1.65;
+  font-size: 0.95rem !important;
+
+  font-weight: 400 !important;
+
+  line-height: 1.7 !important;
+}
+
+
+/* =========================================================
+   GOLD ACCENT
+   ========================================================= */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  > *::after {
+  content: "";
+
+  position: absolute;
+
+  left: 36px;
+  bottom: 0;
+
+  width: 45px;
+  height: 3px;
+
+  background: var(--gold-600);
+
+  transition: width 0.35s ease;
+}
+
+
+/* =========================================================
+   HOVER
+   ========================================================= */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  > *:hover {
+  transform: translateY(-5px);
+
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+
+  z-index: 3;
+}
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-type-grid
+  > *:hover::after {
+  width: 80px;
 }
 
 
@@ -763,12 +760,19 @@
 
 @media (max-width: 1000px) {
 
-  .strategic-partners-hero ~ .section:not(.section--light) .section-heading {
-    margin-bottom: 55px;
+  .strategic-partners-hero
+    ~ .section:not(.section--light)
+    .partner-type-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .strategic-partners-hero
+    ~ .section:not(.section--light)
+    .partner-type-grid
+    > * {
+    min-height: 240px;
+
+    padding: 32px;
   }
 }
 
@@ -779,21 +783,47 @@
 
 @media (max-width: 700px) {
 
-  .strategic-partners-hero ~ .section:not(.section--light) .section-heading h2 {
-    font-size: clamp(2.8rem, 11vw, 4.2rem) !important;
-  }
-
-  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid {
+  .strategic-partners-hero
+    ~ .section:not(.section--light)
+    .partner-type-grid {
     grid-template-columns: 1fr;
   }
 
-  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > * {
-    min-height: 190px;
+  .strategic-partners-hero
+    ~ .section:not(.section--light)
+    .partner-type-grid
+    > * {
+    min-height: 210px;
 
-    padding: 26px;
+    padding: 28px;
   }
 
-  .strategic-partners-hero ~ .section:not(.section--light) .partner-type-grid > *::after {
-    left: 26px;
+  .strategic-partners-hero
+    ~ .section:not(.section--light)
+    .partner-type-grid
+    > *::after {
+    left: 28px;
   }
+}
+
+/* REMOVE GOLD LINES FROM PARTNER CARDS */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .partner-card__line {
+  display: none !important;
+}
+
+/* REMOVE GOLD LINE FROM PARTNER ECOSYSTEM HEADING */
+
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .section-heading
+  .eyebrow::before,
+.strategic-partners-hero
+  ~ .section:not(.section--light)
+  .section-heading
+  .eyebrow::after {
+  display: none !important;
+  content: none !important;
 }

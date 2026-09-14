@@ -21,10 +21,18 @@ import {
 import "./AdminRegister.css";
 
 
-// ============================================================
-// CONTINENTAL FOUNDERS
-// CMS ACCOUNT REGISTRATION
-// ============================================================
+/* ============================================================
+   CONFIG
+============================================================ */
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+
+/* ============================================================
+   ADMIN REGISTER
+============================================================ */
 
 export default function AdminRegister() {
 
@@ -32,14 +40,9 @@ export default function AdminRegister() {
     useNavigate();
 
 
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000";
-
-
-  // ==========================================================
-  // STATE
-  // ==========================================================
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
   const [
     form,
@@ -81,9 +84,9 @@ export default function AdminRegister() {
     useState("");
 
 
-  // ==========================================================
-  // FORM CHANGE
-  // ==========================================================
+  /* ==========================================================
+     FORM CHANGE
+  ========================================================== */
 
   function handleChange(
     event
@@ -106,20 +109,16 @@ export default function AdminRegister() {
     );
 
 
-    if (
-      error
-    ) {
-
+    if (error) {
       setError("");
-
     }
 
   }
 
 
-  // ==========================================================
-  // PASSWORD CHECKS
-  // ==========================================================
+  /* ==========================================================
+     PASSWORD CHECKS
+  ========================================================== */
 
   const passwordChecks = {
 
@@ -144,9 +143,9 @@ export default function AdminRegister() {
   };
 
 
-  // ==========================================================
-  // REGISTER
-  // ==========================================================
+  /* ==========================================================
+     REGISTER
+  ========================================================== */
 
   async function handleSubmit(
     event
@@ -165,10 +164,6 @@ export default function AdminRegister() {
         .trim()
         .toLowerCase();
 
-
-    // ========================================================
-    // VALIDATION
-    // ========================================================
 
     if (
       !fullName ||
@@ -244,12 +239,9 @@ export default function AdminRegister() {
     try {
 
       setLoading(true);
+
       setError("");
 
-
-      // ======================================================
-      // REGISTER WITH BACKEND
-      // ======================================================
 
       const response =
         await fetch(
@@ -258,18 +250,22 @@ export default function AdminRegister() {
             method:
               "POST",
 
+            credentials:
+              "include",
+
             headers: {
               "Content-Type":
                 "application/json",
-            },
 
-            credentials:
-              "include",
+              Accept:
+                "application/json",
+            },
 
             body:
               JSON.stringify({
                 fullName,
                 email,
+
                 password:
                   form.password,
               }),
@@ -292,34 +288,26 @@ export default function AdminRegister() {
       }
 
 
-      if (
-        !response.ok
-      ) {
+      if (!response.ok) {
 
         throw new Error(
-          result.message ||
-          result.error ||
+          result?.message ||
+          result?.error ||
           "Unable to create your account."
         );
 
       }
 
 
-      // ======================================================
-      // REQUIRE OTP STAGE
-      // ======================================================
-
       const otpRequired =
-        result.otpRequired ??
-        result.otp_required ??
-        result.data?.otpRequired ??
-        result.data?.otp_required ??
+        result?.otpRequired ??
+        result?.otp_required ??
+        result?.data?.otpRequired ??
+        result?.data?.otp_required ??
         false;
 
 
-      if (
-        !otpRequired
-      ) {
+      if (!otpRequired) {
 
         throw new Error(
           "The server did not request email verification."
@@ -328,30 +316,23 @@ export default function AdminRegister() {
       }
 
 
-      // ======================================================
-      // GET EMAIL FROM BACKEND
-      // ======================================================
-
       const pendingEmail =
-        result.email ||
-        result.user?.email ||
-        result.data?.email ||
-        result.data?.user?.email ||
+        result?.email ||
+        result?.user?.email ||
+        result?.data?.email ||
+        result?.data?.user?.email ||
         email;
 
 
-      // ======================================================
-      // GET OTP PURPOSE
-      // ======================================================
-
       const purpose =
-        result.purpose ||
-        result.data?.purpose ||
+        result?.purpose ||
+        result?.data?.purpose ||
         "registration";
 
 
       if (
-        purpose !== "registration"
+        purpose !==
+        "registration"
       ) {
 
         throw new Error(
@@ -360,10 +341,6 @@ export default function AdminRegister() {
 
       }
 
-
-      // ======================================================
-      // STORE TEMPORARY OTP INFORMATION
-      // ======================================================
 
       sessionStorage.setItem(
         "cf_pending_admin_email",
@@ -377,10 +354,6 @@ export default function AdminRegister() {
       );
 
 
-      // ======================================================
-      // CLEAR OLD AUTH DATA
-      // ======================================================
-
       localStorage.removeItem(
         "cf_admin_user"
       );
@@ -390,10 +363,6 @@ export default function AdminRegister() {
         "cf_admin_token"
       );
 
-
-      // ======================================================
-      // GO TO OTP VERIFICATION
-      // ======================================================
 
       navigate(
         "/admin/verify-otp",
@@ -421,20 +390,17 @@ export default function AdminRegister() {
 
       if (
         registrationError instanceof
-          TypeError &&
-        registrationError.message.includes(
-          "fetch"
-        )
+          TypeError
       ) {
 
         setError(
-          "Unable to connect to the Continental Founders server. Make sure the backend is running."
+          "Unable to connect to the Continental Founders server."
         );
 
       } else {
 
         setError(
-          registrationError.message ||
+          registrationError?.message ||
           "Unable to create your account."
         );
 
@@ -449,21 +415,30 @@ export default function AdminRegister() {
   }
 
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
 
-    <main className="admin-register">
+    <main className="cf-admin-register">
 
-      <section className="admin-register__panel">
+      {/* ======================================================
+          LEFT VISUAL SIDE
+      ====================================================== */}
 
-        <div className="admin-register__brand">
+      <section className="cf-admin-register__visual">
+
+        <div className="cf-admin-register__visual-background" />
+
+        <div className="cf-admin-register__visual-shade" />
+
+
+        <div className="cf-admin-register__visual-top">
 
           <Link
             to="/"
-            className="admin-register__brand-link"
+            className="cf-admin-register__brand"
             aria-label="Continental Founders home"
           >
 
@@ -475,65 +450,143 @@ export default function AdminRegister() {
           </Link>
 
 
-          <span>
-            CMS ACCESS
-          </span>
+          <div className="cf-admin-register__keywords">
+
+            <span>
+              PEOPLE
+            </span>
+
+            <span>
+              IDEAS
+            </span>
+
+            <span>
+              OPPORTUNITIES
+            </span>
+
+            <span>
+              IMPACT
+            </span>
+
+          </div>
 
         </div>
 
 
-        <div className="admin-register__content">
+        <div className="cf-admin-register__visual-copy">
 
-          <div className="admin-register__security-icon">
+          <span className="cf-admin-register__eyebrow">
+            CONTINENTAL FOUNDERS
+          </span>
+
+
+          <h1>
+
+            Build the
+            <br />
+
+            next chapter.
+
+            <em>
+              Start here.
+            </em>
+
+          </h1>
+
+
+          <div className="cf-admin-register__visual-description">
+
+            <span className="cf-admin-register__gold-line" />
+
+
+            <p>
+              Create your Continental Founders
+              account and access the secure
+              workspace supporting founders,
+              institutions and opportunity.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div className="cf-admin-register__visual-footer">
+
+          <strong>
+            CONTINENTAL FOUNDERS™
+          </strong>
+
+          <span>
+            PEOPLE · IDEAS · OPPORTUNITIES · IMPACT
+          </span>
+
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          REGISTRATION SIDE
+      ====================================================== */}
+
+      <section className="cf-admin-register__form-side">
+
+        <div className="cf-admin-register__cms-label">
+          CMS REGISTRATION
+        </div>
+
+
+        <div className="cf-admin-register__card">
+
+          <div className="cf-admin-register__shield">
 
             <ShieldCheck
-              size={25}
-              strokeWidth={1.6}
+              size={36}
+              strokeWidth={1.45}
             />
 
           </div>
 
 
-          <span className="admin-register__eyebrow">
-            FOUNDER REGISTRATION
-          </span>
+          <div className="cf-admin-register__heading">
+
+            <h2>
+              Create your account.
+            </h2>
 
 
-          <h1>
-            Create your account.
-          </h1>
+            <p>
+              Register with your personal
+              email address. Verification
+              is required before access is
+              activated.
+            </p>
 
-
-          <p className="admin-register__intro">
-
-            Register using your personal
-            email address. A verification
-            code will be sent to that email
-            before your account is activated.
-
-          </p>
+          </div>
 
 
           <form
-            className="admin-register__form"
+            className="cf-admin-register__form"
             onSubmit={
               handleSubmit
             }
           >
 
-            <div className="admin-register__field">
+            {/* FULL NAME */}
+
+            <div className="cf-admin-register__field">
 
               <label htmlFor="register-name">
-                Full Name
+                Full name
               </label>
 
 
-              <div className="admin-register__input-wrapper">
+              <div className="cf-admin-register__input">
 
                 <UserRound
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
@@ -560,19 +613,20 @@ export default function AdminRegister() {
             </div>
 
 
-            <div className="admin-register__field">
+            {/* EMAIL */}
+
+            <div className="cf-admin-register__field">
 
               <label htmlFor="register-email">
-                Personal Email Address
+                Personal email address
               </label>
 
 
-              <div className="admin-register__input-wrapper">
+              <div className="cf-admin-register__input">
 
                 <Mail
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
@@ -583,7 +637,7 @@ export default function AdminRegister() {
                   value={
                     form.email
                   }
-                  placeholder="Enter your personal email"
+                  placeholder="your@email.com"
                   autoComplete="email"
                   disabled={
                     loading
@@ -597,26 +651,27 @@ export default function AdminRegister() {
               </div>
 
 
-              <span className="admin-register__field-note">
+              <span className="cf-admin-register__field-note">
                 Your verification code will be sent to this email.
               </span>
 
             </div>
 
 
-            <div className="admin-register__field">
+            {/* PASSWORD */}
+
+            <div className="cf-admin-register__field">
 
               <label htmlFor="register-password">
                 Password
               </label>
 
 
-              <div className="admin-register__input-wrapper">
+              <div className="cf-admin-register__input">
 
                 <LockKeyhole
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
@@ -645,7 +700,7 @@ export default function AdminRegister() {
 
                 <button
                   type="button"
-                  className="admin-register__password-toggle"
+                  className="cf-admin-register__password-toggle"
                   onClick={() =>
                     setShowPassword(
                       (current) =>
@@ -665,15 +720,13 @@ export default function AdminRegister() {
                   {showPassword ? (
 
                     <EyeOff
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   ) : (
 
                     <Eye
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   )}
@@ -685,9 +738,11 @@ export default function AdminRegister() {
             </div>
 
 
+            {/* PASSWORD REQUIREMENTS */}
+
             {form.password && (
 
-              <div className="admin-register__requirements">
+              <div className="cf-admin-register__requirements">
 
                 <PasswordRequirement
                   passed={
@@ -725,19 +780,20 @@ export default function AdminRegister() {
             )}
 
 
-            <div className="admin-register__field">
+            {/* CONFIRM PASSWORD */}
+
+            <div className="cf-admin-register__field">
 
               <label htmlFor="register-confirm-password">
-                Confirm Password
+                Confirm password
               </label>
 
 
-              <div className="admin-register__input-wrapper">
+              <div className="cf-admin-register__input">
 
                 <LockKeyhole
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
@@ -766,7 +822,7 @@ export default function AdminRegister() {
 
                 <button
                   type="button"
-                  className="admin-register__password-toggle"
+                  className="cf-admin-register__password-toggle"
                   onClick={() =>
                     setShowConfirmPassword(
                       (current) =>
@@ -786,15 +842,13 @@ export default function AdminRegister() {
                   {showConfirmPassword ? (
 
                     <EyeOff
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   ) : (
 
                     <Eye
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   )}
@@ -806,10 +860,12 @@ export default function AdminRegister() {
             </div>
 
 
+            {/* ERROR */}
+
             {error && (
 
               <div
-                className="admin-register__error"
+                className="cf-admin-register__error"
                 role="alert"
               >
 
@@ -820,9 +876,11 @@ export default function AdminRegister() {
             )}
 
 
+            {/* SUBMIT */}
+
             <button
               type="submit"
-              className="admin-register__submit"
+              className="cf-admin-register__submit"
               disabled={
                 loading
               }
@@ -839,7 +897,6 @@ export default function AdminRegister() {
 
               <ArrowRight
                 size={18}
-                strokeWidth={1.8}
               />
 
             </button>
@@ -847,99 +904,80 @@ export default function AdminRegister() {
           </form>
 
 
-          <div className="admin-register__login">
+          <div className="cf-admin-register__security-note">
 
-            <span>
+            <ShieldCheck
+              size={19}
+              strokeWidth={1.55}
+            />
+
+
+            <p>
+              Your account is activated
+              only after your email
+              verification code is confirmed.
+              CMS permissions remain controlled
+              by Continental Founders.
+            </p>
+
+          </div>
+
+
+          <div className="cf-admin-register__login">
+
+            <p>
               Already have an account?
-            </span>
+            </p>
 
 
             <Link to="/admin/login">
+
               Sign in
+
+              <ArrowRight
+                size={15}
+              />
+
             </Link>
 
           </div>
 
 
-          <div className="admin-register__security-note">
+          <div className="cf-admin-register__card-footer">
 
-            <ShieldCheck
-              size={15}
-              strokeWidth={1.7}
-            />
+            <span>
+              PEOPLE
+            </span>
 
+            <i />
 
-            <p>
+            <span>
+              IDEAS
+            </span>
 
-              Your account is activated only
-              after your personal email
-              verification code is confirmed.
-              CMS permissions are controlled
-              securely by Continental Founders.
+            <i />
 
-            </p>
+            <span>
+              OPPORTUNITIES
+            </span>
+
+            <i />
+
+            <span>
+              IMPACT
+            </span>
 
           </div>
 
         </div>
 
 
-        <div className="admin-register__footer">
-
-          <span>
-            Continental Founders™
-          </span>
-
-          <span>
-            Secure CMS Registration
-          </span>
-
-        </div>
-
-      </section>
-
-
-      <section
-        className="admin-register__visual"
-        aria-hidden="true"
-      >
-
-        <div className="admin-register__visual-overlay" />
-
-
-        <div className="admin-register__visual-content">
-
-          <span className="admin-register__visual-eyebrow">
-            CONTINENTAL FOUNDERS
-          </span>
-
-
-          <h2>
-            Build.
-            <br />
-
-            Connect.
-            <br />
-
-            <em>
-              Move forward.
-            </em>
-          </h2>
-
-
-          <p>
-
-            A secure workspace for the
-            people building and managing
-            the Continental Founders
-            ecosystem.
-
-          </p>
-
-
-          <div className="admin-register__visual-line" />
-
-        </div>
+        <Link
+          to="/"
+          className="cf-admin-register__return"
+        >
+          Return to Continental Founders
+        </Link>
 
       </section>
 
@@ -950,9 +988,9 @@ export default function AdminRegister() {
 }
 
 
-// ============================================================
-// PASSWORD REQUIREMENT
-// ============================================================
+/* ============================================================
+   PASSWORD REQUIREMENT
+============================================================ */
 
 function PasswordRequirement({
   passed,
@@ -964,12 +1002,12 @@ function PasswordRequirement({
     <div
       className={
         passed
-          ? "admin-register__requirement admin-register__requirement--passed"
-          : "admin-register__requirement"
+          ? "cf-admin-register__requirement cf-admin-register__requirement--passed"
+          : "cf-admin-register__requirement"
       }
     >
 
-      <span className="admin-register__requirement-icon">
+      <span className="cf-admin-register__requirement-icon">
 
         {passed && (
 

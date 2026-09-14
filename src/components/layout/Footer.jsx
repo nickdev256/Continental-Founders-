@@ -84,7 +84,7 @@ const socials = [
     label: "Instagram",
     icon: Instagram,
     url:
-      "https://www.instagram.com/continentalfounderstm/?hl=en",
+      "https://www.instagram.com/continentalfounderstm/",
   },
   {
     label: "YouTube",
@@ -92,7 +92,7 @@ const socials = [
 
     // Replace with official Continental Founders
     // YouTube URL when available.
-    url: "https://www.youtube.com/",
+    url: "https://www.youtube.com/@ContinentalFounders",
   },
 ];
 

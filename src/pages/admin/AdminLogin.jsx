@@ -5,7 +5,6 @@ import React, {
 
 import {
   Link,
-  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -21,27 +20,28 @@ import {
 import "./AdminLogin.css";
 
 
-// ============================================================
-// ADMIN LOGIN
-// ============================================================
+/* ============================================================
+   CONFIG
+============================================================ */
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+
+/* ============================================================
+   ADMIN LOGIN
+============================================================ */
 
 export default function AdminLogin() {
 
   const navigate =
     useNavigate();
 
-  const location =
-    useLocation();
 
-
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000";
-
-
-  // ==========================================================
-  // STATE
-  // ==========================================================
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
   const [
     email,
@@ -85,14 +85,13 @@ export default function AdminLogin() {
     useState("");
 
 
-  // ==========================================================
-  // CHECK EXISTING SERVER SESSION
-  // ==========================================================
+  /* ==========================================================
+     CHECK EXISTING SESSION
+  ========================================================== */
 
   useEffect(() => {
 
-    let active =
-      true;
+    let active = true;
 
 
     async function checkExistingSession() {
@@ -117,18 +116,10 @@ export default function AdminLogin() {
           );
 
 
-        if (
-          !response.ok
-        ) {
+        if (!response.ok) {
 
-          if (
-            active
-          ) {
-
-            setCheckingSession(
-              false
-            );
-
+          if (active) {
+            setCheckingSession(false);
           }
 
           return;
@@ -152,21 +143,16 @@ export default function AdminLogin() {
 
 
         const user =
-          result.user ||
-          result.admin ||
-          result.data?.user;
+          result?.user ||
+          result?.admin ||
+          result?.data?.user ||
+          null;
 
 
         if (!user) {
 
-          if (
-            active
-          ) {
-
-            setCheckingSession(
-              false
-            );
-
+          if (active) {
+            setCheckingSession(false);
           }
 
           return;
@@ -193,14 +179,8 @@ export default function AdminLogin() {
           )
         ) {
 
-          if (
-            active
-          ) {
-
-            setCheckingSession(
-              false
-            );
-
+          if (active) {
+            setCheckingSession(false);
           }
 
           return;
@@ -210,18 +190,11 @@ export default function AdminLogin() {
 
         if (
           user.status &&
-          user.status !==
-            "active"
+          user.status !== "active"
         ) {
 
-          if (
-            active
-          ) {
-
-            setCheckingSession(
-              false
-            );
-
+          if (active) {
+            setCheckingSession(false);
           }
 
           return;
@@ -268,9 +241,7 @@ export default function AdminLogin() {
         );
 
 
-        if (
-          active
-        ) {
+        if (active) {
 
           navigate(
             "/admin",
@@ -291,14 +262,8 @@ export default function AdminLogin() {
         );
 
 
-        if (
-          active
-        ) {
-
-          setCheckingSession(
-            false
-          );
-
+        if (active) {
+          setCheckingSession(false);
         }
 
       }
@@ -311,20 +276,18 @@ export default function AdminLogin() {
 
     return () => {
 
-      active =
-        false;
+      active = false;
 
     };
 
   }, [
-    API_URL,
     navigate,
   ]);
 
 
-  // ==========================================================
-  // LOGIN
-  // ==========================================================
+  /* ==========================================================
+     LOGIN
+  ========================================================== */
 
   async function handleSubmit(
     event
@@ -338,10 +301,6 @@ export default function AdminLogin() {
         .trim()
         .toLowerCase();
 
-
-    // ========================================================
-    // VALIDATION
-    // ========================================================
 
     if (
       !cleanEmail ||
@@ -358,8 +317,7 @@ export default function AdminLogin() {
 
 
     if (
-      password.length <
-      8
+      password.length < 8
     ) {
 
       setError(
@@ -378,13 +336,6 @@ export default function AdminLogin() {
       setError("");
 
 
-      // ======================================================
-      // VERIFY EMAIL + PASSWORD
-      //
-      // The backend does NOT create final CMS access here.
-      // It sends an OTP first.
-      // ======================================================
-
       const response =
         await fetch(
           `${API_URL}/api/auth/login`,
@@ -392,13 +343,16 @@ export default function AdminLogin() {
             method:
               "POST",
 
+            credentials:
+              "include",
+
             headers: {
               "Content-Type":
                 "application/json",
-            },
 
-            credentials:
-              "include",
+              Accept:
+                "application/json",
+            },
 
             body:
               JSON.stringify({
@@ -426,34 +380,30 @@ export default function AdminLogin() {
       }
 
 
-      if (
-        !response.ok
-      ) {
+      if (!response.ok) {
 
         throw new Error(
-          result.message ||
-          result.error ||
+          result?.message ||
+          result?.error ||
           "Incorrect email or password."
         );
 
       }
 
 
-      // ======================================================
-      // REQUIRE OTP STAGE
-      // ======================================================
+      /* ======================================================
+         OTP REQUIRED
+      ====================================================== */
 
       const otpRequired =
-        result.otpRequired ??
-        result.otp_required ??
-        result.data?.otpRequired ??
-        result.data?.otp_required ??
+        result?.otpRequired ??
+        result?.otp_required ??
+        result?.data?.otpRequired ??
+        result?.data?.otp_required ??
         false;
 
 
-      if (
-        !otpRequired
-      ) {
+      if (!otpRequired) {
 
         throw new Error(
           "The server did not request OTP verification."
@@ -462,31 +412,27 @@ export default function AdminLogin() {
       }
 
 
-      // ======================================================
-      // GET EMAIL
-      // ======================================================
+      /* ======================================================
+         EMAIL
+      ====================================================== */
 
       const pendingEmail =
-        result.email ||
-        result.user?.email ||
-        result.admin?.email ||
-        result.data?.email ||
-        result.data?.user?.email ||
-        result.data?.admin?.email ||
+        result?.email ||
+        result?.user?.email ||
+        result?.admin?.email ||
+        result?.data?.email ||
+        result?.data?.user?.email ||
+        result?.data?.admin?.email ||
         cleanEmail;
 
 
-      // ======================================================
-      // GET OTP PURPOSE
-      //
-      // This is important because a pending verification
-      // account may receive a REGISTRATION OTP even when
-      // arriving from the login page.
-      // ======================================================
+      /* ======================================================
+         OTP PURPOSE
+      ====================================================== */
 
       const purpose =
-        result.purpose ||
-        result.data?.purpose ||
+        result?.purpose ||
+        result?.data?.purpose ||
         "login";
 
 
@@ -502,9 +448,9 @@ export default function AdminLogin() {
       }
 
 
-      // ======================================================
-      // SAVE TEMPORARY OTP DATA
-      // ======================================================
+      /* ======================================================
+         TEMP OTP STORAGE
+      ====================================================== */
 
       sessionStorage.setItem(
         "cf_pending_admin_email",
@@ -518,9 +464,9 @@ export default function AdminLogin() {
       );
 
 
-      // ======================================================
-      // CLEAR OLD FRONTEND AUTH DATA
-      // ======================================================
+      /* ======================================================
+         CLEAR OLD LOCAL AUTH
+      ====================================================== */
 
       localStorage.removeItem(
         "cf_admin_user"
@@ -532,9 +478,9 @@ export default function AdminLogin() {
       );
 
 
-      // ======================================================
-      // REDIRECT TO OTP
-      // ======================================================
+      /* ======================================================
+         GO TO OTP PAGE
+      ====================================================== */
 
       navigate(
         "/admin/verify-otp",
@@ -561,21 +507,17 @@ export default function AdminLogin() {
 
 
       if (
-        requestError instanceof
-          TypeError &&
-        requestError.message.includes(
-          "fetch"
-        )
+        requestError instanceof TypeError
       ) {
 
         setError(
-          "Unable to connect to the Continental Founders server. Make sure the backend is running."
+          "Unable to connect to the Continental Founders server."
         );
 
       } else {
 
         setError(
-          requestError.message ||
+          requestError?.message ||
           "Unable to sign in."
         );
 
@@ -590,102 +532,54 @@ export default function AdminLogin() {
   }
 
 
-  // ==========================================================
-  // LOADING EXISTING SESSION
-  // ==========================================================
+  /* ==========================================================
+     SESSION CHECK SCREEN
+  ========================================================== */
 
-  if (
-    checkingSession
-  ) {
+  if (checkingSession) {
 
     return (
 
-      <main
-        className="admin-login"
-      >
+      <main className="cf-admin-login-loading">
 
-        <section
-          className="admin-login__panel"
-        >
+        <div className="cf-admin-login-loading__box">
 
-          <div
-            className="admin-login__content"
-          >
+          <div className="cf-admin-login-loading__icon">
 
-            <div
-              className="admin-login__security-icon"
-            >
-
-              <ShieldCheck
-                size={25}
-                strokeWidth={1.6}
-              />
-
-            </div>
-
-
-            <span
-              className="admin-login__eyebrow"
-            >
-              SECURE CMS ACCESS
-            </span>
-
-
-            <h1>
-              Checking your session.
-            </h1>
-
-
-            <p
-              className="admin-login__intro"
-            >
-              Please wait while we verify
-              whether you already have an
-              active Continental Founders
-              CMS session.
-            </p>
+            <ShieldCheck
+              size={30}
+              strokeWidth={1.5}
+            />
 
           </div>
 
-        </section>
+
+          <span>
+            SECURE CMS ACCESS
+          </span>
 
 
-        <section
-          className="admin-login__visual"
-          aria-hidden="true"
-        >
-
-          <div
-            className="admin-login__visual-overlay"
-          />
+          <h1>
+            Verifying your session
+          </h1>
 
 
-          <div
-            className="admin-login__visual-content"
-          >
-
-            <span
-              className="admin-login__visual-eyebrow"
-            >
-              CONTINENTAL FOUNDERS
-            </span>
+          <p>
+            Please wait while Continental
+            Founders checks your active
+            administration session.
+          </p>
 
 
-            <h2>
-              Talent is
-              <br />
+          <div className="cf-admin-login-loading__dots">
 
-              everywhere.
-              <br />
-
-              <em>
-                Access is not.
-              </em>
-            </h2>
+            <i />
+            <i />
+            <i />
 
           </div>
 
-        </section>
+        </div>
 
       </main>
 
@@ -694,21 +588,32 @@ export default function AdminLogin() {
   }
 
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
 
-    <main className="admin-login">
+    <main className="cf-admin-login">
 
-      <section className="admin-login__panel">
+      {/* ======================================================
+          LEFT BRAND SIDE
+      ====================================================== */}
 
-        <div className="admin-login__brand">
+      <section className="cf-admin-login__visual">
+
+        <div className="cf-admin-login__visual-background" />
+
+        <div className="cf-admin-login__visual-shade" />
+
+
+        {/* TOP */}
+
+        <div className="cf-admin-login__visual-top">
 
           <Link
             to="/"
-            className="admin-login__brand-link"
+            className="cf-admin-login__brand"
             aria-label="Continental Founders home"
           >
 
@@ -720,77 +625,187 @@ export default function AdminLogin() {
           </Link>
 
 
-          <span>
-            CMS ADMINISTRATION
-          </span>
+          <div className="cf-admin-login__keywords">
+
+            <span>
+              PEOPLE
+            </span>
+
+            <span>
+              IDEAS
+            </span>
+
+            <span>
+              OPPORTUNITIES
+            </span>
+
+            <span>
+              IMPACT
+            </span>
+
+          </div>
 
         </div>
 
 
-        <div className="admin-login__content">
+        {/* MAIN MESSAGE */}
 
-          <div className="admin-login__security-icon">
+        <div className="cf-admin-login__visual-copy">
+
+          <h1>
+
+            Talent is
+            <br />
+
+            everywhere.
+
+            <em>
+              Access is not.
+            </em>
+
+          </h1>
+
+
+          <div className="cf-admin-login__visual-description">
+
+            <span className="cf-admin-login__gold-line" />
+
+            <p>
+              A global platform connecting
+              founders, universities,
+              professionals, markets and
+              opportunity across Africa and
+              beyond.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        {/* SIDE WORDS */}
+
+        <div className="cf-admin-login__vertical-list">
+
+          <span>
+            FOUNDERS
+          </span>
+
+          <span>
+            COMMUNITY
+          </span>
+
+          <span>
+            CAPITAL
+          </span>
+
+          <span>
+            OPPORTUNITY
+          </span>
+
+          <span>
+            A BRIGHTER TOMORROW
+          </span>
+
+          <div />
+
+        </div>
+
+
+        {/* FOOT */}
+
+        <div className="cf-admin-login__visual-footer">
+
+          <strong>
+            CONTINENTAL FOUNDERS™
+          </strong>
+
+          <span>
+            BUILDING A MORE INCLUSIVE TOMORROW
+          </span>
+
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          RIGHT LOGIN AREA
+      ====================================================== */}
+
+      <section className="cf-admin-login__form-side">
+
+        <div className="cf-admin-login__cms-label">
+          CMS ADMINISTRATION
+        </div>
+
+
+        <div className="cf-admin-login__card">
+
+          {/* SECURITY ICON */}
+
+          <div className="cf-admin-login__shield">
 
             <ShieldCheck
-              size={25}
-              strokeWidth={1.6}
+              size={37}
+              strokeWidth={1.45}
             />
 
           </div>
 
 
-          <span className="admin-login__eyebrow">
-            SECURE FOUNDER ACCESS
-          </span>
+          {/* HEADING */}
+
+          <div className="cf-admin-login__heading">
+
+            <h2>
+              Welcome back.
+            </h2>
 
 
-          <h1>
-            Welcome back.
-          </h1>
+            <p>
+              Sign in to access the
+              Continental Founders Content
+              Management System.
+            </p>
+
+          </div>
 
 
-          <p className="admin-login__intro">
-
-            Sign in using the email address
-            connected to your Continental
-            Founders account. A verification
-            code will be sent to your personal
-            email before CMS access is granted.
-
-          </p>
-
+          {/* FORM */}
 
           <form
-            className="admin-login__form"
+            className="cf-admin-login__form"
             onSubmit={
               handleSubmit
             }
           >
 
-            <div className="admin-login__field">
+            {/* EMAIL */}
+
+            <div className="cf-admin-login__field">
 
               <label htmlFor="admin-email">
-                Email Address
+                Email address
               </label>
 
 
-              <div className="admin-login__input-wrapper">
+              <div className="cf-admin-login__input">
 
                 <Mail
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
                 <input
                   id="admin-email"
-                  type="email"
                   name="email"
+                  type="email"
                   value={
                     email
                   }
-                  placeholder="Enter your personal email"
+                  placeholder="your@email.com"
                   autoComplete="email"
                   disabled={
                     loading
@@ -804,12 +819,8 @@ export default function AdminLogin() {
                     );
 
 
-                    if (
-                      error
-                    ) {
-
+                    if (error) {
                       setError("");
-
                     }
 
                   }}
@@ -821,30 +832,31 @@ export default function AdminLogin() {
             </div>
 
 
-            <div className="admin-login__field">
+            {/* PASSWORD */}
+
+            <div className="cf-admin-login__field">
 
               <label htmlFor="admin-password">
                 Password
               </label>
 
 
-              <div className="admin-login__input-wrapper">
+              <div className="cf-admin-login__input">
 
                 <LockKeyhole
-                  size={18}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
+                  size={19}
+                  strokeWidth={1.5}
                 />
 
 
                 <input
                   id="admin-password"
+                  name="password"
                   type={
                     showPassword
                       ? "text"
                       : "password"
                   }
-                  name="password"
                   value={
                     password
                   }
@@ -862,12 +874,8 @@ export default function AdminLogin() {
                     );
 
 
-                    if (
-                      error
-                    ) {
-
+                    if (error) {
                       setError("");
-
                     }
 
                   }}
@@ -877,17 +885,15 @@ export default function AdminLogin() {
 
                 <button
                   type="button"
-                  className="admin-login__password-toggle"
-                  onClick={() =>
-                    setShowPassword(
-                      (
-                        current
-                      ) =>
-                        !current
-                    )
-                  }
+                  className="cf-admin-login__password-toggle"
                   disabled={
                     loading
+                  }
+                  onClick={() =>
+                    setShowPassword(
+                      (current) =>
+                        !current
+                    )
                   }
                   aria-label={
                     showPassword
@@ -899,15 +905,13 @@ export default function AdminLogin() {
                   {showPassword ? (
 
                     <EyeOff
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   ) : (
 
                     <Eye
-                      size={18}
-                      strokeWidth={1.7}
+                      size={19}
                     />
 
                   )}
@@ -919,10 +923,12 @@ export default function AdminLogin() {
             </div>
 
 
+            {/* ERROR */}
+
             {error && (
 
               <div
-                className="admin-login__error"
+                className="cf-admin-login__error"
                 role="alert"
               >
 
@@ -933,9 +939,11 @@ export default function AdminLogin() {
             )}
 
 
+            {/* SUBMIT */}
+
             <button
               type="submit"
-              className="admin-login__submit"
+              className="cf-admin-login__submit"
               disabled={
                 loading
               }
@@ -952,7 +960,6 @@ export default function AdminLogin() {
 
               <ArrowRight
                 size={18}
-                strokeWidth={1.8}
               />
 
             </button>
@@ -960,99 +967,100 @@ export default function AdminLogin() {
           </form>
 
 
-          <div className="admin-login__register">
+          {/* DIVIDER */}
 
-            <span>
-              New Continental Founders member?
-            </span>
+          <div className="cf-admin-login__divider">
+
+            <span />
+
+            <small>
+              SECURITY
+            </small>
+
+            <span />
+
+          </div>
+
+
+          {/* OTP NOTE */}
+
+          <div className="cf-admin-login__security-note">
+
+            <LockKeyhole
+              size={20}
+              strokeWidth={1.6}
+            />
+
+
+            <p>
+              Password verification alone
+              does not grant CMS access.
+              A one-time verification code
+              will be sent to your email.
+            </p>
+
+          </div>
+
+
+          {/* REGISTER */}
+
+          <div className="cf-admin-login__register">
+
+            <p>
+              New to Continental Founders?
+            </p>
 
 
             <Link to="/admin/register">
-              Create account
+
+              Create an account
+
+              <ArrowRight
+                size={15}
+              />
+
             </Link>
 
           </div>
 
 
-          <div className="admin-login__security-note">
+          {/* CARD FOOTER */}
 
-            <LockKeyhole
-              size={15}
-              strokeWidth={1.7}
-            />
+          <div className="cf-admin-login__card-footer">
 
-            <p>
+            <span>
+              PEOPLE
+            </span>
 
-              Password verification alone
-              does not grant CMS access.
-              A one-time verification code
-              must also be confirmed.
+            <i />
 
-            </p>
+            <span>
+              IDEAS
+            </span>
+
+            <i />
+
+            <span>
+              OPPORTUNITIES
+            </span>
+
+            <i />
+
+            <span>
+              IMPACT
+            </span>
 
           </div>
 
         </div>
 
 
-        <div className="admin-login__footer">
-
-          <span>
-            Continental Founders™
-          </span>
-
-          <span>
-            Content Management System
-          </span>
-
-        </div>
-
-      </section>
-
-
-      <section
-        className="admin-login__visual"
-        aria-hidden="true"
-      >
-
-        <div className="admin-login__visual-overlay" />
-
-
-        <div className="admin-login__visual-content">
-
-          <span className="admin-login__visual-eyebrow">
-            CONTINENTAL FOUNDERS
-          </span>
-
-
-          <h2>
-            Talent is
-            <br />
-
-            everywhere.
-            <br />
-
-            <em>
-              Access is not.
-            </em>
-          </h2>
-
-
-          <p>
-
-            One central workspace for
-            managing the content,
-            relationships, opportunities,
-            and stories that move the
-            Continental Founders ecosystem
-            forward.
-
-          </p>
-
-
-          <div className="admin-login__visual-line" />
-
-        </div>
+        <Link
+          to="/"
+          className="cf-admin-login__return"
+        >
+          Return to Continental Founders
+        </Link>
 
       </section>
 

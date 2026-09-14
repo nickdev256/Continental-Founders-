@@ -1,172 +1,194 @@
 /* ============================================================
    CONTINENTAL FOUNDERS
-   ADMIN REGISTER
+   ADMIN REGISTRATION
 ============================================================ */
 
-.admin-register {
-  --register-navy: #071a2e;
-  --register-navy-light: #102d49;
-  --register-gold: #b99757;
-  --register-gold-light: #d7bd82;
-  --register-white: #ffffff;
-  --register-cream: #f5f1e8;
-  --register-text: #13263a;
-  --register-muted: #6f7a85;
-  --register-border: #dfe4e8;
+.cf-admin-register {
+  --cf-navy: #06131f;
+  --cf-navy-soft: #0b2235;
+  --cf-gold: #b88c3d;
+  --cf-gold-light: #d4ae68;
+  --cf-text: #14202b;
+  --cf-muted: #737d86;
+  --cf-border: #dde2e5;
 
-  width: 100%;
   min-height: 100vh;
 
-  display: grid;
-  grid-template-columns:
-    minmax(460px, 0.88fr)
-    minmax(0, 1.12fr);
+  width: 100%;
 
-  background: var(--register-cream);
-  color: var(--register-text);
+  display: grid;
+
+  grid-template-columns:
+    minmax(520px, 1fr)
+    minmax(520px, 1fr);
+
+  background: #f7f7f5;
+
+  overflow: hidden;
 }
 
 
 /* ============================================================
-   LEFT PANEL
+   LEFT VISUAL
 ============================================================ */
 
-.admin-register__panel {
+.cf-admin-register__visual {
+  position: relative;
+
   min-height: 100vh;
 
-  padding:
-    34px
-    clamp(36px, 5vw, 82px);
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
 
-  position: relative;
-  z-index: 2;
+  padding:
+    36px
+    50px
+    38px;
 
-  background: var(--register-white);
+  background: #06131f;
 
-  box-shadow:
-    18px 0 60px
-    rgba(4, 18, 32, 0.08);
+  color: #ffffff;
+}
+
+
+.cf-admin-register__visual-background {
+  position: absolute;
+
+  inset: 0;
+
+  background-image:
+    url("/assets/images/admin-login-africa.jpg");
+
+  background-size: cover;
+
+  background-position:
+    center center;
+
+  background-repeat: no-repeat;
+
+  transform: scale(1.02);
+}
+
+
+.cf-admin-register__visual-shade {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 12, 20, 0.96) 0%,
+      rgba(3, 12, 20, 0.77) 42%,
+      rgba(3, 12, 20, 0.26) 77%,
+      rgba(3, 12, 20, 0.08) 100%
+    ),
+    linear-gradient(
+      0deg,
+      rgba(2, 10, 17, 0.6),
+      transparent 52%
+    );
 }
 
 
 /* ============================================================
-   BRAND
+   LEFT TOP
 ============================================================ */
 
-.admin-register__brand {
-  width: 100%;
+.cf-admin-register__visual-top {
+  position: relative;
+
+  z-index: 3;
 
   display: flex;
+
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+
+  gap: 30px;
 }
 
 
-.admin-register__brand-link {
+.cf-admin-register__brand {
   display: inline-flex;
+
   align-items: center;
 
   text-decoration: none;
 }
 
 
-.admin-register__brand img {
+.cf-admin-register__brand img {
   display: block;
 
   width: auto;
-  max-width: 190px;
-  max-height: 58px;
+  height: 58px;
 
   object-fit: contain;
 }
 
 
-.admin-register__brand > span {
-  color: var(--register-gold);
+.cf-admin-register__keywords {
+  display: flex;
 
-  font-size: 0.61rem;
-  font-weight: 800;
+  align-items: center;
 
-  letter-spacing: 0.17em;
+  gap: 23px;
 
-  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.24em;
+
+  color:
+    rgba(255, 255, 255, 0.66);
 }
 
 
 /* ============================================================
-   CONTENT
+   LEFT COPY
 ============================================================ */
 
-.admin-register__content {
+.cf-admin-register__visual-copy {
+  position: relative;
+
+  z-index: 3;
+
   width: 100%;
-  max-width: 480px;
+  max-width: 680px;
 
-  margin: auto 0;
+  margin-top: auto;
+  margin-bottom: auto;
 
-  padding: 48px 0;
+  padding:
+    70px
+    0;
 }
 
 
-/* ============================================================
-   SECURITY ICON
-============================================================ */
-
-.admin-register__security-icon {
-  width: 52px;
-  height: 52px;
-
-  margin-bottom: 24px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 12px;
-
-  background:
-    linear-gradient(
-      145deg,
-      var(--register-navy),
-      var(--register-navy-light)
-    );
-
-  color: var(--register-gold-light);
-
-  box-shadow:
-    0 12px 28px
-    rgba(7, 26, 46, 0.14);
-}
-
-
-/* ============================================================
-   EYEBROW
-============================================================ */
-
-.admin-register__eyebrow {
+.cf-admin-register__eyebrow {
   display: block;
 
-  margin-bottom: 12px;
+  margin-bottom: 20px;
 
-  color: var(--register-gold);
+  font-size: 10px;
+  font-weight: 700;
 
-  font-size: 0.65rem;
-  font-weight: 800;
+  letter-spacing: 0.24em;
 
-  letter-spacing: 0.18em;
+  color:
+    var(--cf-gold-light);
 }
 
 
-/* ============================================================
-   HEADING
-============================================================ */
+.cf-admin-register__visual-copy h1 {
+  margin: 0;
 
-.admin-register__content h1 {
-  margin: 0 0 14px;
-
-  color: var(--register-navy);
+  max-width: 620px;
 
   font-family:
     Georgia,
@@ -175,33 +197,250 @@
 
   font-size:
     clamp(
-      2.2rem,
-      4vw,
-      3.35rem
+      58px,
+      5.9vw,
+      90px
     );
 
-  font-weight: 500;
+  line-height: 0.96;
 
-  line-height: 1.02;
+  font-weight: 400;
 
-  letter-spacing: -0.035em;
+  letter-spacing: -0.045em;
+
+  color: #ffffff;
+}
+
+
+.cf-admin-register__visual-copy h1 em {
+  display: block;
+
+  margin-top: 12px;
+
+  font-weight: 400;
+
+  color:
+    var(--cf-gold-light);
+}
+
+
+.cf-admin-register__visual-description {
+  display: flex;
+
+  gap: 24px;
+
+  max-width: 510px;
+
+  margin-top: 38px;
+}
+
+
+.cf-admin-register__gold-line {
+  width: 2px;
+
+  min-height: 76px;
+
+  flex: 0 0 2px;
+
+  background:
+    var(--cf-gold);
+}
+
+
+.cf-admin-register__visual-description p {
+  margin: 0;
+
+  font-size: 15px;
+  line-height: 1.72;
+
+  color:
+    rgba(255, 255, 255, 0.7);
 }
 
 
 /* ============================================================
-   INTRO
+   LEFT FOOTER
 ============================================================ */
 
-.admin-register__intro {
-  max-width: 440px;
+.cf-admin-register__visual-footer {
+  position: relative;
 
-  margin: 0 0 30px;
+  z-index: 3;
 
-  color: var(--register-muted);
+  display: grid;
 
-  font-size: 0.9rem;
+  gap: 8px;
+}
 
-  line-height: 1.75;
+
+.cf-admin-register__visual-footer strong {
+  font-size: 10px;
+
+  letter-spacing: 0.22em;
+
+  font-weight: 700;
+}
+
+
+.cf-admin-register__visual-footer span {
+  font-size: 8px;
+
+  letter-spacing: 0.24em;
+
+  color:
+    rgba(255, 255, 255, 0.52);
+}
+
+
+/* ============================================================
+   RIGHT SIDE
+============================================================ */
+
+.cf-admin-register__form-side {
+  position: relative;
+
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    75px
+    48px
+    40px;
+
+  background:
+    radial-gradient(
+      circle at 50% 25%,
+      #ffffff 0%,
+      #fafaf8 60%,
+      #f4f5f3 100%
+    );
+}
+
+
+.cf-admin-register__cms-label {
+  position: absolute;
+
+  top: 40px;
+  right: 50px;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.3em;
+
+  color: #7b858d;
+}
+
+
+/* ============================================================
+   CARD
+============================================================ */
+
+.cf-admin-register__card {
+  width: 100%;
+
+  max-width: 530px;
+
+  padding:
+    36px
+    42px
+    27px;
+
+  border:
+    1px solid
+    #e0e3e4;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.94);
+
+  box-shadow:
+    0 18px 55px
+    rgba(7, 26, 43, 0.055);
+}
+
+
+/* ============================================================
+   SHIELD
+============================================================ */
+
+.cf-admin-register__shield {
+  width: 66px;
+  height: 66px;
+
+  display: grid;
+
+  place-items: center;
+
+  margin:
+    0
+    auto
+    18px;
+
+  border:
+    2px solid
+    var(--cf-gold);
+
+  border-radius: 50%;
+
+  color:
+    var(--cf-gold);
+
+  background: #ffffff;
+}
+
+
+/* ============================================================
+   HEADING
+============================================================ */
+
+.cf-admin-register__heading {
+  text-align: center;
+
+  margin-bottom: 27px;
+}
+
+
+.cf-admin-register__heading h2 {
+  margin:
+    0
+    0
+    10px;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 40px;
+
+  line-height: 1.05;
+
+  font-weight: 500;
+
+  letter-spacing: -0.035em;
+
+  color: #121212;
+}
+
+
+.cf-admin-register__heading p {
+  max-width: 390px;
+
+  margin:
+    0
+    auto;
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  color: #7a838c;
 }
 
 
@@ -209,250 +448,202 @@
    FORM
 ============================================================ */
 
-.admin-register__form {
+.cf-admin-register__form {
+  display: grid;
+
+  gap: 17px;
+}
+
+
+.cf-admin-register__field {
+  display: grid;
+
+  gap: 7px;
+}
+
+
+.cf-admin-register__field label {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: #1e252b;
+}
+
+
+.cf-admin-register__field-note {
+  font-size: 10px;
+
+  color: #8e969d;
+}
+
+
+.cf-admin-register__input {
+  min-height: 52px;
+
   width: 100%;
-
-  display: grid;
-
-  gap: 20px;
-}
-
-
-/* ============================================================
-   FIELD
-============================================================ */
-
-.admin-register__field {
-  display: grid;
-
-  gap: 9px;
-}
-
-
-.admin-register__field label {
-  color: #26384a;
-
-  font-size: 0.74rem;
-  font-weight: 700;
-
-  letter-spacing: 0.01em;
-}
-
-
-.admin-register__field-note {
-  color: #9099a2;
-
-  font-size: 0.67rem;
-
-  line-height: 1.5;
-}
-
-
-/* ============================================================
-   INPUT WRAPPER
-============================================================ */
-
-.admin-register__input-wrapper {
-  min-height: 54px;
-
-  padding: 0 15px;
 
   display: flex;
   align-items: center;
-  gap: 11px;
 
-  border:
-    1px solid var(--register-border);
-
-  border-radius: 9px;
-
-  background: #ffffff;
-
-  color: #929ba4;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
-}
-
-
-.admin-register__input-wrapper:hover {
-  border-color: #cbd2d8;
-}
-
-
-.admin-register__input-wrapper:focus-within {
-  border-color: var(--register-gold);
-
-  box-shadow:
-    0 0 0 4px
-    rgba(185, 151, 87, 0.1);
-}
-
-
-.admin-register__input-wrapper > svg {
-  flex: 0 0 auto;
-
-  color: #8a949e;
-}
-
-
-/* ============================================================
-   INPUT
-============================================================ */
-
-.admin-register__input-wrapper input {
-  width: 100%;
-  min-width: 0;
-
-  padding: 16px 0;
-
-  border: 0;
-  outline: 0;
-
-  background: transparent;
-
-  color: var(--register-text);
-
-  font: inherit;
-
-  font-size: 0.84rem;
-}
-
-
-.admin-register__input-wrapper input::placeholder {
-  color: #a0a8b0;
-}
-
-
-.admin-register__input-wrapper input:disabled {
-  cursor: not-allowed;
-
-  opacity: 0.65;
-}
-
-
-/* ============================================================
-   PASSWORD TOGGLE
-============================================================ */
-
-.admin-register__password-toggle {
-  width: 36px;
-  height: 36px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  padding: 0;
-
-  border: 0;
-
-  border-radius: 7px;
-
-  background: transparent;
-
-  color: #7f8993;
-
-  cursor: pointer;
-
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
-}
-
-
-.admin-register__password-toggle:hover {
-  color: var(--register-navy);
-
-  background: #f2f4f6;
-}
-
-
-.admin-register__password-toggle:disabled {
-  cursor: not-allowed;
-
-  opacity: 0.5;
-}
-
-
-/* ============================================================
-   PASSWORD REQUIREMENTS
-============================================================ */
-
-.admin-register__requirements {
-  margin-top: -7px;
+  gap: 12px;
 
   padding:
-    13px 14px;
-
-  display: grid;
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap:
-    9px
+    0
     14px;
 
   border:
-    1px solid #ebe7dc;
+    1px solid
+    #d7dce0;
 
-  border-radius: 8px;
+  border-radius: 7px;
 
-  background: #faf8f3;
-}
+  background: #ffffff;
 
-
-.admin-register__requirement {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-
-  color: #8a939c;
-
-  font-size: 0.66rem;
-
-  line-height: 1.4;
-
-  transition:
-    color 0.2s ease;
-}
-
-
-.admin-register__requirement-icon {
-  width: 16px;
-  height: 16px;
-
-  flex: 0 0 auto;
-
-  display: grid;
-  place-items: center;
-
-  border:
-    1px solid #ccd2d7;
-
-  border-radius: 50%;
-
-  color: #ffffff;
+  color: #747d86;
 
   transition:
     border-color 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 
-.admin-register__requirement--passed {
-  color: #487257;
+.cf-admin-register__input:focus-within {
+  border-color:
+    var(--cf-gold);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(184, 140, 61, 0.1);
 }
 
 
-.admin-register__requirement--passed
-.admin-register__requirement-icon {
-  border-color: #61886e;
+.cf-admin-register__input input {
+  width: 100%;
 
-  background: #61886e;
+  min-width: 0;
+
+  border: 0;
+
+  outline: none;
+
+  background: transparent;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  color:
+    var(--cf-text);
+}
+
+
+.cf-admin-register__input input::placeholder {
+  color: #9ca4ab;
+}
+
+
+.cf-admin-register__password-toggle {
+  width: 32px;
+  height: 32px;
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  border: 0;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: #747d86;
+
+  cursor: pointer;
+}
+
+
+.cf-admin-register__password-toggle:hover {
+  color:
+    var(--cf-navy);
+
+  background: #f2f4f4;
+}
+
+
+/* ============================================================
+   REQUIREMENTS
+============================================================ */
+
+.cf-admin-register__requirements {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap:
+    7px
+    12px;
+
+  padding:
+    12px
+    13px;
+
+  border:
+    1px solid
+    #e5e7e8;
+
+  border-radius: 6px;
+
+  background: #f8f9f8;
+}
+
+
+.cf-admin-register__requirement {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  font-size: 10px;
+
+  color: #828b92;
+}
+
+
+.cf-admin-register__requirement-icon {
+  width: 15px;
+  height: 15px;
+
+  display: grid;
+
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  border:
+    1px solid
+    #cdd2d5;
+
+  border-radius: 50%;
+}
+
+
+.cf-admin-register__requirement--passed {
+  color: #447159;
+}
+
+
+.cf-admin-register__requirement--passed
+.cf-admin-register__requirement-icon {
+  border-color: #6e9c7d;
+
+  background: #edf6f0;
+
+  color: #47775a;
 }
 
 
@@ -460,65 +651,67 @@
    ERROR
 ============================================================ */
 
-.admin-register__error {
-  padding: 13px 15px;
+.cf-admin-register__error {
+  padding:
+    11px
+    13px;
 
   border:
-    1px solid #eccccc;
+    1px solid
+    #efc7c7;
 
-  border-radius: 8px;
+  border-radius: 5px;
 
-  background: #fff5f5;
+  background: #fff7f7;
 
-  color: #9c4545;
+  color: #a63e3e;
 
-  font-size: 0.77rem;
+  font-size: 12px;
 
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 
 /* ============================================================
-   SUBMIT BUTTON
+   SUBMIT
 ============================================================ */
 
-.admin-register__submit {
-  width: 100%;
+.cf-admin-register__submit {
   min-height: 55px;
 
-  margin-top: 3px;
-
-  padding: 0 19px;
+  width: 100%;
 
   display: flex;
+
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
 
-  border:
-    1px solid var(--register-navy);
+  gap: 13px;
 
-  border-radius: 9px;
+  border: 0;
+
+  border-radius: 7px;
+
+  padding:
+    0
+    20px;
 
   background:
     linear-gradient(
-      135deg,
-      var(--register-navy),
-      var(--register-navy-light)
+      110deg,
+      #071521,
+      #101c25
     );
 
   color: #ffffff;
 
-  font-size: 0.79rem;
+  font-family: inherit;
+
+  font-size: 13px;
+
   font-weight: 700;
 
-  letter-spacing: 0.02em;
-
   cursor: pointer;
-
-  box-shadow:
-    0 10px 22px
-    rgba(7, 26, 46, 0.13);
 
   transition:
     transform 0.2s ease,
@@ -527,66 +720,22 @@
 }
 
 
-.admin-register__submit:hover:not(:disabled) {
-  transform: translateY(-2px);
+.cf-admin-register__submit:hover:not(:disabled) {
+  transform:
+    translateY(-1px);
 
-  background:
-    linear-gradient(
-      135deg,
-      #0b2239,
-      #173c5e
-    );
+  background: #0b2437;
 
   box-shadow:
-    0 14px 30px
-    rgba(7, 26, 46, 0.18);
+    0 12px 26px
+    rgba(4, 16, 26, 0.16);
 }
 
 
-.admin-register__submit:active:not(:disabled) {
-  transform: translateY(0);
-}
+.cf-admin-register__submit:disabled {
+  opacity: 0.62;
 
-
-.admin-register__submit:disabled {
   cursor: not-allowed;
-
-  opacity: 0.6;
-}
-
-
-/* ============================================================
-   LOGIN LINK
-============================================================ */
-
-.admin-register__login {
-  margin-top: 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  color: #7d8790;
-
-  font-size: 0.74rem;
-}
-
-
-.admin-register__login a {
-  color: var(--register-gold);
-
-  font-weight: 700;
-
-  text-decoration: none;
-
-  transition:
-    color 0.2s ease;
-}
-
-
-.admin-register__login a:hover {
-  color: var(--register-navy);
 }
 
 
@@ -594,298 +743,152 @@
    SECURITY NOTE
 ============================================================ */
 
-.admin-register__security-note {
-  margin-top: 22px;
-
-  padding-top: 20px;
-
+.cf-admin-register__security-note {
   display: flex;
+
   align-items: flex-start;
-  gap: 9px;
 
-  border-top:
-    1px solid #eceff1;
+  gap: 12px;
 
-  color: #818b95;
+  margin-top: 20px;
+
+  padding:
+    14px
+    15px;
+
+  background: #f5f6f5;
+
+  border-radius: 6px;
+
+  color: #69727b;
 }
 
 
-.admin-register__security-note svg {
+.cf-admin-register__security-note svg {
   flex: 0 0 auto;
 
   margin-top: 2px;
 
-  color: var(--register-gold);
+  color:
+    var(--cf-navy);
 }
 
 
-.admin-register__security-note p {
+.cf-admin-register__security-note p {
   margin: 0;
 
-  font-size: 0.69rem;
+  font-size: 11px;
 
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
 
 /* ============================================================
-   FOOTER
+   LOGIN
 ============================================================ */
 
-.admin-register__footer {
-  width: 100%;
+.cf-admin-register__login {
+  margin-top: 22px;
 
-  padding-top: 23px;
+  text-align: center;
+}
 
-  display: flex;
+
+.cf-admin-register__login p {
+  margin:
+    0
+    0
+    6px;
+
+  font-size: 12px;
+
+  color: #5b646d;
+}
+
+
+.cf-admin-register__login a {
+  display: inline-flex;
+
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+
+  gap: 6px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #98722f;
+
+  text-decoration: none;
+}
+
+
+.cf-admin-register__login a:hover {
+  color: #6f501c;
+}
+
+
+/* ============================================================
+   CARD FOOTER
+============================================================ */
+
+.cf-admin-register__card-footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 27px;
+
+  padding-top: 19px;
 
   border-top:
-    1px solid #eceff1;
+    1px solid
+    #eceeee;
 
-  color: #8c959e;
+  font-size: 8px;
 
-  font-size: 0.64rem;
+  font-weight: 700;
+
+  letter-spacing: 0.19em;
+
+  color: #86909a;
 }
 
 
-/* ============================================================
-   RIGHT VISUAL PANEL
-============================================================ */
-
-.admin-register__visual {
-  min-height: 100vh;
-
-  position: relative;
-
-  overflow: hidden;
-
-  background:
-    linear-gradient(
-      135deg,
-      #06182a,
-      #102e4b
-    );
-}
-
-
-/* ============================================================
-   BACKGROUND IMAGE
-============================================================ */
-
-.admin-register__visual::before {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background-image:
-    url("/assets/images/about-hero.jpg");
-
-  background-repeat: no-repeat;
-
-  background-position: center;
-
-  background-size: cover;
-
-  transform: scale(1.03);
-}
-
-
-/* ============================================================
-   VISUAL OVERLAY
-============================================================ */
-
-.admin-register__visual-overlay {
-  position: absolute;
-  inset: 0;
-
-  z-index: 1;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(5, 19, 34, 0.2) 0%,
-      rgba(5, 19, 34, 0.47) 48%,
-      rgba(5, 19, 34, 0.95) 100%
-    );
-}
-
-
-/* ============================================================
-   GOLD GLOW
-============================================================ */
-
-.admin-register__visual::after {
-  content: "";
-
-  width: 520px;
-  height: 520px;
-
-  position: absolute;
-
-  top: -220px;
-  right: -190px;
-
-  z-index: 1;
+.cf-admin-register__card-footer i {
+  width: 2px;
+  height: 2px;
 
   border-radius: 50%;
 
   background:
-    radial-gradient(
-      circle,
-      rgba(199, 168, 103, 0.2),
-      rgba(199, 168, 103, 0)
-      68%
-    );
-
-  pointer-events: none;
+    var(--cf-gold);
 }
 
 
 /* ============================================================
-   VISUAL CONTENT
+   RETURN
 ============================================================ */
 
-.admin-register__visual-content {
-  width:
-    min(
-      620px,
-      calc(100% - 100px)
-    );
+.cf-admin-register__return {
+  margin-top: 18px;
 
-  position: absolute;
+  font-size: 11px;
 
-  left:
-    clamp(
-      45px,
-      6vw,
-      100px
-    );
+  color: #828a92;
 
-  bottom:
-    clamp(
-      60px,
-      9vh,
-      105px
-    );
-
-  z-index: 3;
-
-  color: #ffffff;
+  text-decoration: none;
 }
 
 
-/* ============================================================
-   VISUAL EYEBROW
-============================================================ */
-
-.admin-register__visual-eyebrow {
-  display: block;
-
-  margin-bottom: 19px;
-
-  color: var(--register-gold-light);
-
-  font-size: 0.67rem;
-  font-weight: 800;
-
-  letter-spacing: 0.2em;
-}
-
-
-/* ============================================================
-   VISUAL HEADING
-============================================================ */
-
-.admin-register__visual-content h2 {
-  margin: 0 0 25px;
-
-  color: #ffffff;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-size:
-    clamp(
-      3rem,
-      5.5vw,
-      5.8rem
-    );
-
-  font-weight: 400;
-
-  line-height: 0.93;
-
-  letter-spacing: -0.045em;
-}
-
-
-.admin-register__visual-content h2 em {
-  color: var(--register-gold-light);
-
-  font-style: normal;
-}
-
-
-/* ============================================================
-   VISUAL TEXT
-============================================================ */
-
-.admin-register__visual-content p {
-  max-width: 540px;
-
-  margin: 0;
-
+.cf-admin-register__return:hover {
   color:
-    rgba(
-      255,
-      255,
-      255,
-      0.74
-    );
-
-  font-size: 0.91rem;
-
-  line-height: 1.75;
-}
-
-
-/* ============================================================
-   GOLD LINE
-============================================================ */
-
-.admin-register__visual-line {
-  width: 85px;
-  height: 2px;
-
-  margin-top: 30px;
-
-  background: var(--register-gold);
-}
-
-
-/* ============================================================
-   LARGE SCREENS
-============================================================ */
-
-@media (min-width: 1500px) {
-
-  .admin-register {
-    grid-template-columns:
-      minmax(520px, 0.78fr)
-      1.22fr;
-  }
-
-
-  .admin-register__content {
-    max-width: 500px;
-  }
-
+    var(--cf-gold);
 }
 
 
@@ -893,233 +896,172 @@
    TABLET
 ============================================================ */
 
-@media (max-width: 1050px) {
+@media (
+  max-width: 1000px
+) {
 
-  .admin-register {
-    grid-template-columns:
-      minmax(420px, 1fr)
-      0.9fr;
-  }
-
-
-  .admin-register__panel {
-    padding:
-      30px
-      40px;
-  }
-
-
-  .admin-register__visual-content {
-    width:
-      calc(100% - 70px);
-
-    left: 35px;
-  }
-
-
-  .admin-register__visual-content h2 {
-    font-size:
-      clamp(
-        2.8rem,
-        6vw,
-        4.5rem
-      );
-  }
-
-}
-
-
-/* ============================================================
-   MOBILE / SMALL TABLET
-============================================================ */
-
-@media (max-width: 850px) {
-
-  .admin-register {
+  .cf-admin-register {
     display: block;
 
-    min-height: 100vh;
-
-    background: #ffffff;
+    overflow: visible;
   }
 
 
-  .admin-register__panel {
-    width: 100%;
-    min-height: 100vh;
+  .cf-admin-register__visual {
+    min-height: 460px;
 
     padding:
       28px
-      clamp(
-        22px,
-        7vw,
-        60px
-      );
-
-    box-shadow: none;
+      30px
+      70px;
   }
 
 
-  .admin-register__content {
-    max-width: 500px;
+  .cf-admin-register__visual-copy {
+    padding:
+      65px
+      0
+      30px;
 
-    margin: auto;
-
-    padding: 55px 0;
+    margin: 0;
   }
 
 
-  .admin-register__brand {
-    max-width: 500px;
-
-    margin: 0 auto;
+  .cf-admin-register__visual-copy h1 {
+    font-size: 59px;
   }
 
 
-  .admin-register__footer {
-    max-width: 500px;
+  .cf-admin-register__form-side {
+    min-height: auto;
 
-    margin: 0 auto;
+    padding:
+      65px
+      24px
+      42px;
   }
 
 
-  .admin-register__visual {
-    display: none;
+  .cf-admin-register__cms-label {
+    top: 27px;
+    right: 30px;
+  }
+
+
+  .cf-admin-register__card {
+    max-width: 600px;
   }
 
 }
 
 
 /* ============================================================
-   SMALL MOBILE
+   MOBILE
 ============================================================ */
 
-@media (max-width: 540px) {
+@media (
+  max-width: 600px
+) {
 
-  .admin-register__panel {
+  .cf-admin-register__visual {
+    min-height: 390px;
+
     padding:
       22px
+      20px
+      65px;
+  }
+
+
+  .cf-admin-register__brand img {
+    height: 45px;
+  }
+
+
+  .cf-admin-register__keywords {
+    display: none;
+  }
+
+
+  .cf-admin-register__visual-copy {
+    padding:
+      58px
+      0
       20px;
   }
 
 
-  .admin-register__brand img {
-    max-width: 160px;
+  .cf-admin-register__visual-copy h1 {
+    font-size: 43px;
   }
 
 
-  .admin-register__brand > span {
-    display: none;
+  .cf-admin-register__visual-description {
+    gap: 15px;
+
+    margin-top: 24px;
   }
 
 
-  .admin-register__content {
-    padding: 42px 0;
+  .cf-admin-register__visual-description p {
+    font-size: 13px;
   }
 
 
-  .admin-register__security-icon {
-    width: 47px;
-    height: 47px;
-
-    margin-bottom: 20px;
+  .cf-admin-register__visual-footer strong {
+    font-size: 8px;
   }
 
 
-  .admin-register__content h1 {
-    font-size: 2.25rem;
+  .cf-admin-register__visual-footer span {
+    font-size: 6px;
   }
 
 
-  .admin-register__intro {
-    font-size: 0.84rem;
-  }
-
-
-  .admin-register__input-wrapper {
-    min-height: 52px;
-  }
-
-
-  .admin-register__requirements {
-    grid-template-columns: 1fr;
-  }
-
-
-  .admin-register__submit {
-    min-height: 53px;
-  }
-
-
-  .admin-register__login {
-    flex-wrap: wrap;
-
-    text-align: center;
-  }
-
-
-  .admin-register__footer {
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    gap: 6px;
-  }
-
-}
-
-
-/* ============================================================
-   VERY SMALL MOBILE
-============================================================ */
-
-@media (max-width: 360px) {
-
-  .admin-register__panel {
+  .cf-admin-register__form-side {
     padding:
-      18px
-      15px;
+      56px
+      14px
+      34px;
   }
 
 
-  .admin-register__content h1 {
-    font-size: 2rem;
+  .cf-admin-register__cms-label {
+    left: 50%;
+    right: auto;
+
+    transform:
+      translateX(-50%);
+
+    white-space: nowrap;
+
+    font-size: 8px;
   }
 
-}
+
+  .cf-admin-register__card {
+    padding:
+      30px
+      21px
+      23px;
+  }
 
 
-/* ============================================================
-   ACCESSIBILITY
-============================================================ */
-
-.admin-register__submit:focus-visible,
-.admin-register__password-toggle:focus-visible,
-.admin-register__login a:focus-visible,
-.admin-register__brand-link:focus-visible {
-  outline:
-    2px solid var(--register-gold);
-
-  outline-offset: 3px;
-}
+  .cf-admin-register__heading h2 {
+    font-size: 34px;
+  }
 
 
-/* ============================================================
-   REDUCED MOTION
-============================================================ */
+  .cf-admin-register__requirements {
+    grid-template-columns:
+      1fr;
+  }
 
-@media (
-  prefers-reduced-motion:
-  reduce
-) {
 
-  .admin-register__input-wrapper,
-  .admin-register__password-toggle,
-  .admin-register__submit,
-  .admin-register__login a,
-  .admin-register__requirement,
-  .admin-register__requirement-icon {
-    transition: none;
+  .cf-admin-register__card-footer {
+    gap: 7px;
+
+    font-size: 6px;
   }
 
 }

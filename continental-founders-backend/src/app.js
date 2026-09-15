@@ -27,8 +27,11 @@ const dashboardRoutes =
 const eventsRoutes =
   require("./routes/eventsRoutes");
 
+// IMPORTANT:
+// Git currently tracks this file as:
+// src/routes/insightsroutes.js
 const insightsRoutes =
-  require("./routes/insightsRoutes");
+  require("./routes/insightsroutes");
 
 const universityRoutes =
   require("./routes/universityRoutes");
@@ -47,20 +50,19 @@ const pagesRoutes =
 const {
   notFound,
   errorHandler,
-} =
-  require("./middleware/error");
+} = require("./middleware/error");
 
 
 // ============================================================
 // APP
 // ============================================================
 
-const app =
-  express();
+const app = express();
 
 
 // ============================================================
 // TRUST PROXY
+// Required when deployed behind Render's proxy.
 // ============================================================
 
 app.set(
@@ -102,6 +104,8 @@ app.use(
       callback
     ) => {
 
+      // Allow server-to-server requests,
+      // health checks and tools without Origin.
       if (!origin) {
         return callback(
           null,

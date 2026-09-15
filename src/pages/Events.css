@@ -6,6 +6,69 @@
 
 
 /* ============================================================
+   FONTS
+============================================================ */
+
+@import url(
+  "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+);
+
+.events-page {
+  --font-primary: "Trajan Pro", "Trajan Pro 3", Georgia, serif;
+  --font-secondary: "Montserrat", Arial, sans-serif;
+
+  font-family: var(--font-secondary);
+}
+
+
+/* ============================================================
+   PRIMARY FONT — TRAJAN PRO
+   Main headings / titles
+============================================================ */
+
+.events-hero__content h1 {
+  font-family: var(--font-primary);
+}
+
+.events-intro__heading h2 {
+  font-family: var(--font-primary);
+}
+
+.event-card__date strong {
+  font-family: var(--font-primary);
+}
+
+.event-card__body h3 {
+  font-family: var(--font-primary);
+}
+
+.events-status h3 {
+  font-family: var(--font-primary);
+}
+
+.events-cta__heading h2 {
+  font-family: var(--font-primary);
+}
+
+.events-cta__mark strong {
+  font-family: var(--font-primary);
+}
+
+
+/* ============================================================
+   SECONDARY FONT — MONTSERRAT
+   Body text, labels, buttons, links and controls
+============================================================ */
+
+.events-page,
+.events-page button,
+.events-page input,
+.events-page textarea,
+.events-page select {
+  font-family: var(--font-secondary);
+}
+
+/* ============================================================
    ROOT
 ============================================================ */
 
@@ -121,19 +184,29 @@
 .events-hero__media {
   position: absolute;
   inset: 0;
-
   z-index: 0;
-
   background:
     url("/assets/images/events/events-hero.jpg")
     center center / cover
     no-repeat;
 
-  transform: scale(1.02);
+  transform: scale(1.12);
 
   filter:
     saturate(0.95)
     contrast(1.04);
+
+  animation: eventsHeroZoomOut 6s ease-out forwards;
+}
+
+@keyframes eventsHeroZoomOut {
+  from {
+    transform: scale(1.12);
+  }
+
+  to {
+    transform: scale(1.02);
+  }
 }
 
 
@@ -197,10 +270,7 @@
 
   color: var(--events-white);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size:
     clamp(
@@ -410,10 +480,7 @@
 
   color: var(--events-navy);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size:
     clamp(
@@ -551,6 +618,82 @@
 
   gap: 35px;
 }
+
+.events-calendar .section-heading .eyebrow {
+  font-size: 40px;
+  font-family: "Trajan Pro", "Trajan Pro 3", Georgia, serif;
+  
+  
+}
+
+.events-calendar .section-heading {
+  text-align: center;
+}
+
+/* ============================================================
+   CALENDAR TWO-COLUMN LAYOUT
+============================================================ */
+
+.events-calendar__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.65fr);
+  gap: 70px;
+  align-items: start;
+}
+
+.events-calendar__calendar {
+  min-width: 0;
+}
+
+.events-calendar__photo {
+  width: 120%;
+  min-height: 850px;
+  margin-left: -10%;
+  margin-top: 50px;
+}
+
+.events-calendar__photo img {
+  width: 100%;
+  height: 890px;
+  object-fit: cover;
+}
+
+
+/* ============================================================
+   CALENDAR COLUMNS — TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+  .events-calendar__columns {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .events-calendar__photo {
+    min-height: 460px;
+  }
+
+  .events-calendar__photo img {
+    min-height: 460px;
+  }
+}
+
+
+/* ============================================================
+   CALENDAR COLUMNS — MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+  .events-calendar__columns {
+    gap: 38px;
+  }
+
+  .events-calendar__photo,
+  .events-calendar__photo img {
+    min-height: 350px;
+  }
+}
+
 
 
 /* ============================================================
@@ -839,10 +982,7 @@
 
 
 .event-card__date strong {
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size: 1.4rem;
   font-weight: 500;
@@ -960,10 +1100,7 @@
   color:
     var(--events-navy);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size:
     clamp(
@@ -1158,10 +1295,7 @@
   color:
     var(--events-navy);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size:
     1.7rem;
@@ -1419,10 +1553,7 @@
   color:
     var(--events-white);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size:
     clamp(
@@ -1551,10 +1682,7 @@
   color:
     var(--events-gold-light);
 
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family: var(--font-primary);
 
   font-size: 0.83rem;
   font-weight: 500;

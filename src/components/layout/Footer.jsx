@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import {
-  ArrowUpRight,
+  ArrowUpRight, 
   ChevronRight,
   Linkedin,
   Instagram,
@@ -452,7 +452,7 @@ export default function Footer() {
               <div className="cf-footer__column">
 
                 <span className="cf-footer__label">
-                  01
+                  
                 </span>
 
                 <h3>
@@ -502,7 +502,7 @@ export default function Footer() {
               <div className="cf-footer__column">
 
                 <span className="cf-footer__label">
-                  02
+                  
                 </span>
 
                 <h3>
@@ -552,7 +552,7 @@ export default function Footer() {
               <div className="cf-footer__column">
 
                 <span className="cf-footer__label">
-                  03
+                  
                 </span>
 
                 <h3>
@@ -849,41 +849,7 @@ export default function Footer() {
             </div>
 
 
-            {/* ================================================
-                BRAND PHRASE
-            ================================================= */}
-
-            <div className="cf-footer__phrase">
-
-              <span>
-                IDEAS
-              </span>
-
-              <b>
-                |
-              </b>
-
-              <span>
-                PEOPLE
-              </span>
-
-              <b>
-                |
-              </b>
-
-              <span>
-                OPPORTUNITIES
-              </span>
-
-              <b>
-                |
-              </b>
-
-              <span>
-                IMPACT
-              </span>
-
-            </div>
+          
 
           </div>
 

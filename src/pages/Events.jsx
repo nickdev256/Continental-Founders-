@@ -5,7 +5,7 @@ import React, {
 } from "react";
 
 import {
-  ArrowRight,
+  ArrowRight, 
   CalendarDays,
   Lightbulb,
   MapPin,
@@ -508,21 +508,7 @@ export default function Events() {
 
           <div className="events-hero__aside">
 
-            <span>
-              PEOPLE
-            </span>
-
-            <span>
-              IDEAS
-            </span>
-
-            <span>
-              OPPORTUNITIES
-            </span>
-
-            <strong>
-              A STRONGER AFRICA
-            </strong>
+            
 
           </div>
 
@@ -624,115 +610,96 @@ export default function Events() {
           EVENTS CALENDAR
       ====================================================== */}
 
-      <section
-        className="section events-calendar"
-        id="events-calendar"
-      >
+     <section
+  className="section events-calendar"
+  id="events-calendar"
+>
+  <div className="container">
 
-        <div className="container">
+    <div className="events-calendar__columns">
 
-          <div className="events-calendar__header">
+      {/* =========================
+          LEFT — CALENDAR
+      ========================= */}
+      <div className="events-calendar__calendar">
 
-            <SectionHeading
-              eyebrow="Calendar"
-              title="Upcoming and planned programming."
-            />
+        <div className="events-calendar__header">
 
+          <SectionHeading
+            eyebrow="Calendar"
+            title="Upcoming and planned programming."
+          />
 
-            {events.length > 0 && (
-
-              <button
-                type="button"
-                className="events-calendar__view-all"
-                onClick={
-                  scrollToEvents
-                }
-              >
-
-                <span>
-                  View All Events
-                </span>
-
-                <ArrowRight
-                  size={16}
-                  strokeWidth={1.7}
-                />
-
-              </button>
-
-            )}
-
-          </div>
-
-
-          {/* ==================================================
-              LOADING
-          ================================================== */}
-
-          {loading && (
-
-            <div
-              className="events-status"
-              aria-live="polite"
+          {events.length > 0 && (
+            <button
+              type="button"
+              className="events-calendar__view-all"
+              onClick={scrollToEvents}
             >
+              <span>
+                View All Events
+              </span>
 
-              <div className="events-status__loader" />
-
-              <p>
-                Loading upcoming events...
-              </p>
-
-            </div>
-
+              <ArrowRight
+                size={16}
+                strokeWidth={1.7}
+              />
+            </button>
           )}
 
+        </div>
 
-          {/* ==================================================
-              ERROR
-          ================================================== */}
+        {/* ==================================================
+            LOADING
+        ================================================== */}
 
-          {!loading &&
-            error && (
+        {loading && (
+          <div
+            className="events-status"
+            aria-live="polite"
+          >
+            <div className="events-status__loader" />
 
-              <div
-                className="events-status events-status--error"
-                role="alert"
-              >
+            <p>
+              Loading upcoming events...
+            </p>
+          </div>
+        )}
 
-                <CalendarDays
-                  size={30}
-                  strokeWidth={1.5}
-                />
+        {/* ==================================================
+            ERROR
+        ================================================== */}
 
+        {!loading && error && (
+          <div
+            className="events-status events-status--error"
+            role="alert"
+          >
+            <CalendarDays
+              size={30}
+              strokeWidth={1.5}
+            />
 
-                <span className="eyebrow">
-                  Calendar Unavailable
-                </span>
+            <span className="eyebrow">
+              Calendar Unavailable
+            </span>
 
+            <h3>
+              We could not load the event calendar.
+            </h3>
 
-                <h3>
-                  We could not load the event calendar.
-                </h3>
+            <p>
+              {error}
+            </p>
 
-
-                <p>
-                  {error}
-                </p>
-
-
-                <button
-                  type="button"
-                  onClick={
-                    loadEvents
-                  }
-                >
-                  Try Again
-                </button>
-
-              </div>
-
-            )}
-
+            <button
+              type="button"
+              onClick={loadEvents}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
 
           {/* ==================================================
               EMPTY
@@ -950,9 +917,23 @@ export default function Events() {
 
             )}
 
+
         </div>
 
-      </section>
+      {/* =========================
+          RIGHT — PHOTO
+      ========================= */}
+      <div className="events-calendar__photo">
+        <img
+          src="/assets/z.png"
+          alt="Continental Founders event"
+        />
+      </div>
+
+    </div>
+
+  </div>
+</section>
 
 
       {/* ======================================================

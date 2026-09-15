@@ -8,7 +8,7 @@ import {
   Share2,
 } from "lucide-react";
 
-import "./InsightDetails.css";
+import "./InsightDetails.css"; 
 
 export default function InsightDetails() {
   const { slug } = useParams();

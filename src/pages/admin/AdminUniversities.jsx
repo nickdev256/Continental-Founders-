@@ -74,6 +74,7 @@ const initialForm = {
   logoUrl: "",
   description: "",
   status: "draft",
+
   participationAreas: [
     "Faculty Expertise",
     "Research Collaboration",
@@ -90,172 +91,122 @@ const initialForm = {
 function getUniversityName(
   university
 ) {
-
   return (
     university?.name ||
     university?.universityName ||
     university?.university_name ||
     "Unnamed University"
   );
-
 }
 
 
 function getUniversityLocation(
   university
 ) {
-
-  const combined =
-    [
-      university?.city,
-      university?.country,
-    ]
-      .filter(Boolean)
-      .join(", ")
-      .trim();
-
+  const combined = [
+    university?.city,
+    university?.country,
+  ]
+    .filter(Boolean)
+    .join(", ")
+    .trim();
 
   return (
     university?.location ||
     combined ||
     "Location not provided"
   );
-
 }
 
 
 function getUniversityLogo(
   university
 ) {
-
   return (
     university?.logoUrl ||
     university?.logo_url ||
     university?.logo ||
     ""
   );
-
 }
 
 
 function getUniversityShortName(
   university
 ) {
-
   return (
     university?.shortName ||
     university?.short_name ||
     ""
   );
-
 }
 
 
 function getParticipationAreas(
   university
 ) {
-
   const areas =
     university?.participationAreas ||
     university?.participation_areas;
 
-
   if (
-    Array.isArray(
-      areas
-    )
+    Array.isArray(areas)
   ) {
-
     return areas;
-
   }
 
-
   if (
-    typeof areas ===
-    "string"
+    typeof areas === "string"
   ) {
-
     try {
-
       const parsed =
-        JSON.parse(
-          areas
-        );
+        JSON.parse(areas);
 
-
-      return Array.isArray(
-        parsed
-      )
+      return Array.isArray(parsed)
         ? parsed
         : [];
-
     } catch {
-
       return areas
         .split(",")
-        .map(
-          (
-            item
-          ) =>
-            item.trim()
+        .map((item) =>
+          item.trim()
         )
         .filter(Boolean);
-
     }
-
   }
 
-
   return [];
-
 }
 
 
 function getStatusClass(
   status
 ) {
-
   const normalized =
-    String(
-      status || ""
-    )
+    String(status || "")
       .trim()
       .toLowerCase();
 
-
   if (
-    normalized === "active" ||
-    normalized === "published" ||
-    normalized === "partner"
+    normalized === "active"
   ) {
-
     return "admin-universities__status admin-universities__status--active";
-
   }
-
 
   if (
     normalized === "pending"
   ) {
-
     return "admin-universities__status admin-universities__status--pending";
-
   }
-
 
   if (
     normalized === "inactive" ||
     normalized === "archived"
   ) {
-
     return "admin-universities__status admin-universities__status--inactive";
-
   }
 
-
   return "admin-universities__status admin-universities__status--draft";
-
 }
 
 
@@ -275,13 +226,11 @@ export default function AdminUniversities() {
   ] =
     useState([]);
 
-
   const [
     loading,
     setLoading,
   ] =
     useState(true);
-
 
   const [
     error,
@@ -289,13 +238,11 @@ export default function AdminUniversities() {
   ] =
     useState("");
 
-
   const [
     searchQuery,
     setSearchQuery,
   ] =
     useState("");
-
 
   const [
     currentPage,
@@ -303,13 +250,11 @@ export default function AdminUniversities() {
   ] =
     useState(1);
 
-
   const [
     selectedUniversity,
     setSelectedUniversity,
   ] =
     useState(null);
-
 
   const [
     formOpen,
@@ -317,13 +262,11 @@ export default function AdminUniversities() {
   ] =
     useState(false);
 
-
   const [
     formStep,
     setFormStep,
   ] =
     useState(1);
-
 
   const [
     editingUniversity,
@@ -331,13 +274,17 @@ export default function AdminUniversities() {
   ] =
     useState(null);
 
-
   const [
     form,
     setForm,
   ] =
-    useState(initialForm);
+    useState({
+      ...initialForm,
 
+      participationAreas: [
+        ...initialForm.participationAreas,
+      ],
+    });
 
   const [
     formError,
@@ -345,13 +292,11 @@ export default function AdminUniversities() {
   ] =
     useState("");
 
-
   const [
     saving,
     setSaving,
   ] =
     useState(false);
-
 
   const [
     deleting,
@@ -375,24 +320,16 @@ export default function AdminUniversities() {
   const loadUniversities =
     useCallback(
       async () => {
-
         try {
+          setLoading(true);
 
-          setLoading(
-            true
-          );
-
-          setError(
-            ""
-          );
-
+          setError("");
 
           const response =
             await fetch(
               `${API_URL}/api/universities/directory`,
               {
-                method:
-                  "GET",
+                method: "GET",
 
                 headers: {
                   Accept:
@@ -404,52 +341,41 @@ export default function AdminUniversities() {
               }
             );
 
-
           const contentType =
             response.headers.get(
               "content-type"
             ) || "";
-
 
           if (
             !contentType.includes(
               "application/json"
             )
           ) {
-
             const text =
               await response.text();
-
 
             console.error(
               "Unexpected universities response:",
               text
             );
 
-
             throw new Error(
               "The universities service returned an unexpected response."
             );
-
           }
-
 
           const result =
             await response.json();
 
-
           if (
             !response.ok
           ) {
-
             throw new Error(
               result?.message ||
               result?.error ||
               "Unable to load universities."
             );
-
           }
-
 
           const items =
             Array.isArray(
@@ -466,39 +392,30 @@ export default function AdminUniversities() {
                   ? result.data.universities
                   : [];
 
-
           setUniversities(
             items
           );
-
         } catch (
           requestError
         ) {
-
           console.error(
             "Admin universities loading error:",
             requestError
           );
 
-
           setUniversities(
             []
           );
-
 
           setError(
             requestError?.message ||
             "Unable to load universities."
           );
-
         } finally {
-
           setLoading(
             false
           );
-
         }
-
       },
       []
     );
@@ -510,9 +427,7 @@ export default function AdminUniversities() {
 
   useEffect(
     () => {
-
       loadUniversities();
-
     },
     [
       loadUniversities,
@@ -526,38 +441,28 @@ export default function AdminUniversities() {
 
   useEffect(
     () => {
-
       if (
         !formOpen ||
         formStep !== 1
       ) {
-
         return undefined;
-
       }
-
 
       const timer =
         window.setTimeout(
           () => {
-
             nameInputRef
               .current
               ?.focus();
-
           },
           120
         );
 
-
       return () => {
-
         window.clearTimeout(
           timer
         );
-
       };
-
     },
     [
       formOpen,
@@ -573,55 +478,45 @@ export default function AdminUniversities() {
   const filteredUniversities =
     useMemo(
       () => {
-
         const query =
           searchQuery
             .trim()
             .toLowerCase();
 
-
         if (
           !query
         ) {
-
           return universities;
-
         }
 
-
         return universities.filter(
-          (
-            university
-          ) => {
+          (university) => {
+            const searchable = [
+              getUniversityName(
+                university
+              ),
 
-            const searchable =
-              [
-                getUniversityName(
-                  university
-                ),
-                getUniversityShortName(
-                  university
-                ),
-                university.city,
-                university.country,
-                university.location,
-                university.type,
-                university.status,
-                university.description,
-                university.website,
-              ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
+              getUniversityShortName(
+                university
+              ),
 
+              university.city,
+              university.country,
+              university.location,
+              university.type,
+              university.status,
+              university.description,
+              university.website,
+            ]
+              .filter(Boolean)
+              .join(" ")
+              .toLowerCase();
 
             return searchable.includes(
               query
             );
-
           }
         );
-
       },
       [
         universities,
@@ -638,26 +533,14 @@ export default function AdminUniversities() {
     useMemo(
       () =>
         universities.filter(
-          (
-            university
-          ) => {
-
-            const status =
-              String(
-                university.status ||
-                ""
-              )
-                .trim()
-                .toLowerCase();
-
-
-            return (
-              status === "active" ||
-              status === "published" ||
-              status === "partner"
-            );
-
-          }
+          (university) =>
+            String(
+              university.status ||
+              ""
+            )
+              .trim()
+              .toLowerCase() ===
+            "active"
         ).length,
       [
         universities,
@@ -669,9 +552,7 @@ export default function AdminUniversities() {
     useMemo(
       () =>
         universities.filter(
-          (
-            university
-          ) =>
+          (university) =>
             String(
               university.status ||
               ""
@@ -702,11 +583,9 @@ export default function AdminUniversities() {
 
   useEffect(
     () => {
-
       setCurrentPage(
         1
       );
-
     },
     [
       searchQuery,
@@ -716,18 +595,14 @@ export default function AdminUniversities() {
 
   useEffect(
     () => {
-
       if (
         currentPage >
         totalPages
       ) {
-
         setCurrentPage(
           totalPages
         );
-
       }
-
     },
     [
       currentPage,
@@ -739,7 +614,6 @@ export default function AdminUniversities() {
   const paginatedUniversities =
     useMemo(
       () => {
-
         const start =
           (
             currentPage -
@@ -747,13 +621,11 @@ export default function AdminUniversities() {
           ) *
           ITEMS_PER_PAGE;
 
-
         return filteredUniversities.slice(
           start,
           start +
           ITEMS_PER_PAGE
         );
-
       },
       [
         filteredUniversities,
@@ -769,18 +641,14 @@ export default function AdminUniversities() {
   function handleFormChange(
     event
   ) {
-
     const {
       name,
       value,
     } =
       event.target;
 
-
     setForm(
-      (
-        current
-      ) => ({
+      (current) => ({
         ...current,
 
         [name]:
@@ -788,17 +656,13 @@ export default function AdminUniversities() {
       })
     );
 
-
     if (
       formError
     ) {
-
       setFormError(
         ""
       );
-
     }
-
   }
 
 
@@ -809,19 +673,14 @@ export default function AdminUniversities() {
   function toggleParticipationArea(
     area
   ) {
-
     setForm(
-      (
-        current
-      ) => {
-
+      (current) => {
         const exists =
           current
             .participationAreas
             .includes(
               area
             );
-
 
         return {
           ...current,
@@ -831,20 +690,25 @@ export default function AdminUniversities() {
               ? current
                 .participationAreas
                 .filter(
-                  (
-                    item
-                  ) =>
-                    item !== area
+                  (item) =>
+                    item !==
+                    area
                 )
               : [
                   ...current.participationAreas,
                   area,
                 ],
         };
-
       }
     );
 
+    if (
+      formError
+    ) {
+      setFormError(
+        ""
+      );
+    }
   }
 
 
@@ -853,7 +717,6 @@ export default function AdminUniversities() {
   ========================================================== */
 
   function handleCreateUniversity() {
-
     setSelectedUniversity(
       null
     );
@@ -882,7 +745,6 @@ export default function AdminUniversities() {
     setFormOpen(
       true
     );
-
   }
 
 
@@ -893,7 +755,6 @@ export default function AdminUniversities() {
   function handleEditUniversity(
     university
   ) {
-
     setSelectedUniversity(
       null
     );
@@ -902,15 +763,12 @@ export default function AdminUniversities() {
       university
     );
 
-
     const participationAreas =
       getParticipationAreas(
         university
       );
 
-
     setForm({
-
       name:
         getUniversityName(
           university
@@ -963,9 +821,7 @@ export default function AdminUniversities() {
               ...initialForm
                 .participationAreas,
             ],
-
     });
-
 
     setFormError(
       ""
@@ -978,7 +834,6 @@ export default function AdminUniversities() {
     setFormOpen(
       true
     );
-
   }
 
 
@@ -987,7 +842,6 @@ export default function AdminUniversities() {
   ========================================================== */
 
   function resetAndCloseForm() {
-
     setFormOpen(
       false
     );
@@ -1012,24 +866,18 @@ export default function AdminUniversities() {
     setFormStep(
       1
     );
-
   }
 
 
   function closeForm() {
-
     if (
       saving ||
       deleting
     ) {
-
       return;
-
     }
 
-
     resetAndCloseForm();
-
   }
 
 
@@ -1040,29 +888,22 @@ export default function AdminUniversities() {
   function validateStep(
     step
   ) {
-
     if (
       step === 1
     ) {
-
       if (
         !form.name.trim()
       ) {
-
         setFormError(
           "University name is required."
         );
-
 
         nameInputRef
           .current
           ?.focus();
 
-
         return false;
-
       }
-
 
       if (
         form.name
@@ -1070,40 +911,59 @@ export default function AdminUniversities() {
           .length <
         2
       ) {
-
         setFormError(
           "University name is too short."
         );
 
-
         return false;
-
       }
-
 
       if (
         !form.country.trim()
       ) {
-
         setFormError(
           "Country is required."
         );
 
-
         return false;
-
       }
-
     }
 
+    if (
+      step === 2
+    ) {
+      if (
+        form.website.trim() &&
+        !/^https?:\/\//i.test(
+          form.website.trim()
+        )
+      ) {
+        setFormError(
+          "University website must begin with http:// or https://."
+        );
+
+        return false;
+      }
+
+      if (
+        form.logoUrl.trim() &&
+        !/^https?:\/\//i.test(
+          form.logoUrl.trim()
+        )
+      ) {
+        setFormError(
+          "Logo URL must begin with http:// or https://."
+        );
+
+        return false;
+      }
+    }
 
     setFormError(
       ""
     );
 
-
     return true;
-
   }
 
 
@@ -1112,48 +972,36 @@ export default function AdminUniversities() {
   ========================================================== */
 
   function handleNextStep() {
-
     if (
       !validateStep(
         formStep
       )
     ) {
-
       return;
-
     }
 
-
     setFormStep(
-      (
-        current
-      ) =>
+      (current) =>
         Math.min(
           4,
           current + 1
         )
     );
-
   }
 
 
   function handlePreviousStep() {
-
     setFormError(
       ""
     );
 
-
     setFormStep(
-      (
-        current
-      ) =>
+      (current) =>
         Math.max(
           1,
           current - 1
         )
     );
-
   }
 
 
@@ -1162,20 +1010,31 @@ export default function AdminUniversities() {
   ========================================================== */
 
   async function handleSaveUniversity() {
-
     if (
       !validateStep(
         1
       )
     ) {
+      setFormStep(
+        1
+      );
 
       return;
-
     }
 
+    if (
+      !validateStep(
+        2
+      )
+    ) {
+      setFormStep(
+        2
+      );
+
+      return;
+    }
 
     try {
-
       setSaving(
         true
       );
@@ -1184,25 +1043,20 @@ export default function AdminUniversities() {
         ""
       );
 
-
       const editing =
         Boolean(
           editingUniversity?.id
         );
 
-
       const payload = {
-
         name:
           form.name.trim(),
 
         shortName:
-          form.shortName.trim() ||
-          null,
+          form.shortName.trim(),
 
         city:
-          form.city.trim() ||
-          null,
+          form.city.trim(),
 
         country:
           form.country.trim(),
@@ -1212,30 +1066,37 @@ export default function AdminUniversities() {
           "University",
 
         website:
-          form.website.trim() ||
-          null,
+          form.website.trim(),
 
         logoUrl:
-          form.logoUrl.trim() ||
-          null,
+          form.logoUrl.trim(),
 
         description:
-          form.description.trim() ||
-          null,
+          form.description.trim(),
 
         status:
           form.status,
 
         participationAreas:
           form.participationAreas,
-
       };
 
 
+      /*
+       * GET admin directory:
+       * /api/universities/directory
+       *
+       * CREATE:
+       * /api/universities
+       *
+       * UPDATE:
+       * /api/universities/:id
+       */
+
       const endpoint =
         editing
-          ? `${API_URL}/api/universities/directory/${editingUniversity.id}`
-          : `${API_URL}/api/universities/directory`;
+          ? `${API_URL}/api/universities/${editingUniversity.id}`
+          : `${API_URL}/api/universities`;
 
 
       const response =
@@ -1277,21 +1138,17 @@ export default function AdminUniversities() {
           "application/json"
         )
       ) {
-
         const text =
           await response.text();
-
 
         console.error(
           "Unexpected university save response:",
           text
         );
 
-
         throw new Error(
           "The universities service returned an unexpected response."
         );
-
       }
 
 
@@ -1302,7 +1159,6 @@ export default function AdminUniversities() {
       if (
         !response.ok
       ) {
-
         throw new Error(
           result?.message ||
           result?.error ||
@@ -1312,7 +1168,6 @@ export default function AdminUniversities() {
               : "Unable to create university."
           )
         );
-
       }
 
 
@@ -1326,74 +1181,53 @@ export default function AdminUniversities() {
       if (
         savedUniversity?.id
       ) {
-
         setUniversities(
-          (
-            current
-          ) => {
-
+          (current) => {
             if (
               editing
             ) {
-
               return current.map(
-                (
-                  university
-                ) =>
+                (university) =>
                   university.id ===
                   editingUniversity.id
                     ? savedUniversity
                     : university
               );
-
             }
-
 
             return [
               savedUniversity,
               ...current,
             ];
-
           }
         );
-
       } else {
-
         await loadUniversities();
-
       }
 
 
       resetAndCloseForm();
 
-
       setCurrentPage(
         1
       );
-
     } catch (
       saveError
     ) {
-
       console.error(
         "Save university error:",
         saveError
       );
 
-
       setFormError(
         saveError?.message ||
         "Unable to save university."
       );
-
     } finally {
-
       setSaving(
         false
       );
-
     }
-
   }
 
 
@@ -1402,15 +1236,11 @@ export default function AdminUniversities() {
   ========================================================== */
 
   async function handleDeleteUniversity() {
-
     if (
       !editingUniversity?.id
     ) {
-
       return;
-
     }
-
 
     const confirmed =
       window.confirm(
@@ -1419,18 +1249,13 @@ export default function AdminUniversities() {
         )}"? This action cannot be undone.`
       );
 
-
     if (
       !confirmed
     ) {
-
       return;
-
     }
 
-
     try {
-
       setDeleting(
         true
       );
@@ -1440,9 +1265,14 @@ export default function AdminUniversities() {
       );
 
 
+      /*
+       * DELETE:
+       * /api/universities/:id
+       */
+
       const response =
         await fetch(
-          `${API_URL}/api/universities/directory/${editingUniversity.id}`,
+          `${API_URL}/api/universities/${editingUniversity.id}`,
           {
             method:
               "DELETE",
@@ -1472,34 +1302,26 @@ export default function AdminUniversities() {
           "application/json"
         )
       ) {
-
         result =
           await response.json();
-
       }
 
 
       if (
         !response.ok
       ) {
-
         throw new Error(
           result?.message ||
           result?.error ||
           "Unable to delete university."
         );
-
       }
 
 
       setUniversities(
-        (
-          current
-        ) =>
+        (current) =>
           current.filter(
-            (
-              university
-            ) =>
+            (university) =>
               university.id !==
               editingUniversity.id
           )
@@ -1507,30 +1329,23 @@ export default function AdminUniversities() {
 
 
       resetAndCloseForm();
-
     } catch (
       deleteError
     ) {
-
       console.error(
         "Delete university error:",
         deleteError
       );
 
-
       setFormError(
         deleteError?.message ||
         "Unable to delete university."
       );
-
     } finally {
-
       setDeleting(
         false
       );
-
     }
-
   }
 
 
@@ -1554,11 +1369,9 @@ export default function AdminUniversities() {
             PARTNER ECOSYSTEM
           </span>
 
-
           <h1>
             Universities
           </h1>
-
 
           <p>
             Manage university partnerships,
@@ -1600,7 +1413,6 @@ export default function AdminUniversities() {
             size={20}
           />
 
-
           <div>
 
             <strong>
@@ -1622,7 +1434,6 @@ export default function AdminUniversities() {
             size={20}
           />
 
-
           <div>
 
             <strong>
@@ -1643,7 +1454,6 @@ export default function AdminUniversities() {
           <Users
             size={20}
           />
-
 
           <div>
 
@@ -1673,7 +1483,6 @@ export default function AdminUniversities() {
           <Search
             size={17}
           />
-
 
           <input
             type="search"
@@ -1817,7 +1626,8 @@ export default function AdminUniversities() {
 
         {!loading &&
           !error &&
-          filteredUniversities.length === 0 && (
+          filteredUniversities.length ===
+            0 && (
 
             <div className="admin-universities__empty">
 
@@ -1870,7 +1680,8 @@ export default function AdminUniversities() {
 
         {!loading &&
           !error &&
-          paginatedUniversities.length > 0 && (
+          paginatedUniversities.length >
+            0 && (
 
             <div className="admin-universities__list">
 
@@ -1937,7 +1748,7 @@ export default function AdminUniversities() {
                           {getUniversityShortName(
                             university
                           ) ||
-                            "University Partner"}
+                          "University Partner"}
 
                         </span>
 
@@ -1969,7 +1780,7 @@ export default function AdminUniversities() {
 
                       <span>
                         {university.type ||
-                          "University"}
+                        "University"}
                       </span>
 
                     </div>
@@ -1986,7 +1797,7 @@ export default function AdminUniversities() {
                       >
 
                         {university.status ||
-                          "draft"}
+                        "draft"}
 
                       </span>
 
@@ -2010,20 +1821,19 @@ export default function AdminUniversities() {
         {!loading &&
           !error &&
           filteredUniversities.length >
-          ITEMS_PER_PAGE && (
+            ITEMS_PER_PAGE && (
 
             <div className="admin-universities__pagination">
 
               <button
                 type="button"
                 disabled={
-                  currentPage === 1
+                  currentPage ===
+                  1
                 }
                 onClick={() =>
                   setCurrentPage(
-                    (
-                      current
-                    ) =>
+                    (current) =>
                       Math.max(
                         1,
                         current - 1
@@ -2054,9 +1864,7 @@ export default function AdminUniversities() {
                 }
                 onClick={() =>
                   setCurrentPage(
-                    (
-                      current
-                    ) =>
+                    (current) =>
                       Math.min(
                         totalPages,
                         current + 1
@@ -2203,7 +2011,7 @@ export default function AdminUniversities() {
                   }
                 >
                   {selectedUniversity.status ||
-                    "draft"}
+                  "draft"}
                 </span>
 
               </div>
@@ -2246,7 +2054,7 @@ export default function AdminUniversities() {
 
                   <strong>
                     {selectedUniversity.type ||
-                      "University"}
+                    "University"}
                   </strong>
 
                 </div>
@@ -2300,8 +2108,8 @@ export default function AdminUniversities() {
 
                 <p>
                   {selectedUniversity.description ||
-                    selectedUniversity.overview ||
-                    "No partnership description has been added."}
+                  selectedUniversity.overview ||
+                  "No partnership description has been added."}
                 </p>
 
               </div>
@@ -2318,7 +2126,8 @@ export default function AdminUniversities() {
 
                   {getParticipationAreas(
                     selectedUniversity
-                  ).length > 0 ? (
+                  ).length >
+                    0 ? (
 
                     getParticipationAreas(
                       selectedUniversity
@@ -2446,9 +2255,7 @@ export default function AdminUniversities() {
             <div className="admin-universities__steps">
 
               {FORM_STEPS.map(
-                (
-                  step
-                ) => (
+                (step) => (
 
                   <div
                     key={
@@ -2713,7 +2520,7 @@ export default function AdminUniversities() {
                         src={
                           form.logoUrl
                         }
-                        alt=""
+                        alt="University logo preview"
                       />
 
                     </div>
@@ -2757,9 +2564,7 @@ export default function AdminUniversities() {
                         "Student Engagement",
                         "Institutional Partnerships",
                       ].map(
-                        (
-                          area
-                        ) => (
+                        (area) => (
 
                           <label
                             key={
@@ -2813,7 +2618,7 @@ export default function AdminUniversities() {
                     </h3>
 
                     <p>
-                      Control the university's CMS status.
+                      Control whether the university appears publicly.
                     </p>
 
                   </div>
@@ -2856,6 +2661,22 @@ export default function AdminUniversities() {
                       </option>
 
                     </select>
+
+                  </div>
+
+
+                  <div className="admin-universities__publishing-note">
+
+                    {form.status ===
+                    "active" ? (
+                      <p>
+                        This university will appear on the public Universities page after saving.
+                      </p>
+                    ) : (
+                      <p>
+                        This university will remain hidden from the public Universities page.
+                      </p>
+                    )}
 
                   </div>
 
@@ -2904,7 +2725,7 @@ export default function AdminUniversities() {
 
                       <strong>
                         {form.shortName ||
-                          "Not provided"}
+                        "Not provided"}
                       </strong>
 
                     </div>
@@ -2923,7 +2744,8 @@ export default function AdminUniversities() {
                           form.country,
                         ]
                           .filter(Boolean)
-                          .join(", ")}
+                          .join(", ") ||
+                        "Not provided"}
 
                       </strong>
 
@@ -2964,7 +2786,7 @@ export default function AdminUniversities() {
 
                       <strong>
                         {form.website ||
-                          "Not provided"}
+                        "Not provided"}
                       </strong>
 
                     </div>
@@ -2978,7 +2800,7 @@ export default function AdminUniversities() {
 
                       <p>
                         {form.description ||
-                          "No overview provided."}
+                        "No overview provided."}
                       </p>
 
                     </div>
@@ -2990,6 +2812,7 @@ export default function AdminUniversities() {
                         Participation Areas
                       </span>
 
+
                       <div className="admin-universities__review-tags">
 
                         {form
@@ -2999,9 +2822,7 @@ export default function AdminUniversities() {
                           form
                             .participationAreas
                             .map(
-                              (
-                                area
-                              ) => (
+                              (area) => (
 
                                 <span
                                   key={
@@ -3032,7 +2853,9 @@ export default function AdminUniversities() {
               )}
 
 
-              {/* ACTIONS */}
+              {/* =================================================
+                  ACTIONS
+              ================================================= */}
 
               <div className="admin-universities__form-actions">
 
@@ -3167,5 +2990,4 @@ export default function AdminUniversities() {
     </div>
 
   );
-
 }

@@ -15,13 +15,13 @@ export const navigation = [
 
     children: [
       {
-        label: "US Africa Trade & Business Network",
+        label: "U.S.–Africa Trade & Business Network",
         path: "/partners/us-africa-trade-network",
       },
 
       {
         label: "Universities",
-        path: "/partners/universities",
+        path: "/universities",
       },
 
       {

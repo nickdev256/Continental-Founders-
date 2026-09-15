@@ -4,9 +4,18 @@ const express =
 const {
   subscribe,
   getSubscribers,
+  updateSubscriber,
+  deleteSubscriber,
 } =
   require(
     "../controllers/newsletterController"
+  );
+
+const {
+  requireAdmin,
+} =
+  require(
+    "../middleware/auth"
   );
 
 
@@ -16,6 +25,8 @@ const router =
 
 /* ============================================================
    PUBLIC
+
+   POST /api/newsletter/subscribe
 ============================================================ */
 
 router.post(
@@ -25,15 +36,47 @@ router.post(
 
 
 /* ============================================================
-   ADMIN
-   Protect this later with your existing auth middleware
+   ADMIN - GET SUBSCRIBERS
+
+   GET /api/newsletter/subscribers
 ============================================================ */
 
 router.get(
   "/subscribers",
+  requireAdmin,
   getSubscribers
 );
 
+
+/* ============================================================
+   ADMIN - UPDATE SUBSCRIBER
+
+   PATCH /api/newsletter/subscribers/:id
+============================================================ */
+
+router.patch(
+  "/subscribers/:id",
+  requireAdmin,
+  updateSubscriber
+);
+
+
+/* ============================================================
+   ADMIN - DELETE SUBSCRIBER
+
+   DELETE /api/newsletter/subscribers/:id
+============================================================ */
+
+router.delete(
+  "/subscribers/:id",
+  requireAdmin,
+  deleteSubscriber
+);
+
+
+/* ============================================================
+   EXPORT
+============================================================ */
 
 module.exports =
   router;

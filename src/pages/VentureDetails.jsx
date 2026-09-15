@@ -1,5 +1,12 @@
-import React from "react";
-import { Link, useParams } from "react-router-dom";
+import React, {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  Link,
+  useParams,
+} from "react-router-dom";
 
 import {
   ArrowLeft,
@@ -16,11 +23,212 @@ import {
   Mail,
   Phone,
   Layers3,
+  RefreshCw,
 } from "lucide-react";
 
-import ventures from "../data/ventures";
-
 import "./VentureDetails.css";
+
+
+/* ============================================================
+   API
+============================================================ */
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function getFounderList(
+  venture
+) {
+  if (
+    Array.isArray(
+      venture?.founders
+    ) &&
+    venture.founders.length > 0
+  ) {
+    return venture.founders;
+  }
+
+  if (
+    venture?.founder
+  ) {
+    return [
+      {
+        id: 1,
+        name:
+          venture.founder,
+        image:
+          venture.founderImage ||
+          "",
+        role:
+          "Founder",
+        bio:
+          venture.founderBio ||
+          `${venture.founder} is building ${venture.name} with a focus on creating practical value and sustainable growth.`,
+      },
+    ];
+  }
+
+  return [];
+}
+
+
+function getVentureLogo(
+  venture
+) {
+  return (
+    venture?.logo ||
+    venture?.logoUrl ||
+    venture?.logo_url ||
+    ""
+  );
+}
+
+
+function getHeroImage(
+  venture
+) {
+  return (
+    venture?.heroImage ||
+    venture?.heroImageUrl ||
+    venture?.hero_image_url ||
+    ""
+  );
+}
+
+
+function getLookingFor(
+  venture
+) {
+  if (
+    Array.isArray(
+      venture?.lookingFor
+    ) &&
+    venture.lookingFor.length
+  ) {
+    return venture.lookingFor;
+  }
+
+  if (
+    Array.isArray(
+      venture?.looking_for
+    ) &&
+    venture.looking_for.length
+  ) {
+    return venture.looking_for;
+  }
+
+  return [
+    "Strategic partnerships",
+    "Mentorship",
+    "Market access",
+    "Investment pathways",
+  ];
+}
+
+
+function getServices(
+  venture
+) {
+  return Array.isArray(
+    venture?.services
+  )
+    ? venture.services
+    : [];
+}
+
+
+function getOpportunityAreas(
+  venture
+) {
+  if (
+    Array.isArray(
+      venture?.opportunityAreas
+    ) &&
+    venture.opportunityAreas.length
+  ) {
+    return venture.opportunityAreas;
+  }
+
+  if (
+    Array.isArray(
+      venture?.opportunity_areas
+    ) &&
+    venture.opportunity_areas.length
+  ) {
+    return venture.opportunity_areas;
+  }
+
+  return [
+    {
+      title: "Problem",
+      text:
+        venture?.problem ||
+        "The venture is addressing a meaningful market challenge.",
+    },
+
+    {
+      title: "Solution",
+      text:
+        venture?.solution ||
+        venture?.description ||
+        "The venture is developing a practical solution.",
+    },
+
+    {
+      title: "Market",
+      text:
+        venture?.market ||
+        "Building toward a clear and scalable market opportunity.",
+    },
+
+    {
+      title: "Current Stage",
+      text:
+        venture?.stage ||
+        "Early-stage venture development.",
+    },
+  ];
+}
+
+
+function getLongDescription(
+  venture
+) {
+  return (
+    venture?.longDescription ||
+    venture?.long_description ||
+    venture?.description ||
+    ""
+  );
+}
+
+
+function getSecondaryDescription(
+  venture
+) {
+  return (
+    venture?.secondaryDescription ||
+    venture?.secondary_description ||
+    ""
+  );
+}
+
+
+function getSecondaryPhone(
+  venture
+) {
+  return (
+    venture?.secondaryPhone ||
+    venture?.secondary_phone ||
+    ""
+  );
+}
 
 
 /* ============================================================
@@ -28,23 +236,235 @@ import "./VentureDetails.css";
 ============================================================ */
 
 export default function VentureDetails() {
-  const { slug } = useParams();
+  const {
+    slug,
+  } =
+    useParams();
 
 
   /* ==========================================================
-     FIND VENTURE
+     STATE
   ========================================================== */
 
-  const venture = ventures.find(
-    (item) => item.slug === slug
-  );
+  const [
+    venture,
+    setVenture,
+  ] =
+    useState(null);
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+  const [
+    error,
+    setError,
+  ] =
+    useState("");
+
+
+  /* ==========================================================
+     LOAD VENTURE
+  ========================================================== */
+
+  useEffect(() => {
+    let cancelled =
+      false;
+
+    async function loadVenture() {
+      try {
+        setLoading(
+          true
+        );
+
+        setError(
+          ""
+        );
+
+        const response =
+          await fetch(
+            `${API_URL}/api/ventures/${encodeURIComponent(
+              slug
+            )}`,
+            {
+              method:
+                "GET",
+
+              headers: {
+                Accept:
+                  "application/json",
+              },
+            }
+          );
+
+        const contentType =
+          response.headers.get(
+            "content-type"
+          ) || "";
+
+        if (
+          !contentType.includes(
+            "application/json"
+          )
+        ) {
+          const text =
+            await response.text();
+
+          console.error(
+            "Unexpected venture response:",
+            text
+          );
+
+          throw new Error(
+            "The venture service returned an unexpected response."
+          );
+        }
+
+        const result =
+          await response.json();
+
+        if (
+          response.status ===
+          404
+        ) {
+          if (
+            !cancelled
+          ) {
+            setVenture(
+              null
+            );
+
+            setError(
+              result?.message ||
+              "Venture not found."
+            );
+          }
+
+          return;
+        }
+
+        if (
+          !response.ok
+        ) {
+          throw new Error(
+            result?.message ||
+            result?.error ||
+            "Unable to load venture."
+          );
+        }
+
+        if (
+          !cancelled
+        ) {
+          setVenture(
+            result?.venture ||
+            null
+          );
+        }
+      } catch (
+        requestError
+      ) {
+        console.error(
+          "Venture details error:",
+          requestError
+        );
+
+        if (
+          !cancelled
+        ) {
+          setVenture(
+            null
+          );
+
+          setError(
+            requestError?.message ||
+            "Unable to load venture."
+          );
+        }
+      } finally {
+        if (
+          !cancelled
+        ) {
+          setLoading(
+            false
+          );
+        }
+      }
+    }
+
+    if (
+      slug
+    ) {
+      loadVenture();
+    } else {
+      setLoading(
+        false
+      );
+
+      setError(
+        "Venture not found."
+      );
+    }
+
+    return () => {
+      cancelled =
+        true;
+    };
+  }, [
+    slug,
+  ]);
+
+
+  /* ==========================================================
+     LOADING
+  ========================================================== */
+
+  if (
+    loading
+  ) {
+    return (
+      <main className="venture-details-page">
+
+        <section className="venture-details-not-found">
+
+          <div className="venture-details-container">
+
+            <RefreshCw
+              size={28}
+              aria-hidden="true"
+            />
+
+            <span className="venture-details-eyebrow">
+              Loading Venture
+            </span>
+
+            <h1>
+              Loading venture details...
+            </h1>
+
+            <p>
+              Retrieving the latest venture information.
+            </p>
+
+          </div>
+
+        </section>
+
+      </main>
+    );
+  }
 
 
   /* ==========================================================
      NOT FOUND
   ========================================================== */
 
-  if (!venture) {
+  if (
+    error ||
+    !venture
+  ) {
     return (
       <main className="venture-details-page">
 
@@ -61,8 +481,8 @@ export default function VentureDetails() {
             </h1>
 
             <p>
-              The venture may have been removed,
-              renamed, or the link may be incorrect.
+              {error ||
+                "The venture may have been removed, renamed, unpublished, or the link may be incorrect."}
             </p>
 
             <Link
@@ -87,87 +507,71 @@ export default function VentureDetails() {
 
 
   /* ==========================================================
-     DATA FALLBACKS
+     NORMALIZED DATA
   ========================================================== */
 
   const founders =
-    Array.isArray(venture.founders) &&
-    venture.founders.length > 0
-      ? venture.founders
-      : venture.founder
-      ? [
-          {
-            id: 1,
-            name: venture.founder,
-            image: venture.founderImage || "",
-            role: "Founder",
-            bio:
-              venture.founderBio ||
-              `${venture.founder} is building ${venture.name} with a focus on creating practical value and sustainable growth.`,
-          },
-        ]
-      : [];
-
+    getFounderList(
+      venture
+    );
 
   const founderNames =
-    founders.length > 0
+    founders.length >
+    0
       ? founders
-          .map((founder) => founder.name)
+          .map(
+            (founder) =>
+              founder?.name
+          )
+          .filter(Boolean)
           .join(" & ")
       : "Founder information unavailable";
 
-
   const founderLabel =
-    founders.length > 1
+    founders.length >
+    1
       ? "Founders"
       : "Founder";
 
-
   const lookingFor =
-    venture.lookingFor || [
-      "Strategic partnerships",
-      "Mentorship",
-      "Market access",
-      "Investment pathways",
-    ];
-
+    getLookingFor(
+      venture
+    );
 
   const opportunityAreas =
-    venture.opportunityAreas || [
-      {
-        title: "Problem",
-        text:
-          venture.problem ||
-          "The venture is addressing a meaningful market challenge.",
-      },
-
-      {
-        title: "Solution",
-        text:
-          venture.solution ||
-          venture.description,
-      },
-
-      {
-        title: "Market",
-        text:
-          venture.market ||
-          "Building toward a clear and scalable market opportunity.",
-      },
-
-      {
-        title: "Current Stage",
-        text:
-          venture.stage ||
-          "Early-stage venture development.",
-      },
-    ];
-
+    getOpportunityAreas(
+      venture
+    );
 
   const services =
-    Array.isArray(venture.services)
-      ? venture.services
-      : [];
+    getServices(
+      venture
+    );
+
+  const ventureLogo =
+    getVentureLogo(
+      venture
+    );
+
+  const heroImage =
+    getHeroImage(
+      venture
+    );
+
+  const longDescription =
+    getLongDescription(
+      venture
+    );
+
+  const secondaryDescription =
+    getSecondaryDescription(
+      venture
+    );
+
+  const secondaryPhone =
+    getSecondaryPhone(
+      venture
+    );
 
 
   return (
@@ -180,13 +584,13 @@ export default function VentureDetails() {
 
       <section className="venture-details-hero">
 
-        {venture.heroImage && (
+        {heroImage && (
 
           <div
             className="venture-details-hero__background"
             style={{
               backgroundImage:
-                `url("${venture.heroImage}")`,
+                `url("${heroImage}")`,
             }}
             aria-hidden="true"
           />
@@ -220,7 +624,8 @@ export default function VentureDetails() {
             <div className="venture-details-hero__meta">
 
               <span>
-                {venture.sector}
+                {venture.sector ||
+                  "Venture"}
               </span>
 
               <span className="venture-details-meta-dot">
@@ -228,7 +633,8 @@ export default function VentureDetails() {
               </span>
 
               <span>
-                {venture.country}
+                {venture.country ||
+                  "Location unavailable"}
               </span>
 
             </div>
@@ -241,7 +647,8 @@ export default function VentureDetails() {
 
             <p className="venture-details-hero__description">
               {venture.tagline ||
-                venture.description}
+                venture.description ||
+                ""}
             </p>
 
 
@@ -263,9 +670,11 @@ export default function VentureDetails() {
               {venture.website && (
 
                 <a
-                  href={venture.website}
+                  href={
+                    venture.website
+                  }
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="venture-details-button venture-details-button--outline-light"
                 >
                   Visit Website
@@ -285,12 +694,14 @@ export default function VentureDetails() {
 
           <div className="venture-details-hero__profile">
 
-            {venture.logo ? (
+            {ventureLogo ? (
 
               <div className="venture-details-logo">
 
                 <img
-                  src={venture.logo}
+                  src={
+                    ventureLogo
+                  }
                   alt={`${venture.name} logo`}
                 />
 
@@ -301,12 +712,20 @@ export default function VentureDetails() {
               <div className="venture-details-logo-placeholder">
 
                 {venture.name
-                  .split(" ")
-                  .map((word) =>
-                    word.charAt(0)
+                  ?.split(" ")
+                  .map(
+                    (word) =>
+                      word.charAt(
+                        0
+                      )
                   )
                   .join("")
-                  .slice(0, 2)}
+                  .slice(
+                    0,
+                    2
+                  )
+                  .toUpperCase() ||
+                  "CF"}
 
               </div>
 
@@ -335,7 +754,8 @@ export default function VentureDetails() {
                 </span>
 
                 <strong>
-                  {venture.stage}
+                  {venture.stage ||
+                    "Not specified"}
                 </strong>
 
               </div>
@@ -348,7 +768,8 @@ export default function VentureDetails() {
                 </span>
 
                 <strong>
-                  {venture.sector}
+                  {venture.sector ||
+                    "Not specified"}
                 </strong>
 
               </div>
@@ -361,7 +782,8 @@ export default function VentureDetails() {
                 </span>
 
                 <strong>
-                  {venture.country}
+                  {venture.country ||
+                    "Not specified"}
                 </strong>
 
               </div>
@@ -420,15 +842,14 @@ export default function VentureDetails() {
               </h3>
 
               <p>
-                {venture.longDescription ||
-                  venture.description}
+                {longDescription}
               </p>
 
 
-              {venture.secondaryDescription && (
+              {secondaryDescription && (
 
                 <p>
-                  {venture.secondaryDescription}
+                  {secondaryDescription}
                 </p>
 
               )}
@@ -474,7 +895,8 @@ export default function VentureDetails() {
                   </span>
 
                   <strong>
-                    {venture.country}
+                    {venture.country ||
+                      "Not specified"}
                   </strong>
 
                 </div>
@@ -496,7 +918,8 @@ export default function VentureDetails() {
                   </span>
 
                   <strong>
-                    {venture.sector}
+                    {venture.sector ||
+                      "Not specified"}
                   </strong>
 
                 </div>
@@ -518,7 +941,8 @@ export default function VentureDetails() {
                   </span>
 
                   <strong>
-                    {venture.stage}
+                    {venture.stage ||
+                      "Not specified"}
                   </strong>
 
                 </div>
@@ -571,7 +995,10 @@ export default function VentureDetails() {
             <div className="venture-details-services__grid">
 
               {services.map(
-                (service, index) => (
+                (
+                  service,
+                  index
+                ) => (
 
                   <article
                     key={`${service}-${index}`}
@@ -589,7 +1016,9 @@ export default function VentureDetails() {
 
 
                     <span className="venture-details-service-card__number">
-                      {String(index + 1).padStart(
+                      {String(
+                        index + 1
+                      ).padStart(
                         2,
                         "0"
                       )}
@@ -628,7 +1057,8 @@ export default function VentureDetails() {
             <div>
 
               <span className="venture-details-section-number">
-                {services.length > 0
+                {services.length >
+                0
                   ? "03"
                   : "02"}
               </span>
@@ -651,7 +1081,10 @@ export default function VentureDetails() {
           <div className="venture-opportunity-grid">
 
             {opportunityAreas.map(
-              (item, index) => (
+              (
+                item,
+                index
+              ) => (
 
                 <article
                   key={`${item.title}-${index}`}
@@ -659,7 +1092,9 @@ export default function VentureDetails() {
                 >
 
                   <span className="venture-opportunity-card__number">
-                    {String(index + 1).padStart(
+                    {String(
+                      index + 1
+                    ).padStart(
                       2,
                       "0"
                     )}
@@ -699,13 +1134,15 @@ export default function VentureDetails() {
             <div>
 
               <span className="venture-details-section-number">
-                {services.length > 0
+                {services.length >
+                0
                   ? "04"
                   : "03"}
               </span>
 
               <span className="venture-details-eyebrow">
-                {founders.length > 1
+                {founders.length >
+                1
                   ? "Founders"
                   : "Founder"}
               </span>
@@ -716,7 +1153,8 @@ export default function VentureDetails() {
             <div className="venture-details-founder__content">
 
               <h2>
-                {founders.length > 1
+                {founders.length >
+                1
                   ? "Meet the founders behind the venture."
                   : "Meet the founder behind the venture."}
               </h2>
@@ -725,26 +1163,38 @@ export default function VentureDetails() {
               <div className="venture-details-founders__grid">
 
                 {founders.map(
-                  (founder, index) => {
+                  (
+                    founder,
+                    index
+                  ) => {
+
+                    const founderName =
+                      founder?.name ||
+                      "Founder";
 
                     const initials =
-                      founder.name
-                        ?.split(" ")
-                        .map((name) =>
-                          name.charAt(0)
+                      founderName
+                        .split(" ")
+                        .map(
+                          (name) =>
+                            name.charAt(
+                              0
+                            )
                         )
                         .join("")
-                        .slice(0, 2)
+                        .slice(
+                          0,
+                          2
+                        )
                         .toUpperCase() ||
                       "CF";
-
 
                     return (
 
                       <article
                         key={
                           founder.id ||
-                          `${founder.name}-${index}`
+                          `${founderName}-${index}`
                         }
                         className="venture-details-founder__card"
                       >
@@ -754,8 +1204,12 @@ export default function VentureDetails() {
                           {founder.image ? (
 
                             <img
-                              src={founder.image}
-                              alt={founder.name}
+                              src={
+                                founder.image
+                              }
+                              alt={
+                                founderName
+                              }
                             />
 
                           ) : (
@@ -772,7 +1226,7 @@ export default function VentureDetails() {
                         <div className="venture-details-founder__info">
 
                           <h3>
-                            {founder.name}
+                            {founderName}
                           </h3>
 
                           <span className="venture-details-founder__role">
@@ -783,7 +1237,7 @@ export default function VentureDetails() {
 
                           <p>
                             {founder.bio ||
-                              `${founder.name} is helping build ${venture.name} with a focus on creating practical value and sustainable growth.`}
+                              `${founderName} is helping build ${venture.name} with a focus on creating practical value and sustainable growth.`}
                           </p>
 
                         </div>
@@ -813,7 +1267,7 @@ export default function VentureDetails() {
       {(venture.website ||
         venture.email ||
         venture.phone ||
-        venture.secondaryPhone) && (
+        secondaryPhone) && (
 
         <section className="venture-details-contact">
 
@@ -824,7 +1278,8 @@ export default function VentureDetails() {
               <div>
 
                 <span className="venture-details-section-number">
-                  {services.length > 0
+                  {services.length >
+                  0
                     ? "05"
                     : "04"}
                 </span>
@@ -849,9 +1304,11 @@ export default function VentureDetails() {
               {venture.website && (
 
                 <a
-                  href={venture.website}
+                  href={
+                    venture.website
+                  }
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="venture-details-contact__card"
                 >
 
@@ -869,11 +1326,11 @@ export default function VentureDetails() {
                     <strong>
                       {venture.website
                         .replace(
-                          "https://",
+                          /^https?:\/\//i,
                           ""
                         )
                         .replace(
-                          "http://",
+                          /\/$/,
                           ""
                         )}
                     </strong>
@@ -948,10 +1405,10 @@ export default function VentureDetails() {
               )}
 
 
-              {venture.secondaryPhone && (
+              {secondaryPhone && (
 
                 <a
-                  href={`tel:${venture.secondaryPhone}`}
+                  href={`tel:${secondaryPhone}`}
                   className="venture-details-contact__card"
                 >
 
@@ -967,7 +1424,7 @@ export default function VentureDetails() {
                     </span>
 
                     <strong>
-                      {venture.secondaryPhone}
+                      {secondaryPhone}
                     </strong>
 
                   </div>
@@ -999,7 +1456,8 @@ export default function VentureDetails() {
             <div>
 
               <span className="venture-details-section-number">
-                {services.length > 0
+                {services.length >
+                0
                   ? "06"
                   : "05"}
               </span>
@@ -1028,15 +1486,22 @@ export default function VentureDetails() {
               "Evidence",
               "Opportunity",
             ].map(
-              (step, index) => (
+              (
+                step,
+                index
+              ) => (
 
                 <div
-                  key={step}
+                  key={
+                    step
+                  }
                   className="venture-details-journey__step"
                 >
 
                   <span>
-                    {String(index + 1).padStart(
+                    {String(
+                      index + 1
+                    ).padStart(
                       2,
                       "0"
                     )}
@@ -1072,7 +1537,8 @@ export default function VentureDetails() {
             <div>
 
               <span className="venture-details-section-number">
-                {services.length > 0
+                {services.length >
+                0
                   ? "07"
                   : "06"}
               </span>
@@ -1104,7 +1570,10 @@ export default function VentureDetails() {
           <div className="venture-details-looking__list">
 
             {lookingFor.map(
-              (item, index) => (
+              (
+                item,
+                index
+              ) => (
 
                 <div
                   key={`${item}-${index}`}
@@ -1112,7 +1581,9 @@ export default function VentureDetails() {
                 >
 
                   <span>
-                    {String(index + 1).padStart(
+                    {String(
+                      index + 1
+                    ).padStart(
                       2,
                       "0"
                     )}
@@ -1254,9 +1725,11 @@ export default function VentureDetails() {
               {venture.website && (
 
                 <a
-                  href={venture.website}
+                  href={
+                    venture.website
+                  }
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="venture-details-button venture-details-button--outline"
                 >
                   Visit Venture Website

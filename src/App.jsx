@@ -85,6 +85,8 @@ import AdminLayout from "./pages/admin/AdminLayout";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
+import AdminVentures from "./pages/admin/AdminVentures";
+
 import AdminEvents from "./pages/admin/AdminEvents";
 
 import AdminInsights from "./pages/admin/AdminInsights";
@@ -123,7 +125,6 @@ import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 // ============================================================
 
 function ScrollToTop() {
-
   const {
     pathname,
   } =
@@ -132,13 +133,11 @@ function ScrollToTop() {
 
   useEffect(
     () => {
-
       window.scrollTo({
         top: 0,
         left: 0,
         behavior: "instant",
       });
-
     },
     [
       pathname,
@@ -147,7 +146,6 @@ function ScrollToTop() {
 
 
   return null;
-
 }
 
 
@@ -156,7 +154,6 @@ function ScrollToTop() {
 // ============================================================
 
 export default function App() {
-
   const {
     pathname,
   } =
@@ -175,7 +172,6 @@ export default function App() {
 
 
   return (
-
     <div
       className={
         isAdminRoute
@@ -451,6 +447,18 @@ export default function App() {
 
 
                 {/* ==============================================
+                    VENTURES
+                ============================================== */}
+
+                <Route
+                  path="ventures"
+                  element={
+                    <AdminVentures />
+                  }
+                />
+
+
+                {/* ==============================================
                     EVENTS
                 ============================================== */}
 
@@ -593,7 +601,5 @@ export default function App() {
       )}
 
     </div>
-
   );
-
 }

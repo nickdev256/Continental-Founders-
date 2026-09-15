@@ -11,6 +11,11 @@ const {
 } =
   require("../config/supabase");
 
+const {
+  notifySubscribers,
+} =
+  require("../services/siteNotificationService");
+
 
 /* ============================================================
    STORAGE
@@ -273,7 +278,9 @@ function normalizeEvent(
   event
 ) {
 
-  if (!event) {
+  if (
+    !event
+  ) {
 
     return null;
 
@@ -318,7 +325,13 @@ function normalizeEvent(
     created_at:
       event.created_at,
 
+    createdAt:
+      event.created_at,
+
     updated_at:
+      event.updated_at,
+
+    updatedAt:
       event.updated_at,
 
   };
@@ -394,7 +407,9 @@ function getStoragePathFromUrl(
   imageUrl
 ) {
 
-  if (!imageUrl) {
+  if (
+    !imageUrl
+  ) {
 
     return null;
 
@@ -454,7 +469,9 @@ async function uploadEventImage(
   file
 ) {
 
-  if (!file) {
+  if (
+    !file
+  ) {
 
     return null;
 
@@ -480,6 +497,7 @@ async function uploadEventImage(
         imagePath,
         file.buffer,
         {
+
           contentType:
             file.mimetype,
 
@@ -488,6 +506,7 @@ async function uploadEventImage(
 
           upsert:
             false,
+
         }
       );
 
@@ -573,11 +592,13 @@ async function deleteEventImage(
     ) {
 
       return {
+
         success:
           true,
 
         skipped:
           true,
+
       };
 
     }
@@ -619,20 +640,24 @@ async function deleteEventImage(
 
 
       return {
+
         success:
           false,
 
         error,
+
       };
 
     }
 
 
     return {
+
       success:
         true,
 
       data,
+
     };
 
   } catch (
@@ -652,13 +677,134 @@ async function deleteEventImage(
 
 
     return {
+
       success:
         false,
 
       error,
+
     };
 
   }
+
+}
+
+
+/* ============================================================
+   EVENT NOTIFICATION
+============================================================ */
+
+function sendEventNotification(
+  event
+) {
+
+  if (
+    !event ||
+    event.status !==
+      "published"
+  ) {
+
+    return;
+
+  }
+
+
+  let summary =
+    event.description ||
+    "";
+
+
+  if (
+    event.location
+  ) {
+
+    summary =
+      summary
+        ? `${summary}\n\nLocation: ${event.location}`
+        : `Location: ${event.location}`;
+
+  }
+
+
+  notifySubscribers({
+
+    contentType:
+      "event",
+
+    contentId:
+      event.id,
+
+    title:
+      event.title,
+
+    summary,
+
+    path:
+      `/events/${event.slug}`,
+
+    imageUrl:
+      event.image_url ||
+      null,
+
+    notificationType:
+      "published",
+
+  })
+    .then(
+      (
+        result
+      ) => {
+
+        if (
+          result?.skipped
+        ) {
+
+          console.log(
+            "Event newsletter notification skipped:",
+            result.reason
+          );
+
+          return;
+
+        }
+
+
+        if (
+          result?.success
+        ) {
+
+          console.log(
+            "Event newsletter notification processed:",
+            {
+
+              eventId:
+                event.id,
+
+              sentCount:
+                result.sentCount,
+
+              failedCount:
+                result.failedCount,
+
+            }
+          );
+
+        }
+
+      }
+    )
+    .catch(
+      (
+        error
+      ) => {
+
+        console.error(
+          "Event newsletter notification error:",
+          error
+        );
+
+      }
+    );
 
 }
 
@@ -682,9 +828,7 @@ async function getEvents(
         .from(
           "events"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .order(
           "event_date",
           {
@@ -739,6 +883,7 @@ async function getEvents(
           false,
 
         message:
+          error?.message ||
           "Failed to load events.",
 
       });
@@ -767,9 +912,7 @@ async function getPublishedEvents(
         .from(
           "events"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "status",
           "published"
@@ -828,6 +971,7 @@ async function getPublishedEvents(
           false,
 
         message:
+          error?.message ||
           "Failed to load published events.",
 
       });
@@ -838,7 +982,7 @@ async function getPublishedEvents(
 
 
 /* ============================================================
-   GET EVENT BY SLUG
+   GET PUBLISHED EVENT BY SLUG
 ============================================================ */
 
 async function getEventBySlug(
@@ -881,12 +1025,14 @@ async function getEventBySlug(
         .from(
           "events"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "slug",
           slug
+        )
+        .eq(
+          "status",
+          "published"
         )
         .maybeSingle();
 
@@ -951,6 +1097,7 @@ async function getEventBySlug(
           false,
 
         message:
+          error?.message ||
           "Failed to load event.",
 
       });
@@ -1159,9 +1306,7 @@ async function createEvent(
             now,
 
         })
-        .select(
-          "*"
-        )
+        .select("*")
         .single();
 
 
@@ -1184,10 +1329,30 @@ async function createEvent(
               .imagePath,
           ]);
 
+
+        uploadedImage =
+          null;
+
       }
 
 
       throw error;
+
+    }
+
+
+    /* ========================================================
+       NOTIFY IF CREATED AS PUBLISHED
+    ======================================================== */
+
+    if (
+      data.status ===
+      "published"
+    ) {
+
+      sendEventNotification(
+        data
+      );
 
     }
 
@@ -1212,6 +1377,39 @@ async function createEvent(
   } catch (
     error
   ) {
+
+    /* Cleanup only when the DB record was not successfully saved */
+
+    if (
+      uploadedImage
+        ?.imagePath
+    ) {
+
+      try {
+
+        await supabaseAdmin
+          .storage
+          .from(
+            EVENT_IMAGE_BUCKET
+          )
+          .remove([
+            uploadedImage
+              .imagePath,
+          ]);
+
+      } catch (
+        cleanupError
+      ) {
+
+        console.warn(
+          "Unable to clean up uploaded event image:",
+          cleanupError
+        );
+
+      }
+
+    }
+
 
     if (
       error?.name ===
@@ -1333,9 +1531,7 @@ async function updateEvent(
         .from(
           "events"
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .eq(
           "id",
           id
@@ -1391,6 +1587,15 @@ async function updateEvent(
         });
 
     }
+
+
+    /* ========================================================
+       DETECT PREVIOUS PUBLICATION STATE
+    ======================================================== */
+
+    const wasPublished =
+      existingEvent.status ===
+      "published";
 
 
     /* ========================================================
@@ -1619,9 +1824,7 @@ async function updateEvent(
           "id",
           id
         )
-        .select(
-          "*"
-        )
+        .select("*")
         .single();
 
 
@@ -1644,6 +1847,10 @@ async function updateEvent(
               .imagePath,
           ]);
 
+
+        newUploadedImage =
+          null;
+
       }
 
 
@@ -1653,18 +1860,42 @@ async function updateEvent(
 
 
     /* ========================================================
-       DELETE OLD IMAGE
+       DELETE OLD IMAGE AFTER DATABASE SUCCESS
     ======================================================== */
 
     if (
       req.file &&
-      existingEvent.image_url &&
-      existingEvent.image_url !==
-        updates.image_url
+      existingEvent
+        .image_url &&
+      existingEvent
+        .image_url !==
+        data.image_url
     ) {
 
       await deleteEventImage(
-        existingEvent.image_url
+        existingEvent
+          .image_url
+      );
+
+    }
+
+
+    /* ========================================================
+       NOTIFY ONLY ON FIRST MOVE INTO PUBLISHED
+    ======================================================== */
+
+    const isNowPublished =
+      data.status ===
+      "published";
+
+
+    if (
+      !wasPublished &&
+      isNowPublished
+    ) {
+
+      sendEventNotification(
+        data
       );
 
     }
@@ -1690,6 +1921,37 @@ async function updateEvent(
   } catch (
     error
   ) {
+
+    if (
+      newUploadedImage
+        ?.imagePath
+    ) {
+
+      try {
+
+        await supabaseAdmin
+          .storage
+          .from(
+            EVENT_IMAGE_BUCKET
+          )
+          .remove([
+            newUploadedImage
+              .imagePath,
+          ]);
+
+      } catch (
+        cleanupError
+      ) {
+
+        console.warn(
+          "Unable to clean up new event image:",
+          cleanupError
+        );
+
+      }
+
+    }
+
 
     if (
       error?.name ===
@@ -1761,10 +2023,6 @@ async function deleteEvent(
       req.params;
 
 
-    /* ========================================================
-       VALIDATE EVENT ID
-    ======================================================== */
-
     if (
       !id ||
       !String(
@@ -1787,26 +2045,8 @@ async function deleteEvent(
     }
 
 
-    console.log(
-      "\n========================================"
-    );
-
-    console.log(
-      "DELETE EVENT REQUEST"
-    );
-
-    console.log({
-      eventId:
-        id,
-    });
-
-    console.log(
-      "========================================\n"
-    );
-
-
     /* ========================================================
-       FIND EVENT FIRST
+       FIND EVENT
     ======================================================== */
 
     const {
@@ -1836,22 +2076,7 @@ async function deleteEvent(
 
       console.error(
         "Delete event lookup error:",
-        {
-          message:
-            existingError.message,
-
-          code:
-            existingError.code,
-
-          details:
-            existingError.details,
-
-          hint:
-            existingError.hint,
-
-          eventId:
-            id,
-        }
+        existingError
       );
 
 
@@ -1863,6 +2088,7 @@ async function deleteEvent(
             false,
 
           message:
+            existingError.message ||
             "Unable to find the event before deletion.",
 
         });
@@ -1873,15 +2099,6 @@ async function deleteEvent(
     if (
       !existingEvent
     ) {
-
-      console.warn(
-        "Delete event failed because event was not found:",
-        {
-          eventId:
-            id,
-        }
-      );
-
 
       return res
         .status(404)
@@ -1900,10 +2117,6 @@ async function deleteEvent(
 
     /* ========================================================
        DELETE DATABASE ROW
-
-       IMPORTANT:
-       select() makes Supabase return the deleted row so we
-       can confirm that the delete actually happened.
     ======================================================== */
 
     const {
@@ -1934,22 +2147,7 @@ async function deleteEvent(
 
       console.error(
         "Supabase event delete error:",
-        {
-          message:
-            deleteError.message,
-
-          code:
-            deleteError.code,
-
-          details:
-            deleteError.details,
-
-          hint:
-            deleteError.hint,
-
-          eventId:
-            id,
-        }
+        deleteError
       );
 
 
@@ -1969,22 +2167,9 @@ async function deleteEvent(
     }
 
 
-    /* ========================================================
-       VERIFY DELETE
-    ======================================================== */
-
     if (
       !deletedEvent
     ) {
-
-      console.error(
-        "Supabase delete returned no deleted row:",
-        {
-          eventId:
-            id,
-        }
-      );
-
 
       return res
         .status(500)
@@ -2001,22 +2186,8 @@ async function deleteEvent(
     }
 
 
-    console.log(
-      "Event deleted from database:",
-      {
-        id:
-          deletedEvent.id,
-
-        title:
-          deletedEvent.title,
-      }
-    );
-
-
     /* ========================================================
-       DELETE IMAGE FROM STORAGE
-
-       Image cleanup must not undo successful database deletion.
+       DELETE IMAGE
     ======================================================== */
 
     const imageUrl =
@@ -2041,27 +2212,8 @@ async function deleteEvent(
       imageDeleted =
         imageResult.success;
 
-
-      if (
-        !imageResult.success
-      ) {
-
-        console.warn(
-          "Event was deleted, but its image could not be removed from storage.",
-          {
-            eventId:
-              deletedEvent.id,
-          }
-        );
-
-      }
-
     }
 
-
-    /* ========================================================
-       SUCCESS
-    ======================================================== */
 
     return res
       .status(200)
@@ -2092,35 +2244,8 @@ async function deleteEvent(
   ) {
 
     console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "DELETE EVENT EXCEPTION"
-    );
-
-    console.error({
-      message:
-        error?.message,
-
-      name:
-        error?.name,
-
-      code:
-        error?.code,
-
-      status:
-        error?.status,
-
-      details:
-        error?.details,
-
-      hint:
-        error?.hint,
-    });
-
-    console.error(
-      "========================================\n"
+      "Delete event exception:",
+      error
     );
 
 
@@ -2147,10 +2272,17 @@ async function deleteEvent(
 ============================================================ */
 
 module.exports = {
+
   getEvents,
+
   getPublishedEvents,
+
   getEventBySlug,
+
   createEvent,
+
   updateEvent,
+
   deleteEvent,
+
 };

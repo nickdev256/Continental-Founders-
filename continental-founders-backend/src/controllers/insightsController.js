@@ -8,6 +8,10 @@ const {
   supabaseAdmin,
 } = require("../config/supabase");
 
+const {
+  notifySubscribers,
+} = require("../services/siteNotificationService");
+
 
 /* ============================================================
    CONFIG
@@ -123,6 +127,7 @@ function getImageExtension(
 ) {
 
   const extensions = {
+
     "image/jpeg":
       "jpg",
 
@@ -134,6 +139,7 @@ function getImageExtension(
 
     "image/webp":
       "webp",
+
   };
 
 
@@ -155,7 +161,9 @@ async function uploadInsightImage(
   file
 ) {
 
-  if (!file) {
+  if (
+    !file
+  ) {
     return null;
   }
 
@@ -183,6 +191,7 @@ async function uploadInsightImage(
         filePath,
         file.buffer,
         {
+
           contentType:
             file.mimetype,
 
@@ -191,6 +200,7 @@ async function uploadInsightImage(
 
           upsert:
             false,
+
         }
       );
 
@@ -219,6 +229,7 @@ async function uploadInsightImage(
 
 
   return {
+
     path:
       filePath,
 
@@ -226,6 +237,7 @@ async function uploadInsightImage(
       publicUrlData
         ?.publicUrl ||
       null,
+
   };
 
 }
@@ -239,7 +251,9 @@ function getStoragePathFromUrl(
   imageUrl
 ) {
 
-  if (!imageUrl) {
+  if (
+    !imageUrl
+  ) {
     return null;
   }
 
@@ -282,7 +296,8 @@ function getStoragePathFromUrl(
 
     console.warn(
       "Could not parse insight image URL:",
-      error.message
+      error?.message ||
+      error
     );
 
 
@@ -307,14 +322,18 @@ async function deleteInsightImage(
     );
 
 
-  if (!path) {
+  if (
+    !path
+  ) {
 
     return {
+
       success:
         false,
 
       skipped:
         true,
+
     };
 
   }
@@ -344,6 +363,7 @@ async function deleteInsightImage(
 
 
     return {
+
       success:
         false,
 
@@ -351,17 +371,20 @@ async function deleteInsightImage(
         false,
 
       error,
+
     };
 
   }
 
 
   return {
+
     success:
       true,
 
     skipped:
       false,
+
   };
 
 }
@@ -375,7 +398,9 @@ function normalizeInsight(
   insight
 ) {
 
-  if (!insight) {
+  if (
+    !insight
+  ) {
     return null;
   }
 
@@ -407,16 +432,12 @@ function normalizeInsight(
       insight.status,
 
 
-    /* IMAGE */
-
     image_url:
       insight.image_url,
 
     imageUrl:
       insight.image_url,
 
-
-    /* PUBLISHING */
 
     published_at:
       insight.published_at,
@@ -425,16 +446,12 @@ function normalizeInsight(
       insight.published_at,
 
 
-    /* CREATED */
-
     created_at:
       insight.created_at,
 
     createdAt:
       insight.created_at,
 
-
-    /* UPDATED */
 
     updated_at:
       insight.updated_at,
@@ -443,6 +460,108 @@ function normalizeInsight(
       insight.updated_at,
 
   };
+
+}
+
+
+/* ============================================================
+   SEND INSIGHT PUBLICATION NOTIFICATION
+============================================================ */
+
+function sendInsightNotification(
+  insight
+) {
+
+  if (
+    !insight ||
+    insight.status !==
+      "published"
+  ) {
+
+    return;
+
+  }
+
+
+  notifySubscribers({
+
+    contentType:
+      "insight",
+
+    contentId:
+      insight.id,
+
+    title:
+      insight.title,
+
+    summary:
+      insight.excerpt ||
+      "",
+
+    path:
+      `/insights/${insight.slug}`,
+
+    imageUrl:
+      insight.image_url ||
+      null,
+
+    notificationType:
+      "published",
+
+  })
+    .then(
+      (
+        result
+      ) => {
+
+        if (
+          result?.skipped
+        ) {
+
+          console.log(
+            "Insight newsletter notification skipped:",
+            result.reason
+          );
+
+          return;
+
+        }
+
+
+        if (
+          result?.success
+        ) {
+
+          console.log(
+            "Insight newsletter notification processed:",
+            {
+              insightId:
+                insight.id,
+
+              sentCount:
+                result.sentCount,
+
+              failedCount:
+                result.failedCount,
+            }
+          );
+
+        }
+
+      }
+    )
+    .catch(
+      (
+        error
+      ) => {
+
+        console.error(
+          "Insight newsletter notification error:",
+          error
+        );
+
+      }
+    );
 
 }
 
@@ -949,10 +1068,29 @@ async function createInsight(
           uploadedImage.url
         );
 
+        uploadedImage =
+          null;
+
       }
 
 
       throw error;
+
+    }
+
+
+    /* ========================================================
+       SEND EMAIL IF CREATED AS PUBLISHED
+    ======================================================== */
+
+    if (
+      data.status ===
+      "published"
+    ) {
+
+      sendInsightNotification(
+        data
+      );
 
     }
 
@@ -977,9 +1115,6 @@ async function createInsight(
   } catch (
     error
   ) {
-
-    /* Cleanup if upload succeeded
-       but another operation failed */
 
     if (
       uploadedImage
@@ -1207,6 +1342,15 @@ async function updateInsight(
       }
 
     }
+
+
+    /* ========================================================
+       DETECT FIRST-TIME PUBLICATION
+    ======================================================== */
+
+    const wasPublished =
+      existingInsight.status ===
+      "published";
 
 
     /* ========================================================
@@ -1472,9 +1616,6 @@ async function updateInsight(
       error
     ) {
 
-      /* Delete newly uploaded image
-         because DB update failed */
-
       if (
         uploadedImage
           ?.url
@@ -1483,6 +1624,9 @@ async function updateInsight(
         await deleteInsightImage(
           uploadedImage.url
         );
+
+        uploadedImage =
+          null;
 
       }
 
@@ -1508,6 +1652,27 @@ async function updateInsight(
       await deleteInsightImage(
         existingInsight
           .image_url
+      );
+
+    }
+
+
+    /* ========================================================
+       SEND EMAIL ONLY WHEN MOVING INTO PUBLISHED
+    ======================================================== */
+
+    const isNowPublished =
+      data.status ===
+      "published";
+
+
+    if (
+      !wasPublished &&
+      isNowPublished
+    ) {
+
+      sendInsightNotification(
+        data
       );
 
     }
@@ -1609,7 +1774,7 @@ async function deleteInsight(
 
 
     /* ========================================================
-       FIND INSIGHT FIRST
+       FIND INSIGHT
     ======================================================== */
 
     const {
@@ -1716,7 +1881,7 @@ async function deleteInsight(
 
 
     /* ========================================================
-       DELETE IMAGE AFTER DATABASE DELETE
+       DELETE IMAGE
     ======================================================== */
 
     let imageDeleted =
@@ -1749,11 +1914,13 @@ async function deleteInsight(
           true,
 
         deletedInsight: {
+
           id:
             deletedInsight.id,
 
           title:
             deletedInsight.title,
+
         },
 
         imageDeleted,
@@ -1796,10 +1963,17 @@ async function deleteInsight(
 ============================================================ */
 
 module.exports = {
+
   getInsights,
+
   getPublishedInsights,
+
   getInsightBySlug,
+
   createInsight,
+
   updateInsight,
+
   deleteInsight,
+
 };

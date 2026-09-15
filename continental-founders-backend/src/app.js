@@ -33,6 +33,9 @@ const insightsRoutes =
 const universityRoutes =
   require("./routes/universityRoutes");
 
+const venturesRoutes =
+  require("./routes/venturesRoutes");
+
 const pagesRoutes =
   require("./routes/pagesRoutes");
 
@@ -44,7 +47,8 @@ const pagesRoutes =
 const {
   notFound,
   errorHandler,
-} = require("./middleware/error");
+} =
+  require("./middleware/error");
 
 
 // ============================================================
@@ -78,15 +82,17 @@ app.use(
 // CORS
 // ============================================================
 
-const allowedOrigins = (
-  process.env.CLIENT_URL ||
-  "http://localhost:5173"
-)
-  .split(",")
-  .map((url) =>
-    url.trim()
+const allowedOrigins =
+  (
+    process.env.CLIENT_URL ||
+    "http://localhost:5173"
   )
-  .filter(Boolean);
+    .split(",")
+    .map(
+      (url) =>
+        url.trim()
+    )
+    .filter(Boolean);
 
 
 app.use(
@@ -96,19 +102,11 @@ app.use(
       callback
     ) => {
 
-      /*
-        Allow tools such as Postman,
-        server-to-server requests,
-        and same-origin requests.
-      */
-
       if (!origin) {
-
         return callback(
           null,
           true
         );
-
       }
 
 
@@ -117,12 +115,10 @@ app.use(
           origin
         )
       ) {
-
         return callback(
           null,
           true
         );
-
       }
 
 
@@ -131,7 +127,6 @@ app.use(
           `Origin ${origin} is not allowed by CORS`
         )
       );
-
     },
 
     credentials:
@@ -252,6 +247,7 @@ app.get(
     return res
       .status(200)
       .json({
+
         success:
           true,
 
@@ -282,6 +278,9 @@ app.get(
           newsletterSubscribe:
             "/api/newsletter/subscribe",
 
+          newsletterSubscribers:
+            "/api/newsletter/subscribers",
+
           events:
             "/api/events",
 
@@ -297,6 +296,18 @@ app.get(
           universities:
             "/api/universities",
 
+          universityDirectory:
+            "/api/universities/directory",
+
+          ventures:
+            "/api/ventures",
+
+          ventureDirectory:
+            "/api/ventures/directory",
+
+          ventureDetails:
+            "/api/ventures/:slug",
+
           pages:
             "/api/pages",
 
@@ -310,7 +321,6 @@ app.get(
             "/api/admin/dashboard",
         },
       });
-
   }
 );
 
@@ -389,6 +399,16 @@ app.use(
 
 
 // ============================================================
+// VENTURES
+// ============================================================
+
+app.use(
+  "/api/ventures",
+  venturesRoutes
+);
+
+
+// ============================================================
 // CMS PAGES
 // ============================================================
 
@@ -422,6 +442,7 @@ app.get(
     return res
       .status(200)
       .json({
+
         success:
           true,
 
@@ -448,6 +469,12 @@ app.get(
           newsletter:
             "/api/newsletter",
 
+          newsletterSubscribe:
+            "/api/newsletter/subscribe",
+
+          newsletterSubscribers:
+            "/api/newsletter/subscribers",
+
           events:
             "/api/events",
 
@@ -463,6 +490,18 @@ app.get(
           universities:
             "/api/universities",
 
+          universityDirectory:
+            "/api/universities/directory",
+
+          ventures:
+            "/api/ventures",
+
+          ventureDirectory:
+            "/api/ventures/directory",
+
+          ventureDetails:
+            "/api/ventures/:slug",
+
           pages:
             "/api/pages",
 
@@ -476,7 +515,6 @@ app.get(
             "/api/admin/dashboard",
         },
       });
-
   }
 );
 

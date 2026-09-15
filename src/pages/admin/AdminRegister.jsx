@@ -21,28 +21,16 @@ import {
 import "./AdminRegister.css";
 
 
-/* ============================================================
-   CONFIG
-============================================================ */
-
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
 
-
-/* ============================================================
-   ADMIN REGISTER
-============================================================ */
 
 export default function AdminRegister() {
 
   const navigate =
     useNavigate();
 
-
-  /* ==========================================================
-     STATE
-  ========================================================== */
 
   const [
     form,
@@ -84,10 +72,6 @@ export default function AdminRegister() {
     useState("");
 
 
-  /* ==========================================================
-     FORM CHANGE
-  ========================================================== */
-
   function handleChange(
     event
   ) {
@@ -102,7 +86,6 @@ export default function AdminRegister() {
     setForm(
       (current) => ({
         ...current,
-
         [name]:
           value,
       })
@@ -115,10 +98,6 @@ export default function AdminRegister() {
 
   }
 
-
-  /* ==========================================================
-     PASSWORD CHECKS
-  ========================================================== */
 
   const passwordChecks = {
 
@@ -142,10 +121,6 @@ export default function AdminRegister() {
 
   };
 
-
-  /* ==========================================================
-     REGISTER
-  ========================================================== */
 
   async function handleSubmit(
     event
@@ -265,7 +240,6 @@ export default function AdminRegister() {
               JSON.stringify({
                 fullName,
                 email,
-
                 password:
                   form.password,
               }),
@@ -415,17 +389,9 @@ export default function AdminRegister() {
   }
 
 
-  /* ==========================================================
-     RENDER
-  ========================================================== */
-
   return (
 
     <main className="cf-admin-register">
-
-      {/* ======================================================
-          LEFT VISUAL SIDE
-      ====================================================== */}
 
       <section className="cf-admin-register__visual">
 
@@ -448,27 +414,6 @@ export default function AdminRegister() {
             />
 
           </Link>
-
-
-          <div className="cf-admin-register__keywords">
-
-            <span>
-              PEOPLE
-            </span>
-
-            <span>
-              IDEAS
-            </span>
-
-            <span>
-              OPPORTUNITIES
-            </span>
-
-            <span>
-              IMPACT
-            </span>
-
-          </div>
 
         </div>
 
@@ -518,17 +463,13 @@ export default function AdminRegister() {
           </strong>
 
           <span>
-            PEOPLE · IDEAS · OPPORTUNITIES · IMPACT
+            BUILDING A MORE INCLUSIVE TOMORROW
           </span>
 
         </div>
 
       </section>
 
-
-      {/* ======================================================
-          REGISTRATION SIDE
-      ====================================================== */}
 
       <section className="cf-admin-register__form-side">
 
@@ -542,7 +483,7 @@ export default function AdminRegister() {
           <div className="cf-admin-register__shield">
 
             <ShieldCheck
-              size={36}
+              size={38}
               strokeWidth={1.45}
             />
 
@@ -573,8 +514,6 @@ export default function AdminRegister() {
             }
           >
 
-            {/* FULL NAME */}
-
             <div className="cf-admin-register__field">
 
               <label htmlFor="register-name">
@@ -585,7 +524,7 @@ export default function AdminRegister() {
               <div className="cf-admin-register__input">
 
                 <UserRound
-                  size={19}
+                  size={20}
                   strokeWidth={1.5}
                 />
 
@@ -613,8 +552,6 @@ export default function AdminRegister() {
             </div>
 
 
-            {/* EMAIL */}
-
             <div className="cf-admin-register__field">
 
               <label htmlFor="register-email">
@@ -625,7 +562,7 @@ export default function AdminRegister() {
               <div className="cf-admin-register__input">
 
                 <Mail
-                  size={19}
+                  size={20}
                   strokeWidth={1.5}
                 />
 
@@ -658,8 +595,6 @@ export default function AdminRegister() {
             </div>
 
 
-            {/* PASSWORD */}
-
             <div className="cf-admin-register__field">
 
               <label htmlFor="register-password">
@@ -670,7 +605,7 @@ export default function AdminRegister() {
               <div className="cf-admin-register__input">
 
                 <LockKeyhole
-                  size={19}
+                  size={20}
                   strokeWidth={1.5}
                 />
 
@@ -738,8 +673,6 @@ export default function AdminRegister() {
             </div>
 
 
-            {/* PASSWORD REQUIREMENTS */}
-
             {form.password && (
 
               <div className="cf-admin-register__requirements">
@@ -780,8 +713,6 @@ export default function AdminRegister() {
             )}
 
 
-            {/* CONFIRM PASSWORD */}
-
             <div className="cf-admin-register__field">
 
               <label htmlFor="register-confirm-password">
@@ -792,7 +723,7 @@ export default function AdminRegister() {
               <div className="cf-admin-register__input">
 
                 <LockKeyhole
-                  size={19}
+                  size={20}
                   strokeWidth={1.5}
                 />
 
@@ -860,8 +791,6 @@ export default function AdminRegister() {
             </div>
 
 
-            {/* ERROR */}
-
             {error && (
 
               <div
@@ -875,8 +804,6 @@ export default function AdminRegister() {
 
             )}
 
-
-            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -907,17 +834,17 @@ export default function AdminRegister() {
           <div className="cf-admin-register__security-note">
 
             <ShieldCheck
-              size={19}
+              size={20}
               strokeWidth={1.55}
             />
 
 
             <p>
-              Your account is activated
+              Your account becomes active
               only after your email
               verification code is confirmed.
-              CMS permissions remain controlled
-              by Continental Founders.
+              CMS permissions are managed
+              securely by Continental Founders.
             </p>
 
           </div>
@@ -925,9 +852,9 @@ export default function AdminRegister() {
 
           <div className="cf-admin-register__login">
 
-            <p>
+            <span>
               Already have an account?
-            </p>
+            </span>
 
 
             <Link to="/admin/login">
@@ -939,33 +866,6 @@ export default function AdminRegister() {
               />
 
             </Link>
-
-          </div>
-
-
-          <div className="cf-admin-register__card-footer">
-
-            <span>
-              PEOPLE
-            </span>
-
-            <i />
-
-            <span>
-              IDEAS
-            </span>
-
-            <i />
-
-            <span>
-              OPPORTUNITIES
-            </span>
-
-            <i />
-
-            <span>
-              IMPACT
-            </span>
 
           </div>
 
@@ -988,10 +888,6 @@ export default function AdminRegister() {
 }
 
 
-/* ============================================================
-   PASSWORD REQUIREMENT
-============================================================ */
-
 function PasswordRequirement({
   passed,
   text,
@@ -1012,7 +908,7 @@ function PasswordRequirement({
         {passed && (
 
           <Check
-            size={11}
+            size={12}
             strokeWidth={2.5}
           />
 

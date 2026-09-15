@@ -91,7 +91,8 @@ export default function AdminLogin() {
 
   useEffect(() => {
 
-    let active = true;
+    let active =
+      true;
 
 
     async function checkExistingSession() {
@@ -116,10 +117,18 @@ export default function AdminLogin() {
           );
 
 
-        if (!response.ok) {
+        if (
+          !response.ok
+        ) {
 
-          if (active) {
-            setCheckingSession(false);
+          if (
+            active
+          ) {
+
+            setCheckingSession(
+              false
+            );
+
           }
 
           return;
@@ -149,10 +158,18 @@ export default function AdminLogin() {
           null;
 
 
-        if (!user) {
+        if (
+          !user
+        ) {
 
-          if (active) {
-            setCheckingSession(false);
+          if (
+            active
+          ) {
+
+            setCheckingSession(
+              false
+            );
+
           }
 
           return;
@@ -162,7 +179,8 @@ export default function AdminLogin() {
 
         const role =
           String(
-            user.role || ""
+            user.role ||
+            ""
           ).toLowerCase();
 
 
@@ -179,8 +197,14 @@ export default function AdminLogin() {
           )
         ) {
 
-          if (active) {
-            setCheckingSession(false);
+          if (
+            active
+          ) {
+
+            setCheckingSession(
+              false
+            );
+
           }
 
           return;
@@ -190,11 +214,18 @@ export default function AdminLogin() {
 
         if (
           user.status &&
-          user.status !== "active"
+          user.status !==
+            "active"
         ) {
 
-          if (active) {
-            setCheckingSession(false);
+          if (
+            active
+          ) {
+
+            setCheckingSession(
+              false
+            );
+
           }
 
           return;
@@ -241,12 +272,15 @@ export default function AdminLogin() {
         );
 
 
-        if (active) {
+        if (
+          active
+        ) {
 
           navigate(
             "/admin",
             {
-              replace: true,
+              replace:
+                true,
             }
           );
 
@@ -262,8 +296,14 @@ export default function AdminLogin() {
         );
 
 
-        if (active) {
-          setCheckingSession(false);
+        if (
+          active
+        ) {
+
+          setCheckingSession(
+            false
+          );
+
         }
 
       }
@@ -276,7 +316,8 @@ export default function AdminLogin() {
 
     return () => {
 
-      active = false;
+      active =
+        false;
 
     };
 
@@ -317,7 +358,8 @@ export default function AdminLogin() {
 
 
     if (
-      password.length < 8
+      password.length <
+      8
     ) {
 
       setError(
@@ -331,9 +373,13 @@ export default function AdminLogin() {
 
     try {
 
-      setLoading(true);
+      setLoading(
+        true
+      );
 
-      setError("");
+      setError(
+        ""
+      );
 
 
       const response =
@@ -380,7 +426,9 @@ export default function AdminLogin() {
       }
 
 
-      if (!response.ok) {
+      if (
+        !response.ok
+      ) {
 
         throw new Error(
           result?.message ||
@@ -391,10 +439,6 @@ export default function AdminLogin() {
       }
 
 
-      /* ======================================================
-         OTP REQUIRED
-      ====================================================== */
-
       const otpRequired =
         result?.otpRequired ??
         result?.otp_required ??
@@ -403,7 +447,9 @@ export default function AdminLogin() {
         false;
 
 
-      if (!otpRequired) {
+      if (
+        !otpRequired
+      ) {
 
         throw new Error(
           "The server did not request OTP verification."
@@ -411,10 +457,6 @@ export default function AdminLogin() {
 
       }
 
-
-      /* ======================================================
-         EMAIL
-      ====================================================== */
 
       const pendingEmail =
         result?.email ||
@@ -426,10 +468,6 @@ export default function AdminLogin() {
         cleanEmail;
 
 
-      /* ======================================================
-         OTP PURPOSE
-      ====================================================== */
-
       const purpose =
         result?.purpose ||
         result?.data?.purpose ||
@@ -437,8 +475,10 @@ export default function AdminLogin() {
 
 
       if (
-        purpose !== "login" &&
-        purpose !== "registration"
+        purpose !==
+          "login" &&
+        purpose !==
+          "registration"
       ) {
 
         throw new Error(
@@ -447,10 +487,6 @@ export default function AdminLogin() {
 
       }
 
-
-      /* ======================================================
-         TEMP OTP STORAGE
-      ====================================================== */
 
       sessionStorage.setItem(
         "cf_pending_admin_email",
@@ -464,10 +500,6 @@ export default function AdminLogin() {
       );
 
 
-      /* ======================================================
-         CLEAR OLD LOCAL AUTH
-      ====================================================== */
-
       localStorage.removeItem(
         "cf_admin_user"
       );
@@ -478,14 +510,11 @@ export default function AdminLogin() {
       );
 
 
-      /* ======================================================
-         GO TO OTP PAGE
-      ====================================================== */
-
       navigate(
         "/admin/verify-otp",
         {
-          replace: true,
+          replace:
+            true,
 
           state: {
             email:
@@ -507,7 +536,8 @@ export default function AdminLogin() {
 
 
       if (
-        requestError instanceof TypeError
+        requestError instanceof
+          TypeError
       ) {
 
         setError(
@@ -525,7 +555,9 @@ export default function AdminLogin() {
 
     } finally {
 
-      setLoading(false);
+      setLoading(
+        false
+      );
 
     }
 
@@ -536,7 +568,9 @@ export default function AdminLogin() {
      SESSION CHECK SCREEN
   ========================================================== */
 
-  if (checkingSession) {
+  if (
+    checkingSession
+  ) {
 
     return (
 
@@ -565,8 +599,8 @@ export default function AdminLogin() {
 
 
           <p>
-            Please wait while Continental
-            Founders checks your active
+            Please wait while we confirm
+            your Continental Founders
             administration session.
           </p>
 
@@ -597,7 +631,7 @@ export default function AdminLogin() {
     <main className="cf-admin-login">
 
       {/* ======================================================
-          LEFT BRAND SIDE
+          LEFT VISUAL SIDE
       ====================================================== */}
 
       <section className="cf-admin-login__visual">
@@ -606,8 +640,6 @@ export default function AdminLogin() {
 
         <div className="cf-admin-login__visual-shade" />
 
-
-        {/* TOP */}
 
         <div className="cf-admin-login__visual-top">
 
@@ -624,31 +656,8 @@ export default function AdminLogin() {
 
           </Link>
 
-
-          <div className="cf-admin-login__keywords">
-
-            <span>
-              PEOPLE
-            </span>
-
-            <span>
-              IDEAS
-            </span>
-
-            <span>
-              OPPORTUNITIES
-            </span>
-
-            <span>
-              IMPACT
-            </span>
-
-          </div>
-
         </div>
 
-
-        {/* MAIN MESSAGE */}
 
         <div className="cf-admin-login__visual-copy">
 
@@ -670,6 +679,7 @@ export default function AdminLogin() {
 
             <span className="cf-admin-login__gold-line" />
 
+
             <p>
               A global platform connecting
               founders, universities,
@@ -683,42 +693,12 @@ export default function AdminLogin() {
         </div>
 
 
-        {/* SIDE WORDS */}
-
-        <div className="cf-admin-login__vertical-list">
-
-          <span>
-            FOUNDERS
-          </span>
-
-          <span>
-            COMMUNITY
-          </span>
-
-          <span>
-            CAPITAL
-          </span>
-
-          <span>
-            OPPORTUNITY
-          </span>
-
-          <span>
-            A BRIGHTER TOMORROW
-          </span>
-
-          <div />
-
-        </div>
-
-
-        {/* FOOT */}
-
         <div className="cf-admin-login__visual-footer">
 
           <strong>
             CONTINENTAL FOUNDERS™
           </strong>
+
 
           <span>
             BUILDING A MORE INCLUSIVE TOMORROW
@@ -730,7 +710,7 @@ export default function AdminLogin() {
 
 
       {/* ======================================================
-          RIGHT LOGIN AREA
+          RIGHT LOGIN SIDE
       ====================================================== */}
 
       <section className="cf-admin-login__form-side">
@@ -742,19 +722,15 @@ export default function AdminLogin() {
 
         <div className="cf-admin-login__card">
 
-          {/* SECURITY ICON */}
-
           <div className="cf-admin-login__shield">
 
             <ShieldCheck
-              size={37}
+              size={36}
               strokeWidth={1.45}
             />
 
           </div>
 
-
-          {/* HEADING */}
 
           <div className="cf-admin-login__heading">
 
@@ -772,16 +748,12 @@ export default function AdminLogin() {
           </div>
 
 
-          {/* FORM */}
-
           <form
             className="cf-admin-login__form"
             onSubmit={
               handleSubmit
             }
           >
-
-            {/* EMAIL */}
 
             <div className="cf-admin-login__field">
 
@@ -819,8 +791,14 @@ export default function AdminLogin() {
                     );
 
 
-                    if (error) {
-                      setError("");
+                    if (
+                      error
+                    ) {
+
+                      setError(
+                        ""
+                      );
+
                     }
 
                   }}
@@ -831,8 +809,6 @@ export default function AdminLogin() {
 
             </div>
 
-
-            {/* PASSWORD */}
 
             <div className="cf-admin-login__field">
 
@@ -874,8 +850,14 @@ export default function AdminLogin() {
                     );
 
 
-                    if (error) {
-                      setError("");
+                    if (
+                      error
+                    ) {
+
+                      setError(
+                        ""
+                      );
+
                     }
 
                   }}
@@ -891,7 +873,9 @@ export default function AdminLogin() {
                   }
                   onClick={() =>
                     setShowPassword(
-                      (current) =>
+                      (
+                        current
+                      ) =>
                         !current
                     )
                   }
@@ -923,8 +907,6 @@ export default function AdminLogin() {
             </div>
 
 
-            {/* ERROR */}
-
             {error && (
 
               <div
@@ -938,8 +920,6 @@ export default function AdminLogin() {
 
             )}
 
-
-            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -967,48 +947,28 @@ export default function AdminLogin() {
           </form>
 
 
-          {/* DIVIDER */}
-
-          <div className="cf-admin-login__divider">
-
-            <span />
-
-            <small>
-              SECURITY
-            </small>
-
-            <span />
-
-          </div>
-
-
-          {/* OTP NOTE */}
-
           <div className="cf-admin-login__security-note">
 
             <LockKeyhole
-              size={20}
+              size={19}
               strokeWidth={1.6}
             />
 
 
             <p>
-              Password verification alone
-              does not grant CMS access.
               A one-time verification code
-              will be sent to your email.
+              will be sent to your email
+              before CMS access is granted.
             </p>
 
           </div>
 
 
-          {/* REGISTER */}
-
           <div className="cf-admin-login__register">
 
-            <p>
+            <span>
               New to Continental Founders?
-            </p>
+            </span>
 
 
             <Link to="/admin/register">
@@ -1020,35 +980,6 @@ export default function AdminLogin() {
               />
 
             </Link>
-
-          </div>
-
-
-          {/* CARD FOOTER */}
-
-          <div className="cf-admin-login__card-footer">
-
-            <span>
-              PEOPLE
-            </span>
-
-            <i />
-
-            <span>
-              IDEAS
-            </span>
-
-            <i />
-
-            <span>
-              OPPORTUNITIES
-            </span>
-
-            <i />
-
-            <span>
-              IMPACT
-            </span>
 
           </div>
 

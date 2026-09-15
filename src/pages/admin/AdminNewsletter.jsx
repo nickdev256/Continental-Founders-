@@ -1,21 +1,27 @@
 import React, {
+  useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
 
 import {
-  Mail,
-  Search,
-  RefreshCcw,
-  Users,
   CheckCircle2,
-  XCircle,
   Download,
+  Mail,
+  RefreshCcw,
+  Search,
+  Trash2,
+  UserCheck,
+  UserX,
+  Users,
+  XCircle,
 } from "lucide-react";
 
 import {
+  deleteNewsletterSubscriber,
   getNewsletterSubscribers,
+  updateNewsletterSubscriber,
 } from "../../services/adminApi";
 
 import "./AdminNewsletter.css";
@@ -55,6 +61,32 @@ function formatDate(
       year: "numeric",
     }
   ).format(date);
+}
+
+
+/* ============================================================
+   SOURCE FORMATTER
+============================================================ */
+
+function formatSource(
+  value
+) {
+
+  if (!value) {
+    return "Website";
+  }
+
+
+  return String(value)
+    .replace(
+      /_/g,
+      " "
+    )
+    .replace(
+      /\b\w/g,
+      (letter) =>
+        letter.toUpperCase()
+    );
 }
 
 
@@ -99,60 +131,107 @@ export default function AdminNewsletter() {
     useState("all");
 
 
+  const [
+    updatingId,
+    setUpdatingId,
+  ] =
+    useState(null);
+
+
+  const [
+    deletingId,
+    setDeletingId,
+  ] =
+    useState(null);
+
+
+  const [
+    actionMessage,
+    setActionMessage,
+  ] =
+    useState("");
+
+
+  const [
+    actionError,
+    setActionError,
+  ] =
+    useState("");
+
+
   /* ==========================================================
      LOAD SUBSCRIBERS
   ========================================================== */
 
-  async function loadSubscribers() {
+  const loadSubscribers =
+    useCallback(
+      async () => {
 
-    try {
+        try {
 
-      setLoading(true);
+          setLoading(
+            true
+          );
 
-      setError("");
+          setError(
+            ""
+          );
 
-
-      const result =
-        await getNewsletterSubscribers();
-
-
-      setSubscribers(
-        Array.isArray(
-          result.subscribers
-        )
-          ? result.subscribers
-          : []
-      );
-
-    } catch (
-      requestError
-    ) {
-
-      console.error(
-        "Newsletter subscribers error:",
-        requestError
-      );
+          setActionError(
+            ""
+          );
 
 
-      setError(
-        requestError.message ||
-        "Failed to load newsletter subscribers."
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
-
-  }
+          const result =
+            await getNewsletterSubscribers();
 
 
-  useEffect(() => {
+          setSubscribers(
+            Array.isArray(
+              result?.subscribers
+            )
+              ? result.subscribers
+              : []
+          );
 
-    loadSubscribers();
+        } catch (
+          requestError
+        ) {
 
-  }, []);
+          console.error(
+            "Newsletter subscribers error:",
+            requestError
+          );
+
+
+          setError(
+            requestError?.message ||
+            "Failed to load newsletter subscribers."
+          );
+
+        } finally {
+
+          setLoading(
+            false
+          );
+
+        }
+
+      },
+      []
+    );
+
+
+  useEffect(
+    () => {
+
+      loadSubscribers();
+
+    },
+    [
+      loadSubscribers,
+    ]
+  );
 
 
   /* ==========================================================
@@ -180,12 +259,14 @@ export default function AdminNewsletter() {
 
 
         return {
+
           total:
             subscribers.length,
 
           subscribed,
 
           unsubscribed,
+
         };
 
       },
@@ -212,11 +293,28 @@ export default function AdminNewsletter() {
         return subscribers.filter(
           (subscriber) => {
 
+            const email =
+              String(
+                subscriber?.email ||
+                ""
+              ).toLowerCase();
+
+
+            const source =
+              String(
+                subscriber?.source ||
+                ""
+              ).toLowerCase();
+
+
             const matchesSearch =
               !term ||
-              subscriber.email
-                ?.toLowerCase()
-                .includes(term);
+              email.includes(
+                term
+              ) ||
+              source.includes(
+                term
+              );
 
 
             const matchesStatus =
@@ -244,6 +342,201 @@ export default function AdminNewsletter() {
 
 
   /* ==========================================================
+     CHANGE SUBSCRIBER STATUS
+  ========================================================== */
+
+  async function handleStatusChange(
+    subscriber,
+    nextStatus
+  ) {
+
+    if (
+      !subscriber?.id ||
+      !nextStatus
+    ) {
+      return;
+    }
+
+
+    if (
+      subscriber.status ===
+      nextStatus
+    ) {
+      return;
+    }
+
+
+    try {
+
+      setUpdatingId(
+        subscriber.id
+      );
+
+      setActionMessage(
+        ""
+      );
+
+      setActionError(
+        ""
+      );
+
+
+      const result =
+        await updateNewsletterSubscriber(
+          subscriber.id,
+          nextStatus
+        );
+
+
+      const updatedSubscriber =
+        result?.subscriber;
+
+
+      if (
+        !updatedSubscriber
+      ) {
+
+        throw new Error(
+          "The server did not return the updated subscriber."
+        );
+
+      }
+
+
+      setSubscribers(
+        (current) =>
+          current.map(
+            (item) =>
+              item.id ===
+                subscriber.id
+                ? updatedSubscriber
+                : item
+          )
+      );
+
+
+      setActionMessage(
+        nextStatus ===
+          "subscribed"
+          ? `${subscriber.email} has been subscribed.`
+          : `${subscriber.email} has been unsubscribed.`
+      );
+
+    } catch (
+      requestError
+    ) {
+
+      console.error(
+        "Newsletter subscriber update error:",
+        requestError
+      );
+
+
+      setActionError(
+        requestError?.message ||
+        "Unable to update subscriber."
+      );
+
+    } finally {
+
+      setUpdatingId(
+        null
+      );
+
+    }
+
+  }
+
+
+  /* ==========================================================
+     DELETE SUBSCRIBER
+  ========================================================== */
+
+  async function handleDeleteSubscriber(
+    subscriber
+  ) {
+
+    if (
+      !subscriber?.id
+    ) {
+      return;
+    }
+
+
+    const confirmed =
+      window.confirm(
+        `Delete ${subscriber.email} from the newsletter subscriber list?`
+      );
+
+
+    if (
+      !confirmed
+    ) {
+      return;
+    }
+
+
+    try {
+
+      setDeletingId(
+        subscriber.id
+      );
+
+      setActionMessage(
+        ""
+      );
+
+      setActionError(
+        ""
+      );
+
+
+      await deleteNewsletterSubscriber(
+        subscriber.id
+      );
+
+
+      setSubscribers(
+        (current) =>
+          current.filter(
+            (item) =>
+              item.id !==
+              subscriber.id
+          )
+      );
+
+
+      setActionMessage(
+        `${subscriber.email} has been deleted.`
+      );
+
+    } catch (
+      requestError
+    ) {
+
+      console.error(
+        "Delete newsletter subscriber error:",
+        requestError
+      );
+
+
+      setActionError(
+        requestError?.message ||
+        "Unable to delete subscriber."
+      );
+
+    } finally {
+
+      setDeletingId(
+        null
+      );
+
+    }
+
+  }
+
+
+  /* ==========================================================
      EXPORT CSV
   ========================================================== */
 
@@ -262,16 +555,31 @@ export default function AdminNewsletter() {
       "Status",
       "Source",
       "Subscribed At",
+      "Unsubscribed At",
     ];
 
 
     const rows =
       filteredSubscribers.map(
         (subscriber) => [
-          subscriber.email || "",
-          subscriber.status || "",
-          subscriber.source || "",
-          subscriber.subscribed_at || "",
+
+          subscriber.email ||
+            "",
+
+          subscriber.status ||
+            "",
+
+          subscriber.source ||
+            "",
+
+          subscriber.subscribed_at ||
+          subscriber.subscribedAt ||
+            "",
+
+          subscriber.unsubscribed_at ||
+          subscriber.unsubscribedAt ||
+            "",
+
         ]
       );
 
@@ -325,6 +633,7 @@ export default function AdminNewsletter() {
     link.href =
       url;
 
+
     link.download =
       `continental-founders-newsletter-${new Date()
         .toISOString()
@@ -338,9 +647,12 @@ export default function AdminNewsletter() {
       link
     );
 
+
     link.click();
 
+
     link.remove();
+
 
     URL.revokeObjectURL(
       url
@@ -357,7 +669,6 @@ export default function AdminNewsletter() {
 
     <section className="admin-newsletter">
 
-
       {/* ======================================================
           PAGE HEADER
       ====================================================== */}
@@ -370,13 +681,15 @@ export default function AdminNewsletter() {
             COMMUNICATIONS
           </span>
 
+
           <h2>
             Newsletter Subscribers
           </h2>
 
+
           <p>
             View and manage people who
-            subscribed to Continental
+            subscribe to Continental
             Founders updates.
           </p>
 
@@ -401,8 +714,11 @@ export default function AdminNewsletter() {
               strokeWidth={1.8}
             />
 
+
             <span>
-              Refresh
+              {loading
+                ? "Refreshing..."
+                : "Refresh"}
             </span>
 
           </button>
@@ -424,6 +740,7 @@ export default function AdminNewsletter() {
               size={17}
               strokeWidth={1.8}
             />
+
 
             <span>
               Export CSV
@@ -453,16 +770,16 @@ export default function AdminNewsletter() {
 
           </div>
 
+
           <div>
 
             <span>
               Total Subscribers
             </span>
 
+
             <strong>
-              {
-                statistics.total
-              }
+              {statistics.total}
             </strong>
 
           </div>
@@ -481,16 +798,16 @@ export default function AdminNewsletter() {
 
           </div>
 
+
           <div>
 
             <span>
               Active
             </span>
 
+
             <strong>
-              {
-                statistics.subscribed
-              }
+              {statistics.subscribed}
             </strong>
 
           </div>
@@ -509,16 +826,16 @@ export default function AdminNewsletter() {
 
           </div>
 
+
           <div>
 
             <span>
               Unsubscribed
             </span>
 
+
             <strong>
-              {
-                statistics.unsubscribed
-              }
+              {statistics.unsubscribed}
             </strong>
 
           </div>
@@ -541,12 +858,13 @@ export default function AdminNewsletter() {
             strokeWidth={1.7}
           />
 
+
           <input
             type="search"
             value={
               search
             }
-            placeholder="Search by email..."
+            placeholder="Search email or source..."
             aria-label="Search subscribers"
             onChange={(
               event
@@ -592,11 +910,48 @@ export default function AdminNewsletter() {
 
 
       {/* ======================================================
+          ACTION MESSAGE
+      ====================================================== */}
+
+      {actionMessage && (
+
+        <div className="admin-newsletter__message admin-newsletter__message--success">
+
+          <CheckCircle2
+            size={17}
+          />
+
+          <span>
+            {actionMessage}
+          </span>
+
+        </div>
+
+      )}
+
+
+      {actionError && (
+
+        <div className="admin-newsletter__message admin-newsletter__message--error">
+
+          <XCircle
+            size={17}
+          />
+
+          <span>
+            {actionError}
+          </span>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
           TABLE CARD
       ====================================================== */}
 
       <div className="admin-newsletter__table-card">
-
 
         {loading && (
 
@@ -607,9 +962,11 @@ export default function AdminNewsletter() {
               size={28}
             />
 
+
             <h3>
               Loading subscribers
             </h3>
+
 
             <p>
               Retrieving newsletter
@@ -624,33 +981,36 @@ export default function AdminNewsletter() {
         {!loading &&
           error && (
 
-          <div className="admin-newsletter__state">
+            <div className="admin-newsletter__state">
 
-            <Mail
-              size={30}
-            />
+              <Mail
+                size={30}
+              />
 
-            <h3>
-              Unable to load subscribers
-            </h3>
 
-            <p>
-              {error}
-            </p>
+              <h3>
+                Unable to load subscribers
+              </h3>
 
-            <button
-              type="button"
-              onClick={
-                loadSubscribers
-              }
-              className="admin-newsletter__button admin-newsletter__button--primary"
-            >
-              Try Again
-            </button>
 
-          </div>
+              <p>
+                {error}
+              </p>
 
-        )}
+
+              <button
+                type="button"
+                onClick={
+                  loadSubscribers
+                }
+                className="admin-newsletter__button admin-newsletter__button--primary"
+              >
+                Try Again
+              </button>
+
+            </div>
+
+          )}
 
 
         {!loading &&
@@ -658,25 +1018,27 @@ export default function AdminNewsletter() {
           filteredSubscribers.length ===
             0 && (
 
-          <div className="admin-newsletter__state">
+            <div className="admin-newsletter__state">
 
-            <Mail
-              size={30}
-            />
+              <Mail
+                size={30}
+              />
 
-            <h3>
-              No subscribers found
-            </h3>
 
-            <p>
-              Newsletter subscribers will
-              appear here after people
-              subscribe through the website.
-            </p>
+              <h3>
+                No subscribers found
+              </h3>
 
-          </div>
 
-        )}
+              <p>
+                Newsletter subscribers will
+                appear here after people
+                subscribe through the website.
+              </p>
+
+            </div>
+
+          )}
 
 
         {!loading &&
@@ -684,116 +1046,252 @@ export default function AdminNewsletter() {
           filteredSubscribers.length >
             0 && (
 
-          <div className="admin-newsletter__table-wrap">
+            <div className="admin-newsletter__table-wrap">
 
-            <table className="admin-newsletter__table">
+              <table className="admin-newsletter__table">
 
-              <thead>
+                <thead>
 
-                <tr>
+                  <tr>
 
-                  <th>
-                    Subscriber
-                  </th>
+                    <th>
+                      Subscriber
+                    </th>
 
-                  <th>
-                    Status
-                  </th>
+                    <th>
+                      Status
+                    </th>
 
-                  <th>
-                    Source
-                  </th>
+                    <th>
+                      Source
+                    </th>
 
-                  <th>
-                    Date Subscribed
-                  </th>
+                    <th>
+                      Date Subscribed
+                    </th>
 
-                </tr>
+                    <th>
+                      Actions
+                    </th>
 
-              </thead>
+                  </tr>
 
-
-              <tbody>
-
-                {filteredSubscribers.map(
-                  (
-                    subscriber
-                  ) => (
-
-                    <tr
-                      key={
-                        subscriber.id
-                      }
-                    >
-
-                      <td>
-
-                        <div className="admin-newsletter__subscriber">
-
-                          <div className="admin-newsletter__subscriber-icon">
-
-                            <Mail
-                              size={17}
-                              strokeWidth={1.7}
-                            />
-
-                          </div>
-
-                          <span>
-                            {
-                              subscriber.email
-                            }
-                          </span>
-
-                        </div>
-
-                      </td>
+                </thead>
 
 
-                      <td>
+                <tbody>
 
-                        <span
-                          className={`admin-newsletter__status admin-newsletter__status--${subscriber.status}`}
-                        >
-                          {
-                            subscriber.status
+                  {filteredSubscribers.map(
+                    (
+                      subscriber
+                    ) => {
+
+                      const isUpdating =
+                        updatingId ===
+                        subscriber.id;
+
+
+                      const isDeleting =
+                        deletingId ===
+                        subscriber.id;
+
+
+                      const isBusy =
+                        isUpdating ||
+                        isDeleting;
+
+
+                      return (
+
+                        <tr
+                          key={
+                            subscriber.id
                           }
-                        </span>
+                        >
 
-                      </td>
+                          {/* SUBSCRIBER */}
+
+                          <td>
+
+                            <div className="admin-newsletter__subscriber">
+
+                              <div className="admin-newsletter__subscriber-icon">
+
+                                <Mail
+                                  size={17}
+                                  strokeWidth={1.7}
+                                />
+
+                              </div>
 
 
-                      <td>
-                        {
-                          subscriber.source ||
-                          "Website"
-                        }
-                      </td>
+                              <span>
+                                {subscriber.email}
+                              </span>
+
+                            </div>
+
+                          </td>
 
 
-                      <td>
-                        {
-                          formatDate(
-                            subscriber.subscribed_at
-                          )
-                        }
-                      </td>
+                          {/* STATUS */}
 
-                    </tr>
+                          <td>
 
-                  )
-                )}
+                            <span
+                              className={`admin-newsletter__status admin-newsletter__status--${subscriber.status}`}
+                            >
+                              {
+                                subscriber.status ===
+                                "subscribed"
+                                  ? "Subscribed"
+                                  : "Unsubscribed"
+                              }
+                            </span>
 
-              </tbody>
+                          </td>
 
-            </table>
 
-          </div>
+                          {/* SOURCE */}
 
-        )}
+                          <td>
+
+                            {formatSource(
+                              subscriber.source
+                            )}
+
+                          </td>
+
+
+                          {/* DATE */}
+
+                          <td>
+
+                            {formatDate(
+                              subscriber.subscribed_at ||
+                              subscriber.subscribedAt
+                            )}
+
+                          </td>
+
+
+                          {/* ACTIONS */}
+
+                          <td>
+
+                            <div className="admin-newsletter__row-actions">
+
+                              {subscriber.status ===
+                              "subscribed" ? (
+
+                                <button
+                                  type="button"
+                                  className="admin-newsletter__row-action"
+                                  title="Unsubscribe"
+                                  disabled={
+                                    isBusy
+                                  }
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      subscriber,
+                                      "unsubscribed"
+                                    )
+                                  }
+                                >
+
+                                  <UserX
+                                    size={16}
+                                  />
+
+                                  <span>
+                                    {isUpdating
+                                      ? "Updating..."
+                                      : "Unsubscribe"}
+                                  </span>
+
+                                </button>
+
+                              ) : (
+
+                                <button
+                                  type="button"
+                                  className="admin-newsletter__row-action admin-newsletter__row-action--activate"
+                                  title="Subscribe"
+                                  disabled={
+                                    isBusy
+                                  }
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      subscriber,
+                                      "subscribed"
+                                    )
+                                  }
+                                >
+
+                                  <UserCheck
+                                    size={16}
+                                  />
+
+                                  <span>
+                                    {isUpdating
+                                      ? "Updating..."
+                                      : "Subscribe"}
+                                  </span>
+
+                                </button>
+
+                              )}
+
+
+                              <button
+                                type="button"
+                                className="admin-newsletter__row-action admin-newsletter__row-action--delete"
+                                title="Delete subscriber"
+                                disabled={
+                                  isBusy
+                                }
+                                onClick={() =>
+                                  handleDeleteSubscriber(
+                                    subscriber
+                                  )
+                                }
+                              >
+
+                                <Trash2
+                                  size={16}
+                                />
+
+                                <span>
+                                  {isDeleting
+                                    ? "Deleting..."
+                                    : "Delete"}
+                                </span>
+
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                        </tr>
+
+                      );
+
+                    }
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          )}
 
       </div>
 
     </section>
+
   );
+
 }

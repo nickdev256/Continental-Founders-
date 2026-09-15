@@ -12,15 +12,30 @@ async function request(
   options = {}
 ) {
 
+  const hasBody =
+    options.body !== undefined &&
+    options.body !== null;
+
+
   const response =
     await fetch(
       `${API_URL}${endpoint}`,
       {
         ...options,
 
+        credentials:
+          "include",
+
         headers: {
-          "Content-Type":
+          Accept:
             "application/json",
+
+          ...(hasBody
+            ? {
+                "Content-Type":
+                  "application/json",
+              }
+            : {}),
 
           ...options.headers,
         },
@@ -43,10 +58,13 @@ async function request(
   }
 
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
 
     throw new Error(
-      data.message ||
+      data?.message ||
+      data?.error ||
       "Something went wrong."
     );
 
@@ -58,13 +76,61 @@ async function request(
 
 
 /* ============================================================
-   NEWSLETTER
+   NEWSLETTER - GET SUBSCRIBERS
 ============================================================ */
 
 export async function getNewsletterSubscribers() {
 
   return request(
-    "/api/newsletter/subscribers"
+    "/api/newsletter/subscribers",
+    {
+      method:
+        "GET",
+    }
+  );
+
+}
+
+
+/* ============================================================
+   NEWSLETTER - UPDATE SUBSCRIBER
+============================================================ */
+
+export async function updateNewsletterSubscriber(
+  subscriberId,
+  status
+) {
+
+  return request(
+    `/api/newsletter/subscribers/${subscriberId}`,
+    {
+      method:
+        "PATCH",
+
+      body:
+        JSON.stringify({
+          status,
+        }),
+    }
+  );
+
+}
+
+
+/* ============================================================
+   NEWSLETTER - DELETE SUBSCRIBER
+============================================================ */
+
+export async function deleteNewsletterSubscriber(
+  subscriberId
+) {
+
+  return request(
+    `/api/newsletter/subscribers/${subscriberId}`,
+    {
+      method:
+        "DELETE",
+    }
   );
 
 }

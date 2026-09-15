@@ -4,7 +4,7 @@
 
 .universities-hero,
 .university-opening,
-.universities-outcomes,
+.universities-partners,
 .universities-participation,
 .universities-fellowship,
 .universities-ecosystem {
@@ -22,7 +22,13 @@
   --uni-muted: #687887;
 
   --uni-border: #e4e1da;
+  --uni-border-soft: rgba(7, 26, 45, 0.08);
+
   --uni-white: #ffffff;
+
+  --uni-shadow:
+    0 18px 50px
+    rgba(7, 26, 45, 0.08);
 }
 
 
@@ -106,7 +112,7 @@
 
   grid-template-columns:
     minmax(0, 1fr)
-    360px;
+    minmax(280px, 360px);
 
   gap:
     clamp(3rem, 7vw, 7rem);
@@ -280,10 +286,10 @@
 
 
 /* ============================================================
-   POTENTIAL OUTCOMES
+   UNIVERSITY NETWORK
 ============================================================ */
 
-.universities-outcomes {
+.universities-partners {
   position: relative;
 
   overflow: hidden;
@@ -295,22 +301,22 @@
   background:
     linear-gradient(
       180deg,
-      #f4f1e9 0%,
-      #faf8f3 100%
+      #f5f2eb 0%,
+      #fbfaf6 100%
     );
 }
 
 
-.universities-outcomes::before {
+.universities-partners::before {
   content: "";
 
   position: absolute;
 
-  width: 520px;
-  height: 520px;
+  width: 560px;
+  height: 560px;
 
-  left: -260px;
-  top: -240px;
+  left: -300px;
+  top: -270px;
 
   border-radius: 50%;
 
@@ -325,16 +331,16 @@
 }
 
 
-.universities-outcomes::after {
+.universities-partners::after {
   content: "";
 
   position: absolute;
 
-  width: 430px;
-  height: 430px;
+  width: 480px;
+  height: 480px;
 
-  right: -180px;
-  bottom: -210px;
+  right: -240px;
+  bottom: -240px;
 
   border-radius: 50%;
 
@@ -349,65 +355,122 @@
 }
 
 
-.universities-outcomes .container {
+.universities-partners > .container {
   position: relative;
   z-index: 2;
 }
 
 
 /* ============================================================
-   OUTCOMES API STATUS
+   NETWORK STATUS / EMPTY STATES
 ============================================================ */
 
-.universities-outcomes__status {
-  display: inline-flex;
-
-  align-items: center;
-
-  margin-top: 2rem;
-
-  padding:
-    0.85rem
-    1rem;
-
-  border:
-    1px solid
-    rgba(199, 154, 69, 0.18);
-
-  border-left:
-    3px solid
-    var(--uni-gold);
-
-  border-radius: 6px;
-
-  background:
-    rgba(255, 255, 255, 0.68);
-
-  color: var(--uni-muted);
-
-  font-size: 0.83rem;
-
-  font-weight: 600;
-
-  line-height: 1.5;
+.universities-partners__status,
+.universities-partners__empty {
+  margin-top:
+    clamp(2.5rem, 5vw, 4rem);
 }
 
 
-.universities-outcomes__status--error {
-  border-left-color: #a66c3b;
+.universities-partners__status {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  min-height: 180px;
+
+  padding: 2rem;
+
+  border:
+    1px solid
+    var(--uni-border);
+
+  border-radius: 12px;
 
   background:
-    rgba(166, 108, 59, 0.06);
+    rgba(255, 255, 255, 0.75);
 
-  color: #78543a;
+  color: var(--uni-muted);
+
+  font-size: 0.9rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+}
+
+
+.universities-partners__empty {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-start;
+
+  max-width: 720px;
+
+  min-height: 240px;
+
+  padding:
+    clamp(2rem, 4vw, 3rem);
+
+  border:
+    1px solid
+    var(--uni-border);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.88);
+
+  box-shadow:
+    0 12px 35px
+    rgba(7, 26, 45, 0.04);
+}
+
+
+.universities-partners__empty svg {
+  margin-bottom: 1.5rem;
+
+  color: var(--uni-gold);
+}
+
+
+.universities-partners__empty h3 {
+  margin:
+    0
+    0
+    0.8rem;
+
+  color: var(--uni-navy);
+
+  font-size:
+    clamp(1.35rem, 2vw, 1.8rem);
+
+  letter-spacing: -0.025em;
+}
+
+
+.universities-partners__empty p {
+  max-width: 580px;
+
+  margin: 0;
+
+  color: var(--uni-muted);
+
+  font-size: 0.95rem;
+
+  line-height: 1.75;
 }
 
 
 /* ============================================================
-   OUTCOME GRID
+   UNIVERSITY GRID
 ============================================================ */
 
-.outcome-grid {
+.universities-partners__grid {
   display: grid;
 
   grid-template-columns:
@@ -421,42 +484,46 @@
 
 
 /* ============================================================
-   OUTCOME CARD
+   UNIVERSITY CARD
 ============================================================ */
 
-.university-outcome-card {
+.universities-partner-card {
   position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  min-height: 390px;
 
   overflow: hidden;
 
-  min-height: 315px;
-
   padding:
-    2rem
-    2rem
-    2.2rem;
+    1.8rem
+    1.8rem
+    1.9rem;
 
   border:
     1px solid
     rgba(7, 26, 45, 0.09);
 
-  border-radius: 14px;
+  border-radius: 16px;
 
   background:
-    rgba(255, 255, 255, 0.94);
+    rgba(255, 255, 255, 0.97);
 
   box-shadow:
-    0 14px 40px
-    rgba(7, 26, 45, 0.055);
+    0 12px 34px
+    rgba(7, 26, 45, 0.045);
 
   transition:
     transform 0.28s ease,
-    box-shadow 0.28s ease,
-    border-color 0.28s ease;
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
 
-.university-outcome-card::before {
+.universities-partner-card::before {
   content: "";
 
   position: absolute;
@@ -481,23 +548,23 @@
 }
 
 
-.university-outcome-card::after {
+.universities-partner-card::after {
   content: "";
 
   position: absolute;
 
-  width: 220px;
-  height: 220px;
+  width: 240px;
+  height: 240px;
 
-  right: -110px;
-  bottom: -130px;
+  right: -130px;
+  bottom: -150px;
 
   border-radius: 50%;
 
   background:
     radial-gradient(
       circle,
-      rgba(199, 154, 69, 0.11),
+      rgba(199, 154, 69, 0.1),
       rgba(199, 154, 69, 0)
     );
 
@@ -505,155 +572,269 @@
 }
 
 
-.university-outcome-card:hover {
-  transform: translateY(-7px);
+.universities-partner-card:hover {
+  transform: translateY(-6px);
 
   border-color:
-    rgba(199, 154, 69, 0.32);
+    rgba(199, 154, 69, 0.34);
 
   box-shadow:
     0 24px 60px
-    rgba(7, 26, 45, 0.1);
+    rgba(7, 26, 45, 0.09);
 }
 
 
-.university-outcome-card:hover::before {
+.universities-partner-card:hover::before {
   opacity: 1;
 }
 
 
 /* ============================================================
-   OUTCOME CARD TOP
+   CARD HEADER
 ============================================================ */
 
-.university-outcome-card__top {
+.universities-partner-card__top {
+  position: relative;
+  z-index: 2;
+
   display: flex;
 
-  align-items: center;
+  align-items: flex-start;
 
-  justify-content: space-between;
+  gap: 1rem;
 
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 
-.university-outcome-card__number {
-  color:
-    rgba(7, 26, 45, 0.38);
+.universities-partner-card__logo {
+  flex: 0 0 auto;
 
-  font-size: 0.76rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.14em;
-}
-
-
-.university-outcome-card__icon {
   display: grid;
 
   place-items: center;
 
-  width: 46px;
-  height: 46px;
+  width: 62px;
+  height: 62px;
+
+  overflow: hidden;
 
   border:
     1px solid
-    rgba(199, 154, 69, 0.25);
+    rgba(7, 26, 45, 0.09);
 
-  border-radius: 50%;
+  border-radius: 12px;
 
   background:
-    rgba(199, 154, 69, 0.08);
+    #ffffff;
+
+  color: var(--uni-gold);
+}
+
+
+.universities-partner-card__logo img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 8px;
+
+  object-fit: contain;
+}
+
+
+.universities-partner-card__identity {
+  min-width: 0;
+}
+
+
+.universities-partner-card__identity > span {
+  display: inline-flex;
+
+  margin-bottom: 0.45rem;
 
   color: var(--uni-gold);
 
-  transition:
-    background 0.25s ease,
-    color 0.25s ease,
-    transform 0.25s ease;
+  font-size: 0.7rem;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
 }
 
 
-.university-outcome-card:hover
-.university-outcome-card__icon {
-  transform:
-    rotate(-6deg)
-    scale(1.03);
-
-  background: var(--uni-navy);
-
-  color: var(--uni-gold-light);
-}
-
-
-/* ============================================================
-   OUTCOME CARD CONTENT
-============================================================ */
-
-.university-outcome-card h3 {
-  position: relative;
-  z-index: 2;
-
-  max-width: 390px;
-
-  margin:
-    0
-    0
-    1rem;
+.universities-partner-card__identity h3 {
+  margin: 0;
 
   color: var(--uni-navy);
 
   font-size:
-    clamp(1.35rem, 2vw, 1.7rem);
+    clamp(1.25rem, 2vw, 1.55rem);
 
-  line-height: 1.16;
+  line-height: 1.18;
 
   letter-spacing: -0.025em;
 }
 
 
-.university-outcome-card p {
+/* ============================================================
+   CARD META
+============================================================ */
+
+.universities-partner-card__meta {
   position: relative;
   z-index: 2;
 
-  max-width: 440px;
+  display: flex;
 
-  margin: 0;
+  flex-wrap: wrap;
 
-  padding-right: 1rem;
+  gap:
+    0.55rem
+    1.2rem;
+
+  padding:
+    0.9rem
+    0;
+
+  border-top:
+    1px solid
+    var(--uni-border-soft);
+
+  border-bottom:
+    1px solid
+    var(--uni-border-soft);
+}
+
+
+.universities-partner-card__meta > div {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.45rem;
 
   color: var(--uni-muted);
 
-  font-size: 0.96rem;
+  font-size: 0.78rem;
+
+  font-weight: 600;
+}
+
+
+.universities-partner-card__meta svg {
+  flex: 0 0 auto;
+
+  color: var(--uni-gold);
+}
+
+
+/* ============================================================
+   CARD DESCRIPTION
+============================================================ */
+
+.universities-partner-card__description {
+  position: relative;
+  z-index: 2;
+
+  margin:
+    1.3rem
+    0
+    1.25rem;
+
+  color: var(--uni-muted);
+
+  font-size: 0.94rem;
 
   line-height: 1.72;
 }
 
 
-.university-outcome-card__arrow {
-  position: absolute;
+/* ============================================================
+   CARD PARTICIPATION TAGS
+============================================================ */
 
-  right: 1.8rem;
-  bottom: 1.8rem;
-
+.universities-partner-card__areas {
+  position: relative;
   z-index: 2;
 
-  color:
-    rgba(7, 26, 45, 0.3);
+  display: flex;
 
-  transition:
-    color 0.25s ease,
-    transform 0.25s ease;
+  flex-wrap: wrap;
+
+  gap: 0.45rem;
+
+  margin-bottom: 1.5rem;
 }
 
 
-.university-outcome-card:hover
-.university-outcome-card__arrow {
-  color: var(--uni-gold);
+.universities-partner-card__areas span {
+  display: inline-flex;
 
-  transform:
-    translate(3px, -3px);
+  align-items: center;
+
+  min-height: 30px;
+
+  padding:
+    0.35rem
+    0.7rem;
+
+  border:
+    1px solid
+    rgba(199, 154, 69, 0.2);
+
+  border-radius: 999px;
+
+  background:
+    rgba(199, 154, 69, 0.07);
+
+  color: #775d2d;
+
+  font-size: 0.7rem;
+
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   CARD WEBSITE
+============================================================ */
+
+.universities-partner-card__website {
+  position: relative;
+  z-index: 2;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  width: fit-content;
+
+  margin-top: auto;
+
+  color: var(--uni-navy);
+
+  font-size: 0.78rem;
+
+  font-weight: 800;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    gap 0.2s ease;
+}
+
+
+.universities-partner-card__website:hover {
+  gap: 0.7rem;
+
+  color: var(--uni-gold);
 }
 
 
@@ -1028,7 +1209,7 @@
     1px solid
     var(--uni-border);
 
-  border-radius: 10px;
+  border-radius: 12px;
 
   background: #ffffff;
 
@@ -1149,9 +1330,9 @@
   }
 
 
-  .outcome-grid {
+  .universities-partners__grid {
     grid-template-columns:
-      repeat(2, 1fr);
+      repeat(2, minmax(0, 1fr));
   }
 
 
@@ -1162,7 +1343,7 @@
 
   .universities-ecosystem__grid {
     grid-template-columns:
-      repeat(2, 1fr);
+      repeat(2, minmax(0, 1fr));
   }
 
 }
@@ -1193,13 +1374,29 @@
   }
 
 
-  .outcome-grid {
+  .universities-partners__grid {
     grid-template-columns: 1fr;
   }
 
 
-  .university-outcome-card {
-    min-height: 280px;
+  .universities-partner-card {
+    min-height: auto;
+
+    padding:
+      1.5rem
+      1.4rem
+      1.6rem;
+  }
+
+
+  .universities-partner-card__top {
+    align-items: center;
+  }
+
+
+  .universities-partner-card__logo {
+    width: 56px;
+    height: 56px;
   }
 
 
@@ -1243,16 +1440,20 @@
   }
 
 
-  .university-outcome-card {
-    padding:
-      1.6rem
-      1.4rem
-      2rem;
+  .universities-partner-card__top {
+    align-items: flex-start;
   }
 
 
-  .university-outcome-card__top {
-    margin-bottom: 2.3rem;
+  .universities-partner-card__meta {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+
+  .universities-partner-card__areas {
+    gap: 0.35rem;
   }
 
 
@@ -1276,9 +1477,9 @@
 
 @media (prefers-reduced-motion: reduce) {
 
-  .university-outcome-card,
-  .university-outcome-card__icon,
-  .university-outcome-card__arrow,
+  .universities-partner-card,
+  .universities-partner-card::before,
+  .universities-partner-card__website,
   .universities-participation__item,
   .universities-ecosystem__card,
   .universities-hero__link,

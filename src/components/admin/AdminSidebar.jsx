@@ -23,9 +23,9 @@ import {
   Globe2,
   Building2,
   Landmark,
-  Handshake,
   ShieldCheck,
   ChevronRight,
+  BriefcaseBusiness,
 } from "lucide-react";
 
 import "./AdminSidebar.css";
@@ -52,30 +52,42 @@ const managementNavigation = [
     icon: LayoutDashboard,
     end: true,
   },
+
+  {
+    label: "Ventures",
+    description: "Founders & venture profiles",
+    path: "/admin/ventures",
+    icon: BriefcaseBusiness,
+  },
+
   {
     label: "Events",
     description: "Programs & conferences",
     path: "/admin/events",
     icon: CalendarDays,
   },
+
   {
     label: "Insights",
     description: "Articles & publications",
     path: "/admin/insights",
     icon: Newspaper,
   },
+
   {
     label: "Universities",
     description: "Academic directory",
     path: "/admin/universities",
     icon: GraduationCap,
   },
+
   {
     label: "Newsletter",
     description: "Subscribers & campaigns",
     path: "/admin/newsletter",
     icon: Mail,
   },
+
   {
     label: "Contacts",
     description: "Messages & inquiries",
@@ -96,6 +108,7 @@ const contentNavigation = [
     path: "/admin/about",
     icon: FileText,
   },
+
   {
     label: "Leadership",
     description: "Team & governance",
@@ -115,16 +128,13 @@ const partnerNavigation = [
     path: "/admin/partners/us-africa-trade-network",
     icon: Globe2,
   },
-  {
-    label: "Universities Page",
-    path: "/admin/partners/universities",
-    icon: GraduationCap,
-  },
+
   {
     label: "Corporate Partners",
     path: "/admin/partners/corporate",
     icon: Building2,
   },
+
   {
     label: "Government & Development",
     path: "/admin/partners/government-development",
@@ -141,17 +151,14 @@ export default function AdminSidebar({
   open = false,
   onClose,
 }) {
-
   const navigate =
     useNavigate();
-
 
   const [
     loggingOut,
     setLoggingOut,
   ] =
     useState(false);
-
 
   const [
     logoutError,
@@ -165,7 +172,6 @@ export default function AdminSidebar({
   ========================================================== */
 
   function clearLocalAuthState() {
-
     localStorage.removeItem(
       "cf_admin_user"
     );
@@ -181,7 +187,6 @@ export default function AdminSidebar({
     sessionStorage.removeItem(
       "cf_otp_purpose"
     );
-
   }
 
 
@@ -190,18 +195,14 @@ export default function AdminSidebar({
   ========================================================== */
 
   async function handleLogout() {
-
     if (loggingOut) {
       return;
     }
 
-
     setLoggingOut(true);
     setLogoutError("");
 
-
     try {
-
       const response =
         await fetch(
           `${API_URL}/api/auth/logout`,
@@ -219,30 +220,21 @@ export default function AdminSidebar({
         );
 
 
-      let result =
-        null;
-
+      let result = null;
 
       try {
-
         result =
           await response.json();
-
       } catch {
-
-        result =
-          null;
-
+        result = null;
       }
 
 
       if (!response.ok) {
-
         throw new Error(
           result?.message ||
           "Unable to sign out securely."
         );
-
       }
 
 
@@ -260,9 +252,7 @@ export default function AdminSidebar({
           replace: true,
         }
       );
-
     } catch (error) {
-
       console.error(
         "Admin logout error:",
         error
@@ -277,12 +267,16 @@ export default function AdminSidebar({
         "Unable to sign out. Please try again."
       );
 
+
+      navigate(
+        "/admin/login",
+        {
+          replace: true,
+        }
+      );
     } finally {
-
       setLoggingOut(false);
-
     }
-
   }
 
 
@@ -291,11 +285,9 @@ export default function AdminSidebar({
   ========================================================== */
 
   function handleNavigation() {
-
     if (onClose) {
       onClose();
     }
-
   }
 
 
@@ -307,13 +299,11 @@ export default function AdminSidebar({
     item,
     compact = false
   ) {
-
     const Icon =
       item.icon;
 
 
     return (
-
       <NavLink
         key={item.path}
         to={item.path}
@@ -342,12 +332,10 @@ export default function AdminSidebar({
           className="admin-sidebar__link-icon"
           aria-hidden="true"
         >
-
           <Icon
             size={17}
             strokeWidth={1.8}
           />
-
         </span>
 
 
@@ -358,15 +346,14 @@ export default function AdminSidebar({
           </span>
 
 
-          {
-            item.description &&
-            !compact &&
-            (
-              <span className="admin-sidebar__link-description">
-                {item.description}
-              </span>
-            )
-          }
+          {item.description &&
+            !compact && (
+
+            <span className="admin-sidebar__link-description">
+              {item.description}
+            </span>
+
+          )}
 
         </span>
 
@@ -379,9 +366,7 @@ export default function AdminSidebar({
         />
 
       </NavLink>
-
     );
-
   }
 
 
@@ -394,9 +379,7 @@ export default function AdminSidebar({
     items,
     compact = false,
   }) {
-
     return (
-
       <div className="admin-sidebar__section">
 
         <div className="admin-sidebar__section-header">
@@ -426,9 +409,7 @@ export default function AdminSidebar({
         </div>
 
       </div>
-
     );
-
   }
 
 
@@ -437,7 +418,6 @@ export default function AdminSidebar({
   ========================================================== */
 
   return (
-
     <aside
       className={
         open
@@ -449,7 +429,7 @@ export default function AdminSidebar({
 
       {/* ======================================================
           LOGO
-      ======================================================= */}
+      ====================================================== */}
 
       <header className="admin-sidebar__header">
 
@@ -459,13 +439,11 @@ export default function AdminSidebar({
           onClick={handleNavigation}
           aria-label="Continental Founders home"
         >
-
           <img
             src="/assets/continental-founders-logo.png"
             alt="Continental Founders"
             className="admin-sidebar__logo"
           />
-
         </Link>
 
 
@@ -475,12 +453,10 @@ export default function AdminSidebar({
           onClick={onClose}
           aria-label="Close administration menu"
         >
-
           <X
             size={20}
             strokeWidth={1.8}
           />
-
         </button>
 
       </header>
@@ -488,7 +464,7 @@ export default function AdminSidebar({
 
       {/* ======================================================
           ADMIN IDENTITY
-      ======================================================= */}
+      ====================================================== */}
 
       <div className="admin-sidebar__identity">
 
@@ -499,7 +475,6 @@ export default function AdminSidebar({
             size={17}
             strokeWidth={1.8}
           />
-
 
           <span className="admin-sidebar__eyebrow">
             ADMINISTRATION
@@ -514,9 +489,9 @@ export default function AdminSidebar({
 
 
         <p>
-          Manage institutional content,
+          Manage ventures, institutional content,
           partnerships, events, communications,
-          and public-facing information.
+          universities, and public-facing information.
         </p>
 
       </div>
@@ -524,7 +499,7 @@ export default function AdminSidebar({
 
       {/* ======================================================
           NAVIGATION
-      ======================================================= */}
+      ====================================================== */}
 
       <nav
         className="admin-sidebar__nav"
@@ -534,6 +509,7 @@ export default function AdminSidebar({
         {renderSection({
           title:
             "MANAGEMENT",
+
           items:
             managementNavigation,
         })}
@@ -542,6 +518,7 @@ export default function AdminSidebar({
         {renderSection({
           title:
             "CONTENT",
+
           items:
             contentNavigation,
         })}
@@ -550,8 +527,10 @@ export default function AdminSidebar({
         {renderSection({
           title:
             "PARTNERSHIPS",
+
           items:
             partnerNavigation,
+
           compact:
             true,
         })}
@@ -561,7 +540,7 @@ export default function AdminSidebar({
 
       {/* ======================================================
           BOTTOM AREA
-      ======================================================= */}
+      ====================================================== */}
 
       <footer className="admin-sidebar__bottom">
 
@@ -572,7 +551,6 @@ export default function AdminSidebar({
             className="admin-sidebar__utility-link"
             onClick={handleNavigation}
           >
-
             <ExternalLink
               size={16}
               strokeWidth={1.8}
@@ -581,7 +559,22 @@ export default function AdminSidebar({
             <span>
               View Partners Page
             </span>
+          </Link>
 
+
+          <Link
+            to="/ventures"
+            className="admin-sidebar__utility-link"
+            onClick={handleNavigation}
+          >
+            <BriefcaseBusiness
+              size={16}
+              strokeWidth={1.8}
+            />
+
+            <span>
+              View Ventures Page
+            </span>
           </Link>
 
 
@@ -590,7 +583,6 @@ export default function AdminSidebar({
             className="admin-sidebar__utility-link"
             onClick={handleNavigation}
           >
-
             <ExternalLink
               size={16}
               strokeWidth={1.8}
@@ -599,7 +591,6 @@ export default function AdminSidebar({
             <span>
               View Public Website
             </span>
-
           </Link>
 
         </div>
@@ -613,34 +604,29 @@ export default function AdminSidebar({
             onClick={handleLogout}
             disabled={loggingOut}
           >
-
             <LogOut
               size={17}
               strokeWidth={1.8}
             />
 
             <span>
-              {
-                loggingOut
-                  ? "Signing out..."
-                  : "Sign out"
-              }
+              {loggingOut
+                ? "Signing out..."
+                : "Sign out"}
             </span>
-
           </button>
 
 
-          {
-            logoutError &&
-            (
-              <p
-                className="admin-sidebar__logout-error"
-                role="alert"
-              >
-                {logoutError}
-              </p>
-            )
-          }
+          {logoutError && (
+
+            <p
+              className="admin-sidebar__logout-error"
+              role="alert"
+            >
+              {logoutError}
+            </p>
+
+          )}
 
         </div>
 
@@ -660,7 +646,5 @@ export default function AdminSidebar({
       </footer>
 
     </aside>
-
   );
-
 }

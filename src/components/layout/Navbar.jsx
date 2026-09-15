@@ -18,9 +18,12 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import { navigation } from "../../data/navigation";
+import {
+  navigation,
+} from "../../data/navigation";
 
 import "./Navbar.css";
+
 
 export default function Navbar() {
 
@@ -71,75 +74,117 @@ export default function Navbar() {
   ========================================================== */
 
   const searchItems = [
+
     {
-      title: "About Us",
+      title:
+        "About Us",
+
       description:
         "Learn more about Continental Founders, our mission, vision, purpose, and global ecosystem.",
-      url: "/about",
+
+      url:
+        "/about",
     },
 
     {
-      title: "Our Model",
+      title:
+        "Our Model",
+
       description:
         "Explore how Continental Founders brings founders, universities, industry, expertise, markets, and opportunity together.",
-      url: "/our-model",
+
+      url:
+        "/our-model",
     },
 
     {
-      title: "Partners",
+      title:
+        "Partners",
+
       description:
         "Explore the Continental Founders partnership ecosystem and opportunities for collaboration.",
-      url: "/strategic-partners",
+
+      url:
+        "/strategic-partners",
     },
 
     {
-      title: "U.S.–Africa Trade & Business Network",
+      title:
+        "U.S.–Africa Trade & Business Network",
+
       description:
         "Explore trade, business relationships, market access, investor connections, and commercial engagement between Africa and the United States.",
-      url: "/partners/us-africa-trade-network",
+
+      url:
+        "/partners/us-africa-trade-network",
     },
 
     {
-      title: "Universities",
+      title:
+        "Universities",
+
       description:
         "Explore university partnerships, faculty expertise, research collaboration, student engagement, and global learning opportunities.",
-      url: "/partners/universities",
+
+      url:
+        "/universities",
     },
 
     {
-      title: "Corporate Partners",
+      title:
+        "Corporate Partners",
+
       description:
         "Explore corporate collaboration, industry expertise, mentorship, sponsorship, procurement, and commercial opportunities.",
-      url: "/partners/corporate",
+
+      url:
+        "/partners/corporate",
     },
 
     {
-      title: "Government & Development Institutions",
+      title:
+        "Government & Development Institutions",
+
       description:
         "Explore collaboration with government and development institutions around policy, programs, market access, and economic opportunity.",
-      url: "/partners/government-development",
+
+      url:
+        "/partners/government-development",
     },
 
     {
-      title: "Events",
+      title:
+        "Events",
+
       description:
         "Discover upcoming events, gatherings, conferences, and founder activities.",
-      url: "/events",
+
+      url:
+        "/events",
     },
 
     {
-      title: "Insights",
+      title:
+        "Insights",
+
       description:
         "Read Continental Founders insights, ideas, updates, and thought leadership.",
-      url: "/insights",
+
+      url:
+        "/insights",
     },
 
     {
-      title: "Contact Us",
+      title:
+        "Contact Us",
+
       description:
         "Get in touch with Continental Founders and explore opportunities to participate.",
-      url: "/contact",
+
+      url:
+        "/contact",
     },
+
   ];
 
 
@@ -189,45 +234,58 @@ export default function Navbar() {
      CLOSE MOBILE MENU
   ========================================================== */
 
-  const closeMenu = () => {
+  const closeMenu =
+    () => {
 
-    setOpen(false);
+      setOpen(
+        false
+      );
 
-    setMobileDropdown(
-      null
-    );
+      setMobileDropdown(
+        null
+      );
 
-  };
+    };
 
 
   /* ==========================================================
      CLOSE SEARCH
   ========================================================== */
 
-  const closeSearch = () => {
+  const closeSearch =
+    () => {
 
-    setSearchOpen(false);
+      setSearchOpen(
+        false
+      );
 
-    setSearchQuery("");
+      setSearchQuery(
+        ""
+      );
 
-  };
+    };
 
 
   /* ==========================================================
      OPEN SEARCH
   ========================================================== */
 
-  const openSearch = () => {
+  const openSearch =
+    () => {
 
-    setOpen(false);
+      setOpen(
+        false
+      );
 
-    setMobileDropdown(
-      null
-    );
+      setMobileDropdown(
+        null
+      );
 
-    setSearchOpen(true);
+      setSearchOpen(
+        true
+      );
 
-  };
+    };
 
 
   /* ==========================================================
@@ -242,7 +300,8 @@ export default function Navbar() {
       (
         current
       ) =>
-        current === label
+        current ===
+        label
           ? null
           : label
     );
@@ -253,8 +312,8 @@ export default function Navbar() {
   /* ==========================================================
      SECRET CMS ACCESS
 
-     Click the logo 3 times quickly
-     to open the CMS login page.
+     Click logo 3 times quickly
+     to open CMS login.
   ========================================================== */
 
   const handleLogoClick = (
@@ -265,14 +324,18 @@ export default function Navbar() {
 
 
     const nextClicks =
-      logoClicks + 1;
+      logoClicks +
+      1;
 
 
     if (
-      nextClicks >= 3
+      nextClicks >=
+      3
     ) {
 
-      setLogoClicks(0);
+      setLogoClicks(
+        0
+      );
 
       closeMenu();
 
@@ -298,111 +361,126 @@ export default function Navbar() {
 
   /* ==========================================================
      RESET LOGO CLICK COUNTER
-
-     User must click 3 times within 1.5 seconds.
   ========================================================== */
 
-  useEffect(() => {
+  useEffect(
+    () => {
 
-    if (
-      logoClicks === 0
-    ) {
+      if (
+        logoClicks ===
+        0
+      ) {
 
-      return undefined;
+        return undefined;
 
-    }
-
-
-    const timer =
-      window.setTimeout(
-        () => {
-
-          setLogoClicks(0);
-
-        },
-        1500
-      );
+      }
 
 
-    return () => {
+      const timer =
+        window.setTimeout(
+          () => {
 
-      window.clearTimeout(
-        timer
-      );
+            setLogoClicks(
+              0
+            );
 
-    };
+          },
+          1500
+        );
 
-  }, [
-    logoClicks,
-  ]);
+
+      return () => {
+
+        window.clearTimeout(
+          timer
+        );
+
+      };
+
+    },
+    [
+      logoClicks,
+    ]
+  );
 
 
   /* ==========================================================
      CLOSE MENU WHEN ROUTE CHANGES
   ========================================================== */
 
-  useEffect(() => {
+  useEffect(
+    () => {
 
-    setOpen(false);
+      setOpen(
+        false
+      );
 
-    setMobileDropdown(
-      null
-    );
+      setMobileDropdown(
+        null
+      );
 
-    setSearchOpen(false);
+      setSearchOpen(
+        false
+      );
 
-    setSearchQuery("");
+      setSearchQuery(
+        ""
+      );
 
-    setLogoClicks(0);
+      setLogoClicks(
+        0
+      );
 
-  }, [
-    location.pathname,
-  ]);
+    },
+    [
+      location.pathname,
+    ]
+  );
 
 
   /* ==========================================================
      PREVENT BODY SCROLL
   ========================================================== */
 
-  useEffect(() => {
+  useEffect(
+    () => {
 
-    if (
-      open ||
-      searchOpen
-    ) {
+      if (
+        open ||
+        searchOpen
+      ) {
 
-      document.body.classList.add(
-        "nav-open"
-      );
+        document.body.classList.add(
+          "nav-open"
+        );
 
-    } else {
+      } else {
 
-      document.body.classList.remove(
-        "nav-open"
-      );
+        document.body.classList.remove(
+          "nav-open"
+        );
 
-    }
+      }
 
 
-    return () => {
+      return () => {
 
-      document.body.classList.remove(
-        "nav-open"
-      );
+        document.body.classList.remove(
+          "nav-open"
+        );
 
-    };
+      };
 
-  }, [
-    open,
-    searchOpen,
-  ]);
+    },
+    [
+      open,
+      searchOpen,
+    ]
+  );
 
 
   /* ==========================================================
      ACTIVE DROPDOWN CHECK
-
-     Keeps "Partners" highlighted while viewing any of its
-     subpages.
   ========================================================== */
 
   const isDropdownActive = (
@@ -442,58 +520,61 @@ export default function Navbar() {
      KEYBOARD SUPPORT
   ========================================================== */
 
-  useEffect(() => {
+  useEffect(
+    () => {
 
-    const handleKeyDown = (
-      event
-    ) => {
-
-      if (
-        event.key ===
-        "Escape"
-      ) {
+      const handleKeyDown = (
+        event
+      ) => {
 
         if (
-          searchOpen
+          event.key ===
+          "Escape"
         ) {
 
-          closeSearch();
+          if (
+            searchOpen
+          ) {
+
+            closeSearch();
+
+          }
+
+
+          if (
+            open
+          ) {
+
+            closeMenu();
+
+          }
 
         }
 
-
-        if (
-          open
-        ) {
-
-          closeMenu();
-
-        }
-
-      }
-
-    };
+      };
 
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
-
-
-    return () => {
-
-      window.removeEventListener(
+      window.addEventListener(
         "keydown",
         handleKeyDown
       );
 
-    };
 
-  }, [
-    searchOpen,
-    open,
-  ]);
+      return () => {
+
+        window.removeEventListener(
+          "keydown",
+          handleKeyDown
+        );
+
+      };
+
+    },
+    [
+      searchOpen,
+      open,
+    ]
+  );
 
 
   /* ==========================================================
@@ -553,7 +634,7 @@ export default function Navbar() {
             </Link>
 
 
-            <Link to="/partners/universities">
+            <Link to="/universities">
               Universities
             </Link>
 
@@ -1030,11 +1111,9 @@ export default function Navbar() {
 
 
                   <p>
-
                     Search our partnerships,
                     events, insights, model,
-                    and more.
-
+                    universities, and more.
                   </p>
 
                 </div>
@@ -1054,10 +1133,8 @@ export default function Navbar() {
 
 
                     <p>
-
                       No results found for "
                       {searchQuery}".
-
                     </p>
 
                   </div>

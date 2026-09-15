@@ -1,21 +1,56 @@
+/* ============================================================
+   CONTACT PAGE
+   FONT SYSTEM
+============================================================ */
+
+:root {
+  --font-primary: "Trajan Pro", "Trajan Pro 3", Georgia, serif;
+  --font-secondary: "Montserrat", Arial, sans-serif;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
 .page-hero {
   position: relative;
   overflow: hidden;
   min-height: 500px;
   background: var(--navy-900);
   isolation: isolate;
+
+  font-family: var(--font-secondary);
 }
- 
+
+.page-hero__aside {
+  transform: translateY(100px);
+  font-family: var(--font-secondary);
+}
+
 .page-hero::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -2;
 
-  background-image: url("/assets/kk.png");
+  background-image: url("/assets/v.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
+  transform: scale(1.12);
+  animation: heroZoomOut 5s ease-out forwards;
+}
+
+@keyframes heroZoomOut {
+  from {
+    transform: scale(1.12);
+  }
+
+  to {
+    transform: scale(1);
+  }
 }
 
 .page-hero::after {
@@ -43,6 +78,33 @@
 .page-hero__inner {
   position: relative;
   z-index: 2;
+  font-family: var(--font-secondary);
+}
+
+
+/* ============================================================
+   HERO TYPOGRAPHY
+============================================================ */
+
+.page-hero h1 {
+  font-family: var(--font-primary);
+}
+
+.page-hero .eyebrow {
+  font-family: var(--font-secondary);
+}
+
+.page-hero__aside p {
+  font-family: var(--font-secondary);
+}
+
+
+/* ============================================================
+   CONTACT PAGE
+============================================================ */
+
+.contact-page {
+  font-family: var(--font-secondary);
 }
 
 .contact-grid {
@@ -51,10 +113,22 @@
   gap: 110px;
 }
 
+
+/* ============================================================
+   CONTACT INFORMATION
+============================================================ */
+
+.contact-info {
+  font-family: var(--font-secondary);
+}
+
 .contact-info h2 {
   max-width: 650px;
   margin-top: 18px;
+
   color: var(--navy-900);
+
+  font-family: var(--font-primary);
   font-size: clamp(3rem, 5vw, 5.6rem);
   line-height: .96;
 }
@@ -62,15 +136,26 @@
 .contact-info > p {
   max-width: 600px;
   margin-top: 25px;
+
   color: var(--muted);
+
+  font-family: var(--font-secondary);
 }
+
+
+/* ============================================================
+   CONTACT DETAILS
+============================================================ */
 
 .contact-detail {
   display: flex;
   gap: 15px;
   margin-top: 35px;
   padding-top: 20px;
+
   border-top: 1px solid var(--line);
+
+  font-family: var(--font-secondary);
 }
 
 .contact-detail svg {
@@ -80,7 +165,10 @@
 
 .contact-detail span {
   display: block;
+
   color: var(--muted);
+
+  font-family: var(--font-secondary);
   font-size: .7rem;
   font-weight: 850;
   letter-spacing: .08em;
@@ -91,20 +179,33 @@
 .contact-detail p {
   display: block;
   margin-top: 4px;
+
   color: var(--navy-900);
+
+  font-family: var(--font-secondary);
   font-size: .92rem;
 }
 
+
+/* ============================================================
+   CONTACT FORM
+============================================================ */
+
 .contact-form-wrap {
   padding: 35px;
+
   background: var(--surface);
   border-top: 3px solid var(--navy-900);
+
+  font-family: var(--font-secondary);
 }
 
 .contact-form {
   display: flex;
   flex-direction: column;
   gap: 22px;
+
+  font-family: var(--font-secondary);
 }
 
 .form-row {
@@ -117,7 +218,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+
   color: var(--navy-900);
+
+  font-family: var(--font-secondary);
   font-size: .74rem;
   font-weight: 800;
 }
@@ -126,12 +230,18 @@
 .contact-form textarea,
 .contact-form select {
   width: 100%;
+
   border: 1px solid #cfd7dc;
   border-radius: 2px;
   outline: none;
+
   padding: 13px 14px;
+
   color: var(--navy-900);
   background: var(--white);
+
+  font-family: var(--font-secondary);
+
   resize: vertical;
 }
 
@@ -141,16 +251,26 @@
   border-color: var(--navy-900);
 }
 
+
+/* ============================================================
+   SUBMIT BUTTON
+============================================================ */
+
 .contact-submit {
   min-height: 54px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+
   border: 0;
   border-radius: 2px;
+
   color: var(--white);
   background: var(--navy-900);
+
+  font-family: var(--font-secondary);
   font-size: .75rem;
   font-weight: 850;
   letter-spacing: .06em;
@@ -161,12 +281,20 @@
   background: var(--navy-800);
 }
 
+
+/* ============================================================
+   SUCCESS MESSAGE
+============================================================ */
+
 .contact-success {
   min-height: 430px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+
+  font-family: var(--font-secondary);
 }
 
 .contact-success svg {
@@ -175,8 +303,10 @@
 
 .contact-success h3 {
   margin-top: 20px;
+
   color: var(--navy-900);
-  font-family: var(--font-display);
+
+  font-family: var(--font-primary);
   font-size: 3rem;
   font-weight: 400;
 }
@@ -184,21 +314,50 @@
 .contact-success p {
   max-width: 560px;
   margin-top: 12px;
+
   color: var(--muted);
+
+  font-family: var(--font-secondary);
 }
 
 .contact-success button {
   margin-top: 25px;
+
   border: 0;
   border-bottom: 1px solid var(--navy-900);
+
   padding: 0 0 4px;
+
   background: transparent;
   color: var(--navy-900);
+
+  font-family: var(--font-secondary);
   font-weight: 800;
 }
+
+
+/* ============================================================
+   REMOVE GOLD DECORATIVE LINES
+============================================================ */
 
 .contact-page .eyebrow::before,
 .contact-page .eyebrow::after {
   display: none !important;
   content: none !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 900px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }

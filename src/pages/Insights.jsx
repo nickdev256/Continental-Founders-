@@ -364,39 +364,29 @@ export default function Insights() {
           HERO
       ====================================================== */}
 
-      <section className="page-hero">
+   <section className="insights-hero">
+  <div className="container page-hero__inner">
+    <div>
+      <span className="eyebrow eyebrow--light">
+        Insights
+      </span>
 
-        <div className="container page-hero__inner">
+      <h1>
+        Ideas for a more connected world.
+      </h1>
+    </div>
 
-          <div>
-
-            <span className="eyebrow eyebrow--light">
-              Insights
-            </span>
-
-
-            <h1>
-              Ideas for a more connected world.
-            </h1>
-
-          </div>
-
-
-          <div className="page-hero__aside">
-
-            <p>
-              Perspectives on partnership,
-              higher education, research,
-              knowledge exchange,
-              entrepreneurship, and
-              cross-continental collaboration.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
+    <div className="page-hero__aside">
+      <p>
+        Perspectives on partnership,
+        higher education, research,
+        knowledge exchange,
+        entrepreneurship, and
+        cross-continental collaboration.
+      </p>
+    </div>
+  </div>
+</section>
 
 
       {/* ======================================================

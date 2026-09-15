@@ -145,7 +145,7 @@ export default function Contact() {
 
             <h2 className="display">
               Tell us what you're trying
-              to build.
+              to build. 
             </h2>
 
             <p>

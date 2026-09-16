@@ -1,10 +1,11 @@
 const { Resend } = require("resend");
 
-// ============================================================
-// RESEND CLIENT
-// ============================================================
-
 let resendClient = null;
+
+
+// ============================================================
+// GET RESEND CLIENT
+// ============================================================
 
 function getResendClient() {
   const apiKey =
@@ -22,6 +23,7 @@ function getResendClient() {
   return resendClient;
 }
 
+
 // ============================================================
 // SEND EMAIL
 // ============================================================
@@ -33,10 +35,6 @@ async function sendEmail({
   text,
   replyTo,
 }) {
-  // ==========================================================
-  // CONFIGURATION
-  // ==========================================================
-
   const resend =
     getResendClient();
 
@@ -50,9 +48,6 @@ async function sendEmail({
     );
   }
 
-  // ==========================================================
-  // RECIPIENT
-  // ==========================================================
 
   const recipient =
     to ||
@@ -64,17 +59,11 @@ async function sendEmail({
     );
   }
 
-  // ==========================================================
-  // FROM
-  // ==========================================================
 
   const from =
     process.env.EMAIL_FROM ||
     "Continental Founders <noreply@continentalfounders.org>";
 
-  // ==========================================================
-  // MESSAGE
-  // ==========================================================
 
   const message = {
     from,
@@ -82,36 +71,42 @@ async function sendEmail({
     subject,
   };
 
+
   if (html) {
     message.html = html;
   }
+
 
   if (text) {
     message.text = text;
   }
 
+
   if (replyTo) {
-    message.replyTo = replyTo;
+    message.replyTo =
+      replyTo;
   }
 
-  // ==========================================================
-  // SEND THROUGH RESEND
-  // ==========================================================
 
   try {
     const {
       data,
       error,
-    } = await resend.emails.send(
-      message
-    );
+    } =
+      await resend.emails.send(
+        message
+      );
+
 
     if (error) {
       console.error(
         "[EMAIL] Resend rejected email:",
         {
-          name: error.name,
-          message: error.message,
+          name:
+            error.name,
+
+          message:
+            error.message,
         }
       );
 
@@ -120,20 +115,36 @@ async function sendEmail({
       );
     }
 
+
+    console.log(
+      "[EMAIL] Email sent successfully.",
+      {
+        messageId:
+          data?.id ||
+          null,
+      }
+    );
+
+
     return {
       success: true,
+
       messageId:
-        data?.id || null,
+        data?.id ||
+        null,
     };
+
   } catch (error) {
     console.error(
       "[EMAIL] Email delivery failed:",
       error?.message ||
-        "Unknown email error"
+      "Unknown email error"
     );
 
     throw error;
   }
 }
 
-module.exports = sendEmail;
+
+module.exports =
+  sendEmail;

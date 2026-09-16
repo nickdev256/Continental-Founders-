@@ -78,7 +78,7 @@
       rgba(3, 23, 47, 0) 45%,
       rgba(3, 23, 47, 0) 100%
     ),
-    url("/assets/rr.png");
+    url("/assets/rr.webp");
 
   background-size: cover;
   background-position: center;
@@ -1892,7 +1892,7 @@
       rgba(3, 23, 47, 0.28) 50%,
       rgba(3, 23, 47, 0.42) 100%
     ),
-    url("/assets/rr.png") !important;
+    url("/assets/rr.webp") !important;
 
   background-size: cover !important;
   background-position: center center !important;

@@ -52,28 +52,28 @@ const team = [
   {
     name: "Amb. Dr. Karen L. Booker",
     role: "Chair",
-    image: "/assets/team/karen-booker.jpg",
+    image: "/assets/team/karen-booker.webp",
     bio:
       "Amb. Dr. Karen L. Booker brings more than four decades of experience across management services, education, outreach, policy analysis, operational diagnosis, and organizational leadership. Her career includes program development, policy work, housing and real property operations, and educational and environmental health initiatives.",
   },
   {
     name: "Sharneise Allen",
     role: "Vice Chair, Operations",
-    image: "/assets/team/sharneise-allen.jpg",
+    image: "/assets/team/sharneise-allen.webp",
     bio:
       "Sharneise Allen is an education leader, entrepreneur, and youth development strategist with extensive experience designing transformational programs for students, educators, athletes, and communities. She works across entrepreneurship, financial literacy, leadership, SEL, workforce readiness, and sports-based mentorship.",
   },
   {
     name: "Dr. Zaneta Brown-Ingles",
     role: "Vice Chair, Strategic Relations",
-    image: "/assets/team/zaneta-brown-ingles.jpg",
+    image: "/assets/team/zaneta-brown-ingles.webp",
     bio:
       "Dr. Zaneta Brown-Ingles, Ed.D., is an educational leader, author, consultant, strategist, and advocate with more than 20 years of experience in K–12 education, literacy, leadership development, and strategic partnerships.",
   },
   {
     name: "Ashley Robinson-Spann, PhD",
     role: "Treasurer",
-    image: "/assets/team/ashley-robinson-spann.jpg",
+    image: "/assets/team/ashley-robinson-spann.webp",
     bio:
       "Ashley Robinson-Spann, PhD, is a researcher, writer, strategist, and nonprofit leader focused on education, human development, community capacity-building, and organizational strategy. She is the Founder and Executive Director of Still Rising Institute.",
   },
@@ -87,28 +87,28 @@ const opportunity = [
   {
     number: "01",
     title: "Education",
-    icon: "/assets/1.png",
+    icon: "/assets/1.webp",
     text:
       "Creating opportunities for founders, students, educators, researchers, and institutions to exchange knowledge and develop meaningful cross-cultural learning experiences.",
   },
   {
     number: "02",
     title: "Entrepreneurship",
-   icon: "/assets/2.png",
+   icon: "/assets/2.webp",
     text:
       "Helping emerging entrepreneurs explore opportunities, develop practical ventures, validate business ideas, and strengthen their ability to execute.",
   },
   {
     number: "03",
     title: "Innovation",
-    icon: "/assets/3.png",
+    icon: "/assets/3.webp",
     text:
       "Encouraging collaboration around technology, research, creativity, market needs, and solutions to real-world challenges.",
   },
   {
     number: "04",
     title: "Leadership",
-    icon: "/assets/4.png",
+    icon: "/assets/4.webp",
     text:
       "Supporting globally minded leaders equipped to work across cultures, institutions, industries, disciplines, and markets.",
   },
@@ -225,7 +225,7 @@ export default function About() {
 
             <div className="purpose-globe">
               <img
-                src="/assets/w.png"
+                src="/assets/w.webp"
                 alt="Continental collaboration"
               />
             </div>
@@ -310,7 +310,7 @@ export default function About() {
 
        <div className="about-vision__background">
   <img
-    src="/assets/u.png"
+    src="/assets/u.webp"
     alt=""
   />
 </div>
@@ -393,7 +393,7 @@ export default function About() {
               <div className="about-story__image">
 
                 <img
-                  src="/assets/oo.png"
+                  src="/assets/oo.webp"
                   alt="Students and leaders collaborating"
                 />
 
@@ -686,7 +686,7 @@ export default function About() {
             <div className="about-approach__image">
 
               <img
-                src="/assets/images/about-campus.jpg"
+                src="/assets/images/about-campus.webp"
                 alt="University and institutional environment"
               />
 
@@ -756,7 +756,7 @@ export default function About() {
 
            <div className="belief-orbit">
   <img
-    src="/assets/qq.png"
+    src="/assets/qq.webp"
     alt="Our belief"
   />
 </div>

@@ -66,7 +66,7 @@ function getEventImage(event) {
     event?.image ||
     event?.coverImage ||
     event?.cover_image ||
-    "/assets/images/events/event-1.jpg"
+    "/assets/images/events/event-1.webp"
   );
 }
 

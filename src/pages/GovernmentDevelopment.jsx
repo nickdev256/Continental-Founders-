@@ -231,7 +231,7 @@ export default function GovernmentDevelopment() {
           <div className="gd-hero__visual">
 
             <img
-              src="/assets/government/government-hero.jpg"
+              src="/assets/government/government-hero.webp"
               alt="Government and institutional partnership environment"
             />
 
@@ -279,7 +279,7 @@ export default function GovernmentDevelopment() {
             <div className="gd-bridge__main-image">
 
               <img
-                src="/assets/government/institutional-meeting.jpg"
+                src="/assets/government/institutional-meeting.webp"
                 alt="Institutional leaders in discussion"
               />
 
@@ -289,7 +289,7 @@ export default function GovernmentDevelopment() {
             <div className="gd-bridge__secondary-image">
 
               <img
-                src="/assets/government/government-building.jpg"
+                src="/assets/government/government-building.webp"
                 alt="Government institution building"
               />
 
@@ -608,7 +608,7 @@ export default function GovernmentDevelopment() {
           <div className="gd-case-study__image">
 
             <img
-              src="/assets/government/government-case-study.jpg"
+              src="/assets/government/government-case-study.webp"
               alt="Urban commercial district representing national entrepreneurship development"
             />
 
@@ -733,7 +733,7 @@ export default function GovernmentDevelopment() {
       <section className="gd-final-cta">
 
         <img
-          src="/assets/government/government-cta.jpg"
+          src="/assets/government/government-cta.webp"
           alt=""
           aria-hidden="true"
           className="gd-final-cta__background"

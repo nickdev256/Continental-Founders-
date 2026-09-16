@@ -51,11 +51,11 @@ export default function Home() {
   */
 
   const heroImages = [
-    "/assets/images/hero-partnership.jpg",
-    "/assets/images/hero-community.jpg",
-    "/assets/images/hero-education.jpg",
-    "/assets/images/hero-innovation.jpg",
-    "/assets/images/hero-opportunity.jpg",
+    "/assets/images/hero-partnership.webp",
+    "/assets/images/hero-community.webp",
+    "/assets/images/hero-education.webp",
+    "/assets/images/hero-innovation.webp",
+    "/assets/images/hero-opportunity.webp",
   ];
 
   const [currentHero, setCurrentHero] = useState(0);
@@ -639,7 +639,7 @@ export default function Home() {
             <div className="cf-who-visual">
 
               <img
-                src="/assets/images/africa-america-map.png"
+                src="/assets/images/africa-america-map.webp"
                 alt="Africa and America connected through partnership"
                 loading="lazy"
               />
@@ -1151,7 +1151,7 @@ export default function Home() {
           <div className="cf-partnership-image">
 
             <img
-              src="/assets/images/global-network-globe.png"
+              src="/assets/images/global-network-globe.webp"
               alt="Global university partnership network"
               loading="lazy"
             />
@@ -1383,7 +1383,7 @@ export default function Home() {
           <div className="cf-strategic-visual">
 
             <img
-              src="/assets/images/ecosystem-globe.png"
+              src="/assets/images/ecosystem-globe.webp"
               alt="Continental Founders partnership ecosystem"
               loading="lazy"
             />
@@ -1512,7 +1512,7 @@ export default function Home() {
           <div className="cf-news-grid">
 
             <Insight
-              image="/assets/images/insights/university-partnerships.jpg"
+              image="/assets/images/insights/university-partnerships.webp"
               category="ANNOUNCEMENT"
               date="MAY 21, 2026"
               title="Continental Founders™ Begins University Partnership Development"
@@ -1520,7 +1520,7 @@ export default function Home() {
             />
 
             <Insight
-              image="/assets/images/insights/innovation-entrepreneurship.jpg"
+              image="/assets/images/insights/innovation-entrepreneurship.webp"
               category="INSIGHT"
               date="APRIL 26, 2026"
               title="Why Cross-Continental Collaboration Matters"
@@ -1528,7 +1528,7 @@ export default function Home() {
             />
 
             <Insight
-              image="/assets/images/insights/leadership-collaboration.jpg"
+              image="/assets/images/insights/leadership-collaboration.webp"
               category="PROGRAM UPDATE"
               date="APRIL 10, 2026"
               title="Building the Continental Founders™ Framework"

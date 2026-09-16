@@ -36,10 +36,10 @@ const API_URL =
 // ============================================================
 
 const FALLBACK_IMAGES = [
-  "/assets/images/events/event-1.jpg",
-  "/assets/images/events/event-2.jpg",
-  "/assets/images/events/event-3.jpg",
-  "/assets/images/events/event-4.jpg",
+  "/assets/images/events/event-1.webp",
+  "/assets/images/events/event-2.webp",
+  "/assets/images/events/event-3.webp",
+  "/assets/images/events/event-4.webp",
 ];
 
 
@@ -911,7 +911,7 @@ export default function Events() {
             <div className="events-calendar__photo">
 
               <img
-                src="/assets/z.png"
+                src="/assets/z.webp"
                 alt="Continental Founders convening"
                 loading="lazy"
                 decoding="async"

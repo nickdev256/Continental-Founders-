@@ -487,7 +487,7 @@ export default function Universities() {
 
           "Continental Founders is focused on reciprocal relationships where universities contribute knowledge while gaining meaningful opportunities for learning, research, engagement, and global collaboration.",
         ]}
-        image="/assets/images/universities/university-partnership.jpg"
+        image="/assets/images/universities/university-partnership.webp"
         imageAlt="University students and academic communities collaborating on a university campus"
       />
 

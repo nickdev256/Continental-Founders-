@@ -414,7 +414,7 @@ export default function Footer() {
               >
 
                 <img
-                  src="/assets/continental-founders-logo.png"
+                  src="/assets/continental-founders-logo.webp"
                   alt="Continental Founders"
                 />
 

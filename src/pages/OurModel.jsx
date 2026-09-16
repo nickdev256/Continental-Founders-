@@ -57,7 +57,7 @@ export default function OurModel() {
 
   <div className="model-hero__background" aria-hidden="true">
     <img
-      // src="/assets/hero.png"
+      // src="/assets/hero.webp"
       alt=""
     />
   </div>
@@ -156,7 +156,7 @@ export default function OurModel() {
       <div className="model-intro__image">
 
         <img
-          src="/assets/n.png"
+          src="/assets/n.webp"
           alt="Students and university leaders building meaningful relationships"
         />
 
@@ -237,7 +237,7 @@ export default function OurModel() {
           "What does each institution want to achieve? What strengths can each bring? Who needs to be involved? What can be done now, and what needs more groundwork?",
           "These questions help turn broad interest into a partnership that has a credible reason to exist and a practical path forward.",
         ]}
-        image="/assets/partnership-design.png"
+        image="/assets/partnership-design.webp"
         imageAlt="African founders and professionals collaborating on research, innovation, and partnership strategy"
       />
 
@@ -402,7 +402,7 @@ export default function OurModel() {
         <div className="model-final-cta__image">
 
           <img
-            src="/assets/c.png"
+            src="/assets/c.webp"
             alt="Building meaningful collaboration across communities"
           />
 

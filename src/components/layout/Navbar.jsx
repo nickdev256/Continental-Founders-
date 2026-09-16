@@ -667,7 +667,7 @@ export default function Navbar() {
           >
 
             <img
-              src="/assets/continental-founders-logo.png"
+              src="/assets/continental-founders-logo.webp"
               alt="Continental Founders"
               className="navbar__logo"
               draggable="false"

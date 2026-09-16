@@ -440,7 +440,7 @@ export default function AdminSidebar({
           aria-label="Continental Founders home"
         >
           <img
-            src="/assets/continental-founders-logo.png"
+            src="/assets/continental-founders-logo.webp"
             alt="Continental Founders"
             className="admin-sidebar__logo"
           />

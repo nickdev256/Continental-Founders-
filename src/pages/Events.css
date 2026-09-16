@@ -204,7 +204,7 @@
   z-index: 0;
 
   background:
-    url("/assets/images/events/events-hero.jpg")
+    url("/assets/images/events/events-hero.webp")
     center center / cover
     no-repeat;
 
@@ -1589,7 +1589,7 @@ h1 em {
   z-index: 0;
 
   background:
-    url("/assets/images/events/events-cta.jpg")
+    url("/assets/images/events/events-cta.webp")
     center center / cover
     no-repeat;
 

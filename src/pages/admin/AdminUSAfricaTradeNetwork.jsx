@@ -48,7 +48,7 @@ const FALLBACK_CONTENT = {
       "Connecting entrepreneurs, companies, and institutions across the United States and Africa to create real business opportunities, expand markets, and build lasting commercial relationships.",
 
     image:
-      "/assets/images/us-africa/hero.jpg",
+      "/assets/images/us-africa/hero.webp",
 
     primaryButtonText:
       "Explore Partnership",
@@ -118,7 +118,7 @@ const FALLBACK_CONTENT = {
       "Through trusted relationships and strategic partnerships, we help founders move from introductions to commercial opportunities, partnerships, market entry, and long-term growth.",
 
     image:
-      "/assets/images/us-africa/business-handshake.jpg",
+      "/assets/images/us-africa/business-handshake.webp",
 
     imageCaption:
       "Opportunity knows no borders",
@@ -185,7 +185,7 @@ const FALLBACK_CONTENT = {
           "Understand new markets, identify opportunities, and expand globally.",
 
         image:
-          "/assets/images/us-africa/market-access.jpg",
+          "/assets/images/us-africa/market-access.webp",
       },
 
       {
@@ -196,7 +196,7 @@ const FALLBACK_CONTENT = {
           "Build meaningful relationships with industry leaders, buyers, suppliers, and strategic partners.",
 
         image:
-          "/assets/images/us-africa/business-connections.jpg",
+          "/assets/images/us-africa/business-connections.webp",
       },
 
       {
@@ -207,7 +207,7 @@ const FALLBACK_CONTENT = {
           "Prepare for cross-border engagement and investment opportunities.",
 
         image:
-          "/assets/images/us-africa/trade-readiness.jpg",
+          "/assets/images/us-africa/trade-readiness.webp",
       },
 
       {
@@ -218,7 +218,7 @@ const FALLBACK_CONTENT = {
           "Access market intelligence, industry expertise, and proven business practices.",
 
         image:
-          "/assets/images/us-africa/knowledge-exchange.jpg",
+          "/assets/images/us-africa/knowledge-exchange.webp",
       },
 
     ],
@@ -273,7 +273,7 @@ const FALLBACK_CONTENT = {
       "/contact",
 
     image:
-      "/assets/images/us-africa/final-cta.jpg",
+      "/assets/images/us-africa/final-cta.webp",
 
   },
 

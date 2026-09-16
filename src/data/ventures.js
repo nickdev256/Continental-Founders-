@@ -14,9 +14,9 @@ const ventures = [
 
     slug: "eth-tech-solutions",
 
-    logo: "/assets/eth-tech-logo.png",
+    logo: "/assets/eth-tech-logo.webp",
 
-    heroImage: "/assets/venture.png",
+    heroImage: "/assets/venture.webp",
 
     sector: "Technology",
 
@@ -55,7 +55,7 @@ const ventures = [
 
         name: "Nicholas Ssentongo",
 
-        image: "/assets/nico.png",
+        image: "/assets/nico.webp",
 
         role: "Co-Founder",
 
@@ -68,7 +68,7 @@ const ventures = [
 
         name: "Dave Kwagala",
 
-        image: "/assets/dave.png",
+        image: "/assets/dave.webp",
 
         role: "Co-Founder",
 
@@ -173,7 +173,7 @@ const ventures = [
 
     logo: "",
 
-    heroImage: "/assets/venture.png",
+    heroImage: "/assets/venture.webp",
 
     sector: "Agriculture",
 
@@ -280,7 +280,7 @@ const ventures = [
 
     logo: "",
 
-    heroImage: "/assets/venture.png",
+    heroImage: "/assets/venture.webp",
 
     sector: "Health",
 
@@ -387,7 +387,7 @@ const ventures = [
 
     logo: "",
 
-    heroImage: "/assets/venture.png",
+    heroImage: "/assets/venture.webp",
 
     sector: "Education",
 

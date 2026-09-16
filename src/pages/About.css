@@ -5375,3 +5375,1099 @@ and
   line-height: 1.2 !important;
   text-transform: uppercase !important;
 }
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   MOBILE — ABOUT HERO
+   Match the Home Hero mobile layout
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .about-hero {
+    min-height: 100dvh !important;
+    text-align: center !important;
+    overflow: hidden !important;
+   
+  }
+
+  /* Background image */
+  .about-hero__background {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .about-hero__background img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  /* Hero content */
+  .about-hero__inner {
+    width: 100% !important;
+    padding: 70px 24px 55px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    
+  }
+
+  .about-hero__content {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+
+  /* Eyebrow */
+  .about-hero__eyebrow {
+    justify-content: center !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    font-size: 14px !important;
+  }
+
+  .about-hero__eyebrow-line {
+    display: none !important;
+  }
+
+  /* Main heading */
+  .about-hero__content h1 {
+    font-size: 48px !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+    margin: 22px auto 24px !important;
+    max-width: 680px !important;
+  }
+
+  /* Paragraph */
+  .about-hero__lead {
+    font-size: 18px !important;
+    line-height: 1.55 !important;
+    text-align: center !important;
+    max-width: 650px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Buttons */
+  .about-hero__actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 14px !important;
+    width: 100% !important;
+    margin: 30px auto 0 !important;
+  }
+
+  .about-button {
+    width: 100% !important;
+    max-width: 420px !important;
+    min-height: 58px !important;
+    margin: 0 auto !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-size: 15px !important;
+  }
+
+  .about-hero__visual {
+    display: none !important;
+  }
+}
+
+
+/* ============================================================
+   SMALLER PHONES
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .about-hero__inner {
+    padding: 60px 20px 45px !important;
+  }
+
+  .about-hero__eyebrow {
+    font-size: 12px !important;
+  }
+
+  .about-hero__content h1 {
+    font-size: 38px !important;
+    line-height: 1.06 !important;
+    margin-top: 18px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .about-hero__lead {
+    font-size: 16px !important;
+    line-height: 1.55 !important;
+  }
+
+  .about-hero__actions {
+    margin-top: 26px !important;
+    gap: 12px !important;
+  }
+
+  .about-button {
+    max-width: 360px !important;
+    min-height: 54px !important;
+    font-size: 14px !important;
+  }
+}
+
+
+/* ============================================================
+   VERY SMALL PHONES
+============================================================ */
+
+@media (max-width: 380px) {
+
+  .about-hero__inner {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .about-hero__content h1 {
+    font-size: 34px !important;
+    line-height: 1.07 !important;
+  }
+
+  .about-hero__lead {
+    font-size: 15px !important;
+  }
+
+  .about-button {
+    max-width: 330px !important;
+    min-height: 52px !important;
+    font-size: 13px !important;
+  }
+}
+
+
+
+/* MOBILE — MOVE ABOUT HERO CONTENT UP */
+@media (max-width: 768px) {
+  .about-hero__content {
+    transform: translateY(-450px) !important;
+    margin-bottom: 40px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-hero__content {
+    transform: translateY(-450px) !important;
+    margin-bottom: 40px !important;
+    
+  }
+}
+
+/* ============================================================
+   MOBILE — REDUCE ABOUT HERO HEIGHT & CTA WIDTH
+============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Reduce the overall hero height */
+  .about-hero {
+    min-height: 930px !important;
+    height: 930px !important;
+  }
+
+  /* Keep the content positioned upward */
+  .about-hero__content {
+    transform: translateY(-100px) !important;
+  }
+
+  /* Make both CTA buttons shorter */
+  .about-hero__actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .about-button {
+    width: 62% !important;
+    max-width: 500px !important;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  /* Smaller hero on smaller phones */
+  .about-hero {
+    min-height: 820px !important;
+    height: 820px !important;
+  }
+
+  /* Move content slightly upward */
+  .about-hero__content {
+    transform: translateY(-120px) !important;
+  }
+
+  /* Shorter CTA width */
+  .about-button {
+    width: 62% !important;
+  }
+}
+
+
+
+
+
+/* ============================================================
+   MOBILE — MISSION SECTION
+============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Add more space on the sides */
+  .about-mission .about-purpose__grid {
+    width: calc(100% - 50px) !important;
+    max-width: none !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .about-mission .about-purpose__visual,
+  .about-mission .about-purpose__content {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* OUR MISSION */
+  .about-mission .about-number {
+    text-align: center;
+    font-weight: 800 !important;
+  }
+
+  /* Center the image */
+  .about-mission .purpose-globe {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .about-mission .purpose-globe img {
+    display: block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* OUR PURPOSE */
+  .about-mission .about-kicker {
+    display: block;
+    text-align: center;
+  }
+
+  /* Reduce heading */
+  .about-mission .about-purpose__content h2 {
+    font-size: 42px !important;
+    line-height: 1.08 !important;
+    text-align: center;
+  }
+
+  /* Center paragraphs */
+  .about-mission .about-purpose__copy {
+    text-align: center;
+  }
+
+  .about-mission .about-purpose__copy p {
+    text-align: center;
+  }
+}
+
+
+@media (max-width: 480px) {
+
+  /* More side margin on smaller phones */
+  .about-mission .about-purpose__grid {
+    width: calc(100% - 40px) !important;
+  }
+
+  /* Extra bold mission label */
+  .about-mission .about-number {
+    font-weight: 900 !important;
+  }
+
+  /* Smaller heading */
+  .about-mission .about-purpose__content h2 {
+    font-size: 34px !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* MOBILE — CENTER MISSION IMAGE */
+@media (max-width: 768px) {
+  .about-mission .about-purpose__visual {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .about-mission .purpose-globe {
+    width: 40% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-top: 40px auto !important;
+    margin-left: auto !important;
+  }
+
+  .about-mission .purpose-globe img {
+    display: block !important;
+    margin: 0 auto !important;
+    position: static !important;
+    transform: none !important;
+  }
+}
+
+
+
+
+
+/* ============================================================
+   MOBILE — VISION SECTION
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .about-vision {
+    overflow: hidden;
+  }
+
+  .about-vision__grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 40px !important;
+  }
+
+  /* OUR VISION */
+  .about-vision__intro {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .about-vision__intro .about-kicker {
+    text-align: center !important;
+    margin-bottom: 25px !important;
+  }
+
+  /* Vision image */
+  .about-vision__background {
+    position: relative !important;
+    width: 100% !important;
+    height: 360px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .about-vision__background img {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 500px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    display: block !important;
+  }
+
+  /* Vision content */
+  .about-vision__content {
+    width: 100% !important;
+    max-width: 700px !important;
+    text-align: center !important;
+  }
+
+  /* Main vision heading */
+  .about-vision__content h2 {
+    font-size: 38px !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    margin: 0 !important;
+  }
+
+  /* Paragraphs */
+  .about-vision__content p {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .about-vision__lead {
+    margin-top: 25px !important;
+  }
+
+  /* CTA */
+  .about-vision__content .about-button {
+    display: inline-flex !important;
+    width: auto !important;
+    max-width: 100% !important;
+    padding: 16px 28px !important;
+    margin: 25px auto 0 !important;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .about-vision__grid {
+    gap: 30px !important;
+  }
+
+  .about-vision__intro .about-kicker {
+    margin-bottom: 18px !important;
+  }
+
+  .about-vision__background {
+    height: 300px !important;
+  }
+
+  .about-vision__content h2 {
+    font-size: 32px !important;
+    line-height: 1.1 !important;
+  }
+
+  .about-vision__content p {
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+  }
+
+  .about-vision__content .about-button {
+    padding: 15px 24px !important;
+    font-size: 14px !important;
+  }
+}
+
+
+/* ============================================================
+   MOBILE — POSITION VISION IMAGE PROPERLY
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .about-vision__intro {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .about-vision__background {
+    width: 100% !important;
+    height: 330px !important;
+    margin: 0 auto 20px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .about-vision__background img {
+    width: 100% !important;
+    height: 330px !important;
+    max-width: 520px !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+
+  .about-vision__grid {
+    gap: 10px !important;
+  }
+
+  .about-vision__content {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  
+}
+
+@media (max-width: 480px) {
+
+  .about-vision__background {
+    height: 280px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .about-vision__background img {
+    height: 280px !important;
+  }
+
+  .about-vision__grid {
+    gap: 5px !important;
+  }
+  
+}
+
+
+@media (max-width: 768px) {
+  .about-vision__background {
+    transform: translateY(33px) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-vision__background {
+    transform: translateY(45px) !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — OUR STORY
+============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Center everything in the story sections */
+  .about-story,
+  .about-story__content,
+  .about-story__intro,
+  .about-story__body {
+    text-align: center !important;
+  }
+
+  /* Center images */
+  .about-story img {
+    display: block !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+  }
+
+  /* Center section markers / labels */
+  .about-story .about-kicker,
+  .about-story .about-eyebrow,
+  .about-story .section-marker {
+    text-align: center !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+  }
+
+  /* THE NEXT GENERATION... */
+  .about-story h2 {
+    font-size: 42px !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    margin-left: 10px !important;
+    margin-right:10px !important;
+  }
+
+  /* Center all paragraphs */
+  .about-story p {
+    text-align: center !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .about-story h2 {
+    font-size: 34px !important;
+    line-height: 1.1 !important;
+  }
+
+  .about-story p {
+    font-size: 16px !important;
+    line-height: 1.7 !important;
+  }
+}
+
+
+
+
+/* ============================================================
+   MOBILE — OUR BELIEF SECTION
+============================================================ */
+
+@media (max-width: 768px) {
+
+  /* Center the entire section */
+  .about-belief {
+    text-align: center;
+  }
+
+  .about-belief .about-belief__grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Center visual/image */
+  .about-belief .about-belief__visual {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto 55px;
+  }
+
+  .about-belief .belief-orbit {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .about-belief .belief-orbit img {
+    display: block;
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    margin: 0 auto;
+  }
+
+  /* Content */
+  .about-belief .about-belief__content {
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  /* OUR BELIEF */
+  .about-belief .about-kicker {
+    display: block;
+    width: fit-content;
+    margin: 0 auto 30px;
+    text-align: center;
+  }
+
+  /* Main heading */
+  .about-belief .about-belief__content h2 {
+    font-size: 42px !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    margin: 0 auto 50px !important;
+    max-width: 720px;
+  }
+
+  /* Paragraphs */
+  .about-belief .about-belief__content > p {
+    text-align: center !important;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.65;
+  }
+
+  /* Numbered statements */
+  .about-belief .belief-statements {
+    width: 100%;
+    text-align: center;
+    margin: 50px auto;
+  }
+
+  .about-belief .belief-statements > div {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    flex-wrap: wrap;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .about-belief .belief-statements span,
+  .about-belief .belief-statements strong {
+    text-align: center;
+  }
+
+  /* Closing statement */
+  .about-belief .about-belief__closing {
+    text-align: center !important;
+    max-width: 700px;
+    margin: 55px auto 0 !important;
+    padding-top: 35px;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .about-belief .about-belief__grid {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  /* Image */
+  .about-belief .about-belief__visual {
+    margin-bottom: 60px;
+  }
+
+  .about-belief .belief-orbit img {
+    width: 100%;
+    max-width: 430px;
+  }
+
+  /* OUR BELIEF */
+  .about-belief .about-kicker {
+    margin-bottom: 25px;
+  }
+
+  /* Reduce main heading */
+  .about-belief .about-belief__content h2 {
+    font-size: 34px !important;
+    line-height: 1.1 !important;
+    margin-bottom: 45px !important;
+  }
+
+  /* Body text */
+  .about-belief .about-belief__content > p {
+    font-size: 18px !important;
+    line-height: 1.65 !important;
+    margin-bottom: 38px;
+  }
+
+  /* Statements */
+  .about-belief .belief-statements {
+    margin: 45px auto;
+  }
+
+  .about-belief .belief-statements > div {
+    margin-bottom: 20px;
+    line-height: 1.45;
+  }
+
+  .about-belief .belief-statements strong {
+    font-size: 18px !important;
+  }
+
+  /* Closing statement */
+  .about-belief .about-belief__closing {
+    margin-top: 50px !important;
+    padding-top: 35px;
+  }
+}
+
+
+/* Remove numbers from belief statements */
+.about-belief .belief-statements span {
+  display: none !important;
+}
+
+
+
+
+/* ============================================================
+   MOBILE — FOUNDING PARTNERS — FINAL FIX
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .about-founding {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .about-founding .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ONE COLUMN */
+  .about-founding .about-founding__grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    gap: 55px !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ==========================================================
+     GLOBE / VISUAL
+  ========================================================== */
+
+  .about-founding .about-founding__visual {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    transform: none !important;
+  }
+
+  .about-founding .about-founding__visual svg {
+    display: block !important;
+    width: 220px !important;
+    height: 220px !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  .about-founding .about-founding__visual span {
+    display: block !important;
+    width: 100% !important;
+    margin: 24px auto 0 !important;
+    text-align: center !important;
+  }
+
+
+  /* ==========================================================
+     CONTENT — RESET ALL DESKTOP POSITIONING
+  ========================================================== */
+
+  .about-founding .about-founding__content {
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 auto !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+
+    text-align: center !important;
+
+    transform: none !important;
+    translate: none !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* FOUNDING PARTNERS */
+  .about-founding .about-founding__content .about-kicker {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+
+
+  /* MAIN HEADING */
+  .about-founding .about-founding__content h2 {
+    width: 100% !important;
+    max-width: 700px !important;
+
+    margin: 22px auto 0 !important;
+    padding: 0 !important;
+
+    text-align: center !important;
+
+    font-size: 42px !important;
+    line-height: 1.08 !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* PARAGRAPHS */
+  .about-founding .about-founding__content p {
+    width: 100% !important;
+    max-width: 700px !important;
+    min-width: 0 !important;
+
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    text-align: center !important;
+
+    box-sizing: border-box !important;
+  }
+
+
+  /* CTA */
+  .about-founding .about-founding__content .about-button {
+    position: static !important;
+
+    display: inline-flex !important;
+
+    width: auto !important;
+    max-width: 90% !important;
+    min-width: 220px !important;
+
+    margin: 30px auto 0 !important;
+
+    justify-content: center !important;
+    align-items: center !important;
+
+    text-align: center !important;
+
+    transform: none !important;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .about-founding .container {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+
+  .about-founding .about-founding__grid {
+    gap: 45px !important;
+  }
+
+  .about-founding .about-founding__visual svg {
+    width: 200px !important;
+    height: 200px !important;
+  }
+
+  .about-founding .about-founding__visual span {
+    margin-top: 20px !important;
+  }
+
+  .about-founding .about-founding__content h2 {
+    font-size: 34px !important;
+    line-height: 1.1 !important;
+    margin-top: 20px !important;
+  }
+
+  .about-founding .about-founding__content p {
+    margin-top: 22px !important;
+  }
+
+  .about-founding .about-founding__content .about-button {
+    min-width: 220px !important;
+    max-width: 90% !important;
+    margin-top: 28px !important;
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .about-founding .container {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  .about-founding .about-founding__grid {
+    margin-top: 60px !important;
+    margin-bottom: 60px !important;
+  }
+
+  .about-founding .about-founding__visual {
+    margin-bottom: 10px !important;
+  }
+
+  .about-founding .about-founding__content {
+    margin-top: 10px !important;
+    margin-bottom: 40px !important;
+  }
+
+  .about-founding .about-founding__content h2 {
+    margin-top: 28px !important;
+    margin-bottom: 28px !important;
+  }
+
+  .about-founding .about-founding__content p {
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .about-founding .about-founding__content .about-button {
+    margin-top: 35px !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .about-founding .container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .about-founding .about-founding__grid {
+    margin-top: 45px !important;
+    margin-bottom: 45px !important;
+  }
+
+  .about-founding .about-founding__content h2 {
+    margin-top: 24px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .about-founding .about-founding__content p {
+    margin-top: 20px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .about-founding .about-founding__content .about-button {
+    margin-top: 30px !important;
+    margin-bottom: 20px !important;
+  }
+}

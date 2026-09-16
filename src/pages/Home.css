@@ -2317,11 +2317,18 @@ margin-bottom: 20px;
 
   /* MODEL */
 
+  @media (max-width: 768px) {
+
   .cf-model-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
   }
 
-  .cf-model-step,
+  .cf-model-step {
+    text-align: center;
+  }
+
+}
   .cf-model-step:nth-child(2) {
     border-right: 0;
   }
@@ -3241,5 +3248,457 @@ margin-bottom: 20px;
   .cf-section-soft .cf-section-header h2 {
     font-size: 2.25rem !important;
     line-height: 1.08 !important;
+  }
+}
+
+/* REMOVE THE EMPTY SPACE BELOW HERO SLIDER */
+@media (max-width: 600px) {
+  .cf-home-hero,
+  .cf-home-hero__main {
+    min-height: 660px !important;
+    height: 660px !important;
+  }
+
+  .cf-home-hero__visual {
+    height: 100% !important;
+    bottom: 0 !important;
+  }
+
+  .cf-home-hero__dots {
+    bottom: 25px !important;
+  }
+}
+
+/* REDUCE OUR VISION HEADING ON MOBILE */
+@media (max-width: 600px) {
+  .cf-vision-content h2 {
+    font-size: 2.2rem !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* Remove 01, 02, 03, 04 */
+  .cf-model-step .cf-model-step-number {
+    display: none !important;
+  }
+
+  /* Center the icons */
+  .cf-model-step {
+    text-align: center;
+  }
+
+  .cf-model-step svg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+}
+
+
+@media (max-width: 768px) {
+
+  /* REMOVE 01, 02, 03, 04 */
+  .cf-model-step [class*="number"],
+  .cf-model-step [class*="Number"],
+  .cf-model-step [class*="step-number"],
+  .cf-model-step [class*="stepNumber"] {
+    display: none !important;
+  }
+
+  /* CENTER THE ICON */
+  .cf-model-step [class*="icon"],
+  .cf-model-step [class*="Icon"] {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .cf-model-step svg {
+    display: block !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+  }
+
+}@media (max-width: 768px) {
+
+  .cf-model-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+  }
+
+  .cf-model-step {
+    text-align: center;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .cf-model-step > span:first-child {
+    display: none !important;
+  }
+
+}
+
+
+
+@media (max-width: 768px) {
+  .cf-matters-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0;
+  }
+}
+
+
+/* MOBILE — REDUCE UNIVERSITY PARTNERSHIPS HEADING */
+@media (max-width: 768px) {
+  .cf-partnership-content h2 {
+    font-size: 2.6rem !important;
+    line-height: 1.05 !important;
+    text-align: center !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-partnership-content h2 {
+    font-size: 2.2rem !important;
+    line-height: 1.08 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cf-partnership-content h2 {
+    font-size: 1.9rem !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* MOBILE — SHORTER UNIVERSITY PARTNER CTA */
+@media (max-width: 768px) {
+  .cf-partnership-content .cf-button--gold {
+    width: fit-content !important;
+    min-width: 0 !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* MOBILE — PARTNERSHIP ECOSYSTEM: 2 COLUMNS */
+@media (max-width: 768px) {
+  .partner-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+  }
+
+  .partner-card {
+    width: 100% !important;
+  }
+}
+
+
+
+
+/* ============================================================
+   MOBILE — PARTNERSHIP ECOSYSTEM: 2 COLUMNS
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-ecosystem-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+  }
+}
+
+
+/* ============================================================
+   MOBILE — STRATEGIC PARTNERS SECTION
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-strategic-section {
+    text-align: center;
+  }
+
+  .cf-strategic-grid {
+    display: block !important;
+  }
+
+  .cf-strategic-content {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cf-section-marker--light {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .cf-section-marker--light strong {
+    font-size: 14px !important;
+    text-align: center !important;
+  }
+
+  .cf-strategic-content h2 {
+    font-size: 42px !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-strategic-content p {
+    font-size: 17px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-actions {
+    justify-content: center !important;
+    display: flex !important;
+  }
+
+  .cf-button--gold {
+    font-size: 15px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Smaller phones */
+@media (max-width: 480px) {
+  .cf-section-marker--light strong {
+    font-size: 12px !important;
+  }
+
+  .cf-strategic-content h2 {
+    font-size: 34px !important;
+    line-height: 1.08 !important;
+  }
+
+  .cf-strategic-content p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+
+  .cf-button--gold {
+    font-size: 14px !important;
+  }
+}
+
+
+
+
+
+/* ============================================================
+   MOBILE — CONFERENCE & EVENTS
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-conference-section {
+    text-align: center;
+  }
+
+  .cf-conference-grid {
+    display: block !important;
+  }
+
+  .cf-conference-info {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cf-conference-info .cf-section-marker {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .cf-conference-info .cf-section-marker strong {
+    font-size: 14px !important;
+  }
+
+  .cf-conference-info h2 {
+    font-size: 52px !important;
+    line-height: 1.02 !important;
+    text-align: center !important;
+  }
+
+  .cf-conference-location {
+    display: block;
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+  }
+
+  .cf-conference-info p {
+    font-size: 17px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-conference-info .cf-button {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-conference-date {
+    text-align: center !important;
+  }
+
+  .cf-conference-date strong {
+    font-size: 110px !important;
+    line-height: 0.9 !important;
+  }
+
+  .cf-conference-date span {
+    text-align: center !important;
+  }
+}
+
+/* Smaller phones */
+@media (max-width: 480px) {
+  .cf-conference-info .cf-section-marker strong {
+    font-size: 12px !important;
+  }
+
+  .cf-conference-info h2 {
+    font-size: 42px !important;
+    line-height: 1.05 !important;
+  }
+
+  .cf-conference-location {
+    font-size: 14px !important;
+  }
+
+  .cf-conference-info p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+
+  .cf-conference-date strong {
+    font-size: 90px !important;
+  }
+
+  .cf-conference-date span {
+    font-size: 14px !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .cf-conference-info h2 {
+    font-size: 36px !important;
+  }
+
+  .cf-conference-info p {
+    font-size: 14px !important;
+  }
+
+  .cf-conference-date strong {
+    font-size: 80px !important;
+  }
+}
+
+
+
+
+
+/* ============================================================
+   MOBILE — PARTNERSHIP MATERIALS
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-materials-section {
+    text-align: center !important;
+  }
+
+  .cf-materials-grid {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .cf-materials-grid > div {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cf-materials-grid .cf-eyebrow {
+    display: block;
+    text-align: center !important;
+    font-size: 14px !important;
+  }
+
+  .cf-materials-grid h2 {
+    font-size: 42px !important;
+    line-height: 1.08 !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-materials-grid > p {
+    font-size: 17px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-materials-grid .cf-button {
+    display: inline-flex !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    justify-content: center !important;
+    font-size: 15px !important;
+    margin-top: 25px !important;
+  }
+}
+
+/* Smaller phones */
+@media (max-width: 480px) {
+  .cf-materials-grid .cf-eyebrow {
+    font-size: 12px !important;
+  }
+
+  .cf-materials-grid h2 {
+    font-size: 34px !important;
+    line-height: 1.08 !important;
+  }
+
+  .cf-materials-grid > p {
+    font-size: 15px !important;
+    line-height: 1.55 !important;
+  }
+
+  .cf-materials-grid .cf-button {
+    font-size: 13px !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 380px) {
+  .cf-materials-grid h2 {
+    font-size: 31px !important;
+  }
+
+  .cf-materials-grid > p {
+    font-size: 14px !important;
+  }
+
+  .cf-materials-grid .cf-button {
+    font-size: 12px !important;
   }
 }

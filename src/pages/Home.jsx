@@ -1735,21 +1735,15 @@ function ModelStep({
 
       <div className="cf-model-step__top">
 
-        <span>
-          {number}
-        </span>
-
         <div className="cf-model-icon">
           {icon}
         </div>
 
       </div>
 
-
       <h3>
         {title}
       </h3>
-
 
       <p>
         {text}

@@ -2676,3 +2676,570 @@ margin-bottom: 20px;
     transform: translateY(0);
   }
 }
+
+
+
+
+/* ============================================================
+   MOBILE HOME — CENTER EVERYTHING
+============================================================ */
+
+@media (max-width: 768px) {
+
+  /* =========================
+     HERO
+  ========================= */
+
+  .cf-home-hero__content {
+    width: 100%;
+    max-width: 100%;
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .cf-home-hero__content .cf-section-marker {
+    justify-content: center;
+  }
+
+  .cf-home-hero__content h1 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-home-hero__content p {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-home-hero__content .cf-button,
+  .cf-home-hero__content a {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /* =========================
+     QUICK HIGHLIGHTS
+  ========================= */
+
+  .cf-quick-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .cf-quick-icon {
+    margin: 0 auto;
+  }
+
+  .cf-quick-item strong,
+  .cf-quick-item small {
+    text-align: center;
+  }
+
+
+  /* =========================
+     SECTION HEADERS
+  ========================= */
+
+  .cf-section-header {
+    display: block;
+    text-align: center;
+  }
+
+  .cf-section-header > div {
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .cf-section-header h2 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-section-intro {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-section-number {
+    justify-content: center;
+  }
+
+
+  /* =========================
+     WHO WE ARE
+  ========================= */
+
+  .cf-who-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .cf-who-visual {
+    justify-content: center;
+  }
+
+  .cf-who-visual img {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cf-who-content {
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-who-content p {
+    text-align: center;
+  }
+
+  .cf-who-content .cf-text-link {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /* =========================
+     WHAT WE DO
+  ========================= */
+
+  .cf-program-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-program-card {
+    text-align: center;
+  }
+
+  .cf-card-top {
+    justify-content: center;
+  }
+
+  .cf-card-icon {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cf-program-card h3 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-program-card p {
+    text-align: center;
+  }
+
+  .cf-card-arrow {
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+
+  /* =========================
+     OUR VISION
+  ========================= */
+
+  .cf-vision-content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .cf-vision-content .cf-section-marker {
+    justify-content: center;
+  }
+
+  .cf-vision-content h2 {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-vision-content p {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .cf-vision-link {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+
+  /* =========================
+     OUR MODEL
+  ========================= */
+
+  .cf-model-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-model-step {
+    text-align: center;
+  }
+
+  .cf-model-step > * {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cf-model-step h3,
+  .cf-model-step p {
+    text-align: center;
+  }
+
+
+  /* =========================
+     WHY IT MATTERS
+  ========================= */
+
+  .cf-matters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-matter {
+    text-align: center;
+  }
+
+  .cf-matter__number,
+  .cf-matter-number {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cf-matter h3,
+  .cf-matter p {
+    text-align: center;
+  }
+
+
+  /* =========================
+     CENTERED LINKS / BUTTONS
+  ========================= */
+
+  .cf-centered-link {
+    text-align: center;
+  }
+
+  .cf-text-link {
+    justify-content: center;
+  }
+
+}
+
+/* ============================================================
+   MOBILE HERO — SMALLER TYPOGRAPHY
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-home-hero h1 {
+    font-size: 2.15rem;
+    line-height: 1.02;
+  }
+
+  .cf-home-hero__lead {
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-home-hero h1 {
+    font-size: 1.95rem;
+    line-height: 1.04;
+  }
+
+  .cf-home-hero__lead {
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .cf-home-hero h1 {
+    font-size: 1.75rem;
+    line-height: 1.05;
+  }
+
+  .cf-home-hero__lead {
+    font-size: 0.84rem;
+  }
+}
+
+.network-background {
+  pointer-events: none;
+  z-index: 4;
+}
+
+
+
+/* ============================================================
+   MOBILE HERO — STRONGER TEXT BACKGROUND SEPARATION
+============================================================ */
+
+@media (max-width: 768px) {
+  .cf-home-hero__media {
+    background-position: 75% center;
+  }
+
+  .cf-home-hero__overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(2, 24, 48, 0.99) 0%,
+        rgba(2, 24, 48, 0.96) 35%,
+        rgba(2, 24, 48, 0.88) 60%,
+        rgba(2, 24, 48, 0.65) 82%,
+        rgba(2, 24, 48, 0.45) 100%
+      );
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-home-hero__media {
+    background-position: 78% center;
+  }
+
+  .cf-home-hero__overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(2, 24, 48, 1) 0%,
+        rgba(2, 24, 48, 0.98) 38%,
+        rgba(2, 24, 48, 0.93) 62%,
+        rgba(2, 24, 48, 0.78) 82%,
+        rgba(2, 24, 48, 0.58) 100%
+      );
+  }
+}
+
+@media (max-width: 420px) {
+  .cf-home-hero__media {
+    background-position: 80% center;
+  }
+
+  .cf-home-hero__overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(2, 24, 48, 1) 0%,
+        rgba(2, 24, 48, 0.99) 42%,
+        rgba(2, 24, 48, 0.95) 68%,
+        rgba(2, 24, 48, 0.82) 100%
+      );
+  }
+}
+
+
+/* ============================================================
+   MOBILE HERO BUTTONS — SHORTER & CENTERED
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .cf-home-hero .cf-actions {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+   
+    
+  }
+
+  .cf-home-hero .cf-button {
+    width: min(100%, 240px);
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 12px;
+  }
+
+}
+
+/* MOBILE HERO — KEEP ONLY SLIDER DOTS */
+@media (max-width: 600px) {
+  .cf-home-hero__visual-caption {
+    display: none !important;
+  }
+
+  .cf-home-hero__dots {
+    display: flex !important;
+  }
+  
+}
+
+
+@media (max-width: 768px) {
+
+  /* QUICK HIGHLIGHTS — ONE ROW */
+  .cf-quick-bar__grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0 !important;
+    width: 100%;
+     margin-top: -50px;
+  }
+
+  .cf-quick-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+
+    padding: 22px 10px !important;
+
+    border-bottom: 0 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .cf-quick-item:last-child {
+    border-right: 0 !important;
+  }
+
+  .cf-quick-icon {
+    margin-bottom: 8px;
+  }
+
+  .cf-quick-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .cf-quick-number {
+    margin-bottom: 6px;
+    font-size: 1.15rem;
+  }
+
+  .cf-quick-content {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cf-quick-item strong {
+    display: block;
+    text-align: center;
+    font-size: 0.82rem;
+    line-height: 1.25;
+  }
+
+  .cf-quick-item small {
+    display: block;
+    text-align: center;
+    font-size: 0.7rem;
+    line-height: 1.3;
+    margin-top: 4px;
+  }
+}
+
+
+
+/* ============================================================
+   MOBILE HERO — REDUCE SPACE BELOW SLIDER DOTS
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .cf-home-hero__main {
+    min-height: 680px !important;
+    margin-bottom: 69px !important;
+  }
+
+  .cf-home-hero__visual {
+    bottom: 0 !important;
+    height: 100% !important;
+  }
+
+  .cf-home-hero__dots {
+    bottom: 15px !important;
+    
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-home-hero__main {
+    min-height: 680px !important;
+  }
+
+  .cf-home-hero {
+    min-height: 680px !important;
+  }
+}
+
+/* REDUCE WHO WE ARE HEADING ON MOBILE */
+@media (max-width: 1024px) {
+  .cf-section-white .cf-section-header h2 {
+    font-size: 3.4rem !important;
+    line-height: 1.08 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-section-white .cf-section-header h2 {
+    font-size: 2.2rem !important;
+    line-height: 1.08 !important;
+  }
+}
+
+/* ============================================================
+   WHAT WE DO — MOBILE CLEANUP
+============================================================ */
+
+@media (max-width: 600px) {
+
+  /* Reduce the main "What We Do" heading */
+  .cf-programs .cf-section-header h2 {
+    font-size: 2.35rem !important;
+    line-height: 1.08 !important;
+  }
+
+  /* Remove 01, 02, 03, 04 */
+  .cf-program-card .cf-card-top > span {
+    display: none !important;
+  }
+
+  /* Center the icon after removing the number */
+  .cf-program-card .cf-card-top {
+    justify-content: center !important;
+  }
+
+  /* Reduce program card titles */
+  .cf-program-card h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.2 !important;
+    max-width: 100% !important;
+  }
+
+  /* Reduce card descriptions */
+  .cf-program-card p {
+    font-size: 0.88rem !important;
+    line-height: 1.6 !important;
+  }
+}
+
+/* ============================================================
+   WHAT WE DO — REDUCE HEADING ON TABLET / MOBILE
+============================================================ */
+
+@media (max-width: 900px) {
+  .cf-section-soft .cf-section-header h2 {
+    font-size: 2.6rem !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .cf-section-soft .cf-section-header h2 {
+    font-size: 2.25rem !important;
+    line-height: 1.08 !important;
+  }
+}

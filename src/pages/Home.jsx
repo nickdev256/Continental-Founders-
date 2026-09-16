@@ -22,7 +22,7 @@ import {
   Handshake,
   Rocket,
   Search,
-  BriefcaseBusiness,
+  BriefcaseBusiness, 
   Microscope,
   CalendarDays,
   Download,

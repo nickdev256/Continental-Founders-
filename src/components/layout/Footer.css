@@ -1605,3 +1605,355 @@
     animation: none !important;
   }
 }
+
+
+
+/* ============================================================
+   RESPONSIVE FOOTER — ALL DEVICES
+============================================================ */
+
+/* LARGE DESKTOPS & TV SCREENS */
+@media (min-width: 1600px) {
+  .cf-footer__container {
+    width: min(1500px, calc(100% - 160px));
+  }
+
+  .cf-footer__main {
+    padding-top: 120px;
+    padding-bottom: 70px;
+  }
+}
+
+
+/* LAPTOPS & TABLETS */
+@media (max-width: 1200px) {
+  .cf-footer__container {
+    width: calc(100% - 70px);
+  }
+
+  .cf-footer__layout {
+    column-gap: 55px;
+  }
+}
+
+
+/* TABLETS */
+@media (max-width: 950px) {
+  .cf-footer__container {
+    width: calc(100% - 50px);
+  }
+
+  .cf-footer__layout {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .cf-footer__brand,
+  .cf-footer__navigation,
+  .cf-footer__newsletter,
+  .cf-footer__statement {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
+/* MOBILE PHONES */
+@media (max-width: 700px) {
+  .cf-footer {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .cf-footer__container {
+    width: calc(100% - 32px);
+    max-width: none;
+    margin: 0 auto;
+  }
+
+  .cf-footer__main {
+    width: 100%;
+    min-height: auto;
+  }
+
+  .cf-footer__layout {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .cf-footer__brand,
+  .cf-footer__navigation,
+  .cf-footer__newsletter,
+  .cf-footer__statement {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cf-footer__logo img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .cf-footer__description {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .cf-footer__meeting {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .cf-footer__newsletter input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .cf-footer__newsletter button {
+    max-width: 100%;
+  }
+
+  .cf-footer__bottom-inner {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .cf-footer__legal {
+    flex-wrap: wrap;
+  }
+
+  .cf-footer__socials {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* SMALL PHONES */
+@media (max-width: 400px) {
+  .cf-footer__container {
+    width: calc(100% - 24px);
+  }
+
+  .cf-footer__layout {
+    gap: 42px;
+  }
+
+  .cf-footer__meeting {
+    width: 100%;
+  }
+
+  .cf-footer__legal {
+    gap: 14px;
+  }
+
+  .cf-footer__socials {
+    gap: 7px;
+  }
+}
+
+
+/* ============================================================
+   MOBILE NEWSLETTER FIX
+============================================================ */
+
+@media (max-width: 700px) {
+  .cf-footer__newsletter {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .cf-footer__newsletter form {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .cf-footer__newsletter input {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-footer__newsletter button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .cf-footer__bottom-inner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 22px !important;
+  }
+
+  .cf-footer__copyright {
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__legal {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__socials {
+    width: 100% !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+}
+
+/* ============================================================
+   MOBILE NEWSLETTER — FULL WIDTH
+============================================================ */
+
+@media (max-width: 700px) {
+  .cf-footer__newsletter {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 28px !important;
+    padding: 28px 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-footer__newsletter-content {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .cf-footer__newsletter-form {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+  }
+
+  .cf-footer__input-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .cf-footer__input-wrap input {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cf-footer__newsletter-form button {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .cf-footer__statement {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+    justify-content: center !important;
+    margin-top: 5px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .cf-footer__statement {
+    font-size: 16px !important;
+    justify-content: center !important;
+    margin-top: 5px !important;
+  }
+}
+
+/* ============================================================
+   FOOTER BACKGROUND — CLEANER & MORE ORGANIZED
+============================================================ */
+
+.cf-footer__background {
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(3, 23, 47, 0.38) 0%,
+      rgba(3, 23, 47, 0.28) 50%,
+      rgba(3, 23, 47, 0.42) 100%
+    ),
+    url("/assets/rr.png") !important;
+
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+  .cf-footer__background {
+    background-position: center top !important;
+    opacity: 0.75 !important;
+  }
+}
+
+/* SMALL PHONES */
+@media (max-width: 400px) {
+  .cf-footer__background {
+    background-position: center top !important;
+    opacity: 0.68 !important;
+  }
+}
+@media (max-width: 700px) {
+  .cf-footer__logo {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin-top: -50px !important;
+    
+  }
+}
+
+@media (max-width: 700px) {
+  .cf-footer__logo {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__logo img {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .cf-footer__eyebrow {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__description {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}

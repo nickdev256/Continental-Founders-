@@ -16,7 +16,6 @@ import {
   CalendarDays,
   Clock3,
   ExternalLink,
-  Globe2,
   MapPin,
   RefreshCw,
   TrendingUp,
@@ -162,33 +161,6 @@ function formatFullDate(value) {
 }
 
 
-function formatShortDate(value) {
-  if (!value) {
-    return "TBA";
-  }
-
-  const date =
-    new Date(value);
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return "TBA";
-  }
-
-  return date.toLocaleDateString(
-    "en-US",
-    {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }
-  );
-}
-
-
 function formatDateBlock(value) {
   if (!value) {
     return {
@@ -241,7 +213,7 @@ function formatDateBlock(value) {
 
 
 /* ============================================================
-   EVENT DETAILS PAGE
+   EVENT DETAILS
 ============================================================ */
 
 export default function EventDetails() {
@@ -293,8 +265,7 @@ export default function EventDetails() {
               slug
             )}`,
             {
-              method:
-                "GET",
+              method: "GET",
 
               headers: {
                 Accept:
@@ -513,7 +484,7 @@ export default function EventDetails() {
 
 
   /* ==========================================================
-     LOADING STATE
+     LOADING
   ========================================================== */
 
   if (
@@ -556,7 +527,7 @@ export default function EventDetails() {
 
 
   /* ==========================================================
-     ERROR / NOT FOUND
+     ERROR
   ========================================================== */
 
   if (
@@ -587,7 +558,7 @@ export default function EventDetails() {
 
             <p>
               {error ||
-                "The event may have been removed, renamed or unpublished."}
+                "The event may have been removed, renamed, or unpublished."}
             </p>
 
             <Link
@@ -625,8 +596,10 @@ export default function EventDetails() {
 
       <section className="event-details-hero">
 
+        {/* ONLY EVENT PHOTO ON THIS PAGE */}
+
         <div
-          className="event-details-hero__background"
+          className="event-details-hero__photo"
           style={{
             backgroundImage:
               `url("${eventImage}")`,
@@ -634,20 +607,23 @@ export default function EventDetails() {
           aria-hidden="true"
         />
 
+
         <div
-          className="event-details-hero__overlay"
+          className="event-details-hero__shade"
           aria-hidden="true"
         />
 
+
         <div
-          className="event-details-hero__accent"
+          className="event-details-hero__texture"
           aria-hidden="true"
         />
+
 
         <div className="event-details-container event-details-hero__inner">
 
 
-          {/* HERO CONTENT */}
+          {/* LEFT CONTENT */}
 
           <div className="event-details-hero__content">
 
@@ -664,10 +640,14 @@ export default function EventDetails() {
             </Link>
 
 
-            <div className="event-details-hero__label">
-              <span />
+            <div className="event-details-hero__type">
+
+              <span
+                aria-hidden="true"
+              />
 
               {eventType}
+
             </div>
 
 
@@ -686,9 +666,26 @@ export default function EventDetails() {
 
             <div className="event-details-hero__actions">
 
+              {registrationUrl && (
+                <a
+                  href={registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="event-details-button event-details-button--gold"
+                >
+                  Register for Event
+
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+                </a>
+              )}
+
+
               <a
                 href="#event-overview"
-                className="event-details-button event-details-button--gold"
+                className="event-details-button event-details-button--outline-light"
               >
                 Explore Event
 
@@ -698,137 +695,158 @@ export default function EventDetails() {
                 />
               </a>
 
-
-              {registrationUrl && (
-                <a
-                  href={registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="event-details-button event-details-button--outline-light"
-                >
-                  Register
-
-                  <ExternalLink
-                    size={16}
-                    aria-hidden="true"
-                  />
-                </a>
-              )}
-
             </div>
 
           </div>
 
 
-          {/* HERO INFORMATION CARD */}
+          {/* RIGHT QUOTE */}
 
-          <aside className="event-details-hero__card">
+          <div className="event-details-hero__quote">
 
-            <div className="event-details-date-block">
+            <span
+              className="event-details-hero__quote-line"
+              aria-hidden="true"
+            />
 
-              <strong>
-                {dateBlock.day}
-              </strong>
+            <blockquote>
+              “Conversations that create opportunity.”
+            </blockquote>
 
+            <small>
+              Continental Founders
+            </small>
+
+          </div>
+
+        </div>
+
+
+        {/* SIDE WORDS */}
+
+        <div
+          className="event-details-hero__keywords"
+          aria-hidden="true"
+        >
+          <span>People</span>
+          <span>Ideas</span>
+          <span>Capital</span>
+          <span>Impact</span>
+
+          <i />
+        </div>
+
+      </section>
+
+
+      {/* ======================================================
+          HERO INFORMATION BAR
+      ====================================================== */}
+
+      <section className="event-details-quick-info">
+
+        <div className="event-details-container event-details-quick-info__inner">
+
+
+          <div className="event-details-quick-info__date">
+
+            <strong>
+              {dateBlock.day}
+            </strong>
+
+            <span>
+              {dateBlock.month}
+            </span>
+
+            <small>
+              {dateBlock.year}
+            </small>
+
+          </div>
+
+
+          <div className="event-details-quick-info__item">
+
+            <CalendarDays
+              size={22}
+              aria-hidden="true"
+            />
+
+            <div>
               <span>
-                {dateBlock.month}
+                Date
               </span>
 
-              <small>
-                {dateBlock.year}
-              </small>
-
+              <strong>
+                {formatFullDate(
+                  eventDate
+                )}
+              </strong>
             </div>
 
+          </div>
 
-            <div className="event-details-hero__facts">
 
-              <div className="event-details-hero__fact">
+          {eventTime && (
+            <div className="event-details-quick-info__item">
 
-                <CalendarDays
-                  size={18}
-                  aria-hidden="true"
-                />
+              <Clock3
+                size={22}
+                aria-hidden="true"
+              />
 
+              <div>
                 <span>
-                  <small>
-                    Date
-                  </small>
-
-                  <strong>
-                    {formatFullDate(
-                      eventDate
-                    )}
-                  </strong>
+                  Time
                 </span>
 
-              </div>
-
-
-              {eventTime && (
-                <div className="event-details-hero__fact">
-
-                  <Clock3
-                    size={18}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    <small>
-                      Time
-                    </small>
-
-                    <strong>
-                      {eventTime}
-                    </strong>
-                  </span>
-
-                </div>
-              )}
-
-
-              <div className="event-details-hero__fact">
-
-                <MapPin
-                  size={18}
-                  aria-hidden="true"
-                />
-
-                <span>
-                  <small>
-                    Location
-                  </small>
-
-                  <strong>
-                    {location}
-                  </strong>
-                </span>
-
-              </div>
-
-
-              <div className="event-details-hero__fact">
-
-                <Users
-                  size={18}
-                  aria-hidden="true"
-                />
-
-                <span>
-                  <small>
-                    Event Type
-                  </small>
-
-                  <strong>
-                    {eventType}
-                  </strong>
-                </span>
-
+                <strong>
+                  {eventTime}
+                </strong>
               </div>
 
             </div>
+          )}
 
-          </aside>
+
+          <div className="event-details-quick-info__item">
+
+            <MapPin
+              size={22}
+              aria-hidden="true"
+            />
+
+            <div>
+              <span>
+                Location
+              </span>
+
+              <strong>
+                {location}
+              </strong>
+            </div>
+
+          </div>
+
+
+          <div className="event-details-quick-info__item">
+
+            <Users
+              size={22}
+              aria-hidden="true"
+            />
+
+            <div>
+              <span>
+                Event Type
+              </span>
+
+              <strong>
+                {eventType}
+              </strong>
+            </div>
+
+          </div>
 
         </div>
 
@@ -836,7 +854,7 @@ export default function EventDetails() {
 
 
       {/* ======================================================
-          EVENT OVERVIEW
+          OVERVIEW
       ====================================================== */}
 
       <section
@@ -847,39 +865,34 @@ export default function EventDetails() {
         <div className="event-details-container">
 
 
-          <div className="event-details-section-heading">
-
-            <div className="event-details-section-heading__label">
-
-              <span className="event-details-number">
-                01
-              </span>
-
-              <span className="event-details-eyebrow">
-                Event Overview
-              </span>
-
-            </div>
-
-
-            <h2>
-              A space for meaningful
-              conversations and action.
-            </h2>
-
-          </div>
-
-
           <div className="event-details-overview__grid">
 
 
-            {/* ABOUT */}
+            {/* MAIN CONTENT */}
 
-            <article className="event-details-overview__content">
+            <article className="event-details-overview__main">
 
-              <h3>
-                About the Event
-              </h3>
+              <div className="event-details-section-label">
+
+                <span className="event-details-section-number">
+                  01
+                </span>
+
+                <span className="event-details-eyebrow">
+                  Event Overview
+                </span>
+
+                <i
+                  aria-hidden="true"
+                />
+
+              </div>
+
+
+              <h2>
+                A space for meaningful
+                conversations and action.
+              </h2>
 
 
               <div className="event-details-prose">
@@ -906,7 +919,7 @@ export default function EventDetails() {
                         <p
                           key={`${index}-${paragraph.slice(
                             0,
-                            20
+                            18
                           )}`}
                         >
                           {paragraph}
@@ -922,30 +935,43 @@ export default function EventDetails() {
 
               </div>
 
+
+              <a
+                href="#why-we-convene"
+                className="event-details-text-link"
+              >
+                Explore Event Details
+
+                <ArrowRight
+                  size={18}
+                  aria-hidden="true"
+                />
+              </a>
+
             </article>
 
 
-            {/* EVENT INFORMATION */}
+            {/* KEY INFORMATION */}
 
             <aside className="event-details-information">
 
-              <h3>
-                Event Information
-              </h3>
+              <span className="event-details-information__heading">
+                Key Information
+              </span>
 
 
               <div className="event-details-information__item">
 
-                <span className="event-details-information__icon">
+                <div className="event-details-information__icon">
                   <CalendarDays
-                    size={19}
+                    size={23}
                     aria-hidden="true"
                   />
-                </span>
+                </div>
 
                 <div>
                   <span>
-                    Start Date
+                    Date
                   </span>
 
                   <strong>
@@ -961,12 +987,12 @@ export default function EventDetails() {
               {endDate && (
                 <div className="event-details-information__item">
 
-                  <span className="event-details-information__icon">
+                  <div className="event-details-information__icon">
                     <CalendarDays
-                      size={19}
+                      size={23}
                       aria-hidden="true"
                     />
-                  </span>
+                  </div>
 
                   <div>
                     <span>
@@ -987,12 +1013,12 @@ export default function EventDetails() {
               {eventTime && (
                 <div className="event-details-information__item">
 
-                  <span className="event-details-information__icon">
+                  <div className="event-details-information__icon">
                     <Clock3
-                      size={19}
+                      size={23}
                       aria-hidden="true"
                     />
-                  </span>
+                  </div>
 
                   <div>
                     <span>
@@ -1010,12 +1036,12 @@ export default function EventDetails() {
 
               <div className="event-details-information__item">
 
-                <span className="event-details-information__icon">
+                <div className="event-details-information__icon">
                   <MapPin
-                    size={19}
+                    size={23}
                     aria-hidden="true"
                   />
-                </span>
+                </div>
 
                 <div>
                   <span>
@@ -1032,12 +1058,12 @@ export default function EventDetails() {
 
               <div className="event-details-information__item">
 
-                <span className="event-details-information__icon">
+                <div className="event-details-information__icon">
                   <Users
-                    size={19}
+                    size={23}
                     aria-hidden="true"
                   />
-                </span>
+                </div>
 
                 <div>
                   <span>
@@ -1064,29 +1090,31 @@ export default function EventDetails() {
           WHY WE CONVENE
       ====================================================== */}
 
-      <section className="event-details-purpose">
-
-        <div
-          className="event-details-purpose__glow"
-          aria-hidden="true"
-        />
+      <section
+        id="why-we-convene"
+        className="event-details-purpose"
+      >
 
         <div className="event-details-container">
 
 
-          <div className="event-details-purpose__intro">
+          <div className="event-details-purpose__top">
 
             <div>
 
-              <div className="event-details-section-heading__label">
+              <div className="event-details-section-label">
 
-                <span className="event-details-number">
+                <span className="event-details-section-number">
                   02
                 </span>
 
-                <span className="event-details-eyebrow event-details-eyebrow--gold">
+                <span className="event-details-eyebrow">
                   Why We Convene
                 </span>
+
+                <i
+                  aria-hidden="true"
+                />
 
               </div>
 
@@ -1116,14 +1144,16 @@ export default function EventDetails() {
 
               <div className="event-details-purpose-card__icon">
                 <Users
-                  size={27}
+                  size={34}
+                  strokeWidth={1.5}
                   aria-hidden="true"
                 />
               </div>
 
+
               <div>
 
-                <div className="event-details-purpose-card__title">
+                <div className="event-details-purpose-card__heading">
 
                   <span>
                     01.
@@ -1150,14 +1180,16 @@ export default function EventDetails() {
 
               <div className="event-details-purpose-card__icon">
                 <BookOpen
-                  size={27}
+                  size={34}
+                  strokeWidth={1.5}
                   aria-hidden="true"
                 />
               </div>
 
+
               <div>
 
-                <div className="event-details-purpose-card__title">
+                <div className="event-details-purpose-card__heading">
 
                   <span>
                     02.
@@ -1184,14 +1216,16 @@ export default function EventDetails() {
 
               <div className="event-details-purpose-card__icon">
                 <TrendingUp
-                  size={27}
+                  size={34}
+                  strokeWidth={1.5}
                   aria-hidden="true"
                 />
               </div>
 
+
               <div>
 
-                <div className="event-details-purpose-card__title">
+                <div className="event-details-purpose-card__heading">
 
                   <span>
                     03.
@@ -1221,66 +1255,34 @@ export default function EventDetails() {
 
 
       {/* ======================================================
-          FEATURE IMAGE
-      ====================================================== */}
-
-      <section className="event-details-feature">
-
-        <div className="event-details-feature__grid">
-
-          <div className="event-details-feature__image">
-
-            <img
-              src={eventImage}
-              alt={
-                event.title ||
-                "Continental Founders event"
-              }
-              loading="lazy"
-              decoding="async"
-            />
-
-          </div>
-
-
-          <div className="event-details-feature__statement">
-
-            <span
-              className="event-details-feature__line"
-              aria-hidden="true"
-            />
-
-            <p>
-              African founders.
-              <br />
-
-              Global conversations.
-              <br />
-
-              Real impact.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          JOIN THE CONVERSATION
+          JOIN
       ====================================================== */}
 
       <section className="event-details-connect">
 
+        <div
+          className="event-details-connect__pattern"
+          aria-hidden="true"
+        />
+
+
         <div className="event-details-container event-details-connect__grid">
 
 
-          <div className="event-details-connect__heading">
+          <div>
 
-            <span className="event-details-eyebrow">
-              Join the Conversation
-            </span>
+            <div className="event-details-connect__label">
+
+              <i
+                aria-hidden="true"
+              />
+
+              <span>
+                Join the Conversation
+              </span>
+
+            </div>
+
 
             <h2>
               Be part of the room
@@ -1293,10 +1295,10 @@ export default function EventDetails() {
           <div className="event-details-connect__content">
 
             <p>
-              Continental Founders convenings bring together
-              founders, universities, professionals,
-              institutions, partners and opportunity
-              networks around practical conversations.
+              Secure your place and join a community of
+              founders, professionals, institutions and
+              partners working toward practical connections,
+              collaboration and opportunity.
             </p>
 
 
@@ -1321,7 +1323,7 @@ export default function EventDetails() {
 
               <Link
                 to="/contact"
-                className="event-details-button event-details-button--outline"
+                className="event-details-button event-details-button--outline-light"
               >
                 Contact Us
 
@@ -1334,7 +1336,7 @@ export default function EventDetails() {
 
               <Link
                 to="/events"
-                className="event-details-button event-details-button--outline"
+                className="event-details-connect__all-events"
               >
                 View All Events
               </Link>
@@ -1349,38 +1351,20 @@ export default function EventDetails() {
 
 
       {/* ======================================================
-          FINAL BRAND BAND
+          BRAND BAND
       ====================================================== */}
 
-      <section
-        className="event-details-final"
-        style={{
-          "--event-final-image":
-            `url("${eventImage}")`,
-        }}
-      >
+      <section className="event-details-brand-band">
 
-        <div
-          className="event-details-final__background"
-          aria-hidden="true"
-        />
-
-        <div
-          className="event-details-final__overlay"
-          aria-hidden="true"
-        />
-
-
-        <div className="event-details-container event-details-final__inner">
-
-          <Globe2
-            size={30}
-            aria-hidden="true"
-          />
+        <div className="event-details-container event-details-brand-band__inner">
 
           <span>
             Continental Founders
           </span>
+
+          <i
+            aria-hidden="true"
+          />
 
           <strong>
             Talent is everywhere. Access is not.
@@ -1390,36 +1374,20 @@ export default function EventDetails() {
             aria-hidden="true"
           />
 
+          <Link
+            to="/contact"
+          >
+            Connect With Us
+
+            <ArrowRight
+              size={15}
+              aria-hidden="true"
+            />
+          </Link>
+
         </div>
 
       </section>
-
-
-      {/* ======================================================
-          SMALL EVENT META BAND
-      ====================================================== */}
-
-      <div className="event-details-meta-band">
-
-        <div className="event-details-container event-details-meta-band__inner">
-
-          <span>
-            {eventType}
-          </span>
-
-          <span>
-            {formatShortDate(
-              eventDate
-            )}
-          </span>
-
-          <span>
-            {location}
-          </span>
-
-        </div>
-
-      </div>
 
     </main>
   );

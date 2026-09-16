@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <!-- =====================================================
-         BASIC DOCUMENT SETTINGS
+         DOCUMENT SETTINGS
     ====================================================== -->
 
     <meta charset="UTF-8" />
@@ -22,41 +22,48 @@
       content="light"
     />
 
+
     <!-- =====================================================
          PRIMARY SEO
     ====================================================== -->
 
     <title>
-      Continental Founders™ | Africa–America Strategic Partnerships
+      Continental Founders | Connecting African Founders to Global Opportunity
     </title>
 
     <meta
       name="description"
-      content="Continental Founders™ connects universities, entrepreneurs, investors, institutions, and strategic partners across Africa and America through entrepreneurship, innovation, leadership development, and cross-continental collaboration."
-    />
-
-    <meta
-      name="keywords"
-      content="Continental Founders, Africa America partnerships, university partnerships, entrepreneurship, innovation, leadership development, African universities, American universities, cross continental collaboration, student entrepreneurship, global founders"
+      content="Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks through entrepreneurship, collaboration, and venture development."
     />
 
     <meta
       name="author"
-      content="Continental Founders™"
+      content="Continental Founders"
     />
 
     <meta
       name="robots"
-      content="index, follow"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
+
+    <meta
+      name="googlebot"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+
+
+    <!-- =====================================================
+         CANONICAL
+    ====================================================== -->
 
     <link
       rel="canonical"
       href="https://continentalfounders.org/"
     />
 
+
     <!-- =====================================================
-         FAVICON
+         FAVICON / BRAND ICON
     ====================================================== -->
 
     <link
@@ -70,8 +77,9 @@
       href="/assets/continental-founders-logo.png"
     />
 
+
     <!-- =====================================================
-         OPEN GRAPH / SOCIAL SHARING
+         OPEN GRAPH
     ====================================================== -->
 
     <meta
@@ -80,13 +88,18 @@
     />
 
     <meta
+      property="og:site_name"
+      content="Continental Founders"
+    />
+
+    <meta
       property="og:title"
-      content="Continental Founders™ | Africa–America Strategic Partnerships"
+      content="Continental Founders | Connecting African Founders to Global Opportunity"
     />
 
     <meta
       property="og:description"
-      content="Building a connected ecosystem where universities, entrepreneurs, investors, and institutions across Africa and America collaborate to develop the next generation of globally minded founders, innovators, and leaders."
+      content="Connecting African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks."
     />
 
     <meta
@@ -95,22 +108,28 @@
     />
 
     <meta
-      property="og:site_name"
-      content="Continental Founders™"
+      property="og:image"
+      content="https://continentalfounders.org/assets/continental-founders-logo.png"
     />
 
     <meta
-      property="og:image"
-      content="https://continentalfounders.org/assets/continental-founders-social.jpg"
+      property="og:image:secure_url"
+      content="https://continentalfounders.org/assets/continental-founders-logo.png"
     />
 
     <meta
       property="og:image:alt"
-      content="Continental Founders™ — Africa and America Strategic Partnerships"
+      content="Continental Founders"
     />
 
+    <meta
+      property="og:locale"
+      content="en_US"
+    />
+
+
     <!-- =====================================================
-         TWITTER / X
+         X / TWITTER
     ====================================================== -->
 
     <meta
@@ -120,18 +139,24 @@
 
     <meta
       name="twitter:title"
-      content="Continental Founders™ | Africa–America Strategic Partnerships"
+      content="Continental Founders | Connecting African Founders to Global Opportunity"
     />
 
     <meta
       name="twitter:description"
-      content="Connecting universities, entrepreneurs, investors, institutions, and leaders across Africa and America through entrepreneurship, innovation, and leadership development."
+      content="Connecting African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks."
     />
 
     <meta
       name="twitter:image"
-      content="https://continentalfounders.org/assets/continental-founders-social.jpg"
+      content="https://continentalfounders.org/assets/continental-founders-logo.png"
     />
+
+    <meta
+      name="twitter:image:alt"
+      content="Continental Founders"
+    />
+
 
     <!-- =====================================================
          PERFORMANCE
@@ -148,10 +173,9 @@
       crossorigin
     />
 
+
     <!-- =====================================================
          TYPOGRAPHY
-         
-         Institutional serif + modern sans-serif pairing.
     ====================================================== -->
 
     <link
@@ -159,45 +183,80 @@
       rel="stylesheet"
     />
 
+
     <!-- =====================================================
-         STRUCTURED DATA
+         STRUCTURED DATA — ORGANIZATION
     ====================================================== -->
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "Continental Founders™",
-        "alternateName": "Continental Founders",
+        "@id": "https://continentalfounders.org/#organization",
+        "name": "Continental Founders",
+        "alternateName": "Continental Founders™",
         "url": "https://continentalfounders.org/",
-        "logo": "https://continentalfounders.org/assets/continental-founders-logo.png",
-        "description": "Continental Founders™ connects universities, entrepreneurs, investors, institutions, and strategic partners across Africa and America through entrepreneurship, innovation, leadership development, and cross-continental collaboration.",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://continentalfounders.org/assets/continental-founders-logo.png"
+        },
+        "description": "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks through entrepreneurship, collaboration, and venture development.",
         "areaServed": [
           {
-            "@type": "Place",
+            "@type": "Continent",
             "name": "Africa"
           },
           {
-            "@type": "Place",
+            "@type": "Country",
             "name": "United States"
           }
         ],
         "knowsAbout": [
           "Entrepreneurship",
+          "Venture Development",
           "Innovation",
-          "Leadership Development",
           "University Partnerships",
-          "International Collaboration",
-          "Cross-Cultural Collaboration",
-          "Education",
-          "Economic Opportunity"
+          "Founder Development",
+          "Mentorship",
+          "Business Partnerships",
+          "Market Access",
+          "Leadership Development",
+          "International Collaboration"
         ]
       }
     </script>
 
+
+    <!-- =====================================================
+         STRUCTURED DATA — WEBSITE
+    ====================================================== -->
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://continentalfounders.org/#website",
+        "url": "https://continentalfounders.org/",
+        "name": "Continental Founders",
+        "publisher": {
+          "@id": "https://continentalfounders.org/#organization"
+        },
+        "inLanguage": "en"
+      }
+    </script>
   </head>
 
   <body>
+    <!-- =====================================================
+         NOSCRIPT
+    ====================================================== -->
+
+    <noscript>
+      Continental Founders connects founders, universities,
+      mentors, business leaders, markets, and global opportunity
+      networks. JavaScript is required to use this website.
+    </noscript>
+
 
     <!-- =====================================================
          APPLICATION ROOT
@@ -207,13 +266,12 @@
 
 
     <!-- =====================================================
-         JAVASCRIPT APPLICATION
+         APPLICATION
     ====================================================== -->
 
     <script
       type="module"
       src="/src/main.jsx"
     ></script>
-
   </body>
 </html>

@@ -1811,3 +1811,248 @@ body.nav-open {
       calc(100dvh - 160px);
   }
 }
+
+
+
+
+/* ============================================================
+   MOBILE NAVIGATION — DROPDOWN FIX
+   Keeps the mobile menu fully contained and prevents
+   desktop dropdown positioning from affecting mobile.
+============================================================ */
+
+/* ============================================================
+   MOBILE PARTNERS DROPDOWN — FINAL LAYOUT FIX
+============================================================ */
+
+@media (max-width: 1024px) {
+
+  .navbar__dropdown {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .navbar__dropdown-heading {
+    position: relative !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 64px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .navbar__dropdown-trigger {
+    width: 100% !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  .navbar__mobile-dropdown-toggle {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 54px !important;
+    height: 64px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 10 !important;
+  }
+
+  /* CLOSED */
+  .navbar__dropdown-menu {
+    position: static !important;
+    display: block !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: 0 !important;
+    max-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+
+    transform: none !important;
+    translate: none !important;
+  }
+
+  /* OPEN — IMPORTANT:
+     height:auto makes the submenu occupy real space
+     and pushes Events/Insights/Contact downward. */
+  .navbar__dropdown.is-mobile-open .navbar__dropdown-menu {
+    height: auto !important;
+    max-height: none !important;
+
+    width: 100% !important;
+
+    padding: 8px 0 10px !important;
+
+    overflow: visible !important;
+    box-sizing: border-box !important;
+
+    background: #f8f9fa !important;
+  }
+
+  @media (max-width: 1024px) {
+  .navbar__actions {
+    margin-top: 40px !important;
+  }
+}
+
+  .navbar__dropdown-link {
+    display: flex !important;
+    position: relative !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    min-height: 50px !important;
+    height: auto !important;
+
+    margin: 0 !important;
+    padding: 12px 54px 12px 26px !important;
+
+    box-sizing: border-box !important;
+
+    transform: none !important;
+    translate: none !important;
+
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+
+  /* Make sure the links after Partners stay in normal flow */
+  .navbar__dropdown + .navbar__link,
+  .navbar__dropdown ~ .navbar__link {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  .navbar__logo {
+    height: 74px !important;
+    max-width: 240px !important;
+    width: auto !important;
+  }
+
+   .navbar__nav {
+    top: 86px !important;
+    margin-top: 10px;
+    height: calc(100dvh - 86px) !important;
+  }
+}
+
+@media (max-width: 600px) {
+
+  .navbar__inner {
+    min-height: 82px !important;
+  }
+
+  .navbar__logo {
+    height: 70px !important;
+    max-width: 235px !important;
+  }
+
+  .navbar__nav {
+    top: 82px !important;
+     margin-top: 10px;
+    height: calc(100dvh - 82px) !important;
+  }
+}
+
+
+@media (max-width: 420px) {
+
+  .navbar__inner {
+    min-height: 78px !important;
+  }
+
+  .navbar__logo {
+    height: 57px !important;
+    max-width: 190px !important;
+  }
+
+  .navbar__nav {
+    top: 78px !important;
+     margin-top: 10px;
+    height: calc(100dvh - 78px) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* Remove arrows from navigation links */
+  .navbar__link svg {
+    display: none !important;
+  }
+
+  /* Remove arrow from Schedule a Meeting button */
+  .navbar__cta svg {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  /* Remove arrows from Partners dropdown links */
+  .navbar__dropdown-link svg {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navbar__dropdown-menu .navbar__dropdown-link {
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease,
+      padding-left 0.25s ease !important;
+  }
+
+  .navbar__dropdown-menu .navbar__dropdown-link:hover {
+    background-color: #eef1f3 !important;
+    color: #b28422 !important;
+    padding-left: 32px !important;
+  }
+
+  .navbar__dropdown-menu .navbar__dropdown-link:focus-visible {
+    background-color: #eef1f3 !important;
+    color: #b28422 !important;
+    padding-left: 32px !important;
+    outline: none !important;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .navbar__toggle {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .navbar__toggle:hover,
+  .navbar__toggle:focus,
+  .navbar__toggle:focus-visible,
+  .navbar__toggle:active {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}

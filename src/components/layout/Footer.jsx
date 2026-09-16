@@ -387,7 +387,7 @@ export default function Footer() {
 
       <div
         className="cf-footer__background"
-        aria-hidden="true"
+        aria-hidden="true" 
       />
 
 

@@ -17,21 +17,34 @@ const {
   require("../services/siteNotificationService");
 
 
-/* ============================================================
-   STORAGE
-============================================================ */
+// ============================================================
+// STORAGE
+// ============================================================
 
 const EVENT_IMAGE_BUCKET =
   "event-images";
 
 
-/* ============================================================
-   VALIDATION
-============================================================ */
+// ============================================================
+// CONSTANTS
+// ============================================================
+
+const EVENT_STATUSES = [
+  "draft",
+  "published",
+  "cancelled",
+];
+
+const EVENT_SLUG_REGEX =
+  /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+
+// ============================================================
+// VALIDATION
+// ============================================================
 
 const eventSchema =
   z.object({
-
     title:
       z
         .string({
@@ -55,6 +68,7 @@ const eventSchema =
             "Event slug is required.",
         })
         .trim()
+        .toLowerCase()
         .min(
           3,
           "Event slug is required."
@@ -64,7 +78,7 @@ const eventSchema =
           "Event slug is too long."
         )
         .regex(
-          /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+          EVENT_SLUG_REGEX,
           "Invalid event slug."
         ),
 
@@ -91,11 +105,9 @@ const eventSchema =
 
     status:
       z
-        .enum([
-          "draft",
-          "published",
-          "cancelled",
-        ])
+        .enum(
+          EVENT_STATUSES
+        )
         .default(
           "draft"
         ),
@@ -111,7 +123,6 @@ const eventSchema =
           1,
           "Event date is required."
         ),
-
   });
 
 
@@ -119,176 +130,170 @@ const updateEventSchema =
   eventSchema.partial();
 
 
-/* ============================================================
-   NORMALIZE MULTIPART BODY
-============================================================ */
+// ============================================================
+// NORMALIZE CREATE BODY
+// ============================================================
 
 function normalizeEventInput(
   body = {}
 ) {
-
   return {
-
     title:
       typeof body.title ===
       "string"
-        ? body.title
+        ? body.title.trim()
         : "",
 
     slug:
       typeof body.slug ===
       "string"
         ? body.slug
+            .trim()
+            .toLowerCase()
         : "",
 
     description:
       typeof body.description ===
       "string"
-        ? body.description
+        ? body.description.trim()
         : "",
 
     location:
       typeof body.location ===
       "string"
-        ? body.location
+        ? body.location.trim()
         : "",
 
     type:
       typeof body.type ===
       "string"
-        ? body.type
+        ? body.type.trim()
         : "",
 
     status:
       typeof body.status ===
         "string" &&
-      body.status
+      body.status.trim()
         ? body.status
+            .trim()
+            .toLowerCase()
         : "draft",
 
     eventDate:
       typeof body.eventDate ===
       "string"
-        ? body.eventDate
+        ? body.eventDate.trim()
         : "",
-
   };
-
 }
 
 
-/* ============================================================
-   NORMALIZE UPDATE BODY
-============================================================ */
+// ============================================================
+// NORMALIZE UPDATE BODY
+// ============================================================
 
 function normalizeUpdateInput(
   body = {}
 ) {
-
   const normalized = {};
-
 
   if (
     body.title !==
     undefined
   ) {
-
     normalized.title =
-      body.title;
-
+      typeof body.title ===
+      "string"
+        ? body.title.trim()
+        : body.title;
   }
-
 
   if (
     body.slug !==
     undefined
   ) {
-
     normalized.slug =
-      body.slug;
-
+      typeof body.slug ===
+      "string"
+        ? body.slug
+            .trim()
+            .toLowerCase()
+        : body.slug;
   }
-
 
   if (
     body.description !==
     undefined
   ) {
-
     normalized.description =
-      body.description;
-
+      typeof body.description ===
+      "string"
+        ? body.description.trim()
+        : body.description;
   }
-
 
   if (
     body.location !==
     undefined
   ) {
-
     normalized.location =
-      body.location;
-
+      typeof body.location ===
+      "string"
+        ? body.location.trim()
+        : body.location;
   }
-
 
   if (
     body.type !==
     undefined
   ) {
-
     normalized.type =
-      body.type;
-
+      typeof body.type ===
+      "string"
+        ? body.type.trim()
+        : body.type;
   }
-
 
   if (
     body.status !==
     undefined
   ) {
-
     normalized.status =
-      body.status;
-
+      typeof body.status ===
+      "string"
+        ? body.status
+            .trim()
+            .toLowerCase()
+        : body.status;
   }
-
 
   if (
     body.eventDate !==
     undefined
   ) {
-
     normalized.eventDate =
-      body.eventDate;
-
+      typeof body.eventDate ===
+      "string"
+        ? body.eventDate.trim()
+        : body.eventDate;
   }
 
-
   return normalized;
-
 }
 
 
-/* ============================================================
-   NORMALIZE DATABASE EVENT
-============================================================ */
+// ============================================================
+// NORMALIZE DATABASE EVENT
+// ============================================================
 
 function normalizeEvent(
   event
 ) {
-
-  if (
-    !event
-  ) {
-
+  if (!event) {
     return null;
-
   }
 
-
   return {
-
     id:
       event.id,
 
@@ -333,156 +338,144 @@ function normalizeEvent(
 
     updatedAt:
       event.updated_at,
-
   };
-
 }
 
 
-/* ============================================================
-   IMAGE EXTENSION
-============================================================ */
+// ============================================================
+// VALIDATE DATE
+// ============================================================
+
+function parseEventDate(
+  value
+) {
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+
+// ============================================================
+// IMAGE EXTENSION
+// ============================================================
 
 function getImageExtension(
   file
 ) {
-
   const mimeType =
     file?.mimetype ||
     "";
-
 
   if (
     mimeType ===
     "image/png"
   ) {
-
     return "png";
-
   }
-
 
   if (
     mimeType ===
     "image/webp"
   ) {
-
     return "webp";
-
   }
 
-
   return "jpg";
-
 }
 
 
-/* ============================================================
-   IMAGE STORAGE PATH
-============================================================ */
+// ============================================================
+// IMAGE STORAGE PATH
+// ============================================================
 
 function createImagePath(
   file
 ) {
-
   const extension =
     getImageExtension(
       file
     );
 
-
   return [
     "events",
     `${Date.now()}-${crypto.randomUUID()}.${extension}`,
   ].join("/");
-
 }
 
 
-/* ============================================================
-   GET STORAGE PATH FROM PUBLIC URL
-============================================================ */
+// ============================================================
+// GET STORAGE PATH FROM PUBLIC URL
+// ============================================================
 
 function getStoragePathFromUrl(
   imageUrl
 ) {
-
   if (
-    !imageUrl
+    !imageUrl ||
+    typeof imageUrl !==
+      "string"
   ) {
-
     return null;
-
   }
-
 
   const marker =
     `/storage/v1/object/public/${EVENT_IMAGE_BUCKET}/`;
-
 
   const markerIndex =
     imageUrl.indexOf(
       marker
     );
 
-
   if (
     markerIndex === -1
   ) {
-
     return null;
-
   }
 
-
   try {
-
     return decodeURIComponent(
       imageUrl.slice(
         markerIndex +
         marker.length
       )
     );
-
   } catch (
     error
   ) {
-
     console.error(
       "Unable to decode event image storage path:",
       error
     );
 
-
     return null;
-
   }
-
 }
 
 
-/* ============================================================
-   UPLOAD EVENT IMAGE
-============================================================ */
+// ============================================================
+// UPLOAD EVENT IMAGE
+// ============================================================
 
 async function uploadEventImage(
   file
 ) {
-
-  if (
-    !file
-  ) {
-
+  if (!file) {
     return null;
-
   }
-
 
   const imagePath =
     createImagePath(
       file
     );
-
 
   const {
     error:
@@ -497,7 +490,6 @@ async function uploadEventImage(
         imagePath,
         file.buffer,
         {
-
           contentType:
             file.mimetype,
 
@@ -506,19 +498,14 @@ async function uploadEventImage(
 
           upsert:
             false,
-
         }
       );
-
 
   if (
     uploadError
   ) {
-
     throw uploadError;
-
   }
-
 
   const {
     data:
@@ -533,16 +520,13 @@ async function uploadEventImage(
         imagePath
       );
 
-
   const publicUrl =
     publicUrlData
       ?.publicUrl;
 
-
   if (
     !publicUrl
   ) {
-
     await supabaseAdmin
       .storage
       .from(
@@ -552,58 +536,36 @@ async function uploadEventImage(
         imagePath,
       ]);
 
-
     throw new Error(
       "Unable to generate event image URL."
     );
-
   }
 
-
   return {
-
     imagePath,
-
     publicUrl,
-
   };
-
 }
 
 
-/* ============================================================
-   DELETE EVENT IMAGE
-============================================================ */
+// ============================================================
+// DELETE EVENT IMAGE BY STORAGE PATH
+// ============================================================
 
-async function deleteEventImage(
-  imageUrl
+async function deleteEventImageByPath(
+  imagePath
 ) {
+  if (!imagePath) {
+    return {
+      success:
+        true,
+
+      skipped:
+        true,
+    };
+  }
 
   try {
-
-    const imagePath =
-      getStoragePathFromUrl(
-        imageUrl
-      );
-
-
-    if (
-      !imagePath
-    ) {
-
-      return {
-
-        success:
-          true,
-
-        skipped:
-          true,
-
-      };
-
-    }
-
-
     const {
       data,
       error,
@@ -617,11 +579,9 @@ async function deleteEventImage(
           imagePath,
         ]);
 
-
     if (
       error
     ) {
-
       console.error(
         "Delete event image error:",
         {
@@ -631,39 +591,27 @@ async function deleteEventImage(
           statusCode:
             error.statusCode,
 
-          error:
-            error.error,
-
           imagePath,
         }
       );
 
-
       return {
-
         success:
           false,
 
         error,
-
       };
-
     }
 
-
     return {
-
       success:
         true,
 
       data,
-
     };
-
   } catch (
     error
   ) {
-
     console.error(
       "Delete event image exception:",
       {
@@ -672,62 +620,110 @@ async function deleteEventImage(
 
         name:
           error?.name,
+
+        imagePath,
       }
     );
 
-
     return {
-
       success:
         false,
 
       error,
-
     };
-
   }
-
 }
 
 
-/* ============================================================
-   EVENT NOTIFICATION
-============================================================ */
+// ============================================================
+// DELETE EVENT IMAGE BY PUBLIC URL
+// ============================================================
+
+async function deleteEventImage(
+  imageUrl
+) {
+  const imagePath =
+    getStoragePathFromUrl(
+      imageUrl
+    );
+
+  if (
+    !imagePath
+  ) {
+    return {
+      success:
+        true,
+
+      skipped:
+        true,
+    };
+  }
+
+  return deleteEventImageByPath(
+    imagePath
+  );
+}
+
+
+// ============================================================
+// CLEAN UP NEW UPLOAD
+// ============================================================
+
+async function cleanupUploadedImage(
+  uploadedImage
+) {
+  if (
+    !uploadedImage
+      ?.imagePath
+  ) {
+    return;
+  }
+
+  const result =
+    await deleteEventImageByPath(
+      uploadedImage.imagePath
+    );
+
+  if (
+    !result.success
+  ) {
+    console.warn(
+      "Unable to clean up uploaded event image:",
+      uploadedImage.imagePath
+    );
+  }
+}
+
+
+// ============================================================
+// EVENT NOTIFICATION
+// ============================================================
 
 function sendEventNotification(
   event
 ) {
-
   if (
     !event ||
     event.status !==
       "published"
   ) {
-
     return;
-
   }
-
 
   let summary =
     event.description ||
     "";
 
-
   if (
     event.location
   ) {
-
     summary =
       summary
         ? `${summary}\n\nLocation: ${event.location}`
         : `Location: ${event.location}`;
-
   }
 
-
   notifySubscribers({
-
     contentType:
       "event",
 
@@ -748,35 +744,26 @@ function sendEventNotification(
 
     notificationType:
       "published",
-
   })
     .then(
-      (
-        result
-      ) => {
-
+      (result) => {
         if (
           result?.skipped
         ) {
-
           console.log(
             "Event newsletter notification skipped:",
             result.reason
           );
 
           return;
-
         }
-
 
         if (
           result?.success
         ) {
-
           console.log(
             "Event newsletter notification processed:",
             {
-
               eventId:
                 event.id,
 
@@ -785,41 +772,34 @@ function sendEventNotification(
 
               failedCount:
                 result.failedCount,
-
             }
           );
-
         }
-
       }
     )
     .catch(
-      (
-        error
-      ) => {
-
+      (error) => {
         console.error(
           "Event newsletter notification error:",
           error
         );
-
       }
     );
-
 }
 
 
-/* ============================================================
-   GET ALL EVENTS
-============================================================ */
+// ============================================================
+// GET ALL EVENTS
+//
+// ADMIN:
+// GET /api/events
+// ============================================================
 
 async function getEvents(
   req,
   res
 ) {
-
   try {
-
     const {
       data,
       error,
@@ -837,20 +817,15 @@ async function getEvents(
           }
         );
 
-
     if (
       error
     ) {
-
       throw error;
-
     }
-
 
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -862,48 +837,41 @@ async function getEvents(
                 normalizeEvent
               )
             : [],
-
       });
-
   } catch (
     error
   ) {
-
     console.error(
       "Get events error:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to load events.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   GET PUBLISHED EVENTS
-============================================================ */
+// ============================================================
+// GET PUBLISHED EVENTS
+//
+// PUBLIC:
+// GET /api/events/published
+// ============================================================
 
 async function getPublishedEvents(
   req,
   res
 ) {
-
   try {
-
     const {
       data,
       error,
@@ -925,20 +893,15 @@ async function getPublishedEvents(
           }
         );
 
-
     if (
       error
     ) {
-
       throw error;
-
     }
-
 
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -950,72 +913,82 @@ async function getPublishedEvents(
                 normalizeEvent
               )
             : [],
-
       });
-
   } catch (
     error
   ) {
-
     console.error(
       "Get published events error:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to load published events.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   GET PUBLISHED EVENT BY SLUG
-============================================================ */
+// ============================================================
+// GET PUBLISHED EVENT BY SLUG
+//
+// PUBLIC:
+// GET /api/events/published/:slug
+//
+// SECURITY:
+// Only status="published" can be returned.
+// ============================================================
 
 async function getEventBySlug(
   req,
   res
 ) {
-
   try {
-
-    const {
-      slug,
-    } =
-      req.params;
-
+    const slug =
+      typeof req.params?.slug ===
+      "string"
+        ? req.params.slug
+            .trim()
+            .toLowerCase()
+        : "";
 
     if (
       !slug
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "Event slug is required.",
-
         });
-
     }
 
+    if (
+      slug.length > 200 ||
+      !EVENT_SLUG_REGEX.test(
+        slug
+      )
+    ) {
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            "Invalid event slug.",
+        });
+    }
 
     const {
       data,
@@ -1036,39 +1009,29 @@ async function getEventBySlug(
         )
         .maybeSingle();
 
-
     if (
       error
     ) {
-
       throw error;
-
     }
-
 
     if (
       !data
     ) {
-
       return res
         .status(404)
         .json({
-
           success:
             false,
 
           message:
             "Event not found.",
-
         });
-
     }
-
 
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1076,57 +1039,51 @@ async function getEventBySlug(
           normalizeEvent(
             data
           ),
-
       });
-
   } catch (
     error
   ) {
-
     console.error(
-      "Get event error:",
+      "Get published event by slug error:",
       error
     );
-
 
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to load event.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   CREATE EVENT
-============================================================ */
+// ============================================================
+// CREATE EVENT
+//
+// ADMIN:
+// POST /api/events
+// ============================================================
 
 async function createEvent(
   req,
   res
 ) {
-
   let uploadedImage =
     null;
 
+  let databaseSaved =
+    false;
 
   try {
-
     const rawInput =
       normalizeEventInput(
         req.body
       );
-
 
     const input =
       eventSchema.parse(
@@ -1134,63 +1091,52 @@ async function createEvent(
       );
 
 
-    /* ========================================================
-       IMAGE REQUIRED
-    ======================================================== */
+    // ========================================================
+    // IMAGE REQUIRED
+    // ========================================================
 
     if (
       !req.file
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "Please choose an event image.",
-
         });
-
     }
 
 
-    /* ========================================================
-       VALIDATE DATE
-    ======================================================== */
+    // ========================================================
+    // VALIDATE DATE
+    // ========================================================
 
     const eventDate =
-      new Date(
+      parseEventDate(
         input.eventDate
       );
 
-
     if (
-      Number.isNaN(
-        eventDate.getTime()
-      )
+      !eventDate
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "Please provide a valid event date.",
-
         });
-
     }
 
 
-    /* ========================================================
-       CHECK SLUG
-    ======================================================== */
+    // ========================================================
+    // CHECK SLUG
+    // ========================================================
 
     const {
       data:
@@ -1212,38 +1158,30 @@ async function createEvent(
         )
         .maybeSingle();
 
-
     if (
       slugError
     ) {
-
       throw slugError;
-
     }
-
 
     if (
       existingEvent
     ) {
-
       return res
         .status(409)
         .json({
-
           success:
             false,
 
           message:
-            "An event with this title already exists.",
-
+            "An event with this slug already exists.",
         });
-
     }
 
 
-    /* ========================================================
-       UPLOAD IMAGE
-    ======================================================== */
+    // ========================================================
+    // UPLOAD IMAGE
+    // ========================================================
 
     uploadedImage =
       await uploadEventImage(
@@ -1251,14 +1189,13 @@ async function createEvent(
       );
 
 
-    /* ========================================================
-       CREATE DATABASE EVENT
-    ======================================================== */
+    // ========================================================
+    // CREATE DATABASE EVENT
+    // ========================================================
 
     const now =
       new Date()
         .toISOString();
-
 
     const {
       data,
@@ -1269,7 +1206,6 @@ async function createEvent(
           "events"
         )
         .insert({
-
           title:
             input.title,
 
@@ -1304,63 +1240,37 @@ async function createEvent(
 
           updated_at:
             now,
-
         })
         .select("*")
         .single();
 
-
     if (
       error
     ) {
-
-      if (
-        uploadedImage
-          ?.imagePath
-      ) {
-
-        await supabaseAdmin
-          .storage
-          .from(
-            EVENT_IMAGE_BUCKET
-          )
-          .remove([
-            uploadedImage
-              .imagePath,
-          ]);
-
-
-        uploadedImage =
-          null;
-
-      }
-
-
       throw error;
-
     }
 
+    databaseSaved =
+      true;
 
-    /* ========================================================
-       NOTIFY IF CREATED AS PUBLISHED
-    ======================================================== */
+
+    // ========================================================
+    // NOTIFY IF CREATED AS PUBLISHED
+    // ========================================================
 
     if (
       data.status ===
       "published"
     ) {
-
       sendEventNotification(
         data
       );
-
     }
 
 
     return res
       .status(201)
       .json({
-
         success:
           true,
 
@@ -1371,144 +1281,103 @@ async function createEvent(
 
         message:
           "Event created successfully.",
-
       });
-
   } catch (
     error
   ) {
-
-    /* Cleanup only when the DB record was not successfully saved */
-
     if (
+      !databaseSaved &&
       uploadedImage
         ?.imagePath
     ) {
-
-      try {
-
-        await supabaseAdmin
-          .storage
-          .from(
-            EVENT_IMAGE_BUCKET
-          )
-          .remove([
-            uploadedImage
-              .imagePath,
-          ]);
-
-      } catch (
-        cleanupError
-      ) {
-
-        console.warn(
-          "Unable to clean up uploaded event image:",
-          cleanupError
-        );
-
-      }
-
+      await cleanupUploadedImage(
+        uploadedImage
+      );
     }
-
 
     if (
       error?.name ===
       "ZodError"
     ) {
-
       console.error(
         "Create event validation error:",
         error.issues
       );
 
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
-            error.issues
-              ?.[0]
+            error.issues?.[0]
               ?.message ||
             "Invalid event information.",
-
         });
-
     }
-
 
     console.error(
       "Create event error:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to create event.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   UPDATE EVENT
-============================================================ */
+// ============================================================
+// UPDATE EVENT
+//
+// ADMIN:
+// PATCH /api/events/:id
+// ============================================================
 
 async function updateEvent(
   req,
   res
 ) {
-
   let newUploadedImage =
     null;
 
+  let databaseSaved =
+    false;
 
   try {
-
-    const {
-      id,
-    } =
-      req.params;
-
+    const id =
+      typeof req.params?.id ===
+      "string"
+        ? req.params.id.trim()
+        : "";
 
     if (
       !id
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "Event ID is required.",
-
         });
-
     }
-
 
     const rawInput =
       normalizeUpdateInput(
         req.body
       );
-
 
     const input =
       updateEventSchema.parse(
@@ -1516,9 +1385,9 @@ async function updateEvent(
       );
 
 
-    /* ========================================================
-       CHECK EXISTING EVENT
-    ======================================================== */
+    // ========================================================
+    // CHECK EXISTING EVENT
+    // ========================================================
 
     const {
       data:
@@ -1538,34 +1407,25 @@ async function updateEvent(
         )
         .maybeSingle();
 
-
     if (
       existingError
     ) {
-
       throw existingError;
-
     }
-
 
     if (
       !existingEvent
     ) {
-
       return res
         .status(404)
         .json({
-
           success:
             false,
 
           message:
             "Event not found.",
-
         });
-
     }
-
 
     if (
       Object.keys(
@@ -1573,41 +1433,37 @@ async function updateEvent(
       ).length === 0 &&
       !req.file
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "No event changes were provided.",
-
         });
-
     }
 
 
-    /* ========================================================
-       DETECT PREVIOUS PUBLICATION STATE
-    ======================================================== */
+    // ========================================================
+    // PREVIOUS PUBLICATION STATE
+    // ========================================================
 
     const wasPublished =
       existingEvent.status ===
       "published";
 
 
-    /* ========================================================
-       CHECK SLUG
-    ======================================================== */
+    // ========================================================
+    // CHECK SLUG
+    // ========================================================
 
     if (
-      input.slug &&
+      input.slug !==
+        undefined &&
       input.slug !==
         existingEvent.slug
     ) {
-
       const {
         data:
           conflictingEvent,
@@ -1632,182 +1488,139 @@ async function updateEvent(
           )
           .maybeSingle();
 
-
       if (
         conflictError
       ) {
-
         throw conflictError;
-
       }
-
 
       if (
         conflictingEvent
       ) {
-
         return res
           .status(409)
           .json({
-
             success:
               false,
 
             message:
-              "Another event already uses this title.",
-
+              "Another event already uses this slug.",
           });
-
       }
-
     }
 
 
-    /* ========================================================
-       PREPARE UPDATE
-    ======================================================== */
+    // ========================================================
+    // PREPARE UPDATE
+    // ========================================================
 
     const updates = {
-
       updated_at:
         new Date()
           .toISOString(),
-
     };
-
 
     if (
       input.title !==
       undefined
     ) {
-
       updates.title =
         input.title;
-
     }
-
 
     if (
       input.slug !==
       undefined
     ) {
-
       updates.slug =
         input.slug;
-
     }
-
 
     if (
       input.description !==
       undefined
     ) {
-
       updates.description =
         input.description ||
         null;
-
     }
-
 
     if (
       input.location !==
       undefined
     ) {
-
       updates.location =
         input.location ||
         null;
-
     }
-
 
     if (
       input.type !==
       undefined
     ) {
-
       updates.type =
         input.type ||
         null;
-
     }
-
 
     if (
       input.status !==
       undefined
     ) {
-
       updates.status =
         input.status;
-
     }
-
 
     if (
       input.eventDate !==
       undefined
     ) {
-
       const eventDate =
-        new Date(
+        parseEventDate(
           input.eventDate
         );
 
-
       if (
-        Number.isNaN(
-          eventDate.getTime()
-        )
+        !eventDate
       ) {
-
         return res
           .status(400)
           .json({
-
             success:
               false,
 
             message:
               "Please provide a valid event date.",
-
           });
-
       }
-
 
       updates.event_date =
         eventDate
           .toISOString();
-
     }
 
 
-    /* ========================================================
-       NEW IMAGE
-    ======================================================== */
+    // ========================================================
+    // UPLOAD NEW IMAGE
+    // ========================================================
 
     if (
       req.file
     ) {
-
       newUploadedImage =
         await uploadEventImage(
           req.file
         );
 
-
       updates.image_url =
         newUploadedImage
           .publicUrl;
-
     }
 
 
-    /* ========================================================
-       UPDATE DATABASE
-    ======================================================== */
+    // ========================================================
+    // UPDATE DATABASE
+    // ========================================================
 
     const {
       data,
@@ -1827,41 +1640,22 @@ async function updateEvent(
         .select("*")
         .single();
 
-
     if (
       error
     ) {
-
-      if (
-        newUploadedImage
-          ?.imagePath
-      ) {
-
-        await supabaseAdmin
-          .storage
-          .from(
-            EVENT_IMAGE_BUCKET
-          )
-          .remove([
-            newUploadedImage
-              .imagePath,
-          ]);
-
-
-        newUploadedImage =
-          null;
-
-      }
-
-
       throw error;
-
     }
 
+    databaseSaved =
+      true;
 
-    /* ========================================================
-       DELETE OLD IMAGE AFTER DATABASE SUCCESS
-    ======================================================== */
+
+    // ========================================================
+    // DELETE OLD IMAGE ONLY AFTER DATABASE SUCCESS
+    // ========================================================
+
+    let oldImageDeleted =
+      true;
 
     if (
       req.file &&
@@ -1871,40 +1665,47 @@ async function updateEvent(
         .image_url !==
         data.image_url
     ) {
+      const imageResult =
+        await deleteEventImage(
+          existingEvent
+            .image_url
+        );
 
-      await deleteEventImage(
-        existingEvent
-          .image_url
-      );
+      oldImageDeleted =
+        imageResult.success;
 
+      if (
+        !oldImageDeleted
+      ) {
+        console.warn(
+          "Event updated, but the previous image could not be removed:",
+          existingEvent.image_url
+        );
+      }
     }
 
 
-    /* ========================================================
-       NOTIFY ONLY ON FIRST MOVE INTO PUBLISHED
-    ======================================================== */
+    // ========================================================
+    // NOTIFY ONLY ON FIRST MOVE INTO PUBLISHED
+    // ========================================================
 
     const isNowPublished =
       data.status ===
       "published";
 
-
     if (
       !wasPublished &&
       isNowPublished
     ) {
-
       sendEventNotification(
         data
       );
-
     }
 
 
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1913,141 +1714,101 @@ async function updateEvent(
             data
           ),
 
+        oldImageDeleted,
+
         message:
           "Event updated successfully.",
-
       });
-
   } catch (
     error
   ) {
-
     if (
+      !databaseSaved &&
       newUploadedImage
         ?.imagePath
     ) {
-
-      try {
-
-        await supabaseAdmin
-          .storage
-          .from(
-            EVENT_IMAGE_BUCKET
-          )
-          .remove([
-            newUploadedImage
-              .imagePath,
-          ]);
-
-      } catch (
-        cleanupError
-      ) {
-
-        console.warn(
-          "Unable to clean up new event image:",
-          cleanupError
-        );
-
-      }
-
+      await cleanupUploadedImage(
+        newUploadedImage
+      );
     }
-
 
     if (
       error?.name ===
       "ZodError"
     ) {
-
       console.error(
         "Update event validation error:",
         error.issues
       );
 
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
-            error.issues
-              ?.[0]
+            error.issues?.[0]
               ?.message ||
             "Invalid event information.",
-
         });
-
     }
-
 
     console.error(
       "Update event error:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to update event.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   DELETE EVENT
-============================================================ */
+// ============================================================
+// DELETE EVENT
+//
+// ADMIN:
+// DELETE /api/events/:id
+// ============================================================
 
 async function deleteEvent(
   req,
   res
 ) {
-
   try {
-
-    const {
-      id,
-    } =
-      req.params;
-
+    const id =
+      typeof req.params?.id ===
+      "string"
+        ? req.params.id.trim()
+        : "";
 
     if (
-      !id ||
-      !String(
-        id
-      ).trim()
+      !id
     ) {
-
       return res
         .status(400)
         .json({
-
           success:
             false,
 
           message:
             "Event ID is required.",
-
         });
-
     }
 
 
-    /* ========================================================
-       FIND EVENT
-    ======================================================== */
+    // ========================================================
+    // FIND EVENT
+    // ========================================================
 
     const {
       data:
@@ -2069,55 +1830,44 @@ async function deleteEvent(
         )
         .maybeSingle();
 
-
     if (
       existingError
     ) {
-
       console.error(
         "Delete event lookup error:",
         existingError
       );
 
-
       return res
         .status(500)
         .json({
-
           success:
             false,
 
           message:
             existingError.message ||
             "Unable to find the event before deletion.",
-
         });
-
     }
-
 
     if (
       !existingEvent
     ) {
-
       return res
         .status(404)
         .json({
-
           success:
             false,
 
           message:
             "Event not found.",
-
         });
-
     }
 
 
-    /* ========================================================
-       DELETE DATABASE ROW
-    ======================================================== */
+    // ========================================================
+    // DELETE DATABASE ROW FIRST
+    // ========================================================
 
     const {
       data:
@@ -2140,149 +1890,121 @@ async function deleteEvent(
         )
         .maybeSingle();
 
-
     if (
       deleteError
     ) {
-
       console.error(
         "Supabase event delete error:",
         deleteError
       );
 
-
       return res
         .status(500)
         .json({
-
           success:
             false,
 
           message:
             deleteError.message ||
             "Failed to delete event from the database.",
-
         });
-
     }
-
 
     if (
       !deletedEvent
     ) {
-
       return res
         .status(500)
         .json({
-
           success:
             false,
 
           message:
             "The event could not be confirmed as deleted.",
-
         });
-
     }
 
 
-    /* ========================================================
-       DELETE IMAGE
-    ======================================================== */
+    // ========================================================
+    // DELETE ASSOCIATED IMAGE
+    // ========================================================
 
     const imageUrl =
       deletedEvent.image_url ||
       existingEvent.image_url;
 
-
     let imageDeleted =
       true;
-
 
     if (
       imageUrl
     ) {
-
       const imageResult =
         await deleteEventImage(
           imageUrl
         );
 
-
       imageDeleted =
         imageResult.success;
-
     }
 
+
+    // ========================================================
+    // RESPONSE
+    // ========================================================
 
     return res
       .status(200)
       .json({
-
         success:
           true,
 
         deletedEvent: {
-
           id:
             deletedEvent.id,
 
           title:
             deletedEvent.title,
-
         },
 
         imageDeleted,
 
         message:
-          "Event deleted successfully.",
-
+          imageDeleted
+            ? "Event deleted successfully."
+            : "Event deleted successfully, but its image could not be removed from storage.",
       });
-
   } catch (
     error
   ) {
-
     console.error(
       "Delete event exception:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
           error?.message ||
           "Failed to delete event.",
-
       });
-
   }
-
 }
 
 
-/* ============================================================
-   EXPORTS
-============================================================ */
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
-
   getEvents,
-
   getPublishedEvents,
-
   getEventBySlug,
-
   createEvent,
-
   updateEvent,
-
   deleteEvent,
-
 };

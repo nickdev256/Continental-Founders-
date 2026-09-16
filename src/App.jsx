@@ -50,7 +50,9 @@ import GovernmentDevelopment from "./pages/GovernmentDevelopment";
 
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
+
 import Events from "./pages/Events";
+import EventDetails from "./pages/EventDetails";
 
 import Insights from "./pages/Insights";
 import InsightDetails from "./pages/InsightDetails";
@@ -107,7 +109,8 @@ import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 // SITE CONFIGURATION
 // ============================================================
 
-const SITE_NAME = "Continental Founders";
+const SITE_NAME =
+  "Continental Founders";
 
 const SITE_URL =
   "https://continentalfounders.org";
@@ -357,6 +360,115 @@ function setCanonical(url) {
 
 
 // ============================================================
+// APPLY COMMON DYNAMIC SEO
+// ============================================================
+
+function applyDynamicSEO({
+  title,
+  description,
+  canonicalUrl,
+  type = "website",
+}) {
+  document.title =
+    title;
+
+  setMetaTag(
+    'meta[name="description"]',
+    [
+      "name",
+      "description",
+    ],
+    description
+  );
+
+  setMetaTag(
+    'meta[name="robots"]',
+    [
+      "name",
+      "robots",
+    ],
+    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  );
+
+  setMetaTag(
+    'meta[name="googlebot"]',
+    [
+      "name",
+      "googlebot",
+    ],
+    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+  );
+
+  setCanonical(
+    canonicalUrl
+  );
+
+  setMetaTag(
+    'meta[property="og:type"]',
+    [
+      "property",
+      "og:type",
+    ],
+    type
+  );
+
+  setMetaTag(
+    'meta[property="og:site_name"]',
+    [
+      "property",
+      "og:site_name",
+    ],
+    SITE_NAME
+  );
+
+  setMetaTag(
+    'meta[property="og:title"]',
+    [
+      "property",
+      "og:title",
+    ],
+    title
+  );
+
+  setMetaTag(
+    'meta[property="og:description"]',
+    [
+      "property",
+      "og:description",
+    ],
+    description
+  );
+
+  setMetaTag(
+    'meta[property="og:url"]',
+    [
+      "property",
+      "og:url",
+    ],
+    canonicalUrl
+  );
+
+  setMetaTag(
+    'meta[name="twitter:title"]',
+    [
+      "name",
+      "twitter:title",
+    ],
+    title
+  );
+
+  setMetaTag(
+    'meta[name="twitter:description"]',
+    [
+      "name",
+      "twitter:description",
+    ],
+    description
+  );
+}
+
+
+// ============================================================
 // SEO MANAGER
 // ============================================================
 
@@ -369,9 +481,9 @@ function SEOManager() {
 
   useEffect(
     () => {
+
       // ======================================================
-      // ADMIN PAGES
-      // Never allow CMS/auth pages into search engines.
+      // ADMIN
       // ======================================================
 
       if (
@@ -384,6 +496,15 @@ function SEOManager() {
           `Admin | ${SITE_NAME}`;
 
         setMetaTag(
+          'meta[name="description"]',
+          [
+            "name",
+            "description",
+          ],
+          "Continental Founders administration."
+        );
+
+        setMetaTag(
           'meta[name="robots"]',
           [
             "name",
@@ -401,13 +522,20 @@ function SEOManager() {
           "noindex, nofollow, noarchive"
         );
 
+        /*
+         * Do not leave the canonical URL from a previously
+         * visited public page attached to an admin route.
+         */
+        setCanonical(
+          `${SITE_URL}/`
+        );
+
         return;
       }
 
 
       // ======================================================
-      // DYNAMIC VENTURE PAGE
-      // Page itself can replace this with venture-specific SEO.
+      // DYNAMIC VENTURE
       // ======================================================
 
       if (
@@ -415,77 +543,51 @@ function SEOManager() {
           "/ventures/"
         )
       ) {
-        document.title =
-          `Venture | ${SITE_NAME}`;
-
         const canonicalUrl =
           `${SITE_URL}${pathname}`;
 
-        setMetaTag(
-          'meta[name="description"]',
-          [
-            "name",
-            "description",
-          ],
-          "Explore a venture in the Continental Founders network and discover the founders, solutions, markets, and opportunities behind the business."
-        );
+        applyDynamicSEO({
+          title:
+            `Venture | ${SITE_NAME}`,
 
-        setMetaTag(
-          'meta[name="robots"]',
-          [
-            "name",
-            "robots",
-          ],
-          "index, follow"
-        );
+          description:
+            "Explore a venture in the Continental Founders network and discover the founders, solutions, markets, and opportunities behind the business.",
 
-        setMetaTag(
-          'meta[name="googlebot"]',
-          [
-            "name",
-            "googlebot",
-          ],
-          "index, follow"
-        );
-
-        setMetaTag(
-          'meta[property="og:title"]',
-          [
-            "property",
-            "og:title",
-          ],
-          `Venture | ${SITE_NAME}`
-        );
-
-        setMetaTag(
-          'meta[property="og:description"]',
-          [
-            "property",
-            "og:description",
-          ],
-          "Explore a venture in the Continental Founders network."
-        );
-
-        setMetaTag(
-          'meta[property="og:url"]',
-          [
-            "property",
-            "og:url",
-          ],
-          canonicalUrl
-        );
-
-        setCanonical(
-          canonicalUrl
-        );
+          canonicalUrl,
+        });
 
         return;
       }
 
 
       // ======================================================
-      // DYNAMIC INSIGHT PAGE
-      // Page itself can replace this with article-specific SEO.
+      // DYNAMIC EVENT
+      // ======================================================
+
+      if (
+        pathname.startsWith(
+          "/events/"
+        )
+      ) {
+        const canonicalUrl =
+          `${SITE_URL}${pathname}`;
+
+        applyDynamicSEO({
+          title:
+            `Event | ${SITE_NAME}`,
+
+          description:
+            "Explore a Continental Founders event bringing together founders, universities, business leaders, mentors, institutions, and strategic partners.",
+
+          canonicalUrl,
+        });
+
+        return;
+      }
+
+
+      // ======================================================
+      // DYNAMIC INSIGHT
       // ======================================================
 
       if (
@@ -493,84 +595,38 @@ function SEOManager() {
           "/insights/"
         )
       ) {
-        document.title =
-          `Insight | ${SITE_NAME}`;
-
         const canonicalUrl =
           `${SITE_URL}${pathname}`;
 
-        setMetaTag(
-          'meta[name="description"]',
-          [
-            "name",
-            "description",
-          ],
-          "Read insights from Continental Founders on entrepreneurship, innovation, venture development, markets, partnerships, and global opportunity."
-        );
+        applyDynamicSEO({
+          title:
+            `Insight | ${SITE_NAME}`,
 
-        setMetaTag(
-          'meta[name="robots"]',
-          [
-            "name",
-            "robots",
-          ],
-          "index, follow"
-        );
+          description:
+            "Read insights from Continental Founders on entrepreneurship, innovation, venture development, markets, partnerships, and global opportunity.",
 
-        setMetaTag(
-          'meta[name="googlebot"]',
-          [
-            "name",
-            "googlebot",
-          ],
-          "index, follow"
-        );
+          canonicalUrl,
 
-        setMetaTag(
-          'meta[property="og:title"]',
-          [
-            "property",
-            "og:title",
-          ],
-          `Insight | ${SITE_NAME}`
-        );
-
-        setMetaTag(
-          'meta[property="og:description"]',
-          [
-            "property",
-            "og:description",
-          ],
-          "Read insights from Continental Founders."
-        );
-
-        setMetaTag(
-          'meta[property="og:url"]',
-          [
-            "property",
-            "og:url",
-          ],
-          canonicalUrl
-        );
-
-        setCanonical(
-          canonicalUrl
-        );
+          type:
+            "article",
+        });
 
         return;
       }
 
 
       // ======================================================
-      // STATIC PUBLIC PAGES
+      // STATIC PUBLIC PAGE
       // ======================================================
 
       const seo =
-        SEO_ROUTES[pathname];
+        SEO_ROUTES[
+          pathname
+        ];
 
 
       // ======================================================
-      // UNKNOWN / 404 PAGE
+      // UNKNOWN / 404
       // ======================================================
 
       if (!seo) {
@@ -604,12 +660,16 @@ function SEOManager() {
           "noindex, follow"
         );
 
+        setCanonical(
+          `${SITE_URL}${pathname}`
+        );
+
         return;
       }
 
 
       // ======================================================
-      // APPLY PUBLIC PAGE SEO
+      // APPLY STATIC SEO
       // ======================================================
 
       const title =
@@ -628,7 +688,6 @@ function SEOManager() {
         title;
 
 
-      // Description
       setMetaTag(
         'meta[name="description"]',
         [
@@ -639,7 +698,6 @@ function SEOManager() {
       );
 
 
-      // Robots
       setMetaTag(
         'meta[name="robots"]',
         [
@@ -660,7 +718,6 @@ function SEOManager() {
       );
 
 
-      // Canonical
       setCanonical(
         canonicalUrl
       );
@@ -770,7 +827,7 @@ function ScrollToTop() {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: "instant",
+        behavior: "auto",
       });
     },
     [
@@ -984,6 +1041,13 @@ export default function App() {
               }
             />
 
+            <Route
+              path="/events/:slug"
+              element={
+                <EventDetails />
+              }
+            />
+
 
             {/* ==================================================
                 INSIGHTS
@@ -1017,7 +1081,7 @@ export default function App() {
 
 
             {/* ==================================================
-                ADMIN REGISTER
+                ADMIN AUTH
             ================================================== */}
 
             <Route
@@ -1027,22 +1091,12 @@ export default function App() {
               }
             />
 
-
-            {/* ==================================================
-                ADMIN LOGIN
-            ================================================== */}
-
             <Route
               path="/admin/login"
               element={
                 <AdminLogin />
               }
             />
-
-
-            {/* ==================================================
-                ADMIN OTP
-            ================================================== */}
 
             <Route
               path="/admin/verify-otp"
@@ -1053,7 +1107,7 @@ export default function App() {
 
 
             {/* ==================================================
-                PROTECTED ADMIN ROUTES
+                PROTECTED ADMIN
             ================================================== */}
 
             <Route
@@ -1068,10 +1122,6 @@ export default function App() {
                   <AdminLayout />
                 }
               >
-
-                {/* ==============================================
-                    DASHBOARD
-                ============================================== */}
 
                 <Route
                   index

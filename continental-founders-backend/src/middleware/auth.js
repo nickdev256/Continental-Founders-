@@ -1,399 +1,311 @@
-const jwt =
-  require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
 const {
   supabaseAdmin,
-} =
-  require("../config/supabase");
+} = require("../config/supabase");
 
+// ============================================================
+// CONFIGURATION
+// ============================================================
 
-/* ============================================================
-   REQUIRE CMS AUTHENTICATION
-============================================================ */
+const SESSION_COOKIE_NAME =
+  "cf_admin_session";
 
-async function requireAdmin(
-  req,
-  res,
-  next
-) {
+const CMS_ROLES = new Set([
+  "founder",
+  "admin",
+  "super_admin",
+]);
 
+const ACTIVE_STATUS = "active";
+
+// These values must match the values used when signing
+// the admin session token.
+const JWT_ISSUER =
+  "continental-founders-api";
+
+const JWT_AUDIENCE =
+  "continental-founders-admin";
+
+// ============================================================
+// REQUIRE CMS AUTHENTICATION
+// ============================================================
+
+async function requireAdmin(req, res, next) {
   try {
-
-    /* ========================================================
-       GET TOKEN
-
-       Preferred:
-       HttpOnly cookie created after OTP verification.
-
-       Fallback:
-       Bearer token, useful during transition/testing.
-    ======================================================== */
+    // ========================================================
+    // GET SESSION TOKEN
+    // ========================================================
 
     const cookieToken =
-      req.cookies?.cf_admin_session ||
-      null;
-
+      req.cookies?.[SESSION_COOKIE_NAME];
 
     const authHeader =
-      req.headers.authorization ||
-      "";
+      typeof req.headers.authorization === "string"
+        ? req.headers.authorization.trim()
+        : "";
 
+    let bearerToken = null;
 
-    const bearerToken =
-      authHeader.startsWith(
-        "Bearer "
-      )
-        ? authHeader.slice(7)
-        : null;
+    if (authHeader) {
+      const match = authHeader.match(
+        /^Bearer\s+([^\s]+)$/i
+      );
 
+      if (!match) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid authorization header.",
+        });
+      }
 
+      bearerToken = match[1];
+    }
+
+    // Prefer the HttpOnly cookie.
     const token =
-      cookieToken ||
-      bearerToken;
-
+      cookieToken || bearerToken;
 
     if (!token) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Authentication required.",
-
-        });
-
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
     }
 
+    // ========================================================
+    // VERIFY SERVER CONFIGURATION
+    // ========================================================
 
-    /* ========================================================
-       VERIFY JWT
-    ======================================================== */
+    const jwtSecret =
+      process.env.JWT_SECRET;
 
-    if (
-      !process.env.JWT_SECRET
-    ) {
-
+    if (!jwtSecret) {
       console.error(
-        "JWT_SECRET is missing from environment variables."
+        "[AUTH] JWT_SECRET is not configured."
       );
 
-
-      return res
-        .status(500)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Authentication service is not configured.",
-
-        });
-
+      return res.status(500).json({
+        success: false,
+        message:
+          "Authentication service is unavailable.",
+      });
     }
 
+    // ========================================================
+    // VERIFY JWT
+    // ========================================================
 
-    const decoded =
-      jwt.verify(
-        token,
-        process.env.JWT_SECRET
-      );
-
+    const decoded = jwt.verify(
+      token,
+      jwtSecret,
+      {
+        algorithms: ["HS256"],
+        issuer: JWT_ISSUER,
+        audience: JWT_AUDIENCE,
+      }
+    );
 
     if (
-      !decoded?.sub
+      !decoded ||
+      typeof decoded !== "object" ||
+      typeof decoded.sub !== "string" ||
+      !decoded.sub.trim()
     ) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Invalid session.",
-
-        });
-
+      return res.status(401).json({
+        success: false,
+        message: "Invalid session.",
+      });
     }
 
+    const userId =
+      decoded.sub.trim();
 
-    /* ========================================================
-       LOAD CURRENT PROFILE FROM SUPABASE
-
-       Do not rely only on the role/status stored inside the JWT.
-       We check the current database record every request.
-    ======================================================== */
+    // ========================================================
+    // LOAD CURRENT PROFILE
+    //
+    // Never trust role/status claims from the JWT.
+    // Current authorization comes from the database.
+    // ========================================================
 
     const {
-      data:
-        profile,
-
-      error:
-        profileError,
-    } =
-      await supabaseAdmin
-        .from(
-          "profiles"
-        )
-        .select(
-          "id, full_name, email, role, status, email_verified_at, created_at, updated_at"
-        )
-        .eq(
-          "id",
-          decoded.sub
-        )
-        .maybeSingle();
-
+      data: profile,
+      error: profileError,
+    } = await supabaseAdmin
+      .from("profiles")
+      .select(
+        "id, full_name, email, role, status, email_verified_at"
+      )
+      .eq("id", userId)
+      .maybeSingle();
 
     if (profileError) {
-
       console.error(
-        "Authentication profile lookup error:",
-        profileError
+        "[AUTH] Profile lookup failed:",
+        profileError.message
       );
 
-
-      return res
-        .status(500)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Unable to verify your session.",
-
-        });
-
+      return res.status(503).json({
+        success: false,
+        message:
+          "Unable to verify your session at this time.",
+      });
     }
-
 
     if (!profile) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Invalid session.",
-
-        });
-
+      return res.status(401).json({
+        success: false,
+        message: "Invalid session.",
+      });
     }
 
+    // ========================================================
+    // NORMALIZE AUTHORIZATION VALUES
+    // ========================================================
 
-    /* ========================================================
-       CHECK ACCOUNT STATUS
-    ======================================================== */
+    const status =
+      typeof profile.status === "string"
+        ? profile.status.trim().toLowerCase()
+        : "";
+
+    const role =
+      typeof profile.role === "string"
+        ? profile.role.trim().toLowerCase()
+        : "";
+
+    // ========================================================
+    // CHECK ACCOUNT STATUS
+    // ========================================================
+
+    if (status !== ACTIVE_STATUS) {
+      return res.status(403).json({
+        success: false,
+
+        message:
+          status === "disabled"
+            ? "This account has been disabled."
+            : "This account is not active.",
+      });
+    }
+
+    // ========================================================
+    // CHECK CMS ROLE
+    // ========================================================
+
+    if (!CMS_ROLES.has(role)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "You do not have permission to access the CMS.",
+      });
+    }
+
+    // ========================================================
+    // ATTACH MINIMUM SAFE PROFILE
+    // ========================================================
+
+    req.admin = {
+      id: profile.id,
+      full_name: profile.full_name,
+      email: profile.email,
+      role,
+      status,
+      email_verified_at:
+        profile.email_verified_at,
+    };
+
+    return next();
+  } catch (error) {
+    // ========================================================
+    // EXPECTED JWT FAILURES
+    // ========================================================
+
+    if (error?.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message:
+          "Your session has expired. Please sign in again.",
+      });
+    }
 
     if (
-      profile.status !==
-      "active"
+      error?.name === "JsonWebTokenError" ||
+      error?.name === "NotBeforeError"
     ) {
-
-      return res
-        .status(403)
-        .json({
-
-          success:
-            false,
-
-          message:
-            profile.status ===
-            "disabled"
-              ? "This account has been disabled."
-              : "This account is not active.",
-
-        });
-
+      return res.status(401).json({
+        success: false,
+        message: "Invalid session.",
+      });
     }
 
-
-    /* ========================================================
-       CHECK CMS ROLE
-    ======================================================== */
-
-    const allowedRoles =
-      [
-        "founder",
-        "admin",
-        "super_admin",
-      ];
-
-
-    if (
-      !allowedRoles.includes(
-        profile.role
-      )
-    ) {
-
-      return res
-        .status(403)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "You do not have permission to access the CMS.",
-
-        });
-
-    }
-
-
-    /* ========================================================
-       ATTACH SAFE PROFILE TO REQUEST
-    ======================================================== */
-
-    req.admin =
-      profile;
-
-
-    next();
-
-  } catch (
-    error
-  ) {
-
-    if (
-      error?.name ===
-      "TokenExpiredError"
-    ) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Your session has expired. Please sign in again.",
-
-        });
-
-    }
-
-
-    if (
-      error?.name ===
-      "JsonWebTokenError"
-    ) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Invalid session.",
-
-        });
-
-    }
-
+    // ========================================================
+    // UNEXPECTED FAILURE
+    // ========================================================
 
     console.error(
-      "Authentication middleware error:",
+      "[AUTH] Unexpected authentication error:",
       error
     );
 
-
-    return res
-      .status(401)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Unable to authenticate this session.",
-
-      });
-
+    return res.status(500).json({
+      success: false,
+      message:
+        "Authentication service is temporarily unavailable.",
+    });
   }
-
 }
 
+// ============================================================
+// ROLE AUTHORIZATION
+// ============================================================
 
-/* ============================================================
-   OPTIONAL ROLE CHECKER
-
-   We can use this later for sensitive CMS actions.
-============================================================ */
-
-function requireRole(
-  ...roles
-) {
+function requireRole(...roles) {
+  const allowedRoles = new Set(
+    roles
+      .filter(
+        (role) =>
+          typeof role === "string"
+      )
+      .map((role) =>
+        role.trim().toLowerCase()
+      )
+      .filter(Boolean)
+  );
 
   return function roleMiddleware(
     req,
     res,
     next
   ) {
-
-    if (
-      !req.admin
-    ) {
-
-      return res
-        .status(401)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Authentication required.",
-
-        });
-
+    if (!req.admin) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required.",
+      });
     }
 
+    const currentRole =
+      typeof req.admin.role === "string"
+        ? req.admin.role
+            .trim()
+            .toLowerCase()
+        : "";
 
-    if (
-      !roles.includes(
-        req.admin.role
-      )
-    ) {
-
-      return res
-        .status(403)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "You do not have permission to perform this action.",
-
-        });
-
+    if (!allowedRoles.has(currentRole)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "You do not have permission to perform this action.",
+      });
     }
 
-
-    next();
-
+    return next();
   };
-
 }
 
-
-/* ============================================================
-   EXPORTS
-============================================================ */
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
   requireAdmin,

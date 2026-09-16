@@ -4,44 +4,23 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
-
 // ============================================================
 // ROUTES
 // ============================================================
 
-const authRoutes =
-  require("./routes/authRoutes");
+const authRoutes = require("./routes/authRoutes");
+const contactRoutes = require("./routes/contactRoutes");
+const partnershipRoutes = require("./routes/partnershipRoutes");
+const newsletterRoutes = require("./routes/newsletterRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const eventsRoutes = require("./routes/eventsRoutes");
 
-const contactRoutes =
-  require("./routes/contactRoutes");
+// Git currently tracks this filename in lowercase.
+const insightsRoutes = require("./routes/insightsroutes");
 
-const partnershipRoutes =
-  require("./routes/partnershipRoutes");
-
-const newsletterRoutes =
-  require("./routes/newsletterRoutes");
-
-const dashboardRoutes =
-  require("./routes/dashboardRoutes");
-
-const eventsRoutes =
-  require("./routes/eventsRoutes");
-
-// IMPORTANT:
-// Git currently tracks this file as:
-// src/routes/insightsroutes.js
-const insightsRoutes =
-  require("./routes/insightsroutes");
-
-const universityRoutes =
-  require("./routes/universityRoutes");
-
-const venturesRoutes =
-  require("./routes/venturesRoutes");
-
-const pagesRoutes =
-  require("./routes/pagesRoutes");
-
+const universityRoutes = require("./routes/universityRoutes");
+const venturesRoutes = require("./routes/venturesRoutes");
+const pagesRoutes = require("./routes/pagesRoutes");
 
 // ============================================================
 // ERROR MIDDLEWARE
@@ -52,282 +31,260 @@ const {
   errorHandler,
 } = require("./middleware/error");
 
-
 // ============================================================
 // APP
 // ============================================================
 
 const app = express();
 
+const isProduction =
+  process.env.NODE_ENV === "production";
 
 // ============================================================
 // TRUST PROXY
-// Required when deployed behind Render's proxy.
+// Render runs the API behind a reverse proxy.
 // ============================================================
 
-app.set(
-  "trust proxy",
-  1
-);
+app.set("trust proxy", 1);
 
+// ============================================================
+// DISABLE EXPRESS IDENTIFICATION
+// ============================================================
+
+app.disable("x-powered-by");
 
 // ============================================================
 // SECURITY HEADERS
 // ============================================================
 
 app.use(
-  helmet()
-);
+  helmet({
+    crossOriginResourcePolicy: {
+      policy: "cross-origin",
+    },
 
+    referrerPolicy: {
+      policy: "strict-origin-when-cross-origin",
+    },
+
+    hsts: isProduction
+      ? {
+          maxAge: 31536000,
+          includeSubDomains: true,
+          preload: true,
+        }
+      : false,
+  })
+);
 
 // ============================================================
 // CORS
 // ============================================================
 
-const allowedOrigins =
-  (
-    process.env.CLIENT_URL ||
-    "http://localhost:5173"
-  )
-    .split(",")
-    .map(
-      (url) =>
-        url.trim()
-    )
-    .filter(Boolean);
+const configuredOrigins = (
+  process.env.CLIENT_URL || ""
+)
+  .split(",")
+  .map((url) => url.trim())
+  .filter(Boolean);
 
+const developmentOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
 
-app.use(
-  cors({
-    origin: (
-      origin,
-      callback
-    ) => {
+const allowedOrigins = new Set([
+  ...configuredOrigins,
+  ...(isProduction ? [] : developmentOrigins),
+]);
 
-      // Allow server-to-server requests,
-      // health checks and tools without Origin.
-      if (!origin) {
-        return callback(
-          null,
-          true
-        );
-      }
+const corsOptions = {
+  origin(origin, callback) {
+    // Requests without an Origin header can include
+    // server-to-server requests and monitoring.
+    if (!origin) {
+      return callback(null, true);
+    }
 
+    if (allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
 
-      if (
-        allowedOrigins.includes(
-          origin
-        )
-      ) {
-        return callback(
-          null,
-          true
-        );
-      }
+    console.warn(
+      `[CORS] Blocked origin: ${origin}`
+    );
 
+    return callback(
+      new Error("Origin not allowed by CORS")
+    );
+  },
 
-      return callback(
-        new Error(
-          `Origin ${origin} is not allowed by CORS`
-        )
-      );
-    },
+  credentials: true,
 
-    credentials:
-      true,
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ],
 
-    methods: [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE",
-      "OPTIONS",
-    ],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
 
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-    ],
-  })
-);
+  maxAge: 86400,
+};
 
+app.use(cors(corsOptions));
 
 // ============================================================
-// BODY PARSERS
+// REQUEST BODY LIMITS
 // ============================================================
 
 app.use(
   express.json({
-    limit:
-      "1mb",
+    limit: "1mb",
+    strict: true,
   })
 );
-
 
 app.use(
   express.urlencoded({
-    extended:
-      true,
-
-    limit:
-      "1mb",
+    extended: true,
+    limit: "1mb",
+    parameterLimit: 100,
   })
 );
-
 
 // ============================================================
 // COOKIE PARSER
 // ============================================================
 
+app.use(cookieParser());
+
+// ============================================================
+// REQUEST METHOD PROTECTION
+// ============================================================
+
+app.use((req, res, next) => {
+  const allowedMethods = new Set([
+    "GET",
+    "HEAD",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ]);
+
+  if (!allowedMethods.has(req.method)) {
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed.",
+    });
+  }
+
+  return next();
+});
+
+// ============================================================
+// GLOBAL API RATE LIMIT
+// Protects the API from basic request flooding.
+// ============================================================
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  limit: 500,
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  skip: (req) =>
+    req.path === "/health",
+
+  message: {
+    success: false,
+    message:
+      "Too many requests. Please try again later.",
+  },
+});
+
+app.use("/api", apiLimiter);
+
+// ============================================================
+// PUBLIC FORM RATE LIMITER
+// ============================================================
+
+const publicFormLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  limit: 20,
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  message: {
+    success: false,
+    message:
+      "Too many submissions. Please try again later.",
+  },
+});
+
+// ============================================================
+// NEWSLETTER RATE LIMITER
+// ============================================================
+
+const newsletterLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  limit: 15,
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  message: {
+    success: false,
+    message:
+      "Too many newsletter requests. Please try again later.",
+  },
+});
+
+// ============================================================
+// NO-CACHE FOR AUTHENTICATION / ADMIN RESPONSES
+// ============================================================
+
 app.use(
-  cookieParser()
-);
+  ["/api/auth", "/api/admin"],
+  (req, res, next) => {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
 
+    res.setHeader(
+      "Pragma",
+      "no-cache"
+    );
 
-// ============================================================
-// RATE LIMITERS
-// ============================================================
-
-const publicFormLimiter =
-  rateLimit({
-    windowMs:
-      15 * 60 * 1000,
-
-    limit:
-      30,
-
-    standardHeaders:
-      true,
-
-    legacyHeaders:
-      false,
-
-    message: {
-      success:
-        false,
-
-      message:
-        "Too many requests. Please try again shortly.",
-    },
-  });
-
-
-const newsletterLimiter =
-  rateLimit({
-    windowMs:
-      15 * 60 * 1000,
-
-    limit:
-      20,
-
-    standardHeaders:
-      true,
-
-    legacyHeaders:
-      false,
-
-    message: {
-      success:
-        false,
-
-      message:
-        "Too many newsletter requests. Please try again shortly.",
-    },
-  });
-
-
-// ============================================================
-// HEALTH CHECK
-// ============================================================
-
-app.get(
-  "/api/health",
-  (
-    req,
-    res
-  ) => {
-
-    return res
-      .status(200)
-      .json({
-
-        success:
-          true,
-
-        message:
-          "Continental Founders API is running",
-
-        environment:
-          process.env.NODE_ENV ||
-          "development",
-
-        database:
-          "Supabase",
-
-        services: {
-
-          auth:
-            "/api/auth",
-
-          contact:
-            "/api/contact",
-
-          partnerships:
-            "/api/partnerships",
-
-          newsletter:
-            "/api/newsletter",
-
-          newsletterSubscribe:
-            "/api/newsletter/subscribe",
-
-          newsletterSubscribers:
-            "/api/newsletter/subscribers",
-
-          events:
-            "/api/events",
-
-          publishedEvents:
-            "/api/events/published",
-
-          insights:
-            "/api/insights",
-
-          publishedInsights:
-            "/api/insights/published",
-
-          universities:
-            "/api/universities",
-
-          universityDirectory:
-            "/api/universities/directory",
-
-          ventures:
-            "/api/ventures",
-
-          ventureDirectory:
-            "/api/ventures/directory",
-
-          ventureDetails:
-            "/api/ventures/:slug",
-
-          pages:
-            "/api/pages",
-
-          publishedUSAfricaPage:
-            "/api/pages/published/us-africa-trade-network",
-
-          adminUSAfricaPage:
-            "/api/pages/admin/us-africa-trade-network",
-
-          adminDashboard:
-            "/api/admin/dashboard",
-        },
-      });
+    next();
   }
 );
 
+// ============================================================
+// HEALTH CHECK
+// Keep this intentionally minimal.
+// ============================================================
+
+app.get("/api/health", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    status: "ok",
+  });
+});
 
 // ============================================================
 // AUTHENTICATION
@@ -337,7 +294,6 @@ app.use(
   "/api/auth",
   authRoutes
 );
-
 
 // ============================================================
 // CONTACT
@@ -349,7 +305,6 @@ app.use(
   contactRoutes
 );
 
-
 // ============================================================
 // PARTNERSHIPS
 // ============================================================
@@ -359,7 +314,6 @@ app.use(
   publicFormLimiter,
   partnershipRoutes
 );
-
 
 // ============================================================
 // NEWSLETTER
@@ -371,7 +325,6 @@ app.use(
   newsletterRoutes
 );
 
-
 // ============================================================
 // EVENTS
 // ============================================================
@@ -380,7 +333,6 @@ app.use(
   "/api/events",
   eventsRoutes
 );
-
 
 // ============================================================
 // INSIGHTS
@@ -391,7 +343,6 @@ app.use(
   insightsRoutes
 );
 
-
 // ============================================================
 // UNIVERSITIES
 // ============================================================
@@ -400,7 +351,6 @@ app.use(
   "/api/universities",
   universityRoutes
 );
-
 
 // ============================================================
 // VENTURES
@@ -411,7 +361,6 @@ app.use(
   venturesRoutes
 );
 
-
 // ============================================================
 // CMS PAGES
 // ============================================================
@@ -420,7 +369,6 @@ app.use(
   "/api/pages",
   pagesRoutes
 );
-
 
 // ============================================================
 // ADMIN DASHBOARD
@@ -431,119 +379,33 @@ app.use(
   dashboardRoutes
 );
 
-
 // ============================================================
 // API ROOT
+// Don't expose an inventory of private/admin endpoints.
 // ============================================================
 
-app.get(
-  "/api",
-  (
-    req,
-    res
-  ) => {
-
-    return res
-      .status(200)
-      .json({
-
-        success:
-          true,
-
-        name:
-          "Continental Founders API",
-
-        status:
-          "online",
-
-        endpoints: {
-
-          health:
-            "/api/health",
-
-          auth:
-            "/api/auth",
-
-          contact:
-            "/api/contact",
-
-          partnerships:
-            "/api/partnerships",
-
-          newsletter:
-            "/api/newsletter",
-
-          newsletterSubscribe:
-            "/api/newsletter/subscribe",
-
-          newsletterSubscribers:
-            "/api/newsletter/subscribers",
-
-          events:
-            "/api/events",
-
-          publishedEvents:
-            "/api/events/published",
-
-          insights:
-            "/api/insights",
-
-          publishedInsights:
-            "/api/insights/published",
-
-          universities:
-            "/api/universities",
-
-          universityDirectory:
-            "/api/universities/directory",
-
-          ventures:
-            "/api/ventures",
-
-          ventureDirectory:
-            "/api/ventures/directory",
-
-          ventureDetails:
-            "/api/ventures/:slug",
-
-          pages:
-            "/api/pages",
-
-          publishedUSAfricaPage:
-            "/api/pages/published/us-africa-trade-network",
-
-          adminUSAfricaPage:
-            "/api/pages/admin/us-africa-trade-network",
-
-          adminDashboard:
-            "/api/admin/dashboard",
-        },
-      });
-  }
-);
-
+app.get("/api", (req, res) => {
+  return res.status(200).json({
+    success: true,
+    name: "Continental Founders API",
+    status: "online",
+  });
+});
 
 // ============================================================
 // 404 HANDLER
 // ============================================================
 
-app.use(
-  notFound
-);
-
+app.use(notFound);
 
 // ============================================================
 // GLOBAL ERROR HANDLER
 // ============================================================
 
-app.use(
-  errorHandler
-);
-
+app.use(errorHandler);
 
 // ============================================================
 // EXPORT
 // ============================================================
 
-module.exports =
-  app;
+module.exports = app;

@@ -12,6 +12,7 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
+  CheckCircle2,
   KeyRound,
   Mail,
   RefreshCw,
@@ -26,7 +27,6 @@ import "./AdminOtp.css";
 // ============================================================
 
 export default function AdminOtp() {
-
   const navigate =
     useNavigate();
 
@@ -115,14 +115,19 @@ export default function AdminOtp() {
     useState(60);
 
 
+  const [
+    approvalRequired,
+    setApprovalRequired,
+  ] =
+    useState(false);
+
+
   // ==========================================================
   // PROTECT OTP PAGE
   // ==========================================================
 
   useEffect(() => {
-
     if (!loginEmail) {
-
       navigate(
         "/admin/login",
         {
@@ -157,15 +162,17 @@ export default function AdminOtp() {
   // ==========================================================
 
   useEffect(() => {
+    if (approvalRequired) {
+      return undefined;
+    }
+
 
     const timer =
       window.setTimeout(
         () => {
-
           inputRefs.current[
             0
           ]?.focus();
-
         },
         100
       );
@@ -176,7 +183,9 @@ export default function AdminOtp() {
         timer
       );
 
-  }, []);
+  }, [
+    approvalRequired,
+  ]);
 
 
   // ==========================================================
@@ -184,20 +193,17 @@ export default function AdminOtp() {
   // ==========================================================
 
   useEffect(() => {
-
     if (
-      countdown <= 0
+      countdown <= 0 ||
+      approvalRequired
     ) {
-
       return undefined;
-
     }
 
 
     const timer =
       window.setInterval(
         () => {
-
           setCountdown(
             (current) =>
               Math.max(
@@ -205,23 +211,40 @@ export default function AdminOtp() {
                 current - 1
               )
           );
-
         },
         1000
       );
 
 
     return () => {
-
       window.clearInterval(
         timer
       );
-
     };
 
   }, [
     countdown,
+    approvalRequired,
   ]);
+
+
+  // ==========================================================
+  // CLEAR TEMPORARY AUTH DATA
+  // ==========================================================
+
+  function clearPendingAuthData() {
+    sessionStorage.removeItem(
+      "cf_pending_admin_email"
+    );
+
+    sessionStorage.removeItem(
+      "cf_otp_purpose"
+    );
+
+    localStorage.removeItem(
+      "cf_admin_token"
+    );
+  }
 
 
   // ==========================================================
@@ -232,7 +255,6 @@ export default function AdminOtp() {
     index,
     value
   ) {
-
     const cleanValue =
       value.replace(
         /\D/g,
@@ -241,7 +263,6 @@ export default function AdminOtp() {
 
 
     if (!cleanValue) {
-
       const updatedOtp = [
         ...otp,
       ];
@@ -280,13 +301,10 @@ export default function AdminOtp() {
     if (
       index < 5
     ) {
-
       inputRefs.current[
         index + 1
       ]?.focus();
-
     }
-
   }
 
 
@@ -298,46 +316,35 @@ export default function AdminOtp() {
     index,
     event
   ) {
-
     if (
-      event.key ===
-        "Backspace" &&
+      event.key === "Backspace" &&
       !otp[index] &&
       index > 0
     ) {
-
       inputRefs.current[
         index - 1
       ]?.focus();
-
     }
 
 
     if (
-      event.key ===
-        "ArrowLeft" &&
+      event.key === "ArrowLeft" &&
       index > 0
     ) {
-
       inputRefs.current[
         index - 1
       ]?.focus();
-
     }
 
 
     if (
-      event.key ===
-        "ArrowRight" &&
+      event.key === "ArrowRight" &&
       index < 5
     ) {
-
       inputRefs.current[
         index + 1
       ]?.focus();
-
     }
-
   }
 
 
@@ -348,7 +355,6 @@ export default function AdminOtp() {
   function handlePaste(
     event
   ) {
-
     event.preventDefault();
 
 
@@ -366,9 +372,7 @@ export default function AdminOtp() {
 
 
     if (!pastedValue) {
-
       return;
-
     }
 
 
@@ -389,10 +393,8 @@ export default function AdminOtp() {
           digit,
           index
         ) => {
-
           updatedOtp[index] =
             digit;
-
         }
       );
 
@@ -416,7 +418,6 @@ export default function AdminOtp() {
 
     setError("");
     setMessage("");
-
   }
 
 
@@ -427,7 +428,6 @@ export default function AdminOtp() {
   async function handleVerify(
     event
   ) {
-
     event.preventDefault();
 
 
@@ -438,18 +438,15 @@ export default function AdminOtp() {
     if (
       code.length !== 6
     ) {
-
       setError(
         "Please enter the complete 6-digit verification code."
       );
 
       return;
-
     }
 
 
     try {
-
       setLoading(true);
       setError("");
       setMessage("");
@@ -491,32 +488,64 @@ export default function AdminOtp() {
 
 
       try {
-
         result =
           await response.json();
-
       } catch {
-
         result = {};
-
       }
 
 
-      if (
-        !response.ok
-      ) {
-
+      if (!response.ok) {
         throw new Error(
           result.message ||
           result.error ||
           "The verification code is incorrect or has expired."
         );
-
       }
 
 
       // ======================================================
-      // GET VERIFIED USER
+      // REGISTRATION VERIFIED — WAITING FOR APPROVAL
+      //
+      // No CMS session is created at this stage.
+      // ======================================================
+
+      if (
+        result.approvalRequired ===
+        true
+      ) {
+        clearPendingAuthData();
+
+        localStorage.removeItem(
+          "cf_admin_user"
+        );
+
+        setOtp([
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+        ]);
+
+        setApprovalRequired(
+          true
+        );
+
+        setMessage(
+          result.message ||
+          "Your email has been verified. Your CMS account is awaiting approval."
+        );
+
+        return;
+      }
+
+
+      // ======================================================
+      // LOGIN OTP SUCCESS
+      //
+      // A login OTP should return the authenticated user.
       // ======================================================
 
       const user =
@@ -525,11 +554,9 @@ export default function AdminOtp() {
 
 
       if (!user) {
-
         throw new Error(
           "Verification succeeded, but no user information was returned."
         );
-
       }
 
 
@@ -540,7 +567,9 @@ export default function AdminOtp() {
       const role =
         String(
           user.role || ""
-        ).toLowerCase();
+        )
+          .trim()
+          .toLowerCase();
 
 
       const allowedRoles = [
@@ -555,23 +584,41 @@ export default function AdminOtp() {
           role
         )
       ) {
-
         throw new Error(
           "This account does not have access to the Continental Founders CMS."
         );
-
       }
 
 
       // ======================================================
-      // SAVE SAFE USER INFORMATION
+      // VERIFY ACTIVE STATUS
+      // ======================================================
+
+      const status =
+        String(
+          user.status || ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      if (
+        status !== "active"
+      ) {
+        throw new Error(
+          "This CMS account is not currently active."
+        );
+      }
+
+
+      // ======================================================
+      // SAVE SAFE DISPLAY INFORMATION
       //
-      // This is only for frontend display.
-      // Authentication is handled by the HttpOnly cookie.
+      // This is NOT authentication.
+      // Authentication remains in the HttpOnly cookie.
       // ======================================================
 
       const adminUser = {
-
         id:
           user.id ||
           null,
@@ -590,9 +637,7 @@ export default function AdminOtp() {
           user.role,
 
         status:
-          user.status ||
-          "active",
-
+          user.status,
       };
 
 
@@ -605,7 +650,7 @@ export default function AdminOtp() {
 
 
       // ======================================================
-      // REMOVE ANY OLD TOKEN STORAGE
+      // NEVER STORE AUTH TOKEN IN LOCAL STORAGE
       // ======================================================
 
       localStorage.removeItem(
@@ -614,13 +659,12 @@ export default function AdminOtp() {
 
 
       // ======================================================
-      // REMOVE TEMPORARY AUTH DATA
+      // REMOVE TEMPORARY OTP DATA
       // ======================================================
 
       sessionStorage.removeItem(
         "cf_pending_admin_email"
       );
-
 
       sessionStorage.removeItem(
         "cf_otp_purpose"
@@ -641,7 +685,6 @@ export default function AdminOtp() {
     } catch (
       verificationError
     ) {
-
       console.error(
         "OTP verification error:",
         verificationError
@@ -655,26 +698,19 @@ export default function AdminOtp() {
           "fetch"
         )
       ) {
-
         setError(
-          "Unable to connect to the Continental Founders server. Make sure the backend is running."
+          "Unable to connect to the Continental Founders server. Please try again."
         );
-
       } else {
-
         setError(
           verificationError.message ||
           "Unable to verify the code."
         );
-
       }
 
     } finally {
-
       setLoading(false);
-
     }
-
   }
 
 
@@ -683,19 +719,16 @@ export default function AdminOtp() {
   // ==========================================================
 
   async function handleResend() {
-
     if (
       countdown > 0 ||
-      resending
+      resending ||
+      approvalRequired
     ) {
-
       return;
-
     }
 
 
     try {
-
       setResending(true);
       setError("");
       setMessage("");
@@ -734,27 +767,19 @@ export default function AdminOtp() {
 
 
       try {
-
         result =
           await response.json();
-
       } catch {
-
         result = {};
-
       }
 
 
-      if (
-        !response.ok
-      ) {
-
+      if (!response.ok) {
         throw new Error(
           result.message ||
           result.error ||
           "Unable to send another verification code."
         );
-
       }
 
 
@@ -781,11 +806,9 @@ export default function AdminOtp() {
 
       window.setTimeout(
         () => {
-
           inputRefs.current[
             0
           ]?.focus();
-
         },
         100
       );
@@ -793,7 +816,6 @@ export default function AdminOtp() {
     } catch (
       resendError
     ) {
-
       console.error(
         "OTP resend error:",
         resendError
@@ -806,11 +828,8 @@ export default function AdminOtp() {
       );
 
     } finally {
-
       setResending(false);
-
     }
-
   }
 
 
@@ -819,21 +838,7 @@ export default function AdminOtp() {
   // ==========================================================
 
   function handleBackToLogin() {
-
-    sessionStorage.removeItem(
-      "cf_pending_admin_email"
-    );
-
-
-    sessionStorage.removeItem(
-      "cf_otp_purpose"
-    );
-
-
-    localStorage.removeItem(
-      "cf_admin_token"
-    );
-
+    clearPendingAuthData();
 
     navigate(
       "/admin/login",
@@ -841,7 +846,6 @@ export default function AdminOtp() {
         replace: true,
       }
     );
-
   }
 
 
@@ -852,16 +856,13 @@ export default function AdminOtp() {
   function maskEmail(
     emailAddress
   ) {
-
     if (
       !emailAddress ||
       !emailAddress.includes(
         "@"
       )
     ) {
-
       return emailAddress;
-
     }
 
 
@@ -891,7 +892,6 @@ export default function AdminOtp() {
           visible.length
       )
     )}@${domain}`;
-
   }
 
 
@@ -900,7 +900,6 @@ export default function AdminOtp() {
   // ==========================================================
 
   return (
-
     <main className="admin-otp">
 
       <section className="admin-otp__panel">
@@ -912,14 +911,11 @@ export default function AdminOtp() {
             className="admin-otp__brand-link"
             aria-label="Continental Founders home"
           >
-
             <img
               src="/assets/continental-founders-logo.webp"
               alt="Continental Founders"
             />
-
           </a>
-
 
           <span>
             CMS SECURITY
@@ -932,245 +928,278 @@ export default function AdminOtp() {
 
           <div className="admin-otp__security-icon">
 
-            <ShieldCheck
-              size={26}
-              strokeWidth={1.6}
-            />
+            {approvalRequired ? (
+              <CheckCircle2
+                size={26}
+                strokeWidth={1.6}
+              />
+            ) : (
+              <ShieldCheck
+                size={26}
+                strokeWidth={1.6}
+              />
+            )}
 
           </div>
 
 
-          <span className="admin-otp__eyebrow">
-            TWO-STEP VERIFICATION
-          </span>
-
-
-          <h1>
-            Verify your identity.
-          </h1>
-
-
-          <p className="admin-otp__intro">
-
-            {otpPurpose ===
-            "registration"
-              ? "We sent a six-digit verification code to the email address you used to create your Continental Founders account."
-              : "We sent a six-digit security code to your registered Continental Founders account email."}
-
-          </p>
-
-
-          <div className="admin-otp__email">
-
-            <Mail
-              size={17}
-              strokeWidth={1.7}
-            />
-
-            <span>
-              {maskEmail(
-                loginEmail
-              )}
-            </span>
-
-          </div>
-
-
-          <form
-            className="admin-otp__form"
-            onSubmit={
-              handleVerify
-            }
-          >
-
-            <label className="admin-otp__label">
-              Verification Code
-            </label>
-
-
-            <div
-              className="admin-otp__inputs"
-              onPaste={
-                handlePaste
-              }
-            >
-
-              {otp.map(
-                (
-                  digit,
-                  index
-                ) => (
-
-                  <input
-                    key={
-                      index
-                    }
-
-                    ref={(
-                      element
-                    ) => {
-
-                      inputRefs.current[
-                        index
-                      ] =
-                        element;
-
-                    }}
-
-                    type="text"
-
-                    inputMode="numeric"
-
-                    autoComplete={
-                      index === 0
-                        ? "one-time-code"
-                        : "off"
-                    }
-
-                    maxLength={1}
-
-                    value={
-                      digit
-                    }
-
-                    disabled={
-                      loading
-                    }
-
-                    aria-label={`Verification digit ${
-                      index + 1
-                    }`}
-
-                    onChange={(
-                      event
-                    ) =>
-                      handleOtpChange(
-                        index,
-                        event.target.value
-                      )
-                    }
-
-                    onKeyDown={(
-                      event
-                    ) =>
-                      handleKeyDown(
-                        index,
-                        event
-                      )
-                    }
-                  />
-
-                )
-              )}
-
-            </div>
-
-
-            {error && (
-
-              <div
-                className="admin-otp__error"
-                role="alert"
-              >
-
-                {error}
-
-              </div>
-
-            )}
-
-
-            {message && (
-
-              <div
-                className="admin-otp__success"
-                role="status"
-              >
-
-                {message}
-
-              </div>
-
-            )}
-
-
-            <button
-              type="submit"
-              className="admin-otp__verify"
-              disabled={
-                loading
-              }
-            >
-
-              <span>
-
-                {loading
-                  ? "Verifying..."
-                  : "Verify & Continue"}
-
+          {approvalRequired ? (
+            <>
+              <span className="admin-otp__eyebrow">
+                EMAIL VERIFIED
               </span>
 
+              <h1>
+                Verification complete.
+              </h1>
 
-              <ArrowRight
-                size={18}
-                strokeWidth={1.8}
-              />
+              <p className="admin-otp__intro">
+                Your email address has been
+                successfully verified. Your
+                Continental Founders CMS account
+                is now awaiting approval before
+                access can be granted.
+              </p>
 
-            </button>
+              {message && (
+                <div
+                  className="admin-otp__success"
+                  role="status"
+                >
+                  {message}
+                </div>
+              )}
 
-          </form>
+              <button
+                type="button"
+                className="admin-otp__verify"
+                onClick={
+                  handleBackToLogin
+                }
+              >
+                <span>
+                  Return to sign in
+                </span>
+
+                <ArrowRight
+                  size={18}
+                  strokeWidth={1.8}
+                />
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="admin-otp__eyebrow">
+                TWO-STEP VERIFICATION
+              </span>
+
+              <h1>
+                Verify your identity.
+              </h1>
+
+              <p className="admin-otp__intro">
+
+                {otpPurpose ===
+                "registration"
+                  ? "We sent a six-digit verification code to the email address you used to create your Continental Founders account."
+                  : "We sent a six-digit security code to your registered Continental Founders account email."}
+
+              </p>
 
 
-          <div className="admin-otp__resend">
+              <div className="admin-otp__email">
 
-            <p>
-              Didn't receive the code?
-            </p>
+                <Mail
+                  size={17}
+                  strokeWidth={1.7}
+                />
 
+                <span>
+                  {maskEmail(
+                    loginEmail
+                  )}
+                </span>
 
-            <button
-              type="button"
-              onClick={
-                handleResend
-              }
-              disabled={
-                countdown > 0 ||
-                resending
-              }
-            >
-
-              <RefreshCw
-                size={14}
-                strokeWidth={1.8}
-              />
-
-              {resending
-                ? "Sending..."
-                : countdown > 0
-                  ? `Resend in ${countdown}s`
-                  : "Resend code"}
-
-            </button>
-
-          </div>
+              </div>
 
 
-          <button
-            type="button"
-            className="admin-otp__back"
-            onClick={
-              handleBackToLogin
-            }
-          >
+              <form
+                className="admin-otp__form"
+                onSubmit={
+                  handleVerify
+                }
+              >
 
-            <ArrowLeft
-              size={15}
-              strokeWidth={1.8}
-            />
+                <label className="admin-otp__label">
+                  Verification Code
+                </label>
 
-            Back to sign in
 
-          </button>
+                <div
+                  className="admin-otp__inputs"
+                  onPaste={
+                    handlePaste
+                  }
+                >
+
+                  {otp.map(
+                    (
+                      digit,
+                      index
+                    ) => (
+
+                      <input
+                        key={
+                          index
+                        }
+
+                        ref={(
+                          element
+                        ) => {
+                          inputRefs.current[
+                            index
+                          ] =
+                            element;
+                        }}
+
+                        type="text"
+
+                        inputMode="numeric"
+
+                        autoComplete={
+                          index === 0
+                            ? "one-time-code"
+                            : "off"
+                        }
+
+                        maxLength={1}
+
+                        value={
+                          digit
+                        }
+
+                        disabled={
+                          loading
+                        }
+
+                        aria-label={`Verification digit ${
+                          index + 1
+                        }`}
+
+                        onChange={(
+                          event
+                        ) =>
+                          handleOtpChange(
+                            index,
+                            event.target.value
+                          )
+                        }
+
+                        onKeyDown={(
+                          event
+                        ) =>
+                          handleKeyDown(
+                            index,
+                            event
+                          )
+                        }
+                      />
+
+                    )
+                  )}
+
+                </div>
+
+
+                {error && (
+                  <div
+                    className="admin-otp__error"
+                    role="alert"
+                  >
+                    {error}
+                  </div>
+                )}
+
+
+                {message && (
+                  <div
+                    className="admin-otp__success"
+                    role="status"
+                  >
+                    {message}
+                  </div>
+                )}
+
+
+                <button
+                  type="submit"
+                  className="admin-otp__verify"
+                  disabled={
+                    loading
+                  }
+                >
+                  <span>
+                    {loading
+                      ? "Verifying..."
+                      : "Verify & Continue"}
+                  </span>
+
+                  <ArrowRight
+                    size={18}
+                    strokeWidth={1.8}
+                  />
+                </button>
+
+              </form>
+
+
+              <div className="admin-otp__resend">
+
+                <p>
+                  Didn't receive the code?
+                </p>
+
+                <button
+                  type="button"
+                  onClick={
+                    handleResend
+                  }
+                  disabled={
+                    countdown > 0 ||
+                    resending
+                  }
+                >
+                  <RefreshCw
+                    size={14}
+                    strokeWidth={1.8}
+                  />
+
+                  {resending
+                    ? "Sending..."
+                    : countdown > 0
+                      ? `Resend in ${countdown}s`
+                      : "Resend code"}
+                </button>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="admin-otp__back"
+                onClick={
+                  handleBackToLogin
+                }
+              >
+                <ArrowLeft
+                  size={15}
+                  strokeWidth={1.8}
+                />
+
+                Back to sign in
+              </button>
+            </>
+          )}
 
         </div>
 
@@ -1205,26 +1234,21 @@ export default function AdminOtp() {
             strokeWidth={1.4}
           />
 
-
           <span>
             SECURE ACCESS
           </span>
 
-
           <h2>
-            One more step.
+            {approvalRequired
+              ? "Identity verified."
+              : "One more step."}
           </h2>
 
-
           <p>
-
-            Continental Founders CMS access
-            is protected with additional
-            identity verification for
-            authorized users.
-
+            {approvalRequired
+              ? "Your email has been confirmed. CMS access becomes available after your account has been approved."
+              : "Continental Founders CMS access is protected with additional identity verification for authorized users."}
           </p>
-
 
           <div className="admin-otp__line" />
 
@@ -1233,7 +1257,5 @@ export default function AdminOtp() {
       </section>
 
     </main>
-
   );
-
 }

@@ -1,217 +1,235 @@
-const jwt =
-  require("jsonwebtoken");
-
-const {
-  z,
-} =
-  require("zod");
+const jwt = require("jsonwebtoken");
+const { z } = require("zod");
 
 const {
   supabaseAdmin,
   supabaseAuth,
-} =
-  require("../config/supabase");
+} = require("../config/supabase");
 
 const {
   createAndSendOtp,
   verifyOtp,
-} =
-  require("../services/otpService");
+} = require("../services/otpService");
 
+// ============================================================
+// CONSTANTS
+// ============================================================
 
-/* ============================================================
-   VALIDATION SCHEMAS
-============================================================ */
+const SESSION_COOKIE_NAME =
+  "cf_admin_session";
 
-const registerSchema =
-  z.object({
+const JWT_ISSUER =
+  "continental-founders-api";
 
-    fullName:
-      z
-        .string()
-        .trim()
-        .min(
-          2,
-          "Full name is required."
-        )
-        .max(
-          120,
-          "Full name is too long."
-        ),
+const JWT_AUDIENCE =
+  "continental-founders-admin";
 
-    email:
-      z
-        .string()
-        .trim()
-        .email(
-          "Enter a valid email address."
-        ),
+const SESSION_MAX_AGE =
+  8 * 60 * 60 * 1000;
 
-    password:
-      z
-        .string()
-        .min(
-          8,
-          "Password must contain at least 8 characters."
-        )
-        .regex(
-          /[A-Z]/,
-          "Password must contain an uppercase letter."
-        )
-        .regex(
-          /[a-z]/,
-          "Password must contain a lowercase letter."
-        )
-        .regex(
-          /\d/,
-          "Password must contain a number."
-        ),
+const CMS_ROLES = new Set([
+  "founder",
+  "admin",
+  "super_admin",
+]);
 
-  });
+// ============================================================
+// VALIDATION
+// ============================================================
 
+const registerSchema = z
+  .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, "Full name is required.")
+      .max(120, "Full name is too long."),
 
-const loginSchema =
-  z.object({
+    email: z
+      .string()
+      .trim()
+      .email("Enter a valid email address."),
 
-    email:
-      z
-        .string()
-        .trim()
-        .email(
-          "Enter a valid email address."
-        ),
+    password: z
+      .string()
+      .min(
+        8,
+        "Password must contain at least 8 characters."
+      )
+      .max(
+        128,
+        "Password is too long."
+      )
+      .regex(
+        /[A-Z]/,
+        "Password must contain an uppercase letter."
+      )
+      .regex(
+        /[a-z]/,
+        "Password must contain a lowercase letter."
+      )
+      .regex(
+        /\d/,
+        "Password must contain a number."
+      ),
+  })
+  .strict();
 
-    password:
-      z
-        .string()
-        .min(
-          8,
-          "Password must contain at least 8 characters."
-        ),
+const loginSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .email("Enter a valid email address."),
 
-  });
+    password: z
+      .string()
+      .min(8)
+      .max(128),
+  })
+  .strict();
 
+const otpSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .email(),
 
-const otpSchema =
-  z.object({
+    otp: z
+      .string()
+      .regex(
+        /^\d{6}$/,
+        "Verification code must contain exactly 6 digits."
+      ),
 
-    email:
-      z
-        .string()
-        .trim()
-        .email(),
+    purpose: z
+      .enum([
+        "registration",
+        "login",
+      ])
+      .optional(),
+  })
+  .strict();
 
-    otp:
-      z
-        .string()
-        .regex(
-          /^\d{6}$/,
-          "Verification code must contain exactly 6 digits."
-        ),
+const resendOtpSchema = z
+  .object({
+    email: z
+      .string()
+      .trim()
+      .email(),
 
-    purpose:
-      z
-        .enum([
-          "registration",
-          "login",
-        ])
-        .optional(),
+    purpose: z
+      .enum([
+        "registration",
+        "login",
+      ])
+      .optional(),
+  })
+  .strict();
 
-  });
+// ============================================================
+// HELPERS
+// ============================================================
 
-
-const resendOtpSchema =
-  z.object({
-
-    email:
-      z
-        .string()
-        .trim()
-        .email(),
-
-    purpose:
-      z
-        .enum([
-          "registration",
-          "login",
-        ])
-        .optional(),
-
-  });
-
-
-/* ============================================================
-   NORMALIZE EMAIL
-============================================================ */
-
-function normalizeEmail(
-  email
-) {
-
-  return String(
-    email || ""
-  )
+function normalizeEmail(email) {
+  return String(email || "")
     .trim()
     .toLowerCase();
-
 }
 
+function normalizeRole(role) {
+  return String(role || "")
+    .trim()
+    .toLowerCase();
+}
 
-/* ============================================================
-   CREATE CMS SESSION TOKEN
-============================================================ */
+function normalizeStatus(status) {
+  return String(status || "")
+    .trim()
+    .toLowerCase();
+}
 
-function createToken(
-  profile
-) {
+// ============================================================
+// SESSION COOKIE OPTIONS
+// ============================================================
 
-  if (
-    !process.env.JWT_SECRET
-  ) {
+function getSessionCookieOptions() {
+  const isProduction =
+    process.env.NODE_ENV === "production";
 
+  return {
+    httpOnly: true,
+    secure: isProduction,
+
+    sameSite:
+      isProduction
+        ? "none"
+        : "lax",
+
+    maxAge:
+      SESSION_MAX_AGE,
+
+    path: "/",
+  };
+}
+
+// ============================================================
+// COOKIE CLEAR OPTIONS
+//
+// maxAge must not be supplied when clearing.
+// ============================================================
+
+function getClearCookieOptions() {
+  const {
+    maxAge,
+    ...options
+  } = getSessionCookieOptions();
+
+  return options;
+}
+
+// ============================================================
+// CREATE CMS SESSION TOKEN
+// ============================================================
+
+function createToken(profile) {
+  const secret =
+    process.env.JWT_SECRET;
+
+  if (!secret) {
     throw new Error(
       "JWT_SECRET is missing from environment variables."
     );
-
   }
 
-
   return jwt.sign(
-
     {
-      sub:
-        profile.id,
-
-      email:
-        profile.email,
-
-      role:
-        profile.role,
+      sub: String(profile.id),
     },
-
-    process.env.JWT_SECRET,
-
+    secret,
     {
+      algorithm: "HS256",
+
       expiresIn:
         process.env.JWT_EXPIRES_IN ||
-        "1d",
+        "8h",
+
+      issuer:
+        JWT_ISSUER,
+
+      audience:
+        JWT_AUDIENCE,
     }
-
   );
-
 }
 
+// ============================================================
+// SAFE PROFILE
+// ============================================================
 
-/* ============================================================
-   SAFE PROFILE
-============================================================ */
-
-function toSafeUser(
-  profile
-) {
-
+function toSafeUser(profile) {
   return {
-
     id:
       profile.id,
 
@@ -225,236 +243,101 @@ function toSafeUser(
       profile.full_name,
 
     role:
-      profile.role,
+      normalizeRole(
+        profile.role
+      ),
 
     status:
-      profile.status,
-
+      normalizeStatus(
+        profile.status
+      ),
   };
-
 }
 
+// ============================================================
+// GET PROFILE BY EMAIL
+// ============================================================
 
-/* ============================================================
-   GET PROFILE BY EMAIL
-============================================================ */
-
-async function getProfileByEmail(
-  email
-) {
-
+async function getProfileByEmail(email) {
   const cleanEmail =
-    normalizeEmail(
-      email
-    );
-
+    normalizeEmail(email);
 
   const {
     data,
     error,
-  } =
-    await supabaseAdmin
-      .from(
-        "profiles"
-      )
-      .select(
-        "*"
-      )
-      .eq(
-        "email",
-        cleanEmail
-      )
-      .maybeSingle();
+  } = await supabaseAdmin
+    .from("profiles")
+    .select(
+      "id, full_name, email, role, status, email_verified_at, created_at, updated_at"
+    )
+    .eq(
+      "email",
+      cleanEmail
+    )
+    .maybeSingle();
 
-
-  if (
-    error
-  ) {
-
+  if (error) {
     console.error(
-      "\n========================================"
+      "[AUTH] Profile lookup failed:",
+      error.message
     );
-
-    console.error(
-      "PROFILE LOOKUP FAILED"
-    );
-
-    console.error({
-      message:
-        error.message,
-
-      code:
-        error.code,
-
-      details:
-        error.details,
-
-      hint:
-        error.hint,
-
-      email:
-        cleanEmail,
-    });
-
-    console.error(
-      "========================================\n"
-    );
-
 
     throw new Error(
       "Unable to retrieve account information."
     );
-
   }
 
-
   return data;
-
 }
 
+// ============================================================
+// REGISTER
+// ============================================================
 
-/* ============================================================
-   GET PROFILE BY ID
-============================================================ */
-
-async function getProfileById(
-  id
-) {
-
-  const {
-    data,
-    error,
-  } =
-    await supabaseAdmin
-      .from(
-        "profiles"
-      )
-      .select(
-        "*"
-      )
-      .eq(
-        "id",
-        id
-      )
-      .maybeSingle();
-
-
-  if (
-    error
-  ) {
-
-    console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "PROFILE LOOKUP BY ID FAILED"
-    );
-
-    console.error({
-      message:
-        error.message,
-
-      code:
-        error.code,
-
-      details:
-        error.details,
-
-      hint:
-        error.hint,
-
-      id,
-    });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    throw new Error(
-      "Unable to retrieve account information."
-    );
-
-  }
-
-
-  return data;
-
-}
-
-
-/* ============================================================
-   REGISTER FOUNDER
-============================================================ */
-
-async function register(
-  req,
-  res
-) {
-
+async function register(req, res) {
   const input =
     registerSchema.parse(
       req.body
     );
 
-
   const fullName =
-    input.fullName
-      .trim();
-
+    input.fullName.trim();
 
   const email =
     normalizeEmail(
       input.email
     );
 
-
-  /* ==========================================================
-     CHECK EXISTING PROFILE
-  ========================================================== */
+  // ==========================================================
+  // EXISTING PROFILE
+  // ==========================================================
 
   const existingProfile =
     await getProfileByEmail(
       email
     );
 
+  if (existingProfile) {
+    return res.status(409).json({
+      success: false,
 
-  if (
-    existingProfile
-  ) {
-
-    return res
-      .status(409)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "An account already exists with this email address.",
-
-      });
-
+      message:
+        "An account already exists with this email address.",
+    });
   }
 
+  // ==========================================================
+  // CREATE SUPABASE AUTH USER
+  // ==========================================================
 
-  /* ==========================================================
-     CREATE SUPABASE AUTH USER
-  ========================================================== */
-
-  let authData;
-  let authError;
-
+  let authResult;
 
   try {
-
-    const authResult =
+    authResult =
       await supabaseAdmin
         .auth
         .admin
         .createUser({
-
           email,
 
           password:
@@ -464,704 +347,308 @@ async function register(
             true,
 
           user_metadata: {
-
             full_name:
               fullName,
-
           },
-
         });
-
-
-    authData =
-      authResult.data;
-
-
-    authError =
-      authResult.error;
-
-  } catch (
-    unexpectedError
-  ) {
-
+  } catch (error) {
     console.error(
-      "\n========================================"
+      "[AUTH] Supabase account creation unavailable:",
+      error?.message
     );
 
-    console.error(
-      "SUPABASE ACCOUNT CREATION EXCEPTION"
-    );
+    return res.status(503).json({
+      success: false,
 
-    console.error({
       message:
-        unexpectedError?.message,
-
-      name:
-        unexpectedError?.name,
-
-      code:
-        unexpectedError?.code,
-
-      status:
-        unexpectedError?.status,
-
-      causeMessage:
-        unexpectedError?.cause?.message,
-
-      causeCode:
-        unexpectedError?.cause?.code,
+        "The authentication service is temporarily unavailable.",
     });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    return res
-      .status(503)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "The authentication service is temporarily unavailable.",
-
-      });
-
   }
 
+  const {
+    data: authData,
+    error: authError,
+  } = authResult;
 
   if (
     authError ||
     !authData?.user
   ) {
-
     console.error(
-      "\n========================================"
+      "[AUTH] Supabase account creation failed:",
+      authError?.message
     );
 
-    console.error(
-      "SUPABASE ACCOUNT CREATION FAILED"
-    );
+    return res.status(400).json({
+      success: false,
 
-    console.error({
       message:
-        authError?.message,
-
-      status:
-        authError?.status,
-
-      code:
-        authError?.code,
-
-      name:
-        authError?.name,
-
-      email,
+        "Unable to create your account.",
     });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    return res
-      .status(400)
-      .json({
-
-        success:
-          false,
-
-        message:
-          authError?.message ||
-          "Unable to create your account.",
-
-      });
-
   }
-
 
   const userId =
     authData.user.id;
 
-
-  /* ==========================================================
-     CREATE PROFILE
-  ========================================================== */
+  // ==========================================================
+  // CREATE PROFILE
+  // ==========================================================
 
   const {
-    error:
-      profileError,
-  } =
-    await supabaseAdmin
-      .from(
-        "profiles"
-      )
-      .insert({
+    error: profileError,
+  } = await supabaseAdmin
+    .from("profiles")
+    .insert({
+      id:
+        userId,
 
-        id:
-          userId,
-
-        full_name:
-          fullName,
-
-        email,
-
-        role:
-          "founder",
-
-        status:
-          "pending_verification",
-
-      });
-
-
-  if (
-    profileError
-  ) {
-
-    console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "PROFILE CREATION FAILED"
-    );
-
-    console.error({
-      message:
-        profileError.message,
-
-      code:
-        profileError.code,
-
-      details:
-        profileError.details,
-
-      hint:
-        profileError.hint,
-
-      userId,
+      full_name:
+        fullName,
 
       email,
+
+      role:
+        "founder",
+
+      status:
+        "pending_verification",
     });
 
+  if (profileError) {
     console.error(
-      "========================================\n"
+      "[AUTH] Profile creation failed:",
+      profileError.message
     );
 
-
     try {
-
       await supabaseAdmin
         .auth
         .admin
         .deleteUser(
           userId
         );
-
-    } catch (
-      rollbackError
-    ) {
-
+    } catch (rollbackError) {
       console.error(
-        "Registration rollback error:",
-        rollbackError?.message ||
-        rollbackError
+        "[AUTH] Registration rollback failed:",
+        rollbackError?.message
       );
-
     }
 
+    return res.status(500).json({
+      success: false,
 
-    return res
-      .status(500)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Unable to create the founder profile.",
-
-      });
-
+      message:
+        "Unable to create the founder profile.",
+    });
   }
 
-
-  /* ==========================================================
-     SEND REGISTRATION OTP
-  ========================================================== */
+  // ==========================================================
+  // SEND REGISTRATION OTP
+  // ==========================================================
 
   try {
-
     await createAndSendOtp({
-
       userId,
-
       email,
-
       purpose:
         "registration",
-
     });
-
-  } catch (
-    otpError
-  ) {
-
+  } catch (error) {
     console.error(
-      "Registration OTP error:",
-      otpError?.message ||
-      otpError
+      "[AUTH] Registration OTP failed:",
+      error?.message
     );
 
-
-    return res
-      .status(500)
-      .json({
-
-        success:
-          false,
-
-        otpRequired:
-          true,
-
-        email,
-
-        purpose:
-          "registration",
-
-        message:
-          "Your account was created, but the verification email could not be sent. Please request a new verification code.",
-
-      });
-
-  }
-
-
-  /* ==========================================================
-     SUCCESS
-  ========================================================== */
-
-  return res
-    .status(201)
-    .json({
-
-      success:
-        true,
-
-      otpRequired:
-        true,
-
+    return res.status(500).json({
+      success: false,
+      otpRequired: true,
       email,
-
       purpose:
         "registration",
 
       message:
-        "Account created. A verification code has been sent to your personal email.",
-
+        "Your account was created, but the verification email could not be sent. Please request a new verification code.",
     });
+  }
 
+  return res.status(201).json({
+    success: true,
+    otpRequired: true,
+    email,
+    purpose:
+      "registration",
+
+    message:
+      "Account created. A verification code has been sent to your email.",
+  });
 }
 
+// ============================================================
+// LOGIN
+// ============================================================
 
-/* ============================================================
-   LOGIN
-============================================================ */
-
-async function login(
-  req,
-  res
-) {
-
+async function login(req, res) {
   const input =
     loginSchema.parse(
       req.body
     );
-
 
   const email =
     normalizeEmail(
       input.email
     );
 
+  // ==========================================================
+  // VERIFY PASSWORD THROUGH SUPABASE
+  // ==========================================================
 
-  console.log(
-    "\n========================================"
-  );
-
-  console.log(
-    "CMS LOGIN ATTEMPT"
-  );
-
-  console.log({
-    email,
-    time:
-      new Date()
-        .toISOString(),
-  });
-
-  console.log(
-    "========================================\n"
-  );
-
-
-  /* ==========================================================
-     VERIFY EMAIL + PASSWORD WITH SUPABASE
-  ========================================================== */
-
-  let authData =
-    null;
-
-  let authError =
-    null;
-
+  let authResult;
 
   try {
-
-    const authResult =
+    authResult =
       await supabaseAuth
         .auth
         .signInWithPassword({
-
           email,
 
           password:
             input.password,
-
         });
-
-
-    authData =
-      authResult.data;
-
-
-    authError =
-      authResult.error;
-
-  } catch (
-    unexpectedAuthError
-  ) {
-
+  } catch (error) {
     console.error(
-      "\n========================================"
+      "[AUTH] Supabase login unavailable:",
+      error?.message
     );
 
-    console.error(
-      "SUPABASE LOGIN NETWORK EXCEPTION"
-    );
+    return res.status(503).json({
+      success: false,
 
-    console.error({
       message:
-        unexpectedAuthError?.message,
-
-      name:
-        unexpectedAuthError?.name,
-
-      code:
-        unexpectedAuthError?.code,
-
-      status:
-        unexpectedAuthError?.status,
-
-      causeMessage:
-        unexpectedAuthError?.cause?.message,
-
-      causeCode:
-        unexpectedAuthError?.cause?.code,
-
-      causeErrno:
-        unexpectedAuthError?.cause?.errno,
-
-      causeSyscall:
-        unexpectedAuthError?.cause?.syscall,
-
-      causeHostname:
-        unexpectedAuthError?.cause?.hostname,
-
-      email,
+        "The authentication service is temporarily unavailable. Please try again.",
     });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    return res
-      .status(503)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "The authentication service is temporarily unavailable. Please try again.",
-
-      });
-
   }
 
-
-  /* ==========================================================
-     SUPABASE AUTH ERROR
-  ========================================================== */
-
-  if (
-    authError
-  ) {
-
-    console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "SUPABASE LOGIN FAILED"
-    );
-
-    console.error({
-      message:
-        authError.message,
-
-      status:
-        authError.status,
-
-      code:
-        authError.code,
-
-      name:
-        authError.name,
-
-      email,
-    });
-
-    console.error(
-      "========================================\n"
-    );
-
-  }
-
-
-  /* ==========================================================
-     INVALID LOGIN
-  ========================================================== */
+  const {
+    data: authData,
+    error: authError,
+  } = authResult;
 
   if (
     authError ||
     !authData?.user
   ) {
+    return res.status(401).json({
+      success: false,
 
-    return res
-      .status(401)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Incorrect email or password.",
-
-      });
-
+      message:
+        "Incorrect email or password.",
+    });
   }
 
-
-  /* ==========================================================
-     AUTH SUCCESS
-  ========================================================== */
-
-  console.log(
-    "\n========================================"
-  );
-
-  console.log(
-    "SUPABASE LOGIN SUCCESSFUL"
-  );
-
-  console.log({
-    userId:
-      authData.user.id,
-
-    email:
-      authData.user.email,
-  });
-
-  console.log(
-    "========================================\n"
-  );
-
-
-  /* ==========================================================
-     LOAD CONTINENTAL FOUNDERS PROFILE
-  ========================================================== */
+  // ==========================================================
+  // LOAD CMS PROFILE
+  // ==========================================================
 
   let profile;
 
-
   try {
-
     profile =
       await getProfileByEmail(
         email
       );
-
-  } catch (
-    profileLookupError
-  ) {
-
+  } catch (error) {
     console.error(
-      "Profile lookup after login failed:",
-      profileLookupError?.message
+      "[AUTH] Profile lookup after login failed:",
+      error?.message
     );
 
+    return res.status(503).json({
+      success: false,
 
-    return res
-      .status(500)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Your login was accepted, but your profile could not be loaded.",
-
-      });
-
-  }
-
-
-  /* ==========================================================
-     PROFILE NOT FOUND
-  ========================================================== */
-
-  if (
-    !profile
-  ) {
-
-    console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "AUTH USER HAS NO PROFILE"
-    );
-
-    console.error({
-      userId:
-        authData.user.id,
-
-      email,
+      message:
+        "Your account could not be verified at this time.",
     });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Your Continental Founders profile could not be found.",
-
-      });
-
   }
 
+  if (!profile) {
+    return res.status(403).json({
+      success: false,
 
-  /* ==========================================================
-     AUTH / PROFILE ID MATCH
-  ========================================================== */
-
-  if (
-    String(
-      profile.id
-    ) !==
-    String(
-      authData.user.id
-    )
-  ) {
-
-    console.error(
-      "\n========================================"
-    );
-
-    console.error(
-      "AUTH / PROFILE ID MISMATCH"
-    );
-
-    console.error({
-      authUserId:
-        authData.user.id,
-
-      profileId:
-        profile.id,
-
-      email,
+      message:
+        "Your Continental Founders profile could not be found.",
     });
+  }
 
+  // ==========================================================
+  // AUTH USER / PROFILE MATCH
+  // ==========================================================
+
+  if (
+    String(profile.id) !==
+    String(authData.user.id)
+  ) {
     console.error(
-      "========================================\n"
+      "[AUTH] Authentication/profile ID mismatch."
     );
 
+    return res.status(403).json({
+      success: false,
 
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Your account information could not be verified.",
-
-      });
-
+      message:
+        "Your account information could not be verified.",
+    });
   }
 
+  const status =
+    normalizeStatus(
+      profile.status
+    );
 
-  /* ==========================================================
-     DISABLED ACCOUNT
-  ========================================================== */
+  const role =
+    normalizeRole(
+      profile.role
+    );
+
+  // ==========================================================
+  // ROLE CHECK
+  // ==========================================================
 
   if (
-    profile.status ===
-    "disabled"
+    !CMS_ROLES.has(role)
   ) {
+    return res.status(403).json({
+      success: false,
 
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "This account has been disabled.",
-
-      });
-
+      message:
+        "You do not have permission to access the CMS.",
+    });
   }
 
-
-  /* ==========================================================
-     PENDING VERIFICATION
-  ========================================================== */
+  // ==========================================================
+  // DISABLED
+  // ==========================================================
 
   if (
-    profile.status ===
+    status === "disabled"
+  ) {
+    return res.status(403).json({
+      success: false,
+
+      message:
+        "This account has been disabled.",
+    });
+  }
+
+  // ==========================================================
+  // PENDING EMAIL VERIFICATION
+  // ==========================================================
+
+  if (
+    status ===
     "pending_verification"
   ) {
-
     try {
-
       await createAndSendOtp({
-
         userId:
           profile.id,
 
@@ -1170,51 +657,31 @@ async function login(
 
         purpose:
           "registration",
-
       });
-
-    } catch (
-      otpError
-    ) {
-
+    } catch (error) {
       console.error(
-        "Pending verification OTP error:",
-        otpError?.message ||
-        otpError
+        "[AUTH] Registration OTP resend failed:",
+        error?.message
       );
 
+      return res.status(500).json({
+        success: false,
+        otpRequired: true,
 
-      return res
-        .status(500)
-        .json({
+        email:
+          profile.email,
 
-          success:
-            false,
+        purpose:
+          "registration",
 
-          otpRequired:
-            true,
-
-          email:
-            profile.email,
-
-          purpose:
-            "registration",
-
-          message:
-            "Your password was accepted, but the verification email could not be sent.",
-
-        });
-
+        message:
+          "Your password was accepted, but the verification email could not be sent.",
+      });
     }
 
-
     return res.json({
-
-      success:
-        true,
-
-      otpRequired:
-        true,
+      success: true,
+      otpRequired: true,
 
       email:
         profile.email,
@@ -1224,44 +691,47 @@ async function login(
 
       message:
         "Please verify your email address. A new verification code has been sent.",
-
     });
-
   }
 
-
-  /* ==========================================================
-     ACCOUNT MUST BE ACTIVE
-  ========================================================== */
+  // ==========================================================
+  // PENDING ADMIN APPROVAL
+  // ==========================================================
 
   if (
-    profile.status !==
-    "active"
+    status ===
+    "pending_approval"
   ) {
+    return res.status(403).json({
+      success: false,
+      approvalRequired: true,
 
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Your account is not currently active.",
-
-      });
-
+      message:
+        "Your email has been verified. Your CMS account is awaiting approval.",
+    });
   }
 
+  // ==========================================================
+  // MUST BE ACTIVE
+  // ==========================================================
 
-  /* ==========================================================
-     SEND LOGIN OTP
-  ========================================================== */
+  if (
+    status !== "active"
+  ) {
+    return res.status(403).json({
+      success: false,
+
+      message:
+        "Your account is not currently active.",
+    });
+  }
+
+  // ==========================================================
+  // SEND LOGIN OTP
+  // ==========================================================
 
   try {
-
     await createAndSendOtp({
-
       userId:
         profile.id,
 
@@ -1270,69 +740,31 @@ async function login(
 
       purpose:
         "login",
-
     });
-
-  } catch (
-    otpError
-  ) {
-
+  } catch (error) {
     console.error(
-      "\n========================================"
+      "[AUTH] Login OTP failed:",
+      error?.message
     );
 
-    console.error(
-      "LOGIN OTP FAILED"
-    );
-
-    console.error({
-      message:
-        otpError?.message,
+    return res.status(500).json({
+      success: false,
+      otpRequired: true,
 
       email:
         profile.email,
+
+      purpose:
+        "login",
+
+      message:
+        "Your password was accepted, but the login verification email could not be sent.",
     });
-
-    console.error(
-      "========================================\n"
-    );
-
-
-    return res
-      .status(500)
-      .json({
-
-        success:
-          false,
-
-        otpRequired:
-          true,
-
-        email:
-          profile.email,
-
-        purpose:
-          "login",
-
-        message:
-          "Your password was accepted, but the login verification email could not be sent.",
-
-      });
-
   }
 
-
-  /* ==========================================================
-     LOGIN PASSWORD SUCCESS
-  ========================================================== */
-
   return res.json({
-
-    success:
-      true,
-
-    otpRequired:
-      true,
+    success: true,
+    otpRequired: true,
 
     email:
       profile.email,
@@ -1341,104 +773,110 @@ async function login(
       "login",
 
     message:
-      "Password accepted. A verification code has been sent to your personal email.",
-
+      "Password accepted. A verification code has been sent to your email.",
   });
-
 }
 
-
-/* ============================================================
-   VERIFY OTP
-============================================================ */
+// ============================================================
+// VERIFY OTP
+// ============================================================
 
 async function verifyOtpCode(
   req,
   res
 ) {
-
   const input =
     otpSchema.parse(
       req.body
     );
-
 
   const email =
     normalizeEmail(
       input.email
     );
 
-
-  /* ==========================================================
-     FIND PROFILE
-  ========================================================== */
-
   const profile =
     await getProfileByEmail(
       email
     );
 
+  if (!profile) {
+    return res.status(400).json({
+      success: false,
 
-  if (
-    !profile
-  ) {
-
-    return res
-      .status(404)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Account not found.",
-
-      });
-
+      message:
+        "Unable to verify this account.",
+    });
   }
 
+  const status =
+    normalizeStatus(
+      profile.status
+    );
 
   if (
-    profile.status ===
-    "disabled"
+    status === "disabled"
   ) {
+    return res.status(403).json({
+      success: false,
 
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "This account has been disabled.",
-
-      });
-
+      message:
+        "This account has been disabled.",
+    });
   }
 
-
-  /* ==========================================================
-     DETERMINE OTP PURPOSE
-  ========================================================== */
+  // ==========================================================
+  // DETERMINE PURPOSE
+  // ==========================================================
 
   const purpose =
     input.purpose ||
     (
-      profile.status ===
+      status ===
       "pending_verification"
         ? "registration"
         : "login"
     );
 
+  // Registration OTP is only valid while awaiting
+  // initial email verification.
 
-  /* ==========================================================
-     VERIFY OTP
-  ========================================================== */
+  if (
+    purpose === "registration" &&
+    status !==
+      "pending_verification"
+  ) {
+    return res.status(400).json({
+      success: false,
+
+      message:
+        "This account is not awaiting email verification.",
+    });
+  }
+
+  // Login OTP is only meaningful for an active account.
+
+  if (
+    purpose === "login" &&
+    status !== "active"
+  ) {
+    return res.status(403).json({
+      success: false,
+
+      message:
+        status ===
+        "pending_approval"
+          ? "Your CMS account is awaiting approval."
+          : "This account is not active.",
+    });
+  }
+
+  // ==========================================================
+  // VERIFY OTP
+  // ==========================================================
 
   const result =
     await verifyOtp({
-
       userId:
         profile.id,
 
@@ -1449,189 +887,149 @@ async function verifyOtpCode(
         input.otp,
 
       purpose,
-
     });
 
+  if (!result.valid) {
+    return res.status(400).json({
+      success: false,
 
-  if (
-    !result.valid
-  ) {
-
-    return res
-      .status(400)
-      .json({
-
-        success:
-          false,
-
-        message:
-          result.message ||
-          "Invalid verification code.",
-
-      });
-
+      message:
+        result.message ||
+        "Invalid verification code.",
+    });
   }
 
-
-  /* ==========================================================
-     REGISTRATION OTP
-  ========================================================== */
-
-  let currentProfile =
-    profile;
-
+  // ==========================================================
+  // REGISTRATION VERIFICATION
+  //
+  // Email verification DOES NOT grant CMS access.
+  // ==========================================================
 
   if (
-    purpose ===
-    "registration"
+    purpose === "registration"
   ) {
-
     const now =
-      new Date()
-        .toISOString();
-
+      new Date().toISOString();
 
     const {
-      data:
-        updatedProfile,
+      data: updatedProfile,
+      error: updateError,
+    } = await supabaseAdmin
+      .from("profiles")
+      .update({
+        status:
+          "pending_approval",
 
-      error:
-        updateError,
-    } =
-      await supabaseAdmin
-        .from(
-          "profiles"
-        )
-        .update({
+        email_verified_at:
+          now,
 
-          status:
-            "active",
-
-          email_verified_at:
-            now,
-
-          updated_at:
-            now,
-
-        })
-        .eq(
-          "id",
-          profile.id
-        )
-        .select(
-          "*"
-        )
-        .single();
-
+        updated_at:
+          now,
+      })
+      .eq(
+        "id",
+        profile.id
+      )
+      .eq(
+        "status",
+        "pending_verification"
+      )
+      .select(
+        "id, full_name, email, role, status, email_verified_at"
+      )
+      .maybeSingle();
 
     if (
-      updateError
+      updateError ||
+      !updatedProfile
     ) {
-
       console.error(
-        "Profile activation error:",
-        updateError
+        "[AUTH] Profile verification update failed:",
+        updateError?.message
       );
 
-
-      return res
-        .status(500)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Your code was verified, but the account could not be activated.",
-
-        });
-
-    }
-
-
-    currentProfile =
-      updatedProfile;
-
-  }
-
-
-  /* ==========================================================
-     CHECK ACTIVE
-  ========================================================== */
-
-  if (
-    currentProfile.status !==
-    "active"
-  ) {
-
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
+      return res.status(500).json({
+        success: false,
 
         message:
-          "This account is not active.",
-
+          "Your code was verified, but the account status could not be updated.",
       });
+    }
 
+    return res.json({
+      success: true,
+      approvalRequired: true,
+
+      user:
+        toSafeUser(
+          updatedProfile
+        ),
+
+      message:
+        "Your email has been verified. Your CMS account is now awaiting approval.",
+    });
   }
 
+  // ==========================================================
+  // LOGIN OTP: RELOAD PROFILE
+  //
+  // Check status/role again after OTP verification before
+  // issuing a session.
+  // ==========================================================
 
-  /* ==========================================================
-     CREATE SESSION
-  ========================================================== */
+  const currentProfile =
+    await getProfileByEmail(
+      email
+    );
+
+  if (!currentProfile) {
+    return res.status(401).json({
+      success: false,
+
+      message:
+        "Unable to verify this account.",
+    });
+  }
+
+  const currentStatus =
+    normalizeStatus(
+      currentProfile.status
+    );
+
+  const currentRole =
+    normalizeRole(
+      currentProfile.role
+    );
+
+  if (
+    currentStatus !== "active" ||
+    !CMS_ROLES.has(currentRole)
+  ) {
+    return res.status(403).json({
+      success: false,
+
+      message:
+        "This account is not authorized to access the CMS.",
+    });
+  }
+
+  // ==========================================================
+  // CREATE SESSION
+  // ==========================================================
 
   const token =
     createToken(
       currentProfile
     );
 
-
-  /* ==========================================================
-     HTTP-ONLY COOKIE
-  ========================================================== */
-
   res.cookie(
-    "cf_admin_session",
+    SESSION_COOKIE_NAME,
     token,
-    {
-
-      httpOnly:
-        true,
-
-      secure:
-        process.env.NODE_ENV ===
-        "production",
-
-      sameSite:
-        process.env.NODE_ENV ===
-        "production"
-          ? "none"
-          : "lax",
-
-      maxAge:
-        24 *
-        60 *
-        60 *
-        1000,
-
-      path:
-        "/",
-
-    }
+    getSessionCookieOptions()
   );
 
-
-  /* ==========================================================
-     SUCCESS
-  ========================================================== */
-
   return res.json({
-
-    success:
-      true,
+    success: true,
 
     user:
       toSafeUser(
@@ -1639,136 +1037,113 @@ async function verifyOtpCode(
       ),
 
     message:
-      purpose ===
-      "registration"
-        ? "Your email has been verified and your account is active."
-        : "Sign in successful.",
-
+      "Sign in successful.",
   });
-
 }
 
-
-/* ============================================================
-   RESEND OTP
-============================================================ */
+// ============================================================
+// RESEND OTP
+// ============================================================
 
 async function resendOtp(
   req,
   res
 ) {
-
   const input =
     resendOtpSchema.parse(
       req.body
     );
-
 
   const email =
     normalizeEmail(
       input.email
     );
 
+  const genericResponse = {
+    success: true,
+
+    message:
+      "If this account is eligible, a verification code has been sent.",
+  };
 
   const profile =
     await getProfileByEmail(
       email
     );
 
-
-  /* ==========================================================
-     GENERIC UNKNOWN EMAIL RESPONSE
-  ========================================================== */
-
-  if (
-    !profile
-  ) {
-
-    return res.json({
-
-      success:
-        true,
-
-      message:
-        "If this account exists, a verification code has been sent.",
-
-    });
-
+  if (!profile) {
+    return res.json(
+      genericResponse
+    );
   }
 
+  const status =
+    normalizeStatus(
+      profile.status
+    );
 
-  /* ==========================================================
-     DISABLED
-  ========================================================== */
+  const role =
+    normalizeRole(
+      profile.role
+    );
 
   if (
-    profile.status ===
-    "disabled"
+    status === "disabled" ||
+    !CMS_ROLES.has(role)
   ) {
-
-    return res
-      .status(403)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "This account has been disabled.",
-
-      });
-
+    return res.json(
+      genericResponse
+    );
   }
-
-
-  /* ==========================================================
-     PURPOSE
-  ========================================================== */
 
   const purpose =
     input.purpose ||
     (
-      profile.status ===
+      status ===
       "pending_verification"
         ? "registration"
         : "login"
     );
 
-
-  /* ==========================================================
-     PREVENT REGISTRATION OTP FOR ACTIVE ACCOUNT
-  ========================================================== */
+  // ==========================================================
+  // REGISTRATION RESEND
+  // ==========================================================
 
   if (
-    purpose ===
-      "registration" &&
-    profile.status ===
-      "active"
+    purpose === "registration"
   ) {
-
-    return res
-      .status(400)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "This email address has already been verified.",
-
-      });
-
+    if (
+      status !==
+      "pending_verification"
+    ) {
+      return res.json(
+        genericResponse
+      );
+    }
   }
 
+  // ==========================================================
+  // LOGIN RESEND
+  // ==========================================================
 
-  /* ==========================================================
-     SEND OTP
-  ========================================================== */
+  if (
+    purpose === "login"
+  ) {
+    if (
+      status !== "active"
+    ) {
+      return res.json(
+        genericResponse
+      );
+    }
+  }
+
+  // ==========================================================
+  // SEND
+  // ==========================================================
 
   try {
-
     await createAndSendOtp({
-
       userId:
         profile.id,
 
@@ -1776,39 +1151,23 @@ async function resendOtp(
         profile.email,
 
       purpose,
-
     });
-
-  } catch (
-    otpError
-  ) {
-
+  } catch (error) {
     console.error(
-      "Resend OTP error:",
-      otpError?.message ||
-      otpError
+      "[AUTH] OTP resend failed:",
+      error?.message
     );
 
+    return res.status(500).json({
+      success: false,
 
-    return res
-      .status(500)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "Unable to send a new verification code.",
-
-      });
-
+      message:
+        "Unable to send a new verification code.",
+    });
   }
 
-
   return res.json({
-
-    success:
-      true,
+    success: true,
 
     email:
       profile.email,
@@ -1816,105 +1175,55 @@ async function resendOtp(
     purpose,
 
     message:
-      "A new verification code has been sent to your personal email.",
-
+      "A new verification code has been sent to your email.",
   });
-
 }
 
+// ============================================================
+// CURRENT AUTHENTICATED USER
+// ============================================================
 
-/* ============================================================
-   CURRENT AUTHENTICATED USER
-============================================================ */
+async function me(req, res) {
+  if (!req.admin) {
+    return res.status(401).json({
+      success: false,
 
-async function me(
-  req,
-  res
-) {
-
-  if (
-    !req.admin
-  ) {
-
-    return res
-      .status(401)
-      .json({
-
-        success:
-          false,
-
-        message:
-          "No authenticated CMS session was found.",
-
-      });
-
+      message:
+        "No authenticated CMS session was found.",
+    });
   }
 
-
   return res.json({
-
-    success:
-      true,
+    success: true,
 
     user:
       toSafeUser(
         req.admin
       ),
-
   });
-
 }
 
+// ============================================================
+// LOGOUT
+// ============================================================
 
-/* ============================================================
-   LOGOUT
-============================================================ */
-
-async function logout(
-  req,
-  res
-) {
-
+async function logout(req, res) {
   res.clearCookie(
-    "cf_admin_session",
-    {
-
-      httpOnly:
-        true,
-
-      secure:
-        process.env.NODE_ENV ===
-        "production",
-
-      sameSite:
-        process.env.NODE_ENV ===
-        "production"
-          ? "none"
-          : "lax",
-
-      path:
-        "/",
-
-    }
+    SESSION_COOKIE_NAME,
+    getClearCookieOptions()
   );
 
-
   return res.json({
-
-    success:
-      true,
+    success: true,
 
     message:
       "Signed out successfully.",
-
   });
-
 }
 
-
-/* ============================================================
-   EXPORTS
-============================================================ */
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
   register,

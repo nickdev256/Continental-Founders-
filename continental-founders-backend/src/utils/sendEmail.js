@@ -1,10 +1,30 @@
-const getTransporter =
-  require("../config/email");
+const { Resend } = require("resend");
 
+// ============================================================
+// RESEND CLIENT
+// ============================================================
 
-/* ============================================================
-   SEND EMAIL
-============================================================ */
+let resendClient = null;
+
+function getResendClient() {
+  const apiKey =
+    process.env.RESEND_API_KEY;
+
+  if (!apiKey) {
+    return null;
+  }
+
+  if (!resendClient) {
+    resendClient =
+      new Resend(apiKey);
+  }
+
+  return resendClient;
+}
+
+// ============================================================
+// SEND EMAIL
+// ============================================================
 
 async function sendEmail({
   to,
@@ -13,111 +33,107 @@ async function sendEmail({
   text,
   replyTo,
 }) {
+  // ==========================================================
+  // CONFIGURATION
+  // ==========================================================
 
-  const transporter =
-    getTransporter();
+  const resend =
+    getResendClient();
 
-
-  if (!transporter) {
-
-    console.warn(
-      "Email transport is not configured; skipping email notification."
+  if (!resend) {
+    console.error(
+      "[EMAIL] RESEND_API_KEY is not configured."
     );
 
-    return {
-      success: false,
-      skipped: true,
-    };
-
+    throw new Error(
+      "Email service is not configured."
+    );
   }
 
-
-  /* ==========================================================
-     RECIPIENT
-
-     If "to" is provided:
-     send directly to that address.
-
-     Otherwise:
-     preserve existing website behaviour and send to EMAIL_TO.
-  ========================================================== */
+  // ==========================================================
+  // RECIPIENT
+  // ==========================================================
 
   const recipient =
     to ||
-    process.env.EMAIL_TO ||
-    process.env.EMAIL_USER;
-
+    process.env.EMAIL_TO;
 
   if (!recipient) {
-
     throw new Error(
       "No email recipient is configured."
     );
-
   }
 
-
-  /* ==========================================================
-     FROM
-  ========================================================== */
+  // ==========================================================
+  // FROM
+  // ==========================================================
 
   const from =
-    `"Continental Founders" <${process.env.EMAIL_USER}>`;
+    process.env.EMAIL_FROM ||
+    "Continental Founders <noreply@continentalfounders.org>";
 
+  // ==========================================================
+  // MESSAGE
+  // ==========================================================
 
-  /* ==========================================================
-     EMAIL OPTIONS
-  ========================================================== */
-
-  const mailOptions = {
-
+  const message = {
     from,
-
-    to:
-      recipient,
-
+    to: recipient,
     subject,
-
-    html,
-
   };
 
+  if (html) {
+    message.html = html;
+  }
 
   if (text) {
-
-    mailOptions.text =
-      text;
-
+    message.text = text;
   }
-
 
   if (replyTo) {
-
-    mailOptions.replyTo =
-      replyTo;
-
+    message.replyTo = replyTo;
   }
 
+  // ==========================================================
+  // SEND THROUGH RESEND
+  // ==========================================================
 
-  /* ==========================================================
-     SEND
-  ========================================================== */
-
-  const info =
-    await transporter.sendMail(
-      mailOptions
+  try {
+    const {
+      data,
+      error,
+    } = await resend.emails.send(
+      message
     );
 
+    if (error) {
+      console.error(
+        "[EMAIL] Resend rejected email:",
+        {
+          name: error.name,
+          message: error.message,
+        }
+      );
 
-  return {
-    success: true,
+      throw new Error(
+        "Unable to send email."
+      );
+    }
 
-    messageId:
-      info.messageId,
-  };
+    return {
+      success: true,
+      messageId:
+        data?.id || null,
+    };
+  } catch (error) {
+    console.error(
+      "[EMAIL] Email delivery failed:",
+      error?.message ||
+        "Unknown email error"
+    );
 
+    throw error;
+  }
 }
 
-
-module.exports =
-  sendEmail;
+module.exports = sendEmail;

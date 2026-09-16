@@ -1,8 +1,5 @@
-const express =
-  require("express");
-
-const rateLimit =
-  require("express-rate-limit");
+const express = require("express");
+const rateLimit = require("express-rate-limit");
 
 const asyncHandler =
   require("../utils/asyncHandler");
@@ -14,197 +11,190 @@ const {
   resendOtp,
   me,
   logout,
-} =
-  require("../controllers/authController");
+} = require("../controllers/authController");
 
 const {
   requireAdmin,
-} =
-  require("../middleware/auth");
+} = require("../middleware/auth");
 
+const router = express.Router();
 
-const router =
-  express.Router();
+// ============================================================
+// COMMON RATE-LIMIT SETTINGS
+// ============================================================
 
+const commonLimiterOptions = {
+  standardHeaders: true,
+  legacyHeaders: false,
+};
 
-/* ============================================================
-   AUTH RATE LIMITER
+// ============================================================
+// REGISTRATION LIMITER
+//
+// Registration is rare for a CMS.
+// ============================================================
 
-   Protect registration and login from repeated requests.
-============================================================ */
+const registerLimiter = rateLimit({
+  ...commonLimiterOptions,
 
-const authLimiter =
-  rateLimit({
+  windowMs:
+    60 * 60 * 1000,
 
-    windowMs:
-      15 * 60 * 1000,
+  limit:
+    5,
 
-    limit:
-      20,
+  message: {
+    success: false,
+    message:
+      "Too many registration attempts. Please try again later.",
+  },
+});
 
-    standardHeaders:
-      "draft-8",
+// ============================================================
+// LOGIN LIMITER
+//
+// Protects password authentication from repeated attempts.
+// ============================================================
 
-    legacyHeaders:
-      false,
+const loginLimiter = rateLimit({
+  ...commonLimiterOptions,
 
-    message: {
+  windowMs:
+    15 * 60 * 1000,
 
-      success:
-        false,
+  limit:
+    10,
 
-      message:
-        "Too many authentication attempts. Please wait a few minutes and try again.",
+  message: {
+    success: false,
+    message:
+      "Too many sign-in attempts. Please wait before trying again.",
+  },
+});
 
-    },
+// ============================================================
+// OTP VERIFICATION LIMITER
+//
+// The OTP record itself also enforces a maximum number
+// of incorrect attempts.
+// ============================================================
 
-  });
+const verifyOtpLimiter = rateLimit({
+  ...commonLimiterOptions,
 
+  windowMs:
+    10 * 60 * 1000,
 
-/* ============================================================
-   OTP RATE LIMITER
+  limit:
+    10,
 
-   Protect OTP verification and resend endpoints.
-============================================================ */
+  message: {
+    success: false,
+    message:
+      "Too many verification attempts. Please wait before trying again.",
+  },
+});
 
-const otpLimiter =
-  rateLimit({
+// ============================================================
+// OTP RESEND LIMITER
+//
+// Much stricter because every successful request can send
+// an email and create a new OTP.
+// ============================================================
 
-    windowMs:
-      10 * 60 * 1000,
+const resendOtpLimiter = rateLimit({
+  ...commonLimiterOptions,
 
-    limit:
-      15,
+  windowMs:
+    15 * 60 * 1000,
 
-    standardHeaders:
-      "draft-8",
+  limit:
+    3,
 
-    legacyHeaders:
-      false,
+  message: {
+    success: false,
+    message:
+      "Too many verification-code requests. Please wait before requesting another code.",
+  },
+});
 
-    message: {
-
-      success:
-        false,
-
-      message:
-        "Too many verification attempts. Please wait before trying again.",
-
-    },
-
-  });
-
-
-/* ============================================================
-   REGISTER
-
-   POST /api/auth/register
-============================================================ */
+// ============================================================
+// REGISTER
+//
+// POST /api/auth/register
+// ============================================================
 
 router.post(
   "/register",
-
-  authLimiter,
-
-  asyncHandler(
-    register
-  )
+  registerLimiter,
+  asyncHandler(register)
 );
 
-
-/* ============================================================
-   LOGIN
-
-   POST /api/auth/login
-
-   Password is checked first.
-   Successful password authentication triggers OTP.
-============================================================ */
+// ============================================================
+// LOGIN
+//
+// POST /api/auth/login
+//
+// Password is verified first.
+// A successful password check triggers OTP.
+// ============================================================
 
 router.post(
   "/login",
-
-  authLimiter,
-
-  asyncHandler(
-    login
-  )
+  loginLimiter,
+  asyncHandler(login)
 );
 
-
-/* ============================================================
-   VERIFY OTP
-
-   POST /api/auth/verify-otp
-
-   Final CMS session is created only after successful OTP.
-============================================================ */
+// ============================================================
+// VERIFY OTP
+//
+// POST /api/auth/verify-otp
+// ============================================================
 
 router.post(
   "/verify-otp",
-
-  otpLimiter,
-
-  asyncHandler(
-    verifyOtpCode
-  )
+  verifyOtpLimiter,
+  asyncHandler(verifyOtpCode)
 );
 
-
-/* ============================================================
-   RESEND OTP
-
-   POST /api/auth/resend-otp
-============================================================ */
+// ============================================================
+// RESEND OTP
+//
+// POST /api/auth/resend-otp
+// ============================================================
 
 router.post(
   "/resend-otp",
-
-  otpLimiter,
-
-  asyncHandler(
-    resendOtp
-  )
+  resendOtpLimiter,
+  asyncHandler(resendOtp)
 );
 
-
-/* ============================================================
-   CURRENT USER
-
-   GET /api/auth/me
-============================================================ */
+// ============================================================
+// CURRENT AUTHENTICATED CMS USER
+//
+// GET /api/auth/me
+// ============================================================
 
 router.get(
   "/me",
-
   requireAdmin,
-
-  asyncHandler(
-    me
-  )
+  asyncHandler(me)
 );
 
-
-/* ============================================================
-   LOGOUT
-
-   POST /api/auth/logout
-============================================================ */
+// ============================================================
+// LOGOUT
+//
+// POST /api/auth/logout
+// ============================================================
 
 router.post(
   "/logout",
-
   requireAdmin,
-
-  asyncHandler(
-    logout
-  )
+  asyncHandler(logout)
 );
 
+// ============================================================
+// EXPORT
+// ============================================================
 
-/* ============================================================
-   EXPORT
-============================================================ */
-
-module.exports =
-  router;
+module.exports = router;

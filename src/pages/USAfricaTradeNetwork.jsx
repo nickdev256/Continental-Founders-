@@ -33,7 +33,6 @@ const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
 
-
 const PAGE_SLUG =
   "us-africa-trade-network";
 
@@ -41,14 +40,13 @@ const PAGE_SLUG =
 /* ============================================================
    FALLBACK CONTENT
 
-   The page still works even if the CMS/backend is temporarily
-   unavailable.
+   IMPORTANT:
+   Stats are intentionally NOT hard-coded here.
+   Statistics must come from the CMS/backend/database.
 ============================================================ */
 
 const DEFAULT_CONTENT = {
-
   hero: {
-
     eyebrow:
       "U.S.–AFRICA TRADE & BUSINESS NETWORK",
 
@@ -75,27 +73,22 @@ const DEFAULT_CONTENT = {
 
     secondaryButtonText:
       "Learn More",
-
   },
 
 
   highlights: [
-
     {
       title:
         "Stronger Businesses",
     },
-
     {
       title:
         "Expanded Markets",
     },
-
     {
       title:
         "Lasting Impact",
     },
-
   ],
 
 
@@ -109,7 +102,6 @@ const DEFAULT_CONTENT = {
 
 
   trust: {
-
     label:
       "Trusted by forward-thinking organizations",
 
@@ -121,12 +113,10 @@ const DEFAULT_CONTENT = {
       "UNDP",
       "DFC",
     ],
-
   },
 
 
   intro: {
-
     eyebrow:
       "Cross-Border Opportunity",
 
@@ -150,49 +140,19 @@ const DEFAULT_CONTENT = {
 
     buttonLink:
       "/our-model",
-
   },
 
 
-  stats: [
-
-    {
-      value:
-        "2",
-
-      label:
-        "Continents",
-    },
-
-    {
-      value:
-        "1,000+",
-
-      label:
-        "Entrepreneurs & Businesses",
-    },
-
-    {
-      value:
-        "100+",
-
-      label:
-        "Partner Institutions",
-    },
-
-    {
-      value:
-        "Growing",
-
-      label:
-        "Opportunities",
-    },
-
-  ],
+  /*
+   * NO HARDCODED STATS.
+   *
+   * This remains empty unless the CMS/backend/database
+   * sends content.stats.
+   */
+  stats: [],
 
 
   features: {
-
     eyebrow:
       "What the Network Enables",
 
@@ -203,7 +163,6 @@ const DEFAULT_CONTENT = {
       "We help founders, companies, and institutions unlock practical opportunities through trusted relationships, market knowledge, and strategic collaboration.",
 
     items: [
-
       {
         title:
           "Market Access",
@@ -214,7 +173,6 @@ const DEFAULT_CONTENT = {
         image:
           "/assets/images/us-africa/market-access.jpg",
       },
-
       {
         title:
           "Business Connections",
@@ -225,7 +183,6 @@ const DEFAULT_CONTENT = {
         image:
           "/assets/images/us-africa/business-connections.jpg",
       },
-
       {
         title:
           "Trade & Investment Readiness",
@@ -236,7 +193,6 @@ const DEFAULT_CONTENT = {
         image:
           "/assets/images/us-africa/trade-readiness.jpg",
       },
-
       {
         title:
           "Knowledge Exchange",
@@ -247,14 +203,11 @@ const DEFAULT_CONTENT = {
         image:
           "/assets/images/us-africa/knowledge-exchange.jpg",
       },
-
     ],
-
   },
 
 
   network: {
-
     eyebrow:
       "Who We Work With",
 
@@ -268,26 +221,17 @@ const DEFAULT_CONTENT = {
       "We collaborate with the people and institutions that make cross-border business possible.",
 
     items: [
-
       "Entrepreneurs & Founders",
-
       "Companies & Industry Leaders",
-
       "Trade Organizations",
-
       "Business Associations",
-
       "Universities & Institutions",
-
       "Economic Development Partners",
-
     ],
-
   },
 
 
   cta: {
-
     eyebrow:
       "Build With Us",
 
@@ -308,22 +252,18 @@ const DEFAULT_CONTENT = {
 
     image:
       "/assets/images/us-africa/final-cta.jpg",
-
   },
-
 };
 
 
 /* ============================================================
-   HELPERS
+   CONTENT MERGING
 ============================================================ */
 
 function mergeContent(
   content = {}
 ) {
-
   return {
-
     ...DEFAULT_CONTENT,
     ...content,
 
@@ -343,6 +283,13 @@ function mergeContent(
     trust: {
       ...DEFAULT_CONTENT.trust,
       ...(content.trust || {}),
+
+      organizations:
+        Array.isArray(
+          content.trust?.organizations
+        )
+          ? content.trust.organizations
+          : DEFAULT_CONTENT.trust.organizations,
     },
 
 
@@ -378,12 +325,25 @@ function mergeContent(
     },
 
 
+    /*
+     * CMS / DATABASE ONLY
+     *
+     * There is intentionally no fallback to
+     * DEFAULT_CONTENT.stats.
+     */
     stats:
       Array.isArray(
         content.stats
       )
-        ? content.stats
-        : DEFAULT_CONTENT.stats,
+        ? content.stats.filter(
+            (stat) =>
+              stat &&
+              (
+                stat.value ||
+                stat.label
+              )
+          )
+        : [],
 
 
     highlights:
@@ -400,9 +360,7 @@ function mergeContent(
       )
         ? content.sideMessage
         : DEFAULT_CONTENT.sideMessage,
-
   };
-
 }
 
 
@@ -413,26 +371,22 @@ function mergeContent(
 function getHighlightIcon(
   index
 ) {
-
   const icons = [
     Handshake,
     TrendingUp,
     Network,
   ];
 
-
   return (
     icons[index] ||
     Handshake
   );
-
 }
 
 
 function getStatIcon(
   index
 ) {
-
   const icons = [
     Globe2,
     Users,
@@ -440,19 +394,19 @@ function getStatIcon(
     ChartNoAxesCombined,
   ];
 
-
   return (
-    icons[index] ||
+    icons[
+      index %
+      icons.length
+    ] ||
     Globe2
   );
-
 }
 
 
 function getFeatureIcon(
   index
 ) {
-
   const icons = [
     TrendingUp,
     Users,
@@ -460,19 +414,19 @@ function getFeatureIcon(
     Lightbulb,
   ];
 
-
   return (
-    icons[index] ||
+    icons[
+      index %
+      icons.length
+    ] ||
     Lightbulb
   );
-
 }
 
 
 function getNetworkIcon(
   index
 ) {
-
   const icons = [
     Users,
     ChartNoAxesCombined,
@@ -482,21 +436,46 @@ function getNetworkIcon(
     Landmark,
   ];
 
-
   return (
-    icons[index] ||
+    icons[
+      index %
+      icons.length
+    ] ||
     Users
   );
-
 }
 
 
 /* ============================================================
-   U.S.–AFRICA TRADE NETWORK
+   IMAGE ERROR HANDLER
+============================================================ */
+
+function handleImageError(
+  event
+) {
+  const image =
+    event.currentTarget;
+
+  if (
+    image.dataset.fallbackApplied ===
+    "true"
+  ) {
+    return;
+  }
+
+  image.dataset.fallbackApplied =
+    "true";
+
+  image.style.visibility =
+    "hidden";
+}
+
+
+/* ============================================================
+   PAGE
 ============================================================ */
 
 export default function USAfricaTradeNetwork() {
-
   const [
     page,
     setPage,
@@ -519,15 +498,15 @@ export default function USAfricaTradeNetwork() {
 
 
   /* ==========================================================
-     LOAD PAGE
+     LOAD CMS PAGE
   ========================================================== */
 
   const loadPage =
     useCallback(
-      async () => {
-
+      async (
+        signal
+      ) => {
         try {
-
           setLoading(true);
           setError("");
 
@@ -543,6 +522,8 @@ export default function USAfricaTradeNetwork() {
                   Accept:
                     "application/json",
                 },
+
+                signal,
               }
             );
 
@@ -553,20 +534,11 @@ export default function USAfricaTradeNetwork() {
             ) || "";
 
 
-          let result = {};
-
-
           if (
-            contentType.includes(
+            !contentType.includes(
               "application/json"
             )
           ) {
-
-            result =
-              await response.json();
-
-          } else {
-
             const text =
               await response.text();
 
@@ -580,32 +552,39 @@ export default function USAfricaTradeNetwork() {
             throw new Error(
               "The page service returned an unexpected response."
             );
-
           }
+
+
+          const result =
+            await response.json();
 
 
           if (
             !response.ok
           ) {
-
             throw new Error(
-              result.message ||
-              result.error ||
+              result?.message ||
+              result?.error ||
               `Unable to load page. Status: ${response.status}`
             );
-
           }
 
 
           setPage(
-            result.page ||
-            result.data ||
+            result?.page ||
+            result?.data ||
             null
           );
-
         } catch (
           requestError
         ) {
+          if (
+            requestError?.name ===
+            "AbortError"
+          ) {
+            return;
+          }
+
 
           console.error(
             "U.S.–Africa page loading error:",
@@ -613,22 +592,17 @@ export default function USAfricaTradeNetwork() {
           );
 
 
-          /*
-           * Keep fallback content visible.
-           * Backend failure should not destroy the public page.
-           */
-
           setError(
-            requestError.message ||
+            requestError?.message ||
             "Unable to load the latest page content."
           );
-
         } finally {
-
-          setLoading(false);
-
+          if (
+            !signal?.aborted
+          ) {
+            setLoading(false);
+          }
         }
-
       },
       []
     );
@@ -640,9 +614,18 @@ export default function USAfricaTradeNetwork() {
 
   useEffect(
     () => {
+      const controller =
+        new AbortController();
 
-      loadPage();
 
+      loadPage(
+        controller.signal
+      );
+
+
+      return () => {
+        controller.abort();
+      };
     },
     [
       loadPage,
@@ -651,7 +634,7 @@ export default function USAfricaTradeNetwork() {
 
 
   /* ==========================================================
-     CONTENT
+     MERGED CONTENT
   ========================================================== */
 
   const content =
@@ -667,32 +650,20 @@ export default function USAfricaTradeNetwork() {
     );
 
 
-  const hero =
-    content.hero;
+  const {
+    hero,
+    intro,
+    trust,
+    stats,
+    features,
+    network,
+    cta,
+  } =
+    content;
 
 
-  const intro =
-    content.intro;
-
-
-  const trust =
-    content.trust;
-
-
-  const stats =
-    content.stats;
-
-
-  const features =
-    content.features;
-
-
-  const network =
-    content.network;
-
-
-  const cta =
-    content.cta;
+  const hasStats =
+    stats.length > 0;
 
 
   /* ==========================================================
@@ -700,44 +671,41 @@ export default function USAfricaTradeNetwork() {
   ========================================================== */
 
   return (
-
     <main className="us-africa-page">
 
 
-      {/* =====================================================
+      {/* ======================================================
           CMS STATUS
       ====================================================== */}
 
       {loading && (
-
-        <div className="trade-cms-status">
-
+        <div
+          className="trade-cms-status"
+          role="status"
+          aria-live="polite"
+        >
           <RefreshCw
             size={15}
+            aria-hidden="true"
           />
 
           Loading latest content...
-
         </div>
-
       )}
 
 
       {error &&
         import.meta.env.DEV && (
-
-          <div className="trade-cms-status trade-cms-status--error">
-
-            CMS connection:
-            {" "}
-            {error}
-
+          <div
+            className="trade-cms-status trade-cms-status--error"
+            role="status"
+          >
+            CMS connection: {error}
           </div>
-
         )}
 
 
-      {/* =====================================================
+      {/* ======================================================
           HERO
       ====================================================== */}
 
@@ -750,11 +718,22 @@ export default function USAfricaTradeNetwork() {
               hero.image
             }
             alt=""
+            fetchPriority="high"
+            decoding="async"
+            onError={
+              handleImageError
+            }
           />
 
-          <div className="trade-hero__overlay" />
+          <div
+            className="trade-hero__overlay"
+            aria-hidden="true"
+          />
 
-          <div className="trade-hero__glow" />
+          <div
+            className="trade-hero__glow"
+            aria-hidden="true"
+          />
 
         </div>
 
@@ -764,14 +743,11 @@ export default function USAfricaTradeNetwork() {
           <div className="trade-hero__content">
 
             <span className="trade-eyebrow trade-eyebrow--gold">
-
               {hero.eyebrow}
-
             </span>
 
 
             <h1>
-
               {hero.titleLine1}
 
               <br />
@@ -783,7 +759,6 @@ export default function USAfricaTradeNetwork() {
               <span>
                 {hero.titleHighlight}
               </span>
-
             </h1>
 
 
@@ -796,17 +771,17 @@ export default function USAfricaTradeNetwork() {
 
               <Link
                 to={
-                  hero.primaryButtonLink
+                  hero.primaryButtonLink ||
+                  "/contact"
                 }
                 className="trade-button trade-button--gold"
               >
-
                 {hero.primaryButtonText}
 
                 <ArrowRight
                   size={18}
+                  aria-hidden="true"
                 />
-
               </Link>
 
 
@@ -814,9 +789,7 @@ export default function USAfricaTradeNetwork() {
                 href="#network-opportunity"
                 className="trade-button trade-button--outline"
               >
-
                 {hero.secondaryButtonText}
-
               </a>
 
             </div>
@@ -829,7 +802,6 @@ export default function USAfricaTradeNetwork() {
                   item,
                   index
                 ) => {
-
                   const Icon =
                     getHighlightIcon(
                       index
@@ -837,26 +809,21 @@ export default function USAfricaTradeNetwork() {
 
 
                   return (
-
                     <div
                       key={
                         `${item.title}-${index}`
                       }
                     >
-
                       <Icon
-                        size={24}
+                        size={23}
+                        aria-hidden="true"
                       />
-
 
                       <span>
                         {item.title}
                       </span>
-
                     </div>
-
                   );
-
                 }
               )}
 
@@ -865,14 +832,15 @@ export default function USAfricaTradeNetwork() {
           </div>
 
 
-          <div className="trade-hero__side-message">
-
+          <div
+            className="trade-hero__side-message"
+            aria-hidden="true"
+          >
             {content.sideMessage.map(
               (
                 item,
                 index
               ) => (
-
                 <span
                   key={
                     `${item}-${index}`
@@ -880,10 +848,8 @@ export default function USAfricaTradeNetwork() {
                 >
                   {item}
                 </span>
-
               )
             )}
-
           </div>
 
         </div>
@@ -891,7 +857,7 @@ export default function USAfricaTradeNetwork() {
       </section>
 
 
-      {/* =====================================================
+      {/* ======================================================
           TRUST
       ====================================================== */}
 
@@ -914,7 +880,6 @@ export default function USAfricaTradeNetwork() {
                 organization,
                 index
               ) => (
-
                 <div
                   key={
                     `${organization}-${index}`
@@ -922,7 +887,6 @@ export default function USAfricaTradeNetwork() {
                 >
                   {organization}
                 </div>
-
               )
             )}
 
@@ -933,12 +897,18 @@ export default function USAfricaTradeNetwork() {
       </section>
 
 
-      {/* =====================================================
-          CROSS BORDER OPPORTUNITY
+      {/* ======================================================
+          CROSS-BORDER OPPORTUNITY
       ====================================================== */}
 
       <section
-        className="trade-opportunity"
+        className={
+          `trade-opportunity ${
+            hasStats
+              ? "trade-opportunity--with-stats"
+              : "trade-opportunity--without-stats"
+          }`
+        }
         id="network-opportunity"
       >
 
@@ -949,13 +919,22 @@ export default function USAfricaTradeNetwork() {
               intro.image
             }
             alt=""
+            loading="lazy"
+            decoding="async"
+            onError={
+              handleImageError
+            }
+          />
+
+
+          <div
+            className="trade-opportunity__image-shade"
+            aria-hidden="true"
           />
 
 
           <div className="trade-opportunity__image-caption">
-
             {intro.imageCaption}
-
           </div>
 
         </div>
@@ -985,75 +964,83 @@ export default function USAfricaTradeNetwork() {
 
           <Link
             to={
-              intro.buttonLink
+              intro.buttonLink ||
+              "/our-model"
             }
             className="trade-button trade-button--soft"
           >
-
             {intro.buttonText}
 
             <ArrowRight
               size={17}
+              aria-hidden="true"
             />
-
           </Link>
 
         </div>
 
 
-        <div className="trade-opportunity__stats">
+        {/* ====================================================
+            CMS / DATABASE STATISTICS
 
-          {stats.map(
-            (
-              stat,
-              index
-            ) => {
+            These statistics are rendered ONLY when
+            content.stats exists in the CMS response.
+        ==================================================== */}
 
-              const Icon =
-                getStatIcon(
-                  index
-                );
+        {hasStats && (
+          <div className="trade-opportunity__stats">
 
-
-              return (
-
-                <div
-                  className="trade-stat"
-                  key={
-                    `${stat.label}-${index}`
-                  }
-                >
-
-                  <Icon
-                    size={25}
-                  />
+            {stats.map(
+              (
+                stat,
+                index
+              ) => {
+                const Icon =
+                  getStatIcon(
+                    index
+                  );
 
 
-                  <div>
+                return (
+                  <div
+                    className="trade-stat"
+                    key={
+                      `${
+                        stat.label ||
+                        "stat"
+                      }-${index}`
+                    }
+                  >
+                    <Icon
+                      size={25}
+                      aria-hidden="true"
+                    />
 
-                    <strong>
-                      {stat.value}
-                    </strong>
 
-                    <span>
-                      {stat.label}
-                    </span>
+                    <div>
+
+                      <strong>
+                        {stat.value}
+                      </strong>
+
+                      <span>
+                        {stat.label}
+                      </span>
+
+                    </div>
 
                   </div>
+                );
+              }
+            )}
 
-                </div>
-
-              );
-
-            }
-          )}
-
-        </div>
+          </div>
+        )}
 
       </section>
 
 
-      {/* =====================================================
+      {/* ======================================================
           NETWORK ENABLES
       ====================================================== */}
 
@@ -1066,9 +1053,7 @@ export default function USAfricaTradeNetwork() {
             <div>
 
               <span className="trade-eyebrow trade-eyebrow--gold">
-
                 {features.eyebrow}
-
               </span>
 
 
@@ -1093,15 +1078,22 @@ export default function USAfricaTradeNetwork() {
                 item,
                 index
               ) => {
-
                 const Icon =
                   getFeatureIcon(
                     index
                   );
 
 
-                return (
+                const fallbackImage =
+                  DEFAULT_CONTENT
+                    .features
+                    .items[
+                      index
+                    ]
+                    ?.image;
 
+
+                return (
                   <article
                     className="trade-enable-card"
                     key={
@@ -1114,12 +1106,14 @@ export default function USAfricaTradeNetwork() {
                       <img
                         src={
                           item.image ||
-                          DEFAULT_CONTENT
-                            .features
-                            .items[index]
-                            ?.image
+                          fallbackImage
                         }
                         alt=""
+                        loading="lazy"
+                        decoding="async"
+                        onError={
+                          handleImageError
+                        }
                       />
 
                     </div>
@@ -1129,6 +1123,7 @@ export default function USAfricaTradeNetwork() {
 
                       <Icon
                         size={22}
+                        aria-hidden="true"
                       />
 
                     </div>
@@ -1147,9 +1142,7 @@ export default function USAfricaTradeNetwork() {
                     </div>
 
                   </article>
-
                 );
-
               }
             )}
 
@@ -1160,7 +1153,7 @@ export default function USAfricaTradeNetwork() {
       </section>
 
 
-      {/* =====================================================
+      {/* ======================================================
           WHO WE WORK WITH
       ====================================================== */}
 
@@ -1176,13 +1169,11 @@ export default function USAfricaTradeNetwork() {
 
 
             <h2>
-
               {network.titleLine1}
 
               <br />
 
               {network.titleLine2}
-
             </h2>
 
 
@@ -1200,7 +1191,6 @@ export default function USAfricaTradeNetwork() {
                 item,
                 index
               ) => {
-
                 const Icon =
                   getNetworkIcon(
                     index
@@ -1208,26 +1198,22 @@ export default function USAfricaTradeNetwork() {
 
 
                 return (
-
                   <div
                     className="trade-network__item"
                     key={
                       `${item}-${index}`
                     }
                   >
-
                     <Icon
                       size={28}
+                      aria-hidden="true"
                     />
 
                     <span>
                       {item}
                     </span>
-
                   </div>
-
                 );
-
               }
             )}
 
@@ -1238,8 +1224,8 @@ export default function USAfricaTradeNetwork() {
       </section>
 
 
-      {/* =====================================================
-          CTA
+      {/* ======================================================
+          FINAL CTA
       ====================================================== */}
 
       <section className="trade-final-cta">
@@ -1251,9 +1237,16 @@ export default function USAfricaTradeNetwork() {
               cta.image
             }
             alt=""
+            loading="lazy"
+            decoding="async"
+            onError={
+              handleImageError
+            }
           />
 
-          <div />
+          <div
+            aria-hidden="true"
+          />
 
         </div>
 
@@ -1263,20 +1256,16 @@ export default function USAfricaTradeNetwork() {
           <div>
 
             <span className="trade-eyebrow trade-eyebrow--gold">
-
               {cta.eyebrow}
-
             </span>
 
 
             <h2>
-
               {cta.titleLine1}
 
               <br />
 
               {cta.titleLine2}
-
             </h2>
 
           </div>
@@ -1289,17 +1278,17 @@ export default function USAfricaTradeNetwork() {
 
           <Link
             to={
-              cta.buttonLink
+              cta.buttonLink ||
+              "/contact"
             }
             className="trade-button trade-button--gold"
           >
-
             {cta.buttonText}
 
             <ArrowRight
               size={18}
+              aria-hidden="true"
             />
-
           </Link>
 
         </div>
@@ -1307,7 +1296,5 @@ export default function USAfricaTradeNetwork() {
       </section>
 
     </main>
-
   );
-
 }

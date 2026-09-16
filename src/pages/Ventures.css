@@ -1,19 +1,27 @@
 /* ============================================================
+   CONTINENTAL FOUNDERS
    VENTURES PAGE
 ============================================================ */
 
 .ventures-page {
   --ventures-navy: #0d2238;
   --ventures-navy-deep: #08182a;
+  --ventures-navy-soft: #153551;
+
   --ventures-gold: #b8882c;
+  --ventures-gold-dark: #9f741f;
   --ventures-gold-soft: #d4b46f;
+
   --ventures-text: #182331;
   --ventures-muted: #69737d;
   --ventures-line: #dedbd3;
+
   --ventures-cream: #f6f3ec;
   --ventures-white: #ffffff;
 
   width: 100%;
+  min-height: 100vh;
+
   overflow-x: hidden;
 
   background: var(--ventures-white);
@@ -31,19 +39,21 @@
   max-width: 100%;
 }
 
-
 /* ============================================================
    CONTAINER
 ============================================================ */
 
 .ventures-container {
-  width: min(1420px, calc(100% - 96px));
-  margin: 0 auto;
+  width: min(
+    1420px,
+    calc(100% - 96px)
+  );
+
+  margin-inline: auto;
 }
 
-
 /* ============================================================
-   GLOBAL RESPONSIVE SAFETY
+   RESPONSIVE SAFETY
 ============================================================ */
 
 .ventures-hero__content,
@@ -69,7 +79,6 @@
   overflow-wrap: break-word;
 }
 
-
 /* ============================================================
    EYEBROW
 ============================================================ */
@@ -81,8 +90,9 @@
 
   font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.15em;
+
   line-height: 1.4;
+  letter-spacing: 0.15em;
 
   text-transform: uppercase;
 }
@@ -90,7 +100,6 @@
 .ventures-eyebrow--light {
   color: var(--ventures-gold-soft);
 }
-
 
 /* ============================================================
    SECTION NUMBER
@@ -105,30 +114,33 @@
 
   font-size: 0.72rem;
   font-weight: 800;
+
   letter-spacing: 0.08em;
 }
-
 
 /* ============================================================
    BUTTONS
 ============================================================ */
 
 .ventures-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-
   min-height: 52px;
 
   padding: 0 24px;
 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
   border: 1px solid transparent;
 
+  font-family: inherit;
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+
   line-height: 1;
+  letter-spacing: 0.08em;
 
   text-decoration: none;
   text-transform: uppercase;
@@ -147,9 +159,10 @@
 }
 
 .ventures-button svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.25s ease;
 }
 
 .ventures-button:hover svg {
@@ -157,31 +170,39 @@
 }
 
 .ventures-button--gold {
-  background: var(--ventures-gold);
-  border-color: var(--ventures-gold);
+  background:
+    var(--ventures-gold);
 
-  color: #fff;
+  border-color:
+    var(--ventures-gold);
+
+  color: #ffffff;
 }
 
 .ventures-button--gold:hover {
-  background: #9f741f;
-  border-color: #9f741f;
+  background:
+    var(--ventures-gold-dark);
+
+  border-color:
+    var(--ventures-gold-dark);
 }
 
 .ventures-button--outline {
   background: transparent;
 
-  border-color: var(--ventures-navy);
+  border-color:
+    var(--ventures-navy);
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 }
 
 .ventures-button--outline:hover {
-  background: var(--ventures-navy);
+  background:
+    var(--ventures-navy);
 
-  color: #fff;
+  color: #ffffff;
 }
-
 
 /* ============================================================
    HERO
@@ -190,22 +211,22 @@
 .ventures-hero {
   position: relative;
 
+  min-height: 720px;
+
   display: flex;
   align-items: stretch;
 
-  min-height: 720px;
-
   overflow: hidden;
 
-  background: var(--ventures-navy-deep);
+  background:
+    var(--ventures-navy-deep);
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  isolation: isolate;
 }
-
-
-/* ============================================================
-   HERO BACKGROUND
-============================================================ */
 
 .ventures-hero__background {
   position: absolute;
@@ -213,18 +234,18 @@
 
   z-index: 0;
 
-  background-image: url("/assets/venture.png");
+  background-image:
+    url("/assets/venture.png");
+
   background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  background-position:
+    center center;
+
+  background-repeat:
+    no-repeat;
 
   transform: scale(1.01);
 }
-
-
-/* ============================================================
-   HERO OVERLAY
-============================================================ */
 
 .ventures-hero__overlay {
   position: absolute;
@@ -235,44 +256,41 @@
   background:
     linear-gradient(
       90deg,
-      rgba(6, 20, 34, 0.96) 0%,
-      rgba(6, 20, 34, 0.9) 27%,
-      rgba(6, 20, 34, 0.72) 48%,
-      rgba(6, 20, 34, 0.34) 72%,
-      rgba(6, 20, 34, 0.12) 100%
+      rgba(6, 20, 34, 0.97)
+        0%,
+      rgba(6, 20, 34, 0.91)
+        28%,
+      rgba(6, 20, 34, 0.73)
+        49%,
+      rgba(6, 20, 34, 0.36)
+        73%,
+      rgba(6, 20, 34, 0.12)
+        100%
     );
 
   pointer-events: none;
 }
 
-
-/* ============================================================
-   HERO INNER
-============================================================ */
-
 .ventures-hero__inner {
   position: relative;
+
   z-index: 2;
 
+  width: 100%;
+
+  padding-top: 140px;
+  padding-bottom: 80px;
+
   display: grid;
+
   grid-template-columns:
     minmax(0, 1.2fr)
     minmax(300px, 0.8fr);
 
-  gap: 80px;
-
   align-items: end;
 
-  width: 100%;
-
-  padding-top: 125px;
-  padding-bottom: 80px;
+  gap: 80px;
 }
-
-
-/* ============================================================
-   HERO CONTENT
-============================================================ */
 
 .ventures-hero__content {
   max-width: 830px;
@@ -283,41 +301,76 @@
 
   margin: 22px 0 0;
 
-  color: #fff;
+  color: #ffffff;
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(4rem, 6.5vw, 7.3rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      4rem,
+      6.5vw,
+      7.3rem
+    );
+
   font-weight: 400;
-  line-height: 0.9;
-  letter-spacing: -0.05em;
 
-  text-wrap: balance;
+  line-height: 0.9;
+
+  letter-spacing: -0.05em;
 }
 
 .ventures-hero__content p {
   max-width: 590px;
 
-  margin: 30px 0 36px;
+  margin:
+    30px
+    0
+    36px;
 
-  color: rgba(255, 255, 255, 0.78);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.79
+    );
 
   font-size: 1.05rem;
+
   line-height: 1.75;
 }
-
 
 /* ============================================================
    HERO BELIEF
 ============================================================ */
 
 .ventures-hero__belief {
+  width: 100%;
   max-width: 390px;
 
   margin-left: auto;
 
-  padding: 30px 0 8px 32px;
+  padding:
+    30px
+    0
+    8px
+    32px;
 
-  border-left: 1px solid rgba(255, 255, 255, 0.35);
+  border-left:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.35
+    );
 }
 
 .ventures-hero__belief > span {
@@ -325,10 +378,12 @@
 
   margin-bottom: 18px;
 
-  color: var(--ventures-gold-soft);
+  color:
+    var(--ventures-gold-soft);
 
   font-size: 0.68rem;
   font-weight: 800;
+
   letter-spacing: 0.15em;
 
   text-transform: uppercase;
@@ -337,12 +392,28 @@
 .ventures-hero__belief strong {
   display: block;
 
-  color: #fff;
+  color: #ffffff;
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(2rem, 3vw, 3.2rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      2rem,
+      3vw,
+      3.2rem
+    );
+
   font-weight: 400;
+
   line-height: 1;
+
   letter-spacing: -0.035em;
 }
 
@@ -351,23 +422,34 @@
 
   margin: 22px 0 0;
 
-  color: rgba(255, 255, 255, 0.68);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.69
+    );
 
   font-size: 0.88rem;
+
   line-height: 1.7;
 }
-
 
 /* ============================================================
    DIRECTORY
 ============================================================ */
 
 .ventures-directory {
-  padding: clamp(80px, 8vw, 130px) 0;
+  padding:
+    clamp(
+      80px,
+      8vw,
+      130px
+    )
+    0;
 
-  background: #fff;
+  background: #ffffff;
 }
-
 
 /* ============================================================
    DIRECTORY HEADER
@@ -375,10 +457,21 @@
 
 .ventures-section-header {
   display: grid;
-  grid-template-columns: 0.65fr 1.35fr;
+
+  grid-template-columns:
+    minmax(200px, 0.65fr)
+    minmax(0, 1.35fr);
+
   gap: 70px;
 
   align-items: start;
+}
+
+.ventures-section-header__label {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
 }
 
 .ventures-section-header h2 {
@@ -386,45 +479,65 @@
 
   margin: 0;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(3rem, 5vw, 5.8rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      3rem,
+      5vw,
+      5.8rem
+    );
+
   font-weight: 400;
+
   line-height: 0.95;
+
   letter-spacing: -0.045em;
 }
-
 
 /* ============================================================
    TOOLBAR
 ============================================================ */
 
 .ventures-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 30px;
-
   margin-top: 60px;
   margin-bottom: 30px;
 
   padding-top: 24px;
 
-  border-top: 1px solid var(--ventures-line);
-}
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
 
+  gap: 30px;
+
+  border-top:
+    1px solid
+    var(--ventures-line);
+}
 
 /* ============================================================
    FILTERS
 ============================================================ */
 
 .ventures-categories {
+  min-width: 0;
+
   display: flex;
   flex-wrap: wrap;
-  gap: 9px;
 
-  min-width: 0;
+  gap: 9px;
 }
 
 .venture-filter {
@@ -432,16 +545,23 @@
 
   padding: 0 17px;
 
-  border: 1px solid var(--ventures-line);
+  border:
+    1px solid
+    var(--ventures-line);
+
   border-radius: 999px;
 
-  background: #fff;
+  background: #ffffff;
 
-  color: var(--ventures-text);
+  color:
+    var(--ventures-text);
 
   font-family: inherit;
+
   font-size: 0.74rem;
   font-weight: 650;
+
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -452,48 +572,57 @@
 }
 
 .venture-filter:hover {
-  border-color: var(--ventures-navy);
+  border-color:
+    var(--ventures-navy);
 }
 
 .venture-filter.active {
-  background: var(--ventures-navy);
-  border-color: var(--ventures-navy);
+  background:
+    var(--ventures-navy);
 
-  color: #fff;
+  border-color:
+    var(--ventures-navy);
+
+  color: #ffffff;
 }
-
 
 /* ============================================================
    SEARCH
 ============================================================ */
 
 .ventures-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  width: 260px;
+  min-height: 44px;
 
   flex: 0 0 260px;
 
-  width: 260px;
-  min-height: 42px;
-
   padding: 0 14px;
 
-  border: 1px solid var(--ventures-line);
+  display: flex;
+  align-items: center;
 
-  background: #fff;
+  gap: 10px;
 
-  color: var(--ventures-muted);
+  border:
+    1px solid
+    var(--ventures-line);
 
-  transition: border-color 0.2s ease;
+  background: #ffffff;
+
+  color:
+    var(--ventures-muted);
+
+  transition:
+    border-color 0.2s ease;
 }
 
 .ventures-search:focus-within {
-  border-color: var(--ventures-gold);
+  border-color:
+    var(--ventures-gold);
 }
 
 .ventures-search svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .ventures-search input {
@@ -505,9 +634,11 @@
 
   background: transparent;
 
-  color: var(--ventures-text);
+  color:
+    var(--ventures-text);
 
   font: inherit;
+
   font-size: 0.82rem;
 }
 
@@ -515,40 +646,53 @@
   color: #969da4;
 }
 
-
 /* ============================================================
-   VENTURES GRID
+   GRID
 ============================================================ */
 
 .ventures-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  border-top: 1px solid var(--ventures-line);
-  border-left: 1px solid var(--ventures-line);
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  border-top:
+    1px solid
+    var(--ventures-line);
+
+  border-left:
+    1px solid
+    var(--ventures-line);
 }
 
-
 /* ============================================================
-   VENTURE CARD
+   CARD
 ============================================================ */
 
 .venture-card {
-  display: flex;
-  flex-direction: column;
-
-  min-height: 470px;
+  min-width: 0;
+  min-height: 490px;
 
   padding: 26px;
 
-  border-right: 1px solid var(--ventures-line);
-  border-bottom: 1px solid var(--ventures-line);
+  display: flex;
+  flex-direction: column;
 
-  background: #fff;
+  border-right:
+    1px solid
+    var(--ventures-line);
+
+  border-bottom:
+    1px solid
+    var(--ventures-line);
+
+  background: #ffffff;
 
   transition:
     background-color 0.25s ease,
-    transform 0.25s ease,
     box-shadow 0.25s ease;
 }
 
@@ -556,9 +700,14 @@
   background: #fbfaf7;
 
   box-shadow:
-    0 14px 30px rgba(13, 34, 56, 0.06);
+    0 14px 30px
+    rgba(
+      13,
+      34,
+      56,
+      0.06
+    );
 }
-
 
 /* ============================================================
    CARD TOP
@@ -566,74 +715,94 @@
 
 .venture-card__top {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
+  justify-content:
+    space-between;
 
   gap: 18px;
 }
 
 .venture-card__number {
-  color: var(--ventures-navy);
+  flex: 0 0 auto;
+
+  color:
+    var(--ventures-navy);
 
   font-size: 0.7rem;
   font-weight: 800;
+
   letter-spacing: 0.08em;
 }
 
 .venture-card__sector {
-  color: var(--ventures-gold);
+  min-width: 0;
+
+  color:
+    var(--ventures-gold);
 
   font-size: 0.66rem;
   font-weight: 800;
+
+  line-height: 1.4;
   letter-spacing: 0.1em;
 
   text-align: right;
   text-transform: uppercase;
+
+  overflow-wrap: anywhere;
 }
 
-
 /* ============================================================
-   CARD LOGO
+   LOGO
 ============================================================ */
 
 .venture-card__logo {
-  display: flex;
-  align-items: center;
+  position: relative;
 
   min-height: 105px;
 
   margin-top: 20px;
+
+  display: flex;
+  align-items: center;
 }
 
 .venture-card__logo img {
-  display: block;
+  width: auto;
+  height: auto;
 
   max-width: 165px;
-  max-height: 70px;
+  max-height: 72px;
 
   object-fit: contain;
+  object-position: left center;
 }
 
 .venture-card__logo-placeholder {
-  display: grid;
-  place-items: center;
-
   width: 70px;
   height: 70px;
 
-  flex-shrink: 0;
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
 
   border-radius: 50%;
 
-  background: var(--ventures-navy);
+  background:
+    var(--ventures-navy);
 
-  color: #fff;
+  color: #ffffff;
 
   font-size: 1rem;
   font-weight: 800;
+
   letter-spacing: 0.05em;
 }
 
+.venture-card__logo-placeholder--hidden {
+  display: none;
+}
 
 /* ============================================================
    CARD TITLE
@@ -642,39 +811,52 @@
 .venture-card h3 {
   margin: 0;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
   font-size: 1.9rem;
   font-weight: 400;
-  line-height: 1.05;
+
+  line-height: 1.08;
+
   letter-spacing: -0.025em;
+
+  overflow-wrap: anywhere;
 }
 
-
 /* ============================================================
-   CARD LOCATION
+   LOCATION
 ============================================================ */
 
 .venture-card__location {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
   margin-top: 11px;
 
-  color: var(--ventures-muted);
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color:
+    var(--ventures-muted);
 
   font-size: 0.76rem;
 }
 
 .venture-card__location svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
-
 /* ============================================================
-   CARD DESCRIPTION
+   DESCRIPTION
 ============================================================ */
 
 .venture-card__description {
@@ -682,74 +864,98 @@
 
   margin: 24px 0;
 
-  color: var(--ventures-muted);
+  color:
+    var(--ventures-muted);
 
   font-size: 0.9rem;
-  line-height: 1.65;
-}
 
+  line-height: 1.65;
+
+  overflow-wrap: anywhere;
+}
 
 /* ============================================================
    CARD DETAILS
 ============================================================ */
 
 .venture-card__footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-
   padding-top: 20px;
 
-  border-top: 1px solid var(--ventures-line);
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  border-top:
+    1px solid
+    var(--ventures-line);
 }
 
 .venture-card__footer div {
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-  gap: 5px;
 
-  min-width: 0;
+  gap: 5px;
 }
 
 .venture-card__footer span {
-  color: var(--ventures-muted);
+  color:
+    var(--ventures-muted);
 
   font-size: 0.66rem;
+
   letter-spacing: 0.05em;
 
   text-transform: uppercase;
 }
 
 .venture-card__footer strong {
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
   font-size: 0.76rem;
   font-weight: 750;
 
-  overflow-wrap: break-word;
-}
+  line-height: 1.45;
 
+  overflow-wrap: anywhere;
+}
 
 /* ============================================================
    CARD LINK
 ============================================================ */
 
 .venture-card__link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  width: 100%;
 
-  gap: 12px;
+  min-height: 42px;
 
   margin-top: 22px;
   padding-top: 18px;
 
-  border-top: 1px solid var(--ventures-gold-soft);
+  display: flex;
+  align-items: center;
+  justify-content:
+    space-between;
 
-  color: var(--ventures-navy);
+  gap: 12px;
+
+  border-top:
+    1px solid
+    var(--ventures-gold-soft);
+
+  color:
+    var(--ventures-navy);
 
   font-size: 0.7rem;
   font-weight: 800;
+
+  line-height: 1.3;
   letter-spacing: 0.08em;
 
   text-decoration: none;
@@ -757,66 +963,211 @@
 }
 
 .venture-card__link svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease;
 }
 
 .venture-card__link:hover svg {
   transform: translateX(5px);
 }
 
+.venture-card__link--disabled {
+  opacity: 0.45;
+
+  cursor: default;
+  pointer-events: none;
+}
 
 /* ============================================================
-   EMPTY STATE
+   EMPTY / ERROR
 ============================================================ */
 
 .ventures-empty {
-  padding: 70px 20px;
+  min-height: 290px;
 
-  border: 1px solid var(--ventures-line);
+  margin-top: 42px;
+
+  padding: 60px 24px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    var(--ventures-line);
+
+  background: #ffffff;
 
   text-align: center;
 }
 
+.ventures-empty > svg {
+  margin-bottom: 18px;
+
+  color:
+    var(--ventures-gold);
+}
+
 .ventures-empty h3 {
+  max-width: 620px;
+
   margin: 0;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: 2rem;
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      1.7rem,
+      3vw,
+      2.2rem
+    );
+
   font-weight: 400;
+
+  line-height: 1.15;
 }
 
 .ventures-empty p {
+  max-width: 580px;
+
   margin: 12px 0 0;
 
-  color: var(--ventures-muted);
+  color:
+    var(--ventures-muted);
+
+  font-size: 0.9rem;
+
+  line-height: 1.65;
 }
 
+.ventures-empty--error {
+  background: #fffafa;
+}
+
+/* ============================================================
+   RETRY BUTTON
+============================================================ */
+
+.ventures-retry {
+  min-height: 44px;
+
+  margin-top: 24px;
+
+  padding: 0 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  border:
+    1px solid
+    var(--ventures-navy);
+
+  background:
+    var(--ventures-navy);
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.05em;
+
+  cursor: pointer;
+}
+
+.ventures-retry:hover {
+  background:
+    var(--ventures-navy-soft);
+}
+
+/* ============================================================
+   LOADER
+============================================================ */
+
+.ventures-loader {
+  width: 36px;
+  height: 36px;
+
+  margin-bottom: 22px;
+
+  border:
+    3px solid
+    rgba(
+      184,
+      136,
+      44,
+      0.18
+    );
+
+  border-top-color:
+    var(--ventures-gold);
+
+  border-radius: 50%;
+
+  animation:
+    venturesLoaderSpin
+    0.8s
+    linear
+    infinite;
+}
+
+@keyframes venturesLoaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ============================================================
    JOURNEY
 ============================================================ */
 
 .ventures-journey {
-  padding: clamp(80px, 8vw, 125px) 0;
+  padding:
+    clamp(
+      80px,
+      8vw,
+      125px
+    )
+    0;
 
-  background: var(--ventures-cream);
+  background:
+    var(--ventures-cream);
 
-  border-top: 1px solid var(--ventures-line);
-  border-bottom: 1px solid var(--ventures-line);
+  border-top:
+    1px solid
+    var(--ventures-line);
+
+  border-bottom:
+    1px solid
+    var(--ventures-line);
 }
-
-
-/* ============================================================
-   JOURNEY HEADING
-============================================================ */
 
 .ventures-journey__heading {
   display: grid;
-  grid-template-columns: 0.65fr 1.35fr;
+
+  grid-template-columns:
+    minmax(200px, 0.65fr)
+    minmax(0, 1.35fr);
+
   gap: 70px;
 
   align-items: start;
@@ -825,34 +1176,55 @@
 .ventures-journey__heading h2 {
   margin: 0;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(3rem, 5vw, 5.6rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      3rem,
+      5vw,
+      5.6rem
+    );
+
   font-weight: 400;
+
   line-height: 0.95;
+
   letter-spacing: -0.045em;
 }
-
 
 /* ============================================================
    JOURNEY GRID
 ============================================================ */
 
 .venture-journey-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-
   margin-top: 60px;
 
-  border-top: 1px solid var(--ventures-line);
-  border-left: 1px solid var(--ventures-line);
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      5,
+      minmax(0, 1fr)
+    );
+
+  border-top:
+    1px solid
+    var(--ventures-line);
+
+  border-left:
+    1px solid
+    var(--ventures-line);
 }
-
-
-/* ============================================================
-   JOURNEY STEP
-============================================================ */
 
 .venture-journey-step {
   position: relative;
@@ -861,43 +1233,66 @@
 
   padding: 26px;
 
-  border-right: 1px solid var(--ventures-line);
-  border-bottom: 1px solid var(--ventures-line);
+  border-right:
+    1px solid
+    var(--ventures-line);
 
-  background: rgba(255, 255, 255, 0.62);
+  border-bottom:
+    1px solid
+    var(--ventures-line);
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.62
+    );
 
   transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+    background-color 0.2s ease;
 }
 
 .venture-journey-step:hover {
-  background: #fff;
+  background: #ffffff;
 }
 
 .venture-journey-step__number {
-  display: grid;
-  place-items: center;
-
   width: 42px;
   height: 42px;
 
+  display: grid;
+  place-items: center;
+
   border-radius: 50%;
 
-  background: var(--ventures-gold);
+  background:
+    var(--ventures-gold);
 
-  color: #fff;
+  color: #ffffff;
 
   font-size: 0.7rem;
   font-weight: 800;
 }
 
 .venture-journey-step h3 {
-  margin: 52px 0 10px;
+  margin:
+    52px
+    0
+    10px;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
   font-size: 1.55rem;
   font-weight: 400;
 }
@@ -905,9 +1300,11 @@
 .venture-journey-step p {
   margin: 0;
 
-  color: var(--ventures-muted);
+  color:
+    var(--ventures-muted);
 
   font-size: 0.84rem;
+
   line-height: 1.55;
 }
 
@@ -917,27 +1314,30 @@
   top: 37px;
   right: 20px;
 
-  color: var(--ventures-gold);
+  color:
+    var(--ventures-gold);
 }
-
 
 /* ============================================================
    ECOSYSTEM
 ============================================================ */
 
 .ventures-ecosystem {
-  padding: clamp(90px, 9vw, 140px) 0;
+  padding:
+    clamp(
+      90px,
+      9vw,
+      140px
+    )
+    0;
 
-  background: var(--ventures-navy);
+  background:
+    var(--ventures-navy);
 }
-
-
-/* ============================================================
-   ECOSYSTEM GRID
-============================================================ */
 
 .ventures-ecosystem__grid {
   display: grid;
+
   grid-template-columns:
     minmax(0, 0.9fr)
     minmax(430px, 1.1fr);
@@ -947,28 +1347,44 @@
   align-items: center;
 }
 
-
-/* ============================================================
-   ECOSYSTEM CONTENT
-============================================================ */
-
 .ventures-ecosystem__content {
   max-width: 650px;
 }
 
-.ventures-ecosystem__content .ventures-section-number {
-  color: var(--ventures-gold-soft);
+.ventures-ecosystem__content
+.ventures-section-number {
+  color:
+    var(--ventures-gold-soft);
 }
 
 .ventures-ecosystem__content h2 {
-  margin: 18px 0 24px;
+  margin:
+    18px
+    0
+    24px;
 
-  color: #fff;
+  color: #ffffff;
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(3.2rem, 5vw, 5.8rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      3.2rem,
+      5vw,
+      5.8rem
+    );
+
   font-weight: 400;
+
   line-height: 0.95;
+
   letter-spacing: -0.045em;
 }
 
@@ -977,28 +1393,37 @@
 
   margin: 0;
 
-  color: rgba(255, 255, 255, 0.67);
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.68
+    );
 
   font-size: 1rem;
+
   line-height: 1.75;
 }
-
 
 /* ============================================================
    TEXT LINK
 ============================================================ */
 
 .ventures-text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-
   margin-top: 32px;
 
-  color: var(--ventures-gold-soft);
+  display: inline-flex;
+  align-items: center;
+
+  gap: 12px;
+
+  color:
+    var(--ventures-gold-soft);
 
   font-size: 0.74rem;
   font-weight: 800;
+
   letter-spacing: 0.08em;
 
   text-decoration: none;
@@ -1006,15 +1431,15 @@
 }
 
 .ventures-text-link svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.25s ease;
 }
 
 .ventures-text-link:hover svg {
   transform: translateX(5px);
 }
-
 
 /* ============================================================
    ECOSYSTEM NETWORK
@@ -1022,44 +1447,58 @@
 
 .ventures-ecosystem__network {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
 
   gap: 1px;
 
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
 
-  background: rgba(255, 255, 255, 0.12);
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    );
 }
 
+.ecosystem-network__center,
+.ecosystem-network__item {
+  min-width: 0;
+  min-height: 190px;
 
-/* ============================================================
-   CENTER BLOCK
-============================================================ */
+  padding: 25px;
+}
 
 .ecosystem-network__center {
   display: grid;
   place-items: center;
 
-  min-height: 190px;
+  background:
+    var(--ventures-gold);
 
-  padding: 25px;
-
-  background: var(--ventures-gold);
-
-  color: #fff;
+  color: #ffffff;
 
   font-size: 0.76rem;
   font-weight: 800;
+
   letter-spacing: 0.11em;
 
   text-align: center;
   text-transform: uppercase;
 }
-
-
-/* ============================================================
-   NETWORK ITEM
-============================================================ */
 
 .ecosystem-network__item {
   display: flex;
@@ -1067,20 +1506,15 @@
   align-items: center;
   justify-content: center;
 
-  min-height: 190px;
-  min-width: 0;
+  background:
+    var(--ventures-navy-deep);
 
-  padding: 25px;
-
-  background: var(--ventures-navy-deep);
-
-  color: #fff;
+  color: #ffffff;
 
   text-align: center;
 
   transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+    background-color 0.2s ease;
 }
 
 .ecosystem-network__item:hover {
@@ -1088,69 +1522,81 @@
 }
 
 .ecosystem-network__item svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 
   margin-bottom: 14px;
 
-  color: var(--ventures-gold-soft);
+  color:
+    var(--ventures-gold-soft);
 }
 
 .ecosystem-network__item span {
   font-size: 0.76rem;
   font-weight: 700;
+
   letter-spacing: 0.03em;
 
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
-
 
 /* ============================================================
    FINAL CTA
 ============================================================ */
 
 .ventures-final {
-  padding: clamp(85px, 8vw, 125px) 0;
+  padding:
+    clamp(
+      85px,
+      8vw,
+      125px
+    )
+    0;
 
-  background: #fff;
+  background: #ffffff;
 }
-
-
-/* ============================================================
-   FINAL GRID
-============================================================ */
 
 .ventures-final__grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
   gap: 90px;
 
   align-items: end;
 }
 
-
-/* ============================================================
-   FINAL HEADING
-============================================================ */
-
 .ventures-final h2 {
   max-width: 700px;
 
   margin: 16px 0 0;
 
-  color: var(--ventures-navy);
+  color:
+    var(--ventures-navy);
 
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(3.3rem, 5.3vw, 6rem);
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size:
+    clamp(
+      3.3rem,
+      5.3vw,
+      6rem
+    );
+
   font-weight: 400;
+
   line-height: 0.94;
+
   letter-spacing: -0.045em;
 }
-
-
-/* ============================================================
-   FINAL CONTENT
-============================================================ */
 
 .ventures-final__content {
   max-width: 600px;
@@ -1159,43 +1605,46 @@
 .ventures-final__content p {
   margin: 0;
 
-  color: var(--ventures-muted);
+  color:
+    var(--ventures-muted);
 
   font-size: 1rem;
+
   line-height: 1.75;
 }
 
-
-/* ============================================================
-   FINAL ACTIONS
-============================================================ */
-
 .ventures-final__actions {
+  margin-top: 32px;
+
   display: flex;
   flex-wrap: wrap;
 
   gap: 12px;
-
-  margin-top: 32px;
 }
 
-
 /* ============================================================
-   ULTRA-WIDE / 2K / 4K
+   ULTRA WIDE
 ============================================================ */
 
 @media (min-width: 1920px) {
-
   .ventures-container {
-    width: min(1540px, calc(100% - 140px));
+    width:
+      min(
+        1540px,
+        calc(100% - 140px)
+      );
   }
 
   .ventures-hero {
-    min-height: min(860px, 82vh);
+    min-height:
+      min(
+        860px,
+        82vh
+      );
   }
 
   .ventures-hero__inner {
-    padding-top: 145px;
+    padding-top: 155px;
     padding-bottom: 100px;
   }
 
@@ -1203,42 +1652,37 @@
     max-width: 920px;
   }
 
-  .ventures-hero__content h1 {
-    font-size: clamp(5.5rem, 5.8vw, 8rem);
-  }
-
   .ventures-hero__background {
-    background-position: center 45%;
+    background-position:
+      center 45%;
   }
-
 }
 
-
 /* ============================================================
-   LARGE DESKTOP
+   DESKTOP
 ============================================================ */
 
-@media (min-width: 1600px) and (max-width: 1919px) {
-
-  .ventures-hero {
-    min-height: 760px;
+@media (max-width: 1350px) {
+  .ventures-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
   }
-
-  .ventures-hero__content {
-    max-width: 870px;
-  }
-
 }
 
-
 /* ============================================================
-   LARGE TABLET / LAPTOP
+   LAPTOP
 ============================================================ */
 
 @media (max-width: 1200px) {
-
   .ventures-container {
-    width: min(100% - 64px, 1320px);
+    width:
+      min(
+        100% - 64px,
+        1320px
+      );
   }
 
   .ventures-hero {
@@ -1253,9 +1697,9 @@
     gap: 50px;
   }
 
-  .ventures-grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+  .ventures-section-header,
+  .ventures-journey__heading {
+    gap: 50px;
   }
 
   .ventures-ecosystem__grid {
@@ -1265,28 +1709,54 @@
 
     gap: 55px;
   }
-
 }
 
-
 /* ============================================================
-   SHORT LAPTOP SCREENS
-   1366x768 / 1440x800 style displays
+   SMALL LAPTOP
 ============================================================ */
 
-@media (min-width: 901px) and (max-height: 820px) {
+@media (max-width: 1050px) {
+  .ventures-grid {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .venture-journey-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+}
+
+/* ============================================================
+   SHORT LAPTOP
+============================================================ */
+
+@media
+  (min-width: 901px)
+  and (max-height: 820px) {
 
   .ventures-hero {
     min-height: 610px;
   }
 
   .ventures-hero__inner {
-    padding-top: 90px;
+    padding-top: 100px;
     padding-bottom: 55px;
   }
 
   .ventures-hero__content h1 {
-    font-size: clamp(3.7rem, 5.7vw, 5.7rem);
+    font-size:
+      clamp(
+        3.7rem,
+        5.7vw,
+        5.7rem
+      );
   }
 
   .ventures-hero__content p {
@@ -1295,24 +1765,17 @@
 
     line-height: 1.6;
   }
-
-  .ventures-hero__belief {
-    padding-top: 24px;
-  }
-
 }
-
 
 /* ============================================================
    TABLET
 ============================================================ */
 
 @media (max-width: 900px) {
-
   .ventures-container {
-    width: min(100% - 40px, 100%);
+    width:
+      calc(100% - 40px);
   }
-
 
   /* HERO */
 
@@ -1321,32 +1784,39 @@
   }
 
   .ventures-hero__background {
-    background-position: 62% center;
+    background-position:
+      62% center;
   }
 
   .ventures-hero__overlay {
     background:
       linear-gradient(
         90deg,
-        rgba(6, 20, 34, 0.96) 0%,
-        rgba(6, 20, 34, 0.86) 52%,
-        rgba(6, 20, 34, 0.48) 100%
+        rgba(6, 20, 34, 0.96)
+          0%,
+        rgba(6, 20, 34, 0.86)
+          52%,
+        rgba(6, 20, 34, 0.48)
+          100%
       ),
       linear-gradient(
         0deg,
-        rgba(6, 20, 34, 0.72) 0%,
-        rgba(6, 20, 34, 0.1) 65%
+        rgba(6, 20, 34, 0.72)
+          0%,
+        rgba(6, 20, 34, 0.1)
+          65%
       );
   }
 
   .ventures-hero__inner {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
-    gap: 48px;
+    gap: 44px;
 
-    align-items: end;
+    align-content: end;
 
-    padding-top: 105px;
+    padding-top: 120px;
     padding-bottom: 60px;
   }
 
@@ -1359,26 +1829,36 @@
 
     margin-left: 0;
 
-    padding: 24px 0 0;
+    padding:
+      24px
+      0
+      0;
 
     border-left: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.35);
+
+    border-top:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.35
+      );
   }
 
   .ventures-hero__belief p {
     max-width: 450px;
   }
 
-
-  /* HEADERS */
+  /* HEADINGS */
 
   .ventures-section-header,
   .ventures-journey__heading {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     gap: 24px;
   }
-
 
   /* TOOLBAR */
 
@@ -1390,16 +1870,16 @@
   }
 
   .ventures-search {
-    flex: none;
-
     width: 100%;
-  }
 
+    flex: none;
+  }
 
   /* JOURNEY */
 
   .venture-journey-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     border-left: 0;
   }
@@ -1407,7 +1887,11 @@
   .venture-journey-step {
     min-height: auto;
 
-    border-left: 1px solid var(--ventures-line);
+    padding: 24px;
+
+    border-left:
+      1px solid
+      var(--ventures-line);
   }
 
   .venture-journey-step__arrow {
@@ -1415,40 +1899,65 @@
   }
 
   .venture-journey-step h3 {
-    margin-top: 38px;
+    margin-top: 34px;
   }
-
 
   /* ECOSYSTEM */
 
   .ventures-ecosystem__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     gap: 60px;
   }
 
-
   /* FINAL */
 
   .ventures-final__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
 
     gap: 36px;
   }
-
 }
 
+/* ============================================================
+   SMALL TABLET
+============================================================ */
+
+@media (max-width: 720px) {
+  .ventures-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .venture-card {
+    min-height: auto;
+  }
+
+  .ventures-ecosystem__network {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    min-height: 155px;
+  }
+}
 
 /* ============================================================
    MOBILE
 ============================================================ */
 
 @media (max-width: 620px) {
-
   .ventures-container {
-    width: min(100% - 28px, 100%);
+    width:
+      calc(100% - 28px);
   }
-
 
   /* HERO */
 
@@ -1458,36 +1967,41 @@
   }
 
   .ventures-hero__background {
-    background-position: 64% center;
+    background-position:
+      64% center;
   }
 
   .ventures-hero__overlay {
     background:
       linear-gradient(
         180deg,
-        rgba(6, 20, 34, 0.52) 0%,
-        rgba(6, 20, 34, 0.7) 38%,
-        rgba(6, 20, 34, 0.96) 100%
-      ),
-      linear-gradient(
-        90deg,
-        rgba(6, 20, 34, 0.48) 0%,
-        rgba(6, 20, 34, 0.1) 100%
+        rgba(6, 20, 34, 0.5)
+          0%,
+        rgba(6, 20, 34, 0.68)
+          37%,
+        rgba(6, 20, 34, 0.97)
+          100%
       );
   }
 
   .ventures-hero__inner {
-    align-content: end;
+    gap: 34px;
 
-    gap: 36px;
-
-    padding-top: 100px;
+    padding-top: 110px;
     padding-bottom: 42px;
   }
 
   .ventures-hero__content h1 {
-    font-size: clamp(3.2rem, 14vw, 4.8rem);
-    line-height: 0.92;
+    font-size:
+      clamp(
+        3rem,
+        13vw,
+        4.5rem
+      );
+
+    line-height: 0.94;
+
+    letter-spacing: -0.045em;
   }
 
   .ventures-hero__content p {
@@ -1497,6 +2011,8 @@
     margin-bottom: 28px;
 
     font-size: 0.94rem;
+
+    line-height: 1.65;
   }
 
   .ventures-hero__belief {
@@ -1504,105 +2020,164 @@
   }
 
   .ventures-hero__belief strong {
-    font-size: clamp(2.1rem, 10vw, 3rem);
+    font-size:
+      clamp(
+        2rem,
+        9vw,
+        2.8rem
+      );
   }
-
 
   /* DIRECTORY */
 
   .ventures-directory {
-    padding: 70px 0;
+    padding: 68px 0;
   }
 
   .ventures-section-header h2,
   .ventures-journey__heading h2 {
-    font-size: clamp(2.8rem, 12vw, 4rem);
+    font-size:
+      clamp(
+        2.65rem,
+        11vw,
+        3.8rem
+      );
   }
 
   .ventures-toolbar {
-    margin-top: 42px;
+    margin-top: 40px;
+    margin-bottom: 24px;
   }
 
   .ventures-categories {
     width: 100%;
+
+    gap: 8px;
   }
 
   .venture-filter {
-    flex: 1 1 auto;
+    min-height: 42px;
+
+    flex:
+      1
+      1
+      auto;
+
+    padding: 0 14px;
   }
 
-  .ventures-grid {
-    grid-template-columns: 1fr;
+  .ventures-search {
+    min-height: 48px;
   }
+
+  /* CARD */
 
   .venture-card {
-    min-height: auto;
-
-    padding: 24px;
+    padding: 23px;
   }
 
+  .venture-card__logo {
+    min-height: 95px;
+  }
+
+  .venture-card h3 {
+    font-size: 1.8rem;
+  }
+
+  .venture-card__description {
+    margin: 20px 0;
+
+    font-size: 0.88rem;
+  }
 
   /* JOURNEY */
 
   .ventures-journey {
-    padding: 70px 0;
+    padding: 68px 0;
   }
-
 
   /* ECOSYSTEM */
 
   .ventures-ecosystem {
-    padding: 75px 0;
+    padding: 72px 0;
   }
 
   .ventures-ecosystem__content h2 {
-    font-size: clamp(3rem, 12vw, 4.2rem);
+    font-size:
+      clamp(
+        2.8rem,
+        11vw,
+        4rem
+      );
   }
-
-  .ventures-ecosystem__network {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .ecosystem-network__center,
-  .ecosystem-network__item {
-    min-height: 150px;
-  }
-
 
   /* FINAL */
 
   .ventures-final {
-    padding: 70px 0;
+    padding: 68px 0;
   }
 
   .ventures-final h2 {
-    font-size: clamp(3rem, 12vw, 4.3rem);
+    font-size:
+      clamp(
+        2.8rem,
+        11vw,
+        4rem
+      );
   }
 
   .ventures-final__actions {
     flex-direction: column;
   }
 
+  .ventures-final__actions
   .ventures-button {
     width: 100%;
   }
 
+  .ventures-empty {
+    min-height: 250px;
+
+    margin-top: 30px;
+
+    padding:
+      45px
+      18px;
+  }
 }
 
-
 /* ============================================================
-   480PX MOBILE
+   MOBILE 480
 ============================================================ */
 
 @media (max-width: 480px) {
+  .ventures-container {
+    width:
+      calc(100% - 24px);
+  }
 
-  .ventures-hero__content h1,
-  .ventures-section-header h2,
-  .ventures-journey__heading h2,
-  .ventures-ecosystem__content h2,
-  .ventures-final h2 {
-    overflow-wrap: anywhere;
+  .ventures-hero {
+    min-height: 680px;
+  }
+
+  .ventures-hero__inner {
+    padding-top: 100px;
+    padding-bottom: 36px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size:
+      clamp(
+        2.8rem,
+        13vw,
+        3.8rem
+      );
+  }
+
+  .ventures-button {
+    min-height: 50px;
+
+    padding: 0 18px;
   }
 
   .venture-card__top {
@@ -1613,67 +2188,22 @@
     gap: 12px;
   }
 
-}
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    min-height: 140px;
 
+    padding: 20px 12px;
+  }
+}
 
 /* ============================================================
    VERY SMALL MOBILE
 ============================================================ */
 
 @media (max-width: 420px) {
-
   .ventures-container {
-    width: min(100% - 22px, 100%);
-  }
-
-  .ventures-hero {
-    min-height: 680px;
-  }
-
-  .ventures-hero__inner {
-    gap: 28px;
-
-    padding-top: 88px;
-    padding-bottom: 34px;
-  }
-
-  .ventures-hero__content h1 {
-    font-size: clamp(2.9rem, 14vw, 4rem);
-  }
-
-  .ventures-hero__content p {
-    font-size: 0.9rem;
-    line-height: 1.65;
-  }
-
-  .ventures-hero__belief {
-    padding-top: 20px;
-  }
-
-  .ventures-hero__belief p {
-    margin-top: 16px;
-  }
-
-  .ventures-ecosystem__network {
-    grid-template-columns: 1fr;
-  }
-
-  .ecosystem-network__center,
-  .ecosystem-network__item {
-    min-height: 130px;
-  }
-
-}
-
-
-/* ============================================================
-   360PX MOBILE
-============================================================ */
-
-@media (max-width: 360px) {
-
-  .ventures-container {
-    width: calc(100% - 20px);
+    width:
+      calc(100% - 22px);
   }
 
   .ventures-hero {
@@ -1681,44 +2211,58 @@
   }
 
   .ventures-hero__inner {
-    padding-top: 82px;
-    padding-bottom: 30px;
+    gap: 26px;
+
+    padding-top: 90px;
+    padding-bottom: 32px;
   }
 
   .ventures-hero__content h1 {
-    font-size: 2.65rem;
+    font-size:
+      clamp(
+        2.6rem,
+        13vw,
+        3.5rem
+      );
   }
 
-  .ventures-hero__belief strong {
-    font-size: 2rem;
+  .ventures-hero__content p {
+    font-size: 0.88rem;
+  }
+
+  .ventures-hero__belief {
+    padding-top: 18px;
+  }
+
+  .ventures-hero__belief p {
+    margin-top: 15px;
+
+    font-size: 0.83rem;
   }
 
   .venture-card {
     padding: 20px;
   }
 
-  .venture-card h3 {
-    font-size: 1.7rem;
+  .venture-card__footer {
+    grid-template-columns:
+      1fr;
   }
 
-  .ventures-section-header h2,
-  .ventures-journey__heading h2,
-  .ventures-ecosystem__content h2,
-  .ventures-final h2 {
-    font-size: 2.55rem;
+  .ventures-ecosystem__network {
+    grid-template-columns:
+      1fr 1fr;
   }
-
 }
 
-
 /* ============================================================
-   320PX / EXTRA NARROW MOBILE
+   360PX MOBILE
 ============================================================ */
 
-@media (max-width: 340px) {
-
+@media (max-width: 360px) {
   .ventures-container {
-    width: calc(100% - 18px);
+    width:
+      calc(100% - 20px);
   }
 
   .ventures-hero {
@@ -1726,39 +2270,27 @@
   }
 
   .ventures-hero__inner {
-    gap: 24px;
-
-    padding-top: 76px;
-    padding-bottom: 26px;
+    padding-top: 82px;
+    padding-bottom: 28px;
   }
 
   .ventures-eyebrow {
-    font-size: 0.62rem;
+    font-size: 0.63rem;
   }
 
   .ventures-hero__content h1 {
-    font-size: 2.4rem;
-  }
-
-  .ventures-hero__content p {
-    margin-top: 18px;
-    margin-bottom: 22px;
-
-    font-size: 0.84rem;
-  }
-
-  .ventures-hero__belief > span {
-    margin-bottom: 12px;
-
-    font-size: 0.61rem;
+    font-size: 2.55rem;
   }
 
   .ventures-hero__belief strong {
-    font-size: 1.85rem;
+    font-size: 1.95rem;
   }
 
-  .ventures-hero__belief p {
-    font-size: 0.82rem;
+  .ventures-section-header h2,
+  .ventures-journey__heading h2,
+  .ventures-ecosystem__content h2,
+  .ventures-final h2 {
+    font-size: 2.45rem;
   }
 
   .venture-card__top {
@@ -1771,42 +2303,99 @@
     text-align: left;
   }
 
-  .venture-card__footer {
-    grid-template-columns: 1fr;
+  .ventures-ecosystem__network {
+    grid-template-columns:
+      1fr;
+  }
+
+  .ecosystem-network__center,
+  .ecosystem-network__item {
+    min-height: 125px;
+  }
+
+  .ventures-button {
+    font-size: 0.66rem;
+  }
+}
+
+/* ============================================================
+   320PX / EXTRA NARROW
+============================================================ */
+
+@media (max-width: 340px) {
+  .ventures-container {
+    width:
+      calc(100% - 18px);
+  }
+
+  .ventures-hero {
+    min-height: 610px;
+  }
+
+  .ventures-hero__inner {
+    gap: 22px;
+
+    padding-top: 76px;
+    padding-bottom: 25px;
+  }
+
+  .ventures-hero__content h1 {
+    font-size: 2.3rem;
+  }
+
+  .ventures-hero__content p {
+    margin-top: 17px;
+    margin-bottom: 20px;
+
+    font-size: 0.82rem;
+  }
+
+  .ventures-hero__belief > span {
+    margin-bottom: 10px;
+
+    font-size: 0.6rem;
+  }
+
+  .ventures-hero__belief strong {
+    font-size: 1.75rem;
+  }
+
+  .ventures-hero__belief p {
+    font-size: 0.78rem;
   }
 
   .ventures-section-header h2,
   .ventures-journey__heading h2,
   .ventures-ecosystem__content h2,
   .ventures-final h2 {
-    font-size: 2.3rem;
+    font-size: 2.2rem;
   }
 
-  .ventures-button {
-    min-height: 54px;
-
-    padding: 0 16px;
-
-    font-size: 0.66rem;
+  .venture-card {
+    padding: 18px;
   }
 
+  .venture-card h3 {
+    font-size: 1.6rem;
+  }
 }
-
 
 /* ============================================================
    LANDSCAPE PHONES
 ============================================================ */
 
-@media (max-width: 900px)
-       and (max-height: 520px)
-       and (orientation: landscape) {
+@media
+  (max-width: 900px)
+  and (max-height: 520px)
+  and (orientation: landscape) {
 
   .ventures-hero {
     min-height: 520px;
   }
 
   .ventures-hero__background {
-    background-position: 67% center;
+    background-position:
+      67% center;
   }
 
   .ventures-hero__inner {
@@ -1818,14 +2407,19 @@
 
     align-items: center;
 
-    padding-top: 55px;
+    padding-top: 65px;
     padding-bottom: 35px;
   }
 
   .ventures-hero__content h1 {
     margin-top: 12px;
 
-    font-size: clamp(2.5rem, 6vw, 3.8rem);
+    font-size:
+      clamp(
+        2.5rem,
+        6vw,
+        3.8rem
+      );
   }
 
   .ventures-hero__content p {
@@ -1833,16 +2427,29 @@
     margin-bottom: 18px;
 
     font-size: 0.82rem;
+
     line-height: 1.5;
   }
 
   .ventures-hero__belief {
     margin-left: auto;
 
-    padding: 20px 0 8px 22px;
+    padding:
+      20px
+      0
+      8px
+      22px;
 
     border-top: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.35);
+
+    border-left:
+      1px solid
+      rgba(
+        255,
+        255,
+        255,
+        0.35
+      );
   }
 
   .ventures-hero__belief strong {
@@ -1853,18 +2460,16 @@
     margin-top: 14px;
 
     font-size: 0.78rem;
+
     line-height: 1.5;
   }
-
 }
 
-
 /* ============================================================
-   TOUCH DEVICES
+   TOUCH
 ============================================================ */
 
 @media (hover: none) {
-
   .ventures-button:hover {
     transform: none;
   }
@@ -1876,68 +2481,62 @@
   }
 
   .venture-card:hover {
-    background: #fff;
+    background: #ffffff;
 
     box-shadow: none;
   }
 
   .venture-journey-step:hover {
-    background: rgba(255, 255, 255, 0.62);
+    background:
+      rgba(
+        255,
+        255,
+        255,
+        0.62
+      );
   }
 
   .ecosystem-network__item:hover {
-    background: var(--ventures-navy-deep);
+    background:
+      var(--ventures-navy-deep);
   }
-
 }
 
-
 /* ============================================================
-   KEYBOARD FOCUS
+   ACCESSIBILITY
 ============================================================ */
 
 .ventures-button:focus-visible,
 .venture-filter:focus-visible,
 .ventures-search:focus-within,
 .venture-card__link:focus-visible,
-.ventures-text-link:focus-visible {
-  outline: 2px solid var(--ventures-gold);
+.ventures-text-link:focus-visible,
+.ventures-retry:focus-visible {
+  outline:
+    2px solid
+    var(--ventures-gold);
+
   outline-offset: 3px;
 }
-
-
-/* ============================================================
-   HIGH CONTRAST
-============================================================ */
-
-@media (prefers-contrast: more) {
-
-  .ventures-hero__content p,
-  .ventures-hero__belief p,
-  .ventures-ecosystem__content p {
-    color: #fff;
-  }
-
-  .ventures-muted {
-    color: var(--ventures-text);
-  }
-
-}
-
 
 /* ============================================================
    REDUCED MOTION
 ============================================================ */
 
-@media (prefers-reduced-motion: reduce) {
+@media
+  (prefers-reduced-motion: reduce) {
 
   .ventures-page *,
   .ventures-page *::before,
   .ventures-page *::after {
-    scroll-behavior: auto !important;
+    scroll-behavior:
+      auto !important;
 
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
   }
 
   .ventures-button,
@@ -1955,27 +2554,29 @@
     transform: none;
   }
 
+  .ventures-loader {
+    animation: none;
+  }
 }
-
 
 /* ============================================================
    PRINT
 ============================================================ */
 
 @media print {
-
   .ventures-page {
-    background: #fff;
+    background: #ffffff;
 
-    color: #000;
+    color: #000000;
   }
 
   .ventures-hero {
     min-height: auto;
 
-    background: #fff;
+    background: #ffffff;
 
-    border-bottom: 1px solid #ccc;
+    border-bottom:
+      1px solid #cccccc;
   }
 
   .ventures-hero__background,
@@ -1993,15 +2594,18 @@
   .ventures-hero__content p,
   .ventures-hero__belief strong,
   .ventures-hero__belief p {
-    color: #000;
+    color: #000000;
   }
 
   .ventures-hero__belief {
     margin: 30px 0 0;
+
     padding: 20px 0 0;
 
     border-left: 0;
-    border-top: 1px solid #ccc;
+
+    border-top:
+      1px solid #cccccc;
   }
 
   .ventures-toolbar {
@@ -2009,34 +2613,37 @@
   }
 
   .ventures-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(
+        2,
+        1fr
+      );
   }
 
   .ventures-ecosystem {
-    background: #fff;
+    background: #ffffff;
   }
 
   .ventures-ecosystem__content h2,
   .ventures-ecosystem__content p {
-    color: #000;
+    color: #000000;
   }
 
   .ventures-ecosystem__network {
-    border-color: #ccc;
+    border-color: #cccccc;
 
-    background: #ccc;
+    background: #cccccc;
   }
 
   .ecosystem-network__center,
   .ecosystem-network__item {
-    background: #fff;
+    background: #ffffff;
 
-    color: #000;
+    color: #000000;
   }
 
   .venture-card,
   .venture-journey-step {
     break-inside: avoid;
   }
-
 }

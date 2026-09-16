@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 
 const {
   getPublishedVentures,
@@ -16,6 +17,205 @@ const {
 
 const router =
   express.Router();
+
+
+/* ============================================================
+   FILE UPLOAD CONFIGURATION
+============================================================ */
+
+const ALLOWED_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ]);
+
+
+const upload =
+  multer({
+    storage:
+      multer.memoryStorage(),
+
+    limits: {
+      fileSize:
+        5 * 1024 * 1024,
+
+      files:
+        32,
+    },
+
+    fileFilter:
+      (
+        req,
+        file,
+        callback
+      ) => {
+
+        if (
+          !ALLOWED_IMAGE_TYPES.has(
+            file.mimetype
+          )
+        ) {
+
+          return callback(
+            new Error(
+              "Only JPG, PNG and WebP images are allowed."
+            )
+          );
+
+        }
+
+
+        return callback(
+          null,
+          true
+        );
+
+      },
+  });
+
+
+/* ============================================================
+   VENTURE IMAGE FIELDS
+
+   logo
+   heroImage
+   founderImages
+============================================================ */
+
+const ventureImageUpload =
+  upload.fields([
+    {
+      name:
+        "logo",
+
+      maxCount:
+        1,
+    },
+
+    {
+      name:
+        "heroImage",
+
+      maxCount:
+        1,
+    },
+
+    {
+      name:
+        "founderImages",
+
+      maxCount:
+        30,
+    },
+  ]);
+
+
+/* ============================================================
+   MULTER ERROR HANDLER
+============================================================ */
+
+function handleVentureUpload(
+  req,
+  res,
+  next
+) {
+
+  ventureImageUpload(
+    req,
+    res,
+    (error) => {
+
+      if (!error) {
+
+        return next();
+
+      }
+
+
+      console.error(
+        "Venture upload error:",
+        error
+      );
+
+
+      if (
+        error instanceof
+        multer.MulterError
+      ) {
+
+        if (
+          error.code ===
+          "LIMIT_FILE_SIZE"
+        ) {
+
+          return res
+            .status(400)
+            .json({
+              success:
+                false,
+
+              message:
+                "Each image must be 5 MB or smaller.",
+            });
+
+        }
+
+
+        if (
+          error.code ===
+          "LIMIT_FILE_COUNT"
+        ) {
+
+          return res
+            .status(400)
+            .json({
+              success:
+                false,
+
+              message:
+                "Too many venture images were uploaded.",
+            });
+
+        }
+
+
+        if (
+          error.code ===
+          "LIMIT_UNEXPECTED_FILE"
+        ) {
+
+          return res
+            .status(400)
+            .json({
+              success:
+                false,
+
+              message:
+                "An unexpected venture image field was uploaded.",
+            });
+
+        }
+
+      }
+
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            error.message ||
+            "Unable to process the venture images.",
+        });
+
+    }
+  );
+
+}
 
 
 /* ============================================================
@@ -55,6 +255,7 @@ router.get(
 router.post(
   "/",
   requireAdmin,
+  handleVentureUpload,
   createVenture
 );
 
@@ -68,6 +269,7 @@ router.post(
 router.patch(
   "/:id",
   requireAdmin,
+  handleVentureUpload,
   updateVenture
 );
 
@@ -91,8 +293,7 @@ router.delete(
    GET /api/ventures/:slug
 
    IMPORTANT:
-   Keep this route LAST so that /directory is never interpreted
-   as a venture slug.
+   Keep this LAST.
 ============================================================ */
 
 router.get(

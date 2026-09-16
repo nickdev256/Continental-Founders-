@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+const path = require("path");
 const { z } = require("zod");
 
 const {
@@ -11,6 +13,9 @@ const {
 
 const VENTURES_TABLE =
   "ventures";
+
+const VENTURE_IMAGES_BUCKET =
+  "venture-images";
 
 
 /* ============================================================
@@ -52,33 +57,21 @@ const founderSchema =
         .trim()
         .max(5000)
         .default(""),
+
+    removeImage:
+      z
+        .boolean()
+        .optional()
+        .default(false),
   });
 
-
-/*
- * Opportunity areas are intentionally flexible.
- *
- * The CMS can currently send either:
- *
- * "Problem"
- *
- * or:
- *
- * {
- *   title: "Problem",
- *   description: "..."
- * }
- *
- * This gives us room to improve the CMS later without
- * breaking existing venture records.
- */
 
 const opportunityAreaSchema =
   z.union([
     z
       .string()
       .trim()
-      .max(500),
+      .max(5000),
 
     z.object({
       title:
@@ -88,12 +81,19 @@ const opportunityAreaSchema =
           .max(180)
           .default(""),
 
+      text:
+        z
+          .string()
+          .trim()
+          .max(10000)
+          .default(""),
+
       description:
         z
           .string()
           .trim()
-          .max(5000)
-          .default(""),
+          .max(10000)
+          .optional(),
 
       label:
         z
@@ -106,7 +106,7 @@ const opportunityAreaSchema =
         z
           .string()
           .trim()
-          .max(5000)
+          .max(10000)
           .optional(),
     }),
   ]);
@@ -114,7 +114,6 @@ const opportunityAreaSchema =
 
 const ventureCreateSchema =
   z.object({
-
     name:
       z
         .string()
@@ -262,30 +261,16 @@ const ventureCreateSchema =
 
     logoUrl:
       z
-        .union([
-          z
-            .string()
-            .trim()
-            .url(
-              "Logo URL must be valid."
-            ),
-
-          z.literal(""),
-        ])
+        .string()
+        .trim()
+        .max(2000)
         .default(""),
 
     heroImageUrl:
       z
-        .union([
-          z
-            .string()
-            .trim()
-            .url(
-              "Hero image URL must be valid."
-            ),
-
-          z.literal(""),
-        ])
+        .string()
+        .trim()
+        .max(2000)
         .default(""),
 
     founders:
@@ -333,19 +318,37 @@ const ventureCreateSchema =
           "published",
           "archived",
         ])
-        .default(
-          "draft"
-        ),
+        .default("draft"),
+
+    removeLogo:
+      z
+        .boolean()
+        .optional()
+        .default(false),
+
+    removeHeroImage:
+      z
+        .boolean()
+        .optional()
+        .default(false),
+
+    founderImageIndexes:
+      z
+        .array(
+          z.number().int().min(0)
+        )
+        .max(30)
+        .optional()
+        .default([]),
   });
 
 
 const ventureUpdateSchema =
-  ventureCreateSchema
-    .partial();
+  ventureCreateSchema.partial();
 
 
 /* ============================================================
-   HELPERS
+   NORMALIZE VENTURE
 ============================================================ */
 
 function normalizeVenture(
@@ -358,7 +361,6 @@ function normalizeVenture(
 
 
   return {
-
     id:
       venture.id,
 
@@ -483,6 +485,268 @@ function normalizeVenture(
 
 
 /* ============================================================
+   BOOLEAN PARSER
+============================================================ */
+
+function parseBoolean(
+  value
+) {
+
+  if (
+    typeof value ===
+    "boolean"
+  ) {
+    return value;
+  }
+
+
+  if (
+    typeof value ===
+    "number"
+  ) {
+    return value === 1;
+  }
+
+
+  if (
+    typeof value ===
+    "string"
+  ) {
+
+    const normalized =
+      value
+        .trim()
+        .toLowerCase();
+
+
+    return [
+      "true",
+      "1",
+      "yes",
+      "on",
+    ].includes(
+      normalized
+    );
+
+  }
+
+
+  return false;
+
+}
+
+
+/* ============================================================
+   JSON PARSER
+============================================================ */
+
+function parseJsonField(
+  value,
+  fallback
+) {
+
+  if (
+    value ===
+    undefined ||
+    value ===
+    null ||
+    value ===
+    ""
+  ) {
+    return fallback;
+  }
+
+
+  if (
+    typeof value !==
+    "string"
+  ) {
+    return value;
+  }
+
+
+  try {
+
+    return JSON.parse(
+      value
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Unable to parse venture JSON field:",
+      error
+    );
+
+
+    return fallback;
+
+  }
+
+}
+
+
+/* ============================================================
+   NORMALIZE REQUEST BODY
+============================================================ */
+
+function normalizeRequestBody(
+  body = {}
+) {
+
+  const normalized = {
+    ...body,
+  };
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "founders"
+    )
+  ) {
+
+    normalized.founders =
+      parseJsonField(
+        body.founders,
+        []
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "services"
+    )
+  ) {
+
+    normalized.services =
+      parseJsonField(
+        body.services,
+        []
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "lookingFor"
+    )
+  ) {
+
+    normalized.lookingFor =
+      parseJsonField(
+        body.lookingFor,
+        []
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "opportunityAreas"
+    )
+  ) {
+
+    normalized.opportunityAreas =
+      parseJsonField(
+        body.opportunityAreas,
+        []
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "founderImageIndexes"
+    )
+  ) {
+
+    normalized.founderImageIndexes =
+      parseJsonField(
+        body.founderImageIndexes,
+        []
+      )
+        .map(
+          (value) =>
+            Number(value)
+        )
+        .filter(
+          (value) =>
+            Number.isInteger(
+              value
+            ) &&
+            value >= 0
+        );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "removeLogo"
+    )
+  ) {
+
+    normalized.removeLogo =
+      parseBoolean(
+        body.removeLogo
+      );
+
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "removeHeroImage"
+    )
+  ) {
+
+    normalized.removeHeroImage =
+      parseBoolean(
+        body.removeHeroImage
+      );
+
+  }
+
+
+  if (
+    Array.isArray(
+      normalized.founders
+    )
+  ) {
+
+    normalized.founders =
+      normalized.founders.map(
+        (founder) => ({
+          ...founder,
+
+          removeImage:
+            parseBoolean(
+              founder?.removeImage
+            ),
+        })
+      );
+
+  }
+
+
+  return normalized;
+
+}
+
+
+/* ============================================================
    CLEAN STRING ARRAY
 ============================================================ */
 
@@ -495,9 +759,7 @@ function cleanStringArray(
       values
     )
   ) {
-
     return [];
-
   }
 
 
@@ -534,9 +796,7 @@ function cleanFounders(
       founders
     )
   ) {
-
     return [];
-
   }
 
 
@@ -589,9 +849,7 @@ function cleanOpportunityAreas(
       areas
     )
   ) {
-
     return [];
-
   }
 
 
@@ -604,7 +862,22 @@ function cleanOpportunityAreas(
           "string"
         ) {
 
-          return area.trim();
+          const value =
+            area.trim();
+
+
+          if (!value) {
+            return null;
+          }
+
+
+          return {
+            title:
+              value,
+
+            text:
+              "",
+          };
 
         }
 
@@ -616,7 +889,6 @@ function cleanOpportunityAreas(
         ) {
 
           return {
-
             title:
               String(
                 area.title ||
@@ -624,8 +896,9 @@ function cleanOpportunityAreas(
                 ""
               ).trim(),
 
-            description:
+            text:
               String(
+                area.text ||
                 area.description ||
                 area.value ||
                 ""
@@ -640,32 +913,633 @@ function cleanOpportunityAreas(
       }
     )
     .filter(
-      (area) => {
-
-        if (!area) {
-          return false;
-        }
-
-
-        if (
-          typeof area ===
-          "string"
-        ) {
-
-          return Boolean(
-            area
-          );
-
-        }
-
-
-        return Boolean(
+      (area) =>
+        area &&
+        (
           area.title ||
-          area.description
+          area.text
+        )
+    );
+
+}
+
+
+/* ============================================================
+   FILE EXTENSION
+============================================================ */
+
+function getFileExtension(
+  file
+) {
+
+  const mimeExtensions = {
+    "image/jpeg":
+      ".jpg",
+
+    "image/jpg":
+      ".jpg",
+
+    "image/png":
+      ".png",
+
+    "image/webp":
+      ".webp",
+  };
+
+
+  if (
+    mimeExtensions[
+      file?.mimetype
+    ]
+  ) {
+
+    return mimeExtensions[
+      file.mimetype
+    ];
+
+  }
+
+
+  const originalExtension =
+    path
+      .extname(
+        file?.originalname ||
+        ""
+      )
+      .toLowerCase();
+
+
+  if (
+    [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+    ].includes(
+      originalExtension
+    )
+  ) {
+
+    return originalExtension ===
+      ".jpeg"
+      ? ".jpg"
+      : originalExtension;
+
+  }
+
+
+  return ".jpg";
+
+}
+
+
+/* ============================================================
+   SAFE SLUG
+============================================================ */
+
+function safeStorageName(
+  value
+) {
+
+  return String(
+    value ||
+    "venture"
+  )
+    .trim()
+    .toLowerCase()
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+    .replace(
+      /^-+|-+$/g,
+      ""
+    )
+    .slice(
+      0,
+      120
+    ) ||
+    "venture";
+
+}
+
+
+/* ============================================================
+   STORAGE FILE PATH
+============================================================ */
+
+function createStoragePath(
+  folder,
+  ventureSlug,
+  file
+) {
+
+  const extension =
+    getFileExtension(
+      file
+    );
+
+
+  const uniqueId =
+    crypto
+      .randomBytes(12)
+      .toString("hex");
+
+
+  return [
+    "ventures",
+    folder,
+    safeStorageName(
+      ventureSlug
+    ),
+    `${Date.now()}-${uniqueId}${extension}`,
+  ].join("/");
+
+}
+
+
+/* ============================================================
+   UPLOAD IMAGE
+============================================================ */
+
+async function uploadVentureImage(
+  file,
+  folder,
+  ventureSlug
+) {
+
+  if (
+    !file?.buffer
+  ) {
+
+    throw new Error(
+      "The uploaded image is invalid."
+    );
+
+  }
+
+
+  const storagePath =
+    createStoragePath(
+      folder,
+      ventureSlug,
+      file
+    );
+
+
+  const {
+    error:
+      uploadError,
+  } =
+    await supabaseAdmin
+      .storage
+      .from(
+        VENTURE_IMAGES_BUCKET
+      )
+      .upload(
+        storagePath,
+        file.buffer,
+        {
+          contentType:
+            file.mimetype,
+
+          cacheControl:
+            "3600",
+
+          upsert:
+            false,
+        }
+      );
+
+
+  if (
+    uploadError
+  ) {
+
+    console.error(
+      "Venture image upload error:",
+      uploadError
+    );
+
+
+    throw new Error(
+      "Unable to upload the venture image."
+    );
+
+  }
+
+
+  const {
+    data:
+      publicUrlData,
+  } =
+    supabaseAdmin
+      .storage
+      .from(
+        VENTURE_IMAGES_BUCKET
+      )
+      .getPublicUrl(
+        storagePath
+      );
+
+
+  const publicUrl =
+    publicUrlData
+      ?.publicUrl ||
+    "";
+
+
+  if (
+    !publicUrl
+  ) {
+
+    await supabaseAdmin
+      .storage
+      .from(
+        VENTURE_IMAGES_BUCKET
+      )
+      .remove([
+        storagePath,
+      ]);
+
+
+    throw new Error(
+      "Unable to generate the venture image URL."
+    );
+
+  }
+
+
+  return {
+    path:
+      storagePath,
+
+    publicUrl,
+  };
+
+}
+
+
+/* ============================================================
+   GET STORAGE PATH FROM PUBLIC URL
+============================================================ */
+
+function getStoragePathFromUrl(
+  publicUrl
+) {
+
+  if (
+    !publicUrl ||
+    typeof publicUrl !==
+    "string"
+  ) {
+    return "";
+  }
+
+
+  try {
+
+    const url =
+      new URL(
+        publicUrl
+      );
+
+
+    const pathname =
+      decodeURIComponent(
+        url.pathname
+      );
+
+
+    const markers = [
+      `/storage/v1/object/public/${VENTURE_IMAGES_BUCKET}/`,
+      `/storage/v1/object/sign/${VENTURE_IMAGES_BUCKET}/`,
+      `/storage/v1/object/${VENTURE_IMAGES_BUCKET}/`,
+    ];
+
+
+    for (
+      const marker
+      of markers
+    ) {
+
+      const index =
+        pathname.indexOf(
+          marker
         );
 
+
+      if (
+        index !== -1
+      ) {
+
+        return pathname
+          .slice(
+            index +
+            marker.length
+          )
+          .replace(
+            /^\/+/,
+            ""
+          );
+
       }
+
+    }
+
+
+    return "";
+
+  } catch (error) {
+
+    return "";
+
+  }
+
+}
+
+
+/* ============================================================
+   DELETE STORAGE FILE
+============================================================ */
+
+async function deleteStorageFileByUrl(
+  publicUrl
+) {
+
+  const storagePath =
+    getStoragePathFromUrl(
+      publicUrl
     );
+
+
+  if (
+    !storagePath
+  ) {
+
+    return false;
+
+  }
+
+
+  const {
+    error,
+  } =
+    await supabaseAdmin
+      .storage
+      .from(
+        VENTURE_IMAGES_BUCKET
+      )
+      .remove([
+        storagePath,
+      ]);
+
+
+  if (
+    error
+  ) {
+
+    console.error(
+      "Delete venture storage file error:",
+      error
+    );
+
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* ============================================================
+   DELETE MULTIPLE STORAGE URLS
+============================================================ */
+
+async function deleteStorageUrls(
+  urls
+) {
+
+  const uniqueUrls =
+    Array.from(
+      new Set(
+        (
+          urls ||
+          []
+        )
+          .filter(Boolean)
+      )
+    );
+
+
+  for (
+    const url
+    of uniqueUrls
+  ) {
+
+    try {
+
+      await deleteStorageFileByUrl(
+        url
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Venture storage cleanup error:",
+        error
+      );
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   FILE HELPERS
+============================================================ */
+
+function getSingleFile(
+  req,
+  fieldName
+) {
+
+  const files =
+    req.files?.[
+      fieldName
+    ];
+
+
+  if (
+    Array.isArray(
+      files
+    ) &&
+    files.length > 0
+  ) {
+
+    return files[0];
+
+  }
+
+
+  return null;
+
+}
+
+
+function getMultipleFiles(
+  req,
+  fieldName
+) {
+
+  const files =
+    req.files?.[
+      fieldName
+    ];
+
+
+  return Array.isArray(
+    files
+  )
+    ? files
+    : [];
+
+}
+
+
+/* ============================================================
+   APPLY FOUNDER IMAGE UPLOADS
+============================================================ */
+
+async function applyFounderImages({
+  founders,
+  founderFiles,
+  founderImageIndexes,
+  ventureSlug,
+}) {
+
+  const updatedFounders =
+    Array.isArray(
+      founders
+    )
+      ? founders.map(
+          (founder) => ({
+            ...founder,
+          })
+        )
+      : [];
+
+
+  const uploadedUrls =
+    [];
+
+
+  for (
+    let fileIndex = 0;
+    fileIndex <
+      founderFiles.length;
+    fileIndex += 1
+  ) {
+
+    const founderIndex =
+      Number(
+        founderImageIndexes[
+          fileIndex
+        ]
+      );
+
+
+    if (
+      !Number.isInteger(
+        founderIndex
+      ) ||
+      founderIndex < 0 ||
+      founderIndex >=
+        updatedFounders.length
+    ) {
+
+      throw new Error(
+        "A founder image could not be matched to a founder."
+      );
+
+    }
+
+
+    const uploaded =
+      await uploadVentureImage(
+        founderFiles[
+          fileIndex
+        ],
+        "founders",
+        ventureSlug
+      );
+
+
+    uploadedUrls.push(
+      uploaded.publicUrl
+    );
+
+
+    updatedFounders[
+      founderIndex
+    ].image =
+      uploaded.publicUrl;
+
+  }
+
+
+  return {
+    founders:
+      updatedFounders,
+
+    uploadedUrls,
+  };
+
+}
+
+
+/* ============================================================
+   VALIDATION ERROR
+============================================================ */
+
+function sendValidationError(
+  res,
+  parsed
+) {
+
+  const issues =
+    parsed.error?.issues ||
+    [];
+
+
+  return res
+    .status(400)
+    .json({
+      success:
+        false,
+
+      message:
+        issues[0]?.message ||
+        "Please check the venture information.",
+
+      errors:
+        issues.map(
+          (issue) => ({
+            field:
+              issue.path.join(
+                "."
+              ),
+
+            message:
+              issue.message,
+          })
+        ),
+    });
 
 }
 
@@ -684,7 +1558,6 @@ function buildCreatePayload(
 
 
   return {
-
     name:
       input.name,
 
@@ -802,7 +1675,6 @@ function buildUpdatePayload(
 ) {
 
   const payload = {
-
     updated_at:
       new Date()
         .toISOString(),
@@ -813,10 +1685,8 @@ function buildUpdatePayload(
     input.name !==
     undefined
   ) {
-
     payload.name =
       input.name;
-
   }
 
 
@@ -824,10 +1694,8 @@ function buildUpdatePayload(
     input.slug !==
     undefined
   ) {
-
     payload.slug =
       input.slug;
-
   }
 
 
@@ -835,10 +1703,8 @@ function buildUpdatePayload(
     input.sector !==
     undefined
   ) {
-
     payload.sector =
       input.sector;
-
   }
 
 
@@ -846,10 +1712,8 @@ function buildUpdatePayload(
     input.country !==
     undefined
   ) {
-
     payload.country =
       input.country;
-
   }
 
 
@@ -857,10 +1721,8 @@ function buildUpdatePayload(
     input.stage !==
     undefined
   ) {
-
     payload.stage =
       input.stage;
-
   }
 
 
@@ -868,10 +1730,8 @@ function buildUpdatePayload(
     input.tagline !==
     undefined
   ) {
-
     payload.tagline =
       input.tagline;
-
   }
 
 
@@ -879,10 +1739,8 @@ function buildUpdatePayload(
     input.description !==
     undefined
   ) {
-
     payload.description =
       input.description;
-
   }
 
 
@@ -890,10 +1748,8 @@ function buildUpdatePayload(
     input.longDescription !==
     undefined
   ) {
-
     payload.long_description =
       input.longDescription;
-
   }
 
 
@@ -901,10 +1757,8 @@ function buildUpdatePayload(
     input.secondaryDescription !==
     undefined
   ) {
-
     payload.secondary_description =
       input.secondaryDescription;
-
   }
 
 
@@ -912,10 +1766,8 @@ function buildUpdatePayload(
     input.problem !==
     undefined
   ) {
-
     payload.problem =
       input.problem;
-
   }
 
 
@@ -923,10 +1775,8 @@ function buildUpdatePayload(
     input.solution !==
     undefined
   ) {
-
     payload.solution =
       input.solution;
-
   }
 
 
@@ -934,10 +1784,8 @@ function buildUpdatePayload(
     input.market !==
     undefined
   ) {
-
     payload.market =
       input.market;
-
   }
 
 
@@ -945,10 +1793,8 @@ function buildUpdatePayload(
     input.website !==
     undefined
   ) {
-
     payload.website =
       input.website;
-
   }
 
 
@@ -956,10 +1802,8 @@ function buildUpdatePayload(
     input.email !==
     undefined
   ) {
-
     payload.email =
       input.email;
-
   }
 
 
@@ -967,10 +1811,8 @@ function buildUpdatePayload(
     input.phone !==
     undefined
   ) {
-
     payload.phone =
       input.phone;
-
   }
 
 
@@ -978,10 +1820,8 @@ function buildUpdatePayload(
     input.secondaryPhone !==
     undefined
   ) {
-
     payload.secondary_phone =
       input.secondaryPhone;
-
   }
 
 
@@ -989,10 +1829,8 @@ function buildUpdatePayload(
     input.logoUrl !==
     undefined
   ) {
-
     payload.logo_url =
       input.logoUrl;
-
   }
 
 
@@ -1000,10 +1838,8 @@ function buildUpdatePayload(
     input.heroImageUrl !==
     undefined
   ) {
-
     payload.hero_image_url =
       input.heroImageUrl;
-
   }
 
 
@@ -1068,11 +1904,6 @@ function buildUpdatePayload(
       input.status;
 
 
-    /*
-     * Set the publication timestamp only
-     * when a venture becomes published.
-     */
-
     if (
       input.status ===
         "published" &&
@@ -1086,12 +1917,6 @@ function buildUpdatePayload(
 
     }
 
-
-    /*
-     * A draft/archived venture should
-     * no longer have an active
-     * publication timestamp.
-     */
 
     if (
       input.status !==
@@ -1112,50 +1937,7 @@ function buildUpdatePayload(
 
 
 /* ============================================================
-   VALIDATION ERROR
-============================================================ */
-
-function sendValidationError(
-  res,
-  parsed
-) {
-
-  const issues =
-    parsed.error?.issues ||
-    [];
-
-
-  return res
-    .status(400)
-    .json({
-
-      success:
-        false,
-
-      message:
-        issues[0]?.message ||
-        "Please check the venture information.",
-
-      errors:
-        issues.map(
-          (issue) => ({
-            field:
-              issue.path.join(
-                "."
-              ),
-
-            message:
-              issue.message,
-          })
-        ),
-    });
-
-}
-
-
-/* ============================================================
    GET PUBLISHED VENTURES
-   PUBLIC
 ============================================================ */
 
 async function getPublishedVentures(
@@ -1201,7 +1983,6 @@ async function getPublishedVentures(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1215,7 +1996,6 @@ async function getPublishedVentures(
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1239,7 +2019,6 @@ async function getPublishedVentures(
     return res
       .status(500)
       .json({
-
         success:
           false,
 
@@ -1254,7 +2033,6 @@ async function getPublishedVentures(
 
 /* ============================================================
    GET PUBLISHED VENTURE BY SLUG
-   PUBLIC
 ============================================================ */
 
 async function getPublishedVentureBySlug(
@@ -1278,7 +2056,6 @@ async function getPublishedVentureBySlug(
       return res
         .status(400)
         .json({
-
           success:
             false,
 
@@ -1320,7 +2097,6 @@ async function getPublishedVentureBySlug(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1336,7 +2112,6 @@ async function getPublishedVentureBySlug(
       return res
         .status(404)
         .json({
-
           success:
             false,
 
@@ -1350,7 +2125,6 @@ async function getPublishedVentureBySlug(
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1371,7 +2145,6 @@ async function getPublishedVentureBySlug(
     return res
       .status(500)
       .json({
-
         success:
           false,
 
@@ -1424,7 +2197,6 @@ async function getVenturesDirectory(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1438,7 +2210,6 @@ async function getVenturesDirectory(
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1462,7 +2233,6 @@ async function getVenturesDirectory(
     return res
       .status(500)
       .json({
-
         success:
           false,
 
@@ -1484,12 +2254,22 @@ async function createVenture(
   res
 ) {
 
+  const uploadedUrls =
+    [];
+
+
   try {
+
+    const normalizedBody =
+      normalizeRequestBody(
+        req.body
+      );
+
 
     const parsed =
       ventureCreateSchema
         .safeParse(
-          req.body
+          normalizedBody
         );
 
 
@@ -1505,8 +2285,9 @@ async function createVenture(
     }
 
 
-    const input =
-      parsed.data;
+    const input = {
+      ...parsed.data,
+    };
 
 
     /* ----------------------------------------------------------
@@ -1534,7 +2315,9 @@ async function createVenture(
         .maybeSingle();
 
 
-    if (duplicateError) {
+    if (
+      duplicateError
+    ) {
 
       console.error(
         "Check venture slug error:",
@@ -1545,7 +2328,6 @@ async function createVenture(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1563,7 +2345,6 @@ async function createVenture(
       return res
         .status(409)
         .json({
-
           success:
             false,
 
@@ -1573,6 +2354,120 @@ async function createVenture(
 
     }
 
+
+    /* ----------------------------------------------------------
+       LOGO
+    ---------------------------------------------------------- */
+
+    const logoFile =
+      getSingleFile(
+        req,
+        "logo"
+      );
+
+
+    if (
+      logoFile
+    ) {
+
+      const uploaded =
+        await uploadVentureImage(
+          logoFile,
+          "logos",
+          input.slug
+        );
+
+
+      input.logoUrl =
+        uploaded.publicUrl;
+
+
+      uploadedUrls.push(
+        uploaded.publicUrl
+      );
+
+    }
+
+
+    /* ----------------------------------------------------------
+       HERO IMAGE
+    ---------------------------------------------------------- */
+
+    const heroFile =
+      getSingleFile(
+        req,
+        "heroImage"
+      );
+
+
+    if (
+      heroFile
+    ) {
+
+      const uploaded =
+        await uploadVentureImage(
+          heroFile,
+          "heroes",
+          input.slug
+        );
+
+
+      input.heroImageUrl =
+        uploaded.publicUrl;
+
+
+      uploadedUrls.push(
+        uploaded.publicUrl
+      );
+
+    }
+
+
+    /* ----------------------------------------------------------
+       FOUNDER IMAGES
+    ---------------------------------------------------------- */
+
+    const founderFiles =
+      getMultipleFiles(
+        req,
+        "founderImages"
+      );
+
+
+    if (
+      founderFiles.length >
+      0
+    ) {
+
+      const founderResult =
+        await applyFounderImages({
+          founders:
+            input.founders,
+
+          founderFiles,
+
+          founderImageIndexes:
+            input.founderImageIndexes,
+
+          ventureSlug:
+            input.slug,
+        });
+
+
+      input.founders =
+        founderResult.founders;
+
+
+      uploadedUrls.push(
+        ...founderResult.uploadedUrls
+      );
+
+    }
+
+
+    /* ----------------------------------------------------------
+       INSERT DATABASE RECORD
+    ---------------------------------------------------------- */
 
     const payload =
       buildCreatePayload(
@@ -1595,7 +2490,9 @@ async function createVenture(
         .single();
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
       console.error(
         "Create venture error:",
@@ -1603,10 +2500,14 @@ async function createVenture(
       );
 
 
+      await deleteStorageUrls(
+        uploadedUrls
+      );
+
+
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1620,7 +2521,6 @@ async function createVenture(
     return res
       .status(201)
       .json({
-
         success:
           true,
 
@@ -1641,14 +2541,19 @@ async function createVenture(
     );
 
 
+    await deleteStorageUrls(
+      uploadedUrls
+    );
+
+
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
+          error?.message ||
           "Unable to create the venture.",
       });
 
@@ -1666,6 +2571,10 @@ async function updateVenture(
   res
 ) {
 
+  const newlyUploadedUrls =
+    [];
+
+
   try {
 
     const id =
@@ -1680,7 +2589,6 @@ async function updateVenture(
       return res
         .status(400)
         .json({
-
           success:
             false,
 
@@ -1691,10 +2599,16 @@ async function updateVenture(
     }
 
 
+    const normalizedBody =
+      normalizeRequestBody(
+        req.body
+      );
+
+
     const parsed =
       ventureUpdateSchema
         .safeParse(
-          req.body
+          normalizedBody
         );
 
 
@@ -1710,12 +2624,13 @@ async function updateVenture(
     }
 
 
-    const input =
-      parsed.data;
+    const input = {
+      ...parsed.data,
+    };
 
 
     /* ----------------------------------------------------------
-       LOAD CURRENT RECORD
+       LOAD CURRENT VENTURE
     ---------------------------------------------------------- */
 
     const {
@@ -1737,7 +2652,9 @@ async function updateVenture(
         .maybeSingle();
 
 
-    if (existingError) {
+    if (
+      existingError
+    ) {
 
       console.error(
         "Load venture before update error:",
@@ -1748,7 +2665,6 @@ async function updateVenture(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1759,12 +2675,13 @@ async function updateVenture(
     }
 
 
-    if (!existing) {
+    if (
+      !existing
+    ) {
 
       return res
         .status(404)
         .json({
-
           success:
             false,
 
@@ -1776,7 +2693,7 @@ async function updateVenture(
 
 
     /* ----------------------------------------------------------
-       CHECK SLUG IF IT CHANGED
+       CHECK SLUG
     ---------------------------------------------------------- */
 
     if (
@@ -1826,7 +2743,6 @@ async function updateVenture(
         return res
           .status(500)
           .json({
-
             success:
               false,
 
@@ -1844,7 +2760,6 @@ async function updateVenture(
         return res
           .status(409)
           .json({
-
             success:
               false,
 
@@ -1856,6 +2771,333 @@ async function updateVenture(
 
     }
 
+
+    const ventureSlug =
+      input.slug ||
+      existing.slug ||
+      "venture";
+
+
+    const oldUrlsToDelete =
+      [];
+
+
+    /* ----------------------------------------------------------
+       LOGO
+    ---------------------------------------------------------- */
+
+    const logoFile =
+      getSingleFile(
+        req,
+        "logo"
+      );
+
+
+    if (
+      logoFile
+    ) {
+
+      const uploaded =
+        await uploadVentureImage(
+          logoFile,
+          "logos",
+          ventureSlug
+        );
+
+
+      input.logoUrl =
+        uploaded.publicUrl;
+
+
+      newlyUploadedUrls.push(
+        uploaded.publicUrl
+      );
+
+
+      if (
+        existing.logo_url
+      ) {
+
+        oldUrlsToDelete.push(
+          existing.logo_url
+        );
+
+      }
+
+    } else if (
+      input.removeLogo ===
+      true
+    ) {
+
+      input.logoUrl =
+        "";
+
+
+      if (
+        existing.logo_url
+      ) {
+
+        oldUrlsToDelete.push(
+          existing.logo_url
+        );
+
+      }
+
+    } else {
+
+      delete input.logoUrl;
+
+    }
+
+
+    /* ----------------------------------------------------------
+       HERO IMAGE
+    ---------------------------------------------------------- */
+
+    const heroFile =
+      getSingleFile(
+        req,
+        "heroImage"
+      );
+
+
+    if (
+      heroFile
+    ) {
+
+      const uploaded =
+        await uploadVentureImage(
+          heroFile,
+          "heroes",
+          ventureSlug
+        );
+
+
+      input.heroImageUrl =
+        uploaded.publicUrl;
+
+
+      newlyUploadedUrls.push(
+        uploaded.publicUrl
+      );
+
+
+      if (
+        existing.hero_image_url
+      ) {
+
+        oldUrlsToDelete.push(
+          existing.hero_image_url
+        );
+
+      }
+
+    } else if (
+      input.removeHeroImage ===
+      true
+    ) {
+
+      input.heroImageUrl =
+        "";
+
+
+      if (
+        existing.hero_image_url
+      ) {
+
+        oldUrlsToDelete.push(
+          existing.hero_image_url
+        );
+
+      }
+
+    } else {
+
+      delete input.heroImageUrl;
+
+    }
+
+
+    /* ----------------------------------------------------------
+       FOUNDER IMAGES
+    ---------------------------------------------------------- */
+
+    if (
+      input.founders !==
+      undefined
+    ) {
+
+      const existingFounders =
+        Array.isArray(
+          existing.founders
+        )
+          ? existing.founders
+          : [];
+
+
+      /*
+       * Preserve existing founder images where the CMS
+       * has not supplied a new image and has not requested
+       * image removal.
+       */
+
+      input.founders =
+        input.founders.map(
+          (
+            founder,
+            index
+          ) => {
+
+            const oldFounder =
+              existingFounders[
+                index
+              ] ||
+              {};
+
+
+            const updatedFounder = {
+              ...founder,
+            };
+
+
+            if (
+              updatedFounder.removeImage
+            ) {
+
+              if (
+                oldFounder.image
+              ) {
+
+                oldUrlsToDelete.push(
+                  oldFounder.image
+                );
+
+              }
+
+
+              updatedFounder.image =
+                "";
+
+            } else if (
+              !updatedFounder.image &&
+              oldFounder.image
+            ) {
+
+              updatedFounder.image =
+                oldFounder.image;
+
+            }
+
+
+            return updatedFounder;
+
+          }
+        );
+
+
+      /*
+       * If founders were removed completely,
+       * their old images should also be cleaned up.
+       */
+
+      if (
+        existingFounders.length >
+        input.founders.length
+      ) {
+
+        existingFounders
+          .slice(
+            input.founders.length
+          )
+          .forEach(
+            (founder) => {
+
+              if (
+                founder?.image
+              ) {
+
+                oldUrlsToDelete.push(
+                  founder.image
+                );
+
+              }
+
+            }
+          );
+
+      }
+
+
+      const founderFiles =
+        getMultipleFiles(
+          req,
+          "founderImages"
+        );
+
+
+      if (
+        founderFiles.length >
+        0
+      ) {
+
+        /*
+         * Remember images that are being replaced.
+         */
+
+        input.founderImageIndexes
+          .forEach(
+            (founderIndex) => {
+
+              const oldImage =
+                input.founders[
+                  founderIndex
+                ]?.image;
+
+
+              if (
+                oldImage
+              ) {
+
+                oldUrlsToDelete.push(
+                  oldImage
+                );
+
+              }
+
+            }
+          );
+
+
+        const founderResult =
+          await applyFounderImages({
+            founders:
+              input.founders,
+
+            founderFiles,
+
+            founderImageIndexes:
+              input.founderImageIndexes,
+
+            ventureSlug,
+          });
+
+
+        input.founders =
+          founderResult.founders;
+
+
+        newlyUploadedUrls.push(
+          ...founderResult.uploadedUrls
+        );
+
+      }
+
+    }
+
+
+    /* ----------------------------------------------------------
+       UPDATE DATABASE
+    ---------------------------------------------------------- */
 
     const payload =
       buildUpdatePayload(
@@ -1883,7 +3125,9 @@ async function updateVenture(
         .single();
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
       console.error(
         "Update venture error:",
@@ -1891,10 +3135,20 @@ async function updateVenture(
       );
 
 
+      /*
+       * The DB update failed.
+       * Remove newly uploaded images,
+       * but leave old images untouched.
+       */
+
+      await deleteStorageUrls(
+        newlyUploadedUrls
+      );
+
+
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -1905,10 +3159,20 @@ async function updateVenture(
     }
 
 
+    /*
+     * The DB update succeeded.
+     * It is now safe to remove replaced
+     * or explicitly removed images.
+     */
+
+    await deleteStorageUrls(
+      oldUrlsToDelete
+    );
+
+
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -1929,14 +3193,19 @@ async function updateVenture(
     );
 
 
+    await deleteStorageUrls(
+      newlyUploadedUrls
+    );
+
+
     return res
       .status(500)
       .json({
-
         success:
           false,
 
         message:
+          error?.message ||
           "Unable to update the venture.",
       });
 
@@ -1968,7 +3237,6 @@ async function deleteVenture(
       return res
         .status(400)
         .json({
-
           success:
             false,
 
@@ -1978,6 +3246,10 @@ async function deleteVenture(
 
     }
 
+
+    /* ----------------------------------------------------------
+       LOAD FULL RECORD
+    ---------------------------------------------------------- */
 
     const {
       data:
@@ -1990,9 +3262,7 @@ async function deleteVenture(
         .from(
           VENTURES_TABLE
         )
-        .select(
-          "id, name, slug"
-        )
+        .select("*")
         .eq(
           "id",
           id
@@ -2000,7 +3270,9 @@ async function deleteVenture(
         .maybeSingle();
 
 
-    if (existingError) {
+    if (
+      existingError
+    ) {
 
       console.error(
         "Load venture before delete error:",
@@ -2011,7 +3283,6 @@ async function deleteVenture(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -2022,12 +3293,13 @@ async function deleteVenture(
     }
 
 
-    if (!existing) {
+    if (
+      !existing
+    ) {
 
       return res
         .status(404)
         .json({
-
           success:
             false,
 
@@ -2037,6 +3309,10 @@ async function deleteVenture(
 
     }
 
+
+    /* ----------------------------------------------------------
+       DELETE DATABASE RECORD FIRST
+    ---------------------------------------------------------- */
 
     const {
       data:
@@ -2060,7 +3336,9 @@ async function deleteVenture(
         .maybeSingle();
 
 
-    if (deleteError) {
+    if (
+      deleteError
+    ) {
 
       console.error(
         "Delete venture error:",
@@ -2071,7 +3349,6 @@ async function deleteVenture(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -2089,7 +3366,6 @@ async function deleteVenture(
       return res
         .status(500)
         .json({
-
           success:
             false,
 
@@ -2100,10 +3376,68 @@ async function deleteVenture(
     }
 
 
+    /* ----------------------------------------------------------
+       CLEAN STORAGE AFTER DB DELETE
+    ---------------------------------------------------------- */
+
+    const storageUrls = [];
+
+
+    if (
+      existing.logo_url
+    ) {
+
+      storageUrls.push(
+        existing.logo_url
+      );
+
+    }
+
+
+    if (
+      existing.hero_image_url
+    ) {
+
+      storageUrls.push(
+        existing.hero_image_url
+      );
+
+    }
+
+
+    if (
+      Array.isArray(
+        existing.founders
+      )
+    ) {
+
+      existing.founders.forEach(
+        (founder) => {
+
+          if (
+            founder?.image
+          ) {
+
+            storageUrls.push(
+              founder.image
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+
+    await deleteStorageUrls(
+      storageUrls
+    );
+
+
     return res
       .status(200)
       .json({
-
         success:
           true,
 
@@ -2133,7 +3467,6 @@ async function deleteVenture(
     return res
       .status(500)
       .json({
-
         success:
           false,
 

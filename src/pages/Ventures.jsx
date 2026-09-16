@@ -1,12 +1,11 @@
 import React, {
+  useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
 
-import {
-  Link,
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   ArrowRight,
@@ -16,10 +15,11 @@ import {
   Users,
   BriefcaseBusiness,
   Coins,
+  RefreshCw,
+  Building2,
 } from "lucide-react";
 
 import "./Ventures.css";
-
 
 /* ============================================================
    API
@@ -28,7 +28,6 @@ import "./Ventures.css";
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
-
 
 /* ============================================================
    JOURNEY
@@ -62,7 +61,6 @@ const journey = [
   },
 ];
 
-
 /* ============================================================
    HELPERS
 ============================================================ */
@@ -76,42 +74,24 @@ function getLogo(venture) {
   );
 }
 
-
 function getFounders(venture) {
-  if (
-    Array.isArray(
-      venture?.founders
-    )
-  ) {
-    return venture.founders;
-  }
-
-  return [];
+  return Array.isArray(venture?.founders)
+    ? venture.founders
+    : [];
 }
 
-
 function getFounderNames(venture) {
-  const founders =
-    getFounders(venture);
+  const founders = getFounders(venture);
 
-  if (
-    founders.length > 0
-  ) {
+  if (founders.length > 0) {
     return founders
-      .map(
-        (founder) =>
-          founder?.name
-      )
+      .map((founder) => founder?.name)
       .filter(Boolean)
       .join(", ");
   }
 
-  return (
-    venture?.founder ||
-    ""
-  );
+  return venture?.founder || "";
 }
-
 
 function getDescription(venture) {
   return (
@@ -121,423 +101,299 @@ function getDescription(venture) {
   );
 }
 
-
 function getSector(venture) {
-  return (
-    venture?.sector ||
-    "Other"
-  );
+  return venture?.sector || "Other";
 }
-
 
 function getStatus(venture) {
   return String(
-    venture?.status ||
-    ""
+    venture?.status || ""
   )
     .trim()
     .toLowerCase();
 }
 
+function getInitials(name) {
+  return String(name || "Venture")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
 
 /* ============================================================
    VENTURES
 ============================================================ */
 
 export default function Ventures() {
-
-  const [
-    ventures,
-    setVentures,
-  ] =
+  const [ventures, setVentures] =
     useState([]);
 
-
-  const [
-    loading,
-    setLoading,
-  ] =
+  const [loading, setLoading] =
     useState(true);
 
-
-  const [
-    error,
-    setError,
-  ] =
+  const [error, setError] =
     useState("");
-
 
   const [
     activeCategory,
     setActiveCategory,
-  ] =
-    useState("All");
-
+  ] = useState("All");
 
   const [
     searchTerm,
     setSearchTerm,
-  ] =
-    useState("");
-
+  ] = useState("");
 
   /* ==========================================================
      LOAD VENTURES
   ========================================================== */
 
-  useEffect(
-    () => {
+  const loadVentures =
+    useCallback(async () => {
+      setLoading(true);
+      setError("");
 
-      let cancelled =
-        false;
+      try {
+        const response = await fetch(
+          `${API_URL}/api/ventures`,
+          {
+            method: "GET",
 
-
-      async function loadVentures() {
-
-        setLoading(true);
-        setError("");
-
-
-        try {
-
-          const response =
-            await fetch(
-              `${API_URL}/api/ventures`,
-              {
-                method:
-                  "GET",
-
-                headers: {
-                  Accept:
-                    "application/json",
-                },
-              }
-            );
-
-
-          const contentType =
-            response.headers.get(
-              "content-type"
-            ) || "";
-
-
-          let result =
-            null;
-
-
-          if (
-            contentType.includes(
-              "application/json"
-            )
-          ) {
-
-            result =
-              await response.json();
-
-          } else {
-
-            const body =
-              await response.text();
-
-
-            console.error(
-              "Unexpected ventures response:",
-              body
-            );
-
-
-            throw new Error(
-              "The ventures service returned an unexpected response."
-            );
-
+            headers: {
+              Accept: "application/json",
+            },
           }
+        );
 
+        const contentType =
+          response.headers.get(
+            "content-type"
+          ) || "";
 
-          if (
-            !response.ok
-          ) {
+        let result = null;
 
-            throw new Error(
-              result?.message ||
-              "Unable to load ventures."
-            );
-
-          }
-
-
-          const records =
-            Array.isArray(
-              result?.ventures
-            )
-              ? result.ventures
-              : [];
-
-
-          if (
-            !cancelled
-          ) {
-
-            setVentures(
-              records
-            );
-
-          }
-
-        } catch (loadError) {
+        if (
+          contentType.includes(
+            "application/json"
+          )
+        ) {
+          result =
+            await response.json();
+        } else {
+          const body =
+            await response.text();
 
           console.error(
-            "Public ventures error:",
-            loadError
+            "Unexpected ventures response:",
+            body
           );
 
-
-          if (
-            !cancelled
-          ) {
-
-            setError(
-              loadError?.message ||
-              "Unable to load ventures."
-            );
-
-            setVentures(
-              []
-            );
-
-          }
-
-        } finally {
-
-          if (
-            !cancelled
-          ) {
-
-            setLoading(
-              false
-            );
-
-          }
-
+          throw new Error(
+            "The ventures service returned an unexpected response."
+          );
         }
 
+        if (!response.ok) {
+          throw new Error(
+            result?.message ||
+              result?.error ||
+              "Unable to load ventures."
+          );
+        }
+
+        const records =
+          Array.isArray(
+            result?.ventures
+          )
+            ? result.ventures
+            : Array.isArray(
+                result?.data
+              )
+              ? result.data
+              : Array.isArray(
+                  result?.data
+                    ?.ventures
+                )
+                ? result.data
+                    .ventures
+                : [];
+
+        setVentures(records);
+      } catch (loadError) {
+        console.error(
+          "Public ventures error:",
+          loadError
+        );
+
+        setVentures([]);
+
+        setError(
+          loadError?.message ||
+            "Unable to load ventures."
+        );
+      } finally {
+        setLoading(false);
       }
+    }, []);
 
+  /* ==========================================================
+     INITIAL LOAD
+  ========================================================== */
 
-      loadVentures();
-
-
-      return () => {
-
-        cancelled =
-          true;
-
-      };
-
-    },
-    []
-  );
-
+  useEffect(() => {
+    loadVentures();
+  }, [loadVentures]);
 
   /* ==========================================================
      PUBLISHED VENTURES
   ========================================================== */
 
   const publishedVentures =
-    useMemo(
-      () => {
+    useMemo(() => {
+      return ventures.filter(
+        (venture) => {
+          const status =
+            getStatus(venture);
 
-        return ventures.filter(
-          (venture) => {
-
-            const status =
-              getStatus(
-                venture
-              );
-
-
-            /*
-             * Backend should already return
-             * published ventures only.
-             *
-             * This safeguard prevents draft
-             * or archived content being shown
-             * if the API changes later.
-             */
-
-            return (
-              !status ||
-              status ===
-                "published"
-            );
-
-          }
-        );
-
-      },
-      [
-        ventures,
-      ]
-    );
-
+          /*
+           * Public API should already
+           * return published records.
+           *
+           * This remains as a safety
+           * check in case the API
+           * changes later.
+           */
+          return (
+            !status ||
+            status === "published"
+          );
+        }
+      );
+    }, [ventures]);
 
   /* ==========================================================
      DYNAMIC CATEGORIES
   ========================================================== */
 
   const categories =
-    useMemo(
-      () => {
-
-        const sectors =
-          publishedVentures
-            .map(
-              (venture) =>
-                getSector(
-                  venture
-                )
-            )
-            .filter(Boolean);
-
-
-        const uniqueSectors =
-          Array.from(
-            new Set(
-              sectors
-            )
+    useMemo(() => {
+      const sectors =
+        publishedVentures
+          .map((venture) =>
+            getSector(venture)
           )
-            .sort(
-              (
-                first,
-                second
-              ) =>
-                first.localeCompare(
-                  second
-                )
-            );
+          .filter(Boolean);
 
+      const uniqueSectors =
+        Array.from(
+          new Set(sectors)
+        ).sort(
+          (first, second) =>
+            first.localeCompare(
+              second
+            )
+        );
 
-        return [
-          "All",
-          ...uniqueSectors,
-        ];
-
-      },
-      [
-        publishedVentures,
-      ]
-    );
-
+      return [
+        "All",
+        ...uniqueSectors,
+      ];
+    }, [publishedVentures]);
 
   /* ==========================================================
      KEEP CATEGORY VALID
   ========================================================== */
 
-  useEffect(
-    () => {
-
-      if (
-        !categories.includes(
-          activeCategory
-        )
-      ) {
-
-        setActiveCategory(
-          "All"
-        );
-
-      }
-
-    },
-    [
-      categories,
-      activeCategory,
-    ]
-  );
-
+  useEffect(() => {
+    if (
+      !categories.includes(
+        activeCategory
+      )
+    ) {
+      setActiveCategory("All");
+    }
+  }, [
+    categories,
+    activeCategory,
+  ]);
 
   /* ==========================================================
      FILTER VENTURES
   ========================================================== */
 
   const filteredVentures =
-    useMemo(
-      () => {
+    useMemo(() => {
+      const query =
+        searchTerm
+          .trim()
+          .toLowerCase();
 
-        const query =
-          searchTerm
-            .trim()
+      return publishedVentures.filter(
+        (venture) => {
+          const sector =
+            getSector(venture);
+
+          const matchesCategory =
+            activeCategory ===
+              "All" ||
+            sector ===
+              activeCategory;
+
+          const searchableText = [
+            venture?.name,
+            venture?.country,
+            sector,
+            getFounderNames(
+              venture
+            ),
+            venture?.stage,
+            venture?.tagline,
+            getDescription(
+              venture
+            ),
+          ]
+            .filter(Boolean)
+            .join(" ")
             .toLowerCase();
 
-
-        return publishedVentures.filter(
-          (venture) => {
-
-            const sector =
-              getSector(
-                venture
-              );
-
-
-            const matchesCategory =
-              activeCategory ===
-                "All" ||
-              sector ===
-                activeCategory;
-
-
-            const searchableText =
-              [
-                venture?.name,
-                venture?.country,
-                sector,
-                getFounderNames(
-                  venture
-                ),
-                venture?.stage,
-                venture?.tagline,
-                getDescription(
-                  venture
-                ),
-              ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-
-
-            const matchesSearch =
-              !query ||
-              searchableText.includes(
-                query
-              );
-
-
-            return (
-              matchesCategory &&
-              matchesSearch
+          const matchesSearch =
+            !query ||
+            searchableText.includes(
+              query
             );
 
-          }
-        );
+          return (
+            matchesCategory &&
+            matchesSearch
+          );
+        }
+      );
+    }, [
+      publishedVentures,
+      activeCategory,
+      searchTerm,
+    ]);
 
-      },
-      [
-        publishedVentures,
-        activeCategory,
-        searchTerm,
-      ]
-    );
+  /* ==========================================================
+     CLEAR FILTERS
+  ========================================================== */
 
+  function clearFilters() {
+    setActiveCategory("All");
+    setSearchTerm("");
+  }
 
   return (
-
     <main className="ventures-page">
-
-      {/* ========================================================
+      {/* ======================================================
           HERO
-      ========================================================= */}
+      ====================================================== */}
 
       <section className="ventures-hero">
-
         <div
           className="ventures-hero__background"
           aria-hidden="true"
@@ -549,11 +405,10 @@ export default function Ventures() {
         />
 
         <div className="ventures-container ventures-hero__inner">
-
           <div className="ventures-hero__content">
-
             <span className="ventures-eyebrow ventures-eyebrow--light">
-              Continental Founders Ventures
+              Continental Founders
+              Ventures
             </span>
 
             <h1>
@@ -563,8 +418,10 @@ export default function Ventures() {
             </h1>
 
             <p>
-              A growing community of founders building ambitious
-              companies across Africa and the global diaspora.
+              A growing community of
+              founders building ambitious
+              companies across Africa and
+              the global diaspora.
             </p>
 
             <a
@@ -578,12 +435,9 @@ export default function Ventures() {
                 aria-hidden="true"
               />
             </a>
-
           </div>
 
-
           <div className="ventures-hero__belief">
-
             <span>
               Our Belief
             </span>
@@ -595,32 +449,26 @@ export default function Ventures() {
             </strong>
 
             <p>
-              Connecting promising founders with knowledge,
-              relationships, markets, and opportunity.
+              Connecting promising
+              founders with knowledge,
+              relationships, markets,
+              and opportunity.
             </p>
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* ========================================================
-          VENTURE DIRECTORY
-      ========================================================= */}
+      {/* ======================================================
+          DIRECTORY
+      ====================================================== */}
 
       <section
         id="ventures"
         className="ventures-directory"
       >
-
         <div className="ventures-container">
-
           <div className="ventures-section-header">
-
-            <div>
-
+            <div className="ventures-section-header__label">
               <span className="ventures-section-number">
                 01
               </span>
@@ -628,356 +476,379 @@ export default function Ventures() {
               <span className="ventures-eyebrow">
                 Our Ventures
               </span>
-
             </div>
-
 
             <h2>
               Ambitious companies.
               <br />
               Founders moving forward.
             </h2>
-
           </div>
 
-
-          {/* ====================================================
+          {/* ==================================================
               LOADING
-          ===================================================== */}
+          ================================================== */}
 
           {loading && (
-
-            <div className="ventures-empty">
+            <div
+              className="ventures-empty"
+              aria-live="polite"
+            >
+              <div className="ventures-loader" />
 
               <h3>
                 Loading ventures...
               </h3>
 
               <p>
-                Please wait while we load the venture directory.
+                Please wait while we
+                load the venture
+                directory.
               </p>
-
             </div>
-
           )}
 
-
-          {/* ====================================================
+          {/* ==================================================
               ERROR
-          ===================================================== */}
+          ================================================== */}
 
-          {!loading &&
-            error && (
-
-            <div className="ventures-empty">
+          {!loading && error && (
+            <div
+              className="ventures-empty ventures-empty--error"
+              role="alert"
+            >
+              <Building2
+                size={34}
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
 
               <h3>
-                Ventures are temporarily unavailable.
+                Ventures are temporarily
+                unavailable.
               </h3>
 
               <p>
                 {error}
               </p>
 
-            </div>
+              <button
+                type="button"
+                className="ventures-retry"
+                onClick={loadVentures}
+              >
+                <RefreshCw
+                  size={16}
+                  aria-hidden="true"
+                />
 
+                Try Again
+              </button>
+            </div>
           )}
 
-
-          {/* ====================================================
-              DIRECTORY
-          ===================================================== */}
+          {/* ==================================================
+              DIRECTORY CONTENT
+          ================================================== */}
 
           {!loading &&
             !error && (
-
-            <>
-
-              {/* ==================================================
-                  FILTER BAR
-              ================================================== */}
-
-              <div className="ventures-toolbar">
-
-                <div className="ventures-categories">
-
-                  {categories.map(
-                    (category) => (
-
-                      <button
-                        key={category}
-                        type="button"
-                        className={
-                          activeCategory ===
-                          category
-                            ? "venture-filter active"
-                            : "venture-filter"
-                        }
-                        onClick={() =>
-                          setActiveCategory(
+              <>
+                <div className="ventures-toolbar">
+                  <div
+                    className="ventures-categories"
+                    aria-label="Filter ventures by sector"
+                  >
+                    {categories.map(
+                      (category) => (
+                        <button
+                          key={
                             category
-                          )
-                        }
-                      >
-                        {category}
-                      </button>
+                          }
+                          type="button"
+                          className={
+                            activeCategory ===
+                            category
+                              ? "venture-filter active"
+                              : "venture-filter"
+                          }
+                          aria-pressed={
+                            activeCategory ===
+                            category
+                          }
+                          onClick={() =>
+                            setActiveCategory(
+                              category
+                            )
+                          }
+                        >
+                          {category}
+                        </button>
+                      )
+                    )}
+                  </div>
 
-                    )
-                  )}
+                  <label className="ventures-search">
+                    <Search
+                      size={17}
+                      aria-hidden="true"
+                    />
 
+                    <input
+                      type="search"
+                      value={
+                        searchTerm
+                      }
+                      placeholder="Search ventures"
+                      aria-label="Search ventures"
+                      onChange={(
+                        event
+                      ) =>
+                        setSearchTerm(
+                          event
+                            .target
+                            .value
+                        )
+                      }
+                    />
+                  </label>
                 </div>
 
+                {filteredVentures.length >
+                0 ? (
+                  <div className="ventures-grid">
+                    {filteredVentures.map(
+                      (
+                        venture,
+                        index
+                      ) => {
+                        const logo =
+                          getLogo(
+                            venture
+                          );
 
-                <label className="ventures-search">
+                        const founderNames =
+                          getFounderNames(
+                            venture
+                          );
 
-                  <Search
-                    size={17}
-                    aria-hidden="true"
-                  />
+                        const initials =
+                          getInitials(
+                            venture?.name
+                          );
 
-                  <input
-                    type="search"
-                    value={searchTerm}
-                    placeholder="Search ventures"
-                    aria-label="Search ventures"
-                    onChange={(
-                      event
-                    ) =>
-                      setSearchTerm(
-                        event.target.value
-                      )
-                    }
-                  />
-
-                </label>
-
-              </div>
-
-
-              {/* ==================================================
-                  VENTURE GRID
-              ================================================== */}
-
-              {filteredVentures.length > 0 ? (
-
-                <div className="ventures-grid">
-
-                  {filteredVentures.map(
-                    (
-                      venture,
-                      index
-                    ) => {
-
-                      const logo =
-                        getLogo(
-                          venture
-                        );
-
-
-                      const founderNames =
-                        getFounderNames(
-                          venture
-                        );
-
-
-                      return (
-
-                        <article
-                          key={
-                            venture.id ||
-                            venture.slug
-                          }
-                          className="venture-card"
-                        >
-
-                          <div className="venture-card__top">
-
-                            <span className="venture-card__number">
-                              {String(
-                                index + 1
-                              ).padStart(
-                                2,
-                                "0"
-                              )}
-                            </span>
-
-                            <span className="venture-card__sector">
-                              {getSector(
-                                venture
-                              )}
-                            </span>
-
-                          </div>
-
-
-                          <div className="venture-card__logo">
-
-                            {logo ? (
-
-                              <img
-                                src={logo}
-                                alt={`${venture.name} logo`}
-                              />
-
-                            ) : (
-
-                              <div className="venture-card__logo-placeholder">
-
+                        return (
+                          <article
+                            key={
+                              venture.id ||
+                              venture.slug ||
+                              `${venture.name}-${index}`
+                            }
+                            className="venture-card"
+                          >
+                            <div className="venture-card__top">
+                              <span className="venture-card__number">
                                 {String(
-                                  venture?.name ||
-                                  "Venture"
-                                )
-                                  .split(
-                                    /\s+/
-                                  )
-                                  .filter(
-                                    Boolean
-                                  )
-                                  .map(
-                                    (
-                                      word
-                                    ) =>
-                                      word.charAt(
-                                        0
-                                      )
-                                  )
-                                  .join("")
-                                  .slice(
-                                    0,
-                                    2
-                                  )
-                                  .toUpperCase()}
+                                  index +
+                                    1
+                                ).padStart(
+                                  2,
+                                  "0"
+                                )}
+                              </span>
 
+                              <span className="venture-card__sector">
+                                {getSector(
+                                  venture
+                                )}
+                              </span>
+                            </div>
+
+                            <div className="venture-card__logo">
+                              {logo ? (
+                                <img
+                                  src={
+                                    logo
+                                  }
+                                  alt={
+                                    venture?.name
+                                      ? `${venture.name} logo`
+                                      : "Venture logo"
+                                  }
+                                  loading="lazy"
+                                  onError={(
+                                    event
+                                  ) => {
+                                    event.currentTarget.style.display =
+                                      "none";
+
+                                    const fallback =
+                                      event
+                                        .currentTarget
+                                        .nextElementSibling;
+
+                                    if (
+                                      fallback
+                                    ) {
+                                      fallback.style.display =
+                                        "grid";
+                                    }
+                                  }}
+                                />
+                              ) : null}
+
+                              <div
+                                className={`venture-card__logo-placeholder ${
+                                  logo
+                                    ? "venture-card__logo-placeholder--hidden"
+                                    : ""
+                                }`}
+                                aria-hidden="true"
+                              >
+                                {
+                                  initials
+                                }
                               </div>
+                            </div>
 
+                            <h3>
+                              {venture?.name ||
+                                "Venture"}
+                            </h3>
+
+                            {venture?.country && (
+                              <div className="venture-card__location">
+                                <Globe2
+                                  size={
+                                    14
+                                  }
+                                  aria-hidden="true"
+                                />
+
+                                <span>
+                                  {
+                                    venture.country
+                                  }
+                                </span>
+                              </div>
                             )}
 
-                          </div>
+                            <p className="venture-card__description">
+                              {getDescription(
+                                venture
+                              ) ||
+                                "Venture profile coming soon."}
+                            </p>
 
+                            <div className="venture-card__footer">
+                              <div>
+                                <span>
+                                  Founder
+                                </span>
 
-                          <h3>
-                            {venture.name}
-                          </h3>
+                                <strong>
+                                  {founderNames ||
+                                    "Founder profile"}
+                                </strong>
+                              </div>
 
+                              <div>
+                                <span>
+                                  Stage
+                                </span>
 
-                          {venture.country && (
-
-                            <div className="venture-card__location">
-
-                              <Globe2
-                                size={14}
-                                aria-hidden="true"
-                              />
-
-                              <span>
-                                {venture.country}
-                              </span>
-
+                                <strong>
+                                  {venture?.stage ||
+                                    "Not specified"}
+                                </strong>
+                              </div>
                             </div>
 
-                          )}
+                            {venture?.slug ? (
+                              <Link
+                                to={`/ventures/${venture.slug}`}
+                                className="venture-card__link"
+                              >
+                                <span>
+                                  View
+                                  Venture
+                                </span>
 
+                                <ArrowRight
+                                  size={
+                                    16
+                                  }
+                                  aria-hidden="true"
+                                />
+                              </Link>
+                            ) : (
+                              <span className="venture-card__link venture-card__link--disabled">
+                                <span>
+                                  Venture
+                                  Profile
+                                </span>
 
-                          <p className="venture-card__description">
-                            {getDescription(
-                              venture
-                            ) ||
-                              "Venture profile coming soon."}
-                          </p>
-
-
-                          <div className="venture-card__footer">
-
-                            <div>
-
-                              <span>
-                                Founder
+                                <ArrowRight
+                                  size={
+                                    16
+                                  }
+                                  aria-hidden="true"
+                                />
                               </span>
+                            )}
+                          </article>
+                        );
+                      }
+                    )}
+                  </div>
+                ) : (
+                  <div className="ventures-empty">
+                    <Search
+                      size={32}
+                      strokeWidth={
+                        1.5
+                      }
+                      aria-hidden="true"
+                    />
 
-                              <strong>
-                                {founderNames ||
-                                  "Founder profile"}
-                              </strong>
+                    <h3>
+                      No ventures found.
+                    </h3>
 
-                            </div>
+                    <p>
+                      {publishedVentures.length ===
+                      0
+                        ? "There are currently no published ventures available."
+                        : "No ventures match the selected sector or search."}
+                    </p>
 
-
-                            <div>
-
-                              <span>
-                                Stage
-                              </span>
-
-                              <strong>
-                                {venture.stage ||
-                                  "Not specified"}
-                              </strong>
-
-                            </div>
-
-                          </div>
-
-
-                          <Link
-                            to={`/ventures/${venture.slug}`}
-                            className="venture-card__link"
-                          >
-                            View Venture
-
-                            <ArrowRight
-                              size={16}
-                              aria-hidden="true"
-                            />
-                          </Link>
-
-                        </article>
-
-                      );
-
-                    }
-                  )}
-
-                </div>
-
-              ) : (
-
-                <div className="ventures-empty">
-
-                  <h3>
-                    No ventures found.
-                  </h3>
-
-                  <p>
-                    {publishedVentures.length === 0
-                      ? "There are currently no ventures available."
-                      : "Try another search or category."}
-                  </p>
-
-                </div>
-
-              )}
-
-            </>
-
-          )}
-
+                    {publishedVentures.length >
+                      0 && (
+                      <button
+                        type="button"
+                        className="ventures-retry"
+                        onClick={
+                          clearFilters
+                        }
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
         </div>
-
       </section>
 
-
-      {/* ========================================================
+      {/* ======================================================
           JOURNEY
-      ========================================================= */}
+      ====================================================== */}
 
       <section className="ventures-journey">
-
         <div className="ventures-container">
-
           <div className="ventures-journey__heading">
-
             <div>
-
               <span className="ventures-section-number">
                 02
               </span>
@@ -985,34 +856,28 @@ export default function Ventures() {
               <span className="ventures-eyebrow">
                 The Journey
               </span>
-
             </div>
-
 
             <h2>
               From potential
               <br />
               to opportunity.
             </h2>
-
           </div>
 
-
           <div className="venture-journey-grid">
-
             {journey.map(
-              (
-                step,
-                index
-              ) => (
-
+              (step, index) => (
                 <article
-                  key={step.number}
+                  key={
+                    step.number
+                  }
                   className="venture-journey-step"
                 >
-
                   <div className="venture-journey-step__number">
-                    {step.number}
+                    {
+                      step.number
+                    }
                   </div>
 
                   <h3>
@@ -1026,39 +891,27 @@ export default function Ventures() {
                   {index <
                     journey.length -
                       1 && (
-
                     <ArrowRight
                       className="venture-journey-step__arrow"
                       size={18}
                       aria-hidden="true"
                     />
-
                   )}
-
                 </article>
-
               )
             )}
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* ========================================================
+      {/* ======================================================
           ECOSYSTEM
-      ========================================================= */}
+      ====================================================== */}
 
       <section className="ventures-ecosystem">
-
         <div className="ventures-container ventures-ecosystem__grid">
-
           <div className="ventures-ecosystem__content">
-
             <div>
-
               <span className="ventures-section-number">
                 03
               </span>
@@ -1066,9 +919,7 @@ export default function Ventures() {
               <span className="ventures-eyebrow">
                 The Ecosystem
               </span>
-
             </div>
-
 
             <h2>
               Great ventures are
@@ -1076,12 +927,12 @@ export default function Ventures() {
               not built alone.
             </h2>
 
-
             <p>
-              Continental Founders brings together the people
-              and institutions that can help founders move forward.
+              Continental Founders
+              brings together the people
+              and institutions that can
+              help founders move forward.
             </p>
-
 
             <Link
               to="/our-model"
@@ -1094,19 +945,14 @@ export default function Ventures() {
                 aria-hidden="true"
               />
             </Link>
-
           </div>
 
-
           <div className="ventures-ecosystem__network">
-
             <div className="ecosystem-network__center">
               Venture
             </div>
 
-
             <div className="ecosystem-network__item">
-
               <GraduationCap
                 size={22}
                 aria-hidden="true"
@@ -1115,12 +961,9 @@ export default function Ventures() {
               <span>
                 Universities
               </span>
-
             </div>
 
-
             <div className="ecosystem-network__item">
-
               <BriefcaseBusiness
                 size={22}
                 aria-hidden="true"
@@ -1129,12 +972,9 @@ export default function Ventures() {
               <span>
                 Industry
               </span>
-
             </div>
 
-
             <div className="ecosystem-network__item">
-
               <Users
                 size={22}
                 aria-hidden="true"
@@ -1143,12 +983,9 @@ export default function Ventures() {
               <span>
                 Mentors
               </span>
-
             </div>
 
-
             <div className="ecosystem-network__item">
-
               <Coins
                 size={22}
                 aria-hidden="true"
@@ -1157,12 +994,9 @@ export default function Ventures() {
               <span>
                 Investors
               </span>
-
             </div>
 
-
             <div className="ecosystem-network__item">
-
               <Globe2
                 size={22}
                 aria-hidden="true"
@@ -1171,26 +1005,18 @@ export default function Ventures() {
               <span>
                 Markets
               </span>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* ========================================================
+      {/* ======================================================
           FINAL CTA
-      ========================================================= */}
+      ====================================================== */}
 
       <section className="ventures-final">
-
         <div className="ventures-container ventures-final__grid">
-
           <div>
-
             <span className="ventures-eyebrow">
               Build With Us
             </span>
@@ -1200,21 +1026,20 @@ export default function Ventures() {
               <br />
               comes next.
             </h2>
-
           </div>
 
-
           <div className="ventures-final__content">
-
             <p>
-              Whether you are a founder, university, investor,
-              business, sponsor, or strategic partner, there is
-              a place for you in the Continental Founders ecosystem.
+              Whether you are a founder,
+              university, investor,
+              business, sponsor, or
+              strategic partner, there is
+              a place for you in the
+              Continental Founders
+              ecosystem.
             </p>
 
-
             <div className="ventures-final__actions">
-
               <Link
                 to="/contact"
                 className="ventures-button ventures-button--gold"
@@ -1227,7 +1052,6 @@ export default function Ventures() {
                 />
               </Link>
 
-
               <Link
                 to="/our-model"
                 className="ventures-button ventures-button--outline"
@@ -1239,17 +1063,10 @@ export default function Ventures() {
                   aria-hidden="true"
                 />
               </Link>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
-
     </main>
-
   );
-
 }

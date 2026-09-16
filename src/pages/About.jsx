@@ -17,7 +17,7 @@ import "./About.css";
    PRINCIPLES
 ============================================================ */
 
-const principles = [
+const principles = [ 
   {
     number: "01",
     title: "Reciprocity",
@@ -835,70 +835,57 @@ export default function About() {
           06 — WHAT WE BELIEVE
       ====================================================== */}
 
-      <section className="about-principles">
+ <section className="about-principles">
 
-        <div className="container">
+  <div className="container">
 
-          <div className="about-section-heading about-section-heading--center">
+    <div className="about-section-heading about-section-heading--center">
 
-            <span className="about-kicker about-kicker--gold">
-              WHAT WE BELIEVE
-            </span>
+      <span className="about-kicker about-kicker--gold">
+        WHAT WE BELIEVE
+      </span>
 
-          
+      <h2>
+        The standards we bring
+        <br />
+        to partnership.
+      </h2>
 
-            <h2>
-              The standards we bring
-              <br />
-              to partnership.
-            </h2>
+      <p>
+        The way a partnership is built matters as much as
+        the opportunity it seeks to create.
+      </p>
 
-            <p>
-              The way a partnership is built matters as much as
-              the opportunity it seeks to create.
-            </p>
+    </div>
 
-          </div>
+    <br />
 
-          <br />
+    <div className="principles-grid">
 
+      {principles.map((principle) => (
 
-          <div className="principles-grid">
+        <article
+          className="principle-card"
+          key={principle.number}
+        >
 
-            {principles.map((principle) => (
+          <h3>
+            {principle.title}
+          </h3>
 
-              <article
-                className="principle-card"
-                key={principle.number}
-              >
+          <p>
+            {principle.text}
+          </p>
 
-                <span className="principle-card__number">
-                  {principle.number}
-                </span>
+        </article>
 
-                <ArrowUpRight
-                  className="principle-card__arrow"
-                  size={25}
-                  strokeWidth={1.2}
-                />
+      ))}
 
-                <h3>
-                  {principle.title}
-                </h3>
+    </div>
 
-                <p>
-                  {principle.text}
-                </p>
+  </div>
 
-              </article>
-
-            ))}
-
-          </div>
-
-        </div>
-
-      </section>
+</section>
 
 
       {/* ======================================================

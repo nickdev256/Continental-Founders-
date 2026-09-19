@@ -24,7 +24,7 @@ export default function Contact() {
   const [submitted, setSubmitted] =
     useState(false);
 
-  const [submitting, setSubmitting] =
+  const [submitting, setSubmitting] = 
     useState(false);
 
   const [error, setError] =

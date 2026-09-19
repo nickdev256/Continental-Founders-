@@ -2090,3 +2090,102 @@ and (
       #000000;
   }
 }
+
+
+/* ============================================================
+   MOBILE HERO — PULL CONTENT UP
+============================================================ */
+
+@media (max-width: 700px) {
+  .strategic-partners-hero__inner {
+    padding-bottom: 130px !important;
+    /* margin-bottom: -30px; */
+  }
+ 
+}
+
+
+/* Remove golden lines from contribution cards */
+.contribution-card__accent {
+  display: none !important;
+}
+
+/* Remove arrows from Partner Ecosystem cards */
+.partner-card__arrow {
+  display: none !important;
+}
+
+/* ============================================================
+   PARTNER CARD TITLES — GOLD
+============================================================ */
+
+.strategic-ecosystem .partner-grid .partner-card h3 {
+  color: #b28422 !important;
+  -webkit-text-fill-color: #b28422 !important;
+}
+
+
+/* ============================================================
+   CONTRIBUTIONS — 2 CARDS PER ROW ON MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .strategic-contributions .contribution-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    width: 100% !important;
+  }
+
+  .strategic-contributions .contribution-card {
+    width: 100% !important;
+    min-height: 260px !important;
+    padding: 45px 25px !important;
+    box-sizing: border-box;
+  }
+
+  .strategic-contributions .contribution-card__number {
+    display: block;
+    margin-bottom: 70px;
+  }
+
+  .strategic-contributions .contribution-card p {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+
+}
+/* ============================================================
+   BEYOND THE UNIVERSITY — MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  /* Remove the golden line */
+  .strategic-opening__line {
+    display: none !important;
+  }
+
+  /* Reduce the heading size */
+  .strategic-opening__content h2 {
+    font-size: clamp(2.4rem, 8.5vw, 3.2rem) !important;
+    line-height: 1.02 !important;
+  }
+
+}
+
+
+
+/* ============================================================
+   A BROADER NETWORK — MOBILE SPACING
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .strategic-partners-media .media-split__content {
+    padding-top: -35px !important;
+    padding-bottom: -150px !important;
+  }
+
+}

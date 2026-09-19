@@ -424,7 +424,7 @@ export default function Universities() {
 
         </div>
 
-      </section>
+      </section> 
 
 
       {/* ======================================================

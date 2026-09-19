@@ -798,112 +798,137 @@
   text-align: center;
 }
 
-/* ============================================================
-   PROGRAMS
-============================================================ */
+/* =========================================
+   PROGRAM CARDS
+========================================= */
+
+/* =========================================
+   PROGRAM GRID — HORIZONTAL ROWS
+========================================= */
 
 .cf-program-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(4, minmax(0, 1fr));
-
-  gap: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+  align-items: stretch;
 }
+
+/* =========================================
+   PROGRAM CARD
+========================================= */
 
 .cf-program-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
 
+  width: 100%;
   min-width: 0;
+  min-height: 350px;
 
-  padding: 30px 27px 35px;
+  padding: 28px 24px 48px;
 
-  background: var(--cf-white);
+  background: #fff;
+  border: 1px solid #deded9;
 
-  border: 1px solid #e0dfda;
-
-  min-height: 355px;
+  box-sizing: border-box;
 
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
+    border-color 0.3s ease,
+    transform 0.3s ease;
 }
 
-.cf-program-card:hover {
-  transform: translateY(-5px);
+/* Number — top left */
 
-  box-shadow:
-    0 15px 35px rgba(3, 27, 52, 0.08);
+.cf-program-number {
+  display: block;
+  align-self: flex-start;
+  margin-bottom: 24px;
+
+  font-size: 16px;
+  color: #ad8019;
 }
 
-.cf-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Title */
 
-  margin-bottom: 28px;
-}
+.cf-program-title {
+  margin: 0 0 18px;
 
-.cf-card-icon {
-  width: 56px;
-  height: 56px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--cf-gold-dark);
-
-  border: 1px solid #d7c08d;
-
-  border-radius: 50%;
-}
-
-.cf-card-icon svg {
-  width: 27px;
-  height: 27px;
-
-  stroke-width: 1.4;
-}
-
-.cf-card-top > span {
-  color: var(--cf-gold-dark);
-
-  font-size: 1.15rem;
-}
-
-.cf-program-card h3 {
-  max-width: 240px;
-
-  margin: 0 0 16px;
-
-  color: var(--cf-navy);
-
-  font-size: 1.45rem;
+  font-size: 26px;
   font-weight: 400;
+  line-height: 1.15;
 
-  line-height: 1.18;
+  color: #0b2038;
 }
 
-.cf-program-card p {
+/* Description */
+
+.cf-program-text {
   margin: 0;
 
-  color: var(--cf-muted);
-
-  font-family: var(--cf-font-secondary);
-
-  font-size: 0.9rem;
-
+  font-size: 16px;
   line-height: 1.7;
+
+  color: #52677d;
 }
 
-.cf-card-arrow {
-  position: absolute;
 
-  right: 25px;
-  bottom: 23px;
 
-  color: var(--cf-gold-dark);
+/* Hover */
+
+.cf-program-card:hover {
+  border-color: #ad8019;
+  transform: translateY(-3px);
+}
+
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+
+/* Tablets — 2 cards per row */
+
+/* =========================================
+   MOBILE VIEW — 2 ROWS, 2 CARDS PER ROW
+========================================= */
+
+@media (max-width: 600px) {
+
+  .cf-program-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .cf-program-card {
+    width: 100%;
+    min-width: 0;
+    min-height: 260px;
+    padding: 20px 14px 42px;
+    box-sizing: border-box;
+  }
+
+  .cf-program-number {
+    font-size: 14px;
+    margin-bottom: 18px;
+  }
+
+  .cf-program-title {
+    font-size: 19px;
+    line-height: 1.2;
+  }
+
+  .cf-program-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .cf-program-arrow {
+    right: 14px;
+    bottom: 14px;
+  }
+
 }
 
 /* ============================================================
@@ -3086,68 +3111,136 @@ margin-bottom: 20px;
 }
 
 
-@media (max-width: 768px) {
+/* ============================================================
+   QUICK BAR — TABLET VIEW
+   2 columns, third item spans full width
+============================================================ */
 
-  /* QUICK HIGHLIGHTS — ONE ROW */
+@media (min-width: 601px) and (max-width: 1024px) {
+
   .cf-quick-bar__grid {
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 0 !important;
-    width: 100%;
-     margin-top: -50px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .cf-quick-item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-
-    padding: 22px 10px !important;
-
-    border-bottom: 0 !important;
-    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+    grid-template-columns: 32px 28px minmax(0, 1fr);
+    gap: 10px;
+    padding: 18px 16px;
   }
 
-  .cf-quick-item:last-child {
-    border-right: 0 !important;
+  .cf-quick-item:nth-child(2) {
+    border-right: 0;
   }
 
-  .cf-quick-icon {
-    margin-bottom: 8px;
-  }
-
-  .cf-quick-icon svg {
-    width: 25px;
-    height: 25px;
-  }
-
-  .cf-quick-number {
-    margin-bottom: 6px;
-    font-size: 1.15rem;
-  }
-
-  .cf-quick-content {
-    width: 100%;
-    text-align: center;
+  .cf-quick-item:nth-child(3) {
+    grid-column: 1 / -1;
+    border-right: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .cf-quick-item strong {
-    display: block;
-    text-align: center;
     font-size: 0.82rem;
-    line-height: 1.25;
+    line-height: 1.4;
   }
 
   .cf-quick-item small {
-    display: block;
-    text-align: center;
-    font-size: 0.7rem;
-    line-height: 1.3;
-    margin-top: 4px;
+    font-size: 0.72rem;
+    line-height: 1.5;
+  }
+
+}
+
+
+/* ============================================
+   QUICK HIGHLIGHTS — MOBILE & TABLET FONT FIX
+============================================ */
+
+@media (max-width: 1024px) {
+
+  .cf-quick-bar__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-width: 0;
+  }
+
+  .cf-quick-item {
+    min-width: 0;
+    padding: 12px 8px;
+    gap: 5px;
+    overflow: hidden;
+  }
+
+  /* Reduce icons */
+  .cf-quick-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Reduce numbers */
+  .cf-quick-number {
+    font-size: 11px !important;
+    line-height: 1.2;
+  }
+
+  /* FIX OVERSIZED TITLES */
+  .cf-quick-item strong,
+  .cf-quick-item h1,
+  .cf-quick-item h2,
+  .cf-quick-item h3,
+  .cf-quick-item h4,
+  .cf-quick-item h5,
+  .cf-quick-item h6 {
+    font-size: 15px !important;
+    line-height: 1.3 !important;
+    font-weight: 600;
+    letter-spacing: 0 !important;
+    margin: 0 !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  /* Reduce descriptions */
+  .cf-quick-item small,
+  .cf-quick-item p {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    margin: 3px 0 0 !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
   }
 }
 
+/* ============================================
+   SMALL MOBILE — EXTRA COMPACT
+============================================ */
+
+@media (max-width: 480px) {
+
+  .cf-quick-item {
+    padding: 10px 6px;
+    gap: 4px;
+  }
+
+  .cf-quick-item strong,
+  .cf-quick-item h1,
+  .cf-quick-item h2,
+  .cf-quick-item h3,
+  .cf-quick-item h4,
+  .cf-quick-item h5,
+  .cf-quick-item h6 {
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+  }
+
+  .cf-quick-item small,
+  .cf-quick-item p {
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+  }
+
+  .cf-quick-number {
+    font-size: 10px !important;
+  }
+}
 
 
 /* ============================================================

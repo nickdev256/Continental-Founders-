@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ExternalLink,
   GraduationCap,
+  Handshake,
   LayoutDashboard,
   Mail,
   MessageSquareText,
@@ -24,19 +25,32 @@ import { Link } from "react-router-dom";
 
 import "./AdminDashboard.css";
 
-
-/* ============================================================
-   API CONFIGURATION
-============================================================ */
+// ============================================================
+// API CONFIGURATION
+// ============================================================
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
 
+// ============================================================
+// DEFAULT DASHBOARD STATE
+// ============================================================
 
-/* ============================================================
-   QUICK ACCESS
-============================================================ */
+const DEFAULT_DASHBOARD = {
+  upcomingEvents: 0,
+  publishedInsights: 0,
+  newsletterSubscribers: 0,
+  newContacts: 0,
+  totalContacts: 0,
+  partnerships: 0,
+  newPartnerships: 0,
+  recentActivity: [],
+};
+
+// ============================================================
+// QUICK ACCESS
+// ============================================================
 
 const quickAccess = [
   {
@@ -83,10 +97,9 @@ const quickAccess = [
   },
 ];
 
-
-/* ============================================================
-   NUMBER HELPER
-============================================================ */
+// ============================================================
+// NUMBER HELPERS
+// ============================================================
 
 function getNumber(...values) {
   for (const value of values) {
@@ -98,12 +111,9 @@ function getNumber(...values) {
       continue;
     }
 
-    const parsed =
-      Number(value);
+    const parsed = Number(value);
 
-    if (
-      Number.isFinite(parsed)
-    ) {
+    if (Number.isFinite(parsed)) {
       return parsed;
     }
   }
@@ -111,23 +121,15 @@ function getNumber(...values) {
   return 0;
 }
 
-
-/* ============================================================
-   NUMBER FORMATTER
-============================================================ */
-
 function formatNumber(value) {
-  return new Intl.NumberFormat(
-    "en-US"
-  ).format(
+  return new Intl.NumberFormat("en-US").format(
     getNumber(value)
   );
 }
 
-
-/* ============================================================
-   NORMALIZE BACKEND RESPONSE
-============================================================ */
+// ============================================================
+// NORMALIZE BACKEND RESPONSE
+// ============================================================
 
 function normalizeDashboardData(payload) {
   const source =
@@ -142,95 +144,101 @@ function normalizeDashboardData(payload) {
     source?.counts ||
     {};
 
+  let recentActivity = [];
+
+  if (Array.isArray(source.recentActivity)) {
+    recentActivity = source.recentActivity;
+  } else if (
+    Array.isArray(source.recent_activity)
+  ) {
+    recentActivity =
+      source.recent_activity;
+  } else if (
+    Array.isArray(source.activity)
+  ) {
+    recentActivity = source.activity;
+  }
+
   return {
-    upcomingEvents:
-      getNumber(
-        stats.upcomingEvents,
-        stats.upcoming_events,
-        stats.upcomingEventCount,
-        stats.upcoming_event_count
-      ),
+    upcomingEvents: getNumber(
+      stats.upcomingEvents,
+      stats.upcoming_events,
+      stats.upcomingEventCount,
+      stats.upcoming_event_count,
+      source.upcomingEvents,
+      source.upcoming_events
+    ),
 
-    publishedInsights:
-      getNumber(
-        stats.publishedInsights,
-        stats.published_insights,
-        stats.publishedInsightCount,
-        stats.published_insight_count
-      ),
+    publishedInsights: getNumber(
+      stats.publishedInsights,
+      stats.published_insights,
+      stats.publishedInsightCount,
+      stats.published_insight_count,
+      source.publishedInsights,
+      source.published_insights
+    ),
 
-    newsletterSubscribers:
-      getNumber(
-        stats.newsletterSubscribers,
-        stats.newsletter_subscribers,
-        stats.activeSubscribers,
-        stats.active_subscribers,
-        stats.subscribers,
-        stats.totalSubscribers
-      ),
+    newsletterSubscribers: getNumber(
+      stats.newsletterSubscribers,
+      stats.newsletter_subscribers,
+      stats.activeSubscribers,
+      stats.active_subscribers,
+      stats.subscribers,
+      stats.totalSubscribers,
+      source.newsletterSubscribers,
+      source.newsletter_subscribers
+    ),
 
-    newContacts:
-      getNumber(
-        stats.newContacts,
-        stats.new_contacts
-      ),
+    newContacts: getNumber(
+      stats.newContacts,
+      stats.new_contacts,
+      source.newContacts,
+      source.new_contacts
+    ),
 
-    totalContacts:
-      getNumber(
-        stats.contacts,
-        stats.totalContacts,
-        stats.total_contacts
-      ),
+    totalContacts: getNumber(
+      stats.contacts,
+      stats.totalContacts,
+      stats.total_contacts,
+      source.totalContacts,
+      source.total_contacts
+    ),
 
-    partnerships:
-      getNumber(
-        stats.partnerships,
-        stats.totalPartnerships,
-        stats.total_partnerships
-      ),
+    partnerships: getNumber(
+      stats.partnerships,
+      stats.totalPartnerships,
+      stats.total_partnerships,
+      source.partnerships,
+      source.totalPartnerships,
+      source.total_partnerships
+    ),
 
-    newPartnerships:
-      getNumber(
-        stats.newPartnerships,
-        stats.new_partnerships
-      ),
+    newPartnerships: getNumber(
+      stats.newPartnerships,
+      stats.new_partnerships,
+      source.newPartnerships,
+      source.new_partnerships
+    ),
 
-    recentActivity:
-      Array.isArray(
-        source.recentActivity
-      )
-        ? source.recentActivity
-        : Array.isArray(
-            source.recent_activity
-          )
-        ? source.recent_activity
-        : Array.isArray(
-            source.activity
-          )
-        ? source.activity
-        : [],
+    recentActivity,
   };
 }
 
-
-/* ============================================================
-   ACTIVITY HELPERS
-============================================================ */
+// ============================================================
+// ACTIVITY HELPERS
+// ============================================================
 
 function getActivityIcon(item) {
-  const type =
-    String(
-      item?.type ||
+  const type = String(
+    item?.type ||
       item?.category ||
       item?.entity ||
       ""
-    )
-      .trim()
-      .toLowerCase();
+  )
+    .trim()
+    .toLowerCase();
 
-  if (
-    type.includes("event")
-  ) {
+  if (type.includes("event")) {
     return CalendarDays;
   }
 
@@ -258,14 +266,18 @@ function getActivityIcon(item) {
   }
 
   if (
-    type.includes("university")
+    type.includes("partner") ||
+    type.includes("partnership")
   ) {
+    return Handshake;
+  }
+
+  if (type.includes("university")) {
     return GraduationCap;
   }
 
   return Activity;
 }
-
 
 function getActivityTitle(item) {
   return (
@@ -277,7 +289,6 @@ function getActivityTitle(item) {
   );
 }
 
-
 function getActivityDescription(item) {
   return (
     item?.description ||
@@ -287,27 +298,44 @@ function getActivityDescription(item) {
   );
 }
 
-
 function getActivityTime(item) {
-  return (
+  const value =
     item?.time ||
     item?.relativeTime ||
     item?.relative_time ||
     item?.createdAt ||
     item?.created_at ||
-    ""
-  );
+    "";
+
+  if (!value) {
+    return "";
+  }
+
+  const parsedDate = new Date(value);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return String(value);
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }
+  ).format(parsedDate);
 }
 
-
-/* ============================================================
-   STAT CARD
-============================================================ */
+// ============================================================
+// STAT CARD
+// ============================================================
 
 function StatCard({
   icon: Icon,
   label,
   value,
+  helper,
 }) {
   return (
     <article className="admin-dashboard__stat-card">
@@ -326,19 +354,23 @@ function StatCard({
         <strong className="admin-dashboard__stat-value">
           {formatNumber(value)}
         </strong>
+
+        {helper && (
+          <span className="admin-dashboard__stat-helper">
+            {helper}
+          </span>
+        )}
       </div>
     </article>
   );
 }
 
-
-/* ============================================================
-   QUICK ACCESS CARD
-============================================================ */
+// ============================================================
+// QUICK ACCESS CARD
+// ============================================================
 
 function QuickAccessCard({ item }) {
-  const Icon =
-    item.icon;
+  const Icon = item.icon;
 
   return (
     <Link
@@ -353,13 +385,9 @@ function QuickAccessCard({ item }) {
       </div>
 
       <div className="admin-dashboard__quick-copy">
-        <h3>
-          {item.title}
-        </h3>
+        <h3>{item.title}</h3>
 
-        <p>
-          {item.description}
-        </p>
+        <p>{item.description}</p>
       </div>
 
       <ArrowUpRight
@@ -371,25 +399,17 @@ function QuickAccessCard({ item }) {
   );
 }
 
-
-/* ============================================================
-   ADMIN DASHBOARD
-============================================================ */
+// ============================================================
+// ADMIN DASHBOARD
+// ============================================================
 
 function AdminDashboard() {
   const [
     dashboard,
     setDashboard,
-  ] = useState({
-    upcomingEvents: 0,
-    publishedInsights: 0,
-    newsletterSubscribers: 0,
-    newContacts: 0,
-    totalContacts: 0,
-    partnerships: 0,
-    newPartnerships: 0,
-    recentActivity: [],
-  });
+  ] = useState(
+    DEFAULT_DASHBOARD
+  );
 
   const [
     loading,
@@ -397,20 +417,36 @@ function AdminDashboard() {
   ] = useState(true);
 
   const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
+
+  const [
     error,
     setError,
   ] = useState("");
 
+  const [
+    lastUpdated,
+    setLastUpdated,
+  ] = useState(null);
 
-  /* ==========================================================
-     LOAD DASHBOARD
-  ========================================================== */
+  // ==========================================================
+  // LOAD DASHBOARD
+  // ==========================================================
 
   const loadDashboard =
     useCallback(
-      async () => {
+      async ({
+        silent = false,
+      } = {}) => {
         try {
-          setLoading(true);
+          if (silent) {
+            setRefreshing(true);
+          } else {
+            setLoading(true);
+          }
+
           setError("");
 
           const response =
@@ -426,6 +462,9 @@ function AdminDashboard() {
 
                 credentials:
                   "include",
+
+                cache:
+                  "no-store",
               }
             );
 
@@ -447,11 +486,28 @@ function AdminDashboard() {
           const result =
             await response.json();
 
+          if (
+            response.status === 401
+          ) {
+            throw new Error(
+              "Your CMS session is not authenticated. Please sign in again."
+            );
+          }
+
+          if (
+            response.status === 403
+          ) {
+            throw new Error(
+              result?.message ||
+                "Your account does not have permission to access the dashboard."
+            );
+          }
+
           if (!response.ok) {
             throw new Error(
               result?.message ||
-              result?.error ||
-              `Unable to load dashboard (${response.status}).`
+                result?.error ||
+                `Unable to load dashboard (${response.status}).`
             );
           }
 
@@ -460,7 +516,13 @@ function AdminDashboard() {
               result
             )
           );
-        } catch (requestError) {
+
+          setLastUpdated(
+            new Date()
+          );
+        } catch (
+          requestError
+        ) {
           console.error(
             "Dashboard loading error:",
             requestError
@@ -468,28 +530,27 @@ function AdminDashboard() {
 
           setError(
             requestError?.message ||
-            "Unable to load dashboard information."
+              "Unable to load dashboard information."
           );
         } finally {
           setLoading(false);
+          setRefreshing(false);
         }
       },
       []
     );
 
-
-  /* ==========================================================
-     INITIAL LOAD
-  ========================================================== */
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
 
-
-  /* ==========================================================
-     DASHBOARD STATS
-  ========================================================== */
+  // ==========================================================
+  // DASHBOARD STATS
+  // ==========================================================
 
   const stats =
     useMemo(
@@ -497,37 +558,75 @@ function AdminDashboard() {
         {
           label:
             "Upcoming Events",
+
           value:
             dashboard.upcomingEvents,
+
           icon:
             CalendarDays,
+
+          helper:
+            "Scheduled events",
         },
 
         {
           label:
             "Published Insights",
+
           value:
             dashboard.publishedInsights,
+
           icon:
             Newspaper,
+
+          helper:
+            "Live publications",
         },
 
         {
           label:
             "Newsletter Subscribers",
+
           value:
             dashboard.newsletterSubscribers,
+
           icon:
             Mail,
+
+          helper:
+            "Active audience",
         },
 
         {
           label:
             "New Contacts",
+
           value:
             dashboard.newContacts,
+
           icon:
             MessageSquareText,
+
+          helper:
+            `${formatNumber(
+              dashboard.totalContacts
+            )} total enquiries`,
+        },
+
+        {
+          label:
+            "Partnerships",
+
+          value:
+            dashboard.partnerships,
+
+          icon:
+            Handshake,
+
+          helper:
+            `${formatNumber(
+              dashboard.newPartnerships
+            )} new`,
         },
       ],
       [
@@ -535,13 +634,15 @@ function AdminDashboard() {
         dashboard.publishedInsights,
         dashboard.newsletterSubscribers,
         dashboard.newContacts,
+        dashboard.totalContacts,
+        dashboard.partnerships,
+        dashboard.newPartnerships,
       ]
     );
 
-
-  /* ==========================================================
-     RECENT ACTIVITY
-  ========================================================== */
+  // ==========================================================
+  // RECENT ACTIVITY
+  // ==========================================================
 
   const recentActivity =
     useMemo(() => {
@@ -555,38 +656,39 @@ function AdminDashboard() {
 
       return dashboard
         .recentActivity
-        .slice(0, 4);
+        .slice(0, 6);
     }, [
       dashboard.recentActivity,
     ]);
 
-
-  /* ==========================================================
-     RENDER
-  ========================================================== */
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
     <main className="admin-dashboard">
-
-      {/* ======================================================
+      {/* ====================================================
           HERO
-      ====================================================== */}
+      ==================================================== */}
 
       <section className="admin-dashboard__hero">
         <div className="admin-dashboard__hero-copy">
           <span className="admin-dashboard__hero-eyebrow">
-            Continental Founders Administration
+            Continental Founders
+            Administration
           </span>
 
           <h1>
-            Welcome to Continental Founders CMS
+            Welcome to Continental
+            Founders CMS
           </h1>
 
           <p>
-            Manage institutional content,
-            events, insights, partnerships,
-            subscribers and your digital
-            presence from one workspace.
+            Manage institutional
+            content, events, insights,
+            partnerships, subscribers
+            and your digital presence
+            from one workspace.
           </p>
         </div>
 
@@ -601,6 +703,35 @@ function AdminDashboard() {
               CMS Workspace
             </span>
           </div>
+
+          <button
+            type="button"
+            className="admin-dashboard__refresh-button"
+            onClick={() =>
+              loadDashboard({
+                silent: true,
+              })
+            }
+            disabled={
+              loading ||
+              refreshing
+            }
+          >
+            <RefreshCw
+              size={14}
+              className={
+                refreshing
+                  ? "admin-dashboard__refresh-icon admin-dashboard__refresh-icon--active"
+                  : "admin-dashboard__refresh-icon"
+              }
+            />
+
+            <span>
+              {refreshing
+                ? "Refreshing..."
+                : "Refresh data"}
+            </span>
+          </button>
         </div>
 
         <div
@@ -617,10 +748,9 @@ function AdminDashboard() {
         </div>
       </section>
 
-
-      {/* ======================================================
-          ERROR MESSAGE
-      ====================================================== */}
+      {/* ====================================================
+          ERROR
+      ==================================================== */}
 
       {error && (
         <section
@@ -639,12 +769,10 @@ function AdminDashboard() {
 
           <button
             type="button"
-            onClick={
-              loadDashboard
+            onClick={() =>
+              loadDashboard()
             }
-            disabled={
-              loading
-            }
+            disabled={loading}
           >
             <RefreshCw
               size={13}
@@ -657,29 +785,40 @@ function AdminDashboard() {
         </section>
       )}
 
-
-      {/* ======================================================
-          STAT CARDS
-      ====================================================== */}
+      {/* ====================================================
+          STATS
+      ==================================================== */}
 
       <section
         className="admin-dashboard__stats"
         aria-label="Dashboard statistics"
       >
-        {stats.map((stat) => (
-          <StatCard
-            key={stat.label}
-            icon={stat.icon}
-            label={stat.label}
-            value={stat.value}
-          />
-        ))}
+        {stats.map(
+          (stat) => (
+            <StatCard
+              key={
+                stat.label
+              }
+              icon={
+                stat.icon
+              }
+              label={
+                stat.label
+              }
+              value={
+                stat.value
+              }
+              helper={
+                stat.helper
+              }
+            />
+          )
+        )}
       </section>
 
-
-      {/* ======================================================
+      {/* ====================================================
           QUICK ACCESS
-      ====================================================== */}
+      ==================================================== */}
 
       <section className="admin-dashboard__block">
         <header className="admin-dashboard__block-header">
@@ -694,30 +833,35 @@ function AdminDashboard() {
           </div>
 
           <span className="admin-dashboard__block-helper">
-            Open frequently used CMS sections
+            Open frequently used
+            CMS sections
           </span>
         </header>
 
         <div className="admin-dashboard__quick-grid">
-          {quickAccess.map((item) => (
-            <QuickAccessCard
-              key={item.title}
-              item={item}
-            />
-          ))}
+          {quickAccess.map(
+            (item) => (
+              <QuickAccessCard
+                key={
+                  item.title
+                }
+                item={
+                  item
+                }
+              />
+            )
+          )}
         </div>
       </section>
 
-
-      {/* ======================================================
+      {/* ====================================================
           LOWER DASHBOARD
-      ====================================================== */}
+      ==================================================== */}
 
       <section className="admin-dashboard__lower-grid">
-
-        {/* ====================================================
+        {/* ==================================================
             RECENT ACTIVITY
-        ==================================================== */}
+        ================================================== */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
@@ -744,15 +888,35 @@ function AdminDashboard() {
               />
 
               <span>
-                Loading dashboard activity...
+                Loading dashboard
+                activity...
               </span>
             </div>
-          ) : recentActivity.length > 0 ? (
+          ) : recentActivity.length >
+            0 ? (
             <div className="admin-dashboard__activity-list">
               {recentActivity.map(
-                (item, index) => {
+                (
+                  item,
+                  index
+                ) => {
                   const Icon =
                     getActivityIcon(
+                      item
+                    );
+
+                  const title =
+                    getActivityTitle(
+                      item
+                    );
+
+                  const description =
+                    getActivityDescription(
+                      item
+                    );
+
+                  const time =
+                    getActivityTime(
                       item
                     );
 
@@ -761,44 +925,36 @@ function AdminDashboard() {
                       key={
                         item?.id ||
                         item?._id ||
-                        `${getActivityTitle(
-                          item
-                        )}-${index}`
+                        `${title}-${index}`
                       }
                       className="admin-dashboard__activity-item"
                     >
                       <div className="admin-dashboard__activity-icon">
                         <Icon
                           size={13}
-                          strokeWidth={1.8}
+                          strokeWidth={
+                            1.8
+                          }
                         />
                       </div>
 
                       <div className="admin-dashboard__activity-copy">
                         <strong>
-                          {getActivityTitle(
-                            item
-                          )}
+                          {title}
                         </strong>
 
-                        {getActivityDescription(
-                          item
-                        ) && (
+                        {description && (
                           <span>
-                            {getActivityDescription(
-                              item
-                            )}
+                            {
+                              description
+                            }
                           </span>
                         )}
                       </div>
 
-                      {getActivityTime(
-                        item
-                      ) && (
+                      {time && (
                         <time>
-                          {getActivityTime(
-                            item
-                          )}
+                          {time}
                         </time>
                       )}
                     </div>
@@ -813,17 +969,17 @@ function AdminDashboard() {
               />
 
               <span>
-                No recent CMS activity
-                has been recorded yet.
+                No recent CMS
+                activity has been
+                recorded yet.
               </span>
             </div>
           )}
         </article>
 
-
-        {/* ====================================================
+        {/* ==================================================
             SYSTEM STATUS
-        ==================================================== */}
+        ================================================== */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
@@ -873,9 +1029,25 @@ function AdminDashboard() {
 
               <p>
                 {error
-                  ? "The CMS could not load the dashboard statistics."
-                  : "The dashboard statistics endpoint responded successfully."}
+                  ? "The CMS could not load dashboard data from the backend."
+                  : "The CMS is connected to the Continental Founders backend."}
               </p>
+
+              {!error &&
+                lastUpdated && (
+                  <small>
+                    Last updated{" "}
+                    {lastUpdated.toLocaleTimeString(
+                      [],
+                      {
+                        hour:
+                          "2-digit",
+                        minute:
+                          "2-digit",
+                      }
+                    )}
+                  </small>
+                )}
             </div>
           </div>
 
@@ -907,12 +1079,9 @@ function AdminDashboard() {
             </Link>
           </div>
         </article>
-
       </section>
-
     </main>
   );
 }
-
 
 export default AdminDashboard;

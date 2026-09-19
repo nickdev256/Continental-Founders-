@@ -1,6 +1,5 @@
-import React, {
-  useEffect,
-} from "react";
+
+import React, { useEffect } from "react";
 
 import {
   Route,
@@ -109,17 +108,22 @@ import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 // SITE CONFIGURATION
 // ============================================================
 
-const SITE_NAME =
-  "Continental Founders";
+const SITE_NAME = "Continental Founders";
 
 const SITE_URL =
-  "https://continentalfounders.org";
+  "https://www.continentalfounders.org";
+
+const SOCIAL_IMAGE =
+  `${SITE_URL}/assets/continental-founders-logo.png`;
 
 const DEFAULT_TITLE =
   "Continental Founders | Connecting African Founders to Global Opportunity";
 
 const DEFAULT_DESCRIPTION =
   "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks through entrepreneurship, collaboration, and venture development.";
+
+const INDEX_ROBOTS =
+  "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
 
 // ============================================================
@@ -134,41 +138,37 @@ const SEO_ROUTES = {
     description:
       "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks.",
 
-    canonical:
-      "/",
+    canonical: "/",
   },
 
   "/about": {
     title:
-      "About | Continental Founders",
+      "About Continental Founders | Mission, Vision & Leadership",
 
     description:
       "Learn about Continental Founders, our mission, vision, leadership, and commitment to connecting African founders with global knowledge, networks, markets, and opportunity.",
 
-    canonical:
-      "/about",
+    canonical: "/about",
   },
 
   "/ventures": {
     title:
-      "Ventures | Continental Founders",
+      "African Ventures & Founders | Continental Founders",
 
     description:
-      "Discover ventures in the Continental Founders network and the entrepreneurs building practical, scalable solutions across Africa and global markets.",
+      "Discover ventures in the Continental Founders network and entrepreneurs building practical, scalable solutions across Africa and global markets.",
 
-    canonical:
-      "/ventures",
+    canonical: "/ventures",
   },
 
   "/our-model": {
     title:
-      "Our Model | Continental Founders",
+      "Our Venture Development Model | Continental Founders",
 
     description:
-      "Explore the Continental Founders model and how founders progress from potential to preparation, execution, evidence, and opportunity.",
+      "Explore how Continental Founders supports founders through Potential, Preparation, Execution, Evidence, and Opportunity.",
 
-    canonical:
-      "/our-model",
+    canonical: "/our-model",
   },
 
   "/universities": {
@@ -176,21 +176,19 @@ const SEO_ROUTES = {
       "University Partnerships | Continental Founders",
 
     description:
-      "Explore how Continental Founders connects universities, faculty, students, research expertise, and entrepreneurs through meaningful global partnerships.",
+      "Explore how Continental Founders connects universities, faculty, students, research expertise, and African entrepreneurs through meaningful global partnerships.",
 
-    canonical:
-      "/universities",
+    canonical: "/universities",
   },
 
   "/strategic-partners": {
     title:
-      "Strategic Partners | Continental Founders",
+      "Strategic Partnerships | Continental Founders",
 
     description:
-      "Discover the strategic partnership ecosystem connecting Continental Founders with universities, corporations, institutions, experts, and opportunity networks.",
+      "Explore the Continental Founders partnership ecosystem connecting universities, corporations, institutions, experts, mentors, and global opportunity networks.",
 
-    canonical:
-      "/strategic-partners",
+    canonical: "/strategic-partners",
   },
 
   "/partners/us-africa-trade-network": {
@@ -198,7 +196,7 @@ const SEO_ROUTES = {
       "U.S.–Africa Trade & Business Network | Continental Founders",
 
     description:
-      "Explore the Continental Founders U.S.–Africa Trade & Business Network, connecting founders, business leaders, markets, expertise, and commercial opportunity.",
+      "Explore the Continental Founders U.S.–Africa Trade & Business Network connecting founders, business leaders, markets, expertise, and commercial opportunity.",
 
     canonical:
       "/partners/us-africa-trade-network",
@@ -206,10 +204,10 @@ const SEO_ROUTES = {
 
   "/partners/corporate": {
     title:
-      "Corporate Partners | Continental Founders",
+      "Corporate Partnerships | Continental Founders",
 
     description:
-      "Explore corporate partnership opportunities with Continental Founders and support founders through expertise, markets, mentorship, technology, and commercial collaboration.",
+      "Partner with Continental Founders to support entrepreneurs through expertise, mentorship, technology, markets, business networks, and commercial collaboration.",
 
     canonical:
       "/partners/corporate",
@@ -217,7 +215,7 @@ const SEO_ROUTES = {
 
   "/partners/government-development": {
     title:
-      "Government & Development Institutions | Continental Founders",
+      "Government & Development Partnerships | Continental Founders",
 
     description:
       "Explore how Continental Founders works with government and development institutions to strengthen entrepreneurship, innovation, market access, and economic opportunity.",
@@ -228,24 +226,22 @@ const SEO_ROUTES = {
 
   "/programs": {
     title:
-      "Programs | Continental Founders",
+      "Founder Programs | Continental Founders",
 
     description:
-      "Explore Continental Founders programs designed to connect entrepreneurs with mentorship, expertise, universities, markets, business networks, and opportunity.",
+      "Explore Continental Founders programs connecting entrepreneurs with mentorship, universities, industry expertise, markets, business networks, and global opportunity.",
 
-    canonical:
-      "/programs",
+    canonical: "/programs",
   },
 
   "/impact": {
     title:
-      "Impact | Continental Founders",
+      "Our Impact | Continental Founders",
 
     description:
-      "Explore the impact of Continental Founders across entrepreneurship, partnerships, founder development, universities, markets, and global opportunity networks.",
+      "Explore the impact of Continental Founders across entrepreneurship, founder development, university partnerships, innovation, markets, and global opportunity networks.",
 
-    canonical:
-      "/impact",
+    canonical: "/impact",
   },
 
   "/events": {
@@ -255,32 +251,60 @@ const SEO_ROUTES = {
     description:
       "Discover Continental Founders events bringing together founders, universities, investors, business leaders, mentors, institutions, and strategic partners.",
 
-    canonical:
-      "/events",
+    canonical: "/events",
   },
 
   "/insights": {
     title:
-      "Insights | Continental Founders",
+      "Entrepreneurship & Innovation Insights | Continental Founders",
 
     description:
       "Read Continental Founders insights on entrepreneurship, venture development, innovation, university partnerships, markets, leadership, and global opportunity.",
 
-    canonical:
-      "/insights",
+    canonical: "/insights",
   },
 
   "/contact": {
     title:
-      "Contact | Continental Founders",
+      "Contact Continental Founders",
 
     description:
-      "Contact Continental Founders to discuss partnerships, founder opportunities, university collaboration, strategic engagement, and participation in our global network.",
+      "Contact Continental Founders about partnerships, founder opportunities, university collaboration, strategic engagement, and participation in our global network.",
 
-    canonical:
-      "/contact",
+    canonical: "/contact",
   },
 };
+
+
+// ============================================================
+// NORMALIZE PATH
+// ============================================================
+
+function normalizePath(pathname) {
+  if (!pathname || pathname === "/") {
+    return "/";
+  }
+
+  return pathname.replace(/\/+$/, "");
+}
+
+
+// ============================================================
+// BUILD CANONICAL URL
+// ============================================================
+
+function buildCanonicalUrl(path) {
+  if (!path || path === "/") {
+    return `${SITE_URL}/`;
+  }
+
+  const cleanPath =
+    path.startsWith("/")
+      ? path
+      : `/${path}`;
+
+  return `${SITE_URL}${cleanPath}`;
+}
 
 
 // ============================================================
@@ -289,40 +313,43 @@ const SEO_ROUTES = {
 
 function setMetaTag(
   selector,
-  attribute,
-  value
+  attributeName,
+  attributeValue,
+  content
 ) {
   let element =
-    document.head.querySelector(
-      selector
-    );
+    document.head.querySelector(selector);
 
   if (!element) {
     element =
-      document.createElement(
-        "meta"
-      );
-
-    const [
-      key,
-      name,
-    ] =
-      attribute;
+      document.createElement("meta");
 
     element.setAttribute(
-      key,
-      name
+      attributeName,
+      attributeValue
     );
 
-    document.head.appendChild(
-      element
-    );
+    document.head.appendChild(element);
   }
 
   element.setAttribute(
     "content",
-    value
+    content
   );
+}
+
+
+// ============================================================
+// REMOVE META TAG
+// ============================================================
+
+function removeMetaTag(selector) {
+  const element =
+    document.head.querySelector(selector);
+
+  if (element) {
+    element.remove();
+  }
 }
 
 
@@ -338,9 +365,7 @@ function setCanonical(url) {
 
   if (!canonical) {
     canonical =
-      document.createElement(
-        "link"
-      );
+      document.createElement("link");
 
     canonical.setAttribute(
       "rel",
@@ -360,110 +385,265 @@ function setCanonical(url) {
 
 
 // ============================================================
-// APPLY COMMON DYNAMIC SEO
+// REMOVE CANONICAL
 // ============================================================
 
-function applyDynamicSEO({
-  title,
-  description,
-  canonicalUrl,
-  type = "website",
-}) {
-  document.title =
-    title;
+function removeCanonical() {
+  const canonical =
+    document.head.querySelector(
+      'link[rel="canonical"]'
+    );
 
+  if (canonical) {
+    canonical.remove();
+  }
+}
+
+
+// ============================================================
+// SET STANDARD DESCRIPTION
+// ============================================================
+
+function setDescription(description) {
   setMetaTag(
     'meta[name="description"]',
-    [
-      "name",
-      "description",
-    ],
+    "name",
+    "description",
     description
   );
+}
 
+
+// ============================================================
+// SET ROBOTS
+// ============================================================
+
+function setRobots(value) {
   setMetaTag(
     'meta[name="robots"]',
-    [
-      "name",
-      "robots",
-    ],
-    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    "name",
+    "robots",
+    value
   );
 
   setMetaTag(
     'meta[name="googlebot"]',
-    [
-      "name",
-      "googlebot",
-    ],
-    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    "name",
+    "googlebot",
+    value
+  );
+}
+
+
+// ============================================================
+// SET OPEN GRAPH DATA
+// ============================================================
+
+function setOpenGraph({
+  title,
+  description,
+  canonicalUrl,
+  type = "website",
+  image = SOCIAL_IMAGE,
+}) {
+  setMetaTag(
+    'meta[property="og:type"]',
+    "property",
+    "og:type",
+    type
+  );
+
+  setMetaTag(
+    'meta[property="og:site_name"]',
+    "property",
+    "og:site_name",
+    SITE_NAME
+  );
+
+  setMetaTag(
+    'meta[property="og:title"]',
+    "property",
+    "og:title",
+    title
+  );
+
+  setMetaTag(
+    'meta[property="og:description"]',
+    "property",
+    "og:description",
+    description
+  );
+
+  setMetaTag(
+    'meta[property="og:url"]',
+    "property",
+    "og:url",
+    canonicalUrl
+  );
+
+  setMetaTag(
+    'meta[property="og:image"]',
+    "property",
+    "og:image",
+    image
+  );
+
+  setMetaTag(
+    'meta[property="og:image:secure_url"]',
+    "property",
+    "og:image:secure_url",
+    image
+  );
+
+  setMetaTag(
+    'meta[property="og:image:alt"]',
+    "property",
+    "og:image:alt",
+    "Continental Founders"
+  );
+
+  setMetaTag(
+    'meta[property="og:locale"]',
+    "property",
+    "og:locale",
+    "en_US"
+  );
+}
+
+
+// ============================================================
+// SET TWITTER / X DATA
+// ============================================================
+
+function setTwitterMeta({
+  title,
+  description,
+  image = SOCIAL_IMAGE,
+}) {
+  setMetaTag(
+    'meta[name="twitter:card"]',
+    "name",
+    "twitter:card",
+    "summary_large_image"
+  );
+
+  setMetaTag(
+    'meta[name="twitter:title"]',
+    "name",
+    "twitter:title",
+    title
+  );
+
+  setMetaTag(
+    'meta[name="twitter:description"]',
+    "name",
+    "twitter:description",
+    description
+  );
+
+  setMetaTag(
+    'meta[name="twitter:image"]',
+    "name",
+    "twitter:image",
+    image
+  );
+
+  setMetaTag(
+    'meta[name="twitter:image:alt"]',
+    "name",
+    "twitter:image:alt",
+    "Continental Founders"
+  );
+}
+
+
+// ============================================================
+// APPLY PUBLIC SEO
+// ============================================================
+
+function applyPublicSEO({
+  title,
+  description,
+  canonicalUrl,
+  type = "website",
+  image = SOCIAL_IMAGE,
+}) {
+  document.title =
+    title || DEFAULT_TITLE;
+
+  setDescription(
+    description ||
+      DEFAULT_DESCRIPTION
+  );
+
+  setRobots(
+    INDEX_ROBOTS
   );
 
   setCanonical(
     canonicalUrl
   );
 
-  setMetaTag(
-    'meta[property="og:type"]',
-    [
-      "property",
-      "og:type",
-    ],
-    type
-  );
+  setOpenGraph({
+    title:
+      title || DEFAULT_TITLE,
 
-  setMetaTag(
-    'meta[property="og:site_name"]',
-    [
-      "property",
-      "og:site_name",
-    ],
-    SITE_NAME
-  );
+    description:
+      description ||
+      DEFAULT_DESCRIPTION,
 
-  setMetaTag(
-    'meta[property="og:title"]',
-    [
-      "property",
-      "og:title",
-    ],
-    title
-  );
+    canonicalUrl,
 
-  setMetaTag(
-    'meta[property="og:description"]',
-    [
-      "property",
-      "og:description",
-    ],
+    type,
+
+    image,
+  });
+
+  setTwitterMeta({
+    title:
+      title || DEFAULT_TITLE,
+
+    description:
+      description ||
+      DEFAULT_DESCRIPTION,
+
+    image,
+  });
+}
+
+
+// ============================================================
+// APPLY NOINDEX SEO
+// ============================================================
+
+function applyNoIndexSEO({
+  title,
+  description,
+  robots =
+    "noindex, nofollow, noarchive",
+}) {
+  document.title =
+    title;
+
+  setDescription(
     description
   );
 
-  setMetaTag(
-    'meta[property="og:url"]',
-    [
-      "property",
-      "og:url",
-    ],
-    canonicalUrl
+  setRobots(
+    robots
   );
 
-  setMetaTag(
-    'meta[name="twitter:title"]',
-    [
-      "name",
-      "twitter:title",
-    ],
-    title
-  );
+  /*
+   * Admin and missing pages should not inherit the canonical
+   * URL of the public page visited previously.
+   */
+  removeCanonical();
 
-  setMetaTag(
-    'meta[name="twitter:description"]',
-    [
-      "name",
-      "twitter:description",
-    ],
-    description
+  /*
+   * Remove stale public Open Graph URLs.
+   */
+  removeMetaTag(
+    'meta[property="og:url"]'
   );
 }
 
@@ -473,338 +653,178 @@ function applyDynamicSEO({
 // ============================================================
 
 function SEOManager() {
-  const {
-    pathname,
-  } =
+  const { pathname } =
     useLocation();
 
-
-  useEffect(
-    () => {
-
-      // ======================================================
-      // ADMIN
-      // ======================================================
-
-      if (
-        pathname === "/admin" ||
-        pathname.startsWith(
-          "/admin/"
-        )
-      ) {
-        document.title =
-          `Admin | ${SITE_NAME}`;
-
-        setMetaTag(
-          'meta[name="description"]',
-          [
-            "name",
-            "description",
-          ],
-          "Continental Founders administration."
-        );
-
-        setMetaTag(
-          'meta[name="robots"]',
-          [
-            "name",
-            "robots",
-          ],
-          "noindex, nofollow, noarchive"
-        );
-
-        setMetaTag(
-          'meta[name="googlebot"]',
-          [
-            "name",
-            "googlebot",
-          ],
-          "noindex, nofollow, noarchive"
-        );
-
-        /*
-         * Do not leave the canonical URL from a previously
-         * visited public page attached to an admin route.
-         */
-        setCanonical(
-          `${SITE_URL}/`
-        );
-
-        return;
-      }
+  useEffect(() => {
+    const cleanPath =
+      normalizePath(pathname);
 
 
-      // ======================================================
-      // DYNAMIC VENTURE
-      // ======================================================
+    // ========================================================
+    // ADMIN ROUTES
+    // ========================================================
 
-      if (
-        pathname.startsWith(
-          "/ventures/"
-        )
-      ) {
-        const canonicalUrl =
-          `${SITE_URL}${pathname}`;
+    if (
+      cleanPath === "/admin" ||
+      cleanPath.startsWith(
+        "/admin/"
+      )
+    ) {
+      applyNoIndexSEO({
+        title:
+          `Admin | ${SITE_NAME}`,
 
-        applyDynamicSEO({
-          title:
-            `Venture | ${SITE_NAME}`,
+        description:
+          "Continental Founders administration.",
 
-          description:
-            "Explore a venture in the Continental Founders network and discover the founders, solutions, markets, and opportunities behind the business.",
+        robots:
+          "noindex, nofollow, noarchive",
+      });
 
-          canonicalUrl,
-        });
-
-        return;
-      }
-
-
-      // ======================================================
-      // DYNAMIC EVENT
-      // ======================================================
-
-      if (
-        pathname.startsWith(
-          "/events/"
-        )
-      ) {
-        const canonicalUrl =
-          `${SITE_URL}${pathname}`;
-
-        applyDynamicSEO({
-          title:
-            `Event | ${SITE_NAME}`,
-
-          description:
-            "Explore a Continental Founders event bringing together founders, universities, business leaders, mentors, institutions, and strategic partners.",
-
-          canonicalUrl,
-        });
-
-        return;
-      }
+      return;
+    }
 
 
-      // ======================================================
-      // DYNAMIC INSIGHT
-      // ======================================================
+    // ========================================================
+    // DYNAMIC VENTURE PAGE
+    // ========================================================
 
-      if (
-        pathname.startsWith(
-          "/insights/"
-        )
-      ) {
-        const canonicalUrl =
-          `${SITE_URL}${pathname}`;
+    if (
+      cleanPath.startsWith(
+        "/ventures/"
+      )
+    ) {
+      applyPublicSEO({
+        title:
+          `Venture | ${SITE_NAME}`,
 
-        applyDynamicSEO({
-          title:
-            `Insight | ${SITE_NAME}`,
+        description:
+          "Explore a venture in the Continental Founders network and discover the founders, solutions, markets, and opportunities behind the business.",
 
-          description:
-            "Read insights from Continental Founders on entrepreneurship, innovation, venture development, markets, partnerships, and global opportunity.",
+        canonicalUrl:
+          buildCanonicalUrl(
+            cleanPath
+          ),
 
-          canonicalUrl,
+        type:
+          "website",
+      });
 
-          type:
-            "article",
-        });
-
-        return;
-      }
-
-
-      // ======================================================
-      // STATIC PUBLIC PAGE
-      // ======================================================
-
-      const seo =
-        SEO_ROUTES[
-          pathname
-        ];
+      return;
+    }
 
 
-      // ======================================================
-      // UNKNOWN / 404
-      // ======================================================
+    // ========================================================
+    // DYNAMIC EVENT PAGE
+    // ========================================================
 
-      if (!seo) {
-        document.title =
-          `Page Not Found | ${SITE_NAME}`;
+    if (
+      cleanPath.startsWith(
+        "/events/"
+      )
+    ) {
+      applyPublicSEO({
+        title:
+          `Event | ${SITE_NAME}`,
 
-        setMetaTag(
-          'meta[name="description"]',
-          [
-            "name",
-            "description",
-          ],
-          DEFAULT_DESCRIPTION
-        );
+        description:
+          "Explore a Continental Founders event bringing together founders, universities, business leaders, mentors, institutions, and strategic partners.",
 
-        setMetaTag(
-          'meta[name="robots"]',
-          [
-            "name",
-            "robots",
-          ],
-          "noindex, follow"
-        );
+        canonicalUrl:
+          buildCanonicalUrl(
+            cleanPath
+          ),
 
-        setMetaTag(
-          'meta[name="googlebot"]',
-          [
-            "name",
-            "googlebot",
-          ],
-          "noindex, follow"
-        );
+        type:
+          "website",
+      });
 
-        setCanonical(
-          `${SITE_URL}${pathname}`
-        );
-
-        return;
-      }
+      return;
+    }
 
 
-      // ======================================================
-      // APPLY STATIC SEO
-      // ======================================================
+    // ========================================================
+    // DYNAMIC INSIGHT PAGE
+    // ========================================================
 
-      const title =
-        seo.title ||
-        DEFAULT_TITLE;
+    if (
+      cleanPath.startsWith(
+        "/insights/"
+      )
+    ) {
+      applyPublicSEO({
+        title:
+          `Insight | ${SITE_NAME}`,
 
-      const description =
-        seo.description ||
-        DEFAULT_DESCRIPTION;
+        description:
+          "Read insights from Continental Founders on entrepreneurship, innovation, venture development, markets, partnerships, leadership, and global opportunity.",
 
-      const canonicalUrl =
-        `${SITE_URL}${seo.canonical}`;
+        canonicalUrl:
+          buildCanonicalUrl(
+            cleanPath
+          ),
+
+        type:
+          "article",
+      });
+
+      return;
+    }
 
 
-      document.title =
-        title;
+    // ========================================================
+    // STATIC PUBLIC PAGE
+    // ========================================================
+
+    const seo =
+      SEO_ROUTES[cleanPath];
 
 
-      setMetaTag(
-        'meta[name="description"]',
-        [
-          "name",
-          "description",
-        ],
-        description
+    // ========================================================
+    // UNKNOWN / 404
+    // ========================================================
+
+    if (!seo) {
+      applyNoIndexSEO({
+        title:
+          `Page Not Found | ${SITE_NAME}`,
+
+        description:
+          "The requested page could not be found on the Continental Founders website.",
+
+        robots:
+          "noindex, follow",
+      });
+
+      return;
+    }
+
+
+    // ========================================================
+    // APPLY STATIC PAGE SEO
+    // ========================================================
+
+    const title =
+      seo.title ||
+      DEFAULT_TITLE;
+
+    const description =
+      seo.description ||
+      DEFAULT_DESCRIPTION;
+
+    const canonicalUrl =
+      buildCanonicalUrl(
+        seo.canonical
       );
 
+    applyPublicSEO({
+      title,
+      description,
+      canonicalUrl,
+    });
 
-      setMetaTag(
-        'meta[name="robots"]',
-        [
-          "name",
-          "robots",
-        ],
-        "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
-      );
-
-
-      setMetaTag(
-        'meta[name="googlebot"]',
-        [
-          "name",
-          "googlebot",
-        ],
-        "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
-      );
-
-
-      setCanonical(
-        canonicalUrl
-      );
-
-
-      // ======================================================
-      // OPEN GRAPH
-      // ======================================================
-
-      setMetaTag(
-        'meta[property="og:type"]',
-        [
-          "property",
-          "og:type",
-        ],
-        "website"
-      );
-
-
-      setMetaTag(
-        'meta[property="og:site_name"]',
-        [
-          "property",
-          "og:site_name",
-        ],
-        SITE_NAME
-      );
-
-
-      setMetaTag(
-        'meta[property="og:title"]',
-        [
-          "property",
-          "og:title",
-        ],
-        title
-      );
-
-
-      setMetaTag(
-        'meta[property="og:description"]',
-        [
-          "property",
-          "og:description",
-        ],
-        description
-      );
-
-
-      setMetaTag(
-        'meta[property="og:url"]',
-        [
-          "property",
-          "og:url",
-        ],
-        canonicalUrl
-      );
-
-
-      // ======================================================
-      // TWITTER / X
-      // ======================================================
-
-      setMetaTag(
-        'meta[name="twitter:title"]',
-        [
-          "name",
-          "twitter:title",
-        ],
-        title
-      );
-
-
-      setMetaTag(
-        'meta[name="twitter:description"]',
-        [
-          "name",
-          "twitter:description",
-        ],
-        description
-      );
-
-    },
-    [
-      pathname,
-    ]
-  );
+  }, [pathname]);
 
 
   return null;
@@ -816,25 +836,16 @@ function SEOManager() {
 // ============================================================
 
 function ScrollToTop() {
-  const {
-    pathname,
-  } =
+  const { pathname } =
     useLocation();
 
-
-  useEffect(
-    () => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "auto",
-      });
-    },
-    [
-      pathname,
-    ]
-  );
-
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto",
+    });
+  }, [pathname]);
 
   return null;
 }
@@ -845,9 +856,7 @@ function ScrollToTop() {
 // ============================================================
 
 export default function App() {
-  const {
-    pathname,
-  } =
+  const { pathname } =
     useLocation();
 
 
@@ -974,7 +983,7 @@ export default function App() {
 
 
             {/* ==================================================
-                PARTNERS
+                STRATEGIC PARTNERS
             ================================================== */}
 
             <Route
@@ -983,6 +992,11 @@ export default function App() {
                 <StrategicPartners />
               }
             />
+
+
+            {/* ==================================================
+                PARTNER SUBPAGES
+            ================================================== */}
 
             <Route
               path="/partners/us-africa-trade-network"
@@ -1107,7 +1121,7 @@ export default function App() {
 
 
             {/* ==================================================
-                PROTECTED ADMIN
+                PROTECTED ADMIN ROUTES
             ================================================== */}
 
             <Route
@@ -1122,6 +1136,10 @@ export default function App() {
                   <AdminLayout />
                 }
               >
+
+                {/* ==============================================
+                    DASHBOARD
+                ============================================== */}
 
                 <Route
                   index
@@ -1180,7 +1198,7 @@ export default function App() {
 
 
                 {/* ==============================================
-                    PARTNER CMS
+                    U.S.–AFRICA TRADE NETWORK
                 ============================================== */}
 
                 <Route
@@ -1190,12 +1208,22 @@ export default function App() {
                   }
                 />
 
+
+                {/* ==============================================
+                    CORPORATE PARTNERS
+                ============================================== */}
+
                 <Route
                   path="partners/corporate"
                   element={
                     <AdminCorporatePartners />
                   }
                 />
+
+
+                {/* ==============================================
+                    GOVERNMENT & DEVELOPMENT
+                ============================================== */}
 
                 <Route
                   path="partners/government-development"
@@ -1286,3 +1314,4 @@ export default function App() {
     </div>
   );
 }
+

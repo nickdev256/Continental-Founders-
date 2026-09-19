@@ -1,78 +1,577 @@
-const { z } = require('zod');
-const Partnership = require('../models/Partnership');
-const sendEmail = require('../utils/sendEmail');
+const {
+  supabaseAdmin,
+} = require("../config/supabase");
 
-const partnershipSchema = z.object({
-  organization: z.string().min(2).max(180),
-  contactName: z.string().min(2).max(120),
-  email: z.string().email(),
-  phone: z.string().max(40).optional().default(''),
-  organizationType: z.string().max(120).optional().default(''),
-  website: z.string().max(250).optional().default(''),
-  areaOfInterest: z.string().max(180).optional().default(''),
-  message: z.string().max(5000).optional().default(''),
-});
+const Partnership =
+  require("../models/Partnership");
 
-async function createPartnership(req, res) {
-  const data = partnershipSchema.parse(req.body);
-  const partnership = await Partnership.create(data);
+// ============================================================
+// CONFIGURATION
+// ============================================================
 
-  sendEmail({
-    subject: `New partnership inquiry: ${data.organization}`,
-    replyTo: data.email,
-    html: `
-      <h2>New Partnership Inquiry</h2>
-      <p><strong>Organization:</strong> ${safe(data.organization)}</p>
-      <p><strong>Contact:</strong> ${safe(data.contactName)}</p>
-      <p><strong>Email:</strong> ${safe(data.email)}</p>
-      <p><strong>Phone:</strong> ${safe(data.phone || 'Not provided')}</p>
-      <p><strong>Type:</strong> ${safe(data.organizationType || 'Not provided')}</p>
-      <p><strong>Website:</strong> ${safe(data.website || 'Not provided')}</p>
-      <p><strong>Area of interest:</strong> ${safe(data.areaOfInterest || 'Not provided')}</p>
-      <p><strong>Message:</strong></p>
-      <p>${safe(data.message || 'No additional message').replace(/\n/g, '<br>')}</p>
-    `,
-  }).catch((error) => console.error('Email notification failed:', error.message));
+const RECENT_ACTIVITY_LIMIT = 8;
 
-  res.status(201).json({
-    success: true,
-    message: 'Your partnership inquiry has been submitted.',
-    id: partnership._id,
-  });
+// ============================================================
+// SUPABASE COUNT HELPER
+// ============================================================
+
+async function countRows(
+  table,
+  configureQuery = null
+) {
+  let query = supabaseAdmin
+    .from(table)
+    .select("*", {
+      count: "exact",
+      head: true,
+    });
+
+  if (
+    typeof configureQuery ===
+    "function"
+  ) {
+    query =
+      configureQuery(query);
+  }
+
+  const {
+    count,
+    error,
+  } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return count || 0;
 }
 
-async function listPartnerships(req, res) {
-  const { status, page = 1, limit = 20 } = req.query;
-  const filter = status ? { status } : {};
-  const pageNum = Math.max(Number(page) || 1, 1);
-  const limitNum = Math.min(Math.max(Number(limit) || 20, 1), 100);
+// ============================================================
+// OPTIONAL SUPABASE COUNT
+// ============================================================
 
-  const [items, total] = await Promise.all([
-    Partnership.find(filter).sort({ createdAt: -1 }).skip((pageNum - 1) * limitNum).limit(limitNum),
-    Partnership.countDocuments(filter),
-  ]);
+async function optionalCount(
+  label,
+  table,
+  configureQuery = null
+) {
+  try {
+    return await countRows(
+      table,
+      configureQuery
+    );
+  } catch (error) {
+    console.warn(
+      `[DASHBOARD] ${label} unavailable:`,
+      error?.message
+    );
 
-  res.json({ success: true, items, pagination: { page: pageNum, limit: limitNum, total } });
+    return 0;
+  }
 }
 
-async function updatePartnershipStatus(req, res) {
-  const schema = z.object({
-    status: z.enum(['new', 'reviewing', 'contacted', 'approved', 'declined']),
-  });
-  const { status } = schema.parse(req.body);
-  const item = await Partnership.findByIdAndUpdate(req.params.id, { status }, { new: true });
+// ============================================================
+// FETCH RECENT SUPABASE ROWS
+// ============================================================
 
-  if (!item) return res.status(404).json({ success: false, message: 'Partnership inquiry not found.' });
-  res.json({ success: true, item });
+async function fetchRecentRows({
+  label,
+  table,
+  columns,
+  limit = 4,
+}) {
+  try {
+    const {
+      data,
+      error,
+    } = await supabaseAdmin
+      .from(table)
+      .select(columns)
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(limit);
+
+    if (error) {
+      throw error;
+    }
+
+    return Array.isArray(data)
+      ? data
+      : [];
+  } catch (error) {
+    console.warn(
+      `[DASHBOARD] ${label} unavailable:`,
+      error?.message
+    );
+
+    return [];
+  }
 }
 
-function safe(value = '') {
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+// ============================================================
+// PARTNERSHIP COUNTS
+// ============================================================
+
+async function getPartnershipCounts() {
+  try {
+    const [
+      total,
+      newCount,
+    ] = await Promise.all([
+      Partnership.countDocuments(
+        {}
+      ),
+
+      Partnership.countDocuments({
+        status: "new",
+      }),
+    ]);
+
+    return {
+      total:
+        Number(total) || 0,
+
+      newCount:
+        Number(newCount) || 0,
+    };
+  } catch (error) {
+    console.warn(
+      "[DASHBOARD] Partnership counts unavailable:",
+      error?.message
+    );
+
+    return {
+      total: 0,
+      newCount: 0,
+    };
+  }
 }
 
-module.exports = { createPartnership, listPartnerships, updatePartnershipStatus };
+// ============================================================
+// RECENT PARTNERSHIPS
+// ============================================================
+
+async function getRecentPartnerships(
+  limit = 4
+) {
+  try {
+    const partnerships =
+      await Partnership
+        .find({})
+        .sort({
+          createdAt: -1,
+        })
+        .limit(limit)
+        .lean();
+
+    return Array.isArray(
+      partnerships
+    )
+      ? partnerships
+      : [];
+  } catch (error) {
+    console.warn(
+      "[DASHBOARD] Recent partnerships unavailable:",
+      error?.message
+    );
+
+    return [];
+  }
+}
+
+// ============================================================
+// TIMESTAMP HELPER
+// ============================================================
+
+function getTimestamp(item) {
+  const value =
+    item?.created_at ||
+    item?.createdAt ||
+    item?.updated_at ||
+    item?.updatedAt ||
+    item?.event_date ||
+    null;
+
+  if (!value) {
+    return 0;
+  }
+
+  const timestamp =
+    new Date(value)
+      .getTime();
+
+  return Number.isFinite(
+    timestamp
+  )
+    ? timestamp
+    : 0;
+}
+
+// ============================================================
+// DASHBOARD STATS
+//
+// GET /api/admin/dashboard/stats
+// ============================================================
+
+async function stats(
+  req,
+  res
+) {
+  try {
+    const now =
+      new Date()
+        .toISOString();
+
+    // ========================================================
+    // CORE SUPABASE COUNTS
+    // ========================================================
+
+    const [
+      totalContacts,
+      newContacts,
+      upcomingEvents,
+      publishedInsights,
+    ] = await Promise.all([
+      // ------------------------------------------------------
+      // TOTAL CONTACTS
+      // ------------------------------------------------------
+
+      countRows(
+        "contact_messages"
+      ),
+
+      // ------------------------------------------------------
+      // NEW CONTACTS
+      // ------------------------------------------------------
+
+      countRows(
+        "contact_messages",
+        (query) =>
+          query.eq(
+            "status",
+            "new"
+          )
+      ),
+
+      // ------------------------------------------------------
+      // UPCOMING PUBLISHED EVENTS
+      // ------------------------------------------------------
+
+      countRows(
+        "events",
+        (query) =>
+          query
+            .eq(
+              "status",
+              "published"
+            )
+            .gte(
+              "event_date",
+              now
+            )
+      ),
+
+      // ------------------------------------------------------
+      // PUBLISHED INSIGHTS
+      // ------------------------------------------------------
+
+      countRows(
+        "insights",
+        (query) =>
+          query.eq(
+            "status",
+            "published"
+          )
+      ),
+    ]);
+
+    // ========================================================
+    // NEWSLETTER COUNT
+    // ========================================================
+
+    const newsletterSubscribers =
+      await optionalCount(
+        "Newsletter subscriber count",
+        "newsletter_subscribers",
+        (query) =>
+          query.eq(
+            "active",
+            true
+          )
+      );
+
+    // ========================================================
+    // PARTNERSHIP COUNTS
+    // ========================================================
+
+    const partnershipCounts =
+      await getPartnershipCounts();
+
+    // ========================================================
+    // RECENT CONTENT
+    // ========================================================
+
+    const [
+      recentContacts,
+      recentEvents,
+      recentInsights,
+      recentPartnerships,
+    ] = await Promise.all([
+      fetchRecentRows({
+        label:
+          "Recent contacts",
+
+        table:
+          "contact_messages",
+
+        columns:
+          "id, name, organization, status, created_at",
+
+        limit:
+          4,
+      }),
+
+      fetchRecentRows({
+        label:
+          "Recent events",
+
+        table:
+          "events",
+
+        columns:
+          "id, title, status, event_date, created_at",
+
+        limit:
+          3,
+      }),
+
+      fetchRecentRows({
+        label:
+          "Recent insights",
+
+        table:
+          "insights",
+
+        columns:
+          "id, title, status, created_at",
+
+        limit:
+          3,
+      }),
+
+      getRecentPartnerships(
+        4
+      ),
+    ]);
+
+    // ========================================================
+    // CONTACT ACTIVITY
+    // ========================================================
+
+    const contactActivity =
+      recentContacts.map(
+        (contact) => ({
+          id:
+            `contact-${contact.id}`,
+
+          type:
+            "contact",
+
+          title:
+            contact.name
+              ? `Contact from ${contact.name}`
+              : "Website contact inquiry",
+
+          description:
+            contact.organization ||
+            "Website contact inquiry",
+
+          status:
+            contact.status,
+
+          created_at:
+            contact.created_at,
+        })
+      );
+
+    // ========================================================
+    // EVENT ACTIVITY
+    // ========================================================
+
+    const eventActivity =
+      recentEvents.map(
+        (event) => ({
+          id:
+            `event-${event.id}`,
+
+          type:
+            "event",
+
+          title:
+            event.title ||
+            "Event updated",
+
+          description:
+            event.status
+              ? `Event status: ${event.status}`
+              : "Continental Founders event",
+
+          status:
+            event.status,
+
+          event_date:
+            event.event_date,
+
+          created_at:
+            event.created_at,
+        })
+      );
+
+    // ========================================================
+    // INSIGHT ACTIVITY
+    // ========================================================
+
+    const insightActivity =
+      recentInsights.map(
+        (insight) => ({
+          id:
+            `insight-${insight.id}`,
+
+          type:
+            "insight",
+
+          title:
+            insight.title ||
+            "Insight updated",
+
+          description:
+            insight.status
+              ? `Insight status: ${insight.status}`
+              : "Continental Founders insight",
+
+          status:
+            insight.status,
+
+          created_at:
+            insight.created_at,
+        })
+      );
+
+    // ========================================================
+    // PARTNERSHIP ACTIVITY
+    // ========================================================
+
+    const partnershipActivity =
+      recentPartnerships.map(
+        (partnership) => ({
+          id:
+            `partnership-${partnership._id}`,
+
+          type:
+            "partnership",
+
+          title:
+            partnership.organization
+              ? `Partnership inquiry from ${partnership.organization}`
+              : "New partnership inquiry",
+
+          description:
+            partnership.areaOfInterest ||
+            partnership.organizationType ||
+            partnership.contactName ||
+            "Partnership inquiry",
+
+          status:
+            partnership.status,
+
+          created_at:
+            partnership.createdAt,
+        })
+      );
+
+    // ========================================================
+    // COMBINE ACTIVITY
+    // ========================================================
+
+    const recentActivity = [
+      ...contactActivity,
+      ...eventActivity,
+      ...insightActivity,
+      ...partnershipActivity,
+    ]
+      .sort(
+        (a, b) =>
+          getTimestamp(b) -
+          getTimestamp(a)
+      )
+      .slice(
+        0,
+        RECENT_ACTIVITY_LIMIT
+      );
+
+    // ========================================================
+    // RESPONSE
+    // ========================================================
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        stats: {
+          upcomingEvents,
+
+          publishedInsights,
+
+          newsletterSubscribers,
+
+          newContacts,
+
+          totalContacts,
+
+          partnerships:
+            partnershipCounts.total,
+
+          newPartnerships:
+            partnershipCounts.newCount,
+        },
+
+        recentActivity,
+
+        meta: {
+          generatedAt:
+            new Date()
+              .toISOString(),
+        },
+      });
+  } catch (error) {
+    console.error(
+      "[DASHBOARD] Stats error:",
+      error
+    );
+
+    return res
+      .status(500)
+      .json({
+        success: false,
+
+        message:
+          "Unable to load dashboard statistics.",
+
+        error:
+          process.env.NODE_ENV ===
+          "development"
+            ? error?.message
+            : undefined,
+      });
+  }
+}
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
+module.exports = {
+  stats,
+};

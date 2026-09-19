@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -42,6 +43,11 @@
     />
 
     <meta
+      name="application-name"
+      content="Continental Founders"
+    />
+
+    <meta
       name="robots"
       content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
@@ -51,19 +57,28 @@
       content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     />
 
-
-    <!-- =====================================================
-         CANONICAL
-    ====================================================== -->
-
-    <link
-      rel="canonical"
-      href="https://continentalfounders.org/"
+    <meta
+      name="bingbot"
+      content="index, follow"
     />
 
 
     <!-- =====================================================
-         FAVICON / BRAND ICON
+         CANONICAL URL
+
+         IMPORTANT:
+         The live site resolves to the WWW version, so all SEO
+         references should consistently use the WWW domain.
+    ====================================================== -->
+
+    <link
+      rel="canonical"
+      href="https://www.continentalfounders.org/"
+    />
+
+
+    <!-- =====================================================
+         FAVICON / BRAND
     ====================================================== -->
 
     <link
@@ -80,6 +95,7 @@
 
     <!-- =====================================================
          OPEN GRAPH
+         Facebook / LinkedIn / WhatsApp / other platforms
     ====================================================== -->
 
     <meta
@@ -104,22 +120,27 @@
 
     <meta
       property="og:url"
-      content="https://continentalfounders.org/"
+      content="https://www.continentalfounders.org/"
     />
 
     <meta
       property="og:image"
-      content="https://continentalfounders.org/assets/continental-founders-logo.png"
+      content="https://www.continentalfounders.org/assets/continental-founders-logo.png"
     />
 
     <meta
       property="og:image:secure_url"
-      content="https://continentalfounders.org/assets/continental-founders-logo.png"
+      content="https://www.continentalfounders.org/assets/continental-founders-logo.png"
+    />
+
+    <meta
+      property="og:image:type"
+      content="image/png"
     />
 
     <meta
       property="og:image:alt"
-      content="Continental Founders"
+      content="Continental Founders logo"
     />
 
     <meta
@@ -149,12 +170,12 @@
 
     <meta
       name="twitter:image"
-      content="https://continentalfounders.org/assets/continental-founders-logo.png"
+      content="https://www.continentalfounders.org/assets/continental-founders-logo.png"
     />
 
     <meta
       name="twitter:image:alt"
-      content="Continental Founders"
+      content="Continental Founders logo"
     />
 
 
@@ -185,22 +206,34 @@
 
 
     <!-- =====================================================
-         STRUCTURED DATA — ORGANIZATION
+         STRUCTURED DATA
+         ORGANIZATION
     ====================================================== -->
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "@id": "https://continentalfounders.org/#organization",
+        "@id": "https://www.continentalfounders.org/#organization",
+
         "name": "Continental Founders",
-        "alternateName": "Continental Founders™",
-        "url": "https://continentalfounders.org/",
+
+        "url": "https://www.continentalfounders.org/",
+
         "logo": {
           "@type": "ImageObject",
-          "url": "https://continentalfounders.org/assets/continental-founders-logo.png"
+          "@id": "https://www.continentalfounders.org/#logo",
+          "url": "https://www.continentalfounders.org/assets/continental-founders-logo.png",
+          "contentUrl": "https://www.continentalfounders.org/assets/continental-founders-logo.png",
+          "caption": "Continental Founders"
         },
+
+        "image": {
+          "@id": "https://www.continentalfounders.org/#logo"
+        },
+
         "description": "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks through entrepreneurship, collaboration, and venture development.",
+
         "areaServed": [
           {
             "@type": "Continent",
@@ -211,6 +244,7 @@
             "name": "United States"
           }
         ],
+
         "knowsAbout": [
           "Entrepreneurship",
           "Venture Development",
@@ -228,50 +262,117 @@
 
 
     <!-- =====================================================
-         STRUCTURED DATA — WEBSITE
+         STRUCTURED DATA
+         WEBSITE
     ====================================================== -->
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "@id": "https://continentalfounders.org/#website",
-        "url": "https://continentalfounders.org/",
+
+        "@id": "https://www.continentalfounders.org/#website",
+
+        "url": "https://www.continentalfounders.org/",
+
         "name": "Continental Founders",
+
+        "description": "Connecting African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks.",
+
         "publisher": {
-          "@id": "https://continentalfounders.org/#organization"
+          "@id": "https://www.continentalfounders.org/#organization"
         },
-        "inLanguage": "en"
+
+        "inLanguage": "en-US"
       }
     </script>
+
+
+    <!-- =====================================================
+         STRUCTURED DATA
+         HOME PAGE
+    ====================================================== -->
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+
+        "@type": "WebPage",
+
+        "@id": "https://www.continentalfounders.org/#webpage",
+
+        "url": "https://www.continentalfounders.org/",
+
+        "name": "Continental Founders | Connecting African Founders to Global Opportunity",
+
+        "description": "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks.",
+
+        "isPartOf": {
+          "@id": "https://www.continentalfounders.org/#website"
+        },
+
+        "about": {
+          "@id": "https://www.continentalfounders.org/#organization"
+        },
+
+        "publisher": {
+          "@id": "https://www.continentalfounders.org/#organization"
+        },
+
+        "inLanguage": "en-US"
+      }
+    </script>
+
   </head>
 
+
   <body>
+
     <!-- =====================================================
          NOSCRIPT
+         Gives search engines and visitors useful context if
+         JavaScript cannot execute.
     ====================================================== -->
 
     <noscript>
-      Continental Founders connects founders, universities,
-      mentors, business leaders, markets, and global opportunity
-      networks. JavaScript is required to use this website.
+      <h1>Continental Founders</h1>
+
+      <p>
+        Continental Founders connects African founders with
+        universities, mentors, business leaders, investors,
+        markets, and global opportunity networks through
+        entrepreneurship, collaboration, and venture development.
+      </p>
+
+      <p>
+        Our work creates pathways between founders, universities,
+        industry experts, mentors, strategic partners, and global
+        markets.
+      </p>
+
+      <p>
+        Please enable JavaScript to experience the complete
+        Continental Founders website.
+      </p>
     </noscript>
 
 
     <!-- =====================================================
-         APPLICATION ROOT
+         REACT APPLICATION
     ====================================================== -->
 
     <div id="root"></div>
 
 
     <!-- =====================================================
-         APPLICATION
+         APPLICATION ENTRY
     ====================================================== -->
 
     <script
       type="module"
       src="/src/main.jsx"
     ></script>
+
   </body>
 </html>
+

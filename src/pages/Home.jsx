@@ -448,8 +448,7 @@ export default function Home() {
 
 
         <p className="cf-home-hero__lead">
-          Continental Founders is a newly
-          established nonprofit building
+          Continental Founders is a nonprofit building
           strategic partnerships between
           universities in Africa and the
           United States through
@@ -584,21 +583,21 @@ export default function Home() {
 
           <QuickHighlight
             number="01"
-            icon={<GraduationCap />}
+            
             title="University Partnerships"
             text="Africa × United States"
           />
 
           <QuickHighlight
             number="02"
-            icon={<Lightbulb />}
+            
             title="Innovation & Entrepreneurship"
             text="Ideas into practical opportunities"
           />
 
           <QuickHighlight
             number="03"
-            icon={<Users />}
+            
             title="Leadership Development"
             text="Preparing the next generation"
           />
@@ -650,7 +649,7 @@ export default function Home() {
             <div className="cf-who-content">
 
               <p>
-                Continental Founders™ brings
+                Continental Founders brings
                 universities, students,
                 entrepreneurs, researchers,
                 businesses, government leaders,
@@ -739,37 +738,33 @@ export default function Home() {
           </div>
 
 
-          <div className="cf-program-grid">
+  <div className="cf-program-grid">
 
-            <ProgramCard
-              number="01"
-              icon={<GraduationCap />}
-              title="University Partnerships"
-              text="We work with universities to build meaningful institutional relationships between Africa and the United States."
-            />
+  <ProgramCard
+    number="01"
+    title="University Partnerships"
+    text="We work with universities to build meaningful institutional relationships between Africa and the United States."
+  />
 
-            <ProgramCard
-              number="02"
-              icon={<Lightbulb />}
-              title="Innovation & Entrepreneurship"
-              text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
-            />
+  <ProgramCard
+    number="02"
+    title="Innovation & Entrepreneurship"
+    text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
+  />
 
-            <ProgramCard
-              number="03"
-              icon={<Handshake />}
-              title="Strategic Collaboration"
-              text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
-            />
+  <ProgramCard
+    number="03"
+    title="Strategic Collaboration"
+    text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
+  />
 
-            <ProgramCard
-              number="04"
-              icon={<Globe2 />}
-              title="Leadership Development"
-              text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
-            />
+  <ProgramCard
+    number="04"
+    title="Leadership Development"
+    text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
+  />
 
-          </div>
+</div>
 
 
           <div className="cf-centered-link">
@@ -1679,43 +1674,25 @@ function SectionNumber({
    PROGRAM CARD
 ============================================================ */
 
-function ProgramCard({
-  number,
-  icon,
-  title,
-  text,
-}) {
+function ProgramCard({ number, title, text }) {
   return (
-    <article className="cf-program-card">
+    <div className="cf-program-card">
 
-      <div className="cf-card-top">
+      <span className="cf-program-number">
+        {number}
+      </span>
 
-        <div className="cf-card-icon">
-          {icon}
-        </div>
-
-        <span>
-          {number}
-        </span>
-
-      </div>
-
-
-      <h3>
+      <h3 className="cf-program-title">
         {title}
       </h3>
 
-
-      <p>
+      <p className="cf-program-text">
         {text}
       </p>
 
+     
 
-      <span className="cf-card-arrow">
-        <ArrowUpRight size={17} />
-      </span>
-
-    </article>
+    </div>
   );
 }
 

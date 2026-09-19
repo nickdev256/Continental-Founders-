@@ -1448,3 +1448,171 @@ and
     transition: none;
   }
 }
+
+
+/* ============================================================
+   MOBILE — CENTER CONTACT PAGE CONTENT
+============================================================ */
+
+@media screen and (max-width: 768px) {
+
+  /* HERO */
+  .page-hero__inner {
+    width: 100%;
+    justify-items: center;
+    text-align: center;
+   
+  }
+
+  .page-hero__inner > div {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -50px;
+  }
+
+  .page-hero h1 {
+    width: 100%;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    
+    
+  }
+  
+
+  .page-hero .eyebrow {
+    text-align: center;
+  }
+
+  .page-hero__aside {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .page-hero__aside p {
+    width: 100%;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+
+  /* CONTACT SECTION */
+  .contact-grid {
+    width: 100%;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .contact-info {
+    width: 100%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .contact-info .eyebrow {
+    text-align: center;
+  }
+
+  .contact-info h2 {
+    width: 100%;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .contact-info > p {
+    width: 100%;
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+
+  /* CONTACT DETAILS */
+  .contact-detail {
+    width: 100%;
+    max-width: 500px;
+    justify-content: center;
+    text-align: left;
+  }
+
+
+  /* FORM */
+  .contact-form-wrap {
+    width: 100%;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .contact-form {
+    width: 100%;
+    text-align: left;
+  }
+
+}
+
+/* ============================================================
+   MOBILE — REDUCE CONTACT HERO HEADING
+============================================================ */
+
+@media screen and (max-width: 768px) {
+  .page-hero h1 {
+    font-size: 3rem !important;
+    line-height: 1.05 !important;
+    max-width: 360px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .page-hero h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.05 !important;
+    max-width: 350px !important;
+  }
+}
+
+@media screen and (max-width: 390px) {
+  .page-hero h1 {
+    font-size: 1.7rem !important;
+    line-height: 1.05 !important;
+    max-width: 330px !important;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .contact-info h2 {
+    font-size: 2.8rem !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .contact-info h2 {
+    font-size: 2.65rem !important;
+    line-height: 1.05 !important;
+  }
+}
+
+@media screen and (max-width: 390px) {
+  .contact-info h2 {
+    font-size: 2.55rem !important;
+    line-height: 1.05 !important;
+  }
+}

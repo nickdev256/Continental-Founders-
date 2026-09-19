@@ -52,7 +52,7 @@ const team = [
   {
     name: "Amb. Dr. Karen L. Booker",
     role: "Chair",
-    image: "/assets/team/karen-booker.webp",
+    image: "/assets/team/karen-booker.jpg",
     bio:
       "Amb. Dr. Karen L. Booker brings more than four decades of experience across management services, education, outreach, policy analysis, operational diagnosis, and organizational leadership. Her career includes program development, policy work, housing and real property operations, and educational and environmental health initiatives.",
   },
@@ -1200,7 +1200,7 @@ export default function About() {
             <br />
 
             <p>
-              Continental Founders™ is intentionally engaging
+              Continental Founders is intentionally engaging
               universities, businesses, professionals, and strategic
               institutions during the development of the initiative.
             </p>

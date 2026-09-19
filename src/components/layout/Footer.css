@@ -1957,3 +1957,229 @@
     margin-right: auto !important;
   }
 }
+
+
+
+
+/* ============================================================
+   MOBILE FOOTER — 3 CLEAR SECTIONS
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .cf-footer__navigation {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0 !important;
+  }
+
+  /* Each section */
+  .cf-footer__column {
+    width: 100% !important;
+    padding: 35px 0 !important;
+    border: none !important;
+  }
+
+  /* Divider between the 3 sections */
+  .cf-footer__column + .cf-footer__column {
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding-top: 35px !important;
+  }
+
+  /* Links stay inside their own section */
+  .cf-footer__links {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    width: 100% !important;
+  }
+
+  .cf-footer__link {
+    width: 100% !important;
+  }
+}
+
+
+
+
+
+/* ============================================================
+   MOBILE FOOTER — TWO COLUMNS + OUR FOCUS BELOW
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .cf-footer__navigation {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 25px !important;
+    width: 100% !important;
+  }
+
+  /* Explore + Resources */
+  .cf-footer__column {
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  /* Remove the divider between Explore and Resources */
+  .cf-footer__column + .cf-footer__column {
+    padding-top: 0 !important;
+    border-top: none !important;
+  }
+
+  /* Our Focus goes underneath both columns */
+  .cf-footer__column:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin-top: 45px !important;
+    padding-top: 35px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .cf-footer__links {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+
+  .cf-footer__link {
+    width: 100% !important;
+  }
+}
+
+
+@media (max-width: 700px) {
+  .cf-footer__meeting {
+    width: 75% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    
+  }
+
+  .cf-footer__meeting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+}
+
+
+/* ============================================================
+   MOBILE FOOTER — CLEAN CENTERED LAYOUT
+============================================================ */
+
+@media (max-width: 700px) {
+
+  /* ----------------------------------------
+     EXPLORE + RESOURCES
+  ---------------------------------------- */
+
+  .cf-footer__navigation {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    column-gap: 20px !important;
+    width: 100% !important;
+  }
+
+  .cf-footer__column {
+    width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__column h3 {
+    width: 100% !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Center the gold line */
+  .cf-footer__gold-line {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Center navigation links */
+  .cf-footer__links {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 18px !important;
+  }
+
+  .cf-footer__link {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+
+  /* ----------------------------------------
+     OUR FOCUS
+  ---------------------------------------- */
+
+  .cf-footer__column:nth-child(3) {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    margin-top: 45px !important;
+    padding-top: 35px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+    text-align: center !important;
+  }
+
+  .cf-footer__column:nth-child(3) h3 {
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .cf-footer__column:nth-child(3) .cf-footer__gold-line {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+
+  /* ----------------------------------------
+     CENTER THE ENTIRE FOCUS LIST
+  ---------------------------------------- */
+
+  .cf-footer__focus {
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    gap: 20px !important;
+  }
+
+  .cf-footer__focus-item {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 35px auto !important;
+    column-gap: 14px !important;
+    align-items: center !important;
+    justify-content: start !important;
+    text-align: left !important;
+  }
+
+  .cf-footer__focus-item span {
+    text-align: right !important;
+  }
+
+  .cf-footer__focus-item p {
+    margin: 0 !important;
+    text-align: left !important;
+  }
+}

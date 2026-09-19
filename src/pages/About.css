@@ -5490,6 +5490,29 @@ and
 
 
 /* ============================================================
+   MOBILE — MOVE ABOUT HERO CONTENT DOWN
+============================================================ */
+
+@media screen and (max-width: 768px) {
+
+  .about-hero .about-hero__content {
+    position: relative !important;
+    top: 60px !important;
+  }
+
+}
+
+@media screen and (max-width: 480px) {
+
+  .about-hero .about-hero__content {
+    position: relative !important;
+    top: 90px !important;
+  }
+
+}
+
+
+/* ============================================================
    SMALLER PHONES
 ============================================================ */
 
@@ -6414,28 +6437,25 @@ and
     padding-right: 32px !important;
   }
 
-  .about-founding .about-founding__grid {
-    margin-top: 60px !important;
-    margin-bottom: 60px !important;
-  }
+  
 
   .about-founding .about-founding__visual {
     margin-bottom: 10px !important;
   }
 
   .about-founding .about-founding__content {
-    margin-top: 10px !important;
+    margin-top: -30px !important;
     margin-bottom: 40px !important;
   }
 
   .about-founding .about-founding__content h2 {
-    margin-top: 28px !important;
-    margin-bottom: 28px !important;
+    margin-top: 20px !important;
+    
   }
 
   .about-founding .about-founding__content p {
-    margin-top: 24px !important;
-    margin-bottom: 24px !important;
+    margin-top: 14px !important;
+    margin-bottom: 14px !important;
   }
 
   .about-founding .about-founding__content .about-button {
@@ -6457,17 +6477,203 @@ and
   }
 
   .about-founding .about-founding__content h2 {
-    margin-top: 24px !important;
-    margin-bottom: 24px !important;
+    margin-top: 14px !important;
+    margin-bottom: 14px !important;
   }
 
   .about-founding .about-founding__content p {
-    margin-top: 20px !important;
-    margin-bottom: 20px !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
   }
 
   .about-founding .about-founding__content .about-button {
-    margin-top: 30px !important;
+    margin-top: 20px !important;
     margin-bottom: 20px !important;
   }
+}
+
+/* ============================================================
+   MOBILE — REDUCE VISION PHOTO SIZE
+============================================================ */
+
+@media (max-width: 768px) {
+  .about-vision .about-vision__background img {
+    width: 50% !important;
+    max-width: 50% !important;
+    height: auto !important;
+    margin: 0 auto !important;
+    display: block !important;
+    margin-top: -100px !important;
+    margin-bottom: auto;
+   
+  }
+}
+
+@media (max-width: 480px) {
+  .about-vision .about-vision__background img {
+    width: 50% !important;
+    max-width: 50% !important;
+    margin-top: -100px !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — MOVE VISION CONTENT UP
+============================================================ */
+
+@media (max-width: 768px) {
+  .about-vision .about-vision__content {
+    margin-top: -80px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-vision .about-vision__content {
+    margin-top: -110px !important;
+  }
+}
+
+
+
+/* ============================================================
+   MOBILE — INCREASE OUR BELIEF SECTION MARGINS
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .about-belief {
+    padding-top: 90px !important;
+    padding-bottom: 100px !important;
+    margin-top: -100px;
+  }
+
+  .about-belief__grid {
+    padding-left: 28px !important;
+    padding-right: 28px !important;
+     margin-top: -80px;
+  }
+
+  .about-belief__content {
+    margin-top: 50px !important;
+    
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .about-belief {
+    padding-top: 75px !important;
+    padding-bottom: 90px !important;
+     margin-top: -100px;
+  }
+
+  .about-belief__grid {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+     margin-top: -80px;
+  }
+
+  .about-belief__content {
+    margin-top: 40px !important;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE — LEADERSHIP SECTION SIDE MARGINS
+============================================================ */
+
+@media (max-width: 768px) {
+  .about-leadership .container {
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-leadership .container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+}
+
+
+
+/* ============================================================
+   MOBILE — CENTER FINAL CTA
+============================================================ */
+
+@media screen and (max-width: 768px) {
+
+  .about-final-cta {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .about-final-cta .about-final-cta__inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .about-final-cta .about-kicker {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .about-final-cta h2 {
+    width: 100% !important;
+    max-width: 750px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  .about-final-cta p {
+    width: 100% !important;
+    max-width: 700px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  .about-final-cta .about-button {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media screen and (max-width: 480px) {
+
+  .about-final-cta .about-final-cta__inner {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+  }
+
+  .about-final-cta h2 {
+    max-width: 100% !important;
+  }
+
+  .about-final-cta p {
+    max-width: 100% !important;
+  }
+
 }

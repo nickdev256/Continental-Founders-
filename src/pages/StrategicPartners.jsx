@@ -73,7 +73,7 @@ export default function StrategicPartners() {
             />
 
             <p>
-              We connect institutions with organizations
+              We connect institutions with organizations 
               whose expertise, resources, and networks can
               strengthen shared priorities.
             </p>

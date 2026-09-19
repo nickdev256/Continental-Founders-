@@ -379,7 +379,7 @@ export default function Footer() {
 
   return (
 
-    <footer className="cf-footer">
+    <footer className="cf-footer"> 
 
       {/* ======================================================
           BACKGROUND

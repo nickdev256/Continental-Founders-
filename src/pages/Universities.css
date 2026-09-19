@@ -1488,3 +1488,211 @@
   }
 
 }
+
+
+
+
+/* ============================================================
+   UNIVERSITIES HERO — FINAL FIX
+   Remove circular overlay and show background image properly
+   ============================================================ */
+
+.universities-hero {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(3, 18, 32, 0.82) 0%,
+      rgba(3, 18, 32, 0.68) 35%,
+      rgba(3, 18, 32, 0.45) 65%,
+      rgba(3, 18, 32, 0.30) 100%
+    ),
+    url("/assets/images/universities/university-partnership.webp") !important;
+
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+
+  color: #ffffff !important;
+}
+
+
+/* ------------------------------------------------------------
+   REMOVE THE OLD GRID / CIRCLE SHAPES
+   ------------------------------------------------------------ */
+
+.universities-hero::before {
+  content: "" !important;
+
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  border-radius: 0 !important;
+  transform: none !important;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px
+    ) !important;
+
+  background-size: 72px 72px !important;
+
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+
+/* ------------------------------------------------------------
+   REPLACE THE 620px CIRCLE WITH A FULL HERO OVERLAY
+   ------------------------------------------------------------ */
+
+.universities-hero::after {
+  content: "" !important;
+
+  position: absolute !important;
+  inset: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+
+  border-radius: 0 !important;
+  transform: none !important;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 18, 32, 0.20) 0%,
+      rgba(3, 18, 32, 0.10) 55%,
+      rgba(3, 18, 32, 0.05) 100%
+    ) !important;
+
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+
+/* ------------------------------------------------------------
+   KEEP CONTENT ABOVE IMAGE + OVERLAY
+   ------------------------------------------------------------ */
+
+.universities-hero .page-hero__inner {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.universities-hero__content {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.universities-hero .page-hero__aside {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+
+/* ------------------------------------------------------------
+   HERO TEXT
+   ------------------------------------------------------------ */
+
+.universities-hero h1 {
+  position: relative;
+  z-index: 4;
+
+  color: #ffffff !important;
+
+  text-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.28) !important;
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+
+  .universities-hero {
+    background-position: center center !important;
+  }
+
+  .universities-hero::before {
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    border-radius: 0 !important;
+  }
+
+  .universities-hero::after {
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    border-radius: 0 !important;
+
+    background:
+      linear-gradient(
+        90deg,
+        rgba(3, 18, 32, 0.38) 0%,
+        rgba(3, 18, 32, 0.24) 60%,
+        rgba(3, 18, 32, 0.18) 100%
+      ) !important;
+  }
+
+  .universities-hero .page-hero__inner,
+  .universities-hero__content,
+  .universities-hero .page-hero__aside {
+    position: relative !important;
+    z-index: 3 !important;
+  }
+}
+
+/* ============================================================
+   UNIVERSITY OPENING — FORCE REMOVE DECORATIVE LINE
+   ============================================================ */
+
+.university-opening__label {
+  display: block !important;
+}
+
+.university-opening__label .eyebrow {
+  display: inline-block !important;
+  position: relative !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: var(--uni-gold) !important;
+}
+
+.university-opening__label .eyebrow::before,
+.university-opening__label .eyebrow::after {
+  content: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}

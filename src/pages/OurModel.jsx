@@ -386,7 +386,7 @@ export default function OurModel() {
     FINAL CTA
 ======================================================== */}
 
-<section className="model-final-cta">
+<section className="model-final-cta"> 
 
   <div className="container">
 

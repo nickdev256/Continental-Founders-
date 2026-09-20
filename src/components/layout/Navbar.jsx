@@ -9,7 +9,7 @@ import {
   ArrowUpRight,
   ChevronDown,
   Search,
-} from "lucide-react";  
+} from "lucide-react";
 
 import {
   Link,
@@ -25,42 +25,161 @@ import {
 import "./Navbar.css";
 
 
+// ============================================================
+// SEARCHABLE SITE CONTENT
+// ============================================================
+
+const searchItems = [
+  {
+    title: "About Continental Founders",
+
+    description:
+      "Learn about Continental Founders, our mission, vision, leadership, purpose, and global ecosystem.",
+
+    url: "/about",
+  },
+
+  {
+    title: "Ventures",
+
+    description:
+      "Discover founders and ventures building practical and scalable solutions across Africa and global markets.",
+
+    url: "/ventures",
+  },
+
+  {
+    title: "Our Model",
+
+    description:
+      "Explore how Continental Founders supports founders through Potential, Preparation, Execution, Evidence, and Opportunity.",
+
+    url: "/our-model",
+  },
+
+  {
+    title: "Strategic Partners",
+
+    description:
+      "Explore the Continental Founders partnership ecosystem and opportunities for institutional and commercial collaboration.",
+
+    url: "/strategic-partners",
+  },
+
+  {
+    title: "U.S.–Africa Trade & Business Network",
+
+    description:
+      "Explore business relationships, market access, commercial engagement, and connections between Africa and the United States.",
+
+    url: "/partners/us-africa-trade-network",
+  },
+
+  {
+    title: "University Partnerships",
+
+    description:
+      "Explore university partnerships, faculty expertise, research collaboration, student engagement, and global learning opportunities.",
+
+    url: "/universities",
+  },
+
+  {
+    title: "Corporate Partners",
+
+    description:
+      "Explore corporate collaboration, industry expertise, mentorship, sponsorship, markets, and commercial opportunities.",
+
+    url: "/partners/corporate",
+  },
+
+  {
+    title:
+      "Government & Development Institutions",
+
+    description:
+      "Explore collaboration with government and development institutions around entrepreneurship, programs, markets, and economic opportunity.",
+
+    url:
+      "/partners/government-development",
+  },
+
+  {
+    title: "Programs",
+
+    description:
+      "Explore Continental Founders programs connecting entrepreneurs with universities, mentors, expertise, markets, and opportunity.",
+
+    url: "/programs",
+  },
+
+  {
+    title: "Impact",
+
+    description:
+      "Explore the impact of Continental Founders across entrepreneurship, partnerships, innovation, and founder development.",
+
+    url: "/impact",
+  },
+
+  {
+    title: "Events",
+
+    description:
+      "Discover Continental Founders events, gatherings, conferences, and founder activities.",
+
+    url: "/events",
+  },
+
+  {
+    title: "Insights",
+
+    description:
+      "Read Continental Founders insights on entrepreneurship, innovation, markets, partnerships, leadership, and opportunity.",
+
+    url: "/insights",
+  },
+
+  {
+    title: "Contact Continental Founders",
+
+    description:
+      "Contact Continental Founders about partnerships, founder opportunities, university collaboration, and participation.",
+
+    url: "/contact",
+  },
+];
+
+
+// ============================================================
+// NAVBAR
+// ============================================================
+
 export default function Navbar() {
-
-  /* ==========================================================
-     STATE
-  ========================================================== */
-
   const [
     open,
     setOpen,
-  ] =
-    useState(false);
+  ] = useState(false);
 
   const [
     mobileDropdown,
     setMobileDropdown,
-  ] =
-    useState(null);
+  ] = useState(null);
 
   const [
     searchOpen,
     setSearchOpen,
-  ] =
-    useState(false);
+  ] = useState(false);
 
   const [
     searchQuery,
     setSearchQuery,
-  ] =
-    useState("");
+  ] = useState("");
 
   const [
     logoClicks,
     setLogoClicks,
-  ] =
-    useState(0);
-
+  ] = useState(0);
 
   const location =
     useLocation();
@@ -69,525 +188,236 @@ export default function Navbar() {
     useNavigate();
 
 
-  /* ==========================================================
-     WEBSITE SEARCH CONTENT
-  ========================================================== */
-
-  const searchItems = [
-
-    {
-      title:
-        "About Us",
-
-      description:
-        "Learn more about Continental Founders, our mission, vision, purpose, and global ecosystem.",
-
-      url:
-        "/about",
-    },
-
-    {
-      title:
-        "Our Model",
-
-      description:
-        "Explore how Continental Founders brings founders, universities, industry, expertise, markets, and opportunity together.",
-
-      url:
-        "/our-model",
-    },
-
-    {
-      title:
-        "Partners",
-
-      description:
-        "Explore the Continental Founders partnership ecosystem and opportunities for collaboration.",
-
-      url:
-        "/strategic-partners",
-    },
-
-    {
-      title:
-        "U.S.–Africa Trade & Business Network",
-
-      description:
-        "Explore trade, business relationships, market access, investor connections, and commercial engagement between Africa and the United States.",
-
-      url:
-        "/partners/us-africa-trade-network",
-    },
-
-    {
-      title:
-        "Universities",
-
-      description:
-        "Explore university partnerships, faculty expertise, research collaboration, student engagement, and global learning opportunities.",
-
-      url:
-        "/universities",
-    },
-
-    {
-      title:
-        "Corporate Partners",
-
-      description:
-        "Explore corporate collaboration, industry expertise, mentorship, sponsorship, procurement, and commercial opportunities.",
-
-      url:
-        "/partners/corporate",
-    },
-
-    {
-      title:
-        "Government & Development Institutions",
-
-      description:
-        "Explore collaboration with government and development institutions around policy, programs, market access, and economic opportunity.",
-
-      url:
-        "/partners/government-development",
-    },
-
-    {
-      title:
-        "Events",
-
-      description:
-        "Discover upcoming events, gatherings, conferences, and founder activities.",
-
-      url:
-        "/events",
-    },
-
-    {
-      title:
-        "Insights",
-
-      description:
-        "Read Continental Founders insights, ideas, updates, and thought leadership.",
-
-      url:
-        "/insights",
-    },
-
-    {
-      title:
-        "Contact Us",
-
-      description:
-        "Get in touch with Continental Founders and explore opportunities to participate.",
-
-      url:
-        "/contact",
-    },
-
-  ];
-
-
-  /* ==========================================================
-     FILTER SEARCH RESULTS
-  ========================================================== */
+  // ==========================================================
+  // SEARCH RESULTS
+  // ==========================================================
 
   const filteredResults =
-    searchItems.filter(
-      (
-        item
-      ) => {
+    searchItems.filter((item) => {
+      const query =
+        searchQuery
+          .toLowerCase()
+          .trim();
 
-        const query =
-          searchQuery
-            .toLowerCase()
-            .trim();
-
-
-        if (
-          !query
-        ) {
-
-          return false;
-
-        }
-
-
-        return (
-          item.title
-            .toLowerCase()
-            .includes(
-              query
-            ) ||
-          item.description
-            .toLowerCase()
-            .includes(
-              query
-            )
-        );
-
+      if (!query) {
+        return false;
       }
-    );
 
-
-  /* ==========================================================
-     CLOSE MOBILE MENU
-  ========================================================== */
-
-  const closeMenu =
-    () => {
-
-      setOpen(
-        false
+      return (
+        item.title
+          .toLowerCase()
+          .includes(query) ||
+        item.description
+          .toLowerCase()
+          .includes(query)
       );
-
-      setMobileDropdown(
-        null
-      );
-
-    };
+    });
 
 
-  /* ==========================================================
-     CLOSE SEARCH
-  ========================================================== */
+  // ==========================================================
+  // MENU HELPERS
+  // ==========================================================
 
-  const closeSearch =
-    () => {
+  const closeMenu = () => {
+    setOpen(false);
+    setMobileDropdown(null);
+  };
 
-      setSearchOpen(
-        false
-      );
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
 
-      setSearchQuery(
-        ""
-      );
-
-    };
-
-
-  /* ==========================================================
-     OPEN SEARCH
-  ========================================================== */
-
-  const openSearch =
-    () => {
-
-      setOpen(
-        false
-      );
-
-      setMobileDropdown(
-        null
-      );
-
-      setSearchOpen(
-        true
-      );
-
-    };
-
-
-  /* ==========================================================
-     MOBILE DROPDOWN
-  ========================================================== */
+  const openSearch = () => {
+    setOpen(false);
+    setMobileDropdown(null);
+    setSearchOpen(true);
+  };
 
   const toggleMobileDropdown = (
     label
   ) => {
-
     setMobileDropdown(
-      (
-        current
-      ) =>
-        current ===
-        label
+      (current) =>
+        current === label
           ? null
           : label
     );
-
   };
 
 
-  /* ==========================================================
-     SECRET CMS ACCESS
-
-     Click logo 3 times quickly
-     to open CMS login.
-  ========================================================== */
+  // ==========================================================
+  // ADMIN ACCESS
+  // ==========================================================
 
   const handleLogoClick = (
     event
   ) => {
-
-    event.preventDefault();
-
-
     const nextClicks =
-      logoClicks +
-      1;
+      logoClicks + 1;
 
+    if (nextClicks >= 3) {
+      event.preventDefault();
 
-    if (
-      nextClicks >=
-      3
-    ) {
-
-      setLogoClicks(
-        0
-      );
+      setLogoClicks(0);
 
       closeMenu();
-
       closeSearch();
-
 
       navigate(
         "/admin/login"
       );
 
-
       return;
-
     }
-
 
     setLogoClicks(
       nextClicks
     );
-
   };
 
 
-  /* ==========================================================
-     RESET LOGO CLICK COUNTER
-  ========================================================== */
+  // ==========================================================
+  // RESET LOGO CLICK COUNTER
+  // ==========================================================
 
-  useEffect(
-    () => {
+  useEffect(() => {
+    if (logoClicks === 0) {
+      return undefined;
+    }
 
-      if (
-        logoClicks ===
-        0
-      ) {
-
-        return undefined;
-
-      }
-
-
-      const timer =
-        window.setTimeout(
-          () => {
-
-            setLogoClicks(
-              0
-            );
-
-          },
-          1500
-        );
-
-
-      return () => {
-
-        window.clearTimeout(
-          timer
-        );
-
-      };
-
-    },
-    [
-      logoClicks,
-    ]
-  );
-
-
-  /* ==========================================================
-     CLOSE MENU WHEN ROUTE CHANGES
-  ========================================================== */
-
-  useEffect(
-    () => {
-
-      setOpen(
-        false
+    const timer =
+      window.setTimeout(
+        () => {
+          setLogoClicks(0);
+        },
+        1500
       );
 
-      setMobileDropdown(
-        null
+    return () => {
+      window.clearTimeout(
+        timer
       );
+    };
+  }, [logoClicks]);
 
-      setSearchOpen(
-        false
+
+  // ==========================================================
+  // ROUTE CHANGE
+  // ==========================================================
+
+  useEffect(() => {
+    setOpen(false);
+    setMobileDropdown(null);
+    setSearchOpen(false);
+    setSearchQuery("");
+    setLogoClicks(0);
+  }, [location.pathname]);
+
+
+  // ==========================================================
+  // BODY SCROLL
+  // ==========================================================
+
+  useEffect(() => {
+    if (
+      open ||
+      searchOpen
+    ) {
+      document.body.classList.add(
+        "nav-open"
       );
-
-      setSearchQuery(
-        ""
+    } else {
+      document.body.classList.remove(
+        "nav-open"
       );
+    }
 
-      setLogoClicks(
-        0
+    return () => {
+      document.body.classList.remove(
+        "nav-open"
       );
-
-    },
-    [
-      location.pathname,
-    ]
-  );
-
-
-  /* ==========================================================
-     PREVENT BODY SCROLL
-  ========================================================== */
-
-  useEffect(
-    () => {
-
-      if (
-        open ||
-        searchOpen
-      ) {
-
-        document.body.classList.add(
-          "nav-open"
-        );
-
-      } else {
-
-        document.body.classList.remove(
-          "nav-open"
-        );
-
-      }
+    };
+  }, [
+    open,
+    searchOpen,
+  ]);
 
 
-      return () => {
-
-        document.body.classList.remove(
-          "nav-open"
-        );
-
-      };
-
-    },
-    [
-      open,
-      searchOpen,
-    ]
-  );
-
-
-  /* ==========================================================
-     ACTIVE DROPDOWN CHECK
-  ========================================================== */
+  // ==========================================================
+  // DROPDOWN ACTIVE STATE
+  // ==========================================================
 
   const isDropdownActive = (
     item
   ) => {
-
     if (
       location.pathname ===
       item.path
     ) {
-
       return true;
-
     }
 
-
     return item.children?.some(
-      (
-        child
-      ) => {
-
-        return (
-          location.pathname ===
-            child.path ||
-          location.pathname.startsWith(
-            `${child.path}/`
-          )
-        );
-
-      }
+      (child) =>
+        location.pathname ===
+          child.path ||
+        location.pathname.startsWith(
+          `${child.path}/`
+        )
     );
-
   };
 
 
-  /* ==========================================================
-     KEYBOARD SUPPORT
-  ========================================================== */
+  // ==========================================================
+  // KEYBOARD SUPPORT
+  // ==========================================================
 
-  useEffect(
-    () => {
-
-      const handleKeyDown = (
-        event
-      ) => {
-
-        if (
-          event.key ===
-          "Escape"
-        ) {
-
-          if (
-            searchOpen
-          ) {
-
-            closeSearch();
-
-          }
-
-
-          if (
-            open
-          ) {
-
-            closeMenu();
-
-          }
-
+  useEffect(() => {
+    const handleKeyDown = (
+      event
+    ) => {
+      if (
+        event.key ===
+        "Escape"
+      ) {
+        if (searchOpen) {
+          closeSearch();
         }
 
-      };
+        if (open) {
+          closeMenu();
+        }
+      }
+    };
 
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
-      window.addEventListener(
+    return () => {
+      window.removeEventListener(
         "keydown",
         handleKeyDown
       );
+    };
+  }, [
+    searchOpen,
+    open,
+  ]);
 
 
-      return () => {
-
-        window.removeEventListener(
-          "keydown",
-          handleKeyDown
-        );
-
-      };
-
-    },
-    [
-      searchOpen,
-      open,
-    ]
-  );
-
-
-  /* ==========================================================
-     RENDER
-  ========================================================== */
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
-
     <header className="navbar">
 
       {/* =====================================================
           TOP INSTITUTIONAL BAR
-      ===================================================== */}
+      ====================================================== */}
 
       <div className="navbar__top">
 
@@ -599,21 +429,17 @@ export default function Navbar() {
               Africa
             </span>
 
-
             <span className="navbar__top-divider">
               |
             </span>
-
 
             <span>
               United States
             </span>
 
-
             <span className="navbar__top-divider">
               |
             </span>
-
 
             <span>
               Global Partnerships
@@ -628,11 +454,9 @@ export default function Navbar() {
               Contact
             </Link>
 
-
             <Link to="/strategic-partners">
               Partners
             </Link>
-
 
             <Link to="/universities">
               Universities
@@ -647,15 +471,13 @@ export default function Navbar() {
 
       {/* =====================================================
           MAIN NAVIGATION
-      ===================================================== */}
+      ====================================================== */}
 
       <div className="navbar__main">
 
         <div className="navbar__inner">
 
-          {/* =================================================
-              BRAND
-          ================================================= */}
+          {/* BRAND */}
 
           <Link
             to="/"
@@ -676,9 +498,7 @@ export default function Navbar() {
           </Link>
 
 
-          {/* =================================================
-              NAVIGATION
-          ================================================= */}
+          {/* NAVIGATION */}
 
           <nav
             id="primary-navigation"
@@ -693,31 +513,21 @@ export default function Navbar() {
             <div className="navbar__links">
 
               {navigation.map(
-                (
-                  item
-                ) => {
-
-                  /* =============================================
-                     DROPDOWN ITEM
-                  ============================================= */
+                (item) => {
 
                   if (
                     item.children?.length
                   ) {
-
                     const isMobileOpen =
                       mobileDropdown ===
                       item.label;
-
 
                     const dropdownActive =
                       isDropdownActive(
                         item
                       );
 
-
                     return (
-
                       <div
                         key={
                           item.path
@@ -747,23 +557,18 @@ export default function Navbar() {
                               }`
                             }
                             onClick={() => {
-
                               if (
                                 window.innerWidth >
                                 900
                               ) {
-
                                 closeMenu();
-
                               }
-
                             }}
                           >
 
                             <span>
                               {item.label}
                             </span>
-
 
                             <ChevronDown
                               className="navbar__dropdown-arrow"
@@ -800,17 +605,10 @@ export default function Navbar() {
                         </div>
 
 
-                        {/* =======================================
-                            DROPDOWN MENU
-                        ======================================= */}
-
                         <div className="navbar__dropdown-menu">
 
                           {item.children.map(
-                            (
-                              child
-                            ) => (
-
+                            (child) => (
                               <NavLink
                                 key={
                                   child.path
@@ -836,7 +634,6 @@ export default function Navbar() {
                                   {child.label}
                                 </span>
 
-
                                 <ArrowUpRight
                                   size={14}
                                   strokeWidth={1.6}
@@ -844,25 +641,17 @@ export default function Navbar() {
                                 />
 
                               </NavLink>
-
                             )
                           )}
 
                         </div>
 
                       </div>
-
                     );
-
                   }
 
 
-                  /* =============================================
-                     NORMAL NAVIGATION ITEM
-                  ============================================= */
-
                   return (
-
                     <NavLink
                       key={
                         item.path
@@ -893,18 +682,14 @@ export default function Navbar() {
                       </span>
 
                     </NavLink>
-
                   );
-
                 }
               )}
 
             </div>
 
 
-            {/* =================================================
-                NAVIGATION ACTIONS
-            ================================================= */}
+            {/* ACTIONS */}
 
             <div className="navbar__actions">
 
@@ -938,7 +723,6 @@ export default function Navbar() {
                   Schedule a Meeting
                 </span>
 
-
                 <ArrowUpRight
                   size={16}
                   strokeWidth={1.7}
@@ -952,9 +736,7 @@ export default function Navbar() {
           </nav>
 
 
-          {/* =================================================
-              MOBILE MENU BUTTON
-          ================================================= */}
+          {/* MOBILE MENU BUTTON */}
 
           <button
             type="button"
@@ -965,9 +747,7 @@ export default function Navbar() {
             }`}
             onClick={() =>
               setOpen(
-                (
-                  current
-                ) =>
+                (current) =>
                   !current
               )
             }
@@ -983,21 +763,17 @@ export default function Navbar() {
           >
 
             {open ? (
-
               <X
                 size={25}
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
-
             ) : (
-
               <Menu
                 size={25}
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
-
             )}
 
           </button>
@@ -1009,10 +785,9 @@ export default function Navbar() {
 
       {/* =====================================================
           SEARCH MODAL
-      ===================================================== */}
+      ====================================================== */}
 
       {searchOpen && (
-
         <div
           className="search-overlay"
           onClick={
@@ -1033,10 +808,6 @@ export default function Navbar() {
             aria-label="Search Continental Founders"
           >
 
-            {/* =================================================
-                SEARCH HEADER
-            ================================================= */}
-
             <div className="search-header">
 
               <div className="search-input-wrapper">
@@ -1046,7 +817,6 @@ export default function Navbar() {
                   strokeWidth={1.7}
                   aria-hidden="true"
                 />
-
 
                 <input
                   type="search"
@@ -1088,14 +858,9 @@ export default function Navbar() {
             </div>
 
 
-            {/* =================================================
-                SEARCH RESULTS
-            ================================================= */}
-
             <div className="search-results">
 
               {!searchQuery.trim() && (
-
                 <div className="search-empty">
 
                   <Search
@@ -1104,33 +869,29 @@ export default function Navbar() {
                     aria-hidden="true"
                   />
 
-
                   <h3>
                     Search Continental Founders
                   </h3>
 
-
                   <p>
-                    Search our partnerships,
+                    Search our ventures,
+                    partnerships, programs,
                     events, insights, model,
                     universities, and more.
                   </p>
 
                 </div>
-
               )}
 
 
               {searchQuery.trim() &&
                 filteredResults.length ===
                   0 && (
-
                   <div className="search-empty">
 
                     <h3>
                       No results found
                     </h3>
-
 
                     <p>
                       No results found for "
@@ -1138,20 +899,15 @@ export default function Navbar() {
                     </p>
 
                   </div>
-
                 )}
 
 
               {filteredResults.length >
                 0 && (
-
                 <div className="search-result-list">
 
                   {filteredResults.map(
-                    (
-                      item
-                    ) => (
-
+                    (item) => (
                       <Link
                         key={
                           item.url
@@ -1182,7 +938,6 @@ export default function Navbar() {
                             {item.title}
                           </h4>
 
-
                           <p>
                             {item.description}
                           </p>
@@ -1190,12 +945,10 @@ export default function Navbar() {
                         </div>
 
                       </Link>
-
                     )
                   )}
 
                 </div>
-
               )}
 
             </div>
@@ -1203,11 +956,8 @@ export default function Navbar() {
           </div>
 
         </div>
-
       )}
 
     </header>
-
   );
-
 }

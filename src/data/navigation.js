@@ -5,6 +5,11 @@ export const navigation = [
   },
 
   {
+    label: "Ventures",
+    path: "/ventures",
+  },
+
+  {
     label: "Our Model",
     path: "/our-model",
   },

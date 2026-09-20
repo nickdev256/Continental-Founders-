@@ -1,7 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import NetworkBackground from "../components/ui/NetworkBackground";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
+import {
+  Link,
+} from "react-router-dom";
+
+import NetworkBackground from "../components/ui/NetworkBackground";
 
 import {
   ArrowRight,
@@ -17,120 +24,631 @@ import {
   Landmark,
   TrendingUp,
   Users,
-  Globe2,
   Lightbulb,
-  Handshake,
   Rocket,
   Search,
-  BriefcaseBusiness, 
+  BriefcaseBusiness,
   Microscope,
   CalendarDays,
+  MapPin,
   Download,
-  Mail,
 } from "lucide-react";
 
 import "./Home.css";
 
+
+// ============================================================
+// API
+// ============================================================
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+
+// ============================================================
+// HERO IMAGES
+// ============================================================
+
+const HERO_IMAGES = [
+  {
+    src:
+      "/assets/images/hero-partnership.webp",
+
+    alt:
+      "Continental Founders cross-continental partnership and collaboration",
+  },
+
+  {
+    src:
+      "/assets/images/hero-community.webp",
+
+    alt:
+      "Continental Founders community of founders, institutions, and partners",
+  },
+
+  {
+    src:
+      "/assets/images/hero-education.webp",
+
+    alt:
+      "University collaboration and education through Continental Founders",
+  },
+
+  {
+    src:
+      "/assets/images/hero-innovation.webp",
+
+    alt:
+      "Entrepreneurship and innovation within the Continental Founders ecosystem",
+  },
+
+  {
+    src:
+      "/assets/images/hero-opportunity.webp",
+
+    alt:
+      "Global opportunities connecting Africa and the United States",
+  },
+];
+
+
+// ============================================================
+// EVENT HELPERS
+// ============================================================
+
+function getEventDateValue(
+  event
+) {
+  return (
+    event?.eventDate ||
+    event?.event_date ||
+    event?.startDate ||
+    event?.start_date ||
+    event?.date ||
+    null
+  );
+}
+
+
+function getEventImage(
+  event
+) {
+  return (
+    event?.imageUrl ||
+    event?.image_url ||
+    event?.image ||
+    event?.coverImage ||
+    event?.cover_image ||
+    ""
+  );
+}
+
+
+function getEventLocation(
+  event
+) {
+  return (
+    event?.location ||
+    event?.venue ||
+    event?.city ||
+    ""
+  );
+}
+
+
+function getEventType(
+  event
+) {
+  return (
+    event?.type ||
+    event?.category ||
+    "Conference & Events"
+  );
+}
+
+
+function getEventSlug(
+  event
+) {
+  if (
+    typeof event?.slug !==
+    "string"
+  ) {
+    return "";
+  }
+
+  return event.slug.trim();
+}
+
+
+function formatEventDate(
+  event
+) {
+  const value =
+    getEventDateValue(
+      event
+    );
+
+  if (!value) {
+    return null;
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return null;
+  }
+
+  return {
+    day:
+      date.toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+        }
+      ),
+
+    month:
+      date
+        .toLocaleDateString(
+          "en-US",
+          {
+            month: "long",
+          }
+        )
+        .toUpperCase(),
+
+    year:
+      String(
+        date.getFullYear()
+      ),
+
+    full:
+      date.toLocaleDateString(
+        "en-US",
+        {
+          weekday:
+            "long",
+
+          month:
+            "long",
+
+          day:
+            "numeric",
+
+          year:
+            "numeric",
+        }
+      ),
+  };
+}
+
+
+// ============================================================
+// HOME
+// ============================================================
+
 export default function Home() {
-  const videoRef = useRef(null);
-  const videoFrameRef = useRef(null);
+  const videoRef =
+    useRef(null);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [previousVolume, setPreviousVolume] = useState(1);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const videoFrameRef =
+    useRef(null);
 
 
-    /*
-  ============================================================
-  HERO IMAGE SLIDER
-  ============================================================
-  */
+  // ==========================================================
+  // VIDEO STATE
+  // ==========================================================
 
-  const heroImages = [
-    "/assets/images/hero-partnership.webp",
-    "/assets/images/hero-community.webp",
-    "/assets/images/hero-education.webp",
-    "/assets/images/hero-innovation.webp",
-    "/assets/images/hero-opportunity.webp",
-  ];
+  const [
+    isPlaying,
+    setIsPlaying,
+  ] =
+    useState(false);
 
-  const [currentHero, setCurrentHero] = useState(0);
+  const [
+    isMuted,
+    setIsMuted,
+  ] =
+    useState(false);
+
+  const [
+    volume,
+    setVolume,
+  ] =
+    useState(1);
+
+  const [
+    previousVolume,
+    setPreviousVolume,
+  ] =
+    useState(1);
+
+  const [
+    isFullscreen,
+    setIsFullscreen,
+  ] =
+    useState(false);
+
+  const [
+    duration,
+    setDuration,
+  ] =
+    useState(0);
+
+  const [
+    currentTime,
+    setCurrentTime,
+  ] =
+    useState(0);
+
+
+  // ==========================================================
+  // HERO SLIDER STATE
+  // ==========================================================
+
+  const [
+    currentHero,
+    setCurrentHero,
+  ] =
+    useState(0);
+
+
+  // ==========================================================
+  // CMS EVENT STATE
+  // ==========================================================
+
+  const [
+    featuredEvent,
+    setFeaturedEvent,
+  ] =
+    useState(null);
+
+  const [
+    eventLoading,
+    setEventLoading,
+  ] =
+    useState(true);
+
+  const [
+    eventError,
+    setEventError,
+  ] =
+    useState("");
+
+
+  // ==========================================================
+  // HERO IMAGE SLIDER
+  // ==========================================================
 
   useEffect(() => {
-    const heroInterval = setInterval(() => {
-      setCurrentHero(
-        (previous) =>
-          (previous + 1) % heroImages.length
+    const heroInterval =
+      window.setInterval(
+        () => {
+          setCurrentHero(
+            (previous) =>
+              (previous + 1) %
+              HERO_IMAGES.length
+          );
+        },
+        5000
       );
-    }, 5000);
 
     return () => {
-      clearInterval(heroInterval);
+      window.clearInterval(
+        heroInterval
+      );
     };
   }, []);
 
-  /*
-  ============================================================
-  VIDEO EVENTS
-  ============================================================
-  */
+
+  // ==========================================================
+  // LOAD HOMEPAGE EVENT FROM CMS
+  // ==========================================================
 
   useEffect(() => {
-    const video = videoRef.current;
+    const controller =
+      new AbortController();
 
-    if (!video) return;
 
-    video.volume = 1;
-    video.muted = false;
+    async function loadFeaturedEvent() {
+      try {
+        setEventLoading(
+          true
+        );
 
-    const handlePlay = () => {
-      setIsPlaying(true);
-    };
+        setEventError(
+          ""
+        );
 
-    const handlePause = () => {
-      setIsPlaying(false);
-    };
 
-    const handleEnded = () => {
-      setIsPlaying(false);
-    };
+        const response =
+          await fetch(
+            `${API_URL}/api/events/published`,
+            {
+              method:
+                "GET",
 
-    const handleTimeUpdate = () => {
-      setCurrentTime(video.currentTime);
-    };
+              headers: {
+                Accept:
+                  "application/json",
+              },
 
-    const handleLoadedMetadata = () => {
-      setDuration(video.duration || 0);
-    };
+              signal:
+                controller.signal,
+            }
+          );
 
-    const handleVolumeChange = () => {
-      setVolume(video.volume);
 
-      setIsMuted(
-        video.muted ||
-          video.volume === 0
-      );
+        const contentType =
+          response.headers.get(
+            "content-type"
+          ) || "";
 
-      if (
-        !video.muted &&
-        video.volume > 0
-      ) {
-        setPreviousVolume(video.volume);
+
+        if (
+          !contentType.includes(
+            "application/json"
+          )
+        ) {
+          const text =
+            await response.text();
+
+          console.error(
+            "Unexpected homepage events response:",
+            text
+          );
+
+          throw new Error(
+            "The events service returned an unexpected response."
+          );
+        }
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+          throw new Error(
+            result?.message ||
+            result?.error ||
+            "Unable to load events."
+          );
+        }
+
+
+        const eventData =
+          Array.isArray(
+            result?.events
+          )
+            ? result.events
+            : Array.isArray(
+                result?.data
+              )
+              ? result.data
+              : Array.isArray(
+                  result?.data?.events
+                )
+                ? result.data.events
+                : [];
+
+
+        const eventsWithDates =
+          eventData
+            .map(
+              (event) => {
+                const value =
+                  getEventDateValue(
+                    event
+                  );
+
+                const timestamp =
+                  value
+                    ? new Date(
+                        value
+                      ).getTime()
+                    : Number.NaN;
+
+                return {
+                  event,
+                  timestamp,
+                };
+              }
+            )
+            .filter(
+              ({
+                timestamp,
+              }) =>
+                Number.isFinite(
+                  timestamp
+                )
+            )
+            .sort(
+              (
+                first,
+                second
+              ) =>
+                first.timestamp -
+                second.timestamp
+            );
+
+
+        const now =
+          Date.now();
+
+
+        const nextEvent =
+          eventsWithDates.find(
+            ({
+              timestamp,
+            }) =>
+              timestamp >= now
+          );
+
+
+        /*
+        --------------------------------------------------------
+        IMPORTANT
+
+        Homepage normally shows the nearest upcoming event.
+
+        If there are published records but every event has
+        already passed, we do NOT show an old conference as
+        an upcoming event. The homepage instead displays the
+        "new events coming soon" state.
+        --------------------------------------------------------
+        */
+
+        setFeaturedEvent(
+          nextEvent?.event ||
+          null
+        );
+      } catch (error) {
+        if (
+          error?.name ===
+          "AbortError"
+        ) {
+          return;
+        }
+
+
+        console.error(
+          "Homepage event loading error:",
+          error
+        );
+
+
+        setFeaturedEvent(
+          null
+        );
+
+
+        setEventError(
+          error?.message ||
+          "Unable to load the upcoming event."
+        );
+      } finally {
+        if (
+          !controller.signal
+            .aborted
+        ) {
+          setEventLoading(
+            false
+          );
+        }
       }
-    };
+    }
 
-    const handleFullscreen = () => {
-      setIsFullscreen(
-        Boolean(
-          document.fullscreenElement ||
-            document.webkitFullscreenElement
-        )
-      );
+
+    loadFeaturedEvent();
+
+
+    return () => {
+      controller.abort();
     };
+  }, []);
+
+
+  // ==========================================================
+  // VIDEO EVENTS
+  // ==========================================================
+
+  useEffect(() => {
+    const video =
+      videoRef.current;
+
+    if (!video) {
+      return undefined;
+    }
+
+
+    video.volume =
+      1;
+
+    video.muted =
+      false;
+
+
+    const handlePlay =
+      () => {
+        setIsPlaying(
+          true
+        );
+      };
+
+
+    const handlePause =
+      () => {
+        setIsPlaying(
+          false
+        );
+      };
+
+
+    const handleEnded =
+      () => {
+        setIsPlaying(
+          false
+        );
+      };
+
+
+    const handleTimeUpdate =
+      () => {
+        setCurrentTime(
+          video.currentTime
+        );
+      };
+
+
+    const handleLoadedMetadata =
+      () => {
+        setDuration(
+          video.duration ||
+          0
+        );
+      };
+
+
+    const handleVolumeChange =
+      () => {
+        setVolume(
+          video.volume
+        );
+
+        setIsMuted(
+          video.muted ||
+          video.volume === 0
+        );
+
+        if (
+          !video.muted &&
+          video.volume > 0
+        ) {
+          setPreviousVolume(
+            video.volume
+          );
+        }
+      };
+
+
+    const handleFullscreen =
+      () => {
+        setIsFullscreen(
+          Boolean(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement
+          )
+        );
+      };
+
 
     video.addEventListener(
       "play",
@@ -171,6 +689,7 @@ export default function Home() {
       "webkitfullscreenchange",
       handleFullscreen
     );
+
 
     return () => {
       video.removeEventListener(
@@ -215,367 +734,522 @@ export default function Home() {
     };
   }, []);
 
-  /*
-  ============================================================
-  VIDEO PLAY / PAUSE
-  ============================================================
-  */
 
-  const toggleVideo = async () => {
-    const video = videoRef.current;
+  // ==========================================================
+  // VIDEO PLAY / PAUSE
+  // ==========================================================
 
-    if (!video) return;
+  const toggleVideo =
+    async () => {
+      const video =
+        videoRef.current;
 
-    try {
-      if (video.paused) {
-        await video.play();
-      } else {
-        video.pause();
+      if (!video) {
+        return;
       }
-    } catch (error) {
-      console.error(
-        "Unable to control video:",
-        error
-      );
-    }
-  };
 
-  /*
-  ============================================================
-  VIDEO MUTE
-  ============================================================
-  */
+      try {
+        if (
+          video.paused
+        ) {
+          await video.play();
+        } else {
+          video.pause();
+        }
+      } catch (error) {
+        console.error(
+          "Unable to control video:",
+          error
+        );
+      }
+    };
 
-  const toggleMute = () => {
-    const video = videoRef.current;
 
-    if (!video) return;
+  // ==========================================================
+  // VIDEO MUTE
+  // ==========================================================
 
-    if (
-      video.muted ||
-      video.volume === 0
-    ) {
-      const restored =
-        previousVolume || 1;
+  const toggleMute =
+    () => {
+      const video =
+        videoRef.current;
 
-      video.volume = restored;
-      video.muted = false;
+      if (!video) {
+        return;
+      }
 
-      setVolume(restored);
-      setIsMuted(false);
-    } else {
-      setPreviousVolume(
-        video.volume
-      );
 
-      video.muted = true;
+      if (
+        video.muted ||
+        video.volume === 0
+      ) {
+        const restored =
+          previousVolume ||
+          1;
 
-      setIsMuted(true);
-    }
-  };
+        video.volume =
+          restored;
 
-  /*
-  ============================================================
-  VIDEO VOLUME
-  ============================================================
-  */
+        video.muted =
+          false;
 
-  const changeVolume = (event) => {
-    const value = Number(
-      event.target.value
-    );
+        setVolume(
+          restored
+        );
 
-    const safeValue = Math.min(
-      1,
-      Math.max(0, value)
-    );
+        setIsMuted(
+          false
+        );
+      } else {
+        setPreviousVolume(
+          video.volume
+        );
 
-    const video = videoRef.current;
+        video.muted =
+          true;
 
-    if (!video) return;
+        setIsMuted(
+          true
+        );
+      }
+    };
 
-    video.volume = safeValue;
 
-    if (safeValue === 0) {
-      video.muted = true;
-      setIsMuted(true);
-    } else {
-      video.muted = false;
-      setIsMuted(false);
-      setPreviousVolume(
+  // ==========================================================
+  // VIDEO VOLUME
+  // ==========================================================
+
+  const changeVolume =
+    (event) => {
+      const value =
+        Number(
+          event.target.value
+        );
+
+      const safeValue =
+        Math.min(
+          1,
+          Math.max(
+            0,
+            value
+          )
+        );
+
+      const video =
+        videoRef.current;
+
+      if (!video) {
+        return;
+      }
+
+
+      video.volume =
+        safeValue;
+
+
+      if (
+        safeValue === 0
+      ) {
+        video.muted =
+          true;
+
+        setIsMuted(
+          true
+        );
+      } else {
+        video.muted =
+          false;
+
+        setIsMuted(
+          false
+        );
+
+        setPreviousVolume(
+          safeValue
+        );
+      }
+
+
+      setVolume(
         safeValue
       );
-    }
+    };
 
-    setVolume(safeValue);
-  };
 
-  /*
-  ============================================================
-  VIDEO SEEK
-  ============================================================
-  */
+  // ==========================================================
+  // VIDEO SEEK
+  // ==========================================================
 
-  const changeVideoTime = (event) => {
-    const value = Number(
-      event.target.value
-    );
+  const changeVideoTime =
+    (event) => {
+      const value =
+        Number(
+          event.target.value
+        );
 
-    const video = videoRef.current;
+      const video =
+        videoRef.current;
 
-    if (!video) return;
-
-    video.currentTime = value;
-
-    setCurrentTime(value);
-  };
-
-  /*
-  ============================================================
-  FULLSCREEN
-  ============================================================
-  */
-
-  const toggleFullscreen = async () => {
-    const video = videoRef.current;
-    const frame = videoFrameRef.current;
-
-    if (!video) return;
-
-    try {
-      if (!document.fullscreenElement) {
-        if (
-          frame &&
-          frame.requestFullscreen
-        ) {
-          await frame.requestFullscreen();
-          return;
-        }
-
-        if (
-          video.webkitEnterFullscreen
-        ) {
-          video.webkitEnterFullscreen();
-        }
-      } else if (
-        document.exitFullscreen
-      ) {
-        await document.exitFullscreen();
+      if (!video) {
+        return;
       }
-    } catch (error) {
-      console.error(
-        "Fullscreen error:",
-        error
+
+
+      video.currentTime =
+        value;
+
+      setCurrentTime(
+        value
       );
-    }
-  };
+    };
 
-  /*
-  ============================================================
-  FORMAT VIDEO TIME
-  ============================================================
-  */
 
-  const formatTime = (time) => {
-    if (!Number.isFinite(time)) {
-      return "0:00";
-    }
+  // ==========================================================
+  // FULLSCREEN
+  // ==========================================================
 
-    const minutes = Math.floor(
-      time / 60
+  const toggleFullscreen =
+    async () => {
+      const video =
+        videoRef.current;
+
+      const frame =
+        videoFrameRef.current;
+
+      if (!video) {
+        return;
+      }
+
+
+      try {
+        if (
+          !document.fullscreenElement
+        ) {
+          if (
+            frame &&
+            frame.requestFullscreen
+          ) {
+            await frame.requestFullscreen();
+
+            return;
+          }
+
+          if (
+            video.webkitEnterFullscreen
+          ) {
+            video.webkitEnterFullscreen();
+          }
+        } else if (
+          document.exitFullscreen
+        ) {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.error(
+          "Fullscreen error:",
+          error
+        );
+      }
+    };
+
+
+  // ==========================================================
+  // FORMAT VIDEO TIME
+  // ==========================================================
+
+  const formatTime =
+    (time) => {
+      if (
+        !Number.isFinite(
+          time
+        )
+      ) {
+        return "0:00";
+      }
+
+
+      const minutes =
+        Math.floor(
+          time / 60
+        );
+
+
+      const seconds =
+        Math.floor(
+          time % 60
+        )
+          .toString()
+          .padStart(
+            2,
+            "0"
+          );
+
+
+      return `${minutes}:${seconds}`;
+    };
+
+
+  // ==========================================================
+  // FEATURED EVENT VALUES
+  // ==========================================================
+
+  const featuredEventDate =
+    formatEventDate(
+      featuredEvent
     );
 
-    const seconds = Math.floor(
-      time % 60
-    )
-      .toString()
-      .padStart(2, "0");
+  const featuredEventImage =
+    getEventImage(
+      featuredEvent
+    );
 
-    return `${minutes}:${seconds}`;
-  };
+  const featuredEventLocation =
+    getEventLocation(
+      featuredEvent
+    );
+
+  const featuredEventType =
+    getEventType(
+      featuredEvent
+    );
+
+  const featuredEventSlug =
+    getEventSlug(
+      featuredEvent
+    );
+
+  const featuredEventPath =
+    featuredEventSlug
+      ? `/events/${encodeURIComponent(
+          featuredEventSlug
+        )}`
+      : "/events";
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
     <main className="cf-home">
 
-    {/* =========================================================
-    01 — HERO
-========================================================= */}
+      {/* =====================================================
+          01 — HERO
+      ====================================================== */}
 
-<section className="cf-home-hero">
+      <section
+        className="cf-home-hero"
+        aria-labelledby="home-main-heading"
+      >
 
-  <NetworkBackground />
+        <NetworkBackground />
 
-  <div className="cf-container cf-home-hero__container">
 
-    <div className="cf-home-hero__main">
+        <div className="cf-container cf-home-hero__container">
 
-      {/* =================================================
-          HERO CONTENT
-      ================================================= */}
+          <div className="cf-home-hero__main">
 
-      <div className="cf-home-hero__content">
+            <div className="cf-home-hero__content">
 
-        <div className="cf-section-marker">
+              <div className="cf-section-marker">
 
-          
+                <strong>
+                  A CROSS-CONTINENTAL INITIATIVE
+                </strong>
 
-          
+              </div>
 
-          <strong>
-            A CROSS-CONTINENTAL INITIATIVE
-          </strong>
+
+              <h1 id="home-main-heading">
+
+                Bridging Africa
+                <br />
+
+                and America through
+                <br />
+
+                <span>
+                  education,
+                </span>
+
+                <br />
+
+                innovation, &{" "}
+
+                <em>
+                  opportunity.
+                </em>
+
+              </h1>
+
+
+              <p className="cf-home-hero__lead">
+                Continental Founders is a
+                cross-continental nonprofit
+                initiative connecting founders,
+                universities, businesses,
+                institutions, and opportunity
+                networks across Africa and the
+                United States through
+                entrepreneurship, innovation,
+                education, leadership development,
+                and strategic collaboration.
+              </p>
+
+
+              <div className="cf-actions">
+
+                <Link
+                  to="/contact"
+                  className="cf-button cf-button--gold"
+                >
+
+                  <span>
+                    Schedule a Meeting
+                  </span>
+
+                  <CalendarDays
+                    size={18}
+                    strokeWidth={1.7}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+
+                <Link
+                  to="/our-model"
+                  className="cf-button cf-button--outline-dark"
+                >
+
+                  <span>
+                    Explore Our Model
+                  </span>
+
+                  <ArrowRight
+                    size={18}
+                    strokeWidth={1.7}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+              </div>
+
+            </div>
+
+
+            <div className="cf-home-hero__visual">
+
+              <div className="cf-home-hero__slides">
+
+                {HERO_IMAGES.map(
+                  (
+                    image,
+                    index
+                  ) => (
+                    <img
+                      key={
+                        image.src
+                      }
+                      src={
+                        image.src
+                      }
+                      alt={
+                        index ===
+                        currentHero
+                          ? image.alt
+                          : ""
+                      }
+                      aria-hidden={
+                        index !==
+                        currentHero
+                      }
+                      className={
+                        index ===
+                        currentHero
+                          ? "cf-home-hero__slide cf-home-hero__slide--active"
+                          : "cf-home-hero__slide"
+                      }
+                    />
+                  )
+                )}
+
+              </div>
+
+
+              <div
+                className="cf-home-hero__overlay"
+                aria-hidden="true"
+              />
+
+
+              <div className="cf-home-hero__visual-caption">
+
+                <span>
+                  AFRICA
+                </span>
+
+                <i aria-hidden="true" />
+
+                <span>
+                  UNITED STATES
+                </span>
+
+              </div>
+
+
+              <div
+                className="cf-home-hero__dots"
+                aria-label="Hero images"
+              >
+
+                {HERO_IMAGES.map(
+                  (
+                    image,
+                    index
+                  ) => (
+                    <button
+                      key={
+                        image.src
+                      }
+                      type="button"
+                      className={
+                        index ===
+                        currentHero
+                          ? "active"
+                          : ""
+                      }
+                      onClick={() =>
+                        setCurrentHero(
+                          index
+                        )
+                      }
+                      aria-label={`Show hero image ${index + 1}`}
+                      aria-current={
+                        index ===
+                        currentHero
+                          ? "true"
+                          : undefined
+                      }
+                    />
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
 
         </div>
 
-
-        <h1>
-          Bridging Africa
-          <br />
-
-          and America through
-          <br />
-
-          <span>education,</span>
-          
-
-        
-          <br />
-
-          innovation, &{" "}
-
-          <em>opportunity.</em>
-        </h1>
+      </section>
 
 
-        <p className="cf-home-hero__lead">
-          Continental Founders is a nonprofit building
-          strategic partnerships between
-          universities in Africa and the
-          United States through
-          entrepreneurship, innovation,
-          leadership development, and
-          meaningful collaboration.
-        </p>
-
-
-        <div className="cf-actions">
-
-          <Link
-            to="/contact"
-            className="cf-button cf-button--gold"
-          >
-            <span>
-              Schedule a Meeting
-            </span>
-
-            <CalendarDays
-              size={18}
-              strokeWidth={1.7}
-            />
-          </Link>
-
-
-          <Link
-            to="/our-model"
-            className="cf-button cf-button--outline-dark"
-          >
-            <span>
-              Explore Our Model
-            </span>
-
-            <ArrowRight
-              size={18}
-              strokeWidth={1.7}
-            />
-          </Link>
-
-        </div>
-
-      </div>
-
-
-      {/* =================================================
-          HERO IMAGE SLIDER
-      ================================================= */}
-
-      <div className="cf-home-hero__visual">
-
-        {/* HERO SLIDES */}
-
-        <div className="cf-home-hero__slides">
-
-          {heroImages.map((image, index) => (
-            <img
-              key={image}
-              src={image}
-              alt="Continental Founders"
-              className={
-                index === currentHero
-                  ? "cf-home-hero__slide cf-home-hero__slide--active"
-                  : "cf-home-hero__slide"
-              }
-            />
-          ))}
-
-        </div>
-
-
-        {/* NAVY GRADIENT */}
-
-        <div className="cf-home-hero__overlay" />
-
-
-        {/* AFRICA / UNITED STATES */}
-
-        <div className="cf-home-hero__visual-caption">
-
-          <span>
-            AFRICA
-          </span>
-
-          <i />
-
-          <span>
-            UNITED STATES
-          </span>
-
-        </div>
-
-
-        {/* SLIDER DOTS */}
-
-        <div className="cf-home-hero__dots">
-
-          {heroImages.map((_, index) => (
-
-            <button
-              key={index}
-              type="button"
-              className={
-                index === currentHero
-                  ? "active"
-                  : ""
-              }
-              onClick={() => setCurrentHero(index)}
-              aria-label={`Go to hero slide ${index + 1}`}
-            />
-
-          ))}
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-      {/* =========================================================
+      {/* =====================================================
           QUICK HIGHLIGHTS
-      ========================================================= */}
+      ====================================================== */}
 
       <div className="cf-quick-bar">
 
@@ -583,21 +1257,18 @@ export default function Home() {
 
           <QuickHighlight
             number="01"
-            
             title="University Partnerships"
             text="Africa × United States"
           />
 
           <QuickHighlight
             number="02"
-            
             title="Innovation & Entrepreneurship"
             text="Ideas into practical opportunities"
           />
 
           <QuickHighlight
             number="03"
-            
             title="Leadership Development"
             text="Preparing the next generation"
           />
@@ -607,30 +1278,37 @@ export default function Home() {
       </div>
 
 
-      {/* =========================================================
+      {/* =====================================================
           02 — WHO WE ARE
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-section cf-section-white">
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="who-we-are-heading"
+      >
 
         <div className="cf-container">
 
-        <div className="cf-section-header">
+          <div className="cf-section-header">
 
-  <div>
-    <span className="cf-eyebrow">
-      WHO WE ARE
-    </span>
+            <div>
 
-    <h2>
-      Building strategic
-      partnerships that create{" "}
-      <em>opportunity</em> in both
-      directions.
-    </h2>
-  </div>
+              <span className="cf-eyebrow">
+                WHO WE ARE
+              </span>
 
-</div>
+              <h2 id="who-we-are-heading">
+                Building strategic
+                partnerships that create{" "}
+                <em>
+                  opportunity
+                </em>{" "}
+                in both directions.
+              </h2>
+
+            </div>
+
+          </div>
 
 
           <div className="cf-who-grid">
@@ -639,8 +1317,9 @@ export default function Home() {
 
               <img
                 src="/assets/images/africa-america-map.webp"
-                alt="Africa and America connected through partnership"
+                alt="Africa and the United States connected through Continental Founders partnerships"
                 loading="lazy"
+                decoding="async"
               />
 
             </div>
@@ -680,11 +1359,16 @@ export default function Home() {
                 to="/about"
                 className="cf-text-link"
               >
+
                 <span>
                   Discover Our Story
                 </span>
 
-                <ArrowRight size={17} />
+                <ArrowRight
+                  size={17}
+                  aria-hidden="true"
+                />
+
               </Link>
 
             </div>
@@ -696,17 +1380,18 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           03 — WHAT WE DO
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-section cf-section-soft">
+      <section
+        className="cf-section cf-section-soft"
+        aria-labelledby="what-we-do-heading"
+      >
 
         <div className="cf-container">
 
           <div className="cf-section-header">
-
-            
 
             <div>
 
@@ -714,7 +1399,8 @@ export default function Home() {
                 WHAT WE DO
               </span>
 
-              <h2>
+
+              <h2 id="what-we-do-heading">
                 Creating pathways for{" "}
                 <em>
                   institutions, ideas,
@@ -722,6 +1408,7 @@ export default function Home() {
                 and people to work across
                 borders.
               </h2>
+
 
               <p className="cf-section-intro">
                 We connect universities,
@@ -731,6 +1418,7 @@ export default function Home() {
                 meaningful opportunities between
                 Africa and the United States.
               </p>
+
               <br />
 
             </div>
@@ -738,33 +1426,33 @@ export default function Home() {
           </div>
 
 
-  <div className="cf-program-grid">
+          <div className="cf-program-grid">
 
-  <ProgramCard
-    number="01"
-    title="University Partnerships"
-    text="We work with universities to build meaningful institutional relationships between Africa and the United States."
-  />
+            <ProgramCard
+              number="01"
+              title="University Partnerships"
+              text="We work with universities to build meaningful institutional relationships between Africa and the United States."
+            />
 
-  <ProgramCard
-    number="02"
-    title="Innovation & Entrepreneurship"
-    text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
-  />
+            <ProgramCard
+              number="02"
+              title="Innovation & Entrepreneurship"
+              text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
+            />
 
-  <ProgramCard
-    number="03"
-    title="Strategic Collaboration"
-    text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
-  />
+            <ProgramCard
+              number="03"
+              title="Strategic Collaboration"
+              text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
+            />
 
-  <ProgramCard
-    number="04"
-    title="Leadership Development"
-    text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
-  />
+            <ProgramCard
+              number="04"
+              title="Leadership Development"
+              text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
+            />
 
-</div>
+          </div>
 
 
           <div className="cf-centered-link">
@@ -773,11 +1461,16 @@ export default function Home() {
               to="/programs"
               className="cf-text-link"
             >
+
               <span>
                 Explore Our Programs
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
@@ -787,21 +1480,20 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           04 — VISION + VIDEO
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-vision-section">
+      <section
+        className="cf-vision-section"
+        aria-labelledby="vision-heading"
+      >
 
         <div className="cf-container cf-vision-grid">
 
           <div className="cf-vision-content">
 
             <div className="cf-section-marker cf-section-marker--light">
-
-              
-
-              
 
               <strong>
                 OUR VISION
@@ -810,7 +1502,7 @@ export default function Home() {
             </div>
 
 
-            <h2>
+            <h2 id="vision-heading">
               A stronger relationship
               between Africa and America.
             </h2>
@@ -841,36 +1533,46 @@ export default function Home() {
               to="/about"
               className="cf-vision-link"
             >
+
               <span>
                 Learn More About Our Vision
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
 
 
-          {/* VIDEO */}
-
           <div
             className="cf-video"
-            ref={videoFrameRef}
+            ref={
+              videoFrameRef
+            }
           >
 
             <video
-              ref={videoRef}
+              ref={
+                videoRef
+              }
               playsInline
               preload="metadata"
               className="cf-video__player"
+              aria-label="Continental Founders video"
             >
-             <source
-  src="/assets/eth tech.mp4"
-  type="video/mp4"
-/>
+
+              <source
+                src="/assets/eth tech.mp4"
+                type="video/mp4"
+              />
 
               Your browser does not
               support HTML5 video.
+
             </video>
 
 
@@ -878,13 +1580,18 @@ export default function Home() {
               <button
                 type="button"
                 className="cf-video__play"
-                onClick={toggleVideo}
-                aria-label="Play video"
+                onClick={
+                  toggleVideo
+                }
+                aria-label="Play Continental Founders video"
               >
+
                 <Play
                   size={34}
                   fill="currentColor"
+                  aria-hidden="true"
                 />
+
               </button>
             )}
 
@@ -893,38 +1600,56 @@ export default function Home() {
 
               <button
                 type="button"
-                onClick={toggleVideo}
+                onClick={
+                  toggleVideo
+                }
                 aria-label={
                   isPlaying
                     ? "Pause video"
                     : "Play video"
                 }
               >
+
                 {isPlaying ? (
-                  <Pause size={17} />
+                  <Pause
+                    size={17}
+                    aria-hidden="true"
+                  />
                 ) : (
                   <Play
                     size={17}
                     fill="currentColor"
+                    aria-hidden="true"
                   />
                 )}
+
               </button>
 
 
               <button
                 type="button"
-                onClick={toggleMute}
+                onClick={
+                  toggleMute
+                }
                 aria-label={
                   isMuted
                     ? "Unmute video"
                     : "Mute video"
                 }
               >
+
                 {isMuted ? (
-                  <VolumeX size={18} />
+                  <VolumeX
+                    size={18}
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <Volume2 size={18} />
+                  <Volume2
+                    size={18}
+                    aria-hidden="true"
+                  />
                 )}
+
               </button>
 
 
@@ -938,8 +1663,10 @@ export default function Home() {
                     ? 0
                     : volume
                 }
-                onChange={changeVolume}
-                aria-label="Volume"
+                onChange={
+                  changeVolume
+                }
+                aria-label="Video volume"
               />
 
 
@@ -947,31 +1674,57 @@ export default function Home() {
                 type="range"
                 className="cf-video__progress"
                 min="0"
-                max={duration || 0}
+                max={
+                  duration || 0
+                }
                 step="0.01"
-                value={currentTime}
-                onChange={changeVideoTime}
+                value={
+                  currentTime
+                }
+                onChange={
+                  changeVideoTime
+                }
                 aria-label="Video progress"
               />
 
 
               <span>
-                {formatTime(currentTime)}
+                {formatTime(
+                  currentTime
+                )}
+
                 {" / "}
-                {formatTime(duration)}
+
+                {formatTime(
+                  duration
+                )}
               </span>
 
 
               <button
                 type="button"
-                onClick={toggleFullscreen}
-                aria-label="Fullscreen"
+                onClick={
+                  toggleFullscreen
+                }
+                aria-label={
+                  isFullscreen
+                    ? "Exit fullscreen"
+                    : "Enter fullscreen"
+                }
               >
+
                 {isFullscreen ? (
-                  <Minimize size={17} />
+                  <Minimize
+                    size={17}
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <Maximize size={17} />
+                  <Maximize
+                    size={17}
+                    aria-hidden="true"
+                  />
                 )}
+
               </button>
 
             </div>
@@ -983,24 +1736,27 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           05 — OUR MODEL
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-section cf-section-white">
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="our-model-heading"
+      >
 
         <div className="cf-container">
 
           <div className="cf-section-header">
 
-            
             <div>
 
               <span className="cf-eyebrow">
                 OUR MODEL
               </span>
 
-              <h2>
+
+              <h2 id="our-model-heading">
                 From shared purpose to{" "}
                 <em>
                   practical collaboration.
@@ -1010,6 +1766,7 @@ export default function Home() {
             </div>
 
           </div>
+
           <br />
 
 
@@ -1017,28 +1774,36 @@ export default function Home() {
 
             <ModelStep
               number="01"
-              icon={<Users />}
+              icon={
+                <Users />
+              }
               title="CONNECT"
               text="Universities and strategic partners connect around shared goals, expertise, and opportunity."
             />
 
             <ModelStep
               number="02"
-              icon={<Search />}
+              icon={
+                <Search />
+              }
               title="EXPLORE"
               text="Students and institutions explore challenges, ideas, markets, research, and opportunities."
             />
 
             <ModelStep
               number="03"
-              icon={<Lightbulb />}
+              icon={
+                <Lightbulb />
+              }
               title="BUILD"
               text="Teams develop practical ideas through entrepreneurship, innovation, mentorship, and collaboration."
             />
 
             <ModelStep
               number="04"
-              icon={<Rocket />}
+              icon={
+                <Rocket />
+              }
               title="ADVANCE"
               text="Promising initiatives move forward through partnerships, resources, networks, and institutional support."
             />
@@ -1052,11 +1817,16 @@ export default function Home() {
               to="/our-model"
               className="cf-text-link"
             >
+
               <span>
                 Understand Our Model
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
@@ -1066,17 +1836,18 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           06 — WHY IT MATTERS
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-section cf-section-soft">
+      <section
+        className="cf-section cf-section-soft"
+        aria-labelledby="why-it-matters-heading"
+      >
 
         <div className="cf-container">
 
           <div className="cf-section-header">
-
-            
 
             <div>
 
@@ -1084,12 +1855,14 @@ export default function Home() {
                 WHY IT MATTERS
               </span>
 
-              <h2>
+
+              <h2 id="why-it-matters-heading">
                 Partnership should create{" "}
                 <em>
                   lasting value.
                 </em>
               </h2>
+
 
               <p className="cf-section-intro">
                 Not simply another institutional
@@ -1099,6 +1872,7 @@ export default function Home() {
             </div>
 
           </div>
+
           <br />
 
 
@@ -1130,16 +1904,19 @@ export default function Home() {
 
           </div>
 
-        </div> 
+        </div>
 
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           07 — UNIVERSITY PARTNERSHIPS
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-partnership-section">
+      <section
+        className="cf-partnership-section"
+        aria-labelledby="university-partnership-heading"
+      >
 
         <div className="cf-container cf-partnership-grid">
 
@@ -1147,8 +1924,9 @@ export default function Home() {
 
             <img
               src="/assets/images/global-network-globe.webp"
-              alt="Global university partnership network"
+              alt="Continental Founders global university partnership network"
               loading="lazy"
+              decoding="async"
             />
 
           </div>
@@ -1158,8 +1936,6 @@ export default function Home() {
 
             <div className="cf-section-marker">
 
-             
-
               <strong>
                 UNIVERSITY PARTNERSHIPS
               </strong>
@@ -1167,7 +1943,7 @@ export default function Home() {
             </div>
 
 
-            <h2>
+            <h2 id="university-partnership-heading">
               Help shape the initiative
               from the ground up.
             </h2>
@@ -1193,14 +1969,19 @@ export default function Home() {
 
 
             <Link
-              to="/university-partnerships"
+              to="/universities"
               className="cf-button cf-button--gold"
             >
+
               <span>
-                Become a University Partner
+                Explore University Partnerships
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
@@ -1210,17 +1991,18 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           08 — ECOSYSTEM
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-section cf-section-white">
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="ecosystem-heading"
+      >
 
         <div className="cf-container">
 
           <div className="cf-section-header">
-
-           
 
             <div>
 
@@ -1228,7 +2010,8 @@ export default function Home() {
                 OUR PARTNERSHIP ECOSYSTEM
               </span>
 
-              <h2>
+
+              <h2 id="ecosystem-heading">
                 A global network of
                 institutions working toward{" "}
                 <em>
@@ -1239,43 +2022,56 @@ export default function Home() {
             </div>
 
           </div>
+
           <br />
 
 
           <div className="cf-ecosystem-grid">
 
             <EcosystemCard
-              icon={<GraduationCap />}
+              icon={
+                <GraduationCap />
+              }
               title="Universities"
               text="Academic institutions across Africa and the United States."
             />
 
             <EcosystemCard
-              icon={<Building2 />}
+              icon={
+                <Building2 />
+              }
               title="Businesses"
               text="Corporate partners supporting innovation, mentorship, and growth."
             />
 
             <EcosystemCard
-              icon={<Landmark />}
+              icon={
+                <Landmark />
+              }
               title="Government"
               text="Public sector leaders supporting policy, collaboration, and opportunity."
             />
 
             <EcosystemCard
-              icon={<TrendingUp />}
+              icon={
+                <TrendingUp />
+              }
               title="Investors"
               text="Partners supporting promising ventures, entrepreneurs, and innovation."
             />
 
             <EcosystemCard
-              icon={<BriefcaseBusiness />}
+              icon={
+                <BriefcaseBusiness />
+              }
               title="Entrepreneurs"
               text="Founders and innovators developing solutions and building opportunity."
             />
 
             <EcosystemCard
-              icon={<Microscope />}
+              icon={
+                <Microscope />
+              }
               title="Researchers"
               text="Experts contributing knowledge, research, ideas, and practical solutions."
             />
@@ -1289,11 +2085,16 @@ export default function Home() {
               to="/strategic-partners"
               className="cf-text-link"
             >
+
               <span>
                 Explore Strategic Partnerships
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
@@ -1303,19 +2104,20 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
+      {/* =====================================================
           09 — STRATEGIC PARTNERS
-      ========================================================= */}
+      ====================================================== */}
 
-      <section className="cf-strategic-section">
+      <section
+        className="cf-strategic-section"
+        aria-labelledby="strategic-partners-heading"
+      >
 
         <div className="cf-container cf-strategic-grid">
 
           <div className="cf-strategic-content">
 
             <div className="cf-section-marker cf-section-marker--light">
-
-              
 
               <strong>
                 SPONSORS & STRATEGIC PARTNERS
@@ -1324,13 +2126,14 @@ export default function Home() {
             </div>
 
 
-            <h2>
+            <h2 id="strategic-partners-heading">
               Invest in a new generation
               of{" "}
               <em>
-                cross continental opportunity.
+                cross-continental opportunity.
               </em>
             </h2>
+
             <br />
 
 
@@ -1360,15 +2163,17 @@ export default function Home() {
                 to="/strategic-partners"
                 className="cf-button cf-button--gold"
               >
+
                 <span>
                   Become a Strategic Partner
                 </span>
 
-                <ArrowUpRight size={17} />
+                <ArrowUpRight
+                  size={17}
+                  aria-hidden="true"
+                />
+
               </Link>
-
-
-              
 
             </div>
 
@@ -1381,6 +2186,7 @@ export default function Home() {
               src="/assets/images/ecosystem-globe.webp"
               alt="Continental Founders partnership ecosystem"
               loading="lazy"
+              decoding="async"
             />
 
           </div>
@@ -1390,99 +2196,356 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
-          10 — CONFERENCE
-      ========================================================= */}
+      {/* =====================================================
+          10 — CONFERENCE & EVENTS — CMS POWERED
+      ====================================================== */}
 
-      <section className="cf-conference-section">
+      <section
+        className="cf-conference-section"
+        aria-labelledby="conference-heading"
+      >
 
-        <div className="cf-container cf-conference-grid">
+        {eventLoading ? (
 
-          <div className="cf-conference-info">
+          <div className="cf-container cf-conference-grid">
 
-            <div className="cf-section-marker">
+            <div className="cf-conference-info">
 
-              
+              <div className="cf-section-marker">
 
-              
-              <strong>
-                CONFERENCE & EVENTS
-              </strong>
+                <strong>
+                  CONFERENCE & EVENTS
+                </strong>
+
+              </div>
+
+
+              <h2 id="conference-heading">
+                Upcoming
+                <br />
+
+                <em>
+                  programming.
+                </em>
+              </h2>
+
+
+              <p>
+                Loading the latest Continental
+                Founders event.
+              </p>
 
             </div>
 
 
-            <h2>
-              USA–AFRICA
-              <br />
-              <em>
-                CONFERENCE
-              </em>
-            </h2>
-
-
-            <span className="cf-conference-location">
-              UNGA WEEK · NEW YORK CITY
-            </span>
-
-
-            <p>
-              Join the conversation as
-              Continental Founders™ introduces
-              its vision for a new generation of
-              cross-continental education,
-              entrepreneurship, leadership,
-              commerce, and innovation.
-            </p>
-            <br />
-
-
-            <Link
-              to="/events"
-              className="cf-button cf-button--gold"
+            <div
+              className="cf-conference-date"
+              aria-hidden="true"
             >
+
+              <CalendarDays
+                size={42}
+                strokeWidth={1.4}
+              />
+
               <span>
-                Event Information
+                LOADING
               </span>
 
-              <ArrowUpRight size={17} />
-            </Link>
+            </div>
 
           </div>
 
+        ) : featuredEvent ? (
 
-          <div className="cf-conference-date">
+          <div className="cf-container cf-conference-grid">
 
-            <strong>
-              23
-            </strong>
+            <div className="cf-conference-info">
 
-            <span>
-              SEPTEMBER
-            </span>
+              <div className="cf-section-marker">
 
-            <span>
-              2026
-            </span>
+                <strong>
+                  {featuredEventType.toUpperCase()}
+                </strong>
+
+              </div>
+
+
+              <h2 id="conference-heading">
+                {featuredEvent.title}
+              </h2>
+
+
+              {featuredEventLocation && (
+
+                <div className="cf-conference-location">
+
+                  <MapPin
+                    size={16}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+
+                  <span>
+                    {featuredEventLocation}
+                  </span>
+
+                </div>
+
+              )}
+
+
+              {featuredEventDate && (
+
+                <div className="cf-conference-location">
+
+                  <CalendarDays
+                    size={16}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                  />
+
+                  <span>
+                    {featuredEventDate.full}
+                  </span>
+
+                </div>
+
+              )}
+
+
+              {featuredEvent.description && (
+
+                <p>
+                  {featuredEvent.description}
+                </p>
+
+              )}
+
+              <br />
+
+
+              <div className="cf-actions">
+
+                <Link
+                  to={
+                    featuredEventPath
+                  }
+                  className="cf-button cf-button--gold"
+                >
+
+                  <span>
+                    View Event Details
+                  </span>
+
+                  <ArrowUpRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+
+                <Link
+                  to="/events"
+                  className="cf-text-link"
+                >
+
+                  <span>
+                    All Events
+                  </span>
+
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+              </div>
+
+            </div>
+
+
+            <div className="cf-conference-feature">
+
+              {featuredEventImage && (
+
+                <Link
+                  to={
+                    featuredEventPath
+                  }
+                  className="cf-conference-feature__image"
+                  aria-label={`View ${featuredEvent.title}`}
+                >
+
+                  <img
+                    src={
+                      featuredEventImage
+                    }
+                    alt={
+                      featuredEvent.title
+                    }
+                    loading="lazy"
+                    decoding="async"
+                    onError={(
+                      event
+                    ) => {
+                      event.currentTarget
+                        .style
+                        .display =
+                        "none";
+                    }}
+                  />
+
+                </Link>
+
+              )}
+
+
+              <div
+                className="cf-conference-date"
+                aria-label={
+                  featuredEventDate?.full ||
+                  "Event date to be announced"
+                }
+              >
+
+                {featuredEventDate ? (
+                  <>
+
+                    <strong>
+                      {featuredEventDate.day}
+                    </strong>
+
+                    <span>
+                      {featuredEventDate.month}
+                    </span>
+
+                    <span>
+                      {featuredEventDate.year}
+                    </span>
+
+                  </>
+                ) : (
+                  <>
+
+                    <CalendarDays
+                      size={38}
+                      strokeWidth={1.4}
+                      aria-hidden="true"
+                    />
+
+                    <span>
+                      DATE
+                    </span>
+
+                    <span>
+                      TBA
+                    </span>
+
+                  </>
+                )}
+
+              </div>
+
+            </div>
 
           </div>
 
-        </div>
+        ) : (
+
+          <div className="cf-container cf-conference-grid">
+
+            <div className="cf-conference-info">
+
+              <div className="cf-section-marker">
+
+                <strong>
+                  CONFERENCE & EVENTS
+                </strong>
+
+              </div>
+
+
+              <h2 id="conference-heading">
+                New events
+                <br />
+
+                <em>
+                  are coming.
+                </em>
+              </h2>
+
+
+              <p>
+                {eventError
+                  ? "Our latest event information is temporarily unavailable. Visit the events page for current programming."
+                  : "Upcoming Continental Founders conferences, forums, roundtables, and convenings will appear here when they are published."}
+              </p>
+
+              <br />
+
+
+              <Link
+                to="/events"
+                className="cf-button cf-button--gold"
+              >
+
+                <span>
+                  Explore Events
+                </span>
+
+                <ArrowUpRight
+                  size={17}
+                  aria-hidden="true"
+                />
+
+              </Link>
+
+            </div>
+
+
+            <div
+              className="cf-conference-date"
+              aria-label="New events coming soon"
+            >
+
+              <CalendarDays
+                size={42}
+                strokeWidth={1.4}
+                aria-hidden="true"
+              />
+
+              <span>
+                COMING
+              </span>
+
+              <span>
+                SOON
+              </span>
+
+            </div>
+
+          </div>
+
+        )}
 
       </section>
 
 
-      {/* =========================================================
-          11 — NEWS
-      ========================================================= */}
+      {/* =====================================================
+          11 — NEWS & INSIGHTS
+      ====================================================== */}
 
-      <section className="cf-section cf-section-soft">
+      <section
+        className="cf-section cf-section-soft"
+        aria-labelledby="news-heading"
+      >
 
         <div className="cf-container">
 
           <div className="cf-section-header">
-
-            
 
             <div>
 
@@ -1490,7 +2553,8 @@ export default function Home() {
                 NEWS & UPDATES
               </span>
 
-              <h2>
+
+              <h2 id="news-heading">
                 Announcements,
                 developments, and{" "}
                 <em>
@@ -1501,6 +2565,7 @@ export default function Home() {
             </div>
 
           </div>
+
           <br />
 
 
@@ -1539,11 +2604,16 @@ export default function Home() {
               to="/insights"
               className="cf-text-link"
             >
+
               <span>
                 View All Insights
               </span>
 
-              <ArrowRight size={17} />
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
             </Link>
 
           </div>
@@ -1553,11 +2623,137 @@ export default function Home() {
       </section>
 
 
-      {/* =========================================================
-          PARTNERSHIP MATERIALS
-      ========================================================= */}
+      {/* =====================================================
+          12 — EXPLORE CONTINENTAL FOUNDERS
+      ====================================================== */}
 
-      <section className="cf-materials-section">
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="explore-heading"
+      >
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <div>
+
+              <span className="cf-eyebrow">
+                EXPLORE CONTINENTAL FOUNDERS
+              </span>
+
+
+              <h2 id="explore-heading">
+                Discover our mission,
+                model, ventures, partnerships,
+                and{" "}
+                <em>
+                  opportunities.
+                </em>
+              </h2>
+
+
+              <p className="cf-section-intro">
+                Explore the major areas of
+                Continental Founders and learn
+                how founders, universities,
+                businesses, institutions, and
+                strategic partners can connect.
+              </p>
+
+            </div>
+
+          </div>
+
+          <br />
+
+
+          <div className="cf-program-grid">
+
+            <HomePageLink
+              title="About Continental Founders"
+              text="Learn about our mission, vision, leadership, principles, and the story behind Continental Founders."
+              to="/about"
+            />
+
+            <HomePageLink
+              title="Ventures & Founders"
+              text="Discover ventures and entrepreneurs building practical and scalable solutions."
+              to="/ventures"
+            />
+
+            <HomePageLink
+              title="Our Model"
+              text="Understand how Continental Founders connects people, institutions, markets, knowledge, and opportunity."
+              to="/our-model"
+            />
+
+            <HomePageLink
+              title="University Partnerships"
+              text="Explore collaboration opportunities for universities, faculty, researchers, students, and academic institutions."
+              to="/universities"
+            />
+
+            <HomePageLink
+              title="Strategic Partners"
+              text="Explore opportunities for businesses, sponsors, institutions, experts, and development partners."
+              to="/strategic-partners"
+            />
+
+            <HomePageLink
+              title="Programs"
+              text="Explore programs connecting founders with mentorship, universities, expertise, networks, markets, and opportunity."
+              to="/programs"
+            />
+
+            <HomePageLink
+              title="Events"
+              text="Discover Continental Founders conferences, events, forums, and convenings."
+              to="/events"
+            />
+
+            <HomePageLink
+              title="Insights"
+              text="Read Continental Founders news, announcements, ideas, perspectives, and updates."
+              to="/insights"
+            />
+
+          </div>
+
+
+          <div className="cf-centered-link">
+
+            <Link
+              to="/contact"
+              className="cf-text-link"
+            >
+
+              <span>
+                Contact Continental Founders
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          13 — PARTNERSHIP MATERIALS
+      ====================================================== */}
+
+      <section
+        className="cf-materials-section"
+        aria-labelledby="partnership-materials-heading"
+      >
 
         <div className="cf-container cf-materials-grid">
 
@@ -1567,7 +2763,8 @@ export default function Home() {
               PARTNERSHIP MATERIALS
             </span>
 
-            <h2>
+
+            <h2 id="partnership-materials-heading">
               Explore the opportunity
               to work with us.
             </h2>
@@ -1588,32 +2785,33 @@ export default function Home() {
             href="/assets/documents/continental-founders-partnership.pdf"
             className="cf-button cf-button--gold"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
+            aria-label="Download Continental Founders partnership materials PDF"
           >
+
             <span>
               Download Partnership Materials
             </span>
 
-            <Download size={17} />
+            <Download
+              size={17}
+              aria-hidden="true"
+            />
+
           </a>
 
         </div>
 
       </section>
 
-
-      
-
-    
-
     </main>
   );
 }
 
 
-/* ============================================================
-   QUICK HIGHLIGHT
-============================================================ */
+// ============================================================
+// QUICK HIGHLIGHT
+// ============================================================
 
 function QuickHighlight({
   number,
@@ -1624,13 +2822,20 @@ function QuickHighlight({
   return (
     <div className="cf-quick-item">
 
-      <div className="cf-quick-icon">
-        {icon}
-      </div>
+      {icon && (
+        <div
+          className="cf-quick-icon"
+          aria-hidden="true"
+        >
+          {icon}
+        </div>
+      )}
+
 
       <span className="cf-quick-number">
         {number}
       </span>
+
 
       <div className="cf-quick-content">
 
@@ -1649,57 +2854,40 @@ function QuickHighlight({
 }
 
 
-/* ============================================================
-   SECTION NUMBER
-============================================================ */
+// ============================================================
+// PROGRAM CARD
+// ============================================================
 
-function SectionNumber({
+function ProgramCard({
   number,
+  title,
+  text,
 }) {
   return (
-    <div className="cf-section-number">
-
-      <span>
-        {number}
-      </span>
-
-      <i />
-
-    </div>
-  );
-}
-
-
-/* ============================================================
-   PROGRAM CARD
-============================================================ */
-
-function ProgramCard({ number, title, text }) {
-  return (
-    <div className="cf-program-card">
+    <article className="cf-program-card">
 
       <span className="cf-program-number">
         {number}
       </span>
 
+
       <h3 className="cf-program-title">
         {title}
       </h3>
+
 
       <p className="cf-program-text">
         {text}
       </p>
 
-     
-
-    </div>
+    </article>
   );
 }
 
 
-/* ============================================================
-   MODEL STEP
-============================================================ */
+// ============================================================
+// MODEL STEP
+// ============================================================
 
 function ModelStep({
   number,
@@ -1712,15 +2900,24 @@ function ModelStep({
 
       <div className="cf-model-step__top">
 
-        <div className="cf-model-icon">
+        <div
+          className="cf-model-icon"
+          aria-hidden="true"
+        >
           {icon}
         </div>
 
+        <span className="sr-only">
+          Step {number}
+        </span>
+
       </div>
+
 
       <h3>
         {title}
       </h3>
+
 
       <p>
         {text}
@@ -1731,9 +2928,9 @@ function ModelStep({
 }
 
 
-/* ============================================================
-   MATTER
-============================================================ */
+// ============================================================
+// MATTER
+// ============================================================
 
 function Matter({
   number,
@@ -1762,9 +2959,9 @@ function Matter({
 }
 
 
-/* ============================================================
-   ECOSYSTEM CARD
-============================================================ */
+// ============================================================
+// ECOSYSTEM CARD
+// ============================================================
 
 function EcosystemCard({
   icon,
@@ -1774,7 +2971,10 @@ function EcosystemCard({
   return (
     <article className="cf-ecosystem-card">
 
-      <div className="cf-ecosystem-icon">
+      <div
+        className="cf-ecosystem-icon"
+        aria-hidden="true"
+      >
         {icon}
       </div>
 
@@ -1793,9 +2993,9 @@ function EcosystemCard({
 }
 
 
-/* ============================================================
-   INSIGHT / NEWS CARD
-============================================================ */
+// ============================================================
+// INSIGHT
+// ============================================================
 
 function Insight({
   image,
@@ -1813,6 +3013,7 @@ function Insight({
           src={image}
           alt={title}
           loading="lazy"
+          decoding="async"
         />
 
       </div>
@@ -1844,12 +3045,66 @@ function Insight({
       <Link
         to="/insights"
         className="cf-text-link"
+        aria-label={`Read more about ${title}`}
       >
+
         <span>
           Read More
         </span>
 
-        <ArrowUpRight size={16} />
+        <ArrowUpRight
+          size={16}
+          aria-hidden="true"
+        />
+
+      </Link>
+
+    </article>
+  );
+}
+
+
+// ============================================================
+// HOMEPAGE INTERNAL LINK
+// ============================================================
+
+function HomePageLink({
+  title,
+  text,
+  to,
+}) {
+  return (
+    <article className="cf-program-card">
+
+      <h3 className="cf-program-title">
+
+        <Link to={to}>
+          {title}
+        </Link>
+
+      </h3>
+
+
+      <p className="cf-program-text">
+        {text}
+      </p>
+
+
+      <Link
+        to={to}
+        className="cf-text-link"
+        aria-label={`Learn more about ${title}`}
+      >
+
+        <span>
+          Learn More
+        </span>
+
+        <ArrowRight
+          size={17}
+          aria-hidden="true"
+        />
+
       </Link>
 
     </article>

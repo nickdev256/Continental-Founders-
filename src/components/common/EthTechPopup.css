@@ -1,0 +1,1042 @@
+/* ============================================================
+   ETH TECH SOLUTIONS
+   COMPACT FLOATING DEVELOPER POPUP
+============================================================ */
+
+.eth-tech-popup {
+  --eth-navy: #071d31;
+  --eth-teal: #009c98;
+  --eth-teal-dark: #087b78;
+  --eth-white: #ffffff;
+  --eth-muted: #7b8790;
+  --eth-border: rgba(7, 29, 49, 0.09);
+
+  position: fixed;
+
+  right: 18px;
+  bottom: 18px;
+
+  z-index: 99999;
+
+  width: 210px;
+  max-width: calc(100vw - 32px);
+
+  padding: 0;
+
+  overflow: visible;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.8);
+
+  border-radius: 15px;
+
+  background:
+    rgba(255, 255, 255, 0.97);
+
+  box-shadow:
+    0 14px 38px
+    rgba(3, 22, 35, 0.16),
+    0 3px 10px
+    rgba(3, 22, 35, 0.07);
+
+  backdrop-filter:
+    blur(14px);
+
+  -webkit-backdrop-filter:
+    blur(14px);
+
+  isolation: isolate;
+
+  animation:
+    ethTechPopupEnter
+    550ms
+    cubic-bezier(
+      0.16,
+      1,
+      0.3,
+      1
+    )
+    both;
+}
+
+
+/* ============================================================
+   TOP ACCENT
+============================================================ */
+
+.eth-tech-popup::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 28px;
+  right: 28px;
+
+  height: 2px;
+
+  border-radius:
+    0
+    0
+    5px
+    5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--eth-teal),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   SOFT BACKGROUND DETAIL
+============================================================ */
+
+.eth-tech-popup::after {
+  content: "";
+
+  position: absolute;
+
+  top: -30px;
+  right: -25px;
+
+  z-index: -1;
+
+  width: 65px;
+  height: 65px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(0, 156, 152, 0.09),
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   ENTER
+============================================================ */
+
+@keyframes ethTechPopupEnter {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translate3d(
+        22px,
+        18px,
+        0
+      )
+      scale(0.92);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      )
+      scale(1);
+  }
+
+}
+
+
+/* ============================================================
+   EXIT
+============================================================ */
+
+.eth-tech-popup--closing {
+  pointer-events: none;
+
+  animation:
+    ethTechPopupExit
+    300ms
+    cubic-bezier(
+      0.4,
+      0,
+      1,
+      1
+    )
+    forwards;
+}
+
+
+@keyframes ethTechPopupExit {
+
+  from {
+    opacity: 1;
+
+    transform:
+      translate3d(
+        0,
+        0,
+        0
+      )
+      scale(1);
+  }
+
+  to {
+    opacity: 0;
+
+    transform:
+      translate3d(
+        18px,
+        10px,
+        0
+      )
+      scale(0.94);
+  }
+
+}
+
+
+/* ============================================================
+   CLOSE BUTTON
+============================================================ */
+
+.eth-tech-popup__close {
+  position: absolute;
+
+  top: -8px;
+  right: -8px;
+
+  z-index: 10;
+
+  width: 25px;
+  height: 25px;
+
+  display: grid;
+
+  place-items: center;
+
+  padding: 0;
+
+  color:
+    var(--eth-white);
+
+  border:
+    2px solid
+    var(--eth-white);
+
+  border-radius: 50%;
+
+  background:
+    var(--eth-navy);
+
+  box-shadow:
+    0 4px 12px
+    rgba(7, 29, 49, 0.2);
+
+  cursor: pointer;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+
+.eth-tech-popup__close svg {
+  width: 11px;
+  height: 11px;
+
+  stroke-width: 2.4;
+}
+
+
+/* ============================================================
+   MAIN CLICKABLE AREA
+============================================================ */
+
+.eth-tech-popup__link {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  padding:
+    12px
+    12px
+    11px;
+
+  overflow: hidden;
+
+  border-radius: inherit;
+
+  color:
+    var(--eth-navy);
+
+  text-align: center;
+
+  text-decoration: none;
+
+  -webkit-tap-highlight-color:
+    transparent;
+}
+
+
+/* ============================================================
+   WEBSITE DEVELOPED BY
+============================================================ */
+
+.eth-tech-popup__eyebrow {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  margin:
+    0
+    0
+    7px;
+
+  color:
+    var(--eth-muted);
+
+  font-size: 0.52rem;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+
+.eth-tech-popup__eyebrow::before {
+  content: "";
+
+  width: 5px;
+  height: 5px;
+
+  flex:
+    0
+    0
+    5px;
+
+  border-radius: 50%;
+
+  background:
+    var(--eth-teal);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(0, 156, 152, 0.08);
+}
+
+
+/* ============================================================
+   LOGO AREA
+============================================================ */
+
+.eth-tech-popup__logo-wrap {
+  position: relative;
+
+  width: 100%;
+  height: 67px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    5px
+    8px;
+
+  overflow: hidden;
+
+  border:
+    1px solid
+    var(--eth-border);
+
+  border-radius: 10px;
+
+  background:
+    #ffffff;
+
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+
+/* ============================================================
+   SUBTLE LOGO BACKGROUND
+============================================================ */
+
+.eth-tech-popup__logo-wrap::before {
+  content: "";
+
+  position: absolute;
+
+  width: 65px;
+  height: 65px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(0, 156, 152, 0.035);
+
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   LOGO
+============================================================ */
+
+.eth-tech-popup__logo {
+  position: relative;
+
+  z-index: 1;
+
+  display: block;
+
+  width: 135px;
+  max-width: 100%;
+
+  height: 55px;
+
+  object-fit: contain;
+
+  object-position: center;
+
+  transition:
+    transform 250ms
+    cubic-bezier(
+      0.16,
+      1,
+      0.3,
+      1
+    );
+}
+
+
+/* ============================================================
+   VISIT ETH TECH
+============================================================ */
+
+.eth-tech-popup__action {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  min-height: 28px;
+
+  margin-top: 7px;
+
+  padding:
+    5px
+    10px;
+
+  border-radius: 999px;
+
+  color:
+    var(--eth-navy);
+
+  background:
+    rgba(7, 29, 49, 0.055);
+
+  font-size: 0.56rem;
+  font-weight: 700;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+
+.eth-tech-popup__action svg {
+  width: 10px;
+  height: 10px;
+
+  flex: 0 0 auto;
+
+  color:
+    var(--eth-teal-dark);
+
+  transition:
+    transform 180ms ease;
+}
+
+
+/* ============================================================
+   DESKTOP HOVER
+============================================================ */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .eth-tech-popup__link:hover
+  .eth-tech-popup__logo-wrap {
+    border-color:
+      rgba(0, 156, 152, 0.22);
+
+    transform:
+      translateY(-1px);
+  }
+
+
+  .eth-tech-popup__link:hover
+  .eth-tech-popup__logo {
+    transform:
+      scale(1.04);
+  }
+
+
+  .eth-tech-popup__link:hover
+  .eth-tech-popup__action {
+    color:
+      var(--eth-white);
+
+    background:
+      var(--eth-navy);
+
+    transform:
+      translateY(-1px);
+  }
+
+
+  .eth-tech-popup__link:hover
+  .eth-tech-popup__action svg {
+    color:
+      var(--eth-white);
+
+    transform:
+      translate(
+        1px,
+        -1px
+      );
+  }
+
+
+  .eth-tech-popup__close:hover {
+    background:
+      var(--eth-teal-dark);
+
+    transform:
+      rotate(90deg);
+  }
+
+}
+
+
+/* ============================================================
+   TAP
+============================================================ */
+
+.eth-tech-popup__link:active {
+  transform:
+    scale(0.985);
+}
+
+
+.eth-tech-popup__close:active {
+  transform:
+    scale(0.92);
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+.eth-tech-popup__link:focus-visible {
+  outline:
+    2px solid
+    var(--eth-teal);
+
+  outline-offset: 3px;
+}
+
+
+.eth-tech-popup__close:focus-visible {
+  outline:
+    2px solid
+    var(--eth-teal);
+
+  outline-offset: 2px;
+}
+
+
+/* ============================================================
+   MEDIUM LAPTOP / TABLET
+============================================================ */
+
+@media (max-width: 1024px) {
+
+  .eth-tech-popup {
+    right: 16px;
+    bottom: 16px;
+
+    width: 200px;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 63px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 128px;
+    height: 52px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 768px) {
+
+  .eth-tech-popup {
+    right: 14px;
+    bottom: 14px;
+
+    width: 185px;
+
+    border-radius: 14px;
+  }
+
+
+  .eth-tech-popup__link {
+    padding:
+      10px
+      10px
+      9px;
+  }
+
+
+  .eth-tech-popup__eyebrow {
+    margin-bottom: 6px;
+
+    font-size: 0.47rem;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 58px;
+
+    padding:
+      4px
+      6px;
+
+    border-radius: 9px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 118px;
+    height: 48px;
+  }
+
+
+  .eth-tech-popup__action {
+    min-height: 27px;
+
+    margin-top: 6px;
+
+    padding:
+      5px
+      9px;
+
+    font-size: 0.52rem;
+  }
+
+}
+
+
+/* ============================================================
+   NORMAL MOBILE
+   481px - 600px
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .eth-tech-popup {
+    right: 12px;
+    bottom: 12px;
+
+    width: 168px;
+
+    max-width:
+      calc(100vw - 24px);
+
+    border-radius: 13px;
+
+    box-shadow:
+      0 10px 28px
+      rgba(3, 22, 35, 0.18);
+  }
+
+
+  .eth-tech-popup__link {
+    padding:
+      9px
+      9px
+      8px;
+  }
+
+
+  .eth-tech-popup__eyebrow {
+    gap: 4px;
+
+    margin-bottom: 5px;
+
+    font-size: 0.42rem;
+
+    letter-spacing: 0.08em;
+  }
+
+
+  .eth-tech-popup__eyebrow::before {
+    width: 4px;
+    height: 4px;
+
+    flex-basis: 4px;
+
+    box-shadow:
+      0 0 0 2px
+      rgba(0, 156, 152, 0.08);
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 52px;
+
+    padding:
+      3px
+      5px;
+
+    border-radius: 8px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 105px;
+    height: 43px;
+  }
+
+
+  .eth-tech-popup__action {
+    min-height: 25px;
+
+    margin-top: 5px;
+
+    padding:
+      4px
+      8px;
+
+    font-size: 0.47rem;
+  }
+
+
+  .eth-tech-popup__action svg {
+    width: 9px;
+    height: 9px;
+  }
+
+
+  .eth-tech-popup__close {
+    top: -7px;
+    right: -7px;
+
+    width: 23px;
+    height: 23px;
+  }
+
+
+  .eth-tech-popup__close svg {
+    width: 10px;
+    height: 10px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   391px - 480px
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .eth-tech-popup {
+    right: 10px;
+    bottom: 10px;
+
+    width: 155px;
+  }
+
+
+  .eth-tech-popup__link {
+    padding:
+      8px
+      8px
+      7px;
+  }
+
+
+  .eth-tech-popup__eyebrow {
+    font-size: 0.39rem;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 48px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 98px;
+    height: 40px;
+  }
+
+
+  .eth-tech-popup__action {
+    min-height: 24px;
+
+    margin-top: 5px;
+
+    padding:
+      4px
+      7px;
+
+    font-size: 0.44rem;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL MOBILE
+   320px - 390px
+============================================================ */
+
+@media (max-width: 390px) {
+
+  .eth-tech-popup {
+    right: 9px;
+    bottom: 9px;
+
+    width: 145px;
+
+    max-width:
+      calc(100vw - 18px);
+
+    border-radius: 12px;
+  }
+
+
+  .eth-tech-popup__eyebrow {
+    font-size: 0.37rem;
+
+    letter-spacing: 0.065em;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 45px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 92px;
+    height: 37px;
+  }
+
+
+  .eth-tech-popup__action {
+    min-height: 23px;
+
+    padding:
+      3px
+      6px;
+
+    font-size: 0.41rem;
+  }
+
+
+  .eth-tech-popup__action svg {
+    width: 8px;
+    height: 8px;
+  }
+
+
+  .eth-tech-popup__close {
+    width: 22px;
+    height: 22px;
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+   BELOW 340px
+============================================================ */
+
+@media (max-width: 340px) {
+
+  .eth-tech-popup {
+    right: 8px;
+    bottom: 8px;
+
+    width: 138px;
+
+    max-width:
+      calc(100vw - 16px);
+  }
+
+
+  .eth-tech-popup__link {
+    padding:
+      7px
+      7px
+      6px;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 43px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 88px;
+    height: 35px;
+  }
+
+
+  .eth-tech-popup__action {
+    font-size: 0.39rem;
+  }
+
+}
+
+
+/* ============================================================
+   SHORT SCREENS / MOBILE LANDSCAPE
+============================================================ */
+
+@media (max-height: 500px) {
+
+  .eth-tech-popup {
+    right: 10px;
+    bottom: 10px;
+
+    width: 155px;
+  }
+
+
+  .eth-tech-popup__link {
+    padding:
+      7px
+      8px;
+  }
+
+
+  .eth-tech-popup__eyebrow {
+    margin-bottom: 4px;
+
+    font-size: 0.4rem;
+  }
+
+
+  .eth-tech-popup__logo-wrap {
+    height: 44px;
+  }
+
+
+  .eth-tech-popup__logo {
+    width: 95px;
+    height: 36px;
+  }
+
+
+  .eth-tech-popup__action {
+    min-height: 22px;
+
+    margin-top: 4px;
+
+    padding:
+      3px
+      7px;
+
+    font-size: 0.42rem;
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .eth-tech-popup,
+  .eth-tech-popup--closing {
+    animation: none;
+  }
+
+
+  .eth-tech-popup *,
+  .eth-tech-popup *::before,
+  .eth-tech-popup *::after {
+    animation: none !important;
+
+    transition: none !important;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  .eth-tech-popup {
+    display: none !important;
+  }
+
+}

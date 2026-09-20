@@ -17,6 +17,13 @@ import PageTransition from "./components/layout/PageTransition";
 
 
 // ============================================================
+// GLOBAL PUBLIC COMPONENTS
+// ============================================================
+
+import EthTechPopup from "./components/common/EthTechPopup";
+
+
+// ============================================================
 // PUBLIC PAGES
 // ============================================================
 
@@ -1452,10 +1459,18 @@ export default function App() {
       <SEOManager />
 
 
+      {/* =====================================================
+          PUBLIC NAVIGATION
+      ====================================================== */}
+
       {!isAdminRoute && (
         <Navbar />
       )}
 
+
+      {/* =====================================================
+          MAIN APPLICATION
+      ====================================================== */}
 
       <main
         id="main-content"
@@ -1470,7 +1485,9 @@ export default function App() {
 
           <Routes>
 
-            {/* HOME */}
+            {/* =================================================
+                HOME
+            ================================================= */}
 
             <Route
               path="/"
@@ -1480,7 +1497,9 @@ export default function App() {
             />
 
 
-            {/* ABOUT */}
+            {/* =================================================
+                ABOUT
+            ================================================= */}
 
             <Route
               path="/about"
@@ -1490,7 +1509,9 @@ export default function App() {
             />
 
 
-            {/* VENTURES */}
+            {/* =================================================
+                VENTURES
+            ================================================= */}
 
             <Route
               path="/ventures"
@@ -1507,7 +1528,9 @@ export default function App() {
             />
 
 
-            {/* OUR MODEL */}
+            {/* =================================================
+                OUR MODEL
+            ================================================= */}
 
             <Route
               path="/our-model"
@@ -1517,7 +1540,9 @@ export default function App() {
             />
 
 
-            {/* UNIVERSITIES */}
+            {/* =================================================
+                UNIVERSITIES
+            ================================================= */}
 
             <Route
               path="/universities"
@@ -1527,7 +1552,9 @@ export default function App() {
             />
 
 
-            {/* STRATEGIC PARTNERS */}
+            {/* =================================================
+                STRATEGIC PARTNERS
+            ================================================= */}
 
             <Route
               path="/strategic-partners"
@@ -1537,7 +1564,9 @@ export default function App() {
             />
 
 
-            {/* PARTNER SUBPAGES */}
+            {/* =================================================
+                PARTNER SUBPAGES
+            ================================================= */}
 
             <Route
               path="/partners/us-africa-trade-network"
@@ -1561,7 +1590,9 @@ export default function App() {
             />
 
 
-            {/* PROGRAMS */}
+            {/* =================================================
+                PROGRAMS
+            ================================================= */}
 
             <Route
               path="/programs"
@@ -1571,7 +1602,9 @@ export default function App() {
             />
 
 
-            {/* IMPACT */}
+            {/* =================================================
+                IMPACT
+            ================================================= */}
 
             <Route
               path="/impact"
@@ -1581,7 +1614,9 @@ export default function App() {
             />
 
 
-            {/* EVENTS */}
+            {/* =================================================
+                EVENTS
+            ================================================= */}
 
             <Route
               path="/events"
@@ -1598,7 +1633,9 @@ export default function App() {
             />
 
 
-            {/* INSIGHTS */}
+            {/* =================================================
+                INSIGHTS
+            ================================================= */}
 
             <Route
               path="/insights"
@@ -1615,7 +1652,9 @@ export default function App() {
             />
 
 
-            {/* CONTACT */}
+            {/* =================================================
+                CONTACT
+            ================================================= */}
 
             <Route
               path="/contact"
@@ -1775,8 +1814,26 @@ export default function App() {
       </main>
 
 
+      {/* =====================================================
+          PUBLIC FOOTER
+      ====================================================== */}
+
       {!isAdminRoute && (
         <Footer />
+      )}
+
+
+      {/* =====================================================
+          ETH TECH SOLUTIONS PROMOTIONAL POPUP
+
+          - Public website only
+          - Appears after delay configured inside EthTechPopup
+          - Never appears in the admin dashboard
+          - Clicking it opens Eth Tech Solutions
+      ====================================================== */}
+
+      {!isAdminRoute && (
+        <EthTechPopup />
       )}
 
     </div>

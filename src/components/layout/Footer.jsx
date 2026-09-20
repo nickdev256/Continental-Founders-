@@ -7,44 +7,38 @@ import {
 } from "react-router-dom";
 
 import {
-  ArrowUpRight,
+  ArrowUpRight, 
   ChevronRight,
   Globe2,
   Instagram,
+  Linkedin,
   Youtube,
 } from "lucide-react";
 
 import "./Footer.css";
 
 
-// ============================================================
-// NAVIGATION
-// ============================================================
+/* ============================================================
+   NAVIGATION
+============================================================ */
 
 const navigation = {
+
   explore: [
     {
       label: "About",
       path: "/about",
     },
-
-    {
-      label: "Ventures",
-      path: "/ventures",
-    },
-
     {
       label: "Our Model",
       path: "/our-model",
     },
-
     {
       label: "Universities",
       path: "/universities",
     },
-
     {
-      label: "Strategic Partners",
+      label: "Sponsors & Partners",
       path: "/strategic-partners",
     },
   ],
@@ -54,155 +48,175 @@ const navigation = {
       label: "Programs",
       path: "/programs",
     },
-
     {
       label: "Impact",
       path: "/impact",
     },
-
     {
       label: "Events",
       path: "/events",
     },
-
     {
       label: "Insights",
       path: "/insights",
     },
-
     {
       label: "Contact",
       path: "/contact",
     },
   ],
 
-  partners: [
-    {
-      label:
-        "U.S.–Africa Trade & Business Network",
-
-      path:
-        "/partners/us-africa-trade-network",
-    },
-
-    {
-      label:
-        "Corporate Partners",
-
-      path:
-        "/partners/corporate",
-    },
-
-    {
-      label:
-        "Government & Development Institutions",
-
-      path:
-        "/partners/government-development",
-    },
-  ],
 };
 
 
-// ============================================================
-// SOCIAL MEDIA
-// ============================================================
+/* ============================================================
+   SOCIAL MEDIA
+============================================================ */
 
 const socials = [
-  {
-    label: "Instagram",
 
-    icon: Instagram,
+  {
+    label:
+      "LinkedIn",
+
+    icon:
+      Linkedin,
+
+    url:
+      "https://www.linkedin.com/company/145206611/admin/dashboard/",
+  },
+
+  {
+    label:
+      "Instagram",
+
+    icon:
+      Instagram,
 
     url:
       "https://www.instagram.com/continentalfounderstm/",
   },
 
   {
-    label: "YouTube",
+    label:
+      "YouTube",
 
-    icon: Youtube,
+    icon:
+      Youtube,
 
     url:
       "https://www.youtube.com/@ContinentalFounders",
   },
+
 ];
 
 
-// ============================================================
-// FOCUS AREAS
-// ============================================================
+/* ============================================================
+   FOCUS AREAS
+============================================================ */
 
 const focusAreas = [
+
   "Entrepreneurship",
   "Innovation",
   "Leadership Development",
   "U.S.–Africa Partnerships",
+
 ];
 
 
-// ============================================================
-// API
-// ============================================================
+/* ============================================================
+   API
+============================================================ */
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
 
 
-// ============================================================
-// FOOTER
-// ============================================================
+/* ============================================================
+   FOOTER
+============================================================ */
 
 export default function Footer() {
+
   const year =
     new Date().getFullYear();
+
+
+  /* ==========================================================
+     NEWSLETTER STATE
+  ========================================================== */
 
   const [
     email,
     setEmail,
-  ] = useState("");
+  ] =
+    useState("");
+
 
   const [
     submitting,
     setSubmitting,
-  ] = useState(false);
+  ] =
+    useState(false);
+
 
   const [
     newsletterMessage,
     setNewsletterMessage,
-  ] = useState("");
+  ] =
+    useState("");
+
 
   const [
     newsletterError,
     setNewsletterError,
-  ] = useState("");
+  ] =
+    useState("");
 
 
-  // ==========================================================
-  // NEWSLETTER SUBMIT
-  // ==========================================================
+  /* ==========================================================
+     NEWSLETTER SUBMIT
+  ========================================================== */
 
   async function handleNewsletterSubmit(
     event
   ) {
+
     event.preventDefault();
+
+
+    /* --------------------------------------------------------
+       CLEAN EMAIL
+    -------------------------------------------------------- */
 
     const cleanEmail =
       email
         .trim()
         .toLowerCase();
 
-    if (!cleanEmail) {
-      setNewsletterMessage("");
+
+    if (
+      !cleanEmail
+    ) {
+
+      setNewsletterMessage(
+        ""
+      );
 
       setNewsletterError(
         "Please enter your email address."
       );
 
       return;
+
     }
 
+
+    /* --------------------------------------------------------
+       BASIC EMAIL VALIDATION
+    -------------------------------------------------------- */
 
     const emailPattern =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -213,28 +227,46 @@ export default function Footer() {
         cleanEmail
       )
     ) {
-      setNewsletterMessage("");
+
+      setNewsletterMessage(
+        ""
+      );
 
       setNewsletterError(
         "Please enter a valid email address."
       );
 
       return;
+
     }
 
 
     try {
-      setSubmitting(true);
 
-      setNewsletterMessage("");
-      setNewsletterError("");
+      setSubmitting(
+        true
+      );
 
+      setNewsletterMessage(
+        ""
+      );
+
+      setNewsletterError(
+        ""
+      );
+
+
+      /* ------------------------------------------------------
+         SEND TO BACKEND
+      ------------------------------------------------------ */
 
       const response =
         await fetch(
           `${API_URL}/api/newsletter/subscribe`,
           {
-            method: "POST",
+
+            method:
+              "POST",
 
             headers: {
               Accept:
@@ -249,37 +281,64 @@ export default function Footer() {
                 email:
                   cleanEmail,
               }),
+
           }
         );
 
+
+      /* ------------------------------------------------------
+         READ RESPONSE
+      ------------------------------------------------------ */
 
       let result = {};
 
 
       try {
+
         result =
           await response.json();
+
       } catch {
+
         result = {};
+
       }
 
 
-      if (!response.ok) {
+      /* ------------------------------------------------------
+         BACKEND ERROR
+      ------------------------------------------------------ */
+
+      if (
+        !response.ok
+      ) {
+
         throw new Error(
           result?.message ||
           "We could not complete your subscription."
         );
+
       }
 
+
+      /* ------------------------------------------------------
+         SUCCESS
+      ------------------------------------------------------ */
 
       setNewsletterMessage(
         result?.message ||
         "Thank you for subscribing to Continental Founders."
       );
 
-      setEmail("");
 
-    } catch (error) {
+      setEmail(
+        ""
+      );
+
+    } catch (
+      error
+    ) {
+
       console.error(
         "Newsletter subscription error:",
         error
@@ -289,36 +348,50 @@ export default function Footer() {
       if (
         error instanceof TypeError
       ) {
+
         setNewsletterError(
           "We could not connect to the subscription service. Please try again shortly."
         );
+
       } else {
+
         setNewsletterError(
           error?.message ||
           "We could not complete your subscription. Please try again."
         );
+
       }
 
     } finally {
-      setSubmitting(false);
+
+      setSubmitting(
+        false
+      );
+
     }
+
   }
 
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
-    <footer className="cf-footer">
+
+    <footer className="cf-footer"> 
+
+      {/* ======================================================
+          BACKGROUND
+      ====================================================== */}
 
       <div
         className="cf-footer__background"
-        aria-hidden="true"
+        aria-hidden="true" 
       />
 
 
-      {/* =====================================================
+      {/* ======================================================
           MAIN FOOTER
       ====================================================== */}
 
@@ -328,7 +401,9 @@ export default function Footer() {
 
           <div className="cf-footer__layout">
 
-            {/* BRAND AREA */}
+            {/* ==================================================
+                BRAND AREA
+            =================================================== */}
 
             <div className="cf-footer__brand">
 
@@ -352,14 +427,19 @@ export default function Footer() {
 
 
               <p className="cf-footer__description">
-                Continental Founders connects
-                founders, universities, businesses,
-                professionals, institutions, mentors,
-                markets, and opportunity networks
-                across Africa, the United States,
-                and global markets.
+
+                Continental Founders builds strategic
+                relationships around founders,
+                universities, businesses, professionals,
+                institutions, and opportunity networks
+                across Africa and the United States.
+
               </p>
 
+
+              {/* ==============================================
+                  GLOBAL NETWORK
+              =============================================== */}
 
               <div className="cf-footer__location">
 
@@ -368,7 +448,6 @@ export default function Footer() {
                   <Globe2
                     size={20}
                     strokeWidth={1.6}
-                    aria-hidden="true"
                   />
 
                 </span>
@@ -389,6 +468,10 @@ export default function Footer() {
               </div>
 
 
+              {/* ==============================================
+                  CTA
+              =============================================== */}
+
               <Link
                 to="/contact"
                 className="cf-footer__meeting"
@@ -398,12 +481,12 @@ export default function Footer() {
                   Schedule a Meeting
                 </span>
 
+
                 <span className="cf-footer__meeting-arrow">
 
                   <ArrowUpRight
                     size={22}
                     strokeWidth={1.8}
-                    aria-hidden="true"
                   />
 
                 </span>
@@ -413,38 +496,41 @@ export default function Footer() {
             </div>
 
 
-            {/* =================================================
+            {/* ==================================================
                 NAVIGATION
-            ================================================= */}
+            =================================================== */}
 
             <div className="cf-footer__navigation">
 
-              {/* EXPLORE */}
+              {/* ==============================================
+                  EXPLORE
+              =============================================== */}
 
               <div className="cf-footer__column">
 
-                <span
-                  className="cf-footer__label"
-                  aria-hidden="true"
-                />
+                <span className="cf-footer__label">
+                  
+                </span>
+
 
                 <h3>
                   Explore
                 </h3>
 
-                <div
-                  className="cf-footer__gold-line"
-                  aria-hidden="true"
-                />
+
+                <div className="cf-footer__gold-line" />
 
 
                 <nav
                   className="cf-footer__links"
-                  aria-label="Explore Continental Founders"
+                  aria-label="Explore"
                 >
 
                   {navigation.explore.map(
-                    (item) => (
+                    (
+                      item
+                    ) => (
+
                       <Link
                         key={
                           item.path
@@ -459,13 +545,14 @@ export default function Footer() {
                           {item.label}
                         </span>
 
+
                         <ChevronRight
                           size={17}
                           strokeWidth={1.5}
-                          aria-hidden="true"
                         />
 
                       </Link>
+
                     )
                   )}
 
@@ -474,32 +561,35 @@ export default function Footer() {
               </div>
 
 
-              {/* RESOURCES */}
+              {/* ==============================================
+                  RESOURCES
+              =============================================== */}
 
               <div className="cf-footer__column">
 
-                <span
-                  className="cf-footer__label"
-                  aria-hidden="true"
-                />
+                <span className="cf-footer__label">
+                  
+                </span>
+
 
                 <h3>
                   Resources
                 </h3>
 
-                <div
-                  className="cf-footer__gold-line"
-                  aria-hidden="true"
-                />
+
+                <div className="cf-footer__gold-line" />
 
 
                 <nav
                   className="cf-footer__links"
-                  aria-label="Continental Founders resources"
+                  aria-label="Resources"
                 >
 
                   {navigation.resources.map(
-                    (item) => (
+                    (
+                      item
+                    ) => (
+
                       <Link
                         key={
                           item.path
@@ -514,13 +604,14 @@ export default function Footer() {
                           {item.label}
                         </span>
 
+
                         <ChevronRight
                           size={17}
                           strokeWidth={1.5}
-                          aria-hidden="true"
                         />
 
                       </Link>
+
                     )
                   )}
 
@@ -529,23 +620,23 @@ export default function Footer() {
               </div>
 
 
-              {/* OUR FOCUS */}
+              {/* ==============================================
+                  OUR FOCUS
+              =============================================== */}
 
               <div className="cf-footer__column">
 
-                <span
-                  className="cf-footer__label"
-                  aria-hidden="true"
-                />
+                <span className="cf-footer__label">
+                  
+                </span>
+
 
                 <h3>
                   Our Focus
                 </h3>
 
-                <div
-                  className="cf-footer__gold-line"
-                  aria-hidden="true"
-                />
+
+                <div className="cf-footer__gold-line" />
 
 
                 <div className="cf-footer__focus">
@@ -555,6 +646,7 @@ export default function Footer() {
                       area,
                       index
                     ) => (
+
                       <div
                         className="cf-footer__focus-item"
                         key={
@@ -563,19 +655,23 @@ export default function Footer() {
                       >
 
                         <span>
+
                           {String(
                             index + 1
                           ).padStart(
                             2,
                             "0"
                           )}
+
                         </span>
+
 
                         <p>
                           {area}
                         </p>
 
                       </div>
+
                     )
                   )}
 
@@ -586,9 +682,9 @@ export default function Footer() {
             </div>
 
 
-            {/* =================================================
+            {/* ==================================================
                 NEWSLETTER
-            ================================================= */}
+            =================================================== */}
 
             <div className="cf-footer__newsletter">
 
@@ -598,15 +694,19 @@ export default function Footer() {
                   STAY CONNECTED
                 </span>
 
+
                 <h3>
                   Subscribe for More Information
                 </h3>
 
+
                 <p>
+
                   Get updates on programs,
                   partnerships, events, insights,
-                  ventures, and opportunities across
-                  the Continental Founders ecosystem.
+                  and opportunities across the
+                  Continental Founders ecosystem.
+
                 </p>
 
               </div>
@@ -637,25 +737,33 @@ export default function Footer() {
                     onChange={(
                       event
                     ) => {
+
                       setEmail(
                         event.target.value
                       );
 
+
                       if (
                         newsletterError
                       ) {
+
                         setNewsletterError(
                           ""
                         );
+
                       }
+
 
                       if (
                         newsletterMessage
                       ) {
+
                         setNewsletterMessage(
                           ""
                         );
+
                       }
+
                     }}
                     required
                   />
@@ -675,39 +783,57 @@ export default function Footer() {
                 >
 
                   <span>
+
                     {submitting
                       ? "Subscribing..."
                       : "Subscribe"}
+
                   </span>
+
 
                   <ArrowUpRight
                     size={19}
                     strokeWidth={1.8}
-                    aria-hidden="true"
                   />
 
                 </button>
 
 
+                {/* ============================================
+                    SUCCESS
+                ============================================= */}
+
                 {newsletterMessage && (
+
                   <p
                     className="cf-footer__newsletter-success"
                     role="status"
                     aria-live="polite"
                   >
+
                     {newsletterMessage}
+
                   </p>
+
                 )}
 
 
+                {/* ============================================
+                    ERROR
+                ============================================= */}
+
                 {newsletterError && (
+
                   <p
                     className="cf-footer__newsletter-error"
                     role="alert"
                     aria-live="assertive"
                   >
+
                     {newsletterError}
+
                   </p>
+
                 )}
 
               </form>
@@ -717,9 +843,9 @@ export default function Footer() {
           </div>
 
 
-          {/* =================================================
+          {/* ==================================================
               CLOSING STATEMENT
-          ================================================= */}
+          =================================================== */}
 
           <div className="cf-footer__statement">
 
@@ -727,7 +853,7 @@ export default function Footer() {
               Building a Brighter Future Together
             </span>
 
-            <i aria-hidden="true" />
+            <i />
 
           </div>
 
@@ -736,7 +862,7 @@ export default function Footer() {
       </section>
 
 
-      {/* =====================================================
+      {/* ======================================================
           BOTTOM BAR
       ====================================================== */}
 
@@ -746,15 +872,21 @@ export default function Footer() {
 
           <div className="cf-footer__bottom-inner">
 
+            {/* ================================================
+                COPYRIGHT
+            ================================================= */}
+
             <div className="cf-footer__copyright">
 
               <span>
                 © {year} Continental Founders™
               </span>
 
+
               <span className="cf-footer__copyright-separator">
                 |
               </span>
+
 
               <span>
                 All rights reserved.
@@ -763,19 +895,52 @@ export default function Footer() {
             </div>
 
 
-            {/* SOCIAL MEDIA */}
+            {/* ================================================
+                LEGAL
+            ================================================= */}
+
+            <nav
+              className="cf-footer__legal"
+              aria-label="Legal"
+            >
+
+              <Link to="/privacy">
+                Privacy
+              </Link>
+
+
+              <Link to="/terms">
+                Terms
+              </Link>
+
+
+              <Link to="/accessibility">
+                Accessibility
+              </Link>
+
+            </nav>
+
+
+            {/* ================================================
+                SOCIAL MEDIA
+            ================================================= */}
 
             <div
               className="cf-footer__socials"
-              aria-label="Continental Founders social media"
+              aria-label="Social media"
             >
 
               {socials.map(
-                (social) => {
+                (
+                  social
+                ) => {
+
                   const Icon =
                     social.icon;
 
+
                   return (
+
                     <a
                       key={
                         social.label
@@ -784,7 +949,9 @@ export default function Footer() {
                         social.url
                       }
                       className="cf-footer__social"
-                      aria-label={`Continental Founders on ${social.label}`}
+                      aria-label={
+                        social.label
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -792,15 +959,19 @@ export default function Footer() {
                       <Icon
                         size={19}
                         strokeWidth={1.6}
-                        aria-hidden="true"
                       />
 
                     </a>
+
                   );
+
                 }
               )}
 
             </div>
+
+
+          
 
           </div>
 
@@ -809,5 +980,7 @@ export default function Footer() {
       </section>
 
     </footer>
+
   );
+
 }

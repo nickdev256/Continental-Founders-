@@ -864,10 +864,10 @@ export default function Home() {
               preload="metadata"
               className="cf-video__player"
             >
-              <source
-                src="/assets/intro 1.mp4"
-                type="video/mp4"
-              />
+             <source
+  src="/assets/eth tech.mp4"
+  type="video/mp4"
+/>
 
               Your browser does not
               support HTML5 video.

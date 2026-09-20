@@ -1,12 +1,9 @@
-
 import React, { useEffect } from "react";
-
 import {
   Route,
   Routes,
   useLocation,
 } from "react-router-dom";
-
 
 // ============================================================
 // PUBLIC LAYOUT
@@ -15,7 +12,6 @@ import {
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import PageTransition from "./components/layout/PageTransition";
-
 
 // ============================================================
 // PUBLIC PAGES
@@ -28,11 +24,8 @@ import Ventures from "./pages/Ventures";
 import VentureDetails from "./pages/VentureDetails";
 
 import OurModel from "./pages/OurModel";
-
 import StrategicPartners from "./pages/StrategicPartners";
-
 import Universities from "./pages/Universities";
-
 
 // ============================================================
 // PARTNER SUBPAGES
@@ -41,7 +34,6 @@ import Universities from "./pages/Universities";
 import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
 import CorporatePartners from "./pages/CorporatePartners";
 import GovernmentDevelopment from "./pages/GovernmentDevelopment";
-
 
 // ============================================================
 // OTHER PUBLIC PAGES
@@ -59,7 +51,6 @@ import InsightDetails from "./pages/InsightDetails";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
-
 // ============================================================
 // ADMIN AUTH PAGES
 // ============================================================
@@ -67,7 +58,6 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRegister from "./pages/admin/AdminRegister";
 import AdminOtp from "./pages/admin/AdminOtp";
-
 
 // ============================================================
 // ADMIN / CMS PAGES
@@ -87,7 +77,6 @@ import AdminContacts from "./pages/admin/AdminContacts";
 import AdminAbout from "./pages/admin/AdminAbout";
 import AdminLeadership from "./pages/admin/AdminLeadership";
 
-
 // ============================================================
 // ADMIN PARTNER CMS PAGES
 // ============================================================
@@ -96,16 +85,14 @@ import AdminUSAfricaTradeNetwork from "./pages/admin/AdminUSAfricaTradeNetwork";
 import AdminCorporatePartners from "./pages/admin/AdminCorporatePartners";
 import AdminGovernmentDevelopment from "./pages/admin/AdminGovernmentDevelopment";
 
-
 // ============================================================
 // ADMIN PROTECTION
 // ============================================================
 
 import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 
-
 // ============================================================
-// SITE CONFIGURATION
+// GLOBAL SITE CONFIGURATION
 // ============================================================
 
 const SITE_NAME = "Continental Founders";
@@ -125,9 +112,11 @@ const DEFAULT_DESCRIPTION =
 const INDEX_ROBOTS =
   "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
+const NOINDEX_ROBOTS =
+  "noindex, nofollow, noarchive";
 
 // ============================================================
-// SEO CONFIGURATION
+// STATIC SEO CONFIGURATION
 // ============================================================
 
 const SEO_ROUTES = {
@@ -275,9 +264,8 @@ const SEO_ROUTES = {
   },
 };
 
-
 // ============================================================
-// NORMALIZE PATH
+// PATH HELPERS
 // ============================================================
 
 function normalizePath(pathname) {
@@ -287,11 +275,6 @@ function normalizePath(pathname) {
 
   return pathname.replace(/\/+$/, "");
 }
-
-
-// ============================================================
-// BUILD CANONICAL URL
-// ============================================================
 
 function buildCanonicalUrl(path) {
   if (!path || path === "/") {
@@ -306,9 +289,8 @@ function buildCanonicalUrl(path) {
   return `${SITE_URL}${cleanPath}`;
 }
 
-
 // ============================================================
-// META TAG HELPER
+// META HELPERS
 // ============================================================
 
 function setMetaTag(
@@ -338,11 +320,6 @@ function setMetaTag(
   );
 }
 
-
-// ============================================================
-// REMOVE META TAG
-// ============================================================
-
 function removeMetaTag(selector) {
   const element =
     document.head.querySelector(selector);
@@ -351,11 +328,6 @@ function removeMetaTag(selector) {
     element.remove();
   }
 }
-
-
-// ============================================================
-// CANONICAL HELPER
-// ============================================================
 
 function setCanonical(url) {
   let canonical =
@@ -383,11 +355,6 @@ function setCanonical(url) {
   );
 }
 
-
-// ============================================================
-// REMOVE CANONICAL
-// ============================================================
-
 function removeCanonical() {
   const canonical =
     document.head.querySelector(
@@ -399,9 +366,8 @@ function removeCanonical() {
   }
 }
 
-
 // ============================================================
-// SET STANDARD DESCRIPTION
+// DESCRIPTION
 // ============================================================
 
 function setDescription(description) {
@@ -413,9 +379,8 @@ function setDescription(description) {
   );
 }
 
-
 // ============================================================
-// SET ROBOTS
+// ROBOTS
 // ============================================================
 
 function setRobots(value) {
@@ -434,9 +399,8 @@ function setRobots(value) {
   );
 }
 
-
 // ============================================================
-// SET OPEN GRAPH DATA
+// OPEN GRAPH
 // ============================================================
 
 function setOpenGraph({
@@ -496,10 +460,17 @@ function setOpenGraph({
   );
 
   setMetaTag(
+    'meta[property="og:image:type"]',
+    "property",
+    "og:image:type",
+    "image/png"
+  );
+
+  setMetaTag(
     'meta[property="og:image:alt"]',
     "property",
     "og:image:alt",
-    "Continental Founders"
+    "Continental Founders logo"
   );
 
   setMetaTag(
@@ -510,9 +481,8 @@ function setOpenGraph({
   );
 }
 
-
 // ============================================================
-// SET TWITTER / X DATA
+// TWITTER / X
 // ============================================================
 
 function setTwitterMeta({
@@ -552,10 +522,9 @@ function setTwitterMeta({
     'meta[name="twitter:image:alt"]',
     "name",
     "twitter:image:alt",
-    "Continental Founders"
+    "Continental Founders logo"
   );
 }
-
 
 // ============================================================
 // APPLY PUBLIC SEO
@@ -568,12 +537,17 @@ function applyPublicSEO({
   type = "website",
   image = SOCIAL_IMAGE,
 }) {
-  document.title =
+  const finalTitle =
     title || DEFAULT_TITLE;
 
+  const finalDescription =
+    description || DEFAULT_DESCRIPTION;
+
+  document.title =
+    finalTitle;
+
   setDescription(
-    description ||
-      DEFAULT_DESCRIPTION
+    finalDescription
   );
 
   setRobots(
@@ -585,32 +559,19 @@ function applyPublicSEO({
   );
 
   setOpenGraph({
-    title:
-      title || DEFAULT_TITLE,
-
-    description:
-      description ||
-      DEFAULT_DESCRIPTION,
-
+    title: finalTitle,
+    description: finalDescription,
     canonicalUrl,
-
     type,
-
     image,
   });
 
   setTwitterMeta({
-    title:
-      title || DEFAULT_TITLE,
-
-    description:
-      description ||
-      DEFAULT_DESCRIPTION,
-
+    title: finalTitle,
+    description: finalDescription,
     image,
   });
 }
-
 
 // ============================================================
 // APPLY NOINDEX SEO
@@ -619,8 +580,7 @@ function applyPublicSEO({
 function applyNoIndexSEO({
   title,
   description,
-  robots =
-    "noindex, nofollow, noarchive",
+  robots = NOINDEX_ROBOTS,
 }) {
   document.title =
     title;
@@ -633,23 +593,43 @@ function applyNoIndexSEO({
     robots
   );
 
-  /*
-   * Admin and missing pages should not inherit the canonical
-   * URL of the public page visited previously.
-   */
   removeCanonical();
 
-  /*
-   * Remove stale public Open Graph URLs.
-   */
   removeMetaTag(
     'meta[property="og:url"]'
   );
+
+  removeMetaTag(
+    'meta[property="og:title"]'
+  );
+
+  removeMetaTag(
+    'meta[property="og:description"]'
+  );
+
+  removeMetaTag(
+    'meta[property="og:image"]'
+  );
+
+  removeMetaTag(
+    'meta[property="og:image:secure_url"]'
+  );
+
+  removeMetaTag(
+    'meta[name="twitter:title"]'
+  );
+
+  removeMetaTag(
+    'meta[name="twitter:description"]'
+  );
+
+  removeMetaTag(
+    'meta[name="twitter:image"]'
+  );
 }
 
-
 // ============================================================
-// SEO MANAGER
+// GLOBAL SEO MANAGER
 // ============================================================
 
 function SEOManager() {
@@ -660,16 +640,13 @@ function SEOManager() {
     const cleanPath =
       normalizePath(pathname);
 
-
     // ========================================================
     // ADMIN ROUTES
     // ========================================================
 
     if (
       cleanPath === "/admin" ||
-      cleanPath.startsWith(
-        "/admin/"
-      )
+      cleanPath.startsWith("/admin/")
     ) {
       applyNoIndexSEO({
         title:
@@ -679,15 +656,14 @@ function SEOManager() {
           "Continental Founders administration.",
 
         robots:
-          "noindex, nofollow, noarchive",
+          NOINDEX_ROBOTS,
       });
 
       return;
     }
 
-
     // ========================================================
-    // DYNAMIC VENTURE PAGE
+    // DYNAMIC VENTURE
     // ========================================================
 
     if (
@@ -714,9 +690,8 @@ function SEOManager() {
       return;
     }
 
-
     // ========================================================
-    // DYNAMIC EVENT PAGE
+    // DYNAMIC EVENT
     // ========================================================
 
     if (
@@ -743,9 +718,8 @@ function SEOManager() {
       return;
     }
 
-
     // ========================================================
-    // DYNAMIC INSIGHT PAGE
+    // DYNAMIC INSIGHT
     // ========================================================
 
     if (
@@ -772,14 +746,12 @@ function SEOManager() {
       return;
     }
 
-
     // ========================================================
-    // STATIC PUBLIC PAGE
+    // STATIC PAGE
     // ========================================================
 
     const seo =
       SEO_ROUTES[cleanPath];
-
 
     // ========================================================
     // UNKNOWN / 404
@@ -800,36 +772,29 @@ function SEOManager() {
       return;
     }
 
-
     // ========================================================
-    // APPLY STATIC PAGE SEO
+    // APPLY STATIC SEO
     // ========================================================
-
-    const title =
-      seo.title ||
-      DEFAULT_TITLE;
-
-    const description =
-      seo.description ||
-      DEFAULT_DESCRIPTION;
-
-    const canonicalUrl =
-      buildCanonicalUrl(
-        seo.canonical
-      );
 
     applyPublicSEO({
-      title,
-      description,
-      canonicalUrl,
+      title:
+        seo.title ||
+        DEFAULT_TITLE,
+
+      description:
+        seo.description ||
+        DEFAULT_DESCRIPTION,
+
+      canonicalUrl:
+        buildCanonicalUrl(
+          seo.canonical
+        ),
     });
 
   }, [pathname]);
 
-
   return null;
 }
-
 
 // ============================================================
 // SCROLL TO TOP
@@ -850,7 +815,6 @@ function ScrollToTop() {
   return null;
 }
 
-
 // ============================================================
 // APP
 // ============================================================
@@ -859,17 +823,9 @@ export default function App() {
   const { pathname } =
     useLocation();
 
-
-  // ==========================================================
-  // ADMIN ROUTE CHECK
-  // ==========================================================
-
   const isAdminRoute =
     pathname === "/admin" ||
-    pathname.startsWith(
-      "/admin/"
-    );
-
+    pathname.startsWith("/admin/");
 
   return (
     <div
@@ -879,17 +835,14 @@ export default function App() {
           : "site-shell"
       }
     >
-
-      {/* ======================================================
+      {/* =====================================================
           GLOBAL HELPERS
       ====================================================== */}
 
       <ScrollToTop />
-
       <SEOManager />
 
-
-      {/* ======================================================
+      {/* =====================================================
           PUBLIC NAVBAR
       ====================================================== */}
 
@@ -897,8 +850,7 @@ export default function App() {
         <Navbar />
       )}
 
-
-      {/* ======================================================
+      {/* =====================================================
           ROUTES
       ====================================================== */}
 
@@ -910,296 +862,162 @@ export default function App() {
             : "main-content"
         }
       >
-
         <PageTransition>
-
           <Routes>
 
-            {/* ==================================================
-                HOME
-            ================================================== */}
-
+            {/* HOME */}
             <Route
               path="/"
-              element={
-                <Home />
-              }
+              element={<Home />}
             />
 
-
-            {/* ==================================================
-                ABOUT
-            ================================================== */}
-
+            {/* ABOUT */}
             <Route
               path="/about"
-              element={
-                <About />
-              }
+              element={<About />}
             />
 
-
-            {/* ==================================================
-                VENTURES
-            ================================================== */}
-
+            {/* VENTURES */}
             <Route
               path="/ventures"
-              element={
-                <Ventures />
-              }
+              element={<Ventures />}
             />
 
             <Route
               path="/ventures/:slug"
-              element={
-                <VentureDetails />
-              }
+              element={<VentureDetails />}
             />
 
-
-            {/* ==================================================
-                OUR MODEL
-            ================================================== */}
-
+            {/* OUR MODEL */}
             <Route
               path="/our-model"
-              element={
-                <OurModel />
-              }
+              element={<OurModel />}
             />
 
-
-            {/* ==================================================
-                UNIVERSITIES
-            ================================================== */}
-
+            {/* UNIVERSITIES */}
             <Route
               path="/universities"
-              element={
-                <Universities />
-              }
+              element={<Universities />}
             />
 
-
-            {/* ==================================================
-                STRATEGIC PARTNERS
-            ================================================== */}
-
+            {/* STRATEGIC PARTNERS */}
             <Route
               path="/strategic-partners"
-              element={
-                <StrategicPartners />
-              }
+              element={<StrategicPartners />}
             />
 
-
-            {/* ==================================================
-                PARTNER SUBPAGES
-            ================================================== */}
-
+            {/* PARTNER SUBPAGES */}
             <Route
               path="/partners/us-africa-trade-network"
-              element={
-                <USAfricaTradeNetwork />
-              }
+              element={<USAfricaTradeNetwork />}
             />
 
             <Route
               path="/partners/corporate"
-              element={
-                <CorporatePartners />
-              }
+              element={<CorporatePartners />}
             />
 
             <Route
               path="/partners/government-development"
-              element={
-                <GovernmentDevelopment />
-              }
+              element={<GovernmentDevelopment />}
             />
 
-
-            {/* ==================================================
-                PROGRAMS
-            ================================================== */}
-
+            {/* PROGRAMS */}
             <Route
               path="/programs"
-              element={
-                <Programs />
-              }
+              element={<Programs />}
             />
 
-
-            {/* ==================================================
-                IMPACT
-            ================================================== */}
-
+            {/* IMPACT */}
             <Route
               path="/impact"
-              element={
-                <Impact />
-              }
+              element={<Impact />}
             />
 
-
-            {/* ==================================================
-                EVENTS
-            ================================================== */}
-
+            {/* EVENTS */}
             <Route
               path="/events"
-              element={
-                <Events />
-              }
+              element={<Events />}
             />
 
             <Route
               path="/events/:slug"
-              element={
-                <EventDetails />
-              }
+              element={<EventDetails />}
             />
 
-
-            {/* ==================================================
-                INSIGHTS
-            ================================================== */}
-
+            {/* INSIGHTS */}
             <Route
               path="/insights"
-              element={
-                <Insights />
-              }
+              element={<Insights />}
             />
 
             <Route
               path="/insights/:slug"
-              element={
-                <InsightDetails />
-              }
+              element={<InsightDetails />}
             />
 
-
-            {/* ==================================================
-                CONTACT
-            ================================================== */}
-
+            {/* CONTACT */}
             <Route
               path="/contact"
-              element={
-                <Contact />
-              }
+              element={<Contact />}
             />
 
-
-            {/* ==================================================
+            {/* =================================================
                 ADMIN AUTH
-            ================================================== */}
+            ================================================= */}
 
             <Route
               path="/admin/register"
-              element={
-                <AdminRegister />
-              }
+              element={<AdminRegister />}
             />
 
             <Route
               path="/admin/login"
-              element={
-                <AdminLogin />
-              }
+              element={<AdminLogin />}
             />
 
             <Route
               path="/admin/verify-otp"
-              element={
-                <AdminOtp />
-              }
+              element={<AdminOtp />}
             />
 
-
-            {/* ==================================================
+            {/* =================================================
                 PROTECTED ADMIN ROUTES
-            ================================================== */}
+            ================================================= */}
 
             <Route
               element={
                 <ProtectedAdminRoute />
               }
             >
-
               <Route
                 path="/admin"
-                element={
-                  <AdminLayout />
-                }
+                element={<AdminLayout />}
               >
-
-                {/* ==============================================
-                    DASHBOARD
-                ============================================== */}
-
                 <Route
                   index
-                  element={
-                    <AdminDashboard />
-                  }
+                  element={<AdminDashboard />}
                 />
-
-
-                {/* ==============================================
-                    VENTURES
-                ============================================== */}
 
                 <Route
                   path="ventures"
-                  element={
-                    <AdminVentures />
-                  }
+                  element={<AdminVentures />}
                 />
-
-
-                {/* ==============================================
-                    EVENTS
-                ============================================== */}
 
                 <Route
                   path="events"
-                  element={
-                    <AdminEvents />
-                  }
+                  element={<AdminEvents />}
                 />
-
-
-                {/* ==============================================
-                    INSIGHTS
-                ============================================== */}
 
                 <Route
                   path="insights"
-                  element={
-                    <AdminInsights />
-                  }
+                  element={<AdminInsights />}
                 />
-
-
-                {/* ==============================================
-                    UNIVERSITIES
-                ============================================== */}
 
                 <Route
                   path="universities"
-                  element={
-                    <AdminUniversities />
-                  }
+                  element={<AdminUniversities />}
                 />
-
-
-                {/* ==============================================
-                    U.S.–AFRICA TRADE NETWORK
-                ============================================== */}
 
                 <Route
                   path="partners/us-africa-trade-network"
@@ -1208,22 +1026,12 @@ export default function App() {
                   }
                 />
 
-
-                {/* ==============================================
-                    CORPORATE PARTNERS
-                ============================================== */}
-
                 <Route
                   path="partners/corporate"
                   element={
                     <AdminCorporatePartners />
                   }
                 />
-
-
-                {/* ==============================================
-                    GOVERNMENT & DEVELOPMENT
-                ============================================== */}
 
                 <Route
                   path="partners/government-development"
@@ -1232,86 +1040,48 @@ export default function App() {
                   }
                 />
 
-
-                {/* ==============================================
-                    NEWSLETTER
-                ============================================== */}
-
                 <Route
                   path="newsletter"
-                  element={
-                    <AdminNewsletter />
-                  }
+                  element={<AdminNewsletter />}
                 />
-
-
-                {/* ==============================================
-                    CONTACTS
-                ============================================== */}
 
                 <Route
                   path="contacts"
-                  element={
-                    <AdminContacts />
-                  }
+                  element={<AdminContacts />}
                 />
-
-
-                {/* ==============================================
-                    ABOUT
-                ============================================== */}
 
                 <Route
                   path="about"
-                  element={
-                    <AdminAbout />
-                  }
+                  element={<AdminAbout />}
                 />
-
-
-                {/* ==============================================
-                    LEADERSHIP
-                ============================================== */}
 
                 <Route
                   path="leadership"
-                  element={
-                    <AdminLeadership />
-                  }
+                  element={<AdminLeadership />}
                 />
-
               </Route>
-
             </Route>
 
-
-            {/* ==================================================
+            {/* =================================================
                 404
-            ================================================== */}
+            ================================================= */}
 
             <Route
               path="*"
-              element={
-                <NotFound />
-              }
+              element={<NotFound />}
             />
 
           </Routes>
-
         </PageTransition>
-
       </main>
 
-
-      {/* ======================================================
+      {/* =====================================================
           PUBLIC FOOTER
       ====================================================== */}
 
       {!isAdminRoute && (
         <Footer />
       )}
-
     </div>
   );
 }
-

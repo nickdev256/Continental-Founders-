@@ -3,51 +3,59 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://continentalfounders.org/</loc>
+    <loc>https://www.continentalfounders.org/</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/about</loc>
+    <loc>https://www.continentalfounders.org/about</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/our-model</loc>
+    <loc>https://www.continentalfounders.org/our-model</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/strategic-partners</loc>
+    <loc>https://www.continentalfounders.org/ventures</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/partners/us-africa-trade-network</loc>
+    <loc>https://www.continentalfounders.org/universities</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/universities</loc>
+    <loc>https://www.continentalfounders.org/strategic-partners</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/partners/corporate</loc>
+    <loc>https://www.continentalfounders.org/partners/us-africa-trade-network</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/partners/government-development</loc>
+    <loc>https://www.continentalfounders.org/partners/corporate</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/ventures</loc>
+    <loc>https://www.continentalfounders.org/partners/government-development</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/events</loc>
+    <loc>https://www.continentalfounders.org/programs</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/insights</loc>
+    <loc>https://www.continentalfounders.org/impact</loc>
   </url>
 
   <url>
-    <loc>https://continentalfounders.org/contact</loc>
+    <loc>https://www.continentalfounders.org/events</loc>
+  </url>
+
+  <url>
+    <loc>https://www.continentalfounders.org/insights</loc>
+  </url>
+
+  <url>
+    <loc>https://www.continentalfounders.org/contact</loc>
   </url>
 
 </urlset>

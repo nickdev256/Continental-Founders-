@@ -1,14 +1,22 @@
 import React, {
+  useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 
 import {
+  AlertCircle,
   BriefcaseBusiness,
+  CheckCircle2,
   ChevronRight,
+  Loader2,
   Mail,
+  Pencil,
   Plus,
+  RefreshCw,
   Search,
+  Trash2,
   UserRound,
   Users,
   X,
@@ -18,14 +26,175 @@ import "./AdminLeadership.css";
 
 
 // ============================================================
-// CONTINENTAL FOUNDERS
-// ADMIN LEADERSHIP
+// API
+// ============================================================
+
+const API_URL =
+  (
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000"
+  ).replace(/\/+$/, "");
+
+
+// ============================================================
+// EMPTY FORM
+// ============================================================
+
+const EMPTY_FORM = {
+  name: "",
+  position: "",
+  email: "",
+  image: "",
+  bio: "",
+  status: "active",
+  display_order: 0,
+};
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getLeaderName(leader) {
+  return (
+    leader?.name ||
+    leader?.fullName ||
+    leader?.full_name ||
+    "Unnamed Leader"
+  );
+}
+
+
+function getLeaderRole(leader) {
+  return (
+    leader?.position ||
+    leader?.title ||
+    leader?.role ||
+    "Leadership Team"
+  );
+}
+
+
+function getStatusClass(status) {
+  const value =
+    String(
+      status || ""
+    ).toLowerCase();
+
+  if (
+    value === "active" ||
+    value === "published"
+  ) {
+    return "active";
+  }
+
+  if (value === "draft") {
+    return "draft";
+  }
+
+  if (
+    value === "inactive" ||
+    value === "archived"
+  ) {
+    return "inactive";
+  }
+
+  return "draft";
+}
+
+
+function normalizeLeader(leader) {
+  return {
+    id:
+      leader?.id || "",
+
+    name:
+      getLeaderName(
+        leader
+      ),
+
+    position:
+      getLeaderRole(
+        leader
+      ),
+
+    email:
+      leader?.email || "",
+
+    image:
+      leader?.image || "",
+
+    bio:
+      leader?.bio || "",
+
+    status:
+      leader?.status ||
+      "active",
+
+    display_order:
+      Number(
+        leader?.display_order ??
+          0
+      ),
+
+    created_at:
+      leader?.created_at ||
+      null,
+
+    updated_at:
+      leader?.updated_at ||
+      null,
+  };
+}
+
+
+// ============================================================
+// COMPONENT
 // ============================================================
 
 export default function AdminLeadership() {
 
   // ==========================================================
-  // STATE
+  // DATA STATE
+  // ==========================================================
+
+  const [
+    leaders,
+    setLeaders,
+  ] =
+    useState([]);
+
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] =
+    useState(false);
+
+
+  const [
+    error,
+    setError,
+  ] =
+    useState("");
+
+
+  const [
+    success,
+    setSuccess,
+  ] =
+    useState("");
+
+
+  // ==========================================================
+  // SEARCH / SELECTION
   // ==========================================================
 
   const [
@@ -43,19 +212,237 @@ export default function AdminLeadership() {
 
 
   // ==========================================================
-  // LEADERSHIP DATA
-  //
-  // Keep empty until we connect this page to the backend.
+  // FORM STATE
   // ==========================================================
 
   const [
-    leaders,
+    formOpen,
+    setFormOpen,
   ] =
-    useState([]);
+    useState(false);
+
+
+  const [
+    editingLeader,
+    setEditingLeader,
+  ] =
+    useState(null);
+
+
+  const [
+    form,
+    setForm,
+  ] =
+    useState(
+      EMPTY_FORM
+    );
+
+
+  const [
+    saving,
+    setSaving,
+  ] =
+    useState(false);
+
+
+  const [
+    deletingId,
+    setDeletingId,
+  ] =
+    useState(null);
 
 
   // ==========================================================
-  // FILTER LEADERS
+  // CLEAR MESSAGES
+  // ==========================================================
+
+  function clearMessages() {
+    setError("");
+    setSuccess("");
+  }
+
+
+  // ==========================================================
+  // READ RESPONSE
+  // ==========================================================
+
+  async function readResponse(
+    response
+  ) {
+    const contentType =
+      response.headers.get(
+        "content-type"
+      ) || "";
+
+
+    if (
+      contentType.includes(
+        "application/json"
+      )
+    ) {
+      return response.json();
+    }
+
+
+    const text =
+      await response.text();
+
+
+    return {
+      success:
+        response.ok,
+
+      message:
+        text ||
+        "Unexpected server response.",
+    };
+  }
+
+
+  // ==========================================================
+  // LOAD LEADERSHIP
+  // ==========================================================
+
+  const loadLeadership =
+    useCallback(
+      async (
+        showRefreshState =
+          false
+      ) => {
+
+        if (
+          showRefreshState
+        ) {
+          setRefreshing(
+            true
+          );
+        } else {
+          setLoading(
+            true
+          );
+        }
+
+
+        setError("");
+
+
+        try {
+
+          const response =
+            await fetch(
+              `${API_URL}/api/leadership/admin`,
+              {
+                method:
+                  "GET",
+
+                credentials:
+                  "include",
+
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+
+          const data =
+            await readResponse(
+              response
+            );
+
+
+          if (
+            response.status ===
+              401 ||
+            response.status ===
+              403
+          ) {
+            throw new Error(
+              "Your admin session has expired. Please sign in again."
+            );
+          }
+
+
+          if (
+            !response.ok
+          ) {
+            throw new Error(
+              data?.message ||
+              "Unable to load leadership profiles."
+            );
+          }
+
+
+          const records =
+            Array.isArray(
+              data?.leaders
+            )
+              ? data.leaders
+              : Array.isArray(
+                    data
+                  )
+                ? data
+                : [];
+
+
+          setLeaders(
+            records.map(
+              normalizeLeader
+            )
+          );
+
+        } catch (
+          requestError
+        ) {
+
+          console.error(
+            "Leadership loading error:",
+            requestError
+          );
+
+
+          setError(
+            requestError
+              ?.message ||
+              "Unable to load leadership profiles."
+          );
+
+        } finally {
+
+          setLoading(
+            false
+          );
+
+          setRefreshing(
+            false
+          );
+
+        }
+
+      },
+      []
+    );
+
+
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      loadLeadership();
+
+    },
+    [
+      loadLeadership,
+    ]
+  );
+
+
+  // ==========================================================
+  // FILTER
   // ==========================================================
 
   const filteredLeaders =
@@ -68,12 +455,8 @@ export default function AdminLeadership() {
             .toLowerCase();
 
 
-        if (
-          !query
-        ) {
-
+        if (!query) {
           return leaders;
-
         }
 
 
@@ -82,23 +465,30 @@ export default function AdminLeadership() {
             leader
           ) => {
 
-            const searchableText = [
-              leader.name,
-              leader.fullName,
-              leader.full_name,
-              leader.title,
-              leader.role,
-              leader.position,
-              leader.email,
-              leader.bio,
-              leader.status,
-            ]
-              .filter(Boolean)
-              .join(" ")
-              .toLowerCase();
+            const searchable =
+              [
+                getLeaderName(
+                  leader
+                ),
+
+                getLeaderRole(
+                  leader
+                ),
+
+                leader.email,
+
+                leader.bio,
+
+                leader.status,
+              ]
+                .filter(
+                  Boolean
+                )
+                .join(" ")
+                .toLowerCase();
 
 
-            return searchableText.includes(
+            return searchable.includes(
               query
             );
 
@@ -114,114 +504,537 @@ export default function AdminLeadership() {
 
 
   // ==========================================================
-  // LEADER NAME
-  // ==========================================================
-
-  function getLeaderName(
-    leader
-  ) {
-
-    return (
-      leader?.name ||
-      leader?.fullName ||
-      leader?.full_name ||
-      "Unnamed Leader"
-    );
-
-  }
-
-
-  // ==========================================================
-  // LEADER ROLE
-  // ==========================================================
-
-  function getLeaderRole(
-    leader
-  ) {
-
-    return (
-      leader?.title ||
-      leader?.position ||
-      leader?.role ||
-      "Leadership Team"
-    );
-
-  }
-
-
-  // ==========================================================
-  // STATUS CLASS
-  // ==========================================================
-
-  function getStatusClass(
-    status
-  ) {
-
-    const normalized =
-      String(
-        status || ""
-      )
-        .trim()
-        .toLowerCase();
-
-
-    if (
-      normalized === "active" ||
-      normalized === "published"
-    ) {
-
-      return "admin-leadership__status admin-leadership__status--active";
-
-    }
-
-
-    if (
-      normalized === "draft"
-    ) {
-
-      return "admin-leadership__status admin-leadership__status--draft";
-
-    }
-
-
-    if (
-      normalized === "inactive" ||
-      normalized === "archived"
-    ) {
-
-      return "admin-leadership__status admin-leadership__status--inactive";
-
-    }
-
-
-    return "admin-leadership__status";
-
-  }
-
-
-  // ==========================================================
-  // ACTIVE COUNT
+  // SUMMARY COUNTS
   // ==========================================================
 
   const activeCount =
-    leaders.filter(
+    useMemo(
+      () =>
+        leaders.filter(
+          (leader) =>
+            String(
+              leader.status
+            ).toLowerCase() ===
+            "active"
+        ).length,
+      [
+        leaders,
+      ]
+    );
+
+
+  const draftCount =
+    useMemo(
+      () =>
+        leaders.filter(
+          (leader) =>
+            String(
+              leader.status
+            ).toLowerCase() ===
+            "draft"
+        ).length,
+      [
+        leaders,
+      ]
+    );
+
+
+  // ==========================================================
+  // FORM UPDATE
+  // ==========================================================
+
+  function updateForm(
+    event
+  ) {
+
+    const {
+      name,
+      value,
+    } =
+      event.target;
+
+
+    clearMessages();
+
+
+    setForm(
       (
+        current
+      ) => ({
+        ...current,
+
+        [name]:
+          name ===
+          "display_order"
+            ? value
+            : value,
+      })
+    );
+
+  }
+
+
+  // ==========================================================
+  // OPEN CREATE
+  // ==========================================================
+
+  function openCreate() {
+
+    clearMessages();
+
+    setSelectedLeader(
+      null
+    );
+
+    setEditingLeader(
+      null
+    );
+
+    setForm({
+      ...EMPTY_FORM,
+
+      display_order:
+        leaders.length,
+    });
+
+    setFormOpen(
+      true
+    );
+
+  }
+
+
+  // ==========================================================
+  // OPEN EDIT
+  // ==========================================================
+
+  function openEdit(
+    leader
+  ) {
+
+    clearMessages();
+
+
+    const normalized =
+      normalizeLeader(
         leader
-      ) => {
-
-        const status =
-          String(
-            leader.status || ""
-          ).toLowerCase();
+      );
 
 
-        return (
-          status === "active" ||
-          status === "published"
+    setSelectedLeader(
+      null
+    );
+
+
+    setEditingLeader(
+      normalized
+    );
+
+
+    setForm({
+      name:
+        normalized.name,
+
+      position:
+        normalized.position,
+
+      email:
+        normalized.email,
+
+      image:
+        normalized.image,
+
+      bio:
+        normalized.bio,
+
+      status:
+        normalized.status,
+
+      display_order:
+        normalized.display_order,
+    });
+
+
+    setFormOpen(
+      true
+    );
+
+  }
+
+
+  // ==========================================================
+  // CLOSE FORM
+  // ==========================================================
+
+  function closeForm() {
+
+    if (saving) {
+      return;
+    }
+
+
+    setFormOpen(
+      false
+    );
+
+    setEditingLeader(
+      null
+    );
+
+    setForm(
+      EMPTY_FORM
+    );
+
+  }
+
+
+  // ==========================================================
+  // SAVE LEADER
+  // ==========================================================
+
+  async function saveLeader(
+    event
+  ) {
+
+    event.preventDefault();
+
+
+    if (saving) {
+      return;
+    }
+
+
+    clearMessages();
+
+
+    const name =
+      form.name.trim();
+
+
+    const position =
+      form.position.trim();
+
+
+    if (!name) {
+
+      setError(
+        "Leader name is required."
+      );
+
+      return;
+
+    }
+
+
+    if (!position) {
+
+      setError(
+        "Leadership position is required."
+      );
+
+      return;
+
+    }
+
+
+    const payload = {
+
+      name,
+
+      position,
+
+      email:
+        form.email.trim(),
+
+      image:
+        form.image.trim(),
+
+      bio:
+        form.bio.trim(),
+
+      status:
+        form.status,
+
+      display_order:
+        Number(
+          form.display_order ||
+          0
+        ),
+
+    };
+
+
+    const isEditing =
+      Boolean(
+        editingLeader?.id
+      );
+
+
+    const endpoint =
+      isEditing
+        ? `${API_URL}/api/leadership/${editingLeader.id}`
+        : `${API_URL}/api/leadership`;
+
+
+    const method =
+      isEditing
+        ? "PATCH"
+        : "POST";
+
+
+    setSaving(
+      true
+    );
+
+
+    try {
+
+      const response =
+        await fetch(
+          endpoint,
+          {
+            method,
+
+            credentials:
+              "include",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+
+              Accept:
+                "application/json",
+            },
+
+            body:
+              JSON.stringify(
+                payload
+              ),
+          }
         );
 
+
+      const data =
+        await readResponse(
+          response
+        );
+
+
+      if (
+        response.status ===
+          401 ||
+        response.status ===
+          403
+      ) {
+        throw new Error(
+          "Your admin session has expired. Please sign in again."
+        );
       }
-    ).length;
+
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+          (
+            isEditing
+              ? "Unable to update leadership profile."
+              : "Unable to create leadership profile."
+          )
+        );
+      }
+
+
+      setFormOpen(
+        false
+      );
+
+      setEditingLeader(
+        null
+      );
+
+      setForm(
+        EMPTY_FORM
+      );
+
+
+      setSuccess(
+        data?.message ||
+        (
+          isEditing
+            ? "Leadership profile updated successfully."
+            : "Leadership profile created successfully."
+        )
+      );
+
+
+      await loadLeadership(
+        true
+      );
+
+    } catch (
+      requestError
+    ) {
+
+      console.error(
+        "Leadership save error:",
+        requestError
+      );
+
+
+      setError(
+        requestError
+          ?.message ||
+          "Unable to save leadership profile."
+      );
+
+    } finally {
+
+      setSaving(
+        false
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // DELETE LEADER
+  // ==========================================================
+
+  async function deleteLeader(
+    leader
+  ) {
+
+    if (
+      !leader?.id ||
+      deletingId
+    ) {
+      return;
+    }
+
+
+    const confirmed =
+      window.confirm(
+        `Delete ${getLeaderName(
+          leader
+        )}? This action cannot be undone.`
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    clearMessages();
+
+
+    setDeletingId(
+      leader.id
+    );
+
+
+    try {
+
+      const response =
+        await fetch(
+          `${API_URL}/api/leadership/${leader.id}`,
+          {
+            method:
+              "DELETE",
+
+            credentials:
+              "include",
+
+            headers: {
+              Accept:
+                "application/json",
+            },
+          }
+        );
+
+
+      const data =
+        await readResponse(
+          response
+        );
+
+
+      if (
+        response.status ===
+          401 ||
+        response.status ===
+          403
+      ) {
+        throw new Error(
+          "Your admin session has expired. Please sign in again."
+        );
+      }
+
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+          "Unable to delete leadership profile."
+        );
+      }
+
+
+      setLeaders(
+        (
+          current
+        ) =>
+          current.filter(
+            (
+              item
+            ) =>
+              item.id !==
+              leader.id
+          )
+      );
+
+
+      if (
+        selectedLeader?.id ===
+        leader.id
+      ) {
+        setSelectedLeader(
+          null
+        );
+      }
+
+
+      setSuccess(
+        data?.message ||
+        "Leadership profile deleted successfully."
+      );
+
+    } catch (
+      requestError
+    ) {
+
+      console.error(
+        "Leadership delete error:",
+        requestError
+      );
+
+
+      setError(
+        requestError
+          ?.message ||
+          "Unable to delete leadership profile."
+      );
+
+    } finally {
+
+      setDeletingId(
+        null
+      );
+
+    }
+
+  }
 
 
   // ==========================================================
@@ -229,197 +1042,230 @@ export default function AdminLeadership() {
   // ==========================================================
 
   return (
-
-    <div className="admin-leadership">
+    <main className="admin-leadership">
 
       {/* ======================================================
-          PAGE HEADER
+          HEADER
       ====================================================== */}
 
-      <div className="admin-leadership__header">
+      <section className="leadership-header">
 
         <div>
 
-          <span className="admin-leadership__eyebrow">
-            ORGANIZATION
-          </span>
-
+          <p className="leadership-eyebrow">
+            Continental Founders CMS
+          </p>
 
           <h1>
             Leadership
           </h1>
 
-
-          <p>
-            Manage the Continental Founders leadership
-            team, founders, executive profiles,
-            biographies, and website visibility.
+          <p className="leadership-header-copy">
+            Manage the leadership profiles displayed across
+            the Continental Founders platform.
           </p>
 
         </div>
 
 
-        <button
-          type="button"
-          className="admin-leadership__create"
-          onClick={() => {
+        <div className="leadership-header-actions">
 
-            console.log(
-              "Add leader"
-            );
+          <button
+            type="button"
+            className="leadership-secondary-button"
+            onClick={() =>
+              loadLeadership(
+                true
+              )
+            }
+            disabled={
+              refreshing
+            }
+          >
 
-          }}
-        >
+            <RefreshCw
+              size={17}
+              className={
+                refreshing
+                  ? "spin"
+                  : ""
+              }
+            />
 
-          <Plus
-            size={18}
-            strokeWidth={1.8}
-          />
+            {refreshing
+              ? "Refreshing..."
+              : "Refresh"}
+
+          </button>
 
 
-          <span>
+          <button
+            type="button"
+            className="leadership-primary-button"
+            onClick={
+              openCreate
+            }
+          >
+
+            <Plus
+              size={18}
+            />
+
             Add Leader
-          </span>
 
-        </button>
+          </button>
 
-      </div>
+        </div>
+
+      </section>
 
 
       {/* ======================================================
-          SUMMARY CARDS
+          MESSAGES
       ====================================================== */}
 
-      <div className="admin-leadership__summary-grid">
+      {error && (
+        <div className="leadership-alert leadership-alert-error">
 
-        <div className="admin-leadership__summary-card">
+          <AlertCircle
+            size={19}
+          />
 
-          <div className="admin-leadership__summary-icon">
+          <span>
+            {error}
+          </span>
 
-            <Users
-              size={20}
-              strokeWidth={1.6}
+          <button
+            type="button"
+            onClick={() =>
+              setError("")
+            }
+            aria-label="Dismiss error"
+          >
+            <X
+              size={17}
             />
+          </button>
 
+        </div>
+      )}
+
+
+      {success && (
+        <div className="leadership-alert leadership-alert-success">
+
+          <CheckCircle2
+            size={19}
+          />
+
+          <span>
+            {success}
+          </span>
+
+          <button
+            type="button"
+            onClick={() =>
+              setSuccess("")
+            }
+            aria-label="Dismiss message"
+          >
+            <X
+              size={17}
+            />
+          </button>
+
+        </div>
+      )}
+
+
+      {/* ======================================================
+          SUMMARY
+      ====================================================== */}
+
+      <section className="leadership-summary">
+
+        <article className="leadership-summary-card">
+
+          <div className="leadership-summary-icon">
+            <Users
+              size={22}
+            />
           </div>
 
-
           <div>
+            <span>
+              Total Leaders
+            </span>
 
             <strong>
               {leaders.length}
             </strong>
-
-            <span>
-              Leadership Profiles
-            </span>
-
           </div>
 
-        </div>
+        </article>
 
 
-        <div className="admin-leadership__summary-card">
+        <article className="leadership-summary-card">
 
-          <div className="admin-leadership__summary-icon">
-
+          <div className="leadership-summary-icon">
             <UserRound
-              size={20}
-              strokeWidth={1.6}
+              size={22}
             />
-
           </div>
-
 
           <div>
+            <span>
+              Active
+            </span>
 
             <strong>
               {activeCount}
             </strong>
-
-            <span>
-              Active Profiles
-            </span>
-
           </div>
 
-        </div>
+        </article>
 
 
-        <div className="admin-leadership__summary-card">
+        <article className="leadership-summary-card">
 
-          <div className="admin-leadership__summary-icon">
-
+          <div className="leadership-summary-icon">
             <BriefcaseBusiness
-              size={20}
-              strokeWidth={1.6}
+              size={22}
             />
-
           </div>
-
 
           <div>
-
-            <strong>
-
-              {
-                leaders.filter(
-                  (
-                    leader
-                  ) => {
-
-                    const role =
-                      String(
-                        leader.role ||
-                        leader.title ||
-                        leader.position ||
-                        ""
-                      ).toLowerCase();
-
-
-                    return role.includes(
-                      "founder"
-                    );
-
-                  }
-                ).length
-              }
-
-            </strong>
-
             <span>
-              Founders
+              Draft
             </span>
 
+            <strong>
+              {draftCount}
+            </strong>
           </div>
 
-        </div>
+        </article>
 
-      </div>
+      </section>
 
 
       {/* ======================================================
           TOOLBAR
       ====================================================== */}
 
-      <div className="admin-leadership__toolbar">
+      <section className="leadership-toolbar">
 
-        <div className="admin-leadership__search">
+        <div className="leadership-search">
 
           <Search
             size={18}
-            strokeWidth={1.6}
-            aria-hidden="true"
           />
-
 
           <input
             type="search"
             value={
               searchQuery
             }
-            placeholder="Search leadership..."
-            aria-label="Search leadership profiles"
             onChange={(
               event
             ) =>
@@ -427,281 +1273,349 @@ export default function AdminLeadership() {
                 event.target.value
               )
             }
+            placeholder="Search leadership..."
+            aria-label="Search leadership"
           />
 
-
           {searchQuery && (
-
             <button
               type="button"
               onClick={() =>
-                setSearchQuery("")
+                setSearchQuery(
+                  ""
+                )
               }
               aria-label="Clear search"
             >
-
               <X
                 size={16}
-                strokeWidth={1.7}
               />
-
             </button>
-
           )}
 
         </div>
 
 
-        <div className="admin-leadership__count">
+        <div className="leadership-result-count">
 
           {filteredLeaders.length}
 
           {" "}
 
-          {filteredLeaders.length === 1
+          {filteredLeaders.length ===
+          1
             ? "profile"
             : "profiles"}
 
         </div>
 
-      </div>
+      </section>
 
 
       {/* ======================================================
-          LEADERSHIP PANEL
+          CONTENT
       ====================================================== */}
 
-      <section className="admin-leadership__panel">
+      <section className="leadership-content">
 
-        <div className="admin-leadership__table-header">
+        {loading ? (
 
-          <span>
-            Leader
-          </span>
+          <div className="leadership-loading">
 
-          <span>
-            Position
-          </span>
+            <Loader2
+              size={30}
+              className="spin"
+            />
 
-          <span>
-            Email
-          </span>
+            <h3>
+              Loading leadership
+            </h3>
 
-          <span>
-            Status
-          </span>
+            <p>
+              Retrieving profiles from the CMS.
+            </p>
 
-          <span />
+          </div>
 
-        </div>
+        ) : filteredLeaders.length ===
+          0 ? (
 
+          <div className="leadership-empty">
 
-        {filteredLeaders.length === 0 ? (
-
-          <div className="admin-leadership__empty">
-
-            <div className="admin-leadership__empty-icon">
-
+            <div className="leadership-empty-icon">
               <Users
-                size={28}
-                strokeWidth={1.5}
+                size={30}
               />
-
             </div>
 
 
             <h3>
-
               {searchQuery
-                ? "No matching leadership profiles"
+                ? "No matching leaders"
                 : "No leadership profiles yet"}
-
             </h3>
 
 
             <p>
-
               {searchQuery
-                ? "Try another name, position, email address, or keyword."
-                : "Leadership profiles created through the Continental Founders CMS will appear here."}
-
+                ? "Try another name, role, email or status."
+                : "Create the first leadership profile for Continental Founders."}
             </p>
 
 
             {!searchQuery && (
-
               <button
                 type="button"
-                onClick={() => {
-
-                  console.log(
-                    "Add first leader"
-                  );
-
-                }}
+                className="leadership-primary-button"
+                onClick={
+                  openCreate
+                }
               >
 
                 <Plus
-                  size={17}
-                  strokeWidth={1.8}
+                  size={18}
                 />
 
-                Add first leadership profile
+                Add First Leader
 
               </button>
-
             )}
 
           </div>
 
         ) : (
 
-          <div className="admin-leadership__list">
+          <div className="leadership-table-wrap">
 
-            {filteredLeaders.map(
-              (
-                leader,
-                index
-              ) => {
+            <table className="leadership-table">
 
-                const leaderId =
-                  leader.id ||
-                  `${getLeaderName(leader)}-${index}`;
+              <thead>
+                <tr>
+
+                  <th>
+                    Leader
+                  </th>
+
+                  <th>
+                    Position
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Order
+                  </th>
+
+                  <th>
+                    Actions
+                  </th>
+
+                </tr>
+              </thead>
 
 
-                return (
+              <tbody>
 
-                  <button
-                    key={
-                      leaderId
-                    }
-                    type="button"
-                    className="admin-leadership__row"
-                    onClick={() =>
-                      setSelectedLeader(
-                        leader
-                      )
-                    }
-                  >
+                {filteredLeaders.map(
+                  (
+                    leader
+                  ) => (
 
-                    <div className="admin-leadership__person">
+                    <tr
+                      key={
+                        leader.id
+                      }
+                    >
 
-                      <div className="admin-leadership__avatar">
+                      <td>
 
-                        {leader.image ||
-                        leader.imageUrl ||
-                        leader.image_url ? (
+                        <button
+                          type="button"
+                          className="leadership-person"
+                          onClick={() =>
+                            setSelectedLeader(
+                              leader
+                            )
+                          }
+                        >
 
-                          <img
-                            src={
-                              leader.image ||
-                              leader.imageUrl ||
-                              leader.image_url
-                            }
-                            alt={
-                              getLeaderName(
+                          <div className="leadership-avatar">
+
+                            {leader.image ? (
+
+                              <img
+                                src={
+                                  leader.image
+                                }
+                                alt=""
+                              />
+
+                            ) : (
+
+                              <UserRound
+                                size={21}
+                              />
+
+                            )}
+
+                          </div>
+
+
+                          <div>
+
+                            <strong>
+                              {getLeaderName(
+                                leader
+                              )}
+                            </strong>
+
+                            {leader.email && (
+                              <span>
+                                {
+                                  leader.email
+                                }
+                              </span>
+                            )}
+
+                          </div>
+
+                        </button>
+
+                      </td>
+
+
+                      <td>
+
+                        <span className="leadership-position">
+                          {getLeaderRole(
+                            leader
+                          )}
+                        </span>
+
+                      </td>
+
+
+                      <td>
+
+                        <span
+                          className={`leadership-status leadership-status-${getStatusClass(
+                            leader.status
+                          )}`}
+                        >
+
+                          {leader.status ||
+                            "draft"}
+
+                        </span>
+
+                      </td>
+
+
+                      <td>
+
+                        <span className="leadership-order">
+                          {leader.display_order}
+                        </span>
+
+                      </td>
+
+
+                      <td>
+
+                        <div className="leadership-row-actions">
+
+                          <button
+                            type="button"
+                            className="leadership-icon-button"
+                            onClick={() =>
+                              openEdit(
                                 leader
                               )
                             }
-                          />
+                            aria-label={`Edit ${getLeaderName(
+                              leader
+                            )}`}
+                            title="Edit"
+                          >
 
-                        ) : (
+                            <Pencil
+                              size={17}
+                            />
 
-                          <UserRound
-                            size={18}
-                            strokeWidth={1.6}
-                          />
-
-                        )}
-
-                      </div>
-
-
-                      <div>
-
-                        <strong>
-                          {getLeaderName(
-                            leader
-                          )}
-                        </strong>
+                          </button>
 
 
-                        <span>
-                          {leader.department ||
-                            "Continental Founders"}
-                        </span>
+                          <button
+                            type="button"
+                            className="leadership-icon-button leadership-delete-button"
+                            onClick={() =>
+                              deleteLeader(
+                                leader
+                              )
+                            }
+                            disabled={
+                              deletingId ===
+                              leader.id
+                            }
+                            aria-label={`Delete ${getLeaderName(
+                              leader
+                            )}`}
+                            title="Delete"
+                          >
 
-                      </div>
+                            {deletingId ===
+                            leader.id ? (
 
-                    </div>
+                              <Loader2
+                                size={17}
+                                className="spin"
+                              />
 
+                            ) : (
 
-                    <div className="admin-leadership__role">
+                              <Trash2
+                                size={17}
+                              />
 
-                      <BriefcaseBusiness
-                        size={14}
-                        strokeWidth={1.6}
-                      />
+                            )}
 
-
-                      <span>
-                        {getLeaderRole(
-                          leader
-                        )}
-                      </span>
-
-                    </div>
-
-
-                    <div className="admin-leadership__email">
-
-                      <Mail
-                        size={14}
-                        strokeWidth={1.6}
-                      />
-
-
-                      <span>
-                        {leader.email ||
-                          "Not provided"}
-                      </span>
-
-                    </div>
+                          </button>
 
 
-                    <div>
+                          <button
+                            type="button"
+                            className="leadership-icon-button"
+                            onClick={() =>
+                              setSelectedLeader(
+                                leader
+                              )
+                            }
+                            aria-label={`View ${getLeaderName(
+                              leader
+                            )}`}
+                            title="View"
+                          >
 
-                      <span
-                        className={
-                          getStatusClass(
-                            leader.status
-                          )
-                        }
-                      >
+                            <ChevronRight
+                              size={19}
+                            />
 
-                        {leader.status ||
-                          "Active"}
+                          </button>
 
-                      </span>
+                        </div>
 
-                    </div>
+                      </td>
 
+                    </tr>
 
-                    <div className="admin-leadership__arrow">
+                  )
+                )}
 
-                      <ChevronRight
-                        size={17}
-                        strokeWidth={1.7}
-                      />
+              </tbody>
 
-                    </div>
-
-                  </button>
-
-                );
-
-              }
-            )}
+            </table>
 
           </div>
 
@@ -711,271 +1625,227 @@ export default function AdminLeadership() {
 
 
       {/* ======================================================
-          LEADERSHIP DETAIL DRAWER
+          PROFILE DRAWER
       ====================================================== */}
 
       {selectedLeader && (
 
         <div
-          className="admin-leadership__overlay"
-          onClick={() =>
-            setSelectedLeader(
-              null
-            )
-          }
-          role="presentation"
+          className="leadership-overlay"
+          onMouseDown={(
+            event
+          ) => {
+
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+              setSelectedLeader(
+                null
+              );
+            }
+
+          }}
         >
 
-          <aside
-            className="admin-leadership__drawer"
-            onClick={(
-              event
-            ) =>
-              event.stopPropagation()
-            }
-            aria-label="Leadership profile details"
-          >
+          <aside className="leadership-drawer">
 
-            <div className="admin-leadership__drawer-header">
+            <div className="leadership-drawer-header">
 
               <div>
-
-                <span className="admin-leadership__drawer-eyebrow">
-                  LEADERSHIP PROFILE
+                <span>
+                  Leadership Profile
                 </span>
-
 
                 <h2>
                   {getLeaderName(
                     selectedLeader
                   )}
                 </h2>
-
               </div>
 
 
               <button
                 type="button"
-                className="admin-leadership__drawer-close"
+                className="leadership-close-button"
                 onClick={() =>
                   setSelectedLeader(
                     null
                   )
                 }
-                aria-label="Close leadership profile"
+                aria-label="Close profile"
               >
-
                 <X
                   size={20}
-                  strokeWidth={1.7}
                 />
-
               </button>
 
             </div>
 
 
-            <div className="admin-leadership__drawer-body">
+            <div className="leadership-drawer-body">
 
-              {/* ===============================================
-                  PROFILE
-              =============================================== */}
+              <div className="leadership-profile-image">
 
-              <div className="admin-leadership__profile">
+                {selectedLeader.image ? (
 
-                <div className="admin-leadership__profile-image">
+                  <img
+                    src={
+                      selectedLeader.image
+                    }
+                    alt={
+                      getLeaderName(
+                        selectedLeader
+                      )
+                    }
+                  />
 
-                  {selectedLeader.image ||
-                  selectedLeader.imageUrl ||
-                  selectedLeader.image_url ? (
+                ) : (
 
-                    <img
-                      src={
-                        selectedLeader.image ||
-                        selectedLeader.imageUrl ||
-                        selectedLeader.image_url
-                      }
-                      alt={
-                        getLeaderName(
-                          selectedLeader
-                        )
-                      }
-                    />
+                  <UserRound
+                    size={46}
+                  />
 
-                  ) : (
-
-                    <UserRound
-                      size={36}
-                      strokeWidth={1.4}
-                    />
-
-                  )}
-
-                </div>
-
-
-                <div>
-
-                  <h3>
-                    {getLeaderName(
-                      selectedLeader
-                    )}
-                  </h3>
-
-
-                  <p>
-                    {getLeaderRole(
-                      selectedLeader
-                    )}
-                  </p>
-
-                </div>
+                )}
 
               </div>
 
 
-              {/* ===============================================
-                  STATUS
-              =============================================== */}
+              <div className="leadership-profile-heading">
 
-              <div className="admin-leadership__detail-row">
+                <h3>
+                  {getLeaderName(
+                    selectedLeader
+                  )}
+                </h3>
 
-                <span>
-                  Status
-                </span>
-
+                <p>
+                  {getLeaderRole(
+                    selectedLeader
+                  )}
+                </p>
 
                 <span
-                  className={
-                    getStatusClass(
-                      selectedLeader.status
-                    )
-                  }
+                  className={`leadership-status leadership-status-${getStatusClass(
+                    selectedLeader.status
+                  )}`}
                 >
-
-                  {selectedLeader.status ||
-                    "Active"}
-
+                  {selectedLeader.status}
                 </span>
 
               </div>
 
 
-              {/* ===============================================
-                  POSITION
-              =============================================== */}
+              {selectedLeader.email && (
 
-              <div className="admin-leadership__detail-card">
-
-                <BriefcaseBusiness
-                  size={18}
-                  strokeWidth={1.6}
-                />
-
-
-                <div>
-
-                  <span>
-                    Position
-                  </span>
-
-                  <strong>
-                    {getLeaderRole(
-                      selectedLeader
-                    )}
-                  </strong>
-
-                </div>
-
-              </div>
-
-
-              {/* ===============================================
-                  EMAIL
-              =============================================== */}
-
-              <div className="admin-leadership__detail-card">
-
-                <Mail
-                  size={18}
-                  strokeWidth={1.6}
-                />
-
-
-                <div>
+                <div className="leadership-detail">
 
                   <span>
                     Email
                   </span>
 
+                  <a
+                    href={`mailto:${selectedLeader.email}`}
+                  >
+                    <Mail
+                      size={17}
+                    />
 
-                  {selectedLeader.email ? (
-
-                    <a
-                      href={`mailto:${selectedLeader.email}`}
-                    >
-                      {selectedLeader.email}
-                    </a>
-
-                  ) : (
-
-                    <strong>
-                      Not provided
-                    </strong>
-
-                  )}
+                    {
+                      selectedLeader.email
+                    }
+                  </a>
 
                 </div>
 
-              </div>
+              )}
 
 
-              {/* ===============================================
-                  BIOGRAPHY
-              =============================================== */}
-
-              <div className="admin-leadership__bio">
+              <div className="leadership-detail">
 
                 <span>
-                  Biography
+                  Display Order
                 </span>
 
-
                 <p>
-
-                  {selectedLeader.bio ||
-                    selectedLeader.biography ||
-                    "No biography has been added yet."}
-
+                  {
+                    selectedLeader.display_order
+                  }
                 </p>
 
               </div>
 
 
-              {/* ===============================================
-                  ACTIONS
-              =============================================== */}
+              <div className="leadership-detail">
 
-              <div className="admin-leadership__drawer-actions">
+                <span>
+                  Biography
+                </span>
 
-                <button
-                  type="button"
-                  className="admin-leadership__edit"
-                  onClick={() => {
-
-                    console.log(
-                      "Edit leadership profile:",
-                      selectedLeader
-                    );
-
-                  }}
-                >
-
-                  Edit Profile
-
-                </button>
+                <p>
+                  {selectedLeader.bio ||
+                    "No biography has been added yet."}
+                </p>
 
               </div>
+
+            </div>
+
+
+            <div className="leadership-drawer-footer">
+
+              <button
+                type="button"
+                className="leadership-secondary-button leadership-danger-button"
+                onClick={() =>
+                  deleteLeader(
+                    selectedLeader
+                  )
+                }
+                disabled={
+                  deletingId ===
+                  selectedLeader.id
+                }
+              >
+
+                {deletingId ===
+                selectedLeader.id ? (
+
+                  <Loader2
+                    size={17}
+                    className="spin"
+                  />
+
+                ) : (
+
+                  <Trash2
+                    size={17}
+                  />
+
+                )}
+
+                Delete
+
+              </button>
+
+
+              <button
+                type="button"
+                className="leadership-primary-button"
+                onClick={() =>
+                  openEdit(
+                    selectedLeader
+                  )
+                }
+              >
+
+                <Pencil
+                  size={17}
+                />
+
+                Edit Profile
+
+              </button>
 
             </div>
 
@@ -985,8 +1855,363 @@ export default function AdminLeadership() {
 
       )}
 
-    </div>
 
+      {/* ======================================================
+          CREATE / EDIT MODAL
+      ====================================================== */}
+
+      {formOpen && (
+
+        <div
+          className="leadership-overlay"
+          onMouseDown={(
+            event
+          ) => {
+
+            if (
+              event.target ===
+                event.currentTarget &&
+              !saving
+            ) {
+              closeForm();
+            }
+
+          }}
+        >
+
+          <section className="leadership-modal">
+
+            <div className="leadership-modal-header">
+
+              <div>
+
+                <span>
+                  {editingLeader
+                    ? "Update Profile"
+                    : "New Profile"}
+                </span>
+
+                <h2>
+                  {editingLeader
+                    ? "Edit Leader"
+                    : "Add Leader"}
+                </h2>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="leadership-close-button"
+                onClick={
+                  closeForm
+                }
+                disabled={
+                  saving
+                }
+                aria-label="Close form"
+              >
+                <X
+                  size={20}
+                />
+              </button>
+
+            </div>
+
+
+            <form
+              className="leadership-form"
+              onSubmit={
+                saveLeader
+              }
+            >
+
+              <div className="leadership-form-grid">
+
+                <label className="leadership-field">
+
+                  <span>
+                    Full Name *
+                  </span>
+
+                  <input
+                    type="text"
+                    name="name"
+                    value={
+                      form.name
+                    }
+                    onChange={
+                      updateForm
+                    }
+                    placeholder="e.g. Dr. Jane Doe"
+                    maxLength={
+                      180
+                    }
+                    required
+                  />
+
+                </label>
+
+
+                <label className="leadership-field">
+
+                  <span>
+                    Position *
+                  </span>
+
+                  <input
+                    type="text"
+                    name="position"
+                    value={
+                      form.position
+                    }
+                    onChange={
+                      updateForm
+                    }
+                    placeholder="e.g. Chair"
+                    maxLength={
+                      180
+                    }
+                    required
+                  />
+
+                </label>
+
+
+                <label className="leadership-field">
+
+                  <span>
+                    Email
+                  </span>
+
+                  <input
+                    type="email"
+                    name="email"
+                    value={
+                      form.email
+                    }
+                    onChange={
+                      updateForm
+                    }
+                    placeholder="name@example.com"
+                  />
+
+                </label>
+
+
+                <label className="leadership-field">
+
+                  <span>
+                    Status
+                  </span>
+
+                  <select
+                    name="status"
+                    value={
+                      form.status
+                    }
+                    onChange={
+                      updateForm
+                    }
+                  >
+
+                    <option value="active">
+                      Active
+                    </option>
+
+                    <option value="draft">
+                      Draft
+                    </option>
+
+                    <option value="inactive">
+                      Inactive
+                    </option>
+
+                  </select>
+
+                </label>
+
+
+                <label className="leadership-field leadership-field-full">
+
+                  <span>
+                    Image URL
+                  </span>
+
+                  <input
+                    type="text"
+                    name="image"
+                    value={
+                      form.image
+                    }
+                    onChange={
+                      updateForm
+                    }
+                    placeholder="/assets/team/leader.webp or https://..."
+                    maxLength={
+                      1000
+                    }
+                  />
+
+                </label>
+
+
+                {form.image && (
+
+                  <div className="leadership-image-preview leadership-field-full">
+
+                    <span>
+                      Image Preview
+                    </span>
+
+                    <div>
+
+                      <img
+                        src={
+                          form.image
+                        }
+                        alt="Leadership preview"
+                        onError={(
+                          event
+                        ) => {
+                          event.currentTarget.style.display =
+                            "none";
+                        }}
+                      />
+
+                    </div>
+
+                  </div>
+
+                )}
+
+
+                <label className="leadership-field">
+
+                  <span>
+                    Display Order
+                  </span>
+
+                  <input
+                    type="number"
+                    name="display_order"
+                    min="0"
+                    max="10000"
+                    step="1"
+                    value={
+                      form.display_order
+                    }
+                    onChange={
+                      updateForm
+                    }
+                  />
+
+                </label>
+
+
+                <div className="leadership-field leadership-order-help">
+
+                  <span>
+                    Ordering
+                  </span>
+
+                  <p>
+                    Lower numbers appear before higher
+                    numbers on the website.
+                  </p>
+
+                </div>
+
+
+                <label className="leadership-field leadership-field-full">
+
+                  <span>
+                    Biography
+                  </span>
+
+                  <textarea
+                    name="bio"
+                    value={
+                      form.bio
+                    }
+                    onChange={
+                      updateForm
+                    }
+                    rows="7"
+                    maxLength={
+                      10000
+                    }
+                    placeholder="Write the leader's professional biography..."
+                  />
+
+                  <small>
+                    {form.bio.length.toLocaleString()}
+                    {" / "}
+                    10,000
+                  </small>
+
+                </label>
+
+              </div>
+
+
+              <div className="leadership-form-actions">
+
+                <button
+                  type="button"
+                  className="leadership-secondary-button"
+                  onClick={
+                    closeForm
+                  }
+                  disabled={
+                    saving
+                  }
+                >
+                  Cancel
+                </button>
+
+
+                <button
+                  type="submit"
+                  className="leadership-primary-button"
+                  disabled={
+                    saving
+                  }
+                >
+
+                  {saving ? (
+                    <>
+                      <Loader2
+                        size={17}
+                        className="spin"
+                      />
+
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2
+                        size={17}
+                      />
+
+                      {editingLeader
+                        ? "Save Changes"
+                        : "Create Leader"}
+                    </>
+                  )}
+
+                </button>
+
+              </div>
+
+            </form>
+
+          </section>
+
+        </div>
+
+      )}
+
+    </main>
   );
-
 }

@@ -11,14 +11,17 @@ import {
   BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
+  CircleDollarSign,
   Globe2,
   ImagePlus,
   Layers3,
   MapPin,
   Plus,
   RefreshCw,
+  Rocket,
   Save,
   Search,
+  Sparkles,
   Trash2,
   UserRound,
   Users,
@@ -32,9 +35,10 @@ import "./AdminVentures.css";
    API
 ============================================================ */
 
-const API_URL =
+const API_URL = (
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  "http://localhost:5000"
+).replace(/\/+$/, "");
 
 
 /* ============================================================
@@ -46,19 +50,60 @@ const ITEMS_PER_PAGE = 6;
 const FORM_STEPS = [
   {
     number: 1,
-    label: "Venture",
+    label: "CFCV",
   },
   {
     number: 2,
-    label: "Business",
+    label: "Venture",
   },
   {
     number: 3,
-    label: "Founders",
+    label: "Business",
   },
   {
     number: 4,
+    label: "Founders",
+  },
+  {
+    number: 5,
     label: "Review",
+  },
+];
+
+
+const CFCV_TRACKS = [
+  {
+    value: "genesis",
+    name: "Genesis",
+    action: "Build It",
+    description:
+      "Transform an opportunity into a validated venture.",
+  },
+  {
+    value: "ascend",
+    name: "Ascend",
+    action: "Prove It",
+    description:
+      "Demonstrate that the venture can work commercially.",
+  },
+  {
+    value: "horizon",
+    name: "Horizon",
+    action: "Scale It",
+    description:
+      "Prepare the venture for larger markets, partnerships, and capital opportunities.",
+  },
+];
+
+
+const FELLOW_STATUSES = [
+  {
+    value: "current",
+    label: "Current Fellow",
+  },
+  {
+    value: "alumni",
+    label: "Alumni",
   },
 ];
 
@@ -96,6 +141,13 @@ const DEFAULT_OPPORTUNITY_AREAS = [
 ============================================================ */
 
 const initialForm = {
+  cfcvTrack: "genesis",
+  fellowStatus: "current",
+  cohort: "",
+  cohortYear: "",
+  catalyticSupport: false,
+  displayOrder: 0,
+
   name: "",
   slug: "",
   sector: "",
@@ -159,7 +211,152 @@ function slugify(value = "") {
 }
 
 
-function getVentureLogo(venture) {
+function normalizeTrack(value) {
+  const track = String(
+    value || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  if (
+    CFCV_TRACKS.some(
+      (item) =>
+        item.value === track
+    )
+  ) {
+    return track;
+  }
+
+  return "genesis";
+}
+
+
+function normalizeFellowStatus(
+  value
+) {
+  const status = String(
+    value || ""
+  )
+    .trim()
+    .toLowerCase();
+
+  if (
+    status === "alumni"
+  ) {
+    return "alumni";
+  }
+
+  return "current";
+}
+
+
+function getTrackValue(
+  venture
+) {
+  return normalizeTrack(
+    venture?.cfcvTrack ||
+      venture?.cfcv_track ||
+      venture?.track ||
+      "genesis"
+  );
+}
+
+
+function getTrack(
+  venture
+) {
+  const value =
+    getTrackValue(
+      venture
+    );
+
+  return (
+    CFCV_TRACKS.find(
+      (item) =>
+        item.value === value
+    ) ||
+    CFCV_TRACKS[0]
+  );
+}
+
+
+function getFellowStatus(
+  venture
+) {
+  return normalizeFellowStatus(
+    venture?.fellowStatus ||
+      venture?.fellow_status ||
+      "current"
+  );
+}
+
+
+function getCohort(
+  venture
+) {
+  return (
+    venture?.cohort ||
+    venture?.cohortName ||
+    venture?.cohort_name ||
+    ""
+  );
+}
+
+
+function getCohortYear(
+  venture
+) {
+  return (
+    venture?.cohortYear ||
+    venture?.cohort_year ||
+    ""
+  );
+}
+
+
+function hasCatalyticSupport(
+  venture
+) {
+  const value =
+    venture?.catalyticSupport ??
+    venture?.catalytic_support ??
+    false;
+
+  if (
+    typeof value === "string"
+  ) {
+    return (
+      value.toLowerCase() ===
+      "true"
+    );
+  }
+
+  return Boolean(value);
+}
+
+
+function getDisplayOrder(
+  venture
+) {
+  const value =
+    venture?.displayOrder ??
+    venture?.display_order ??
+    0;
+
+  const parsed =
+    Number(value);
+
+  return Number.isFinite(
+    parsed
+  )
+    ? parsed
+    : 0;
+}
+
+
+function getVentureLogo(
+  venture
+) {
   return (
     venture?.logo ||
     venture?.logoUrl ||
@@ -169,7 +366,9 @@ function getVentureLogo(venture) {
 }
 
 
-function getHeroImage(venture) {
+function getHeroImage(
+  venture
+) {
   return (
     venture?.heroImage ||
     venture?.heroImageUrl ||
@@ -179,7 +378,9 @@ function getHeroImage(venture) {
 }
 
 
-function getFounders(venture) {
+function getFounders(
+  venture
+) {
   if (
     Array.isArray(
       venture?.founders
@@ -199,10 +400,12 @@ function getFounders(venture) {
 
         image:
           venture.founderImage ||
+          venture.founder_image ||
           "",
 
         bio:
           venture.founderBio ||
+          venture.founder_bio ||
           "",
       },
     ];
@@ -299,6 +502,16 @@ function getStatusClass(
 }
 
 
+function getTrackClass(
+  track
+) {
+  const value =
+    normalizeTrack(track);
+
+  return `admin-ventures__track admin-ventures__track--${value}`;
+}
+
+
 function cloneInitialForm() {
   return {
     ...initialForm,
@@ -361,6 +574,18 @@ export default function AdminVentures() {
     setSearchQuery,
   ] =
     useState("");
+
+  const [
+    trackFilter,
+    setTrackFilter,
+  ] =
+    useState("all");
+
+  const [
+    fellowFilter,
+    setFellowFilter,
+  ] =
+    useState("all");
 
   const [
     currentPage,
@@ -436,7 +661,6 @@ export default function AdminVentures() {
       async () => {
         try {
           setLoading(true);
-
           setError("");
 
           const response =
@@ -536,7 +760,7 @@ export default function AdminVentures() {
   useEffect(() => {
     if (
       !formOpen ||
-      formStep !== 1
+      formStep !== 2
     ) {
       return undefined;
     }
@@ -573,12 +797,30 @@ export default function AdminVentures() {
           .trim()
           .toLowerCase();
 
-      if (!query) {
-        return ventures;
-      }
-
       return ventures.filter(
         (venture) => {
+          const track =
+            getTrackValue(
+              venture
+            );
+
+          const fellowStatus =
+            getFellowStatus(
+              venture
+            );
+
+          const matchesTrack =
+            trackFilter ===
+              "all" ||
+            track ===
+              trackFilter;
+
+          const matchesFellow =
+            fellowFilter ===
+              "all" ||
+            fellowStatus ===
+              fellowFilter;
+
           const searchable = [
             venture.name,
             venture.slug,
@@ -591,19 +833,42 @@ export default function AdminVentures() {
               venture
             ),
             venture.status,
+            getTrack(
+              venture
+            ).name,
+            getTrack(
+              venture
+            ).action,
+            fellowStatus,
+            getCohort(
+              venture
+            ),
+            getCohortYear(
+              venture
+            ),
           ]
             .filter(Boolean)
             .join(" ")
             .toLowerCase();
 
-          return searchable.includes(
-            query
+          const matchesSearch =
+            !query ||
+            searchable.includes(
+              query
+            );
+
+          return (
+            matchesTrack &&
+            matchesFellow &&
+            matchesSearch
           );
         }
       );
     }, [
       ventures,
       searchQuery,
+      trackFilter,
+      fellowFilter,
     ]);
 
 
@@ -611,60 +876,59 @@ export default function AdminVentures() {
      STATS
   ========================================================== */
 
-  const publishedCount =
+  const genesisCount =
     useMemo(
       () =>
         ventures.filter(
           (venture) =>
-            String(
-              venture?.status ||
-              ""
-            )
-              .toLowerCase()
-              .trim() ===
-            "published"
+            getTrackValue(
+              venture
+            ) ===
+            "genesis"
         ).length,
-      [
-        ventures,
-      ]
+      [ventures]
     );
 
 
-  const draftCount =
+  const ascendCount =
     useMemo(
       () =>
         ventures.filter(
           (venture) =>
-            String(
-              venture?.status ||
-              ""
-            )
-              .toLowerCase()
-              .trim() ===
-            "draft"
+            getTrackValue(
+              venture
+            ) ===
+            "ascend"
         ).length,
-      [
-        ventures,
-      ]
+      [ventures]
     );
 
 
-  const archivedCount =
+  const horizonCount =
     useMemo(
       () =>
         ventures.filter(
           (venture) =>
-            String(
-              venture?.status ||
-              ""
-            )
-              .toLowerCase()
-              .trim() ===
-            "archived"
+            getTrackValue(
+              venture
+            ) ===
+            "horizon"
         ).length,
-      [
-        ventures,
-      ]
+      [ventures]
+    );
+
+
+  const currentFellowsCount =
+    useMemo(
+      () =>
+        ventures.filter(
+          (venture) =>
+            getFellowStatus(
+              venture
+            ) ===
+            "current"
+        ).length,
+      [ventures]
     );
 
 
@@ -677,7 +941,7 @@ export default function AdminVentures() {
       1,
       Math.ceil(
         filteredVentures.length /
-        ITEMS_PER_PAGE
+          ITEMS_PER_PAGE
       )
     );
 
@@ -686,6 +950,8 @@ export default function AdminVentures() {
     setCurrentPage(1);
   }, [
     searchQuery,
+    trackFilter,
+    fellowFilter,
   ]);
 
 
@@ -716,7 +982,7 @@ export default function AdminVentures() {
       return filteredVentures.slice(
         start,
         start +
-        ITEMS_PER_PAGE
+          ITEMS_PER_PAGE
       );
     }, [
       filteredVentures,
@@ -725,7 +991,7 @@ export default function AdminVentures() {
 
 
   /* ==========================================================
-     BASIC FORM CHANGE
+     FORM CHANGE
   ========================================================== */
 
   function handleFormChange(
@@ -734,13 +1000,19 @@ export default function AdminVentures() {
     const {
       name,
       value,
+      type,
+      checked,
     } =
       event.target;
 
     setForm(
       (current) => ({
         ...current,
-        [name]: value,
+
+        [name]:
+          type === "checkbox"
+            ? checked
+            : value,
       })
     );
 
@@ -1114,6 +1386,36 @@ export default function AdminVentures() {
 
 
     setForm({
+      cfcvTrack:
+        getTrackValue(
+          venture
+        ),
+
+      fellowStatus:
+        getFellowStatus(
+          venture
+        ),
+
+      cohort:
+        getCohort(
+          venture
+        ),
+
+      cohortYear:
+        getCohortYear(
+          venture
+        ),
+
+      catalyticSupport:
+        hasCatalyticSupport(
+          venture
+        ),
+
+      displayOrder:
+        getDisplayOrder(
+          venture
+        ),
+
       name:
         venture?.name ||
         "",
@@ -1205,6 +1507,8 @@ export default function AdminVentures() {
 
                 image:
                   founder?.image ||
+                  founder?.imageUrl ||
+                  founder?.image_url ||
                   "",
 
                 bio:
@@ -1243,6 +1547,7 @@ export default function AdminVentures() {
 
                 text:
                   item?.text ||
+                  item?.description ||
                   "",
               })
             )
@@ -1309,6 +1614,49 @@ export default function AdminVentures() {
       step === 1
     ) {
       if (
+        !form.cfcvTrack
+      ) {
+        setFormError(
+          "Select a CFCV track."
+        );
+
+        return false;
+      }
+
+      if (
+        !form.fellowStatus
+      ) {
+        setFormError(
+          "Select the fellow status."
+        );
+
+        return false;
+      }
+
+      if (
+        form.cohortYear &&
+        (
+          Number(
+            form.cohortYear
+          ) < 2000 ||
+          Number(
+            form.cohortYear
+          ) > 2100
+        )
+      ) {
+        setFormError(
+          "Enter a valid cohort year."
+        );
+
+        return false;
+      }
+    }
+
+
+    if (
+      step === 2
+    ) {
+      if (
         !form.name.trim()
       ) {
         setFormError(
@@ -1365,7 +1713,7 @@ export default function AdminVentures() {
 
 
     if (
-      step === 2
+      step === 3
     ) {
       if (
         form.website.trim() &&
@@ -1409,7 +1757,7 @@ export default function AdminVentures() {
 
 
     if (
-      step === 3
+      step === 4
     ) {
       const validFounders =
         form.founders.filter(
@@ -1452,7 +1800,7 @@ export default function AdminVentures() {
     setFormStep(
       (current) =>
         Math.min(
-          4,
+          5,
           current + 1
         )
     );
@@ -1477,30 +1825,23 @@ export default function AdminVentures() {
   ========================================================== */
 
   async function handleSaveVenture() {
-    if (
-      !validateStep(1)
+    for (
+      let step = 1;
+      step <= 4;
+      step += 1
     ) {
-      setFormStep(1);
-      return;
-    }
-
-    if (
-      !validateStep(2)
-    ) {
-      setFormStep(2);
-      return;
-    }
-
-    if (
-      !validateStep(3)
-    ) {
-      setFormStep(3);
-      return;
+      if (
+        !validateStep(
+          step
+        )
+      ) {
+        setFormStep(step);
+        return;
+      }
     }
 
     try {
       setSaving(true);
-
       setFormError("");
 
       const editing =
@@ -1570,6 +1911,32 @@ export default function AdminVentures() {
 
 
       const payload = {
+        cfcvTrack:
+          form.cfcvTrack,
+
+        fellowStatus:
+          form.fellowStatus,
+
+        cohort:
+          form.cohort.trim(),
+
+        cohortYear:
+          form.cohortYear
+            ? Number(
+                form.cohortYear
+              )
+            : null,
+
+        catalyticSupport:
+          Boolean(
+            form.catalyticSupport
+          ),
+
+        displayOrder:
+          Number(
+            form.displayOrder
+          ) || 0,
+
         name:
           form.name.trim(),
 
@@ -1725,9 +2092,7 @@ export default function AdminVentures() {
       ) {
         setVentures(
           (current) => {
-            if (
-              editing
-            ) {
+            if (editing) {
               return current.map(
                 (venture) =>
                   venture.id ===
@@ -1791,7 +2156,6 @@ export default function AdminVentures() {
 
     try {
       setDeleting(true);
-
       setFormError("");
 
       const response =
@@ -1871,7 +2235,6 @@ export default function AdminVentures() {
   return (
     <div className="admin-ventures">
 
-
       {/* ======================================================
           HEADER
       ====================================================== */}
@@ -1879,21 +2242,19 @@ export default function AdminVentures() {
       <div className="admin-ventures__header">
 
         <div>
-
           <span className="admin-ventures__eyebrow">
-            VENTURE MANAGEMENT
+            CFCV VENTURE MANAGEMENT
           </span>
 
           <h1>
-            Ventures
+            Fellows & Ventures
           </h1>
 
           <p>
-            Manage venture profiles, founders,
-            business information, opportunities
-            and publication status.
+            Manage CFCV ventures, track placement,
+            cohorts, founders, venture information,
+            catalytic support and publication status.
           </p>
-
         </div>
 
 
@@ -1913,13 +2274,12 @@ export default function AdminVentures() {
 
 
       {/* ======================================================
-          STATS
+          SUMMARY
       ====================================================== */}
 
       <div className="admin-ventures__summary-grid">
 
         <div className="admin-ventures__summary-card">
-
           <BriefcaseBusiness
             size={20}
           />
@@ -1933,71 +2293,62 @@ export default function AdminVentures() {
               Total Ventures
             </span>
           </div>
-
         </div>
 
 
         <div className="admin-ventures__summary-card">
-
-          <Globe2
+          <Sparkles
             size={20}
           />
 
           <div>
             <strong>
-              {publishedCount}
+              {genesisCount}
             </strong>
 
             <span>
-              Published
+              Genesis
             </span>
           </div>
-
         </div>
 
 
         <div className="admin-ventures__summary-card">
+          <TrendingIcon />
 
-          <Layers3
+          <div>
+            <strong>
+              {ascendCount}
+            </strong>
+
+            <span>
+              Ascend
+            </span>
+          </div>
+        </div>
+
+
+        <div className="admin-ventures__summary-card">
+          <Rocket
             size={20}
           />
 
           <div>
             <strong>
-              {draftCount}
+              {horizonCount}
             </strong>
 
             <span>
-              Drafts
+              Horizon
             </span>
           </div>
-
-        </div>
-
-
-        <div className="admin-ventures__summary-card">
-
-          <Users
-            size={20}
-          />
-
-          <div>
-            <strong>
-              {archivedCount}
-            </strong>
-
-            <span>
-              Archived
-            </span>
-          </div>
-
         </div>
 
       </div>
 
 
       {/* ======================================================
-          TOOLBAR
+          FILTERS
       ====================================================== */}
 
       <div className="admin-ventures__toolbar">
@@ -2011,7 +2362,7 @@ export default function AdminVentures() {
             value={
               searchQuery
             }
-            placeholder="Search ventures..."
+            placeholder="Search ventures, founders or cohorts..."
             onChange={(
               event
             ) =>
@@ -2021,9 +2372,7 @@ export default function AdminVentures() {
             }
           />
 
-
           {searchQuery && (
-
             <button
               type="button"
               onClick={() =>
@@ -2032,14 +2381,70 @@ export default function AdminVentures() {
             >
               <X size={15} />
             </button>
-
           )}
 
         </div>
 
 
-        <span className="admin-ventures__count">
+        <select
+          value={
+            trackFilter
+          }
+          onChange={(
+            event
+          ) =>
+            setTrackFilter(
+              event.target.value
+            )
+          }
+          aria-label="Filter by CFCV track"
+        >
+          <option value="all">
+            All Tracks
+          </option>
 
+          <option value="genesis">
+            Genesis
+          </option>
+
+          <option value="ascend">
+            Ascend
+          </option>
+
+          <option value="horizon">
+            Horizon
+          </option>
+        </select>
+
+
+        <select
+          value={
+            fellowFilter
+          }
+          onChange={(
+            event
+          ) =>
+            setFellowFilter(
+              event.target.value
+            )
+          }
+          aria-label="Filter by fellow status"
+        >
+          <option value="all">
+            All Fellows
+          </option>
+
+          <option value="current">
+            Current Fellows
+          </option>
+
+          <option value="alumni">
+            Alumni
+          </option>
+        </select>
+
+
+        <span className="admin-ventures__count">
           {!loading &&
             `${filteredVentures.length} ${
               filteredVentures.length ===
@@ -2047,7 +2452,6 @@ export default function AdminVentures() {
                 ? "venture"
                 : "ventures"
             }`}
-
         </span>
 
       </div>
@@ -2060,34 +2464,16 @@ export default function AdminVentures() {
       <section className="admin-ventures__panel">
 
         <div className="admin-ventures__table-header">
-
-          <span>
-            Venture
-          </span>
-
-          <span>
-            Sector
-          </span>
-
-          <span>
-            Country
-          </span>
-
-          <span>
-            Stage
-          </span>
-
-          <span>
-            Status
-          </span>
-
+          <span>Venture</span>
+          <span>Track</span>
+          <span>Country</span>
+          <span>Stage</span>
+          <span>Status</span>
           <span />
-
         </div>
 
 
         {loading && (
-
           <div className="admin-ventures__empty">
 
             <RefreshCw size={28} />
@@ -2097,294 +2483,286 @@ export default function AdminVentures() {
             </h3>
 
             <p>
-              Retrieving venture profiles.
+              Retrieving CFCV venture profiles.
             </p>
 
           </div>
-
         )}
 
 
         {!loading &&
           error && (
+            <div className="admin-ventures__empty">
 
-          <div className="admin-ventures__empty">
+              <BriefcaseBusiness
+                size={28}
+              />
 
-            <BriefcaseBusiness
-              size={28}
-            />
+              <h3>
+                Ventures could not be loaded
+              </h3>
 
-            <h3>
-              Ventures could not be loaded
-            </h3>
+              <p>
+                {error}
+              </p>
 
-            <p>
-              {error}
-            </p>
+              <button
+                type="button"
+                onClick={
+                  loadVentures
+                }
+              >
+                <RefreshCw
+                  size={16}
+                />
 
-            <button
-              type="button"
-              onClick={
-                loadVentures
-              }
-            >
-              <RefreshCw size={16} />
+                Try Again
+              </button>
 
-              Try Again
-            </button>
-
-          </div>
-
-        )}
+            </div>
+          )}
 
 
         {!loading &&
           !error &&
           filteredVentures.length ===
             0 && (
+            <div className="admin-ventures__empty">
 
-          <div className="admin-ventures__empty">
+              <BriefcaseBusiness
+                size={30}
+              />
 
-            <BriefcaseBusiness
-              size={30}
-            />
+              <h3>
+                {searchQuery ||
+                trackFilter !== "all" ||
+                fellowFilter !== "all"
+                  ? "No matching ventures"
+                  : "No ventures yet"}
+              </h3>
 
-            <h3>
-              {searchQuery
-                ? "No matching ventures"
-                : "No ventures yet"}
-            </h3>
+              <p>
+                {searchQuery ||
+                trackFilter !== "all" ||
+                fellowFilter !== "all"
+                  ? "Change the search or filters to find another venture."
+                  : "Add the first venture to the CFCV ecosystem."}
+              </p>
 
-            <p>
-              {searchQuery
-                ? "Try another search term."
-                : "Add the first venture to the Continental Founders network."}
-            </p>
+              {!searchQuery &&
+                trackFilter ===
+                  "all" &&
+                fellowFilter ===
+                  "all" && (
+                  <button
+                    type="button"
+                    onClick={
+                      handleCreateVenture
+                    }
+                  >
+                    <Plus size={16} />
 
-            {!searchQuery && (
+                    Add first venture
+                  </button>
+                )}
 
-              <button
-                type="button"
-                onClick={
-                  handleCreateVenture
-                }
-              >
-                <Plus size={16} />
-
-                Add first venture
-              </button>
-
-            )}
-
-          </div>
-
-        )}
+            </div>
+          )}
 
 
         {!loading &&
           !error &&
           paginatedVentures.length >
             0 && (
+            <div className="admin-ventures__list">
 
-          <div className="admin-ventures__list">
-
-            {paginatedVentures.map(
-              (
-                venture,
-                index
-              ) => (
-
-              <button
-                key={
-                  venture.id ||
-                  `${venture.slug}-${index}`
-                }
-                type="button"
-                className="admin-ventures__row"
-                onClick={() =>
-                  setSelectedVenture(
-                    venture
-                  )
-                }
-              >
-
-                <div className="admin-ventures__venture">
-
-                  <div className="admin-ventures__logo">
-
-                    {getVentureLogo(
+              {paginatedVentures.map(
+                (
+                  venture,
+                  index
+                ) => {
+                  const track =
+                    getTrack(
                       venture
-                    ) ? (
+                    );
 
-                      <img
-                        src={
-                          getVentureLogo(
+                  return (
+                    <button
+                      key={
+                        venture.id ||
+                        `${venture.slug}-${index}`
+                      }
+                      type="button"
+                      className="admin-ventures__row"
+                      onClick={() =>
+                        setSelectedVenture(
+                          venture
+                        )
+                      }
+                    >
+
+                      <div className="admin-ventures__venture">
+
+                        <div className="admin-ventures__logo">
+
+                          {getVentureLogo(
                             venture
-                          )
-                        }
-                        alt=""
+                          ) ? (
+                            <img
+                              src={
+                                getVentureLogo(
+                                  venture
+                                )
+                              }
+                              alt=""
+                            />
+                          ) : (
+                            <BriefcaseBusiness
+                              size={19}
+                            />
+                          )}
+
+                        </div>
+
+
+                        <div>
+                          <strong>
+                            {venture.name}
+                          </strong>
+
+                          <span>
+                            {getFounderNames(
+                              venture
+                            )}
+                          </span>
+                        </div>
+
+                      </div>
+
+
+                      <div>
+                        <span
+                          className={
+                            getTrackClass(
+                              track.value
+                            )
+                          }
+                        >
+                          {track.name}
+                        </span>
+                      </div>
+
+
+                      <div className="admin-ventures__meta">
+                        <MapPin
+                          size={13}
+                        />
+
+                        <span>
+                          {venture.country ||
+                            "Not specified"}
+                        </span>
+                      </div>
+
+
+                      <div className="admin-ventures__meta">
+                        <Layers3
+                          size={13}
+                        />
+
+                        <span>
+                          {venture.stage ||
+                            "Not specified"}
+                        </span>
+                      </div>
+
+
+                      <div>
+                        <span
+                          className={
+                            getStatusClass(
+                              venture.status
+                            )
+                          }
+                        >
+                          {venture.status ||
+                            "draft"}
+                        </span>
+                      </div>
+
+
+                      <ChevronRight
+                        size={16}
                       />
 
-                    ) : (
+                    </button>
+                  );
+                }
+              )}
 
-                      <BriefcaseBusiness
-                        size={19}
-                      />
-
-                    )}
-
-                  </div>
-
-
-                  <div>
-
-                    <strong>
-                      {venture.name}
-                    </strong>
-
-                    <span>
-                      {getFounderNames(
-                        venture
-                      )}
-                    </span>
-
-                  </div>
-
-                </div>
-
-
-                <div className="admin-ventures__meta">
-
-                  <BriefcaseBusiness
-                    size={13}
-                  />
-
-                  <span>
-                    {venture.sector ||
-                    "Not specified"}
-                  </span>
-
-                </div>
-
-
-                <div className="admin-ventures__meta">
-
-                  <MapPin
-                    size={13}
-                  />
-
-                  <span>
-                    {venture.country ||
-                    "Not specified"}
-                  </span>
-
-                </div>
-
-
-                <div className="admin-ventures__meta">
-
-                  <Layers3
-                    size={13}
-                  />
-
-                  <span>
-                    {venture.stage ||
-                    "Not specified"}
-                  </span>
-
-                </div>
-
-
-                <div>
-
-                  <span
-                    className={
-                      getStatusClass(
-                        venture.status
-                      )
-                    }
-                  >
-                    {venture.status ||
-                    "draft"}
-                  </span>
-
-                </div>
-
-
-                <ChevronRight
-                  size={16}
-                />
-
-              </button>
-
-            ))}
-
-          </div>
-
-        )}
+            </div>
+          )}
 
 
         {!loading &&
           !error &&
           filteredVentures.length >
             ITEMS_PER_PAGE && (
+            <div className="admin-ventures__pagination">
 
-          <div className="admin-ventures__pagination">
+              <button
+                type="button"
+                disabled={
+                  currentPage === 1
+                }
+                onClick={() =>
+                  setCurrentPage(
+                    (current) =>
+                      Math.max(
+                        1,
+                        current - 1
+                      )
+                  )
+                }
+              >
+                <ChevronLeft
+                  size={15}
+                />
 
-            <button
-              type="button"
-              disabled={
-                currentPage === 1
-              }
-              onClick={() =>
-                setCurrentPage(
-                  (current) =>
-                    Math.max(
-                      1,
-                      current - 1
-                    )
-                )
-              }
-            >
-              <ChevronLeft
-                size={15}
-              />
-
-              Previous
-            </button>
-
-
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
+                Previous
+              </button>
 
 
-            <button
-              type="button"
-              disabled={
-                currentPage ===
-                totalPages
-              }
-              onClick={() =>
-                setCurrentPage(
-                  (current) =>
-                    Math.min(
-                      totalPages,
-                      current + 1
-                    )
-                )
-              }
-            >
-              Next
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
 
-              <ChevronRight
-                size={15}
-              />
-            </button>
 
-          </div>
+              <button
+                type="button"
+                disabled={
+                  currentPage ===
+                  totalPages
+                }
+                onClick={() =>
+                  setCurrentPage(
+                    (current) =>
+                      Math.min(
+                        totalPages,
+                        current + 1
+                      )
+                  )
+                }
+              >
+                Next
 
-        )}
+                <ChevronRight
+                  size={15}
+                />
+              </button>
+
+            </div>
+          )}
 
       </section>
 
@@ -2394,7 +2772,6 @@ export default function AdminVentures() {
       ====================================================== */}
 
       {selectedVenture && (
-
         <div
           className="admin-ventures__overlay"
           onClick={() =>
@@ -2416,15 +2793,13 @@ export default function AdminVentures() {
             <div className="admin-ventures__drawer-header">
 
               <div>
-
                 <span className="admin-ventures__drawer-eyebrow">
-                  VENTURE PROFILE
+                  CFCV VENTURE PROFILE
                 </span>
 
                 <h2>
                   {selectedVenture.name}
                 </h2>
-
               </div>
 
 
@@ -2448,9 +2823,7 @@ export default function AdminVentures() {
               {getHeroImage(
                 selectedVenture
               ) && (
-
                 <div className="admin-ventures__hero-preview">
-
                   <img
                     src={
                       getHeroImage(
@@ -2459,9 +2832,7 @@ export default function AdminVentures() {
                     }
                     alt=""
                   />
-
                 </div>
-
               )}
 
 
@@ -2472,7 +2843,6 @@ export default function AdminVentures() {
                   {getVentureLogo(
                     selectedVenture
                   ) ? (
-
                     <img
                       src={
                         getVentureLogo(
@@ -2481,19 +2851,35 @@ export default function AdminVentures() {
                       }
                       alt=""
                     />
-
                   ) : (
-
                     <BriefcaseBusiness
                       size={34}
                     />
-
                   )}
 
                 </div>
 
 
                 <div>
+                  <span
+                    className={
+                      getTrackClass(
+                        getTrackValue(
+                          selectedVenture
+                        )
+                      )
+                    }
+                  >
+                    {
+                      getTrack(
+                        selectedVenture
+                      ).name
+                    } — {
+                      getTrack(
+                        selectedVenture
+                      ).action
+                    }
+                  </span>
 
                   <h3>
                     {selectedVenture.name}
@@ -2501,10 +2887,9 @@ export default function AdminVentures() {
 
                   <p>
                     {selectedVenture.tagline ||
-                    selectedVenture.description ||
-                    "No tagline provided."}
+                      selectedVenture.description ||
+                      "No tagline provided."}
                   </p>
-
                 </div>
 
               </div>
@@ -2524,7 +2909,7 @@ export default function AdminVentures() {
                   }
                 >
                   {selectedVenture.status ||
-                  "draft"}
+                    "draft"}
                 </span>
 
               </div>
@@ -2533,27 +2918,69 @@ export default function AdminVentures() {
               <div className="admin-ventures__detail-grid">
 
                 <div className="admin-ventures__detail-card">
-
-                  <BriefcaseBusiness
+                  <Sparkles
                     size={18}
                   />
 
                   <div>
                     <span>
-                      Sector
+                      CFCV Track
                     </span>
 
                     <strong>
-                      {selectedVenture.sector ||
-                      "Not provided"}
+                      {
+                        getTrack(
+                          selectedVenture
+                        ).name
+                      }
                     </strong>
                   </div>
-
                 </div>
 
 
                 <div className="admin-ventures__detail-card">
+                  <Users
+                    size={18}
+                  />
 
+                  <div>
+                    <span>
+                      Fellowship
+                    </span>
+
+                    <strong>
+                      {getFellowStatus(
+                        selectedVenture
+                      ) ===
+                      "alumni"
+                        ? "Alumni"
+                        : "Current Fellow"}
+                    </strong>
+                  </div>
+                </div>
+
+
+                <div className="admin-ventures__detail-card">
+                  <Globe2
+                    size={18}
+                  />
+
+                  <div>
+                    <span>
+                      Cohort
+                    </span>
+
+                    <strong>
+                      {getCohort(
+                        selectedVenture
+                      ) ||
+                        "Not provided"}
+                    </strong>
+                  </div>
+                </div>
+
+
+                <div className="admin-ventures__detail-card">
                   <MapPin
                     size={18}
                   />
@@ -2565,15 +2992,13 @@ export default function AdminVentures() {
 
                     <strong>
                       {selectedVenture.country ||
-                      "Not provided"}
+                        "Not provided"}
                     </strong>
                   </div>
-
                 </div>
 
 
                 <div className="admin-ventures__detail-card">
-
                   <Layers3
                     size={18}
                   />
@@ -2585,15 +3010,13 @@ export default function AdminVentures() {
 
                     <strong>
                       {selectedVenture.stage ||
-                      "Not provided"}
+                        "Not provided"}
                     </strong>
                   </div>
-
                 </div>
 
 
                 <div className="admin-ventures__detail-card">
-
                   <UserRound
                     size={18}
                   />
@@ -2609,14 +3032,33 @@ export default function AdminVentures() {
                       )}
                     </strong>
                   </div>
+                </div>
 
+
+                <div className="admin-ventures__detail-card">
+                  <CircleDollarSign
+                    size={18}
+                  />
+
+                  <div>
+                    <span>
+                      Catalytic Support
+                    </span>
+
+                    <strong>
+                      {hasCatalyticSupport(
+                        selectedVenture
+                      )
+                        ? "Selected"
+                        : "Not selected"}
+                    </strong>
+                  </div>
                 </div>
 
               </div>
 
 
               {selectedVenture.website && (
-
                 <a
                   href={
                     selectedVenture.website
@@ -2631,7 +3073,6 @@ export default function AdminVentures() {
                     size={16}
                   />
                 </a>
-
               )}
 
 
@@ -2656,7 +3097,6 @@ export default function AdminVentures() {
           </aside>
 
         </div>
-
       )}
 
 
@@ -2665,7 +3105,6 @@ export default function AdminVentures() {
       ====================================================== */}
 
       {formOpen && (
-
         <div
           className="admin-ventures__overlay"
           onClick={
@@ -2685,11 +3124,10 @@ export default function AdminVentures() {
             <div className="admin-ventures__drawer-header">
 
               <div>
-
                 <span className="admin-ventures__drawer-eyebrow">
                   {editingVenture
-                    ? "EDIT VENTURE"
-                    : "NEW VENTURE"}
+                    ? "EDIT CFCV VENTURE"
+                    : "NEW CFCV VENTURE"}
                 </span>
 
                 <h2>
@@ -2697,7 +3135,6 @@ export default function AdminVentures() {
                     ? "Update Venture"
                     : "Add Venture"}
                 </h2>
-
               </div>
 
 
@@ -2718,41 +3155,36 @@ export default function AdminVentures() {
             </div>
 
 
-            {/* ==================================================
-                STEPS
-            ================================================== */}
+            {/* STEPS */}
 
             <div className="admin-ventures__steps">
 
               {FORM_STEPS.map(
                 (step) => (
+                  <div
+                    key={
+                      step.number
+                    }
+                    className={
+                      formStep ===
+                      step.number
+                        ? "admin-ventures__step active"
+                        : formStep >
+                            step.number
+                          ? "admin-ventures__step complete"
+                          : "admin-ventures__step"
+                    }
+                  >
+                    <span>
+                      {step.number}
+                    </span>
 
-                <div
-                  key={
-                    step.number
-                  }
-                  className={
-                    formStep ===
-                    step.number
-                      ? "admin-ventures__step active"
-                      : formStep >
-                        step.number
-                        ? "admin-ventures__step complete"
-                        : "admin-ventures__step"
-                  }
-                >
-
-                  <span>
-                    {step.number}
-                  </span>
-
-                  <small>
-                    {step.label}
-                  </small>
-
-                </div>
-
-              ))}
+                    <small>
+                      {step.label}
+                    </small>
+                  </div>
+                )
+              )}
 
             </div>
 
@@ -2760,23 +3192,224 @@ export default function AdminVentures() {
             <div className="admin-ventures__form">
 
               {formError && (
-
                 <div className="admin-ventures__form-error">
                   {formError}
                 </div>
-
               )}
 
 
               {/* =================================================
-                  STEP 1 - VENTURE
+                  STEP 1 — CFCV
               ================================================= */}
 
               {formStep === 1 && (
                 <>
 
                   <div className="admin-ventures__step-heading">
+                    <h3>
+                      CFCV Placement
+                    </h3>
 
+                    <p>
+                      Place the venture in its CFCV
+                      pathway, cohort and fellowship status.
+                    </p>
+                  </div>
+
+
+                  <div className="admin-ventures__subsection">
+
+                    <div className="admin-ventures__subsection-header">
+                      <div>
+                        <h4>
+                          Venture Pathway
+                        </h4>
+
+                        <p>
+                          Select the pathway that reflects
+                          the venture's current development stage.
+                        </p>
+                      </div>
+                    </div>
+
+
+                    {CFCV_TRACKS.map(
+                      (track) => (
+                        <label
+                          key={
+                            track.value
+                          }
+                          className="admin-ventures__opportunity-editor"
+                        >
+                          <div>
+                            <input
+                              type="radio"
+                              name="cfcvTrack"
+                              value={
+                                track.value
+                              }
+                              checked={
+                                form.cfcvTrack ===
+                                track.value
+                              }
+                              onChange={
+                                handleFormChange
+                              }
+                            />
+
+                            <strong>
+                              {track.name} — {track.action}
+                            </strong>
+                          </div>
+
+                          <p>
+                            {track.description}
+                          </p>
+                        </label>
+                      )
+                    )}
+
+                  </div>
+
+
+                  <div className="admin-ventures__form-grid">
+
+                    <div className="admin-ventures__field">
+                      <label>
+                        Fellow Status *
+                      </label>
+
+                      <select
+                        name="fellowStatus"
+                        value={
+                          form.fellowStatus
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                      >
+                        {FELLOW_STATUSES.map(
+                          (item) => (
+                            <option
+                              key={
+                                item.value
+                              }
+                              value={
+                                item.value
+                              }
+                            >
+                              {item.label}
+                            </option>
+                          )
+                        )}
+                      </select>
+                    </div>
+
+
+                    <div className="admin-ventures__field">
+                      <label>
+                        Cohort Year
+                      </label>
+
+                      <input
+                        name="cohortYear"
+                        type="number"
+                        min="2000"
+                        max="2100"
+                        value={
+                          form.cohortYear
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                        placeholder="2026"
+                      />
+                    </div>
+
+                  </div>
+
+
+                  <div className="admin-ventures__field">
+                    <label>
+                      Cohort Name
+                    </label>
+
+                    <input
+                      name="cohort"
+                      value={
+                        form.cohort
+                      }
+                      onChange={
+                        handleFormChange
+                      }
+                      placeholder="e.g. CFCV 2026 Cohort"
+                    />
+                  </div>
+
+
+                  <div className="admin-ventures__field">
+                    <label>
+                      Display Order
+                    </label>
+
+                    <input
+                      name="displayOrder"
+                      type="number"
+                      min="0"
+                      value={
+                        form.displayOrder
+                      }
+                      onChange={
+                        handleFormChange
+                      }
+                      placeholder="0"
+                    />
+
+                    <small>
+                      Lower numbers can be displayed first
+                      in the public venture directory.
+                    </small>
+                  </div>
+
+
+                  <div className="admin-ventures__publishing-note">
+
+                    <label>
+                      <input
+                        type="checkbox"
+                        name="catalyticSupport"
+                        checked={
+                          form.catalyticSupport
+                        }
+                        onChange={
+                          handleFormChange
+                        }
+                      />
+
+                      {" "}
+                      Selected for Catalytic Support
+                    </label>
+
+                    <p>
+                      Use this after the venture has been
+                      formally selected for additional
+                      catalytic support.
+                    </p>
+
+                  </div>
+
+                </>
+              )}
+
+
+              {/* =================================================
+                  STEP 2 — VENTURE
+              ================================================= */}
+
+              {formStep === 2 && (
+                <>
+
+                  <div className="admin-ventures__step-heading">
                     <h3>
                       Venture Information
                     </h3>
@@ -2785,12 +3418,10 @@ export default function AdminVentures() {
                       Add the venture identity,
                       sector, location and stage.
                     </p>
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Venture Name *
                     </label>
@@ -2807,12 +3438,10 @@ export default function AdminVentures() {
                       }
                       placeholder="e.g. Eth Tech Solutions"
                     />
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       URL Slug *
                     </label>
@@ -2830,14 +3459,12 @@ export default function AdminVentures() {
                     <small>
                       Public URL: /ventures/{form.slug || "venture-name"}
                     </small>
-
                   </div>
 
 
                   <div className="admin-ventures__form-grid">
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Sector *
                       </label>
@@ -2852,12 +3479,10 @@ export default function AdminVentures() {
                         }
                         placeholder="Technology"
                       />
-
                     </div>
 
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Country *
                       </label>
@@ -2872,14 +3497,12 @@ export default function AdminVentures() {
                         }
                         placeholder="Uganda"
                       />
-
                     </div>
 
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Venture Stage *
                     </label>
@@ -2894,12 +3517,10 @@ export default function AdminVentures() {
                       }
                       placeholder="e.g. Early Growth"
                     />
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Tagline
                     </label>
@@ -2914,12 +3535,10 @@ export default function AdminVentures() {
                       }
                       placeholder="A short venture statement"
                     />
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Short Description
                     </label>
@@ -2935,7 +3554,6 @@ export default function AdminVentures() {
                       }
                       placeholder="Summarize what the venture does..."
                     />
-
                   </div>
 
                 </>
@@ -2943,29 +3561,25 @@ export default function AdminVentures() {
 
 
               {/* =================================================
-                  STEP 2 - BUSINESS
+                  STEP 3 — BUSINESS
               ================================================= */}
 
-              {formStep === 2 && (
+              {formStep === 3 && (
                 <>
 
                   <div className="admin-ventures__step-heading">
-
                     <h3>
                       Business Profile
                     </h3>
 
                     <p>
-                      Add venture content,
-                      contact information,
-                      services and opportunity.
+                      Add venture content, contact
+                      information, services and opportunity.
                     </p>
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Full Venture Description
                     </label>
@@ -2981,12 +3595,10 @@ export default function AdminVentures() {
                       }
                       placeholder="Describe the venture in detail..."
                     />
-
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Secondary Description
                     </label>
@@ -3002,14 +3614,12 @@ export default function AdminVentures() {
                       }
                       placeholder="Additional venture context..."
                     />
-
                   </div>
 
 
                   <div className="admin-ventures__form-grid">
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Website
                       </label>
@@ -3025,12 +3635,10 @@ export default function AdminVentures() {
                         }
                         placeholder="https://..."
                       />
-
                     </div>
 
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Email
                       </label>
@@ -3046,7 +3654,6 @@ export default function AdminVentures() {
                         }
                         placeholder="info@example.com"
                       />
-
                     </div>
 
                   </div>
@@ -3055,7 +3662,6 @@ export default function AdminVentures() {
                   <div className="admin-ventures__form-grid">
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Phone
                       </label>
@@ -3070,12 +3676,10 @@ export default function AdminVentures() {
                         }
                         placeholder="+256..."
                       />
-
                     </div>
 
 
                     <div className="admin-ventures__field">
-
                       <label>
                         Alternative Phone
                       </label>
@@ -3090,20 +3694,17 @@ export default function AdminVentures() {
                         }
                         placeholder="+256..."
                       />
-
                     </div>
 
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Venture Logo URL
                     </label>
 
                     <div className="admin-ventures__input-icon">
-
                       <ImagePlus
                         size={16}
                       />
@@ -3118,36 +3719,28 @@ export default function AdminVentures() {
                         }
                         placeholder="https://..."
                       />
-
                     </div>
-
                   </div>
 
 
                   {form.logoUrl && (
-
                     <div className="admin-ventures__image-preview admin-ventures__image-preview--logo">
-
                       <img
                         src={
                           form.logoUrl
                         }
                         alt="Logo preview"
                       />
-
                     </div>
-
                   )}
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Hero Image URL
                     </label>
 
                     <div className="admin-ventures__input-icon">
-
                       <ImagePlus
                         size={16}
                       />
@@ -3162,34 +3755,26 @@ export default function AdminVentures() {
                         }
                         placeholder="https://..."
                       />
-
                     </div>
-
                   </div>
 
 
                   {form.heroImageUrl && (
-
                     <div className="admin-ventures__image-preview">
-
                       <img
                         src={
                           form.heroImageUrl
                         }
                         alt="Hero preview"
                       />
-
                     </div>
-
                   )}
 
 
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
-
                       <div>
-
                         <h4>
                           Services
                         </h4>
@@ -3197,7 +3782,6 @@ export default function AdminVentures() {
                         <p>
                           Add what the venture provides.
                         </p>
-
                       </div>
 
                       <button
@@ -3207,10 +3791,8 @@ export default function AdminVentures() {
                         }
                       >
                         <Plus size={14} />
-
                         Add
                       </button>
-
                     </div>
 
 
@@ -3219,41 +3801,38 @@ export default function AdminVentures() {
                         service,
                         index
                       ) => (
-
-                      <div
-                        key={`service-${index}`}
-                        className="admin-ventures__repeat-row"
-                      >
-
-                        <input
-                          value={
-                            service
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            updateService(
-                              index,
-                              event.target.value
-                            )
-                          }
-                          placeholder={`Service ${index + 1}`}
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeService(
-                              index
-                            )
-                          }
+                        <div
+                          key={`service-${index}`}
+                          className="admin-ventures__repeat-row"
                         >
-                          <X size={15} />
-                        </button>
+                          <input
+                            value={
+                              service
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateService(
+                                index,
+                                event.target.value
+                              )
+                            }
+                            placeholder={`Service ${index + 1}`}
+                          />
 
-                      </div>
-
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeService(
+                                index
+                              )
+                            }
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                      )
+                    )}
 
                   </div>
 
@@ -3261,20 +3840,16 @@ export default function AdminVentures() {
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
-
                       <div>
-
                         <h4>
                           Opportunity
                         </h4>
 
                         <p>
-                          Explain the problem,
-                          solution, market and stage.
+                          Explain the problem, solution,
+                          market and current stage.
                         </p>
-
                       </div>
-
                     </div>
 
 
@@ -3283,48 +3858,45 @@ export default function AdminVentures() {
                         item,
                         index
                       ) => (
+                        <div
+                          key={`opportunity-${index}`}
+                          className="admin-ventures__opportunity-editor"
+                        >
+                          <input
+                            value={
+                              item.title
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateOpportunityArea(
+                                index,
+                                "title",
+                                event.target.value
+                              )
+                            }
+                            placeholder="Title"
+                          />
 
-                      <div
-                        key={`opportunity-${index}`}
-                        className="admin-ventures__opportunity-editor"
-                      >
-
-                        <input
-                          value={
-                            item.title
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            updateOpportunityArea(
-                              index,
-                              "title",
-                              event.target.value
-                            )
-                          }
-                          placeholder="Title"
-                        />
-
-                        <textarea
-                          rows={4}
-                          value={
-                            item.text
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            updateOpportunityArea(
-                              index,
-                              "text",
-                              event.target.value
-                            )
-                          }
-                          placeholder="Description..."
-                        />
-
-                      </div>
-
-                    ))}
+                          <textarea
+                            rows={4}
+                            value={
+                              item.text
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateOpportunityArea(
+                                index,
+                                "text",
+                                event.target.value
+                              )
+                            }
+                            placeholder="Description..."
+                          />
+                        </div>
+                      )
+                    )}
 
                   </div>
 
@@ -3333,32 +3905,28 @@ export default function AdminVentures() {
 
 
               {/* =================================================
-                  STEP 3 - FOUNDERS
+                  STEP 4 — FOUNDERS
               ================================================= */}
 
-              {formStep === 3 && (
+              {formStep === 4 && (
                 <>
 
                   <div className="admin-ventures__step-heading">
-
                     <h3>
                       Founders & Opportunities
                     </h3>
 
                     <p>
-                      Add founder profiles and
-                      what the venture is looking for.
+                      Add founder profiles and the
+                      relationships the venture is seeking.
                     </p>
-
                   </div>
 
 
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
-
                       <div>
-
                         <h4>
                           Founders
                         </h4>
@@ -3366,7 +3934,6 @@ export default function AdminVentures() {
                         <p>
                           Add one or more venture founders.
                         </p>
-
                       </div>
 
                       <button
@@ -3379,7 +3946,6 @@ export default function AdminVentures() {
 
                         Add Founder
                       </button>
-
                     </div>
 
 
@@ -3388,162 +3954,145 @@ export default function AdminVentures() {
                         founder,
                         index
                       ) => (
+                        <div
+                          key={`founder-${index}`}
+                          className="admin-ventures__founder-editor"
+                        >
 
-                      <div
-                        key={`founder-${index}`}
-                        className="admin-ventures__founder-editor"
-                      >
+                          <div className="admin-ventures__founder-editor-header">
+                            <strong>
+                              Founder {index + 1}
+                            </strong>
 
-                        <div className="admin-ventures__founder-editor-header">
+                            {form.founders.length >
+                              1 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  removeFounder(
+                                    index
+                                  )
+                                }
+                              >
+                                <Trash2
+                                  size={14}
+                                />
+                              </button>
+                            )}
+                          </div>
 
-                          <strong>
-                            Founder {index + 1}
-                          </strong>
 
-                          {form.founders.length >
-                            1 && (
+                          <div className="admin-ventures__form-grid">
 
-                            <button
-                              type="button"
-                              onClick={() =>
-                                removeFounder(
-                                  index
-                                )
-                              }
-                            >
-                              <Trash2
-                                size={14}
+                            <div className="admin-ventures__field">
+                              <label>
+                                Name *
+                              </label>
+
+                              <input
+                                value={
+                                  founder.name
+                                }
+                                onChange={(
+                                  event
+                                ) =>
+                                  updateFounder(
+                                    index,
+                                    "name",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Founder name"
                               />
-                            </button>
-
-                          )}
-
-                        </div>
+                            </div>
 
 
-                        <div className="admin-ventures__form-grid">
+                            <div className="admin-ventures__field">
+                              <label>
+                                Role
+                              </label>
 
-                          <div className="admin-ventures__field">
-
-                            <label>
-                              Name *
-                            </label>
-
-                            <input
-                              value={
-                                founder.name
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                updateFounder(
-                                  index,
-                                  "name",
-                                  event.target.value
-                                )
-                              }
-                              placeholder="Founder name"
-                            />
+                              <input
+                                value={
+                                  founder.role
+                                }
+                                onChange={(
+                                  event
+                                ) =>
+                                  updateFounder(
+                                    index,
+                                    "role",
+                                    event.target.value
+                                  )
+                                }
+                                placeholder="Founder"
+                              />
+                            </div>
 
                           </div>
 
 
                           <div className="admin-ventures__field">
-
                             <label>
-                              Role
+                              Founder Image URL
                             </label>
 
                             <input
                               value={
-                                founder.role
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                updateFounder(
-                                  index,
-                                  "role",
-                                  event.target.value
-                                )
-                              }
-                              placeholder="Founder"
-                            />
-
-                          </div>
-
-                        </div>
-
-
-                        <div className="admin-ventures__field">
-
-                          <label>
-                            Founder Image URL
-                          </label>
-
-                          <input
-                            value={
-                              founder.image
-                            }
-                            onChange={(
-                              event
-                            ) =>
-                              updateFounder(
-                                index,
-                                "image",
-                                event.target.value
-                              )
-                            }
-                            placeholder="https://..."
-                          />
-
-                        </div>
-
-
-                        {founder.image && (
-
-                          <div className="admin-ventures__founder-image-preview">
-
-                            <img
-                              src={
                                 founder.image
                               }
-                              alt=""
+                              onChange={(
+                                event
+                              ) =>
+                                updateFounder(
+                                  index,
+                                  "image",
+                                  event.target.value
+                                )
+                              }
+                              placeholder="https://..."
                             />
-
                           </div>
 
-                        )}
+
+                          {founder.image && (
+                            <div className="admin-ventures__founder-image-preview">
+                              <img
+                                src={
+                                  founder.image
+                                }
+                                alt=""
+                              />
+                            </div>
+                          )}
 
 
-                        <div className="admin-ventures__field">
+                          <div className="admin-ventures__field">
+                            <label>
+                              Biography
+                            </label>
 
-                          <label>
-                            Biography
-                          </label>
-
-                          <textarea
-                            rows={4}
-                            value={
-                              founder.bio
-                            }
-                            onChange={(
-                              event
-                            ) =>
-                              updateFounder(
-                                index,
-                                "bio",
-                                event.target.value
-                              )
-                            }
-                            placeholder="Short founder biography..."
-                          />
+                            <textarea
+                              rows={4}
+                              value={
+                                founder.bio
+                              }
+                              onChange={(
+                                event
+                              ) =>
+                                updateFounder(
+                                  index,
+                                  "bio",
+                                  event.target.value
+                                )
+                              }
+                              placeholder="Short founder biography..."
+                            />
+                          </div>
 
                         </div>
-
-                      </div>
-
-                    ))}
+                      )
+                    )}
 
                   </div>
 
@@ -3551,18 +4100,15 @@ export default function AdminVentures() {
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
-
                       <div>
-
                         <h4>
                           Looking For
                         </h4>
 
                         <p>
-                          What relationships or
-                          opportunities does this venture need?
+                          What relationships or opportunities
+                          does this venture need?
                         </p>
-
                       </div>
 
                       <button
@@ -3575,7 +4121,6 @@ export default function AdminVentures() {
 
                         Add
                       </button>
-
                     </div>
 
 
@@ -3584,47 +4129,43 @@ export default function AdminVentures() {
                         item,
                         index
                       ) => (
-
-                      <div
-                        key={`looking-${index}`}
-                        className="admin-ventures__repeat-row"
-                      >
-
-                        <input
-                          value={
-                            item
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            updateLookingFor(
-                              index,
-                              event.target.value
-                            )
-                          }
-                          placeholder="e.g. Strategic partnerships"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            removeLookingFor(
-                              index
-                            )
-                          }
+                        <div
+                          key={`looking-${index}`}
+                          className="admin-ventures__repeat-row"
                         >
-                          <X size={15} />
-                        </button>
+                          <input
+                            value={
+                              item
+                            }
+                            onChange={(
+                              event
+                            ) =>
+                              updateLookingFor(
+                                index,
+                                event.target.value
+                              )
+                            }
+                            placeholder="e.g. Strategic partnerships"
+                          />
 
-                      </div>
-
-                    ))}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              removeLookingFor(
+                                index
+                              )
+                            }
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                      )
+                    )}
 
                   </div>
 
 
                   <div className="admin-ventures__field">
-
                     <label>
                       Publication Status
                     </label>
@@ -3650,39 +4191,29 @@ export default function AdminVentures() {
                         Archived
                       </option>
                     </select>
-
                   </div>
 
 
                   <div className="admin-ventures__publishing-note">
-
                     {form.status ===
                     "published" ? (
-
                       <p>
                         This venture will appear
-                        on the public Ventures page
-                        after saving.
+                        in the public CFCV venture
+                        directory after saving.
                       </p>
-
                     ) : form.status ===
                       "archived" ? (
-
                       <p>
                         This venture will be hidden
                         from the public website.
                       </p>
-
                     ) : (
-
                       <p>
-                        This venture will remain
-                        private in the CMS until
-                        it is published.
+                        This venture remains private
+                        in the CMS until published.
                       </p>
-
                     )}
-
                   </div>
 
                 </>
@@ -3690,39 +4221,33 @@ export default function AdminVentures() {
 
 
               {/* =================================================
-                  STEP 4 - REVIEW
+                  STEP 5 — REVIEW
               ================================================= */}
 
-              {formStep === 4 && (
+              {formStep === 5 && (
                 <>
 
                   <div className="admin-ventures__step-heading">
-
                     <h3>
                       Review Venture
                     </h3>
 
                     <p>
-                      Confirm the venture information
-                      before saving.
+                      Confirm the CFCV placement
+                      and venture information before saving.
                     </p>
-
                   </div>
 
 
                   {form.heroImageUrl && (
-
                     <div className="admin-ventures__review-hero">
-
                       <img
                         src={
                           form.heroImageUrl
                         }
                         alt=""
                       />
-
                     </div>
-
                   )}
 
 
@@ -3731,30 +4256,36 @@ export default function AdminVentures() {
                     <div className="admin-ventures__review-logo">
 
                       {form.logoUrl ? (
-
                         <img
                           src={
                             form.logoUrl
                           }
                           alt=""
                         />
-
                       ) : (
-
                         <BriefcaseBusiness
                           size={28}
                         />
-
                       )}
 
                     </div>
 
 
                     <div>
-
                       <span>
-                        {form.sector ||
-                        "Sector"}
+                        {
+                          CFCV_TRACKS.find(
+                            (track) =>
+                              track.value ===
+                              form.cfcvTrack
+                          )?.name
+                        } — {
+                          CFCV_TRACKS.find(
+                            (track) =>
+                              track.value ===
+                              form.cfcvTrack
+                          )?.action
+                        }
                       </span>
 
                       <h3>
@@ -3763,16 +4294,83 @@ export default function AdminVentures() {
 
                       <p>
                         {form.tagline ||
-                        form.description ||
-                        "No tagline provided."}
+                          form.description ||
+                          "No tagline provided."}
                       </p>
-
                     </div>
 
                   </div>
 
 
                   <div className="admin-ventures__review">
+
+                    <div>
+                      <span>
+                        CFCV Track
+                      </span>
+
+                      <strong>
+                        {
+                          CFCV_TRACKS.find(
+                            (track) =>
+                              track.value ===
+                              form.cfcvTrack
+                          )?.name
+                        }
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
+                        Fellow Status
+                      </span>
+
+                      <strong>
+                        {form.fellowStatus ===
+                        "alumni"
+                          ? "Alumni"
+                          : "Current Fellow"}
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
+                        Cohort
+                      </span>
+
+                      <strong>
+                        {form.cohort ||
+                          "Not specified"}
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
+                        Cohort Year
+                      </span>
+
+                      <strong>
+                        {form.cohortYear ||
+                          "Not specified"}
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
+                        Catalytic Support
+                      </span>
+
+                      <strong>
+                        {form.catalyticSupport
+                          ? "Selected"
+                          : "Not selected"}
+                      </strong>
+                    </div>
+
 
                     <div>
                       <span>
@@ -3831,7 +4429,7 @@ export default function AdminVentures() {
                           )
                           .filter(Boolean)
                           .join(" & ") ||
-                        "None"}
+                          "None"}
                       </strong>
                     </div>
 
@@ -3850,22 +4448,19 @@ export default function AdminVentures() {
 
 
                     <div className="admin-ventures__review-wide">
-
                       <span>
                         Description
                       </span>
 
                       <p>
                         {form.longDescription ||
-                        form.description ||
-                        "No description provided."}
+                          form.description ||
+                          "No description provided."}
                       </p>
-
                     </div>
 
 
                     <div className="admin-ventures__review-wide">
-
                       <span>
                         Looking For
                       </span>
@@ -3875,20 +4470,19 @@ export default function AdminVentures() {
                         {form.lookingFor
                           .filter(Boolean)
                           .map(
-                            (item) => (
-
-                            <span
-                              key={
-                                item
-                              }
-                            >
-                              {item}
-                            </span>
-
-                          ))}
+                            (
+                              item,
+                              index
+                            ) => (
+                              <span
+                                key={`${item}-${index}`}
+                              >
+                                {item}
+                              </span>
+                            )
+                          )}
 
                       </div>
-
                     </div>
 
                   </div>
@@ -3904,35 +4498,32 @@ export default function AdminVentures() {
               <div className="admin-ventures__form-actions">
 
                 {editingVenture &&
-                  formStep === 4 && (
+                  formStep === 5 && (
+                    <button
+                      type="button"
+                      className="admin-ventures__delete"
+                      onClick={
+                        handleDeleteVenture
+                      }
+                      disabled={
+                        saving ||
+                        deleting
+                      }
+                    >
+                      <Trash2
+                        size={16}
+                      />
 
-                  <button
-                    type="button"
-                    className="admin-ventures__delete"
-                    onClick={
-                      handleDeleteVenture
-                    }
-                    disabled={
-                      saving ||
-                      deleting
-                    }
-                  >
-                    <Trash2
-                      size={16}
-                    />
-
-                    {deleting
-                      ? "Deleting..."
-                      : "Delete Venture"}
-                  </button>
-
-                )}
+                      {deleting
+                        ? "Deleting..."
+                        : "Delete Venture"}
+                    </button>
+                  )}
 
 
                 <div className="admin-ventures__form-actions-right">
 
                   {formStep > 1 && (
-
                     <button
                       type="button"
                       className="admin-ventures__cancel"
@@ -3950,12 +4541,10 @@ export default function AdminVentures() {
 
                       Previous
                     </button>
-
                   )}
 
 
-                  {formStep < 4 ? (
-
+                  {formStep < 5 ? (
                     <button
                       type="button"
                       className="admin-ventures__save"
@@ -3973,9 +4562,7 @@ export default function AdminVentures() {
                         size={15}
                       />
                     </button>
-
                   ) : (
-
                     <button
                       type="button"
                       className="admin-ventures__save"
@@ -4003,7 +4590,6 @@ export default function AdminVentures() {
                           ? "Save Changes"
                           : "Create Venture"}
                     </button>
-
                   )}
 
                 </div>
@@ -4015,9 +4601,22 @@ export default function AdminVentures() {
           </aside>
 
         </div>
-
       )}
 
     </div>
+  );
+}
+
+
+/* ============================================================
+   SMALL LOCAL ICON
+============================================================ */
+
+function TrendingIcon() {
+  return (
+    <ArrowUpRight
+      size={20}
+      aria-hidden="true"
+    />
   );
 }

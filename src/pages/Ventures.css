@@ -1,27 +1,30 @@
 /* ============================================================
    CONTINENTAL FOUNDERS
-   VENTURES PAGE
+   CFCV / VENTURES PAGE
 ============================================================ */
 
 .ventures-page {
   --ventures-navy: #0d2238;
-  --ventures-navy-deep: #08182a;
+  --ventures-navy-deep: #071727;
   --ventures-navy-soft: #153551;
+  --ventures-navy-lighter: #1d4567;
 
   --ventures-gold: #b8882c;
-  --ventures-gold-dark: #9f741f;
+  --ventures-gold-dark: #966d1f;
   --ventures-gold-soft: #d4b46f;
+  --ventures-gold-pale: #eee1bf;
 
   --ventures-text: #182331;
   --ventures-muted: #69737d;
   --ventures-line: #dedbd3;
+  --ventures-line-dark: rgba(255, 255, 255, 0.14);
 
   --ventures-cream: #f6f3ec;
+  --ventures-cream-dark: #eee9df;
   --ventures-white: #ffffff;
 
   width: 100%;
   min-height: 100vh;
-
   overflow-x: hidden;
 
   background: var(--ventures-white);
@@ -39,48 +42,22 @@
   max-width: 100%;
 }
 
+.ventures-page button,
+.ventures-page input {
+  font-family: inherit;
+}
+
 /* ============================================================
    CONTAINER
 ============================================================ */
 
 .ventures-container {
-  width: min(
-    1420px,
-    calc(100% - 96px)
-  );
-
+  width: min(1420px, calc(100% - 96px));
   margin-inline: auto;
 }
 
 /* ============================================================
-   RESPONSIVE SAFETY
-============================================================ */
-
-.ventures-hero__content,
-.ventures-hero__belief,
-.ventures-section-header > *,
-.ventures-journey__heading > *,
-.ventures-ecosystem__content,
-.ventures-ecosystem__network,
-.ventures-final__grid > *,
-.venture-card,
-.venture-journey-step {
-  min-width: 0;
-}
-
-.ventures-hero__content h1,
-.ventures-hero__belief strong,
-.ventures-section-header h2,
-.venture-card h3,
-.ventures-journey__heading h2,
-.venture-journey-step h3,
-.ventures-ecosystem__content h2,
-.ventures-final h2 {
-  overflow-wrap: break-word;
-}
-
-/* ============================================================
-   EYEBROW
+   TYPOGRAPHY HELPERS
 ============================================================ */
 
 .ventures-eyebrow {
@@ -90,7 +67,6 @@
 
   font-size: 0.7rem;
   font-weight: 800;
-
   line-height: 1.4;
   letter-spacing: 0.15em;
 
@@ -101,12 +77,9 @@
   color: var(--ventures-gold-soft);
 }
 
-/* ============================================================
-   SECTION NUMBER
-============================================================ */
-
 .ventures-section-number {
   display: inline-block;
+  flex: 0 0 auto;
 
   margin-right: 16px;
 
@@ -114,7 +87,6 @@
 
   font-size: 0.72rem;
   font-weight: 800;
-
   letter-spacing: 0.08em;
 }
 
@@ -124,21 +96,17 @@
 
 .ventures-button {
   min-height: 52px;
-
   padding: 0 24px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   gap: 12px;
 
   border: 1px solid transparent;
 
-  font-family: inherit;
   font-size: 0.72rem;
   font-weight: 800;
-
   line-height: 1;
   letter-spacing: 0.08em;
 
@@ -149,8 +117,8 @@
 
   transition:
     background-color 0.25s ease,
-    color 0.25s ease,
     border-color 0.25s ease,
+    color 0.25s ease,
     transform 0.25s ease;
 }
 
@@ -160,9 +128,7 @@
 
 .ventures-button svg {
   flex: 0 0 auto;
-
-  transition:
-    transform 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 .ventures-button:hover svg {
@@ -170,38 +136,79 @@
 }
 
 .ventures-button--gold {
-  background:
-    var(--ventures-gold);
-
-  border-color:
-    var(--ventures-gold);
-
+  background: var(--ventures-gold);
+  border-color: var(--ventures-gold);
   color: #ffffff;
 }
 
 .ventures-button--gold:hover {
-  background:
-    var(--ventures-gold-dark);
-
-  border-color:
-    var(--ventures-gold-dark);
+  background: var(--ventures-gold-dark);
+  border-color: var(--ventures-gold-dark);
 }
 
 .ventures-button--outline {
   background: transparent;
-
-  border-color:
-    var(--ventures-navy);
-
-  color:
-    var(--ventures-navy);
+  border-color: var(--ventures-navy);
+  color: var(--ventures-navy);
 }
 
 .ventures-button--outline:hover {
-  background:
-    var(--ventures-navy);
+  background: var(--ventures-navy);
+  color: #ffffff;
+}
+
+.ventures-button--outline-light {
+  background: transparent;
+
+  border-color: rgba(255, 255, 255, 0.46);
 
   color: #ffffff;
+}
+
+.ventures-button--outline-light:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--ventures-navy);
+}
+
+/* ============================================================
+   TEXT LINKS
+============================================================ */
+
+.ventures-text-link {
+  margin-top: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  color: var(--ventures-navy);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.ventures-text-link svg {
+  flex: 0 0 auto;
+  color: var(--ventures-gold);
+
+  transition: transform 0.25s ease;
+}
+
+.ventures-text-link:hover svg {
+  transform: translateX(5px);
+}
+
+.ventures-text-link--light {
+  color: #ffffff;
+}
+
+.ventures-text-link--light svg {
+  color: var(--ventures-gold-soft);
 }
 
 /* ============================================================
@@ -211,61 +218,45 @@
 .ventures-hero {
   position: relative;
 
-  min-height: 720px;
+  min-height: 760px;
 
   display: flex;
   align-items: stretch;
 
   overflow: hidden;
-
-  background:
-    var(--ventures-navy-deep);
-
-  border-bottom:
-    1px solid
-    rgba(255, 255, 255, 0.08);
-
   isolation: isolate;
+
+  background: var(--ventures-navy-deep);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .ventures-hero__background {
   position: absolute;
   inset: 0;
-
   z-index: 0;
 
-  background-image:
-    url("/assets/venture.webp");
-
+  background-image: url("/assets/venture.webp");
   background-size: cover;
-  background-position:
-    center center;
+  background-position: center center;
+  background-repeat: no-repeat;
 
-  background-repeat:
-    no-repeat;
-
-  transform: scale(1.01);
+  transform: scale(1.015);
 }
 
 .ventures-hero__overlay {
   position: absolute;
   inset: 0;
-
   z-index: 1;
 
   background:
     linear-gradient(
       90deg,
-      rgba(6, 20, 34, 0.97)
-        0%,
-      rgba(6, 20, 34, 0.91)
-        28%,
-      rgba(6, 20, 34, 0.73)
-        49%,
-      rgba(6, 20, 34, 0.36)
-        73%,
-      rgba(6, 20, 34, 0.12)
-        100%
+      rgba(5, 18, 31, 0.98) 0%,
+      rgba(5, 18, 31, 0.93) 30%,
+      rgba(5, 18, 31, 0.76) 53%,
+      rgba(5, 18, 31, 0.38) 77%,
+      rgba(5, 18, 31, 0.15) 100%
     );
 
   pointer-events: none;
@@ -273,31 +264,30 @@
 
 .ventures-hero__inner {
   position: relative;
-
   z-index: 2;
 
   width: 100%;
 
-  padding-top: 140px;
-  padding-bottom: 80px;
+  padding-top: 145px;
+  padding-bottom: 90px;
 
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1.2fr)
-    minmax(300px, 0.8fr);
+    minmax(0, 1.25fr)
+    minmax(300px, 0.75fr);
 
   align-items: end;
-
-  gap: 80px;
+  gap: 90px;
 }
 
 .ventures-hero__content {
-  max-width: 830px;
+  max-width: 850px;
+  min-width: 0;
 }
 
 .ventures-hero__content h1 {
-  max-width: 850px;
+  max-width: 900px;
 
   margin: 22px 0 0;
 
@@ -312,39 +302,29 @@
       serif
     );
 
-  font-size:
-    clamp(
-      4rem,
-      6.5vw,
-      7.3rem
-    );
-
+  font-size: clamp(4rem, 6.7vw, 7.5rem);
   font-weight: 400;
-
-  line-height: 0.9;
-
+  line-height: 0.88;
   letter-spacing: -0.05em;
+
+  overflow-wrap: break-word;
 }
 
 .ventures-hero__content p {
-  max-width: 590px;
+  max-width: 620px;
 
-  margin:
-    30px
-    0
-    36px;
+  margin: 32px 0 36px;
 
-  color:
-    rgba(
-      255,
-      255,
-      255,
-      0.79
-    );
+  color: rgba(255, 255, 255, 0.79);
 
-  font-size: 1.05rem;
-
+  font-size: 1.03rem;
   line-height: 1.75;
+}
+
+.ventures-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 /* ============================================================
@@ -353,24 +333,12 @@
 
 .ventures-hero__belief {
   width: 100%;
-  max-width: 390px;
+  max-width: 400px;
 
   margin-left: auto;
+  padding: 32px 0 8px 34px;
 
-  padding:
-    30px
-    0
-    8px
-    32px;
-
-  border-left:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.35
-    );
+  border-left: 1px solid rgba(255, 255, 255, 0.34);
 }
 
 .ventures-hero__belief > span {
@@ -378,12 +346,10 @@
 
   margin-bottom: 18px;
 
-  color:
-    var(--ventures-gold-soft);
+  color: var(--ventures-gold-soft);
 
-  font-size: 0.68rem;
+  font-size: 0.67rem;
   font-weight: 800;
-
   letter-spacing: 0.15em;
 
   text-transform: uppercase;
@@ -403,56 +369,100 @@
       serif
     );
 
-  font-size:
-    clamp(
-      2rem,
-      3vw,
-      3.2rem
-    );
-
+  font-size: clamp(2rem, 3vw, 3.25rem);
   font-weight: 400;
-
-  line-height: 1;
-
+  line-height: 1.02;
   letter-spacing: -0.035em;
 }
 
 .ventures-hero__belief p {
-  max-width: 320px;
+  max-width: 330px;
 
   margin: 22px 0 0;
 
-  color:
-    rgba(
-      255,
-      255,
-      255,
-      0.69
-    );
+  color: rgba(255, 255, 255, 0.68);
 
   font-size: 0.88rem;
-
   line-height: 1.7;
 }
 
 /* ============================================================
-   DIRECTORY
+   CFCV INTRO
 ============================================================ */
 
-.ventures-directory {
-  padding:
-    clamp(
-      80px,
-      8vw,
-      130px
-    )
-    0;
+.cfcv-intro {
+  padding: clamp(90px, 9vw, 145px) 0;
 
   background: #ffffff;
+
+  border-bottom: 1px solid var(--ventures-line);
+}
+
+.cfcv-intro__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(200px, 0.65fr)
+    minmax(0, 1.35fr);
+
+  gap: 70px;
+}
+
+.cfcv-intro__content {
+  max-width: 900px;
+}
+
+.cfcv-intro__content h2 {
+  margin: 0 0 36px;
+
+  color: var(--ventures-navy);
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(3rem, 5.2vw, 6rem);
+  font-weight: 400;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
+}
+
+.cfcv-intro__content p {
+  max-width: 750px;
+
+  margin: 0 0 18px;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.98rem;
+  line-height: 1.8;
+}
+
+.cfcv-intro__content .cfcv-intro__lead {
+  max-width: 760px;
+
+  color: var(--ventures-navy);
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(1.5rem, 2.2vw, 2.25rem);
+  line-height: 1.25;
 }
 
 /* ============================================================
-   DIRECTORY HEADER
+   SHARED SECTION HEADER
 ============================================================ */
 
 .ventures-section-header {
@@ -463,7 +473,6 @@
     minmax(0, 1.35fr);
 
   gap: 70px;
-
   align-items: start;
 }
 
@@ -475,12 +484,11 @@
 }
 
 .ventures-section-header h2 {
-  max-width: 900px;
+  max-width: 920px;
 
   margin: 0;
 
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
   font-family:
     var(
@@ -491,18 +499,721 @@
       serif
     );
 
-  font-size:
-    clamp(
-      3rem,
-      5vw,
-      5.8rem
+  font-size: clamp(3rem, 5vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.ventures-section-header > p {
+  grid-column: 2;
+
+  max-width: 740px;
+
+  margin: 4px 0 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+/* ============================================================
+   THREE TRACKS
+============================================================ */
+
+.cfcv-tracks {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: var(--ventures-cream);
+}
+
+.cfcv-tracks__grid {
+  margin-top: 65px;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
+}
+
+.cfcv-track-card {
+  min-height: 440px;
+  padding: 34px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+
+  background: rgba(255, 255, 255, 0.62);
+
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.cfcv-track-card:hover {
+  background: #ffffff;
+}
+
+.cfcv-track-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  color: var(--ventures-gold);
+}
+
+.cfcv-track-card__number {
+  color: var(--ventures-navy);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.cfcv-track-card__label {
+  margin-top: 62px;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-track-card h3 {
+  margin: 12px 0 18px;
+
+  color: var(--ventures-navy);
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
     );
 
+  font-size: clamp(2.4rem, 3.5vw, 4rem);
   font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
 
+.cfcv-track-card p {
+  flex: 1;
+
+  margin: 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.9rem;
+  line-height: 1.72;
+}
+
+.cfcv-track-card > a {
+  margin-top: 32px;
+  padding-top: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  border-top: 1px solid var(--ventures-line);
+
+  color: var(--ventures-navy);
+
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.cfcv-track-card > a svg {
+  color: var(--ventures-gold);
+  transition: transform 0.2s ease;
+}
+
+.cfcv-track-card > a:hover svg {
+  transform: translateX(5px);
+}
+
+/* ============================================================
+   HOW IT WORKS
+============================================================ */
+
+.cfcv-how {
+  padding: clamp(95px, 9vw, 145px) 0;
+
+  background: var(--ventures-navy);
+}
+
+.cfcv-how__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(0, 1.05fr);
+
+  gap: 100px;
+}
+
+.cfcv-how__heading .ventures-section-number {
+  color: var(--ventures-gold-soft);
+}
+
+.cfcv-how__heading h2 {
+  margin: 20px 0 0;
+
+  color: #ffffff;
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(3.2rem, 5vw, 5.8rem);
+  font-weight: 400;
   line-height: 0.95;
-
   letter-spacing: -0.045em;
+}
+
+.cfcv-how__content {
+  max-width: 650px;
+
+  padding-top: 46px;
+}
+
+.cfcv-how__content > p {
+  margin: 0 0 20px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 0.98rem;
+  line-height: 1.78;
+}
+
+.cfcv-how__statement {
+  margin-top: 42px;
+  padding: 28px;
+
+  display: flex;
+  gap: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cfcv-how__statement > svg {
+  flex: 0 0 auto;
+
+  color: var(--ventures-gold-soft);
+}
+
+.cfcv-how__statement div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cfcv-how__statement span {
+  color: var(--ventures-gold-soft);
+
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-how__statement strong {
+  color: #ffffff;
+
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* ============================================================
+   SIX-MONTH JOURNEY
+============================================================ */
+
+.ventures-journey {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid var(--ventures-line);
+}
+
+.ventures-journey__heading {
+  display: grid;
+
+  grid-template-columns:
+    minmax(200px, 0.65fr)
+    minmax(0, 1.35fr);
+
+  gap: 70px;
+}
+
+.ventures-journey__heading h2 {
+  margin: 0;
+
+  color: var(--ventures-navy);
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(3rem, 5vw, 5.7rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.cfcv-months {
+  margin-top: 65px;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
+}
+
+.cfcv-month-card {
+  position: relative;
+
+  min-height: 410px;
+  padding: 30px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+
+  background: #ffffff;
+
+  transition: background-color 0.2s ease;
+}
+
+.cfcv-month-card:hover {
+  background: #fbfaf7;
+}
+
+.cfcv-month-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+}
+
+.cfcv-month-card__number {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: var(--ventures-gold);
+
+  color: #ffffff;
+
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.cfcv-month-card__month {
+  color: var(--ventures-muted);
+
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-month-card__subtitle {
+  margin-top: 50px;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-month-card h3 {
+  margin: 12px 0 16px;
+
+  color: var(--ventures-navy);
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.cfcv-month-card > p {
+  margin: 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.86rem;
+  line-height: 1.68;
+}
+
+.cfcv-month-card__deliverable {
+  margin-top: auto;
+  padding-top: 22px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  border-top: 1px solid var(--ventures-line);
+}
+
+.cfcv-month-card__deliverable span {
+  color: var(--ventures-muted);
+
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-month-card__deliverable strong {
+  color: var(--ventures-navy);
+
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.cfcv-month-card__arrow {
+  position: absolute;
+
+  top: 42px;
+  right: -10px;
+  z-index: 3;
+
+  padding: 3px;
+
+  background: #ffffff;
+
+  color: var(--ventures-gold);
+}
+
+.cfcv-journey-link {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ============================================================
+   MIDPOINT REVIEW
+============================================================ */
+
+.cfcv-midpoint {
+  padding: clamp(95px, 9vw, 145px) 0;
+
+  background: var(--ventures-navy-deep);
+}
+
+.cfcv-midpoint__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.95fr)
+    minmax(0, 1.05fr);
+
+  gap: 100px;
+}
+
+.cfcv-midpoint .ventures-section-number {
+  color: var(--ventures-gold-soft);
+}
+
+.cfcv-midpoint h2 {
+  max-width: 680px;
+
+  margin: 20px 0 0;
+
+  color: #ffffff;
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(3rem, 5vw, 5.6rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.cfcv-midpoint__content {
+  max-width: 650px;
+
+  padding-top: 45px;
+}
+
+.cfcv-midpoint__content > p {
+  margin: 0 0 20px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 0.96rem;
+  line-height: 1.78;
+}
+
+.cfcv-midpoint__highlight {
+  margin-top: 38px;
+  padding: 28px;
+
+  display: flex;
+  gap: 20px;
+
+  border-left: 3px solid var(--ventures-gold);
+
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.cfcv-midpoint__highlight > svg {
+  flex: 0 0 auto;
+
+  color: var(--ventures-gold-soft);
+}
+
+.cfcv-midpoint__highlight div {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cfcv-midpoint__highlight span {
+  color: var(--ventures-gold-soft);
+
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-midpoint__highlight strong {
+  color: #ffffff;
+
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* ============================================================
+   CATALYTIC SUPPORT
+============================================================ */
+
+.cfcv-catalytic {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: var(--ventures-cream);
+}
+
+.cfcv-catalytic__grid {
+  margin-top: 65px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(0, 1.15fr);
+
+  border: 1px solid var(--ventures-line);
+}
+
+.cfcv-catalytic__statement {
+  min-height: 430px;
+  padding: 45px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--ventures-navy);
+
+  color: #ffffff;
+}
+
+.cfcv-catalytic__statement > svg {
+  margin-bottom: auto;
+
+  color: var(--ventures-gold-soft);
+}
+
+.cfcv-catalytic__statement strong {
+  max-width: 500px;
+
+  margin-top: 70px;
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: clamp(2.5rem, 4vw, 4.4rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.cfcv-catalytic__statement p {
+  max-width: 500px;
+
+  margin: 25px 0 0;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 0.9rem;
+  line-height: 1.72;
+}
+
+.cfcv-catalytic__content {
+  padding: 48px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: #ffffff;
+}
+
+.cfcv-catalytic__content > p {
+  max-width: 680px;
+
+  margin: 0 0 20px;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+.cfcv-catalytic__flow {
+  margin-top: 28px;
+  padding: 22px 0;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  border-top: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+}
+
+.cfcv-catalytic__flow span {
+  color: var(--ventures-navy);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-catalytic__flow svg {
+  color: var(--ventures-gold);
+}
+
+/* ============================================================
+   DIRECTORY
+============================================================ */
+
+.ventures-directory {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: #ffffff;
+}
+
+.cfcv-directory-nav {
+  margin-top: 54px;
+
+  display: flex;
+  flex-wrap: wrap;
+
+  border-top: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+}
+
+.cfcv-directory-nav a {
+  min-height: 55px;
+  padding: 0 25px;
+
+  display: inline-flex;
+  align-items: center;
+
+  border-right: 1px solid var(--ventures-line);
+
+  color: var(--ventures-muted);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-decoration: none;
+  text-transform: uppercase;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.cfcv-directory-nav a:hover {
+  background: var(--ventures-navy);
+  color: #ffffff;
 }
 
 /* ============================================================
@@ -510,21 +1221,14 @@
 ============================================================ */
 
 .ventures-toolbar {
-  margin-top: 60px;
+  margin-top: 36px;
   margin-bottom: 30px;
-
-  padding-top: 24px;
 
   display: flex;
   align-items: center;
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 30px;
-
-  border-top:
-    1px solid
-    var(--ventures-line);
 }
 
 /* ============================================================
@@ -536,29 +1240,20 @@
 
   display: flex;
   flex-wrap: wrap;
-
   gap: 9px;
 }
 
 .venture-filter {
   min-height: 40px;
-
   padding: 0 17px;
 
-  border:
-    1px solid
-    var(--ventures-line);
-
+  border: 1px solid var(--ventures-line);
   border-radius: 999px;
 
   background: #ffffff;
+  color: var(--ventures-text);
 
-  color:
-    var(--ventures-text);
-
-  font-family: inherit;
-
-  font-size: 0.74rem;
+  font-size: 0.73rem;
   font-weight: 650;
 
   white-space: nowrap;
@@ -572,16 +1267,12 @@
 }
 
 .venture-filter:hover {
-  border-color:
-    var(--ventures-navy);
+  border-color: var(--ventures-navy);
 }
 
 .venture-filter.active {
-  background:
-    var(--ventures-navy);
-
-  border-color:
-    var(--ventures-navy);
+  background: var(--ventures-navy);
+  border-color: var(--ventures-navy);
 
   color: #ffffff;
 }
@@ -591,34 +1282,27 @@
 ============================================================ */
 
 .ventures-search {
-  width: 260px;
+  width: 270px;
   min-height: 44px;
 
-  flex: 0 0 260px;
+  flex: 0 0 270px;
 
   padding: 0 14px;
 
   display: flex;
   align-items: center;
-
   gap: 10px;
 
-  border:
-    1px solid
-    var(--ventures-line);
+  border: 1px solid var(--ventures-line);
 
   background: #ffffff;
+  color: var(--ventures-muted);
 
-  color:
-    var(--ventures-muted);
-
-  transition:
-    border-color 0.2s ease;
+  transition: border-color 0.2s ease;
 }
 
 .ventures-search:focus-within {
-  border-color:
-    var(--ventures-gold);
+  border-color: var(--ventures-gold);
 }
 
 .ventures-search svg {
@@ -633,11 +1317,7 @@
   outline: 0;
 
   background: transparent;
-
-  color:
-    var(--ventures-text);
-
-  font: inherit;
+  color: var(--ventures-text);
 
   font-size: 0.82rem;
 }
@@ -647,47 +1327,31 @@
 }
 
 /* ============================================================
-   GRID
+   VENTURES GRID
 ============================================================ */
 
 .ventures-grid {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  grid-template-columns:
-    repeat(
-      4,
-      minmax(0, 1fr)
-    );
-
-  border-top:
-    1px solid
-    var(--ventures-line);
-
-  border-left:
-    1px solid
-    var(--ventures-line);
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
 }
 
 /* ============================================================
-   CARD
+   VENTURE CARD
 ============================================================ */
 
 .venture-card {
   min-width: 0;
-  min-height: 490px;
-
+  min-height: 520px;
   padding: 26px;
 
   display: flex;
   flex-direction: column;
 
-  border-right:
-    1px solid
-    var(--ventures-line);
-
-  border-bottom:
-    1px solid
-    var(--ventures-line);
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
 
   background: #ffffff;
 
@@ -700,24 +1364,13 @@
   background: #fbfaf7;
 
   box-shadow:
-    0 14px 30px
-    rgba(
-      13,
-      34,
-      56,
-      0.06
-    );
+    0 14px 30px rgba(13, 34, 56, 0.06);
 }
-
-/* ============================================================
-   CARD TOP
-============================================================ */
 
 .venture-card__top {
   display: flex;
   align-items: flex-start;
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 18px;
 }
@@ -725,24 +1378,20 @@
 .venture-card__number {
   flex: 0 0 auto;
 
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
   font-size: 0.7rem;
   font-weight: 800;
-
   letter-spacing: 0.08em;
 }
 
 .venture-card__sector {
   min-width: 0;
 
-  color:
-    var(--ventures-gold);
+  color: var(--ventures-gold);
 
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   font-weight: 800;
-
   line-height: 1.4;
   letter-spacing: 0.1em;
 
@@ -753,7 +1402,7 @@
 }
 
 /* ============================================================
-   LOGO
+   VENTURE LOGO
 ============================================================ */
 
 .venture-card__logo {
@@ -782,21 +1431,16 @@
   width: 70px;
   height: 70px;
 
-  flex: 0 0 auto;
-
   display: grid;
   place-items: center;
 
   border-radius: 50%;
 
-  background:
-    var(--ventures-navy);
-
+  background: var(--ventures-navy);
   color: #ffffff;
 
   font-size: 1rem;
   font-weight: 800;
-
   letter-spacing: 0.05em;
 }
 
@@ -804,15 +1448,29 @@
   display: none;
 }
 
-/* ============================================================
-   CARD TITLE
-============================================================ */
+.venture-card__track {
+  align-self: flex-start;
+
+  margin-bottom: 12px;
+  padding: 6px 10px;
+
+  border: 1px solid var(--ventures-gold-pale);
+
+  background: #fbf7ed;
+
+  color: var(--ventures-gold-dark);
+
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
 
 .venture-card h3 {
   margin: 0;
 
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
   font-family:
     var(
@@ -825,28 +1483,20 @@
 
   font-size: 1.9rem;
   font-weight: 400;
-
   line-height: 1.08;
-
   letter-spacing: -0.025em;
 
   overflow-wrap: anywhere;
 }
-
-/* ============================================================
-   LOCATION
-============================================================ */
 
 .venture-card__location {
   margin-top: 11px;
 
   display: flex;
   align-items: center;
-
   gap: 8px;
 
-  color:
-    var(--ventures-muted);
+  color: var(--ventures-muted);
 
   font-size: 0.76rem;
 }
@@ -855,43 +1505,30 @@
   flex: 0 0 auto;
 }
 
-/* ============================================================
-   DESCRIPTION
-============================================================ */
-
 .venture-card__description {
   flex: 1;
 
   margin: 24px 0;
 
-  color:
-    var(--ventures-muted);
+  color: var(--ventures-muted);
 
-  font-size: 0.9rem;
-
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.67;
 
   overflow-wrap: anywhere;
 }
-
-/* ============================================================
-   CARD DETAILS
-============================================================ */
 
 .venture-card__footer {
   padding-top: 20px;
 
   display: grid;
-
   grid-template-columns:
     minmax(0, 1fr)
     minmax(0, 1fr);
 
   gap: 18px;
 
-  border-top:
-    1px solid
-    var(--ventures-line);
+  border-top: 1px solid var(--ventures-line);
 }
 
 .venture-card__footer div {
@@ -899,40 +1536,30 @@
 
   display: flex;
   flex-direction: column;
-
   gap: 5px;
 }
 
 .venture-card__footer span {
-  color:
-    var(--ventures-muted);
+  color: var(--ventures-muted);
 
-  font-size: 0.66rem;
-
-  letter-spacing: 0.05em;
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
 
   text-transform: uppercase;
 }
 
 .venture-card__footer strong {
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 750;
-
   line-height: 1.45;
 
   overflow-wrap: anywhere;
 }
 
-/* ============================================================
-   CARD LINK
-============================================================ */
-
 .venture-card__link {
   width: 100%;
-
   min-height: 42px;
 
   margin-top: 22px;
@@ -940,21 +1567,16 @@
 
   display: flex;
   align-items: center;
-  justify-content:
-    space-between;
+  justify-content: space-between;
 
   gap: 12px;
 
-  border-top:
-    1px solid
-    var(--ventures-gold-soft);
+  border-top: 1px solid var(--ventures-gold-soft);
 
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 800;
-
   line-height: 1.3;
   letter-spacing: 0.08em;
 
@@ -963,10 +1585,7 @@
 }
 
 .venture-card__link svg {
-  flex: 0 0 auto;
-
-  transition:
-    transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .venture-card__link:hover svg {
@@ -988,7 +1607,6 @@
   min-height: 290px;
 
   margin-top: 42px;
-
   padding: 60px 24px;
 
   display: flex;
@@ -996,9 +1614,7 @@
   align-items: center;
   justify-content: center;
 
-  border:
-    1px solid
-    var(--ventures-line);
+  border: 1px solid var(--ventures-line);
 
   background: #ffffff;
 
@@ -1008,8 +1624,7 @@
 .ventures-empty > svg {
   margin-bottom: 18px;
 
-  color:
-    var(--ventures-gold);
+  color: var(--ventures-gold);
 }
 
 .ventures-empty h3 {
@@ -1017,8 +1632,7 @@
 
   margin: 0;
 
-  color:
-    var(--ventures-navy);
+  color: var(--ventures-navy);
 
   font-family:
     var(
@@ -1029,15 +1643,8 @@
       serif
     );
 
-  font-size:
-    clamp(
-      1.7rem,
-      3vw,
-      2.2rem
-    );
-
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
   font-weight: 400;
-
   line-height: 1.15;
 }
 
@@ -1046,11 +1653,9 @@
 
   margin: 12px 0 0;
 
-  color:
-    var(--ventures-muted);
+  color: var(--ventures-muted);
 
   font-size: 0.9rem;
-
   line-height: 1.65;
 }
 
@@ -1058,45 +1663,31 @@
   background: #fffafa;
 }
 
-/* ============================================================
-   RETRY BUTTON
-============================================================ */
-
 .ventures-retry {
   min-height: 44px;
 
   margin-top: 24px;
-
   padding: 0 20px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   gap: 9px;
 
-  border:
-    1px solid
-    var(--ventures-navy);
+  border: 1px solid var(--ventures-navy);
 
-  background:
-    var(--ventures-navy);
-
+  background: var(--ventures-navy);
   color: #ffffff;
-
-  font-family: inherit;
 
   font-size: 0.72rem;
   font-weight: 800;
-
   letter-spacing: 0.05em;
 
   cursor: pointer;
 }
 
 .ventures-retry:hover {
-  background:
-    var(--ventures-navy-soft);
+  background: var(--ventures-navy-soft);
 }
 
 /* ============================================================
@@ -1109,25 +1700,11 @@
 
   margin-bottom: 22px;
 
-  border:
-    3px solid
-    rgba(
-      184,
-      136,
-      44,
-      0.18
-    );
-
-  border-top-color:
-    var(--ventures-gold);
-
+  border: 3px solid rgba(184, 136, 44, 0.18);
+  border-top-color: var(--ventures-gold);
   border-radius: 50%;
 
-  animation:
-    venturesLoaderSpin
-    0.8s
-    linear
-    infinite;
+  animation: venturesLoaderSpin 0.8s linear infinite;
 }
 
 @keyframes venturesLoaderSpin {
@@ -1137,202 +1714,13 @@
 }
 
 /* ============================================================
-   JOURNEY
-============================================================ */
-
-.ventures-journey {
-  padding:
-    clamp(
-      80px,
-      8vw,
-      125px
-    )
-    0;
-
-  background:
-    var(--ventures-cream);
-
-  border-top:
-    1px solid
-    var(--ventures-line);
-
-  border-bottom:
-    1px solid
-    var(--ventures-line);
-}
-
-.ventures-journey__heading {
-  display: grid;
-
-  grid-template-columns:
-    minmax(200px, 0.65fr)
-    minmax(0, 1.35fr);
-
-  gap: 70px;
-
-  align-items: start;
-}
-
-.ventures-journey__heading h2 {
-  margin: 0;
-
-  color:
-    var(--ventures-navy);
-
-  font-family:
-    var(
-      --font-display,
-      "Trajan Pro",
-      "Trajan Pro 3",
-      Georgia,
-      serif
-    );
-
-  font-size:
-    clamp(
-      3rem,
-      5vw,
-      5.6rem
-    );
-
-  font-weight: 400;
-
-  line-height: 0.95;
-
-  letter-spacing: -0.045em;
-}
-
-/* ============================================================
-   JOURNEY GRID
-============================================================ */
-
-.venture-journey-grid {
-  margin-top: 60px;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(
-      5,
-      minmax(0, 1fr)
-    );
-
-  border-top:
-    1px solid
-    var(--ventures-line);
-
-  border-left:
-    1px solid
-    var(--ventures-line);
-}
-
-.venture-journey-step {
-  position: relative;
-
-  min-height: 220px;
-
-  padding: 26px;
-
-  border-right:
-    1px solid
-    var(--ventures-line);
-
-  border-bottom:
-    1px solid
-    var(--ventures-line);
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.62
-    );
-
-  transition:
-    background-color 0.2s ease;
-}
-
-.venture-journey-step:hover {
-  background: #ffffff;
-}
-
-.venture-journey-step__number {
-  width: 42px;
-  height: 42px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 50%;
-
-  background:
-    var(--ventures-gold);
-
-  color: #ffffff;
-
-  font-size: 0.7rem;
-  font-weight: 800;
-}
-
-.venture-journey-step h3 {
-  margin:
-    52px
-    0
-    10px;
-
-  color:
-    var(--ventures-navy);
-
-  font-family:
-    var(
-      --font-display,
-      "Trajan Pro",
-      "Trajan Pro 3",
-      Georgia,
-      serif
-    );
-
-  font-size: 1.55rem;
-  font-weight: 400;
-}
-
-.venture-journey-step p {
-  margin: 0;
-
-  color:
-    var(--ventures-muted);
-
-  font-size: 0.84rem;
-
-  line-height: 1.55;
-}
-
-.venture-journey-step__arrow {
-  position: absolute;
-
-  top: 37px;
-  right: 20px;
-
-  color:
-    var(--ventures-gold);
-}
-
-/* ============================================================
    ECOSYSTEM
 ============================================================ */
 
 .ventures-ecosystem {
-  padding:
-    clamp(
-      90px,
-      9vw,
-      140px
-    )
-    0;
+  padding: clamp(95px, 9vw, 145px) 0;
 
-  background:
-    var(--ventures-navy);
+  background: var(--ventures-navy);
 }
 
 .ventures-ecosystem__grid {
@@ -1343,7 +1731,6 @@
     minmax(430px, 1.1fr);
 
   gap: 90px;
-
   align-items: center;
 }
 
@@ -1351,17 +1738,12 @@
   max-width: 650px;
 }
 
-.ventures-ecosystem__content
-.ventures-section-number {
-  color:
-    var(--ventures-gold-soft);
+.ventures-ecosystem__content .ventures-section-number {
+  color: var(--ventures-gold-soft);
 }
 
 .ventures-ecosystem__content h2 {
-  margin:
-    18px
-    0
-    24px;
+  margin: 18px 0 24px;
 
   color: #ffffff;
 
@@ -1374,104 +1756,32 @@
       serif
     );
 
-  font-size:
-    clamp(
-      3.2rem,
-      5vw,
-      5.8rem
-    );
-
+  font-size: clamp(3.2rem, 5vw, 5.8rem);
   font-weight: 400;
-
   line-height: 0.95;
-
   letter-spacing: -0.045em;
 }
 
 .ventures-ecosystem__content p {
-  max-width: 520px;
+  max-width: 540px;
 
-  margin: 0;
+  margin: 0 0 18px;
 
-  color:
-    rgba(
-      255,
-      255,
-      255,
-      0.68
-    );
+  color: rgba(255, 255, 255, 0.68);
 
-  font-size: 1rem;
-
+  font-size: 0.96rem;
   line-height: 1.75;
 }
 
-/* ============================================================
-   TEXT LINK
-============================================================ */
-
-.ventures-text-link {
-  margin-top: 32px;
-
-  display: inline-flex;
-  align-items: center;
-
-  gap: 12px;
-
-  color:
-    var(--ventures-gold-soft);
-
-  font-size: 0.74rem;
-  font-weight: 800;
-
-  letter-spacing: 0.08em;
-
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.ventures-text-link svg {
-  flex: 0 0 auto;
-
-  transition:
-    transform 0.25s ease;
-}
-
-.ventures-text-link:hover svg {
-  transform: translateX(5px);
-}
-
-/* ============================================================
-   ECOSYSTEM NETWORK
-============================================================ */
-
 .ventures-ecosystem__network {
   display: grid;
-
-  grid-template-columns:
-    repeat(
-      3,
-      minmax(0, 1fr)
-    );
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 1px;
 
-  border:
-    1px solid
-    rgba(
-      255,
-      255,
-      255,
-      0.12
-    );
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.12
-    );
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .ecosystem-network__center,
@@ -1486,14 +1796,11 @@
   display: grid;
   place-items: center;
 
-  background:
-    var(--ventures-gold);
-
+  background: var(--ventures-gold);
   color: #ffffff;
 
   font-size: 0.76rem;
   font-weight: 800;
-
   letter-spacing: 0.11em;
 
   text-align: center;
@@ -1506,15 +1813,12 @@
   align-items: center;
   justify-content: center;
 
-  background:
-    var(--ventures-navy-deep);
-
+  background: var(--ventures-navy-deep);
   color: #ffffff;
 
   text-align: center;
 
-  transition:
-    background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .ecosystem-network__item:hover {
@@ -1522,58 +1826,198 @@
 }
 
 .ecosystem-network__item svg {
-  flex: 0 0 auto;
-
   margin-bottom: 14px;
 
-  color:
-    var(--ventures-gold-soft);
+  color: var(--ventures-gold-soft);
 }
 
 .ecosystem-network__item span {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 700;
-
   letter-spacing: 0.03em;
-
-  overflow-wrap: anywhere;
 }
 
 /* ============================================================
-   FINAL CTA
+   ADVANCEMENT PATH
 ============================================================ */
 
-.ventures-final {
-  padding:
-    clamp(
-      85px,
-      8vw,
-      125px
-    )
-    0;
+.cfcv-advancement {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: var(--ventures-cream);
+}
+
+.cfcv-advancement__path {
+  margin-top: 65px;
+
+  display: flex;
+  align-items: stretch;
+}
+
+.cfcv-advancement__item,
+.cfcv-advancement__ecosystem {
+  min-width: 0;
+  min-height: 190px;
+
+  flex: 1;
+
+  padding: 25px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  border: 1px solid var(--ventures-line);
+
+  background: #ffffff;
+
+  text-decoration: none;
+}
+
+.cfcv-advancement__item {
+  color: var(--ventures-navy);
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.cfcv-advancement__item:hover {
+  background: var(--ventures-navy);
+  color: #ffffff;
+}
+
+.cfcv-advancement__item > span {
+  margin-bottom: auto;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.cfcv-advancement__item strong {
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
+    );
+
+  font-size: 1.55rem;
+  font-weight: 400;
+}
+
+.cfcv-advancement__item small {
+  margin-top: 6px;
+
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-advancement__arrow {
+  align-self: center;
+  flex: 0 0 auto;
+
+  margin: 0 10px;
+
+  color: var(--ventures-gold);
+}
+
+.cfcv-advancement__ecosystem {
+  background: var(--ventures-gold);
+  border-color: var(--ventures-gold);
+
+  color: #ffffff;
+}
+
+.cfcv-advancement__ecosystem svg {
+  margin-bottom: auto;
+}
+
+.cfcv-advancement__ecosystem span {
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-advancement__ecosystem strong {
+  margin-top: 8px;
+
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   GET INVOLVED
+============================================================ */
+
+.cfcv-involved {
+  padding: clamp(90px, 9vw, 140px) 0;
 
   background: #ffffff;
 }
 
-.ventures-final__grid {
+.cfcv-involved__grid {
+  margin-top: 65px;
+
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-
-  gap: 90px;
-
-  align-items: end;
+  border-top: 1px solid var(--ventures-line);
+  border-left: 1px solid var(--ventures-line);
 }
 
-.ventures-final h2 {
-  max-width: 700px;
+.cfcv-involved-card {
+  min-height: 390px;
+  padding: 30px;
 
-  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
 
-  color:
-    var(--ventures-navy);
+  border-right: 1px solid var(--ventures-line);
+  border-bottom: 1px solid var(--ventures-line);
+
+  background: #ffffff;
+  color: var(--ventures-navy);
+
+  text-decoration: none;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.cfcv-involved-card:hover {
+  background: var(--ventures-navy);
+  color: #ffffff;
+}
+
+.cfcv-involved-card > svg {
+  color: var(--ventures-gold);
+}
+
+.cfcv-involved-card > span {
+  margin-top: 65px;
+
+  color: var(--ventures-gold);
+
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-involved-card h3 {
+  margin: 12px 0 16px;
 
   font-family:
     var(
@@ -1584,33 +2028,127 @@
       serif
     );
 
-  font-size:
-    clamp(
-      3.3rem,
-      5.3vw,
-      6rem
+  font-size: 1.7rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.cfcv-involved-card p {
+  margin: 0;
+
+  color: var(--ventures-muted);
+
+  font-size: 0.85rem;
+  line-height: 1.67;
+
+  transition: color 0.25s ease;
+}
+
+.cfcv-involved-card:hover p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.cfcv-involved-card strong {
+  margin-top: auto;
+  padding-top: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  border-top: 1px solid var(--ventures-line);
+
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+}
+
+.cfcv-involved-card:hover strong {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   FINAL CTA
+============================================================ */
+
+.ventures-final {
+  padding: clamp(90px, 9vw, 140px) 0;
+
+  background: var(--ventures-navy-deep);
+}
+
+.ventures-final__grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 90px;
+  align-items: end;
+}
+
+.ventures-final h2 {
+  max-width: 700px;
+
+  margin: 16px 0 0;
+
+  color: #ffffff;
+
+  font-family:
+    var(
+      --font-display,
+      "Trajan Pro",
+      "Trajan Pro 3",
+      Georgia,
+      serif
     );
 
+  font-size: clamp(3.3rem, 5.3vw, 6rem);
   font-weight: 400;
-
   line-height: 0.94;
-
   letter-spacing: -0.045em;
 }
 
 .ventures-final__content {
-  max-width: 600px;
+  max-width: 650px;
 }
 
-.ventures-final__content p {
+.ventures-final__content > p {
   margin: 0;
 
-  color:
-    var(--ventures-muted);
+  color: rgba(255, 255, 255, 0.69);
 
-  font-size: 1rem;
-
+  font-size: 0.96rem;
   line-height: 1.75;
+}
+
+.ventures-final__statement {
+  margin-top: 30px;
+  padding: 22px 0;
+
+  display: flex;
+  gap: 15px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ventures-final__statement svg {
+  flex: 0 0 auto;
+
+  color: var(--ventures-gold-soft);
+}
+
+.ventures-final__statement strong {
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
 .ventures-final__actions {
@@ -1618,43 +2156,49 @@
 
   display: flex;
   flex-wrap: wrap;
-
   gap: 12px;
 }
 
 /* ============================================================
-   ULTRA WIDE
+   RESPONSIVE SAFETY
+============================================================ */
+
+.ventures-hero__content,
+.ventures-hero__belief,
+.cfcv-intro__content,
+.cfcv-track-card,
+.cfcv-how__heading,
+.cfcv-how__content,
+.cfcv-month-card,
+.cfcv-midpoint__content,
+.cfcv-catalytic__statement,
+.cfcv-catalytic__content,
+.venture-card,
+.ventures-ecosystem__content,
+.ventures-ecosystem__network,
+.cfcv-advancement__item,
+.cfcv-advancement__ecosystem,
+.cfcv-involved-card,
+.ventures-final__grid > * {
+  min-width: 0;
+}
+
+/* ============================================================
+   LARGE DESKTOP
 ============================================================ */
 
 @media (min-width: 1920px) {
   .ventures-container {
-    width:
-      min(
-        1540px,
-        calc(100% - 140px)
-      );
+    width: min(1540px, calc(100% - 140px));
   }
 
   .ventures-hero {
-    min-height:
-      min(
-        860px,
-        82vh
-      );
+    min-height: min(870px, 84vh);
   }
 
   .ventures-hero__inner {
-    padding-top: 155px;
-    padding-bottom: 100px;
-  }
-
-  .ventures-hero__content {
-    max-width: 920px;
-  }
-
-  .ventures-hero__background {
-    background-position:
-      center 45%;
+    padding-top: 160px;
+    padding-bottom: 105px;
   }
 }
 
@@ -1664,11 +2208,11 @@
 
 @media (max-width: 1350px) {
   .ventures-grid {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(0, 1fr)
-      );
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cfcv-involved__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -1678,36 +2222,35 @@
 
 @media (max-width: 1200px) {
   .ventures-container {
-    width:
-      min(
-        100% - 64px,
-        1320px
-      );
-  }
-
-  .ventures-hero {
-    min-height: 680px;
+    width: min(100% - 64px, 1320px);
   }
 
   .ventures-hero__inner {
-    grid-template-columns:
-      minmax(0, 1.15fr)
-      minmax(280px, 0.85fr);
-
     gap: 50px;
   }
 
   .ventures-section-header,
-  .ventures-journey__heading {
+  .ventures-journey__heading,
+  .cfcv-intro__grid {
     gap: 50px;
   }
 
-  .ventures-ecosystem__grid {
-    grid-template-columns:
-      minmax(0, 0.8fr)
-      minmax(0, 1.2fr);
+  .cfcv-how__grid,
+  .cfcv-midpoint__grid {
+    gap: 60px;
+  }
 
+  .ventures-ecosystem__grid {
     gap: 55px;
+  }
+
+  .cfcv-advancement__path {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .cfcv-advancement__arrow {
+    display: none;
   }
 }
 
@@ -1717,53 +2260,15 @@
 
 @media (max-width: 1050px) {
   .ventures-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .venture-journey-grid {
-    grid-template-columns:
-      repeat(
-        3,
-        minmax(0, 1fr)
-      );
-  }
-}
-
-/* ============================================================
-   SHORT LAPTOP
-============================================================ */
-
-@media
-  (min-width: 901px)
-  and (max-height: 820px) {
-
-  .ventures-hero {
-    min-height: 610px;
+  .cfcv-months {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .ventures-hero__inner {
-    padding-top: 100px;
-    padding-bottom: 55px;
-  }
-
-  .ventures-hero__content h1 {
-    font-size:
-      clamp(
-        3.7rem,
-        5.7vw,
-        5.7rem
-      );
-  }
-
-  .ventures-hero__content p {
-    margin-top: 22px;
-    margin-bottom: 28px;
-
-    line-height: 1.6;
+  .cfcv-month-card__arrow {
+    display: none;
   }
 }
 
@@ -1773,44 +2278,36 @@
 
 @media (max-width: 900px) {
   .ventures-container {
-    width:
-      calc(100% - 40px);
+    width: calc(100% - 40px);
   }
 
   /* HERO */
 
   .ventures-hero {
-    min-height: 700px;
+    min-height: 740px;
   }
 
   .ventures-hero__background {
-    background-position:
-      62% center;
+    background-position: 62% center;
   }
 
   .ventures-hero__overlay {
     background:
       linear-gradient(
         90deg,
-        rgba(6, 20, 34, 0.96)
-          0%,
-        rgba(6, 20, 34, 0.86)
-          52%,
-        rgba(6, 20, 34, 0.48)
-          100%
+        rgba(6, 20, 34, 0.96) 0%,
+        rgba(6, 20, 34, 0.86) 52%,
+        rgba(6, 20, 34, 0.48) 100%
       ),
       linear-gradient(
         0deg,
-        rgba(6, 20, 34, 0.72)
-          0%,
-        rgba(6, 20, 34, 0.1)
-          65%
+        rgba(6, 20, 34, 0.75) 0%,
+        rgba(6, 20, 34, 0.1) 65%
       );
   }
 
   .ventures-hero__inner {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
 
     gap: 44px;
 
@@ -1820,47 +2317,64 @@
     padding-bottom: 60px;
   }
 
-  .ventures-hero__content {
-    max-width: 760px;
-  }
-
   .ventures-hero__belief {
-    max-width: 540px;
+    max-width: 560px;
 
     margin-left: 0;
-
-    padding:
-      24px
-      0
-      0;
+    padding: 24px 0 0;
 
     border-left: 0;
-
-    border-top:
-      1px solid
-      rgba(
-        255,
-        255,
-        255,
-        0.35
-      );
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
   }
 
-  .ventures-hero__belief p {
-    max-width: 450px;
-  }
-
-  /* HEADINGS */
+  /* SHARED */
 
   .ventures-section-header,
-  .ventures-journey__heading {
-    grid-template-columns:
-      1fr;
-
-    gap: 24px;
+  .ventures-journey__heading,
+  .cfcv-intro__grid,
+  .cfcv-how__grid,
+  .cfcv-midpoint__grid,
+  .cfcv-catalytic__grid,
+  .ventures-ecosystem__grid,
+  .ventures-final__grid {
+    grid-template-columns: 1fr;
   }
 
-  /* TOOLBAR */
+  .ventures-section-header > p {
+    grid-column: 1;
+  }
+
+  .cfcv-how__grid,
+  .cfcv-midpoint__grid {
+    gap: 35px;
+  }
+
+  .cfcv-how__content,
+  .cfcv-midpoint__content {
+    padding-top: 0;
+  }
+
+  /* TRACKS */
+
+  .cfcv-tracks__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cfcv-track-card {
+    min-height: auto;
+  }
+
+  .cfcv-track-card__label {
+    margin-top: 40px;
+  }
+
+  /* CATALYTIC */
+
+  .cfcv-catalytic__statement {
+    min-height: 370px;
+  }
+
+  /* DIRECTORY */
 
   .ventures-toolbar {
     flex-direction: column;
@@ -1871,53 +2385,25 @@
 
   .ventures-search {
     width: 100%;
-
     flex: none;
-  }
-
-  /* JOURNEY */
-
-  .venture-journey-grid {
-    grid-template-columns:
-      1fr;
-
-    border-left: 0;
-  }
-
-  .venture-journey-step {
-    min-height: auto;
-
-    padding: 24px;
-
-    border-left:
-      1px solid
-      var(--ventures-line);
-  }
-
-  .venture-journey-step__arrow {
-    display: none;
-  }
-
-  .venture-journey-step h3 {
-    margin-top: 34px;
   }
 
   /* ECOSYSTEM */
 
   .ventures-ecosystem__grid {
-    grid-template-columns:
-      1fr;
-
     gap: 60px;
+  }
+
+  /* ADVANCEMENT */
+
+  .cfcv-advancement__path {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   /* FINAL */
 
   .ventures-final__grid {
-    grid-template-columns:
-      1fr;
-
-    gap: 36px;
+    gap: 40px;
   }
 }
 
@@ -1926,9 +2412,9 @@
 ============================================================ */
 
 @media (max-width: 720px) {
-  .ventures-grid {
-    grid-template-columns:
-      1fr;
+  .ventures-grid,
+  .cfcv-months {
+    grid-template-columns: 1fr;
   }
 
   .venture-card {
@@ -1936,16 +2422,20 @@
   }
 
   .ventures-ecosystem__network {
-    grid-template-columns:
-      repeat(
-        2,
-        minmax(0, 1fr)
-      );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ecosystem-network__center,
   .ecosystem-network__item {
     min-height: 155px;
+  }
+
+  .cfcv-involved__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cfcv-involved-card {
+    min-height: 330px;
   }
 }
 
@@ -1955,115 +2445,166 @@
 
 @media (max-width: 620px) {
   .ventures-container {
-    width:
-      calc(100% - 28px);
+    width: calc(100% - 28px);
   }
 
   /* HERO */
 
   .ventures-hero {
-    min-height: 700px;
+    min-height: 730px;
     height: auto;
   }
 
   .ventures-hero__background {
-    background-position:
-      64% center;
+    background-position: 64% center;
   }
 
   .ventures-hero__overlay {
     background:
       linear-gradient(
         180deg,
-        rgba(6, 20, 34, 0.5)
-          0%,
-        rgba(6, 20, 34, 0.68)
-          37%,
-        rgba(6, 20, 34, 0.97)
-          100%
+        rgba(6, 20, 34, 0.48) 0%,
+        rgba(6, 20, 34, 0.7) 38%,
+        rgba(6, 20, 34, 0.98) 100%
       );
   }
 
   .ventures-hero__inner {
-    gap: 34px;
+    gap: 32px;
 
     padding-top: 110px;
     padding-bottom: 42px;
   }
 
   .ventures-hero__content h1 {
-    font-size:
-      clamp(
-        3rem,
-        13vw,
-        4.5rem
-      );
-
+    font-size: clamp(3rem, 13vw, 4.5rem);
     line-height: 0.94;
-
-    letter-spacing: -0.045em;
   }
 
   .ventures-hero__content p {
-    max-width: 100%;
-
     margin-top: 24px;
     margin-bottom: 28px;
 
-    font-size: 0.94rem;
-
+    font-size: 0.92rem;
     line-height: 1.65;
+  }
+
+  .ventures-hero__actions {
+    flex-direction: column;
+  }
+
+  .ventures-hero__actions .ventures-button {
+    width: 100%;
   }
 
   .ventures-hero__belief {
     max-width: 100%;
   }
 
-  .ventures-hero__belief strong {
-    font-size:
-      clamp(
-        2rem,
-        9vw,
-        2.8rem
-      );
-  }
+  /* TYPOGRAPHY */
 
-  /* DIRECTORY */
-
-  .ventures-directory {
-    padding: 68px 0;
-  }
-
+  .cfcv-intro__content h2,
   .ventures-section-header h2,
-  .ventures-journey__heading h2 {
-    font-size:
-      clamp(
-        2.65rem,
-        11vw,
-        3.8rem
-      );
+  .ventures-journey__heading h2,
+  .cfcv-how__heading h2,
+  .cfcv-midpoint h2,
+  .ventures-ecosystem__content h2,
+  .ventures-final h2 {
+    font-size: clamp(2.65rem, 11vw, 3.9rem);
   }
+
+  /* SECTIONS */
+
+  .cfcv-intro,
+  .cfcv-tracks,
+  .cfcv-how,
+  .ventures-journey,
+  .cfcv-midpoint,
+  .cfcv-catalytic,
+  .ventures-directory,
+  .ventures-ecosystem,
+  .cfcv-advancement,
+  .cfcv-involved,
+  .ventures-final {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  /* TRACKS */
+
+  .cfcv-tracks__grid,
+  .cfcv-months,
+  .cfcv-catalytic__grid,
+  .cfcv-involved__grid {
+    margin-top: 45px;
+  }
+
+  .cfcv-track-card {
+    padding: 25px;
+  }
+
+  .cfcv-track-card h3 {
+    font-size: 2.65rem;
+  }
+
+  /* MONTHS */
+
+  .cfcv-month-card {
+    min-height: auto;
+    padding: 24px;
+  }
+
+  .cfcv-month-card__subtitle {
+    margin-top: 35px;
+  }
+
+  .cfcv-month-card__deliverable {
+    margin-top: 32px;
+  }
+
+  /* CATALYTIC */
+
+  .cfcv-catalytic__statement,
+  .cfcv-catalytic__content {
+    padding: 30px;
+  }
+
+  .cfcv-catalytic__statement {
+    min-height: 350px;
+  }
+
+  .cfcv-catalytic__statement strong {
+    font-size: 2.8rem;
+  }
+
+  /* DIRECTORY NAV */
+
+  .cfcv-directory-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cfcv-directory-nav a {
+    padding: 0 14px;
+
+    border-right: 1px solid var(--ventures-line);
+    border-bottom: 1px solid var(--ventures-line);
+  }
+
+  /* FILTERS */
 
   .ventures-toolbar {
-    margin-top: 40px;
-    margin-bottom: 24px;
+    margin-top: 30px;
   }
 
   .ventures-categories {
     width: 100%;
-
-    gap: 8px;
   }
 
   .venture-filter {
+    flex: 1 1 auto;
+
     min-height: 42px;
-
-    flex:
-      1
-      1
-      auto;
-
-    padding: 0 14px;
   }
 
   .ventures-search {
@@ -2076,88 +2617,43 @@
     padding: 23px;
   }
 
-  .venture-card__logo {
-    min-height: 95px;
-  }
-
   .venture-card h3 {
     font-size: 1.8rem;
   }
 
-  .venture-card__description {
-    margin: 20px 0;
+  /* ADVANCEMENT */
 
-    font-size: 0.88rem;
+  .cfcv-advancement__path {
+    grid-template-columns: 1fr;
   }
 
-  /* JOURNEY */
-
-  .ventures-journey {
-    padding: 68px 0;
-  }
-
-  /* ECOSYSTEM */
-
-  .ventures-ecosystem {
-    padding: 72px 0;
-  }
-
-  .ventures-ecosystem__content h2 {
-    font-size:
-      clamp(
-        2.8rem,
-        11vw,
-        4rem
-      );
+  .cfcv-advancement__item,
+  .cfcv-advancement__ecosystem {
+    min-height: 150px;
   }
 
   /* FINAL */
-
-  .ventures-final {
-    padding: 68px 0;
-  }
-
-  .ventures-final h2 {
-    font-size:
-      clamp(
-        2.8rem,
-        11vw,
-        4rem
-      );
-  }
 
   .ventures-final__actions {
     flex-direction: column;
   }
 
-  .ventures-final__actions
-  .ventures-button {
+  .ventures-final__actions .ventures-button {
     width: 100%;
-  }
-
-  .ventures-empty {
-    min-height: 250px;
-
-    margin-top: 30px;
-
-    padding:
-      45px
-      18px;
   }
 }
 
 /* ============================================================
-   MOBILE 480
+   480PX MOBILE
 ============================================================ */
 
 @media (max-width: 480px) {
   .ventures-container {
-    width:
-      calc(100% - 24px);
+    width: calc(100% - 24px);
   }
 
   .ventures-hero {
-    min-height: 680px;
+    min-height: 700px;
   }
 
   .ventures-hero__inner {
@@ -2166,22 +2662,23 @@
   }
 
   .ventures-hero__content h1 {
-    font-size:
-      clamp(
-        2.8rem,
-        13vw,
-        3.8rem
-      );
+    font-size: clamp(2.8rem, 13vw, 3.8rem);
   }
 
   .ventures-button {
     min-height: 50px;
-
     padding: 0 18px;
   }
 
-  .venture-card__top {
-    align-items: flex-start;
+  .cfcv-how__statement,
+  .cfcv-midpoint__highlight {
+    padding: 22px;
+
+    flex-direction: column;
+  }
+
+  .cfcv-catalytic__flow {
+    gap: 10px;
   }
 
   .venture-card__footer {
@@ -2202,12 +2699,11 @@
 
 @media (max-width: 420px) {
   .ventures-container {
-    width:
-      calc(100% - 22px);
+    width: calc(100% - 22px);
   }
 
   .ventures-hero {
-    min-height: 650px;
+    min-height: 680px;
   }
 
   .ventures-hero__inner {
@@ -2218,26 +2714,19 @@
   }
 
   .ventures-hero__content h1 {
-    font-size:
-      clamp(
-        2.6rem,
-        13vw,
-        3.5rem
-      );
+    font-size: clamp(2.6rem, 13vw, 3.5rem);
   }
 
   .ventures-hero__content p {
-    font-size: 0.88rem;
-  }
-
-  .ventures-hero__belief {
-    padding-top: 18px;
+    font-size: 0.87rem;
   }
 
   .ventures-hero__belief p {
-    margin-top: 15px;
+    font-size: 0.82rem;
+  }
 
-    font-size: 0.83rem;
+  .cfcv-directory-nav {
+    grid-template-columns: 1fr;
   }
 
   .venture-card {
@@ -2245,13 +2734,11 @@
   }
 
   .venture-card__footer {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .ventures-ecosystem__network {
-    grid-template-columns:
-      1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2261,12 +2748,11 @@
 
 @media (max-width: 360px) {
   .ventures-container {
-    width:
-      calc(100% - 20px);
+    width: calc(100% - 20px);
   }
 
   .ventures-hero {
-    min-height: 630px;
+    min-height: 660px;
   }
 
   .ventures-hero__inner {
@@ -2275,7 +2761,7 @@
   }
 
   .ventures-eyebrow {
-    font-size: 0.63rem;
+    font-size: 0.61rem;
   }
 
   .ventures-hero__content h1 {
@@ -2286,11 +2772,23 @@
     font-size: 1.95rem;
   }
 
+  .cfcv-intro__content h2,
   .ventures-section-header h2,
   .ventures-journey__heading h2,
+  .cfcv-how__heading h2,
+  .cfcv-midpoint h2,
   .ventures-ecosystem__content h2,
   .ventures-final h2 {
-    font-size: 2.45rem;
+    font-size: 2.4rem;
+  }
+
+  .cfcv-catalytic__statement,
+  .cfcv-catalytic__content {
+    padding: 23px;
+  }
+
+  .cfcv-catalytic__statement strong {
+    font-size: 2.3rem;
   }
 
   .venture-card__top {
@@ -2304,169 +2802,17 @@
   }
 
   .ventures-ecosystem__network {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .ecosystem-network__center,
   .ecosystem-network__item {
     min-height: 125px;
   }
-
-  .ventures-button {
-    font-size: 0.66rem;
-  }
 }
 
 /* ============================================================
-   320PX / EXTRA NARROW
-============================================================ */
-
-@media (max-width: 340px) {
-  .ventures-container {
-    width:
-      calc(100% - 18px);
-  }
-
-  .ventures-hero {
-    min-height: 610px;
-  }
-
-  .ventures-hero__inner {
-    gap: 22px;
-
-    padding-top: 76px;
-    padding-bottom: 25px;
-  }
-
-  .ventures-hero__content h1 {
-    font-size: 2.3rem;
-  }
-
-  .ventures-hero__content p {
-    margin-top: 17px;
-    margin-bottom: 20px;
-
-    font-size: 0.82rem;
-  }
-
-  .ventures-hero__belief > span {
-    margin-bottom: 10px;
-
-    font-size: 0.6rem;
-  }
-
-  .ventures-hero__belief strong {
-    font-size: 1.75rem;
-  }
-
-  .ventures-hero__belief p {
-    font-size: 0.78rem;
-  }
-
-  .ventures-section-header h2,
-  .ventures-journey__heading h2,
-  .ventures-ecosystem__content h2,
-  .ventures-final h2 {
-    font-size: 2.2rem;
-  }
-
-  .venture-card {
-    padding: 18px;
-  }
-
-  .venture-card h3 {
-    font-size: 1.6rem;
-  }
-}
-
-/* ============================================================
-   LANDSCAPE PHONES
-============================================================ */
-
-@media
-  (max-width: 900px)
-  and (max-height: 520px)
-  and (orientation: landscape) {
-
-  .ventures-hero {
-    min-height: 520px;
-  }
-
-  .ventures-hero__background {
-    background-position:
-      67% center;
-  }
-
-  .ventures-hero__inner {
-    grid-template-columns:
-      minmax(0, 1.3fr)
-      minmax(220px, 0.7fr);
-
-    gap: 35px;
-
-    align-items: center;
-
-    padding-top: 65px;
-    padding-bottom: 35px;
-  }
-
-  .ventures-hero__content h1 {
-    margin-top: 12px;
-
-    font-size:
-      clamp(
-        2.5rem,
-        6vw,
-        3.8rem
-      );
-  }
-
-  .ventures-hero__content p {
-    margin-top: 14px;
-    margin-bottom: 18px;
-
-    font-size: 0.82rem;
-
-    line-height: 1.5;
-  }
-
-  .ventures-hero__belief {
-    margin-left: auto;
-
-    padding:
-      20px
-      0
-      8px
-      22px;
-
-    border-top: 0;
-
-    border-left:
-      1px solid
-      rgba(
-        255,
-        255,
-        255,
-        0.35
-      );
-  }
-
-  .ventures-hero__belief strong {
-    font-size: 1.8rem;
-  }
-
-  .ventures-hero__belief p {
-    margin-top: 14px;
-
-    font-size: 0.78rem;
-
-    line-height: 1.5;
-  }
-}
-
-/* ============================================================
-   TOUCH
+   TOUCH DEVICES
 ============================================================ */
 
 @media (hover: none) {
@@ -2476,29 +2822,15 @@
 
   .ventures-button:hover svg,
   .venture-card__link:hover svg,
-  .ventures-text-link:hover svg {
+  .ventures-text-link:hover svg,
+  .cfcv-track-card > a:hover svg {
     transform: none;
   }
 
-  .venture-card:hover {
-    background: #ffffff;
-
+  .venture-card:hover,
+  .cfcv-track-card:hover,
+  .cfcv-month-card:hover {
     box-shadow: none;
-  }
-
-  .venture-journey-step:hover {
-    background:
-      rgba(
-        255,
-        255,
-        255,
-        0.62
-      );
-  }
-
-  .ecosystem-network__item:hover {
-    background:
-      var(--ventures-navy-deep);
   }
 }
 
@@ -2508,46 +2840,35 @@
 
 .ventures-button:focus-visible,
 .venture-filter:focus-visible,
-.ventures-search:focus-within,
 .venture-card__link:focus-visible,
 .ventures-text-link:focus-visible,
-.ventures-retry:focus-visible {
-  outline:
-    2px solid
-    var(--ventures-gold);
-
+.ventures-retry:focus-visible,
+.cfcv-track-card > a:focus-visible,
+.cfcv-directory-nav a:focus-visible,
+.cfcv-advancement__item:focus-visible,
+.cfcv-involved-card:focus-visible {
+  outline: 2px solid var(--ventures-gold);
   outline-offset: 3px;
+}
+
+.ventures-search:focus-within {
+  outline: 2px solid transparent;
 }
 
 /* ============================================================
    REDUCED MOTION
 ============================================================ */
 
-@media
-  (prefers-reduced-motion: reduce) {
-
+@media (prefers-reduced-motion: reduce) {
   .ventures-page *,
   .ventures-page *::before,
   .ventures-page *::after {
-    scroll-behavior:
-      auto !important;
+    scroll-behavior: auto !important;
 
-    animation-duration:
-      0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
 
-    animation-iteration-count:
-      1 !important;
-  }
-
-  .ventures-button,
-  .ventures-button svg,
-  .venture-filter,
-  .venture-card,
-  .venture-card__link svg,
-  .venture-journey-step,
-  .ventures-text-link svg,
-  .ecosystem-network__item {
-    transition: none;
+    transition-duration: 0.01ms !important;
   }
 
   .ventures-hero__background {
@@ -2566,7 +2887,6 @@
 @media print {
   .ventures-page {
     background: #ffffff;
-
     color: #000000;
   }
 
@@ -2575,8 +2895,7 @@
 
     background: #ffffff;
 
-    border-bottom:
-      1px solid #cccccc;
+    border-bottom: 1px solid #cccccc;
   }
 
   .ventures-hero__background,
@@ -2599,51 +2918,43 @@
 
   .ventures-hero__belief {
     margin: 30px 0 0;
-
     padding: 20px 0 0;
 
     border-left: 0;
-
-    border-top:
-      1px solid #cccccc;
+    border-top: 1px solid #cccccc;
   }
 
-  .ventures-toolbar {
+  .ventures-toolbar,
+  .ventures-final__actions {
     display: none;
   }
 
   .ventures-grid {
-    grid-template-columns:
-      repeat(
-        2,
-        1fr
-      );
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .ventures-ecosystem {
+  .cfcv-how,
+  .cfcv-midpoint,
+  .ventures-ecosystem,
+  .ventures-final {
     background: #ffffff;
   }
 
-  .ventures-ecosystem__content h2,
-  .ventures-ecosystem__content p {
-    color: #000000;
-  }
-
-  .ventures-ecosystem__network {
-    border-color: #cccccc;
-
-    background: #cccccc;
-  }
-
-  .ecosystem-network__center,
-  .ecosystem-network__item {
-    background: #ffffff;
-
+  .cfcv-how h2,
+  .cfcv-how p,
+  .cfcv-midpoint h2,
+  .cfcv-midpoint p,
+  .ventures-ecosystem h2,
+  .ventures-ecosystem p,
+  .ventures-final h2,
+  .ventures-final p {
     color: #000000;
   }
 
   .venture-card,
-  .venture-journey-step {
+  .cfcv-track-card,
+  .cfcv-month-card,
+  .cfcv-involved-card {
     break-inside: avoid;
   }
 }

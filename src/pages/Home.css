@@ -234,7 +234,7 @@
 }
 
 /* ============================================
-   HERO PARAGRAPH — MOBILE ONLY
+   HERO PARAGRAPH â€” MOBILE ONLY
 ============================================ */
 
 @media screen and (max-width: 600px) {
@@ -494,7 +494,7 @@
 }
 
 /* ============================================================
-   QUICK HIGHLIGHTS — NAVY / GOLD
+   QUICK HIGHLIGHTS â€” NAVY / GOLD
 ============================================================ */
 
 .cf-impact-highlights {
@@ -708,7 +708,7 @@
 
 
 /* ============================================================
-   LEARN MORE — GOLD BUTTON
+   LEARN MORE â€” GOLD BUTTON
 ============================================================ */
 
 .cf-impact-item__link {
@@ -1036,7 +1036,7 @@
 ========================================= */
 
 /* =========================================
-   PROGRAM GRID — HORIZONTAL ROWS
+   PROGRAM GRID â€” HORIZONTAL ROWS
 ========================================= */
 
 .cf-program-grid {
@@ -1072,7 +1072,7 @@
     transform 0.3s ease;
 }
 
-/* Number — top left */
+/* Number â€” top left */
 
 .cf-program-number {
   display: block;
@@ -1119,10 +1119,10 @@
    RESPONSIVE LAYOUT
 ========================================= */
 
-/* Tablets — 2 cards per row */
+/* Tablets â€” 2 cards per row */
 
 /* =========================================
-   MOBILE VIEW — 2 ROWS, 2 CARDS PER ROW
+   MOBILE VIEW â€” 2 ROWS, 2 CARDS PER ROW
 ========================================= */
 
 @media (max-width: 600px) {
@@ -1164,7 +1164,7 @@
 
 }
 /* ============================================================
-   VISION + VIDEO — REFERENCE DESIGN
+   VISION + VIDEO â€” REFERENCE DESIGN
    Matches the supplied light institutional reference
 ============================================================ */
 
@@ -1212,6 +1212,14 @@
   width: 100%;
   max-width: 650px;
   padding: 0;
+}
+
+
+/* Remove the gold line from the Home page section marker */
+.cf-section-marker--light::before,
+.cf-section-marker--light::after {
+  display: none !important;
+  content: none !important;
 }
 
 /* Reference eyebrow: gold line + spaced label */
@@ -3227,7 +3235,7 @@ margin-bottom: 20px;
 }
 
 /* ============================================================
-   HOME PAGE — SMOOTH SECTION REVEAL
+   HOME PAGE â€” SMOOTH SECTION REVEAL
 ============================================================ */
 
 .cf-home > section {
@@ -3280,7 +3288,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE HOME — CENTER EVERYTHING
+   MOBILE HOME â€” CENTER EVERYTHING
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -3539,7 +3547,7 @@ margin-bottom: 20px;
 }
 
 /* ============================================================
-   MOBILE HERO — SMALLER TYPOGRAPHY
+   MOBILE HERO â€” SMALLER TYPOGRAPHY
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -3584,7 +3592,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE HERO — STRONGER TEXT BACKGROUND SEPARATION
+   MOBILE HERO â€” STRONGER TEXT BACKGROUND SEPARATION
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -3642,7 +3650,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE HERO BUTTONS — SHORTER & CENTERED
+   MOBILE HERO BUTTONS â€” SHORTER & CENTERED
 ============================================================ */
 
 @media (max-width: 600px) {
@@ -3665,7 +3673,7 @@ margin-bottom: 20px;
 
 }
 
-/* MOBILE HERO — KEEP ONLY SLIDER DOTS */
+/* MOBILE HERO â€” KEEP ONLY SLIDER DOTS */
 @media (max-width: 600px) {
   .cf-home-hero__visual-caption {
     display: none !important;
@@ -3679,7 +3687,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   QUICK BAR — TABLET VIEW
+   QUICK BAR â€” TABLET VIEW
    2 columns, third item spans full width
 ============================================================ */
 
@@ -3719,7 +3727,7 @@ margin-bottom: 20px;
 
 
 /* ============================================
-   QUICK HIGHLIGHTS — MOBILE & TABLET FONT FIX
+   QUICK HIGHLIGHTS â€” MOBILE & TABLET FONT FIX
 ============================================ */
 
 @media (max-width: 1024px) {
@@ -3777,7 +3785,7 @@ margin-bottom: 20px;
 }
 
 /* ============================================
-   SMALL MOBILE — EXTRA COMPACT
+   SMALL MOBILE â€” EXTRA COMPACT
 ============================================ */
 
 @media (max-width: 480px) {
@@ -3811,7 +3819,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE HERO — REDUCE SPACE BELOW SLIDER DOTS
+   MOBILE HERO â€” REDUCE SPACE BELOW SLIDER DOTS
 ============================================================ */
 
 @media (max-width: 600px) {
@@ -3858,7 +3866,7 @@ margin-bottom: 20px;
 }
 
 /* ============================================================
-   WHAT WE DO — MOBILE CLEANUP
+   WHAT WE DO â€” MOBILE CLEANUP
 ============================================================ */
 
 @media (max-width: 600px) {
@@ -3894,7 +3902,7 @@ margin-bottom: 20px;
 }
 
 /* ============================================================
-   WHAT WE DO — REDUCE HEADING ON TABLET / MOBILE
+   WHAT WE DO â€” REDUCE HEADING ON TABLET / MOBILE
 ============================================================ */
 
 @media (max-width: 900px) {
@@ -4015,7 +4023,7 @@ margin-bottom: 20px;
 }
 
 
-/* MOBILE — REDUCE UNIVERSITY PARTNERSHIPS HEADING */
+/* MOBILE â€” REDUCE UNIVERSITY PARTNERSHIPS HEADING */
 @media (max-width: 768px) {
   .cf-partnership-content h2 {
     font-size: 2.6rem !important;
@@ -4038,7 +4046,7 @@ margin-bottom: 20px;
   }
 }
 
-/* MOBILE — SHORTER UNIVERSITY PARTNER CTA */
+/* MOBILE â€” SHORTER UNIVERSITY PARTNER CTA */
 @media (max-width: 768px) {
   .cf-partnership-content .cf-button--gold {
     width: fit-content !important;
@@ -4050,7 +4058,7 @@ margin-bottom: 20px;
   }
 }
 
-/* MOBILE — PARTNERSHIP ECOSYSTEM: 2 COLUMNS */
+/* MOBILE â€” PARTNERSHIP ECOSYSTEM: 2 COLUMNS */
 @media (max-width: 768px) {
   .partner-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -4066,7 +4074,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE — PARTNERSHIP ECOSYSTEM: 2 COLUMNS
+   MOBILE â€” PARTNERSHIP ECOSYSTEM: 2 COLUMNS
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -4079,7 +4087,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE — STRATEGIC PARTNERS SECTION
+   MOBILE â€” STRATEGIC PARTNERS SECTION
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -4160,7 +4168,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE — CONFERENCE & EVENTS
+   MOBILE â€” CONFERENCE & EVENTS
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -4275,7 +4283,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   MOBILE — PARTNERSHIP MATERIALS
+   MOBILE â€” PARTNERSHIP MATERIALS
 ============================================================ */
 
 @media (max-width: 768px) {
@@ -4366,7 +4374,7 @@ margin-bottom: 20px;
 
 
 /* ============================================
-   HERO BUTTONS — MOBILE & TABLET
+   HERO BUTTONS â€” MOBILE & TABLET
 ============================================ */
 
 @media (max-width: 1024px) {
@@ -4415,7 +4423,7 @@ margin-bottom: 20px;
 
 
 /* ============================================================
-   HERO BUTTONS — MOBILE & TABLET SIZE FIX
+   HERO BUTTONS â€” MOBILE & TABLET SIZE FIX
    Desktop remains unchanged
 ============================================================ */
 
@@ -4868,5 +4876,115 @@ margin-bottom: 20px;
   .cf-model-step,
   .cf-matter {
     transition: none;
+  }
+}
+
+
+/* ============================================================
+   HOMEPAGE TYPOGRAPHY + VISUAL POLISH
+   Keeps the HERO heading unchanged.
+   Applies only to the non-hero homepage content.
+============================================================ */
+
+/* Reduce all homepage H2 headings outside the hero */
+.cf-home h2 {
+  font-size: clamp(1.85rem, 2.65vw, 2.7rem) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* Any H1 outside the hero follows the same refined scale */
+.cf-home section:not(.cf-home-hero) h1 {
+  font-size: clamp(2rem, 3.1vw, 3.15rem) !important;
+  line-height: 1.12 !important;
+  text-wrap: balance;
+}
+
+/* Keep headings visually consistent without changing the hero */
+.cf-section-header h2,
+.cf-vision-content h2,
+.cf-partnership-content h2,
+.cf-strategic-content h2,
+.cf-materials-grid h2,
+.cf-final-section h2,
+.cf-conference-info h2 {
+  max-width: 900px;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+/* Refine section headers for a cleaner, more intentional layout */
+.cf-section-header {
+  gap: 24px;
+}
+
+.cf-section-header > div {
+  min-width: 0;
+}
+
+.cf-section-intro {
+  max-width: 760px;
+  line-height: 1.75;
+}
+
+/* Subtle card refinement â€” preserves existing layout and colors */
+.cf-program-card,
+.cf-ecosystem-card,
+.cf-news-card,
+.cf-model-step,
+.cf-matter {
+  border-radius: 10px;
+  box-shadow: 0 10px 28px rgba(3, 27, 52, 0.075);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.cf-program-card:hover,
+.cf-ecosystem-card:hover,
+.cf-news-card:hover,
+.cf-model-step:hover,
+.cf-matter:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 38px rgba(3, 27, 52, 0.12);
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .cf-home h2 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem) !important;
+  }
+
+  .cf-home section:not(.cf-home-hero) h1 {
+    font-size: clamp(1.9rem, 4.5vw, 2.5rem) !important;
+  }
+}
+
+/* Mobile â€” hero typography remains untouched */
+@media (max-width: 600px) {
+  .cf-home h2 {
+    font-size: clamp(1.55rem, 6.2vw, 2rem) !important;
+    line-height: 1.16 !important;
+  }
+
+  .cf-home section:not(.cf-home-hero) h1 {
+    font-size: clamp(1.7rem, 7vw, 2.15rem) !important;
+    line-height: 1.16 !important;
+  }
+
+  .cf-section-header {
+    gap: 16px;
+  }
+
+  .cf-section-header h2,
+  .cf-vision-content h2,
+  .cf-partnership-content h2,
+  .cf-strategic-content h2,
+  .cf-materials-grid h2,
+  .cf-final-section h2,
+  .cf-conference-info h2 {
+    margin-bottom: 14px;
   }
 }

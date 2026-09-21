@@ -604,7 +604,7 @@ export default function About() {
                 </span>
 
                 <p>
-                  A compelling idea matters—but founders also need
+                  A compelling idea matters but founders also need
                   the ability to validate, execute, adapt, and grow.
                 </p>
 

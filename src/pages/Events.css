@@ -868,8 +868,8 @@ h1 em {
 
   border-radius: 2px;
 
-  background:
-    var(--events-navy);
+  /* background:
+    var(--events-navy); */
 }
 
 .events-calendar__photo img {

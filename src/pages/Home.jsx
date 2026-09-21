@@ -1249,7 +1249,7 @@ export default function Home() {
       ====================================================== */}
 
       <section
-        className="cf-vision-section"
+        className="cf-vision-section" 
         aria-labelledby="vision-heading"
       >
 
@@ -1277,7 +1277,7 @@ export default function Home() {
 
 
             <p>
-              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment—helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
+              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
             </p>
 
 
@@ -1668,16 +1668,26 @@ export default function Home() {
           <div className="cf-section-header">
 
             <div>
+              
+
+              <br/>
+              <br/>  
 
               <span className="cf-eyebrow">
                 THE CONTINENTAL FOUNDERS DIFFERENCE
               </span>
+
+              <br/>
+
+              
 
               <h2 id="who-we-are-heading">
                 Africa + Diaspora
                 <br />
                 <em>+ Global Ecosystem.</em>
               </h2>
+              <br/>
+              <br/>
 
             </div>
 
@@ -1751,6 +1761,10 @@ export default function Home() {
 
           <div className="cf-section-header">
 
+            <br/>
+            <br/>
+            <br/>
+
             <div>
 
               <span className="cf-eyebrow">
@@ -1768,6 +1782,7 @@ export default function Home() {
               </p>
 
               <br />
+              <br/>
 
             </div>
 
@@ -1842,6 +1857,9 @@ export default function Home() {
           <div className="cf-section-header">
 
             <div>
+              <br/>
+              <br/>
+              <br/>
 
               <span className="cf-eyebrow">
                 OUR MODEL
@@ -1854,6 +1872,7 @@ export default function Home() {
                   global impact.
                 </em>
               </h2>
+              <br/>
 
             </div>
 
@@ -1941,6 +1960,9 @@ export default function Home() {
 
           <div className="cf-section-header">
 
+            <br/>
+            <br/>
+
             <div>
 
               <span className="cf-eyebrow">
@@ -1957,8 +1979,9 @@ export default function Home() {
 
 
               <p className="cf-section-intro">
-                CF Research Division — Evidence. Insight. Impact.
+                CF Research Division Evidence. Insight. Impact.
               </p>
+              <br/>
 
             </div>
 
@@ -1998,6 +2021,9 @@ export default function Home() {
         </div>
 
       </section>
+
+      <br/>
+      <br/>
 
 
       {/* =====================================================
@@ -2085,6 +2111,9 @@ export default function Home() {
 
           <div className="cf-section-header">
 
+            <br/>
+            <br/>
+
             <div>
 
               <span className="cf-eyebrow">
@@ -2169,6 +2198,7 @@ export default function Home() {
               <span>
                 Explore Strategic Partnerships
               </span>
+              
 
               <ArrowRight
                 size={17}
@@ -2182,6 +2212,9 @@ export default function Home() {
         </div>
 
       </section>
+
+      <br/>
+      <br/>
 
 
       {/* =====================================================
@@ -2615,6 +2648,8 @@ export default function Home() {
         <div className="cf-container">
 
           <div className="cf-section-header">
+            <br/>
+            <br/>
 
             <div>
 
@@ -2704,6 +2739,9 @@ export default function Home() {
         <div className="cf-container">
 
           <div className="cf-section-header">
+            <br/>
+            <br/>
+            <br/>
 
             <div>
 
@@ -2730,6 +2768,7 @@ export default function Home() {
           </div>
 
           <br />
+          <br/>
 
 
           <div className="cf-program-grid">
@@ -2792,7 +2831,11 @@ export default function Home() {
               className="cf-text-link"
             >
 
+              <br/>
+              
+
               <span>
+                
                 Build With Us
               </span>
 
@@ -2808,6 +2851,9 @@ export default function Home() {
         </div>
 
       </section>
+
+      <br/>
+      <br/>
 
 
       {/* =====================================================

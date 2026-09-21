@@ -614,7 +614,7 @@ export default function Events() {
                     <ArrowRight
                       size={16}
                       strokeWidth={1.7}
-                      aria-hidden="true"
+                      aria-hidden="true" 
                     />
                   </button>
                 )}

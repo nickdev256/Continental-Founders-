@@ -10,9 +10,6 @@ import {
   ArrowUpRight, 
   ChevronRight,
   Globe2,
-  Instagram,
-  Linkedin,
-  Youtube,
 } from "lucide-react";
 
 import "./Footer.css";
@@ -74,40 +71,26 @@ const navigation = {
 ============================================================ */
 
 const socials = [
-
   {
-    label:
-      "LinkedIn",
-
-    icon:
-      Linkedin,
-
-    url:
-      "https://www.linkedin.com/company/145206611/admin/dashboard/",
+    label: "LinkedIn",
+    image: "/assets/link.png",
+    url: "https://www.linkedin.com/company/145206611/admin/dashboard/",
   },
-
   {
-    label:
-      "Instagram",
-
-    icon:
-      Instagram,
-
-    url:
-      "https://www.instagram.com/continentalfounderstm/",
+    label: "Instagram",
+    image: "/assets/ig.png",
+    url: "https://www.instagram.com/continentalfounderstm/",
   },
-
   {
-    label:
-      "YouTube",
-
-    icon:
-      Youtube,
-
-    url:
-      "https://www.youtube.com/@ContinentalFounders",
+    label: "Facebook",
+    image: "/assets/fb.png",
+    url: "https://www.facebook.com/YOUR_PAGE",
   },
-
+  {
+    label: "YouTube",
+    image: "/assets/ut.png",
+    url: "https://www.youtube.com/@ContinentalFounders",
+  },
 ];
 
 
@@ -397,7 +380,7 @@ export default function Footer() {
 
       <section className="cf-footer__main">
 
-        <div className="cf-footer__container">
+        <div className="cf-footer__container"> 
 
           <div className="cf-footer__layout">
 
@@ -414,7 +397,7 @@ export default function Footer() {
               >
 
                 <img
-                  src="/assets/continental-founders-logo.webp"
+                  src="/assets/logo.png"
                   alt="Continental Founders"
                 />
 
@@ -930,43 +913,40 @@ export default function Footer() {
               aria-label="Social media"
             >
 
-              {socials.map(
-                (
-                  social
-                ) => {
+              {socials.map((social) => {
+                const Icon = social.icon;
 
-                  const Icon =
-                    social.icon;
-
-
-                  return (
-
-                    <a
-                      key={
-                        social.label
-                      }
-                      href={
-                        social.url
-                      }
-                      className="cf-footer__social"
-                      aria-label={
-                        social.label
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-
+                return (
+                  <a
+                    key={social.label}
+                    href={social.url}
+                    className="cf-footer__social"
+                    aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {social.image ? (
+                      <img
+                        src={social.image}
+                        alt=""
+                        className="cf-footer__social-icon"
+                        style={{
+                          width: 30,
+                          height: 30,
+                          objectFit: "contain",
+                          display: "block",
+                          flexShrink: 0,
+                        }}
+                      />
+                    ) : Icon ? (
                       <Icon
-                        size={19}
+                        size={30}
                         strokeWidth={1.6}
                       />
-
-                    </a>
-
-                  );
-
-                }
-              )}
+                    ) : null}
+                  </a>
+                );
+              })}
 
             </div>
 

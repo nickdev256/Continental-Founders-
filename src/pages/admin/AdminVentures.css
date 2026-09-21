@@ -40,7 +40,6 @@
   gap: 2rem;
 
   margin-bottom: 1.2rem;
-
   padding: 1.5rem 1.6rem;
 
   border-radius: 14px;
@@ -85,7 +84,6 @@
     clamp(1.75rem, 3vw, 2.25rem);
 
   line-height: 1.08;
-
   letter-spacing: -0.035em;
 }
 
@@ -237,7 +235,6 @@
   color: var(--venture-navy);
 
   font-size: 1.35rem;
-
   line-height: 1;
 }
 
@@ -273,7 +270,6 @@
   flex: 1 1 390px;
 
   max-width: 470px;
-
   min-height: 42px;
 
   padding: 0 0.85rem;
@@ -353,13 +349,15 @@
 }
 
 
-/* FILTER SELECTS */
-
 .admin-ventures__toolbar > select {
   min-width: 135px;
   min-height: 42px;
 
-  padding: 0 2.1rem 0 0.75rem;
+  padding:
+    0
+    2.1rem
+    0
+    0.75rem;
 
   border:
     1px solid
@@ -429,10 +427,11 @@
 
 
 /* ============================================================
-   TABLE HEADER
+   TABLE
 ============================================================ */
 
-.admin-ventures__table-header {
+.admin-ventures__table-header,
+.admin-ventures__row {
   display: grid;
 
   grid-template-columns:
@@ -446,7 +445,10 @@
   align-items: center;
 
   gap: 1rem;
+}
 
+
+.admin-ventures__table-header {
   min-height: 44px;
 
   padding: 0 1rem;
@@ -463,14 +465,9 @@
   font-weight: 800;
 
   letter-spacing: 0.08em;
-
   text-transform: uppercase;
 }
 
-
-/* ============================================================
-   LIST
-============================================================ */
 
 .admin-ventures__list {
   display: flex;
@@ -479,20 +476,6 @@
 
 
 .admin-ventures__row {
-  display: grid;
-
-  grid-template-columns:
-    minmax(230px, 1.5fr)
-    minmax(100px, 0.7fr)
-    minmax(110px, 0.7fr)
-    minmax(120px, 0.75fr)
-    minmax(95px, 0.6fr)
-    28px;
-
-  align-items: center;
-
-  gap: 1rem;
-
   width: 100%;
   min-height: 78px;
 
@@ -543,6 +526,10 @@
   color: var(--venture-gold);
 }
 
+
+/* ============================================================
+   VENTURE LIST ITEM
+============================================================ */
 
 .admin-ventures__venture {
   display: flex;
@@ -602,7 +589,6 @@
   color: var(--venture-navy);
 
   font-size: 0.82rem;
-
   line-height: 1.3;
 
   text-overflow: ellipsis;
@@ -656,7 +642,7 @@
 
 
 /* ============================================================
-   CFCV TRACK BADGES
+   TRACK BADGES
 ============================================================ */
 
 .admin-ventures__track {
@@ -928,8 +914,7 @@
   background:
     rgba(4, 14, 24, 0.55);
 
-  backdrop-filter:
-    blur(3px);
+  backdrop-filter: blur(3px);
 }
 
 
@@ -938,12 +923,7 @@
 ============================================================ */
 
 .admin-ventures__drawer {
-  width:
-    min(
-      100%,
-      590px
-    );
-
+  width: min(100%, 590px);
   height: 100vh;
 
   overflow-y: auto;
@@ -958,6 +938,11 @@
   animation:
     ventureDrawerIn
     0.25s ease;
+}
+
+
+.admin-ventures__form-drawer {
+  width: min(100%, 760px);
 }
 
 
@@ -978,15 +963,6 @@
 }
 
 
-.admin-ventures__form-drawer {
-  width:
-    min(
-      100%,
-      760px
-    );
-}
-
-
 /* ============================================================
    DRAWER HEADER
 ============================================================ */
@@ -999,7 +975,6 @@
   z-index: 20;
 
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
 
@@ -1077,12 +1052,15 @@
 ============================================================ */
 
 .admin-ventures__drawer-body {
-  padding: 1.4rem 1.45rem 2rem;
+  padding:
+    1.4rem
+    1.45rem
+    2rem;
 }
 
 
 /* ============================================================
-   HERO PREVIEW
+   HERO / PROFILE
 ============================================================ */
 
 .admin-ventures__hero-preview {
@@ -1099,16 +1077,14 @@
 
 
 .admin-ventures__hero-preview img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
   object-fit: cover;
 }
 
-
-/* ============================================================
-   PROFILE
-============================================================ */
 
 .admin-ventures__profile {
   display: flex;
@@ -1154,6 +1130,8 @@
 
 
 .admin-ventures__profile-logo img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
@@ -1193,12 +1171,11 @@
 
 
 /* ============================================================
-   DETAIL ROW
+   DETAILS
 ============================================================ */
 
 .admin-ventures__detail-row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -1221,10 +1198,6 @@
   font-weight: 700;
 }
 
-
-/* ============================================================
-   DETAILS GRID
-============================================================ */
 
 .admin-ventures__detail-grid {
   display: grid;
@@ -1289,10 +1262,6 @@
 }
 
 
-/* ============================================================
-   WEBSITE
-============================================================ */
-
 .admin-ventures__website {
   display: inline-flex;
   align-items: center;
@@ -1314,10 +1283,6 @@
   color: var(--venture-navy);
 }
 
-
-/* ============================================================
-   DRAWER ACTIONS
-============================================================ */
 
 .admin-ventures__drawer-actions {
   display: flex;
@@ -1357,7 +1322,7 @@
 
 
 /* ============================================================
-   5-STEP CFCV FORM
+   5 STEP WIZARD
 ============================================================ */
 
 .admin-ventures__steps {
@@ -1400,7 +1365,6 @@
   position: absolute;
 
   top: 14px;
-
   left:
     calc(50% + 18px);
 
@@ -1499,7 +1463,10 @@
 ============================================================ */
 
 .admin-ventures__form {
-  padding: 1.4rem 1.45rem 2rem;
+  padding:
+    1.4rem
+    1.45rem
+    2rem;
 }
 
 
@@ -1526,10 +1493,6 @@
   line-height: 1.5;
 }
 
-
-/* ============================================================
-   ERROR
-============================================================ */
 
 .admin-ventures__form-error {
   margin-bottom: 1rem;
@@ -1570,7 +1533,7 @@
 }
 
 
-.admin-ventures__field label {
+.admin-ventures__field > label {
   color: var(--venture-navy);
 
   font-size: 0.7rem;
@@ -1578,11 +1541,11 @@
 }
 
 
-.admin-ventures__field input,
+.admin-ventures__field input:not([type="file"]),
 .admin-ventures__field textarea,
 .admin-ventures__field select,
 .admin-ventures__repeat-row input,
-.admin-ventures__opportunity-editor input,
+.admin-ventures__opportunity-editor input:not([type="radio"]),
 .admin-ventures__opportunity-editor textarea {
   width: 100%;
 
@@ -1607,10 +1570,10 @@
 }
 
 
-.admin-ventures__field input,
+.admin-ventures__field input:not([type="file"]),
 .admin-ventures__field select,
 .admin-ventures__repeat-row input,
-.admin-ventures__opportunity-editor input {
+.admin-ventures__opportunity-editor input:not([type="radio"]) {
   min-height: 42px;
 
   padding: 0 0.8rem;
@@ -1629,11 +1592,11 @@
 }
 
 
-.admin-ventures__field input:focus,
+.admin-ventures__field input:not([type="file"]):focus,
 .admin-ventures__field textarea:focus,
 .admin-ventures__field select:focus,
 .admin-ventures__repeat-row input:focus,
-.admin-ventures__opportunity-editor input:focus,
+.admin-ventures__opportunity-editor input:not([type="radio"]):focus,
 .admin-ventures__opportunity-editor textarea:focus {
   border-color:
     rgba(199, 154, 69, 0.75);
@@ -1651,10 +1614,6 @@
 }
 
 
-/* ============================================================
-   FORM GRID
-============================================================ */
-
 .admin-ventures__form-grid {
   display: grid;
 
@@ -1666,16 +1625,134 @@
 
 
 /* ============================================================
-   INPUT ICON
+   FILE UPLOAD — NEW
 ============================================================ */
 
-.admin-ventures__input-icon {
+.admin-ventures__upload {
+  position: relative;
+
   display: flex;
   align-items: center;
 
-  gap: 0.5rem;
+  gap: 0.85rem;
 
-  padding-left: 0.75rem;
+  width: 100%;
+  min-height: 86px;
+
+  padding: 0.9rem 1rem;
+
+  overflow: hidden;
+
+  border:
+    1px dashed
+    rgba(7, 26, 45, 0.24);
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #fafbfd 100%
+    );
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.admin-ventures__upload:hover {
+  transform: translateY(-1px);
+
+  border-color:
+    rgba(199, 154, 69, 0.7);
+
+  background:
+    rgba(199, 154, 69, 0.035);
+
+  box-shadow:
+    0 8px 22px
+    rgba(7, 26, 45, 0.05);
+}
+
+
+.admin-ventures__upload:focus-within {
+  border-color:
+    var(--venture-gold);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(199, 154, 69, 0.09);
+}
+
+
+.admin-ventures__upload--hero {
+  min-height: 100px;
+}
+
+
+.admin-ventures__upload-icon {
+  flex: 0 0 auto;
+
+  display: grid;
+  place-items: center;
+
+  width: 45px;
+  height: 45px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(199, 154, 69, 0.1);
+
+  color: var(--venture-gold);
+}
+
+
+.admin-ventures__upload-copy {
+  min-width: 0;
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  gap: 0.22rem;
+}
+
+
+.admin-ventures__upload-copy strong {
+  color: var(--venture-navy);
+
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+
+.admin-ventures__upload-copy span {
+  color: var(--venture-muted);
+
+  font-size: 0.64rem;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+
+.admin-ventures__upload-button {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 34px;
+
+  padding: 0.5rem 0.75rem;
 
   border:
     1px solid
@@ -1684,35 +1761,173 @@
   border-radius: 8px;
 
   background: #ffffff;
-}
 
+  color: var(--venture-navy);
 
-.admin-ventures__input-icon > svg {
-  flex: 0 0 auto;
-
-  color: var(--venture-gold);
-}
-
-
-.admin-ventures__input-icon input {
-  border: 0;
-
-  box-shadow: none;
-}
-
-
-.admin-ventures__input-icon:focus-within {
-  border-color:
-    rgba(199, 154, 69, 0.75);
+  font-size: 0.66rem;
+  font-weight: 800;
 
   box-shadow:
-    0 0 0 3px
-    rgba(199, 154, 69, 0.09);
+    0 3px 9px
+    rgba(7, 26, 45, 0.04);
+}
+
+
+.admin-ventures__upload:hover
+.admin-ventures__upload-button {
+  border-color:
+    rgba(199, 154, 69, 0.45);
+
+  color: #866529;
+}
+
+
+.admin-ventures__upload input[type="file"] {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  overflow: hidden;
+
+  opacity: 0;
+
+  pointer-events: none;
 }
 
 
 /* ============================================================
-   IMAGE PREVIEW
+   UPLOADED MEDIA PREVIEW — NEW
+============================================================ */
+
+.admin-ventures__uploaded-media {
+  display: grid;
+
+  grid-template-columns:
+    150px
+    minmax(0, 1fr);
+
+  gap: 1rem;
+
+  align-items: center;
+
+  margin:
+    -0.2rem
+    0
+    1rem;
+
+  padding: 0.8rem;
+
+  border:
+    1px solid
+    var(--venture-border);
+
+  border-radius: 11px;
+
+  background: #fafbfd;
+}
+
+
+.admin-ventures__uploaded-media
+.admin-ventures__image-preview {
+  width: 150px;
+  height: 95px;
+
+  margin: 0;
+
+  border-radius: 8px;
+}
+
+
+.admin-ventures__uploaded-media
+.admin-ventures__image-preview--logo {
+  width: 95px;
+  height: 95px;
+
+  justify-self: center;
+
+  background: #ffffff;
+}
+
+
+.admin-ventures__uploaded-media-info {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+
+.admin-ventures__uploaded-media-info > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.22rem;
+}
+
+
+.admin-ventures__uploaded-media-info strong {
+  overflow: hidden;
+
+  color: var(--venture-navy);
+
+  font-size: 0.72rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.admin-ventures__uploaded-media-info span {
+  color: var(--venture-muted);
+
+  font-size: 0.64rem;
+}
+
+
+.admin-ventures__uploaded-media-info button {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.35rem;
+
+  min-height: 33px;
+
+  padding: 0.45rem 0.65rem;
+
+  border:
+    1px solid
+    rgba(163, 66, 66, 0.18);
+
+  border-radius: 7px;
+
+  background:
+    rgba(163, 66, 66, 0.045);
+
+  color: var(--venture-red);
+
+  font-size: 0.65rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.admin-ventures__uploaded-media-info button:hover {
+  background:
+    rgba(163, 66, 66, 0.09);
+}
+
+
+/* ============================================================
+   GENERIC IMAGE PREVIEW
 ============================================================ */
 
 .admin-ventures__image-preview {
@@ -1736,6 +1951,8 @@
 
 
 .admin-ventures__image-preview img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
@@ -1762,7 +1979,7 @@
 
 
 /* ============================================================
-   SUBSECTION
+   SUBSECTIONS
 ============================================================ */
 
 .admin-ventures__subsection {
@@ -1782,7 +1999,6 @@
 
 .admin-ventures__subsection-header {
   display: flex;
-
   align-items: flex-start;
   justify-content: space-between;
 
@@ -1838,9 +2054,16 @@
 }
 
 
+.admin-ventures__subsection-header button:hover {
+  border-color:
+    rgba(199, 154, 69, 0.4);
+
+  color: #866529;
+}
+
+
 /* ============================================================
-   CFCV TRACK SELECTION
-   Uses opportunity-editor markup from JSX step 1
+   TRACK SELECTION
 ============================================================ */
 
 .admin-ventures__subsection
@@ -1865,6 +2088,12 @@
     border-color 0.18s ease,
     background 0.18s ease,
     box-shadow 0.18s ease;
+}
+
+
+.admin-ventures__subsection
+> label.admin-ventures__opportunity-editor:last-child {
+  margin-bottom: 0;
 }
 
 
@@ -1907,7 +2136,6 @@
 input[type="radio"] {
   width: 16px;
   height: 16px;
-
   min-height: auto;
 
   padding: 0;
@@ -1952,7 +2180,8 @@ p {
   display: grid;
 
   grid-template-columns:
-    1fr 36px;
+    1fr
+    36px;
 
   gap: 0.5rem;
 
@@ -2037,7 +2266,6 @@ div.admin-ventures__opportunity-editor:last-child {
 
 .admin-ventures__founder-editor-header {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -2076,16 +2304,46 @@ div.admin-ventures__opportunity-editor:last-child {
 }
 
 
-.admin-ventures__founder-image-preview {
-  width: 86px;
-  height: 86px;
+.admin-ventures__founder-editor-header button:hover {
+  background:
+    rgba(178, 72, 72, 0.09);
+}
 
-  overflow: hidden;
+
+/* ============================================================
+   FOUNDER UPLOAD PREVIEW — NEW
+============================================================ */
+
+.admin-ventures__founder-upload-preview {
+  display: flex;
+  align-items: center;
+
+  gap: 0.85rem;
 
   margin:
-    -0.2rem
+    -0.15rem
     0
-    0.9rem;
+    1rem;
+
+  padding: 0.75rem;
+
+  border:
+    1px solid
+    var(--venture-border);
+
+  border-radius: 10px;
+
+  background: #fafbfd;
+}
+
+
+.admin-ventures__founder-image-preview {
+  flex: 0 0 auto;
+
+  width: 82px;
+  height: 82px;
+
+  overflow: hidden;
 
   border:
     1px solid
@@ -2098,6 +2356,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
 .admin-ventures__founder-image-preview img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
@@ -2105,11 +2365,71 @@ div.admin-ventures__opportunity-editor:last-child {
 }
 
 
+.admin-ventures__founder-upload-preview > div:last-child {
+  min-width: 0;
+
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+}
+
+
+.admin-ventures__founder-upload-preview strong {
+  overflow: hidden;
+
+  color: var(--venture-navy);
+
+  font-size: 0.7rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.admin-ventures__founder-upload-preview button {
+  flex: 0 0 auto;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.35rem;
+
+  padding: 0.45rem 0.6rem;
+
+  border:
+    1px solid
+    rgba(163, 66, 66, 0.18);
+
+  border-radius: 7px;
+
+  background:
+    rgba(163, 66, 66, 0.045);
+
+  color: var(--venture-red);
+
+  font-size: 0.64rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.admin-ventures__founder-upload-preview button:hover {
+  background:
+    rgba(163, 66, 66, 0.09);
+}
+
+
 /* ============================================================
-   PUBLISHING / CATALYTIC NOTE
+   PUBLISHING / CATALYTIC
 ============================================================ */
 
 .admin-ventures__publishing-note {
+  margin-top: 0.35rem;
+
   padding: 0.8rem 0.9rem;
 
   border:
@@ -2183,6 +2503,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
 .admin-ventures__review-hero img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
@@ -2238,6 +2560,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
 .admin-ventures__review-logo img {
+  display: block;
+
   width: 100%;
   height: 100%;
 
@@ -2259,7 +2583,6 @@ div.admin-ventures__opportunity-editor:last-child {
   font-weight: 800;
 
   letter-spacing: 0.08em;
-
   text-transform: uppercase;
 }
 
@@ -2345,7 +2668,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
 .admin-ventures__review-wide {
-  grid-column: 1 / -1;
+  grid-column:
+    1 / -1;
 }
 
 
@@ -2386,7 +2710,6 @@ div.admin-ventures__opportunity-editor:last-child {
 
 .admin-ventures__form-actions {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
@@ -2416,7 +2739,6 @@ div.admin-ventures__opportunity-editor:last-child {
 .admin-ventures__save,
 .admin-ventures__delete {
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
@@ -2432,6 +2754,11 @@ div.admin-ventures__opportunity-editor:last-child {
   font-weight: 800;
 
   cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
 }
 
 
@@ -2525,7 +2852,8 @@ div.admin-ventures__opportunity-editor:last-child {
   }
 
 
-  .admin-ventures__table-header {
+  .admin-ventures__table-header,
+  .admin-ventures__row {
     grid-template-columns:
       minmax(220px, 1.4fr)
       minmax(100px, 0.7fr)
@@ -2541,16 +2869,6 @@ div.admin-ventures__opportunity-editor:last-child {
   }
 
 
-  .admin-ventures__row {
-    grid-template-columns:
-      minmax(220px, 1.4fr)
-      minmax(100px, 0.7fr)
-      minmax(110px, 0.7fr)
-      minmax(95px, 0.65fr)
-      28px;
-  }
-
-
   .admin-ventures__row
   > .admin-ventures__meta:nth-child(4) {
     display: none;
@@ -2560,7 +2878,7 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
 /* ============================================================
-   MOBILE / SMALL TABLET
+   SMALL TABLET
 ============================================================ */
 
 @media (max-width: 820px) {
@@ -2586,7 +2904,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
   .admin-ventures__search {
-    grid-column: 1 / -1;
+    grid-column:
+      1 / -1;
 
     width: 100%;
   }
@@ -2599,7 +2918,8 @@ div.admin-ventures__opportunity-editor:last-child {
 
 
   .admin-ventures__count {
-    grid-column: 1 / -1;
+    grid-column:
+      1 / -1;
 
     margin-left: 0;
   }
@@ -2634,11 +2954,7 @@ div.admin-ventures__opportunity-editor:last-child {
   }
 
 
-  .admin-ventures__detail-grid {
-    grid-template-columns: 1fr;
-  }
-
-
+  .admin-ventures__detail-grid,
   .admin-ventures__form-grid {
     grid-template-columns: 1fr;
   }
@@ -2658,6 +2974,19 @@ div.admin-ventures__opportunity-editor:last-child {
 
   .admin-ventures__step small {
     font-size: 0.55rem;
+  }
+
+
+  .admin-ventures__uploaded-media {
+    grid-template-columns:
+      115px
+      minmax(0, 1fr);
+  }
+
+
+  .admin-ventures__uploaded-media
+  .admin-ventures__image-preview {
+    width: 115px;
   }
 
 }
@@ -2738,6 +3067,71 @@ div.admin-ventures__opportunity-editor:last-child {
   }
 
 
+  .admin-ventures__upload {
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+
+    padding: 0.85rem;
+  }
+
+
+  .admin-ventures__upload-copy {
+    min-width:
+      calc(100% - 60px);
+  }
+
+
+  .admin-ventures__upload-button {
+    width: 100%;
+
+    margin-top: 0.25rem;
+  }
+
+
+  .admin-ventures__uploaded-media {
+    grid-template-columns: 1fr;
+
+    align-items: stretch;
+  }
+
+
+  .admin-ventures__uploaded-media
+  .admin-ventures__image-preview {
+    width: 100%;
+    height: 160px;
+  }
+
+
+  .admin-ventures__uploaded-media
+  .admin-ventures__image-preview--logo {
+    width: 110px;
+    height: 110px;
+
+    justify-self: start;
+  }
+
+
+  .admin-ventures__uploaded-media-info {
+    align-items: flex-start;
+  }
+
+
+  .admin-ventures__founder-upload-preview {
+    align-items: flex-start;
+  }
+
+
+  .admin-ventures__founder-upload-preview
+  > div:last-child {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 0.6rem;
+  }
+
+
   .admin-ventures__review {
     grid-template-columns: 1fr;
   }
@@ -2769,11 +3163,6 @@ div.admin-ventures__opportunity-editor:last-child {
 
   .admin-ventures__delete {
     width: 100%;
-  }
-
-
-  .admin-ventures__subsection-header {
-    gap: 0.7rem;
   }
 
 }
@@ -2832,6 +3221,25 @@ div.admin-ventures__opportunity-editor:last-child {
     width: 100%;
   }
 
+
+  .admin-ventures__founder-upload-preview {
+    flex-direction: column;
+  }
+
+
+  .admin-ventures__uploaded-media-info {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .admin-ventures__uploaded-media-info button {
+    justify-content: center;
+
+    width: 100%;
+  }
+
 }
 
 
@@ -2843,7 +3251,8 @@ div.admin-ventures__opportunity-editor:last-child {
 .admin-ventures input:focus-visible,
 .admin-ventures textarea:focus-visible,
 .admin-ventures select:focus-visible,
-.admin-ventures a:focus-visible {
+.admin-ventures a:focus-visible,
+.admin-ventures__upload:focus-within {
   outline:
     2px solid
     var(--venture-gold);
@@ -2862,6 +3271,7 @@ div.admin-ventures__opportunity-editor:last-child {
   .admin-ventures__row,
   .admin-ventures__drawer,
   .admin-ventures__summary-card,
+  .admin-ventures__upload,
   .admin-ventures__field input,
   .admin-ventures__field textarea,
   .admin-ventures__field select,

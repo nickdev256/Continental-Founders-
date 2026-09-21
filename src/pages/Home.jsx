@@ -24,6 +24,7 @@ import {
   Landmark,
   TrendingUp,
   Users,
+  Globe2,
   Lightbulb,
   Rocket,
   Search,
@@ -42,8 +43,7 @@ import "./Home.css";
 // ============================================================
 
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 
 // ============================================================
@@ -358,6 +358,15 @@ export default function Home() {
 
 
     async function loadFeaturedEvent() {
+      // If no API URL is configured, keep the homepage usable
+      // without attempting a localhost request that will fail.
+      if (!API_URL) {
+        setFeaturedEvent(null);
+        setEventError("");
+        setEventLoading(false);
+        return;
+      }
+
       try {
         setEventLoading(
           true
@@ -519,10 +528,13 @@ export default function Home() {
         }
 
 
-        console.error(
-          "Homepage event loading error:",
-          error
-        );
+        // Keep the homepage usable when the CMS/API is temporarily offline.
+        if (import.meta.env.DEV) {
+          console.warn(
+            "Homepage events are temporarily unavailable:",
+            error?.message || error
+          );
+        }
 
 
         setFeaturedEvent(
@@ -574,6 +586,9 @@ export default function Home() {
 
     video.muted =
       false;
+
+    // Force the browser to load the current source.
+    video.load();
 
 
     const handlePlay =
@@ -1054,7 +1069,7 @@ export default function Home() {
               <div className="cf-section-marker">
 
                 <strong>
-                  A CROSS-CONTINENTAL INITIATIVE
+                  CONTINENTAL FOUNDERS
                 </strong>
 
               </div>
@@ -1062,38 +1077,20 @@ export default function Home() {
 
               <h1 id="home-main-heading">
 
-                Bridging Africa
+                Empowering Global Founders.
                 <br />
 
-                and America through
-                <br />
-
-                <span>
-                  education,
-                </span>
-
-                <br />
-
-                innovation, &{" "}
+                Building a More Inclusive,{" "}
 
                 <em>
-                  opportunity.
+                  Prosperous World.
                 </em>
 
               </h1>
 
 
               <p className="cf-home-hero__lead">
-                Continental Founders is a
-                cross-continental nonprofit
-                initiative connecting founders,
-                universities, businesses,
-                institutions, and opportunity
-                networks across Africa and the
-                United States through
-                entrepreneurship, innovation,
-                education, leadership development,
-                and strategic collaboration.
+                Continental Founders is a nonprofit organization building an interconnected ecosystem where founders, researchers, universities, corporations, investors, diaspora leaders, and global partners work together to transform entrepreneurial potential into sustainable economic impact.
               </p>
 
 
@@ -1105,7 +1102,7 @@ export default function Home() {
                 >
 
                   <span>
-                    Schedule a Meeting
+                    Partner With Us
                   </span>
 
                   <CalendarDays
@@ -1123,7 +1120,7 @@ export default function Home() {
                 >
 
                   <span>
-                    Explore Our Model
+                    Explore Our Ecosystem
                   </span>
 
                   <ArrowRight
@@ -1248,240 +1245,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          QUICK HIGHLIGHTS
-      ====================================================== */}
-
-      <div className="cf-quick-bar">
-
-        <div className="cf-container cf-quick-bar__grid">
-
-          <QuickHighlight
-            number="01"
-            title="University Partnerships"
-            text="Africa × United States"
-          />
-
-          <QuickHighlight
-            number="02"
-            title="Innovation & Entrepreneurship"
-            text="Ideas into practical opportunities"
-          />
-
-          <QuickHighlight
-            number="03"
-            title="Leadership Development"
-            text="Preparing the next generation"
-          />
-
-        </div>
-
-      </div>
-
-
-      {/* =====================================================
-          02 — WHO WE ARE
-      ====================================================== */}
-
-      <section
-        className="cf-section cf-section-white"
-        aria-labelledby="who-we-are-heading"
-      >
-
-        <div className="cf-container">
-
-          <div className="cf-section-header">
-
-            <div>
-
-              <span className="cf-eyebrow">
-                WHO WE ARE
-              </span>
-
-              <h2 id="who-we-are-heading">
-                Building strategic
-                partnerships that create{" "}
-                <em>
-                  opportunity
-                </em>{" "}
-                in both directions.
-              </h2>
-
-            </div>
-
-          </div>
-
-
-          <div className="cf-who-grid">
-
-            <div className="cf-who-visual">
-
-              <img
-                src="/assets/images/africa-america-map.webp"
-                alt="Africa and the United States connected through Continental Founders partnerships"
-                loading="lazy"
-                decoding="async"
-              />
-
-            </div>
-
-
-            <div className="cf-who-content">
-
-              <p>
-                Continental Founders brings
-                universities, students,
-                entrepreneurs, researchers,
-                businesses, government leaders,
-                investors, and other strategic
-                partners together across Africa
-                and the United States.
-              </p>
-
-              <p>
-                We are developing a collaborative
-                platform where institutions can
-                exchange knowledge, develop
-                entrepreneurial ideas, strengthen
-                leadership capacity, and create
-                practical pathways for meaningful
-                international collaboration.
-              </p>
-
-              <p>
-                At the heart of the initiative is
-                a simple principle: partnership
-                should create value for everyone
-                involved.
-              </p>
-
-
-              <Link
-                to="/about"
-                className="cf-text-link"
-              >
-
-                <span>
-                  Discover Our Story
-                </span>
-
-                <ArrowRight
-                  size={17}
-                  aria-hidden="true"
-                />
-
-              </Link>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* =====================================================
-          03 — WHAT WE DO
-      ====================================================== */}
-
-      <section
-        className="cf-section cf-section-soft"
-        aria-labelledby="what-we-do-heading"
-      >
-
-        <div className="cf-container">
-
-          <div className="cf-section-header">
-
-            <div>
-
-              <span className="cf-eyebrow">
-                WHAT WE DO
-              </span>
-
-
-              <h2 id="what-we-do-heading">
-                Creating pathways for{" "}
-                <em>
-                  institutions, ideas,
-                </em>{" "}
-                and people to work across
-                borders.
-              </h2>
-
-
-              <p className="cf-section-intro">
-                We connect universities,
-                entrepreneurs, businesses,
-                investors, government leaders,
-                and emerging leaders to create
-                meaningful opportunities between
-                Africa and the United States.
-              </p>
-
-              <br />
-
-            </div>
-
-          </div>
-
-
-          <div className="cf-program-grid">
-
-            <ProgramCard
-              number="01"
-              title="University Partnerships"
-              text="We work with universities to build meaningful institutional relationships between Africa and the United States."
-            />
-
-            <ProgramCard
-              number="02"
-              title="Innovation & Entrepreneurship"
-              text="Students and partners explore opportunities, develop ideas, and transform practical challenges into entrepreneurial possibilities."
-            />
-
-            <ProgramCard
-              number="03"
-              title="Strategic Collaboration"
-              text="Businesses, government, investors, and institutions contribute expertise, resources, networks, and opportunities."
-            />
-
-            <ProgramCard
-              number="04"
-              title="Leadership Development"
-              text="We help prepare emerging leaders with international exposure, collaboration experience, and practical leadership opportunities."
-            />
-
-          </div>
-
-
-          <div className="cf-centered-link">
-
-            <Link
-              to="/programs"
-              className="cf-text-link"
-            >
-
-              <span>
-                Explore Our Programs
-              </span>
-
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* =====================================================
-          04 — VISION + VIDEO
+          02 — VISION + VIDEO
       ====================================================== */}
 
       <section
@@ -1496,36 +1260,24 @@ export default function Home() {
             <div className="cf-section-marker cf-section-marker--light">
 
               <strong>
-                OUR VISION
+                FROM POTENTIAL TO GLOBAL IMPACT
               </strong>
 
             </div>
 
 
             <h2 id="vision-heading">
-              A stronger relationship
-              between Africa and America.
+              We Build Founders. We Connect Ecosystems. We Create Opportunity.
             </h2>
 
 
             <p>
-              We envision a future where
-              universities and institutions
-              across both continents work
-              together as equal partners to
-              expand education, innovation,
-              entrepreneurship, leadership,
-              and opportunity.
+              Continental Founders operates at the intersection of entrepreneurship, research, global markets, investment, and economic development.
             </p>
 
 
             <p>
-              Continental Founders seeks to
-              create relationships that move
-              beyond traditional exchanges
-              toward practical collaboration
-              and long-term institutional
-              impact.
+              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment—helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
             </p>
 
 
@@ -1535,7 +1287,7 @@ export default function Home() {
             >
 
               <span>
-                Learn More About Our Vision
+                Explore Our Ecosystem
               </span>
 
               <ArrowRight
@@ -1560,9 +1312,16 @@ export default function Home() {
                 videoRef
               }
               playsInline
-              preload="metadata"
+              preload="auto"
               className="cf-video__player"
               aria-label="Continental Founders video"
+              onClick={toggleVideo}
+              onLoadedData={() => {
+                const video = videoRef.current;
+                if (video) {
+                  setDuration(video.duration || 0);
+                }
+              }}
             >
 
               <source
@@ -1736,6 +1495,339 @@ export default function Home() {
       </section>
 
 
+
+ {/* =====================================================
+    QUICK HIGHLIGHTS
+====================================================== */}
+
+<section className="cf-impact-highlights">
+  <div className="cf-container">
+
+    {/* =====================================================
+        SECTION HEADER
+    ====================================================== */}
+
+    <header className="cf-impact-highlights__header">
+
+      <span className="cf-impact-highlights__eyebrow">
+        QUICK HIGHLIGHTS
+      </span>
+
+      <h2>
+        Our Path to Global Impact
+      </h2>
+
+      <p>
+        Connecting founder development, research, and market
+        opportunity to build ventures prepared for lasting impact.
+      </p>
+
+    </header>
+
+
+    {/* =====================================================
+        HIGHLIGHTS
+    ====================================================== */}
+
+    <div className="cf-impact-highlights__grid">
+
+
+      {/* =================================================
+          01 — FOUNDER DEVELOPMENT
+
+          Opens:
+          Our Model
+          /our-model
+      ================================================== */}
+
+      <article className="cf-impact-item">
+
+        <span className="cf-impact-item__number">
+          01
+        </span>
+
+        <h3>
+          Founder Development
+        </h3>
+
+        <p>
+          Equipping founders with the tools, networks, and support
+          to develop, validate, and scale high-impact ventures.
+        </p>
+
+        <Link
+          to="/our-model"
+          className="cf-impact-item__link"
+          aria-label="Explore the Continental Founders development model"
+        >
+          <span>Learn More</span>
+
+          <ArrowRight
+            size={17}
+            aria-hidden="true"
+          />
+        </Link>
+
+      </article>
+
+
+      {/* =================================================
+          02 — RESEARCH & EVIDENCE
+
+          Opens:
+          Universities
+          /universities
+      ================================================== */}
+
+      <article className="cf-impact-item">
+
+        <span className="cf-impact-item__number">
+          02
+        </span>
+
+        <h3>
+          Research &amp; Evidence
+        </h3>
+
+        <p>
+          Generating evidence, insights, and practical solutions
+          to inform stronger entrepreneurship ecosystems.
+        </p>
+
+        <Link
+          to="/universities"
+          className="cf-impact-item__link"
+          aria-label="Explore Continental Founders university and research partnerships"
+        >
+          <span>Learn More</span>
+
+          <ArrowRight
+            size={17}
+            aria-hidden="true"
+          />
+        </Link>
+
+      </article>
+
+
+      {/* =================================================
+          03 — MARKET ACCESS
+
+          Opens:
+          U.S.–Africa Trade & Business Network
+          /partners/us-africa-trade-network
+      ================================================== */}
+
+      <article className="cf-impact-item">
+
+        <span className="cf-impact-item__number">
+          03
+        </span>
+
+        <h3>
+          Market Access
+        </h3>
+
+        <p>
+          Creating connections, opening opportunities, and enabling
+          global pathways for sustainable growth.
+        </p>
+
+        <Link
+          to="/partners/us-africa-trade-network"
+          className="cf-impact-item__link"
+          aria-label="Explore the U.S.–Africa Trade and Business Network"
+        >
+          <span>Learn More</span>
+
+          <ArrowRight
+            size={17}
+            aria-hidden="true"
+          />
+        </Link>
+
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+
+      {/* =====================================================
+          03 — THE CONTINENTAL FOUNDERS DIFFERENCE
+      ====================================================== */}
+
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="who-we-are-heading"
+      >
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <div>
+
+              <span className="cf-eyebrow">
+                THE CONTINENTAL FOUNDERS DIFFERENCE
+              </span>
+
+              <h2 id="who-we-are-heading">
+                Africa + Diaspora
+                <br />
+                <em>+ Global Ecosystem.</em>
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div className="cf-who-grid">
+
+            <div className="cf-who-visual">
+
+              <img
+                src="/assets/images/africa-america-map.webp"
+                alt="Africa and the United States connected through Continental Founders partnerships"
+                loading="lazy"
+                decoding="async"
+              />
+
+            </div>
+
+
+            <div className="cf-who-content">
+
+              <p>
+                One of the defining elements of Continental Founders is the deliberate connection between African founders and founders across the global African diaspora.
+              </p>
+
+              <p>
+                These relationships create opportunities for knowledge exchange, cross-cultural learning, capstone collaborations, mentorship, joint ventures, market discovery, and long-term business partnerships.
+              </p>
+
+              <p>
+                We are developing globally minded founders who understand how to lead across cultures, markets, institutions, and borders.
+              </p>
+
+
+              <Link
+                to="/about"
+                className="cf-text-link"
+              >
+
+                <span>
+                  Discover Our Difference
+                </span>
+
+                <ArrowRight
+                  size={17}
+                  aria-hidden="true"
+                />
+
+              </Link>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          04 — OUR FLAGSHIP PROGRAM
+      ====================================================== */}
+
+      <section
+        className="cf-section cf-section-soft"
+        aria-labelledby="what-we-do-heading"
+      >
+
+        <div className="cf-container">
+
+          <div className="cf-section-header">
+
+            <div>
+
+              <span className="cf-eyebrow">
+                OUR FLAGSHIP PROGRAM
+              </span>
+
+
+              <h2 id="what-we-do-heading">
+                Continental Founders Catalytic Ventures — <em>CFCV.</em>
+              </h2>
+
+
+              <p className="cf-section-intro">
+                Continental Founders Catalytic Ventures (CFCV) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
+              </p>
+
+              <br />
+
+            </div>
+
+          </div>
+
+
+          <div className="cf-program-grid">
+
+            <ProgramCard
+              number="01"
+              title="Founder Development"
+              text="Build solutions that matter and respond to real needs."
+            />
+
+            <ProgramCard
+              number="02"
+              title="Research & Evidence"
+              text="Create pathways that connect founders with people, resources, markets, and opportunity."
+            />
+
+            <ProgramCard
+              number="03"
+              title="HORIZON — Launch. Invest. Globalize."
+              text="Qualified ventures move toward larger markets, strategic partnerships, investment opportunities, and international expansion."
+            />
+
+            <ProgramCard
+              number="04"
+              title="Market Access"
+              text="Support founders whose work can strengthen communities, industries, and economies."
+            />
+
+          </div>
+
+
+          <div className="cf-centered-link">
+
+            <Link
+              to="/programs"
+              className="cf-text-link"
+            >
+
+              <span>
+                Explore CFCV
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
       {/* =====================================================
           05 — OUR MODEL
       ====================================================== */}
@@ -1757,9 +1849,9 @@ export default function Home() {
 
 
               <h2 id="our-model-heading">
-                From shared purpose to{" "}
+                From potential to{" "}
                 <em>
-                  practical collaboration.
+                  global impact.
                 </em>
               </h2>
 
@@ -1777,8 +1869,8 @@ export default function Home() {
               icon={
                 <Users />
               }
-              title="CONNECT"
-              text="Universities and strategic partners connect around shared goals, expertise, and opportunity."
+              title="DEVELOP"
+              text="Founder development builds stronger leadership, ventures, business models, and operating foundations."
             />
 
             <ModelStep
@@ -1786,8 +1878,8 @@ export default function Home() {
               icon={
                 <Search />
               }
-              title="EXPLORE"
-              text="Students and institutions explore challenges, ideas, markets, research, and opportunities."
+              title="VALIDATE"
+              text="Research, evidence, customer learning, and market feedback help founders test assumptions and strengthen their ventures."
             />
 
             <ModelStep
@@ -1795,8 +1887,8 @@ export default function Home() {
               icon={
                 <Lightbulb />
               }
-              title="BUILD"
-              text="Teams develop practical ideas through entrepreneurship, innovation, mentorship, and collaboration."
+              title="CONNECT"
+              text="Founders connect with universities, corporations, diaspora networks, markets, institutions, and strategic partners."
             />
 
             <ModelStep
@@ -1804,8 +1896,8 @@ export default function Home() {
               icon={
                 <Rocket />
               }
-              title="ADVANCE"
-              text="Promising initiatives move forward through partnerships, resources, networks, and institutional support."
+              title="SCALE"
+              text="Investment readiness, market access, procurement, partnerships, and capital help qualified ventures move toward growth and international expansion."
             />
 
           </div>
@@ -1837,7 +1929,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          06 — WHY IT MATTERS
+          06 — RESEARCH THAT STRENGTHENS ENTREPRENEURSHIP
       ====================================================== */}
 
       <section
@@ -1852,21 +1944,20 @@ export default function Home() {
             <div>
 
               <span className="cf-eyebrow">
-                WHY IT MATTERS
+                RESEARCH THAT STRENGTHENS ENTREPRENEURSHIP
               </span>
 
 
               <h2 id="why-it-matters-heading">
-                Partnership should create{" "}
+                Research that strengthens{" "}
                 <em>
-                  lasting value.
+                  entrepreneurship.
                 </em>
               </h2>
 
 
               <p className="cf-section-intro">
-                Not simply another institutional
-                connection.
+                CF Research Division — Evidence. Insight. Impact.
               </p>
 
             </div>
@@ -1880,26 +1971,26 @@ export default function Home() {
 
             <Matter
               number="01"
-              title="RECIPROCAL"
-              text="African and American institutions bring knowledge, expertise, perspective, networks, and opportunity to one another."
+              title="GENERATE EVIDENCE"
+              text="Postdoctoral fellows, university partners, researchers, and practitioners study entrepreneurship, knowledge transfer, founder development, diaspora engagement, and venture growth."
             />
 
             <Matter
               number="02"
-              title="PRACTICAL"
-              text="The initiative focuses on practical collaboration, entrepreneurship, innovation, research, leadership, and measurable outcomes."
+              title="INFORM STRATEGY"
+              text="Evidence helps identify barriers to growth, understand knowledge-transfer models, evaluate program outcomes, and continuously improve CFCV."
             />
 
             <Matter
               number="03"
-              title="INCLUSIVE"
-              text="Universities, businesses, government, investors, researchers, entrepreneurs, and students can each contribute to the ecosystem."
+              title="UNIVERSITY CONSORTIUM"
+              text="Academic partners can contribute mentorship, research rigor, ethics and IRB support, joint research, publications, and multidisciplinary expertise."
             />
 
             <Matter
               number="04"
-              title="INSTITUTIONAL"
-              text="The initiative is being developed around credible university and strategic partnerships designed for long-term institutional relationships."
+              title="DRIVE IMPACT"
+              text="Experience becomes evidence, and evidence improves the founder experience, strengthening programs and future founder cohorts."
             />
 
           </div>
@@ -1910,7 +2001,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          07 — UNIVERSITY PARTNERSHIPS
+          07 — CF RESEARCH DIVISION
       ====================================================== */}
 
       <section
@@ -1937,34 +2028,24 @@ export default function Home() {
             <div className="cf-section-marker">
 
               <strong>
-                UNIVERSITY PARTNERSHIPS
+                CF RESEARCH DIVISION
               </strong>
 
             </div>
 
 
             <h2 id="university-partnership-heading">
-              Help shape the initiative
-              from the ground up.
+              Evidence. Insight. Impact.
             </h2>
 
 
             <p>
-              Continental Founders™ is currently
-              in its partnership development phase
-              and is intentionally engaging
-              universities interested in shaping
-              the future of the initiative.
+              Continental Founders is building research directly into the founder-development ecosystem through the CF Research Division.
             </p>
 
 
             <p>
-              Founding university partners will
-              have an opportunity to contribute
-              perspective, expertise, institutional
-              context, and ideas as the academic
-              framework and student experience
-              continue to develop.
+              Through our proposed university consortium, academic partners can contribute mentorship, research rigor, ethics and IRB support, joint research, publications, and access to multidisciplinary expertise.
             </p>
 
 
@@ -1974,7 +2055,7 @@ export default function Home() {
             >
 
               <span>
-                Explore University Partnerships
+                Explore Founder Development
               </span>
 
               <ArrowRight
@@ -2007,15 +2088,14 @@ export default function Home() {
             <div>
 
               <span className="cf-eyebrow">
-                OUR PARTNERSHIP ECOSYSTEM
+                AN ECOSYSTEM BUILT FOR COLLABORATION
               </span>
 
 
               <h2 id="ecosystem-heading">
-                A global network of
-                institutions working toward{" "}
+                An ecosystem built for{" "}
                 <em>
-                  shared opportunity.
+                  collaboration.
                 </em>
               </h2>
 
@@ -2032,24 +2112,24 @@ export default function Home() {
               icon={
                 <GraduationCap />
               }
-              title="Universities"
-              text="Academic institutions across Africa and the United States."
+              title="Universities & Researchers"
+              text="Academic partners generate knowledge, evidence, mentorship, research rigor, and multidisciplinary expertise."
             />
 
             <EcosystemCard
               icon={
                 <Building2 />
               }
-              title="Businesses"
-              text="Corporate partners supporting innovation, mentorship, and growth."
+              title="Corporations"
+              text="Corporate partners provide expertise, markets, procurement opportunities, technology, pilots, and commercial pathways."
             />
 
             <EcosystemCard
               icon={
                 <Landmark />
               }
-              title="Government"
-              text="Public sector leaders supporting policy, collaboration, and opportunity."
+              title="Government & Institutions"
+              text="Government and institutional partners help create pathways to markets, relationships, and economic development."
             />
 
             <EcosystemCard
@@ -2057,23 +2137,23 @@ export default function Home() {
                 <TrendingUp />
               }
               title="Investors"
-              text="Partners supporting promising ventures, entrepreneurs, and innovation."
+              text="Capital partners provide investment, validation, strategic guidance, due diligence, syndication, and growth pathways."
             />
 
             <EcosystemCard
               icon={
                 <BriefcaseBusiness />
               }
-              title="Entrepreneurs"
-              text="Founders and innovators developing solutions and building opportunity."
+              title="Founders"
+              text="Founders build the future through scalable ventures, innovative solutions, employment, and economic opportunity."
             />
 
             <EcosystemCard
               icon={
                 <Microscope />
               }
-              title="Researchers"
-              text="Experts contributing knowledge, research, ideas, and practical solutions."
+              title="Diaspora & Global Partners"
+              text="Diaspora leaders and global partners bridge countries, cultures, expertise, networks, markets, and opportunity."
             />
 
           </div>
@@ -2120,17 +2200,16 @@ export default function Home() {
             <div className="cf-section-marker cf-section-marker--light">
 
               <strong>
-                SPONSORS & STRATEGIC PARTNERS
+                CORPORATE PARTNERS
               </strong>
 
             </div>
 
 
             <h2 id="strategic-partners-heading">
-              Invest in a new generation
-              of{" "}
+              Expertise. Markets.{" "}
               <em>
-                cross-continental opportunity.
+                Opportunities.
               </em>
             </h2>
 
@@ -2138,22 +2217,12 @@ export default function Home() {
 
 
             <p>
-              Continental Founders™ brings
-              universities, businesses,
-              government, investors, and
-              innovation leaders together to
-              create meaningful opportunities
-              across Africa and the United States.
+              Corporations play an important role in transforming founder development into commercial opportunity. Continental Founders seeks relationships with corporations that can contribute more than sponsorship.
             </p>
 
 
             <p>
-              Strategic partners can contribute
-              expertise, funding, networks,
-              mentorship, technology, research,
-              and other resources that help
-              strengthen the Continental Founders™
-              ecosystem.
+              Corporate partners can contribute industry expertise, procurement and supplier development, customer and distribution opportunities, innovation challenges, pilot programs, partnerships, technology and infrastructure, and executive mentorship.
             </p>
 
 
@@ -2165,7 +2234,7 @@ export default function Home() {
               >
 
                 <span>
-                  Become a Strategic Partner
+                  Become a Corporate Partner
                 </span>
 
                 <ArrowUpRight
@@ -2624,7 +2693,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          12 — EXPLORE CONTINENTAL FOUNDERS
+          12 — THE CONTINENTAL FOUNDERS FLYWHEEL
       ====================================================== */}
 
       <section
@@ -2639,26 +2708,21 @@ export default function Home() {
             <div>
 
               <span className="cf-eyebrow">
-                EXPLORE CONTINENTAL FOUNDERS
+                THE CONTINENTAL FOUNDERS FLYWHEEL
               </span>
 
 
               <h2 id="explore-heading">
-                Discover our mission,
-                model, ventures, partnerships,
-                and{" "}
+                Research. Develop. Connect.
+                Invest. Measure.{" "}
                 <em>
-                  opportunities.
+                  Improve.
                 </em>
               </h2>
 
 
               <p className="cf-section-intro">
-                Explore the major areas of
-                Continental Founders and learn
-                how founders, universities,
-                businesses, institutions, and
-                strategic partners can connect.
+                Our ecosystem is intentionally circular: research strengthens founder development, founder development produces stronger ventures, real-world outcomes generate new evidence, and that evidence returns to improve future programs and founder cohorts.
               </p>
 
             </div>
@@ -2671,50 +2735,50 @@ export default function Home() {
           <div className="cf-program-grid">
 
             <HomePageLink
-              title="About Continental Founders"
-              text="Learn about our mission, vision, leadership, principles, and the story behind Continental Founders."
+              title="Founder Development"
+              text="Develop globally ready leaders and stronger ventures through structured founder development."
               to="/about"
             />
 
             <HomePageLink
-              title="Ventures & Founders"
-              text="Discover ventures and entrepreneurs building practical and scalable solutions."
+              title="Research & Evidence"
+              text="Generate evidence that informs strategy, improves programs, and strengthens the founder experience."
               to="/ventures"
             />
 
             <HomePageLink
-              title="Our Model"
-              text="Understand how Continental Founders connects people, institutions, markets, knowledge, and opportunity."
+              title="Market Access"
+              text="Connect qualified founders with procurement, customers, diaspora networks, institutions, and global markets."
               to="/our-model"
             />
 
             <HomePageLink
-              title="University Partnerships"
+              title="Founder Development"
               text="Explore collaboration opportunities for universities, faculty, researchers, students, and academic institutions."
               to="/universities"
             />
 
             <HomePageLink
-              title="Strategic Partners"
-              text="Explore opportunities for businesses, sponsors, institutions, experts, and development partners."
+              title="Investment"
+              text="Prepare ventures for appropriate capital, investor relationships, due diligence, validation, and growth."
               to="/strategic-partners"
             />
 
             <HomePageLink
-              title="Programs"
-              text="Explore programs connecting founders with mentorship, universities, expertise, networks, markets, and opportunity."
+              title="Measure Outcomes"
+              text="Track revenue, capital, contracts, customers, jobs, partnerships, markets entered, and international growth."
               to="/programs"
             />
 
             <HomePageLink
-              title="Events"
-              text="Discover Continental Founders conferences, events, forums, and convenings."
+              title="Improve"
+              text="Turn founder experience and measurable outcomes into evidence that strengthens future cohorts."
               to="/events"
             />
 
             <HomePageLink
-              title="Insights"
-              text="Read Continental Founders news, announcements, ideas, perspectives, and updates."
+              title="Greater Impact"
+              text="Build an entrepreneurial ecosystem that becomes stronger with every founder, partner, and cycle of learning."
               to="/insights"
             />
 
@@ -2729,7 +2793,7 @@ export default function Home() {
             >
 
               <span>
-                Contact Continental Founders
+                Build With Us
               </span>
 
               <ArrowRight
@@ -2747,7 +2811,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          13 — PARTNERSHIP MATERIALS
+          13 — BUILD WITH US
       ====================================================== */}
 
       <section
@@ -2760,24 +2824,19 @@ export default function Home() {
           <div>
 
             <span className="cf-eyebrow">
-              PARTNERSHIP MATERIALS
+              BUILD WITH US
             </span>
 
 
             <h2 id="partnership-materials-heading">
-              Explore the opportunity
-              to work with us.
+              The next generation of global founders is already emerging.
             </h2>
 
           </div>
 
 
           <p>
-            Access information about
-            Continental Founders, our
-            partnership approach, and
-            opportunities for universities,
-            sponsors, and strategic partners.
+            Across Africa and throughout the diaspora, entrepreneurs are developing solutions, creating businesses, generating employment, and imagining industries that can transform communities and economies. Continental Founders invites universities, researchers, corporations, investors, governments, foundations, diaspora organizations, mentors, and ecosystem builders to become part of this work.
           </p>
 
 
@@ -2790,7 +2849,7 @@ export default function Home() {
           >
 
             <span>
-              Download Partnership Materials
+              Support Continental Founders
             </span>
 
             <Download

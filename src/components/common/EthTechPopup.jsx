@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -17,20 +18,20 @@ import "./EthTechPopup.css";
 // ============================================================
 
 // First appearance:
-// Wait 5 seconds after website loads.
+// Wait 5 seconds after the website loads.
 const FIRST_APPEAR_DELAY = 5000;
 
-// How long the popup remains visible.
-const VISIBLE_DURATION = 5000;
+// Popup stays visible for 15 seconds.
+const VISIBLE_DURATION = 15000;
 
-// After disappearing:
-// Wait 10 seconds before showing again.
+// Popup stays hidden for 10 seconds.
 const HIDDEN_DURATION = 10000;
 
 // Closing animation duration.
-// Must match CSS exit animation.
+// Keep this synchronized with the CSS exit animation.
 const CLOSING_DURATION = 300;
 
+// Eth Tech Solutions website.
 const ETH_TECH_WEBSITE =
   "https://www.ethtechsolutions.com";
 
@@ -47,6 +48,10 @@ export default function EthTechPopup() {
     useState(false);
 
 
+  // ==========================================================
+  // TIMER REFERENCES
+  // ==========================================================
+
   const showTimerRef =
     useRef(null);
 
@@ -56,96 +61,155 @@ export default function EthTechPopup() {
   const closeTimerRef =
     useRef(null);
 
+  const mountedRef =
+    useRef(false);
+
 
   // ==========================================================
-  // CLEAR TIMERS
+  // CLEAR INDIVIDUAL TIMER
   // ==========================================================
 
-  const clearTimers = () => {
-    if (showTimerRef.current) {
+  const clearTimer = (
+    timerRef
+  ) => {
+    if (timerRef.current !== null) {
       window.clearTimeout(
-        showTimerRef.current
+        timerRef.current
       );
-    }
 
-    if (hideTimerRef.current) {
-      window.clearTimeout(
-        hideTimerRef.current
-      );
-    }
-
-    if (closeTimerRef.current) {
-      window.clearTimeout(
-        closeTimerRef.current
-      );
+      timerRef.current = null;
     }
   };
 
 
   // ==========================================================
-  // SHOW POPUP
+  // CLEAR ALL TIMERS
   // ==========================================================
 
-  const showPopup = () => {
-    setIsClosing(false);
-    setIsVisible(true);
+  const clearAllTimers =
+    useCallback(() => {
+      clearTimer(
+        showTimerRef
+      );
 
+      clearTimer(
+        hideTimerRef
+      );
 
-    // Stay visible for 5 seconds,
-    // then begin closing.
-    hideTimerRef.current =
-      window.setTimeout(() => {
-        hidePopup();
-      }, VISIBLE_DURATION);
-  };
-
-
-  // ==========================================================
-  // HIDE POPUP
-  // ==========================================================
-
-  const hidePopup = () => {
-    setIsClosing(true);
-
-
-    // Allow closing animation to finish.
-    closeTimerRef.current =
-      window.setTimeout(() => {
-        setIsVisible(false);
-        setIsClosing(false);
-
-
-        // Wait 10 seconds before
-        // showing popup again.
-        showTimerRef.current =
-          window.setTimeout(() => {
-            showPopup();
-          }, HIDDEN_DURATION);
-
-      }, CLOSING_DURATION);
-  };
+      clearTimer(
+        closeTimerRef
+      );
+    }, []);
 
 
   // ==========================================================
-  // INITIAL TIMER
+  // SCHEDULE NEXT APPEARANCE
+  // ==========================================================
+
+  const scheduleNextAppearance =
+    useCallback((delay) => {
+      clearTimer(
+        showTimerRef
+      );
+
+
+      showTimerRef.current =
+        window.setTimeout(() => {
+          if (!mountedRef.current) {
+            return;
+          }
+
+
+          setIsClosing(false);
+          setIsVisible(true);
+
+
+          // ================================================
+          // KEEP POPUP VISIBLE FOR 15 SECONDS
+          // ================================================
+
+          clearTimer(
+            hideTimerRef
+          );
+
+
+          hideTimerRef.current =
+            window.setTimeout(() => {
+              if (!mountedRef.current) {
+                return;
+              }
+
+
+              // Begin closing animation.
+              setIsClosing(true);
+
+
+              // ============================================
+              // WAIT FOR CLOSING ANIMATION
+              // ============================================
+
+              clearTimer(
+                closeTimerRef
+              );
+
+
+              closeTimerRef.current =
+                window.setTimeout(() => {
+                  if (!mountedRef.current) {
+                    return;
+                  }
+
+
+                  setIsVisible(false);
+                  setIsClosing(false);
+
+
+                  // ========================================
+                  // HIDDEN FOR 10 SECONDS
+                  // THEN START AGAIN
+                  // ========================================
+
+                  scheduleNextAppearance(
+                    HIDDEN_DURATION
+                  );
+
+                }, CLOSING_DURATION);
+
+            }, VISIBLE_DURATION);
+
+        }, delay);
+
+    }, []);
+
+
+  // ==========================================================
+  // INITIAL POPUP CYCLE
   // ==========================================================
 
   useEffect(() => {
-
-    // First popup appears 5 seconds
-    // after the website loads.
-    showTimerRef.current =
-      window.setTimeout(() => {
-        showPopup();
-      }, FIRST_APPEAR_DELAY);
+    mountedRef.current = true;
 
 
-    // Clean everything when component unmounts.
+    // First popup appears after 5 seconds.
+    scheduleNextAppearance(
+      FIRST_APPEAR_DELAY
+    );
+
+
+    // ========================================================
+    // CLEANUP
+    // ========================================================
+
     return () => {
-      clearTimers();
+      mountedRef.current = false;
+
+      clearAllTimers();
     };
 
-  }, []);
+  }, [
+    clearAllTimers,
+    scheduleNextAppearance,
+  ]);
 
 
   // ==========================================================
@@ -159,20 +223,45 @@ export default function EthTechPopup() {
     event.stopPropagation();
 
 
-    // Cancel automatic hide timer.
-    if (hideTimerRef.current) {
-      window.clearTimeout(
-        hideTimerRef.current
-      );
-    }
+    // Stop the automatic visible timer.
+    clearTimer(
+      hideTimerRef
+    );
 
 
-    hidePopup();
+    // Prevent duplicate close timers.
+    clearTimer(
+      closeTimerRef
+    );
+
+
+    // Start closing animation.
+    setIsClosing(true);
+
+
+    closeTimerRef.current =
+      window.setTimeout(() => {
+        if (!mountedRef.current) {
+          return;
+        }
+
+
+        setIsVisible(false);
+        setIsClosing(false);
+
+
+        // If visitor closes it manually,
+        // wait 10 seconds before showing again.
+        scheduleNextAppearance(
+          HIDDEN_DURATION
+        );
+
+      }, CLOSING_DURATION);
   };
 
 
   // ==========================================================
-  // DON'T RENDER WHILE HIDDEN
+  // DO NOT RENDER WHILE HIDDEN
   // ==========================================================
 
   if (!isVisible) {
@@ -204,7 +293,10 @@ export default function EthTechPopup() {
         onClick={handleClose}
         aria-label="Close Eth Tech Solutions popup"
       >
-        <X size={15} />
+        <X
+          size={15}
+          aria-hidden="true"
+        />
       </button>
 
 
@@ -219,6 +311,10 @@ export default function EthTechPopup() {
         className="eth-tech-popup__link"
         aria-label="Visit Eth Tech Solutions website"
       >
+
+        {/* ===================================================
+            LABEL
+        ==================================================== */}
 
         <span className="eth-tech-popup__eyebrow">
           Website developed by

@@ -11,7 +11,6 @@ import {
   BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
-  CircleDollarSign,
   Globe2,
   ImagePlus,
   Layers3,
@@ -46,6 +45,16 @@ const API_URL = (
 ============================================================ */
 
 const ITEMS_PER_PAGE = 6;
+
+const MAX_IMAGE_SIZE =
+  8 * 1024 * 1024;
+
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+
 
 const FORM_STEPS = [
   {
@@ -168,14 +177,34 @@ const initialForm = {
   phone: "",
   secondaryPhone: "",
 
-  logoUrl: "",
-  heroImageUrl: "",
+  /*
+   * Stored values returned from the backend.
+   *
+   * These may be storage paths or public URLs depending
+   * on how the backend returns venture media.
+   */
+  logo: "",
+  heroImage: "",
+
+  /*
+   * Newly selected local files.
+   */
+  logoFile: null,
+  heroImageFile: null,
+
+  /*
+   * Browser preview values.
+   */
+  logoPreview: "",
+  heroImagePreview: "",
 
   founders: [
     {
       name: "",
       role: "Founder",
       image: "",
+      imageFile: null,
+      imagePreview: "",
       bio: "",
     },
   ],
@@ -512,6 +541,61 @@ function getTrackClass(
 }
 
 
+function validateImageFile(
+  file
+) {
+  if (!file) {
+    return "";
+  }
+
+  if (
+    !ALLOWED_IMAGE_TYPES.includes(
+      file.type
+    )
+  ) {
+    return "Please upload a JPG, PNG or WebP image.";
+  }
+
+  if (
+    file.size >
+    MAX_IMAGE_SIZE
+  ) {
+    return "Image must be smaller than 8 MB.";
+  }
+
+  return "";
+}
+
+
+function createImagePreview(
+  file
+) {
+  if (!file) {
+    return "";
+  }
+
+  return URL.createObjectURL(
+    file
+  );
+}
+
+
+function revokePreview(
+  preview
+) {
+  if (
+    preview &&
+    preview.startsWith(
+      "blob:"
+    )
+  ) {
+    URL.revokeObjectURL(
+      preview
+    );
+  }
+}
+
+
 function cloneInitialForm() {
   return {
     ...initialForm,
@@ -650,6 +734,31 @@ export default function AdminVentures() {
 
   const nameInputRef =
     useRef(null);
+
+
+  /* ==========================================================
+     CLEAN LOCAL PREVIEWS ON UNMOUNT
+  ========================================================== */
+
+  useEffect(() => {
+    return () => {
+      revokePreview(
+        form.logoPreview
+      );
+
+      revokePreview(
+        form.heroImagePreview
+      );
+
+      form.founders.forEach(
+        (founder) => {
+          revokePreview(
+            founder.imagePreview
+          );
+        }
+      );
+    };
+  }, []);
 
 
   /* ==========================================================
@@ -918,20 +1027,6 @@ export default function AdminVentures() {
     );
 
 
-  const currentFellowsCount =
-    useMemo(
-      () =>
-        ventures.filter(
-          (venture) =>
-            getFellowStatus(
-              venture
-            ) ===
-            "current"
-        ).length,
-      [ventures]
-    );
-
-
   /* ==========================================================
      PAGINATION
   ========================================================== */
@@ -991,7 +1086,7 @@ export default function AdminVentures() {
 
 
   /* ==========================================================
-     FORM CHANGE
+     BASIC FORM CHANGE
   ========================================================== */
 
   function handleFormChange(
@@ -1083,6 +1178,160 @@ export default function AdminVentures() {
 
 
   /* ==========================================================
+     VENTURE LOGO UPLOAD
+  ========================================================== */
+
+  function handleLogoUpload(
+    event
+  ) {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const validationError =
+      validateImageFile(
+        file
+      );
+
+    if (validationError) {
+      setFormError(
+        validationError
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    setForm(
+      (current) => {
+        revokePreview(
+          current.logoPreview
+        );
+
+        return {
+          ...current,
+
+          logoFile:
+            file,
+
+          logoPreview:
+            createImagePreview(
+              file
+            ),
+        };
+      }
+    );
+
+    setFormError("");
+  }
+
+
+  function removeLogoImage() {
+    setForm(
+      (current) => {
+        revokePreview(
+          current.logoPreview
+        );
+
+        return {
+          ...current,
+
+          logo:
+            "",
+
+          logoFile:
+            null,
+
+          logoPreview:
+            "",
+        };
+      }
+    );
+  }
+
+
+  /* ==========================================================
+     HERO IMAGE UPLOAD
+  ========================================================== */
+
+  function handleHeroUpload(
+    event
+  ) {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const validationError =
+      validateImageFile(
+        file
+      );
+
+    if (validationError) {
+      setFormError(
+        validationError
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    setForm(
+      (current) => {
+        revokePreview(
+          current.heroImagePreview
+        );
+
+        return {
+          ...current,
+
+          heroImageFile:
+            file,
+
+          heroImagePreview:
+            createImagePreview(
+              file
+            ),
+        };
+      }
+    );
+
+    setFormError("");
+  }
+
+
+  function removeHeroImage() {
+    setForm(
+      (current) => {
+        revokePreview(
+          current.heroImagePreview
+        );
+
+        return {
+          ...current,
+
+          heroImage:
+            "",
+
+          heroImageFile:
+            null,
+
+          heroImagePreview:
+            "",
+        };
+      }
+    );
+  }
+
+
+  /* ==========================================================
      FOUNDERS
   ========================================================== */
 
@@ -1127,6 +1376,8 @@ export default function AdminVentures() {
             name: "",
             role: "Founder",
             image: "",
+            imageFile: null,
+            imagePreview: "",
             bio: "",
           },
         ],
@@ -1139,21 +1390,146 @@ export default function AdminVentures() {
     index
   ) {
     setForm(
+      (current) => {
+        if (
+          current.founders.length <=
+          1
+        ) {
+          return current;
+        }
+
+        const removed =
+          current.founders[
+            index
+          ];
+
+        revokePreview(
+          removed?.imagePreview
+        );
+
+        return {
+          ...current,
+
+          founders:
+            current.founders.filter(
+              (
+                _founder,
+                founderIndex
+              ) =>
+                founderIndex !==
+                index
+            ),
+        };
+      }
+    );
+  }
+
+
+  function handleFounderImageUpload(
+    index,
+    event
+  ) {
+    const file =
+      event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const validationError =
+      validateImageFile(
+        file
+      );
+
+    if (validationError) {
+      setFormError(
+        validationError
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    setForm(
       (current) => ({
         ...current,
 
         founders:
-          current.founders.length <=
-          1
-            ? current.founders
-            : current.founders.filter(
-                (
-                  _founder,
-                  founderIndex
-                ) =>
-                  founderIndex !==
-                  index
-              ),
+          current.founders.map(
+            (
+              founder,
+              founderIndex
+            ) => {
+              if (
+                founderIndex !==
+                index
+              ) {
+                return founder;
+              }
+
+              revokePreview(
+                founder.imagePreview
+              );
+
+              return {
+                ...founder,
+
+                imageFile:
+                  file,
+
+                imagePreview:
+                  createImagePreview(
+                    file
+                  ),
+              };
+            }
+          ),
+      })
+    );
+
+    setFormError("");
+  }
+
+
+  function removeFounderImage(
+    index
+  ) {
+    setForm(
+      (current) => ({
+        ...current,
+
+        founders:
+          current.founders.map(
+            (
+              founder,
+              founderIndex
+            ) => {
+              if (
+                founderIndex !==
+                index
+              ) {
+                return founder;
+              }
+
+              revokePreview(
+                founder.imagePreview
+              );
+
+              return {
+                ...founder,
+
+                image:
+                  "",
+
+                imageFile:
+                  null,
+
+                imagePreview:
+                  "",
+              };
+            }
+          ),
       })
     );
   }
@@ -1314,6 +1690,7 @@ export default function AdminVentures() {
               index
                 ? {
                     ...item,
+
                     [field]:
                       value,
                   }
@@ -1381,6 +1758,16 @@ export default function AdminVentures() {
 
     const opportunityAreas =
       getOpportunityAreas(
+        venture
+      );
+
+    const logo =
+      getVentureLogo(
+        venture
+      );
+
+    const heroImage =
+      getHeroImage(
         venture
       );
 
@@ -1483,44 +1870,62 @@ export default function AdminVentures() {
         venture?.secondary_phone ||
         "",
 
-      logoUrl:
-        getVentureLogo(
-          venture
-        ),
+      logo,
 
-      heroImageUrl:
-        getHeroImage(
-          venture
-        ),
+      heroImage,
+
+      logoFile:
+        null,
+
+      heroImageFile:
+        null,
+
+      logoPreview:
+        logo,
+
+      heroImagePreview:
+        heroImage,
 
       founders:
         founders.length
           ? founders.map(
-              (founder) => ({
-                name:
-                  founder?.name ||
-                  "",
-
-                role:
-                  founder?.role ||
-                  "Founder",
-
-                image:
+              (founder) => {
+                const image =
                   founder?.image ||
                   founder?.imageUrl ||
                   founder?.image_url ||
-                  "",
+                  "";
 
-                bio:
-                  founder?.bio ||
-                  "",
-              })
+                return {
+                  name:
+                    founder?.name ||
+                    "",
+
+                  role:
+                    founder?.role ||
+                    "Founder",
+
+                  image,
+
+                  imageFile:
+                    null,
+
+                  imagePreview:
+                    image,
+
+                  bio:
+                    founder?.bio ||
+                    "",
+                };
+              }
             )
           : [
               {
                 name: "",
                 role: "Founder",
                 image: "",
+                imageFile: null,
+                imagePreview: "",
                 bio: "",
               },
             ],
@@ -1571,10 +1976,26 @@ export default function AdminVentures() {
 
 
   /* ==========================================================
-     CLOSE
+     CLOSE FORM
   ========================================================== */
 
   function resetAndCloseForm() {
+    revokePreview(
+      form.logoPreview
+    );
+
+    revokePreview(
+      form.heroImagePreview
+    );
+
+    form.founders.forEach(
+      (founder) => {
+        revokePreview(
+          founder.imagePreview
+        );
+      }
+    );
+
     setFormOpen(false);
 
     setEditingVenture(
@@ -1729,26 +2150,13 @@ export default function AdminVentures() {
       }
 
       if (
-        form.logoUrl.trim() &&
-        !/^https?:\/\//i.test(
-          form.logoUrl.trim()
+        form.email.trim() &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          form.email.trim()
         )
       ) {
         setFormError(
-          "Logo URL must begin with http:// or https://."
-        );
-
-        return false;
-      }
-
-      if (
-        form.heroImageUrl.trim() &&
-        !/^https?:\/\//i.test(
-          form.heroImageUrl.trim()
-        )
-      ) {
-        setFormError(
-          "Hero image URL must begin with http:// or https://."
+          "Enter a valid venture email address."
         );
 
         return false;
@@ -1840,9 +2248,11 @@ export default function AdminVentures() {
       }
     }
 
+
     try {
       setSaving(true);
       setFormError("");
+
 
       const editing =
         Boolean(
@@ -1861,8 +2271,14 @@ export default function AdminVentures() {
                 founder.role.trim() ||
                 "Founder",
 
+              /*
+               * Existing image remains here.
+               * If a new file exists the backend
+               * replaces this value after upload.
+               */
               image:
-                founder.image.trim(),
+                founder.image ||
+                "",
 
               bio:
                 founder.bio.trim(),
@@ -1910,7 +2326,7 @@ export default function AdminVentures() {
           );
 
 
-      const payload = {
+      const venturePayload = {
         cfcvTrack:
           form.cfcvTrack,
 
@@ -1987,11 +2403,13 @@ export default function AdminVentures() {
         secondaryPhone:
           form.secondaryPhone.trim(),
 
-        logoUrl:
-          form.logoUrl.trim(),
+        logo:
+          form.logo ||
+          "",
 
-        heroImageUrl:
-          form.heroImageUrl.trim(),
+        heroImage:
+          form.heroImage ||
+          "",
 
         founders,
 
@@ -2004,6 +2422,62 @@ export default function AdminVentures() {
         status:
           form.status,
       };
+
+
+      /*
+       * Multipart request.
+       *
+       * IMPORTANT:
+       * Do not manually set Content-Type here.
+       * The browser adds the multipart boundary.
+       */
+      const multipart =
+        new FormData();
+
+
+      multipart.append(
+        "venture",
+        JSON.stringify(
+          venturePayload
+        )
+      );
+
+
+      if (
+        form.logoFile
+      ) {
+        multipart.append(
+          "logo",
+          form.logoFile
+        );
+      }
+
+
+      if (
+        form.heroImageFile
+      ) {
+        multipart.append(
+          "heroImage",
+          form.heroImageFile
+        );
+      }
+
+
+      form.founders.forEach(
+        (
+          founder,
+          index
+        ) => {
+          if (
+            founder.imageFile
+          ) {
+            multipart.append(
+              `founderImage_${index}`,
+              founder.imageFile
+            );
+          }
+        }
+      );
 
 
       const endpoint =
@@ -2024,18 +2498,13 @@ export default function AdminVentures() {
             headers: {
               Accept:
                 "application/json",
-
-              "Content-Type":
-                "application/json",
             },
 
             credentials:
               "include",
 
             body:
-              JSON.stringify(
-                payload
-              ),
+              multipart,
           }
         );
 
@@ -2153,6 +2622,7 @@ export default function AdminVentures() {
     if (!confirmed) {
       return;
     }
+
 
     try {
       setDeleting(true);
@@ -2314,7 +2784,9 @@ export default function AdminVentures() {
 
 
         <div className="admin-ventures__summary-card">
-          <TrendingIcon />
+          <ArrowUpRight
+            size={20}
+          />
 
           <div>
             <strong>
@@ -2476,7 +2948,9 @@ export default function AdminVentures() {
         {loading && (
           <div className="admin-ventures__empty">
 
-            <RefreshCw size={28} />
+            <RefreshCw
+              size={28}
+            />
 
             <h3>
               Loading ventures
@@ -2548,6 +3022,7 @@ export default function AdminVentures() {
                   ? "Change the search or filters to find another venture."
                   : "Add the first venture to the CFCV ecosystem."}
               </p>
+
 
               {!searchQuery &&
                 trackFilter ===
@@ -2713,7 +3188,8 @@ export default function AdminVentures() {
               <button
                 type="button"
                 disabled={
-                  currentPage === 1
+                  currentPage ===
+                  1
                 }
                 onClick={() =>
                   setCurrentPage(
@@ -3036,7 +3512,7 @@ export default function AdminVentures() {
 
 
                 <div className="admin-ventures__detail-card">
-                  <CircleDollarSign
+                  <Sparkles
                     size={18}
                   />
 
@@ -3227,7 +3703,7 @@ export default function AdminVentures() {
 
                         <p>
                           Select the pathway that reflects
-                          the venture's current development stage.
+                          the venture&apos;s current development stage.
                         </p>
                       </div>
                     </div>
@@ -3573,8 +4049,8 @@ export default function AdminVentures() {
                     </h3>
 
                     <p>
-                      Add venture content, contact
-                      information, services and opportunity.
+                      Add venture content, contact information,
+                      uploaded media, services and opportunity.
                     </p>
                   </div>
 
@@ -3699,81 +4175,204 @@ export default function AdminVentures() {
                   </div>
 
 
+                  {/* VENTURE LOGO */}
+
                   <div className="admin-ventures__field">
+
                     <label>
-                      Venture Logo URL
+                      Venture Logo
                     </label>
 
-                    <div className="admin-ventures__input-icon">
-                      <ImagePlus
-                        size={16}
-                      />
+                    <label className="admin-ventures__upload">
+
+                      <div className="admin-ventures__upload-icon">
+                        <ImagePlus
+                          size={22}
+                        />
+                      </div>
+
+
+                      <div className="admin-ventures__upload-copy">
+
+                        <strong>
+                          Upload venture logo
+                        </strong>
+
+                        <span>
+                          JPG, PNG or WebP · Maximum 8 MB
+                        </span>
+
+                      </div>
+
+
+                      <span className="admin-ventures__upload-button">
+                        Choose File
+                      </span>
+
 
                       <input
-                        name="logoUrl"
-                        value={
-                          form.logoUrl
-                        }
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
                         onChange={
-                          handleFormChange
+                          handleLogoUpload
                         }
-                        placeholder="https://..."
                       />
-                    </div>
+
+                    </label>
+
                   </div>
 
 
-                  {form.logoUrl && (
-                    <div className="admin-ventures__image-preview admin-ventures__image-preview--logo">
-                      <img
-                        src={
-                          form.logoUrl
-                        }
-                        alt="Logo preview"
-                      />
+                  {form.logoPreview && (
+                    <div className="admin-ventures__uploaded-media">
+
+                      <div className="admin-ventures__image-preview admin-ventures__image-preview--logo">
+
+                        <img
+                          src={
+                            form.logoPreview
+                          }
+                          alt="Venture logo preview"
+                        />
+
+                      </div>
+
+
+                      <div className="admin-ventures__uploaded-media-info">
+
+                        <div>
+                          <strong>
+                            {form.logoFile?.name ||
+                              "Current venture logo"}
+                          </strong>
+
+                          <span>
+                            Venture logo
+                          </span>
+                        </div>
+
+
+                        <button
+                          type="button"
+                          onClick={
+                            removeLogoImage
+                          }
+                        >
+                          <Trash2
+                            size={15}
+                          />
+
+                          Remove
+                        </button>
+
+                      </div>
+
                     </div>
                   )}
 
 
+                  {/* HERO IMAGE */}
+
                   <div className="admin-ventures__field">
+
                     <label>
-                      Hero Image URL
+                      Hero Image
                     </label>
 
-                    <div className="admin-ventures__input-icon">
-                      <ImagePlus
-                        size={16}
-                      />
+                    <label className="admin-ventures__upload admin-ventures__upload--hero">
+
+                      <div className="admin-ventures__upload-icon">
+                        <ImagePlus
+                          size={22}
+                        />
+                      </div>
+
+
+                      <div className="admin-ventures__upload-copy">
+
+                        <strong>
+                          Upload hero image
+                        </strong>
+
+                        <span>
+                          Landscape recommended · JPG, PNG or WebP
+                        </span>
+
+                      </div>
+
+
+                      <span className="admin-ventures__upload-button">
+                        Choose File
+                      </span>
+
 
                       <input
-                        name="heroImageUrl"
-                        value={
-                          form.heroImageUrl
-                        }
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
                         onChange={
-                          handleFormChange
+                          handleHeroUpload
                         }
-                        placeholder="https://..."
                       />
-                    </div>
+
+                    </label>
+
                   </div>
 
 
-                  {form.heroImageUrl && (
-                    <div className="admin-ventures__image-preview">
-                      <img
-                        src={
-                          form.heroImageUrl
-                        }
-                        alt="Hero preview"
-                      />
+                  {form.heroImagePreview && (
+                    <div className="admin-ventures__uploaded-media">
+
+                      <div className="admin-ventures__image-preview">
+
+                        <img
+                          src={
+                            form.heroImagePreview
+                          }
+                          alt="Hero preview"
+                        />
+
+                      </div>
+
+
+                      <div className="admin-ventures__uploaded-media-info">
+
+                        <div>
+                          <strong>
+                            {form.heroImageFile?.name ||
+                              "Current hero image"}
+                          </strong>
+
+                          <span>
+                            Venture hero image
+                          </span>
+                        </div>
+
+
+                        <button
+                          type="button"
+                          onClick={
+                            removeHeroImage
+                          }
+                        >
+                          <Trash2
+                            size={15}
+                          />
+
+                          Remove
+                        </button>
+
+                      </div>
+
                     </div>
                   )}
 
+
+                  {/* SERVICES */}
 
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
+
                       <div>
                         <h4>
                           Services
@@ -3784,6 +4383,7 @@ export default function AdminVentures() {
                         </p>
                       </div>
 
+
                       <button
                         type="button"
                         onClick={
@@ -3791,8 +4391,10 @@ export default function AdminVentures() {
                         }
                       >
                         <Plus size={14} />
+
                         Add
                       </button>
+
                     </div>
 
 
@@ -3805,6 +4407,7 @@ export default function AdminVentures() {
                           key={`service-${index}`}
                           className="admin-ventures__repeat-row"
                         >
+
                           <input
                             value={
                               service
@@ -3820,6 +4423,7 @@ export default function AdminVentures() {
                             placeholder={`Service ${index + 1}`}
                           />
 
+
                           <button
                             type="button"
                             onClick={() =>
@@ -3830,6 +4434,7 @@ export default function AdminVentures() {
                           >
                             <X size={15} />
                           </button>
+
                         </div>
                       )
                     )}
@@ -3837,9 +4442,12 @@ export default function AdminVentures() {
                   </div>
 
 
+                  {/* OPPORTUNITY */}
+
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
+
                       <div>
                         <h4>
                           Opportunity
@@ -3850,6 +4458,7 @@ export default function AdminVentures() {
                           market and current stage.
                         </p>
                       </div>
+
                     </div>
 
 
@@ -3862,6 +4471,7 @@ export default function AdminVentures() {
                           key={`opportunity-${index}`}
                           className="admin-ventures__opportunity-editor"
                         >
+
                           <input
                             value={
                               item.title
@@ -3877,6 +4487,7 @@ export default function AdminVentures() {
                             }
                             placeholder="Title"
                           />
+
 
                           <textarea
                             rows={4}
@@ -3894,6 +4505,7 @@ export default function AdminVentures() {
                             }
                             placeholder="Description..."
                           />
+
                         </div>
                       )
                     )}
@@ -3917,8 +4529,8 @@ export default function AdminVentures() {
                     </h3>
 
                     <p>
-                      Add founder profiles and the
-                      relationships the venture is seeking.
+                      Add founder profiles, upload founder photos
+                      and define the relationships the venture is seeking.
                     </p>
                   </div>
 
@@ -3926,6 +4538,7 @@ export default function AdminVentures() {
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
+
                       <div>
                         <h4>
                           Founders
@@ -3935,6 +4548,7 @@ export default function AdminVentures() {
                           Add one or more venture founders.
                         </p>
                       </div>
+
 
                       <button
                         type="button"
@@ -3946,6 +4560,7 @@ export default function AdminVentures() {
 
                         Add Founder
                       </button>
+
                     </div>
 
 
@@ -3960,9 +4575,11 @@ export default function AdminVentures() {
                         >
 
                           <div className="admin-ventures__founder-editor-header">
+
                             <strong>
                               Founder {index + 1}
                             </strong>
+
 
                             {form.founders.length >
                               1 && (
@@ -3979,12 +4596,14 @@ export default function AdminVentures() {
                                 />
                               </button>
                             )}
+
                           </div>
 
 
                           <div className="admin-ventures__form-grid">
 
                             <div className="admin-ventures__field">
+
                               <label>
                                 Name *
                               </label>
@@ -4004,10 +4623,12 @@ export default function AdminVentures() {
                                 }
                                 placeholder="Founder name"
                               />
+
                             </div>
 
 
                             <div className="admin-ventures__field">
+
                               <label>
                                 Role
                               </label>
@@ -4027,47 +4648,116 @@ export default function AdminVentures() {
                                 }
                                 placeholder="Founder"
                               />
+
                             </div>
 
                           </div>
 
 
+                          {/* FOUNDER IMAGE UPLOAD */}
+
                           <div className="admin-ventures__field">
+
                             <label>
-                              Founder Image URL
+                              Founder Photo
                             </label>
 
-                            <input
-                              value={
-                                founder.image
-                              }
-                              onChange={(
-                                event
-                              ) =>
-                                updateFounder(
-                                  index,
-                                  "image",
-                                  event.target.value
-                                )
-                              }
-                              placeholder="https://..."
-                            />
+
+                            <label className="admin-ventures__upload">
+
+                              <div className="admin-ventures__upload-icon">
+                                <UserRound
+                                  size={21}
+                                />
+                              </div>
+
+
+                              <div className="admin-ventures__upload-copy">
+
+                                <strong>
+                                  Upload founder photo
+                                </strong>
+
+                                <span>
+                                  JPG, PNG or WebP · Maximum 8 MB
+                                </span>
+
+                              </div>
+
+
+                              <span className="admin-ventures__upload-button">
+                                Choose File
+                              </span>
+
+
+                              <input
+                                type="file"
+                                accept="image/jpeg,image/png,image/webp"
+                                onChange={(
+                                  event
+                                ) =>
+                                  handleFounderImageUpload(
+                                    index,
+                                    event
+                                  )
+                                }
+                              />
+
+                            </label>
+
                           </div>
 
 
-                          {founder.image && (
-                            <div className="admin-ventures__founder-image-preview">
-                              <img
-                                src={
-                                  founder.image
-                                }
-                                alt=""
-                              />
+                          {founder.imagePreview && (
+                            <div className="admin-ventures__founder-upload-preview">
+
+                              <div className="admin-ventures__founder-image-preview">
+
+                                <img
+                                  src={
+                                    founder.imagePreview
+                                  }
+                                  alt={
+                                    founder.name
+                                      ? `${founder.name} preview`
+                                      : "Founder preview"
+                                  }
+                                />
+
+                              </div>
+
+
+                              <div>
+
+                                <strong>
+                                  {founder.imageFile?.name ||
+                                    "Current founder photo"}
+                                </strong>
+
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeFounderImage(
+                                      index
+                                    )
+                                  }
+                                >
+                                  <Trash2
+                                    size={14}
+                                  />
+
+                                  Remove
+                                </button>
+
+                              </div>
+
                             </div>
                           )}
 
 
                           <div className="admin-ventures__field">
+
                             <label>
                               Biography
                             </label>
@@ -4088,6 +4778,7 @@ export default function AdminVentures() {
                               }
                               placeholder="Short founder biography..."
                             />
+
                           </div>
 
                         </div>
@@ -4097,9 +4788,12 @@ export default function AdminVentures() {
                   </div>
 
 
+                  {/* LOOKING FOR */}
+
                   <div className="admin-ventures__subsection">
 
                     <div className="admin-ventures__subsection-header">
+
                       <div>
                         <h4>
                           Looking For
@@ -4111,6 +4805,7 @@ export default function AdminVentures() {
                         </p>
                       </div>
 
+
                       <button
                         type="button"
                         onClick={
@@ -4121,6 +4816,7 @@ export default function AdminVentures() {
 
                         Add
                       </button>
+
                     </div>
 
 
@@ -4133,6 +4829,7 @@ export default function AdminVentures() {
                           key={`looking-${index}`}
                           className="admin-ventures__repeat-row"
                         >
+
                           <input
                             value={
                               item
@@ -4148,6 +4845,7 @@ export default function AdminVentures() {
                             placeholder="e.g. Strategic partnerships"
                           />
 
+
                           <button
                             type="button"
                             onClick={() =>
@@ -4158,6 +4856,7 @@ export default function AdminVentures() {
                           >
                             <X size={15} />
                           </button>
+
                         </div>
                       )
                     )}
@@ -4166,6 +4865,7 @@ export default function AdminVentures() {
 
 
                   <div className="admin-ventures__field">
+
                     <label>
                       Publication Status
                     </label>
@@ -4191,16 +4891,17 @@ export default function AdminVentures() {
                         Archived
                       </option>
                     </select>
+
                   </div>
 
 
                   <div className="admin-ventures__publishing-note">
+
                     {form.status ===
                     "published" ? (
                       <p>
-                        This venture will appear
-                        in the public CFCV venture
-                        directory after saving.
+                        This venture will appear in the public
+                        CFCV venture directory after saving.
                       </p>
                     ) : form.status ===
                       "archived" ? (
@@ -4214,6 +4915,7 @@ export default function AdminVentures() {
                         in the CMS until published.
                       </p>
                     )}
+
                   </div>
 
                 </>
@@ -4228,25 +4930,29 @@ export default function AdminVentures() {
                 <>
 
                   <div className="admin-ventures__step-heading">
+
                     <h3>
                       Review Venture
                     </h3>
 
                     <p>
-                      Confirm the CFCV placement
-                      and venture information before saving.
+                      Confirm the CFCV placement, uploaded
+                      media and venture information before saving.
                     </p>
+
                   </div>
 
 
-                  {form.heroImageUrl && (
+                  {form.heroImagePreview && (
                     <div className="admin-ventures__review-hero">
+
                       <img
                         src={
-                          form.heroImageUrl
+                          form.heroImagePreview
                         }
                         alt=""
                       />
+
                     </div>
                   )}
 
@@ -4255,10 +4961,10 @@ export default function AdminVentures() {
 
                     <div className="admin-ventures__review-logo">
 
-                      {form.logoUrl ? (
+                      {form.logoPreview ? (
                         <img
                           src={
-                            form.logoUrl
+                            form.logoPreview
                           }
                           alt=""
                         />
@@ -4272,6 +4978,7 @@ export default function AdminVentures() {
 
 
                     <div>
+
                       <span>
                         {
                           CFCV_TRACKS.find(
@@ -4297,6 +5004,7 @@ export default function AdminVentures() {
                           form.description ||
                           "No tagline provided."}
                       </p>
+
                     </div>
 
                   </div>
@@ -4418,6 +5126,36 @@ export default function AdminVentures() {
 
                     <div>
                       <span>
+                        Venture Logo
+                      </span>
+
+                      <strong>
+                        {form.logoFile
+                          ? "New image selected"
+                          : form.logo
+                            ? "Current image retained"
+                            : "No logo"}
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
+                        Hero Image
+                      </span>
+
+                      <strong>
+                        {form.heroImageFile
+                          ? "New image selected"
+                          : form.heroImage
+                            ? "Current image retained"
+                            : "No hero image"}
+                      </strong>
+                    </div>
+
+
+                    <div>
+                      <span>
                         Founders
                       </span>
 
@@ -4448,6 +5186,7 @@ export default function AdminVentures() {
 
 
                     <div className="admin-ventures__review-wide">
+
                       <span>
                         Description
                       </span>
@@ -4457,10 +5196,12 @@ export default function AdminVentures() {
                           form.description ||
                           "No description provided."}
                       </p>
+
                     </div>
 
 
                     <div className="admin-ventures__review-wide">
+
                       <span>
                         Looking For
                       </span>
@@ -4483,6 +5224,7 @@ export default function AdminVentures() {
                           )}
 
                       </div>
+
                     </div>
 
                   </div>
@@ -4585,7 +5327,7 @@ export default function AdminVentures() {
                       )}
 
                       {saving
-                        ? "Saving..."
+                        ? "Uploading & Saving..."
                         : editingVenture
                           ? "Save Changes"
                           : "Create Venture"}
@@ -4604,19 +5346,5 @@ export default function AdminVentures() {
       )}
 
     </div>
-  );
-}
-
-
-/* ============================================================
-   SMALL LOCAL ICON
-============================================================ */
-
-function TrendingIcon() {
-  return (
-    <ArrowUpRight
-      size={20}
-      aria-hidden="true"
-    />
   );
 }

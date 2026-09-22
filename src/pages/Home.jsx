@@ -242,6 +242,9 @@ export default function Home() {
   const videoFrameRef =
     useRef(null);
 
+  const hasUserInteractedRef =
+    useRef(false);
+
 
   // ==========================================================
   // VIDEO STATE
@@ -257,13 +260,13 @@ export default function Home() {
     isMuted,
     setIsMuted,
   ] =
-    useState(true);
+    useState(false);
 
   const [
     volume,
     setVolume,
   ] =
-    useState(0);
+    useState(1);
 
   const [
     previousVolume,
@@ -582,15 +585,14 @@ export default function Home() {
     }
 
 
-    // Muted playback is required for browser autoplay.
     video.volume =
-      0;
+      1;
 
     video.muted =
-      true;
+      false;
 
     video.defaultMuted =
-      true;
+      false;
 
     // Force the browser to load the current source.
     video.load();
@@ -756,7 +758,7 @@ export default function Home() {
 
 
   // ==========================================================
-  // AUTOPLAY VIDEO WHEN VISIBLE
+  // AUTOPLAY WITH SOUND WHEN VISIBLE
   // ==========================================================
 
   useEffect(() => {
@@ -774,6 +776,122 @@ export default function Home() {
     }
 
 
+    // Browsers require a user gesture before autoplay with sound.
+    const playWithSound =
+      async () => {
+        const restoredVolume =
+          previousVolume > 0
+            ? previousVolume
+            : 1;
+
+        video.muted =
+          false;
+
+        video.defaultMuted =
+          false;
+
+        video.volume =
+          restoredVolume;
+
+        setIsMuted(
+          false
+        );
+
+        setVolume(
+          restoredVolume
+        );
+
+        if (
+          video.paused
+        ) {
+          await video.play();
+        }
+      };
+
+
+    const registerInteraction =
+      async () => {
+        hasUserInteractedRef.current =
+          true;
+
+        window.removeEventListener(
+          "pointerdown",
+          registerInteraction
+        );
+
+        window.removeEventListener(
+          "keydown",
+          registerInteraction
+        );
+
+        window.removeEventListener(
+          "touchstart",
+          registerInteraction
+        );
+
+        const rectangle =
+          frame.getBoundingClientRect();
+
+        const visibleHeight =
+          Math.max(
+            0,
+            Math.min(
+              rectangle.bottom,
+              window.innerHeight
+            ) -
+              Math.max(
+                rectangle.top,
+                0
+              )
+          );
+
+        const visibleRatio =
+          rectangle.height > 0
+            ? visibleHeight /
+              rectangle.height
+            : 0;
+
+        if (
+          visibleRatio >= 0.5
+        ) {
+          try {
+            await playWithSound();
+          } catch (error) {
+            if (
+              import.meta.env.DEV
+            ) {
+              console.warn(
+                "Playback with sound was prevented:",
+                error
+              );
+            }
+          }
+        }
+      };
+
+
+    window.addEventListener(
+      "pointerdown",
+      registerInteraction,
+      {
+        passive: true,
+      }
+    );
+
+    window.addEventListener(
+      "keydown",
+      registerInteraction
+    );
+
+    window.addEventListener(
+      "touchstart",
+      registerInteraction,
+      {
+        passive: true,
+      }
+    );
+
+
     const observer =
       new IntersectionObserver(
         async (
@@ -786,19 +904,21 @@ export default function Home() {
             entry.isIntersecting &&
             entry.intersectionRatio >= 0.5
           ) {
+            // Never start muted. Wait for a valid browser gesture.
+            if (
+              !hasUserInteractedRef.current
+            ) {
+              return;
+            }
+
             try {
-              // Browsers permit automatic playback only while muted.
-              if (
-                video.paused
-              ) {
-                await video.play();
-              }
+              await playWithSound();
             } catch (error) {
               if (
                 import.meta.env.DEV
               ) {
                 console.warn(
-                  "Viewport autoplay was prevented:",
+                  "Autoplay with sound was prevented:",
                   error
                 );
               }
@@ -827,9 +947,24 @@ export default function Home() {
     return () => {
       observer.disconnect();
 
+      window.removeEventListener(
+        "pointerdown",
+        registerInteraction
+      );
+
+      window.removeEventListener(
+        "keydown",
+        registerInteraction
+      );
+
+      window.removeEventListener(
+        "touchstart",
+        registerInteraction
+      );
+
       video.pause();
     };
-  }, []);
+  }, [previousVolume]);
 
 
   // ==========================================================
@@ -1394,7 +1529,6 @@ export default function Home() {
                 videoRef
               }
               playsInline
-              muted
               preload="metadata"
               className="cf-video__player"
               aria-label="Continental Founders video"

@@ -257,13 +257,13 @@ export default function Home() {
     isMuted,
     setIsMuted,
   ] =
-    useState(false);
+    useState(true);
 
   const [
     volume,
     setVolume,
   ] =
-    useState(1);
+    useState(0);
 
   const [
     previousVolume,
@@ -582,11 +582,15 @@ export default function Home() {
     }
 
 
+    // Muted playback is required for browser autoplay.
     video.volume =
-      1;
+      0;
 
     video.muted =
-      false;
+      true;
+
+    video.defaultMuted =
+      true;
 
     // Force the browser to load the current source.
     video.load();
@@ -747,6 +751,83 @@ export default function Home() {
         "webkitfullscreenchange",
         handleFullscreen
       );
+    };
+  }, []);
+
+
+  // ==========================================================
+  // AUTOPLAY VIDEO WHEN VISIBLE
+  // ==========================================================
+
+  useEffect(() => {
+    const video =
+      videoRef.current;
+
+    const frame =
+      videoFrameRef.current;
+
+    if (
+      !video ||
+      !frame
+    ) {
+      return undefined;
+    }
+
+
+    const observer =
+      new IntersectionObserver(
+        async (
+          entries
+        ) => {
+          const entry =
+            entries[0];
+
+          if (
+            entry.isIntersecting &&
+            entry.intersectionRatio >= 0.5
+          ) {
+            try {
+              // Browsers permit automatic playback only while muted.
+              if (
+                video.paused
+              ) {
+                await video.play();
+              }
+            } catch (error) {
+              if (
+                import.meta.env.DEV
+              ) {
+                console.warn(
+                  "Viewport autoplay was prevented:",
+                  error
+                );
+              }
+            }
+          } else if (
+            !video.paused
+          ) {
+            video.pause();
+          }
+        },
+        {
+          threshold: [
+            0,
+            0.5,
+            1,
+          ],
+        }
+      );
+
+
+    observer.observe(
+      frame
+    );
+
+
+    return () => {
+      observer.disconnect();
+
+      video.pause();
     };
   }, []);
 
@@ -1313,7 +1394,8 @@ export default function Home() {
                 videoRef
               }
               playsInline
-              preload="auto"
+              muted
+              preload="metadata"
               className="cf-video__player"
               aria-label="Continental Founders video"
               onClick={toggleVideo}

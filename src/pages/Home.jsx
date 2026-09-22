@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import NetworkBackground from "../components/ui/NetworkBackground";
+import NewsAnnouncements from "../components/sections/NewsAnnouncements";
 
 import {
   ArrowRight,
@@ -2635,96 +2636,11 @@ export default function Home() {
 
       </section>
 
+{/* ============================================================
+    11 — NEWS & ANNOUNCEMENTS — CMS CONTENT
+============================================================ */}
 
-      {/* =====================================================
-          11 — NEWS & INSIGHTS
-      ====================================================== */}
-
-      <section
-        className="cf-section cf-section-soft"
-        aria-labelledby="news-heading"
-      >
-
-        <div className="cf-container">
-
-          <div className="cf-section-header">
-            <br/>
-            <br/>
-
-            <div>
-
-              <span className="cf-eyebrow">
-                NEWS & UPDATES
-              </span>
-
-
-              <h2 id="news-heading">
-                Announcements,
-                developments, and{" "}
-                <em>
-                  milestones.
-                </em>
-              </h2>
-
-            </div>
-
-          </div>
-
-          <br />
-
-
-          <div className="cf-news-grid">
-
-            <Insight
-              image="/assets/images/insights/university-partnerships.webp"
-              category="ANNOUNCEMENT"
-              date="MAY 21, 2026"
-              title="Continental Founders™ Begins University Partnership Development"
-              text="The initiative begins conversations with institutions interested in shaping a new model for Africa–United States collaboration."
-            />
-
-            <Insight
-              image="/assets/images/insights/innovation-entrepreneurship.webp"
-              category="INSIGHT"
-              date="APRIL 26, 2026"
-              title="Why Cross-Continental Collaboration Matters"
-              text="Exploring the opportunities created when universities and institutions work together across continents."
-            />
-
-            <Insight
-              image="/assets/images/insights/leadership-collaboration.webp"
-              category="PROGRAM UPDATE"
-              date="APRIL 10, 2026"
-              title="Building the Continental Founders™ Framework"
-              text="Partner institutions and stakeholders contribute ideas toward the development of the initiative."
-            />
-
-          </div>
-
-
-          <div className="cf-centered-link">
-
-            <Link
-              to="/insights"
-              className="cf-text-link"
-            >
-
-              <span>
-                View All Insights
-              </span>
-
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
+<NewsAnnouncements />
 
 
       {/* =====================================================

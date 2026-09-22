@@ -245,6 +245,12 @@ export default function Home() {
   const hasUserInteractedRef =
     useRef(false);
 
+  const savedVideoTimeRef =
+    useRef(0);
+
+  const previousVolumeRef =
+    useRef(1);
+
 
   // ==========================================================
   // VIDEO STATE
@@ -594,10 +600,6 @@ export default function Home() {
     video.defaultMuted =
       false;
 
-    // Force the browser to load the current source.
-    video.load();
-
-
     const handlePlay =
       () => {
         setIsPlaying(
@@ -616,6 +618,9 @@ export default function Home() {
 
     const handleEnded =
       () => {
+        savedVideoTimeRef.current =
+          0;
+
         setIsPlaying(
           false
         );
@@ -654,6 +659,9 @@ export default function Home() {
           !video.muted &&
           video.volume > 0
         ) {
+          previousVolumeRef.current =
+            video.volume;
+
           setPreviousVolume(
             video.volume
           );
@@ -780,8 +788,8 @@ export default function Home() {
     const playWithSound =
       async () => {
         const restoredVolume =
-          previousVolume > 0
-            ? previousVolume
+          previousVolumeRef.current > 0
+            ? previousVolumeRef.current
             : 1;
 
         video.muted =
@@ -800,6 +808,20 @@ export default function Home() {
         setVolume(
           restoredVolume
         );
+
+        if (
+          savedVideoTimeRef.current > 0 &&
+          Number.isFinite(
+            savedVideoTimeRef.current
+          ) &&
+          Math.abs(
+            video.currentTime -
+            savedVideoTimeRef.current
+          ) > 0.25
+        ) {
+          video.currentTime =
+            savedVideoTimeRef.current;
+        }
 
         if (
           video.paused
@@ -926,6 +948,9 @@ export default function Home() {
           } else if (
             !video.paused
           ) {
+            savedVideoTimeRef.current =
+              video.currentTime;
+
             video.pause();
           }
         },
@@ -962,9 +987,12 @@ export default function Home() {
         registerInteraction
       );
 
+      savedVideoTimeRef.current =
+        video.currentTime;
+
       video.pause();
     };
-  }, [previousVolume]);
+  }, []);
 
 
   // ==========================================================
@@ -1037,6 +1065,9 @@ export default function Home() {
           video.volume
         );
 
+        previousVolumeRef.current =
+          video.volume;
+
         video.muted =
           true;
 
@@ -1099,6 +1130,9 @@ export default function Home() {
         setPreviousVolume(
           safeValue
         );
+
+        previousVolumeRef.current =
+          safeValue;
       }
 
 

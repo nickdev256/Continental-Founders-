@@ -2050,3 +2050,348 @@
     animation: none;
   }
 }
+
+
+
+
+
+/* ============================================================
+   INSIGHT DETAILS — PROFESSIONAL DESIGN REFINEMENT
+   Paste at the VERY BOTTOM of InsightDetails.css
+============================================================ */
+
+
+/* ============================================================
+   1. REFINED HEADING SIZES
+============================================================ */
+
+.insight-detail .insight-hero h1 {
+  font-size: clamp(2.35rem, 4.4vw, 4.15rem);
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+  max-width: 820px;
+}
+
+.insight-detail .insight-state h1 {
+  font-size: clamp(1.8rem, 3.2vw, 2.45rem);
+  line-height: 1.15;
+}
+
+.insight-detail .insight-next h2 {
+  font-size: clamp(1.7rem, 3vw, 2.65rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.insight-detail .insight-article__empty h3 {
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   2. HERO SECTION
+============================================================ */
+
+.insight-detail .insight-hero {
+  padding-top: clamp(6rem, 9vw, 8.2rem);
+  padding-bottom: clamp(5rem, 8vw, 7rem);
+}
+
+.insight-detail .insight-hero__grid {
+  gap: clamp(2.5rem, 5vw, 5rem);
+}
+
+.insight-detail .insight-kicker {
+  margin-bottom: 1.2rem;
+  padding: 0.42rem 0.72rem;
+  letter-spacing: 0.11em;
+}
+
+.insight-detail .insight-hero__excerpt {
+  max-width: 720px;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   3. ARTICLE CONTENT
+============================================================ */
+
+.insight-detail .insight-content {
+  padding-top: clamp(3.5rem, 6vw, 5.5rem);
+  padding-bottom: clamp(4rem, 7vw, 6.5rem);
+}
+
+.insight-detail .insight-article {
+  padding: clamp(1.8rem, 3.5vw, 3rem);
+
+  border: 1px solid rgba(7, 26, 45, 0.09);
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 16px 42px rgba(7, 26, 45, 0.055);
+}
+
+.insight-detail .insight-article__paragraph {
+  font-size: clamp(1rem, 1.15vw, 1.075rem);
+  line-height: 1.85;
+  color: #354657;
+}
+
+.insight-detail .insight-article__lead {
+  font-size: clamp(1.05rem, 1.3vw, 1.18rem);
+  line-height: 1.78;
+  color: #20364a;
+}
+
+.insight-detail .insight-article__lead::first-letter {
+  font-size: 3em;
+}
+
+
+/* ============================================================
+   4. FEATURED IMAGE
+   Keep the entire image visible — no cropping
+============================================================ */
+
+.insight-detail .insight-feature__frame {
+  border-radius: 14px;
+
+  box-shadow:
+    0 18px 48px rgba(7, 26, 45, 0.12);
+}
+
+.insight-detail .insight-feature__frame img {
+  width: 100%;
+  height: auto;
+  max-height: 720px;
+
+  object-fit: contain;
+  object-position: center;
+}
+
+
+/* ============================================================
+   5. SIDEBAR CARDS
+============================================================ */
+
+.insight-detail .insight-sidebar__card {
+  padding: 1.5rem;
+
+  border: 1px solid rgba(7, 26, 45, 0.09);
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 10px 28px rgba(7, 26, 45, 0.045);
+
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.insight-detail .insight-sidebar__card h3 {
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.insight-detail .insight-sidebar__card p {
+  font-size: 0.85rem;
+  line-height: 1.75;
+}
+
+.insight-detail .insight-share-button {
+  border-radius: 8px;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.insight-detail
+.insight-share-button:not(.insight-share-button--linkedin):hover {
+  border-color: var(--gold);
+  background: var(--cream);
+}
+
+
+/* ============================================================
+   6. ARTICLE FOOTER
+============================================================ */
+
+.insight-detail .insight-article__footer {
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+
+  border-top: 1px solid var(--border);
+}
+
+.insight-detail .insight-article__footer strong {
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   7. BOTTOM CALL-TO-ACTION
+============================================================ */
+
+.insight-detail .insight-next {
+  padding: clamp(3.5rem, 6vw, 5rem) 0;
+}
+
+.insight-detail .insight-next__inner {
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+.insight-detail .insight-next p {
+  max-width: 580px;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.insight-detail .insight-button {
+  border-radius: 8px;
+}
+
+
+/* ============================================================
+   8. TABLET RESPONSIVENESS
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .insight-detail .insight-hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+  }
+
+  .insight-detail .insight-next h2 {
+    font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+  }
+
+  .insight-detail .insight-article {
+    padding: 2rem;
+  }
+
+}
+
+
+/* ============================================================
+   9. MOBILE RESPONSIVENESS
+============================================================ */
+
+@media (max-width: 680px) {
+
+  .insight-detail .insight-hero {
+    padding-top: 4.8rem;
+    padding-bottom: 4rem;
+  }
+
+  .insight-detail .insight-hero h1 {
+    font-size: clamp(1.95rem, 7.5vw, 2.7rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+  }
+
+  .insight-detail .insight-hero__excerpt {
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  .insight-detail .insight-content {
+    padding-top: 2.7rem;
+    padding-bottom: 3.75rem;
+  }
+
+  .insight-detail .insight-article {
+    padding: 1.5rem 1.25rem;
+    border-radius: 10px;
+  }
+
+  .insight-detail .insight-article__paragraph {
+    font-size: 0.97rem;
+    line-height: 1.8;
+  }
+
+  .insight-detail .insight-article__lead {
+    font-size: 1.03rem;
+    line-height: 1.72;
+  }
+
+  .insight-detail .insight-article__lead::first-letter {
+    font-size: 2.7em;
+  }
+
+  .insight-detail .insight-article__footer {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .insight-detail .insight-sidebar__card {
+    padding: 1.3rem;
+  }
+
+  .insight-detail .insight-next h2 {
+    font-size: clamp(1.55rem, 6vw, 2.1rem);
+    line-height: 1.18;
+  }
+
+  .insight-detail .insight-next__inner {
+    gap: 1.8rem;
+  }
+
+  .insight-detail .insight-button--light {
+    width: 100%;
+  }
+
+  .insight-detail .insight-state h1 {
+    font-size: clamp(1.65rem, 6vw, 2.1rem);
+  }
+
+}
+
+
+/* ============================================================
+   10. SMALL MOBILE
+============================================================ */
+
+@media (max-width: 430px) {
+
+  .insight-detail .insight-hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .insight-detail .insight-article {
+    padding: 1.25rem 1rem;
+  }
+
+  .insight-detail .insight-next h2 {
+    font-size: 1.55rem;
+  }
+
+}
+
+
+/* ============================================================
+   11. ACCESSIBILITY
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .insight-detail *,
+  .insight-detail *::before,
+  .insight-detail *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+}

@@ -377,54 +377,59 @@ export default function Universities() {
   return (
     <>
 
-      {/* ======================================================
-          HERO
-      ====================================================== */}
+{/* ======================================================
+    HERO
+====================================================== */}
 
-      <section className="page-hero universities-hero">
+<section className="page-hero universities-hero">
 
-        <div className="container page-hero__inner">
+  {/* Animated background image */}
+  <div
+    className="universities-hero__bg"
+    aria-hidden="true"
+  />
 
-          <div className="universities-hero__content">
+  <div className="container page-hero__inner">
 
-            <span className="eyebrow eyebrow--light">
-              Universities
-            </span>
+    <div className="universities-hero__content">
 
-            <h1>
-              Connecting academic expertise with founders,
-              markets, and opportunity.
-            </h1>
+      <span className="eyebrow eyebrow--light">
+        Universities
+      </span>
 
-          </div>
+      <h1>
+        Connecting academic expertise with founders,
+        markets, and opportunity.
+      </h1>
 
+    </div>
 
-          <div className="page-hero__aside">
+    <div className="page-hero__aside">
 
-            <p>
-              Continental Founders brings universities into a
-              wider ecosystem where faculty expertise, research,
-              students, founders, industry, and institutions can
-              contribute to meaningful commercial collaboration.
-            </p>
+      <p>
+        Continental Founders brings universities into a
+        wider ecosystem where faculty expertise, research,
+        students, founders, industry, and institutions can
+        contribute to meaningful commercial collaboration.
+      </p>
 
-            <Link
-              to="/contact"
-              className="universities-hero__link"
-            >
-              Explore Partnership
+      <Link
+        to="/contact"
+        className="universities-hero__link"
+      >
+        Explore Partnership
 
-              <ArrowUpRight
-                size={17}
-                aria-hidden="true"
-              />
-            </Link>
+        <ArrowUpRight
+          size={17}
+          aria-hidden="true"
+        />
+      </Link>
 
-          </div>
+    </div>
 
-        </div>
+  </div>
 
-      </section> 
+</section>
 
 
       {/* ======================================================
@@ -462,7 +467,7 @@ export default function Universities() {
             <p>
               The objective is not simply to create another
               institutional relationship. It is to identify where
-              academic capability can contribute meaningful value,
+              academic capability can contribute meaningful value, 
               where universities can learn from emerging markets
               and entrepreneurs, and where collaboration can grow
               into lasting institutional engagement.

@@ -213,7 +213,7 @@ export default function CorporatePartners() {
               <br />
 
               <span>
-                Founder ambition.
+                Founder ambition. 
               </span>
 
               <br />

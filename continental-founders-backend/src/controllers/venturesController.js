@@ -11,336 +11,350 @@ const {
    CONSTANTS
 ============================================================ */
 
-const VENTURES_TABLE =
-  "ventures";
-
-const VENTURE_IMAGES_BUCKET =
-  "venture-images";
+const VENTURES_TABLE = "ventures";
+const VENTURE_IMAGES_BUCKET = "venture-images";
 
 
 /* ============================================================
    VALIDATION
 ============================================================ */
 
-const founderSchema =
+const founderSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Founder name is required.")
+    .max(180, "Founder name is too long."),
+
+  role: z
+    .string()
+    .trim()
+    .max(180)
+    .default(""),
+
+  image: z
+    .string()
+    .trim()
+    .max(2000)
+    .default(""),
+
+  bio: z
+    .string()
+    .trim()
+    .max(5000)
+    .default(""),
+
+  removeImage: z
+    .boolean()
+    .optional()
+    .default(false),
+});
+
+
+const opportunityAreaSchema = z.union([
+  z
+    .string()
+    .trim()
+    .max(5000),
+
   z.object({
-    name:
-      z
-        .string()
-        .trim()
-        .min(
-          1,
-          "Founder name is required."
-        )
-        .max(
-          180,
-          "Founder name is too long."
-        ),
-
-    role:
-      z
-        .string()
-        .trim()
-        .max(180)
-        .default(""),
-
-    image:
-      z
-        .string()
-        .trim()
-        .max(2000)
-        .default(""),
-
-    bio:
-      z
-        .string()
-        .trim()
-        .max(5000)
-        .default(""),
-
-    removeImage:
-      z
-        .boolean()
-        .optional()
-        .default(false),
-  });
-
-
-const opportunityAreaSchema =
-  z.union([
-    z
+    title: z
       .string()
       .trim()
-      .max(5000),
+      .max(180)
+      .default(""),
 
-    z.object({
-      title:
-        z
-          .string()
-          .trim()
-          .max(180)
-          .default(""),
+    text: z
+      .string()
+      .trim()
+      .max(10000)
+      .default(""),
 
-      text:
-        z
-          .string()
-          .trim()
-          .max(10000)
-          .default(""),
+    description: z
+      .string()
+      .trim()
+      .max(10000)
+      .optional(),
 
-      description:
-        z
-          .string()
-          .trim()
-          .max(10000)
-          .optional(),
+    label: z
+      .string()
+      .trim()
+      .max(180)
+      .optional(),
 
-      label:
-        z
-          .string()
-          .trim()
-          .max(180)
-          .optional(),
-
-      value:
-        z
-          .string()
-          .trim()
-          .max(10000)
-          .optional(),
-    }),
-  ]);
+    value: z
+      .string()
+      .trim()
+      .max(10000)
+      .optional(),
+  }),
+]);
 
 
-const ventureCreateSchema =
-  z.object({
-    name:
+/* ============================================================
+   CREATE SCHEMA
+============================================================ */
+
+const ventureCreateSchema = z.object({
+  /* ----------------------------------------------------------
+     CFCV
+  ---------------------------------------------------------- */
+
+  cfcvTrack: z
+    .string()
+    .trim()
+    .max(180)
+    .default(""),
+
+  fellowStatus: z
+    .string()
+    .trim()
+    .max(180)
+    .default(""),
+
+  cohort: z
+    .string()
+    .trim()
+    .max(180)
+    .default(""),
+
+  cohortYear: z
+    .union([
+      z.number().int().min(2000).max(2100),
+      z.null(),
+    ])
+    .optional()
+    .default(null),
+
+  catalyticSupport: z
+    .boolean()
+    .optional()
+    .default(false),
+
+  displayOrder: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .default(0),
+
+
+  /* ----------------------------------------------------------
+     CORE VENTURE
+  ---------------------------------------------------------- */
+
+  name: z
+    .string({
+      required_error:
+        "Venture name is required.",
+    })
+    .trim()
+    .min(
+      2,
+      "Venture name is required."
+    )
+    .max(220),
+
+  slug: z
+    .string({
+      required_error:
+        "Venture slug is required.",
+    })
+    .trim()
+    .min(
+      2,
+      "Venture slug is required."
+    )
+    .max(220)
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "Slug must contain lowercase letters, numbers and hyphens only."
+    ),
+
+  sector: z
+    .string({
+      required_error:
+        "Sector is required.",
+    })
+    .trim()
+    .min(
+      2,
+      "Sector is required."
+    )
+    .max(180),
+
+  country: z
+    .string({
+      required_error:
+        "Country is required.",
+    })
+    .trim()
+    .min(
+      2,
+      "Country is required."
+    )
+    .max(180),
+
+  stage: z
+    .string({
+      required_error:
+        "Venture stage is required.",
+    })
+    .trim()
+    .min(
+      2,
+      "Venture stage is required."
+    )
+    .max(180),
+
+  tagline: z
+    .string()
+    .trim()
+    .max(500)
+    .default(""),
+
+  description: z
+    .string()
+    .trim()
+    .max(5000)
+    .default(""),
+
+  longDescription: z
+    .string()
+    .trim()
+    .max(15000)
+    .default(""),
+
+  secondaryDescription: z
+    .string()
+    .trim()
+    .max(10000)
+    .default(""),
+
+  problem: z
+    .string()
+    .trim()
+    .max(10000)
+    .default(""),
+
+  solution: z
+    .string()
+    .trim()
+    .max(10000)
+    .default(""),
+
+  market: z
+    .string()
+    .trim()
+    .max(10000)
+    .default(""),
+
+  website: z
+    .union([
       z
         .string()
         .trim()
-        .min(
-          2,
-          "Venture name is required."
-        )
-        .max(220),
-
-    slug:
-      z
-        .string()
-        .trim()
-        .min(
-          2,
-          "Venture slug is required."
-        )
-        .max(220)
-        .regex(
-          /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-          "Slug must contain lowercase letters, numbers and hyphens only."
+        .url(
+          "Website must be a valid URL."
         ),
 
-    sector:
+      z.literal(""),
+    ])
+    .default(""),
+
+  email: z
+    .union([
       z
         .string()
         .trim()
-        .min(
-          2,
-          "Sector is required."
-        )
-        .max(180),
+        .email(
+          "Email address is invalid."
+        ),
 
-    country:
-      z
-        .string()
-        .trim()
-        .min(
-          2,
-          "Country is required."
-        )
-        .max(180),
+      z.literal(""),
+    ])
+    .default(""),
 
-    stage:
-      z
-        .string()
-        .trim()
-        .min(
-          2,
-          "Venture stage is required."
-        )
-        .max(180),
+  phone: z
+    .string()
+    .trim()
+    .max(80)
+    .default(""),
 
-    tagline:
+  secondaryPhone: z
+    .string()
+    .trim()
+    .max(80)
+    .default(""),
+
+  logoUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .default(""),
+
+  heroImageUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .default(""),
+
+  founders: z
+    .array(founderSchema)
+    .max(30)
+    .default([]),
+
+  services: z
+    .array(
       z
         .string()
         .trim()
         .max(500)
-        .default(""),
+    )
+    .max(100)
+    .default([]),
 
-    description:
+  lookingFor: z
+    .array(
       z
         .string()
         .trim()
-        .max(5000)
-        .default(""),
+        .max(500)
+    )
+    .max(100)
+    .default([]),
 
-    longDescription:
-      z
-        .string()
-        .trim()
-        .max(15000)
-        .default(""),
+  opportunityAreas: z
+    .array(opportunityAreaSchema)
+    .max(100)
+    .default([]),
 
-    secondaryDescription:
-      z
-        .string()
-        .trim()
-        .max(10000)
-        .default(""),
+  status: z
+    .enum([
+      "draft",
+      "published",
+      "archived",
+    ])
+    .default("draft"),
 
-    problem:
-      z
-        .string()
-        .trim()
-        .max(10000)
-        .default(""),
+  removeLogo: z
+    .boolean()
+    .optional()
+    .default(false),
 
-    solution:
-      z
-        .string()
-        .trim()
-        .max(10000)
-        .default(""),
+  removeHeroImage: z
+    .boolean()
+    .optional()
+    .default(false),
 
-    market:
-      z
-        .string()
-        .trim()
-        .max(10000)
-        .default(""),
-
-    website:
-      z
-        .union([
-          z
-            .string()
-            .trim()
-            .url(
-              "Website must be a valid URL."
-            ),
-
-          z.literal(""),
-        ])
-        .default(""),
-
-    email:
-      z
-        .union([
-          z
-            .string()
-            .trim()
-            .email(
-              "Email address is invalid."
-            ),
-
-          z.literal(""),
-        ])
-        .default(""),
-
-    phone:
-      z
-        .string()
-        .trim()
-        .max(80)
-        .default(""),
-
-    secondaryPhone:
-      z
-        .string()
-        .trim()
-        .max(80)
-        .default(""),
-
-    logoUrl:
-      z
-        .string()
-        .trim()
-        .max(2000)
-        .default(""),
-
-    heroImageUrl:
-      z
-        .string()
-        .trim()
-        .max(2000)
-        .default(""),
-
-    founders:
-      z
-        .array(
-          founderSchema
-        )
-        .max(30)
-        .default([]),
-
-    services:
-      z
-        .array(
-          z
-            .string()
-            .trim()
-            .max(500)
-        )
-        .max(100)
-        .default([]),
-
-    lookingFor:
-      z
-        .array(
-          z
-            .string()
-            .trim()
-            .max(500)
-        )
-        .max(100)
-        .default([]),
-
-    opportunityAreas:
-      z
-        .array(
-          opportunityAreaSchema
-        )
-        .max(100)
-        .default([]),
-
-    status:
-      z
-        .enum([
-          "draft",
-          "published",
-          "archived",
-        ])
-        .default("draft"),
-
-    removeLogo:
-      z
-        .boolean()
-        .optional()
-        .default(false),
-
-    removeHeroImage:
-      z
-        .boolean()
-        .optional()
-        .default(false),
-
-    founderImageIndexes:
-      z
-        .array(
-          z.number().int().min(0)
-        )
-        .max(30)
-        .optional()
-        .default([]),
-  });
+  founderImageIndexes: z
+    .array(
+      z.number().int().min(0)
+    )
+    .max(30)
+    .optional()
+    .default([]),
+});
 
 
 const ventureUpdateSchema =
@@ -348,93 +362,96 @@ const ventureUpdateSchema =
 
 
 /* ============================================================
-   NORMALIZE VENTURE
+   NORMALIZE VENTURE FROM DATABASE
 ============================================================ */
 
-function normalizeVenture(
-  venture
-) {
-
+function normalizeVenture(venture) {
   if (!venture) {
     return null;
   }
-
 
   return {
     id:
       venture.id,
 
+    /* CFCV */
+
+    cfcvTrack:
+      venture.cfcv_track || "",
+
+    fellowStatus:
+      venture.fellow_status || "",
+
+    cohort:
+      venture.cohort || "",
+
+    cohortYear:
+      venture.cohort_year ?? null,
+
+    catalyticSupport:
+      Boolean(
+        venture.catalytic_support
+      ),
+
+    displayOrder:
+      venture.display_order ?? 0,
+
+    /* CORE */
+
     name:
-      venture.name ||
-      "",
+      venture.name || "",
 
     slug:
-      venture.slug ||
-      "",
+      venture.slug || "",
 
     sector:
-      venture.sector ||
-      "",
+      venture.sector || "",
 
     country:
-      venture.country ||
-      "",
+      venture.country || "",
 
     stage:
-      venture.stage ||
-      "",
+      venture.stage || "",
 
     tagline:
-      venture.tagline ||
-      "",
+      venture.tagline || "",
 
     description:
-      venture.description ||
-      "",
+      venture.description || "",
 
     longDescription:
-      venture.long_description ||
-      "",
+      venture.long_description || "",
 
     secondaryDescription:
       venture.secondary_description ||
       "",
 
     problem:
-      venture.problem ||
-      "",
+      venture.problem || "",
 
     solution:
-      venture.solution ||
-      "",
+      venture.solution || "",
 
     market:
-      venture.market ||
-      "",
+      venture.market || "",
 
     website:
-      venture.website ||
-      "",
+      venture.website || "",
 
     email:
-      venture.email ||
-      "",
+      venture.email || "",
 
     phone:
-      venture.phone ||
-      "",
+      venture.phone || "",
 
     secondaryPhone:
-      venture.secondary_phone ||
-      "",
+      venture.secondary_phone || "",
 
     logoUrl:
-      venture.logo_url ||
-      "",
+      venture.logo_url || "",
 
     heroImageUrl:
-      venture.hero_image_url ||
-      "",
+      venture.hero_image_url || "",
 
     founders:
       Array.isArray(
@@ -465,22 +482,17 @@ function normalizeVenture(
         : [],
 
     status:
-      venture.status ||
-      "draft",
+      venture.status || "draft",
 
     publishedAt:
-      venture.published_at ||
-      null,
+      venture.published_at || null,
 
     createdAt:
-      venture.created_at ||
-      null,
+      venture.created_at || null,
 
     updatedAt:
-      venture.updated_at ||
-      null,
+      venture.updated_at || null,
   };
-
 }
 
 
@@ -488,51 +500,36 @@ function normalizeVenture(
    BOOLEAN PARSER
 ============================================================ */
 
-function parseBoolean(
-  value
-) {
-
+function parseBoolean(value) {
   if (
-    typeof value ===
-    "boolean"
+    typeof value === "boolean"
   ) {
     return value;
   }
 
-
   if (
-    typeof value ===
-    "number"
+    typeof value === "number"
   ) {
     return value === 1;
   }
 
-
   if (
-    typeof value ===
-    "string"
+    typeof value === "string"
   ) {
-
     const normalized =
       value
         .trim()
         .toLowerCase();
-
 
     return [
       "true",
       "1",
       "yes",
       "on",
-    ].includes(
-      normalized
-    );
-
+    ].includes(normalized);
   }
 
-
   return false;
-
 }
 
 
@@ -544,45 +541,75 @@ function parseJsonField(
   value,
   fallback
 ) {
-
   if (
-    value ===
-    undefined ||
-    value ===
-    null ||
-    value ===
-    ""
+    value === undefined ||
+    value === null ||
+    value === ""
   ) {
     return fallback;
   }
 
-
   if (
-    typeof value !==
-    "string"
+    typeof value !== "string"
   ) {
     return value;
   }
 
-
   try {
-
-    return JSON.parse(
-      value
-    );
-
+    return JSON.parse(value);
   } catch (error) {
-
     console.error(
       "Unable to parse venture JSON field:",
       error
     );
 
-
     return fallback;
+  }
+}
 
+
+/* ============================================================
+   NUMBER PARSER
+============================================================ */
+
+function parseOptionalInteger(
+  value
+) {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return null;
   }
 
+  const number =
+    Number(value);
+
+  return Number.isInteger(number)
+    ? number
+    : value;
+}
+
+
+function parseInteger(
+  value,
+  fallback = 0
+) {
+  if (
+    value === undefined ||
+    value === null ||
+    value === ""
+  ) {
+    return fallback;
+  }
+
+  const number =
+    Number(value);
+
+  return Number.isInteger(number)
+    ? number
+    : value;
 }
 
 
@@ -593,11 +620,14 @@ function parseJsonField(
 function normalizeRequestBody(
   body = {}
 ) {
-
   const normalized = {
     ...body,
   };
 
+
+  /* ----------------------------------------------------------
+     JSON ARRAYS
+  ---------------------------------------------------------- */
 
   if (
     Object.prototype.hasOwnProperty.call(
@@ -605,13 +635,11 @@ function normalizeRequestBody(
       "founders"
     )
   ) {
-
     normalized.founders =
       parseJsonField(
         body.founders,
         []
       );
-
   }
 
 
@@ -621,13 +649,11 @@ function normalizeRequestBody(
       "services"
     )
   ) {
-
     normalized.services =
       parseJsonField(
         body.services,
         []
       );
-
   }
 
 
@@ -637,13 +663,11 @@ function normalizeRequestBody(
       "lookingFor"
     )
   ) {
-
     normalized.lookingFor =
       parseJsonField(
         body.lookingFor,
         []
       );
-
   }
 
 
@@ -653,13 +677,11 @@ function normalizeRequestBody(
       "opportunityAreas"
     )
   ) {
-
     normalized.opportunityAreas =
       parseJsonField(
         body.opportunityAreas,
         []
       );
-
   }
 
 
@@ -669,7 +691,6 @@ function normalizeRequestBody(
       "founderImageIndexes"
     )
   ) {
-
     normalized.founderImageIndexes =
       parseJsonField(
         body.founderImageIndexes,
@@ -686,9 +707,12 @@ function normalizeRequestBody(
             ) &&
             value >= 0
         );
-
   }
 
+
+  /* ----------------------------------------------------------
+     BOOLEANS
+  ---------------------------------------------------------- */
 
   if (
     Object.prototype.hasOwnProperty.call(
@@ -696,12 +720,10 @@ function normalizeRequestBody(
       "removeLogo"
     )
   ) {
-
     normalized.removeLogo =
       parseBoolean(
         body.removeLogo
       );
-
   }
 
 
@@ -711,21 +733,66 @@ function normalizeRequestBody(
       "removeHeroImage"
     )
   ) {
-
     normalized.removeHeroImage =
       parseBoolean(
         body.removeHeroImage
       );
-
   }
 
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "catalyticSupport"
+    )
+  ) {
+    normalized.catalyticSupport =
+      parseBoolean(
+        body.catalyticSupport
+      );
+  }
+
+
+  /* ----------------------------------------------------------
+     NUMBERS
+  ---------------------------------------------------------- */
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "cohortYear"
+    )
+  ) {
+    normalized.cohortYear =
+      parseOptionalInteger(
+        body.cohortYear
+      );
+  }
+
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      body,
+      "displayOrder"
+    )
+  ) {
+    normalized.displayOrder =
+      parseInteger(
+        body.displayOrder,
+        0
+      );
+  }
+
+
+  /* ----------------------------------------------------------
+     FOUNDER REMOVE IMAGE
+  ---------------------------------------------------------- */
 
   if (
     Array.isArray(
       normalized.founders
     )
   ) {
-
     normalized.founders =
       normalized.founders.map(
         (founder) => ({
@@ -737,12 +804,10 @@ function normalizeRequestBody(
             ),
         })
       );
-
   }
 
 
   return normalized;
-
 }
 
 
@@ -750,18 +815,10 @@ function normalizeRequestBody(
    CLEAN STRING ARRAY
 ============================================================ */
 
-function cleanStringArray(
-  values
-) {
-
-  if (
-    !Array.isArray(
-      values
-    )
-  ) {
+function cleanStringArray(values) {
+  if (!Array.isArray(values)) {
     return [];
   }
-
 
   const cleaned =
     values
@@ -773,13 +830,9 @@ function cleanStringArray(
       )
       .filter(Boolean);
 
-
   return Array.from(
-    new Set(
-      cleaned
-    )
+    new Set(cleaned)
   );
-
 }
 
 
@@ -787,44 +840,32 @@ function cleanStringArray(
    CLEAN FOUNDERS
 ============================================================ */
 
-function cleanFounders(
-  founders
-) {
-
-  if (
-    !Array.isArray(
-      founders
-    )
-  ) {
+function cleanFounders(founders) {
+  if (!Array.isArray(founders)) {
     return [];
   }
-
 
   return founders
     .map(
       (founder) => ({
         name:
           String(
-            founder?.name ||
-            ""
+            founder?.name || ""
           ).trim(),
 
         role:
           String(
-            founder?.role ||
-            ""
+            founder?.role || ""
           ).trim(),
 
         image:
           String(
-            founder?.image ||
-            ""
+            founder?.image || ""
           ).trim(),
 
         bio:
           String(
-            founder?.bio ||
-            ""
+            founder?.bio || ""
           ).trim(),
       })
     )
@@ -832,7 +873,6 @@ function cleanFounders(
       (founder) =>
         founder.name
     );
-
 }
 
 
@@ -843,75 +883,52 @@ function cleanFounders(
 function cleanOpportunityAreas(
   areas
 ) {
-
-  if (
-    !Array.isArray(
-      areas
-    )
-  ) {
+  if (!Array.isArray(areas)) {
     return [];
   }
 
-
   return areas
-    .map(
-      (area) => {
+    .map((area) => {
+      if (
+        typeof area === "string"
+      ) {
+        const value =
+          area.trim();
 
-        if (
-          typeof area ===
-          "string"
-        ) {
-
-          const value =
-            area.trim();
-
-
-          if (!value) {
-            return null;
-          }
-
-
-          return {
-            title:
-              value,
-
-            text:
-              "",
-          };
-
+        if (!value) {
+          return null;
         }
 
-
-        if (
-          area &&
-          typeof area ===
-          "object"
-        ) {
-
-          return {
-            title:
-              String(
-                area.title ||
-                area.label ||
-                ""
-              ).trim(),
-
-            text:
-              String(
-                area.text ||
-                area.description ||
-                area.value ||
-                ""
-              ).trim(),
-          };
-
-        }
-
-
-        return null;
-
+        return {
+          title: value,
+          text: "",
+        };
       }
-    )
+
+      if (
+        area &&
+        typeof area === "object"
+      ) {
+        return {
+          title:
+            String(
+              area.title ||
+              area.label ||
+              ""
+            ).trim(),
+
+          text:
+            String(
+              area.text ||
+              area.description ||
+              area.value ||
+              ""
+            ).trim(),
+        };
+      }
+
+      return null;
+    })
     .filter(
       (area) =>
         area &&
@@ -920,7 +937,6 @@ function cleanOpportunityAreas(
           area.text
         )
     );
-
 }
 
 
@@ -928,37 +944,23 @@ function cleanOpportunityAreas(
    FILE EXTENSION
 ============================================================ */
 
-function getFileExtension(
-  file
-) {
-
+function getFileExtension(file) {
   const mimeExtensions = {
-    "image/jpeg":
-      ".jpg",
-
-    "image/jpg":
-      ".jpg",
-
-    "image/png":
-      ".png",
-
-    "image/webp":
-      ".webp",
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
   };
-
 
   if (
     mimeExtensions[
       file?.mimetype
     ]
   ) {
-
     return mimeExtensions[
       file.mimetype
     ];
-
   }
-
 
   const originalExtension =
     path
@@ -967,7 +969,6 @@ function getFileExtension(
         ""
       )
       .toLowerCase();
-
 
   if (
     [
@@ -979,31 +980,23 @@ function getFileExtension(
       originalExtension
     )
   ) {
-
     return originalExtension ===
       ".jpeg"
       ? ".jpg"
       : originalExtension;
-
   }
 
-
   return ".jpg";
-
 }
 
 
 /* ============================================================
-   SAFE SLUG
+   SAFE STORAGE NAME
 ============================================================ */
 
-function safeStorageName(
-  value
-) {
-
+function safeStorageName(value) {
   return String(
-    value ||
-    "venture"
+    value || "venture"
   )
     .trim()
     .toLowerCase()
@@ -1020,12 +1013,11 @@ function safeStorageName(
       120
     ) ||
     "venture";
-
 }
 
 
 /* ============================================================
-   STORAGE FILE PATH
+   CREATE STORAGE PATH
 ============================================================ */
 
 function createStoragePath(
@@ -1033,18 +1025,13 @@ function createStoragePath(
   ventureSlug,
   file
 ) {
-
   const extension =
-    getFileExtension(
-      file
-    );
-
+    getFileExtension(file);
 
   const uniqueId =
     crypto
       .randomBytes(12)
       .toString("hex");
-
 
   return [
     "ventures",
@@ -1054,7 +1041,6 @@ function createStoragePath(
     ),
     `${Date.now()}-${uniqueId}${extension}`,
   ].join("/");
-
 }
 
 
@@ -1067,17 +1053,11 @@ async function uploadVentureImage(
   folder,
   ventureSlug
 ) {
-
-  if (
-    !file?.buffer
-  ) {
-
+  if (!file?.buffer) {
     throw new Error(
       "The uploaded image is invalid."
     );
-
   }
-
 
   const storagePath =
     createStoragePath(
@@ -1086,10 +1066,8 @@ async function uploadVentureImage(
       file
     );
 
-
   const {
-    error:
-      uploadError,
+    error: uploadError,
   } =
     await supabaseAdmin
       .storage
@@ -1111,27 +1089,19 @@ async function uploadVentureImage(
         }
       );
 
-
-  if (
-    uploadError
-  ) {
-
+  if (uploadError) {
     console.error(
       "Venture image upload error:",
       uploadError
     );
 
-
     throw new Error(
       "Unable to upload the venture image."
     );
-
   }
 
-
   const {
-    data:
-      publicUrlData,
+    data: publicUrlData,
   } =
     supabaseAdmin
       .storage
@@ -1142,17 +1112,11 @@ async function uploadVentureImage(
         storagePath
       );
 
-
   const publicUrl =
-    publicUrlData
-      ?.publicUrl ||
+    publicUrlData?.publicUrl ||
     "";
 
-
-  if (
-    !publicUrl
-  ) {
-
+  if (!publicUrl) {
     await supabaseAdmin
       .storage
       .from(
@@ -1162,13 +1126,10 @@ async function uploadVentureImage(
         storagePath,
       ]);
 
-
     throw new Error(
       "Unable to generate the venture image URL."
     );
-
   }
-
 
   return {
     path:
@@ -1176,40 +1137,32 @@ async function uploadVentureImage(
 
     publicUrl,
   };
-
 }
 
 
 /* ============================================================
-   GET STORAGE PATH FROM PUBLIC URL
+   STORAGE PATH FROM PUBLIC URL
 ============================================================ */
 
 function getStoragePathFromUrl(
   publicUrl
 ) {
-
   if (
     !publicUrl ||
     typeof publicUrl !==
-    "string"
+      "string"
   ) {
     return "";
   }
 
-
   try {
-
     const url =
-      new URL(
-        publicUrl
-      );
-
+      new URL(publicUrl);
 
     const pathname =
       decodeURIComponent(
         url.pathname
       );
-
 
     const markers = [
       `/storage/v1/object/public/${VENTURE_IMAGES_BUCKET}/`,
@@ -1217,22 +1170,15 @@ function getStoragePathFromUrl(
       `/storage/v1/object/${VENTURE_IMAGES_BUCKET}/`,
     ];
 
-
     for (
-      const marker
-      of markers
+      const marker of markers
     ) {
-
       const index =
         pathname.indexOf(
           marker
         );
 
-
-      if (
-        index !== -1
-      ) {
-
+      if (index !== -1) {
         return pathname
           .slice(
             index +
@@ -1242,20 +1188,13 @@ function getStoragePathFromUrl(
             /^\/+/,
             ""
           );
-
       }
-
     }
 
-
     return "";
-
   } catch (error) {
-
     return "";
-
   }
-
 }
 
 
@@ -1266,21 +1205,14 @@ function getStoragePathFromUrl(
 async function deleteStorageFileByUrl(
   publicUrl
 ) {
-
   const storagePath =
     getStoragePathFromUrl(
       publicUrl
     );
 
-
-  if (
-    !storagePath
-  ) {
-
+  if (!storagePath) {
     return false;
-
   }
-
 
   const {
     error,
@@ -1294,24 +1226,16 @@ async function deleteStorageFileByUrl(
         storagePath,
       ]);
 
-
-  if (
-    error
-  ) {
-
+  if (error) {
     console.error(
       "Delete venture storage file error:",
       error
     );
 
-
     return false;
-
   }
 
-
   return true;
-
 }
 
 
@@ -1322,62 +1246,37 @@ async function deleteStorageFileByUrl(
 async function deleteStorageUrls(
   urls
 ) {
-
   const uniqueUrls =
     Array.from(
       new Set(
-        (
-          urls ||
-          []
-        )
+        (urls || [])
           .filter(Boolean)
       )
     );
 
-
   for (
-    const url
-    of uniqueUrls
+    const url of uniqueUrls
   ) {
-
     try {
-
       await deleteStorageFileByUrl(
         url
       );
-
     } catch (error) {
-
       console.error(
         "Venture storage cleanup error:",
         error
       );
-
     }
-
   }
-
 }
 
 
 /* ============================================================
    FILE HELPERS
-
-   Supports multer upload.any().
-
-   Expected image fields:
-   logo
-   heroImage
-   founderImage_0
-   founderImage_1
-   founderImage_2
-   ...
+   Supports multer upload.any()
 ============================================================ */
 
-function getRequestFiles(
-  req
-) {
-
+function getRequestFiles(req) {
   if (
     Array.isArray(
       req.files
@@ -1386,26 +1285,20 @@ function getRequestFiles(
     return req.files;
   }
 
-
-  // Backwards-compatible fallback for object-shaped req.files.
   if (
     req.files &&
     typeof req.files ===
       "object"
   ) {
-
     return Object
       .values(
         req.files
       )
       .flat()
       .filter(Boolean);
-
   }
 
-
   return [];
-
 }
 
 
@@ -1413,12 +1306,8 @@ function getSingleFile(
   req,
   fieldName
 ) {
-
   const files =
-    getRequestFiles(
-      req
-    );
-
+    getRequestFiles(req);
 
   return (
     files.find(
@@ -1428,101 +1317,61 @@ function getSingleFile(
     ) ||
     null
   );
-
-}
-
-
-function getMultipleFiles(
-  req,
-  fieldName
-) {
-
-  const files =
-    getRequestFiles(
-      req
-    );
-
-
-  return files.filter(
-    (file) =>
-      file?.fieldname ===
-      fieldName
-  );
-
 }
 
 
 /* ============================================================
    DYNAMIC FOUNDER IMAGE FILES
-
-   founderImage_0 = founder at index 0
-   founderImage_1 = founder at index 1
-   founderImage_2 = founder at index 2
 ============================================================ */
 
-function getFounderImageFiles(
-  req
-) {
-
+function getFounderImageFiles(req) {
   const files =
-    getRequestFiles(
-      req
-    );
-
+    getRequestFiles(req);
 
   return files
-    .map(
-      (file) => {
+    .map((file) => {
+      const match =
+        String(
+          file?.fieldname ||
+          ""
+        ).match(
+          /^founderImage_(\d+)$/
+        );
 
-        const match =
-          String(
-            file?.fieldname ||
-            ""
-          ).match(
-            /^founderImage_(\d+)$/
-          );
-
-
-        if (!match) {
-          return null;
-        }
-
-
-        const founderIndex =
-          Number(
-            match[1]
-          );
-
-
-        if (
-          !Number.isInteger(
-            founderIndex
-          ) ||
-          founderIndex < 0
-        ) {
-          return null;
-        }
-
-
-        return {
-          file,
-          founderIndex,
-        };
-
+      if (!match) {
+        return null;
       }
-    )
+
+      const founderIndex =
+        Number(
+          match[1]
+        );
+
+      if (
+        !Number.isInteger(
+          founderIndex
+        ) ||
+        founderIndex < 0
+      ) {
+        return null;
+      }
+
+      return {
+        file,
+        founderIndex,
+      };
+    })
     .filter(Boolean)
     .sort(
       (a, b) =>
         a.founderIndex -
         b.founderIndex
     );
-
 }
 
 
 /* ============================================================
-   APPLY FOUNDER IMAGE UPLOADS
+   APPLY FOUNDER IMAGES
 ============================================================ */
 
 async function applyFounderImages({
@@ -1530,11 +1379,8 @@ async function applyFounderImages({
   founderUploads,
   ventureSlug,
 }) {
-
   const updatedFounders =
-    Array.isArray(
-      founders
-    )
+    Array.isArray(founders)
       ? founders.map(
           (founder) => ({
             ...founder,
@@ -1542,22 +1388,17 @@ async function applyFounderImages({
         )
       : [];
 
-
-  const uploadedUrls =
-    [];
-
+  const uploadedUrls = [];
 
   for (
     const uploadItem of
     founderUploads
   ) {
-
     const {
       file,
       founderIndex,
     } =
       uploadItem;
-
 
     if (
       !Number.isInteger(
@@ -1567,13 +1408,10 @@ async function applyFounderImages({
       founderIndex >=
         updatedFounders.length
     ) {
-
       throw new Error(
         `Founder image ${founderIndex} could not be matched to a founder.`
       );
-
     }
-
 
     const uploaded =
       await uploadVentureImage(
@@ -1582,19 +1420,15 @@ async function applyFounderImages({
         ventureSlug
       );
 
-
     uploadedUrls.push(
       uploaded.publicUrl
     );
-
 
     updatedFounders[
       founderIndex
     ].image =
       uploaded.publicUrl;
-
   }
-
 
   return {
     founders:
@@ -1602,7 +1436,6 @@ async function applyFounderImages({
 
     uploadedUrls,
   };
-
 }
 
 
@@ -1614,11 +1447,18 @@ function sendValidationError(
   res,
   parsed
 ) {
-
   const issues =
     parsed.error?.issues ||
     [];
 
+  console.error(
+    "VENTURE VALIDATION FAILED:",
+    JSON.stringify(
+      issues,
+      null,
+      2
+    )
+  );
 
   return res
     .status(400)
@@ -1627,23 +1467,39 @@ function sendValidationError(
         false,
 
       message:
-        issues[0]?.message ||
-        "Please check the venture information.",
+        issues.length
+          ? issues
+              .map((issue) => {
+                const field =
+                  issue.path?.length
+                    ? issue.path.join(
+                        "."
+                      )
+                    : "venture";
+
+                return `${field}: ${issue.message}`;
+              })
+              .join(" | ")
+          : "Please check the venture information.",
 
       errors:
         issues.map(
           (issue) => ({
             field:
-              issue.path.join(
-                "."
-              ),
+              issue.path?.length
+                ? issue.path.join(
+                    "."
+                  )
+                : "venture",
 
             message:
               issue.message,
+
+            code:
+              issue.code,
           })
         ),
     });
-
 }
 
 
@@ -1651,16 +1507,35 @@ function sendValidationError(
    CREATE DATABASE PAYLOAD
 ============================================================ */
 
-function buildCreatePayload(
-  input
-) {
-
+function buildCreatePayload(input) {
   const now =
     new Date()
       .toISOString();
 
-
   return {
+    /* CFCV */
+
+    cfcv_track:
+      input.cfcvTrack || "",
+
+    fellow_status:
+      input.fellowStatus || "",
+
+    cohort:
+      input.cohort || "",
+
+    cohort_year:
+      input.cohortYear ?? null,
+
+    catalytic_support:
+      input.catalyticSupport ===
+      true,
+
+    display_order:
+      input.displayOrder ?? 0,
+
+    /* CORE */
+
     name:
       input.name,
 
@@ -1677,12 +1552,10 @@ function buildCreatePayload(
       input.stage,
 
     tagline:
-      input.tagline ||
-      "",
+      input.tagline || "",
 
     description:
-      input.description ||
-      "",
+      input.description || "",
 
     long_description:
       input.longDescription ||
@@ -1693,40 +1566,31 @@ function buildCreatePayload(
       "",
 
     problem:
-      input.problem ||
-      "",
+      input.problem || "",
 
     solution:
-      input.solution ||
-      "",
+      input.solution || "",
 
     market:
-      input.market ||
-      "",
+      input.market || "",
 
     website:
-      input.website ||
-      "",
+      input.website || "",
 
     email:
-      input.email ||
-      "",
+      input.email || "",
 
     phone:
-      input.phone ||
-      "",
+      input.phone || "",
 
     secondary_phone:
-      input.secondaryPhone ||
-      "",
+      input.secondaryPhone || "",
 
     logo_url:
-      input.logoUrl ||
-      "",
+      input.logoUrl || "",
 
     hero_image_url:
-      input.heroImageUrl ||
-      "",
+      input.heroImageUrl || "",
 
     founders:
       cleanFounders(
@@ -1749,8 +1613,7 @@ function buildCreatePayload(
       ),
 
     status:
-      input.status ||
-      "draft",
+      input.status || "draft",
 
     published_at:
       input.status ===
@@ -1764,19 +1627,17 @@ function buildCreatePayload(
     updated_at:
       now,
   };
-
 }
 
 
 /* ============================================================
-   CREATE UPDATE PAYLOAD
+   UPDATE DATABASE PAYLOAD
 ============================================================ */
 
 function buildUpdatePayload(
   input,
   existing
 ) {
-
   const payload = {
     updated_at:
       new Date()
@@ -1784,58 +1645,105 @@ function buildUpdatePayload(
   };
 
 
+  /* ----------------------------------------------------------
+     CFCV
+  ---------------------------------------------------------- */
+
   if (
-    input.name !==
+    input.cfcvTrack !==
     undefined
+  ) {
+    payload.cfcv_track =
+      input.cfcvTrack;
+  }
+
+  if (
+    input.fellowStatus !==
+    undefined
+  ) {
+    payload.fellow_status =
+      input.fellowStatus;
+  }
+
+  if (
+    input.cohort !==
+    undefined
+  ) {
+    payload.cohort =
+      input.cohort;
+  }
+
+  if (
+    input.cohortYear !==
+    undefined
+  ) {
+    payload.cohort_year =
+      input.cohortYear;
+  }
+
+  if (
+    input.catalyticSupport !==
+    undefined
+  ) {
+    payload.catalytic_support =
+      input.catalyticSupport ===
+      true;
+  }
+
+  if (
+    input.displayOrder !==
+    undefined
+  ) {
+    payload.display_order =
+      input.displayOrder;
+  }
+
+
+  /* ----------------------------------------------------------
+     CORE
+  ---------------------------------------------------------- */
+
+  if (
+    input.name !== undefined
   ) {
     payload.name =
       input.name;
   }
 
-
   if (
-    input.slug !==
-    undefined
+    input.slug !== undefined
   ) {
     payload.slug =
       input.slug;
   }
 
-
   if (
-    input.sector !==
-    undefined
-  ) {    payload.sector =
+    input.sector !== undefined
+  ) {
+    payload.sector =
       input.sector;
   }
 
-
   if (
-    input.country !==
-    undefined
+    input.country !== undefined
   ) {
     payload.country =
       input.country;
   }
 
-
   if (
-    input.stage !==
-    undefined
+    input.stage !== undefined
   ) {
     payload.stage =
       input.stage;
   }
 
-
   if (
-    input.tagline !==
-    undefined
+    input.tagline !== undefined
   ) {
     payload.tagline =
       input.tagline;
   }
-
 
   if (
     input.description !==
@@ -1845,7 +1753,6 @@ function buildUpdatePayload(
       input.description;
   }
 
-
   if (
     input.longDescription !==
     undefined
@@ -1853,7 +1760,6 @@ function buildUpdatePayload(
     payload.long_description =
       input.longDescription;
   }
-
 
   if (
     input.secondaryDescription !==
@@ -1863,60 +1769,47 @@ function buildUpdatePayload(
       input.secondaryDescription;
   }
 
-
   if (
-    input.problem !==
-    undefined
+    input.problem !== undefined
   ) {
     payload.problem =
       input.problem;
   }
 
-
   if (
-    input.solution !==
-    undefined
+    input.solution !== undefined
   ) {
     payload.solution =
       input.solution;
   }
 
-
   if (
-    input.market !==
-    undefined
+    input.market !== undefined
   ) {
     payload.market =
       input.market;
   }
 
-
   if (
-    input.website !==
-    undefined
+    input.website !== undefined
   ) {
     payload.website =
       input.website;
   }
 
-
   if (
-    input.email !==
-    undefined
+    input.email !== undefined
   ) {
     payload.email =
       input.email;
   }
 
-
   if (
-    input.phone !==
-    undefined
+    input.phone !== undefined
   ) {
     payload.phone =
       input.phone;
   }
-
 
   if (
     input.secondaryPhone !==
@@ -1926,15 +1819,12 @@ function buildUpdatePayload(
       input.secondaryPhone;
   }
 
-
   if (
-    input.logoUrl !==
-    undefined
+    input.logoUrl !== undefined
   ) {
     payload.logo_url =
       input.logoUrl;
   }
-
 
   if (
     input.heroImageUrl !==
@@ -1944,67 +1834,54 @@ function buildUpdatePayload(
       input.heroImageUrl;
   }
 
-
   if (
-    input.founders !==
-    undefined
+    input.founders !== undefined
   ) {
-
     payload.founders =
       cleanFounders(
         input.founders
       );
-
   }
 
-
   if (
-    input.services !==
-    undefined
+    input.services !== undefined
   ) {
-
     payload.services =
       cleanStringArray(
         input.services
       );
-
   }
-
 
   if (
     input.lookingFor !==
     undefined
   ) {
-
     payload.looking_for =
       cleanStringArray(
         input.lookingFor
       );
-
   }
-
 
   if (
     input.opportunityAreas !==
     undefined
   ) {
-
     payload.opportunity_areas =
       cleanOpportunityAreas(
         input.opportunityAreas
       );
-
   }
 
 
-  if (
-    input.status !==
-    undefined
-  ) {
+  /* ----------------------------------------------------------
+     PUBLICATION STATUS
+  ---------------------------------------------------------- */
 
+  if (
+    input.status !== undefined
+  ) {
     payload.status =
       input.status;
-
 
     if (
       input.status ===
@@ -2012,29 +1889,21 @@ function buildUpdatePayload(
       existing.status !==
         "published"
     ) {
-
       payload.published_at =
         new Date()
           .toISOString();
-
     }
-
 
     if (
       input.status !==
       "published"
     ) {
-
       payload.published_at =
         null;
-
     }
-
   }
 
-
   return payload;
-
 }
 
 
@@ -2046,9 +1915,7 @@ async function getPublishedVentures(
   req,
   res
 ) {
-
   try {
-
     const {
       data,
       error,
@@ -2063,73 +1930,58 @@ async function getPublishedVentures(
           "published"
         )
         .order(
+          "display_order",
+          {
+            ascending: true,
+          }
+        )
+        .order(
           "published_at",
           {
-            ascending:
-              false,
-
-            nullsFirst:
-              false,
+            ascending: false,
+            nullsFirst: false,
           }
         );
 
-
     if (error) {
-
       console.error(
         "Get published ventures error:",
         error
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to load ventures.",
         });
-
     }
-
 
     return res
       .status(200)
       .json({
-        success:
-          true,
+        success: true,
 
         ventures:
-          (
-            data ||
-            []
-          ).map(
+          (data || []).map(
             normalizeVenture
           ),
       });
-
   } catch (error) {
-
     console.error(
       "Get published ventures exception:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
-
+        success: false,
         message:
           "Unable to load ventures.",
       });
-
   }
-
 }
 
 
@@ -2141,32 +1993,23 @@ async function getPublishedVentureBySlug(
   req,
   res
 ) {
-
   try {
-
     const slug =
       String(
-        req.params.slug ||
-        ""
+        req.params.slug || ""
       )
         .trim()
         .toLowerCase();
 
-
     if (!slug) {
-
       return res
         .status(400)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture slug is required.",
         });
-
     }
-
 
     const {
       data,
@@ -2187,75 +2030,55 @@ async function getPublishedVentureBySlug(
         )
         .maybeSingle();
 
-
     if (error) {
-
       console.error(
         "Get venture by slug error:",
         error
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to load this venture.",
         });
-
     }
 
-
     if (!data) {
-
       return res
         .status(404)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture not found.",
         });
-
     }
-
 
     return res
       .status(200)
       .json({
-        success:
-          true,
+        success: true,
 
         venture:
           normalizeVenture(
             data
           ),
       });
-
   } catch (error) {
-
     console.error(
       "Get venture by slug exception:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
-
+        success: false,
         message:
           "Unable to load this venture.",
       });
-
   }
-
 }
 
 
@@ -2267,9 +2090,7 @@ async function getVenturesDirectory(
   req,
   res
 ) {
-
   try {
-
     const {
       data,
       error,
@@ -2280,70 +2101,111 @@ async function getVenturesDirectory(
         )
         .select("*")
         .order(
+          "display_order",
+          {
+            ascending: true,
+          }
+        )
+        .order(
           "created_at",
           {
-            ascending:
-              false,
+            ascending: false,
           }
         );
 
-
     if (error) {
-
       console.error(
         "Get venture directory error:",
         error
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to load the venture directory.",
         });
-
     }
-
 
     return res
       .status(200)
       .json({
-        success:
-          true,
+        success: true,
 
         ventures:
-          (
-            data ||
-            []
-          ).map(
+          (data || []).map(
             normalizeVenture
           ),
       });
-
   } catch (error) {
-
     console.error(
       "Get venture directory exception:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
-
+        success: false,
         message:
           "Unable to load the venture directory.",
       });
+  }
+}
 
+
+/* ============================================================
+   EXTRACT MULTIPART VENTURE
+============================================================ */
+
+function extractVentureBody(req) {
+  let requestBody =
+    req.body || {};
+
+  if (
+    Object.prototype
+      .hasOwnProperty
+      .call(
+        requestBody,
+        "venture"
+      )
+  ) {
+    const parsedVenture =
+      parseJsonField(
+        requestBody.venture,
+        null
+      );
+
+    if (
+      !parsedVenture ||
+      typeof parsedVenture !==
+        "object" ||
+      Array.isArray(
+        parsedVenture
+      )
+    ) {
+      return {
+        success: false,
+        body: null,
+      };
+    }
+
+    requestBody = {
+      ...requestBody,
+      ...parsedVenture,
+    };
+
+    delete requestBody.venture;
   }
 
+  return {
+    success: true,
+    body:
+      normalizeRequestBody(
+        requestBody
+      ),
+  };
 }
 
 
@@ -2355,100 +2217,38 @@ async function createVenture(
   req,
   res
 ) {
-
-  const uploadedUrls =
-    [];
-
+  const uploadedUrls = [];
 
   try {
+    /* ----------------------------------------------------------
+       READ MULTIPART VENTURE
+    ---------------------------------------------------------- */
 
-    /*
-     * The AdminVentures frontend sends the venture
-     * object as JSON inside the multipart field:
-     *
-     * venture
-     *
-     * We therefore unpack that object before validation.
-     */
+    const extracted =
+      extractVentureBody(req);
 
-    let requestBody =
-      req.body ||
-      {};
-
-
-    if (
-      Object.prototype
-        .hasOwnProperty
-        .call(
-          requestBody,
-          "venture"
-        )
-    ) {
-
-      const parsedVenture =
-        parseJsonField(
-          requestBody.venture,
-          null
-        );
-
-
-      if (
-        !parsedVenture ||
-        typeof parsedVenture !==
-          "object" ||
-        Array.isArray(
-          parsedVenture
-        )
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "The venture information is invalid.",
-          });
-
-      }
-
-
-      requestBody = {
-        ...requestBody,
-        ...parsedVenture,
-      };
-
-
-      delete requestBody.venture;
-
+    if (!extracted.success) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "The venture information is invalid.",
+        });
     }
-
-
-    const normalizedBody =
-      normalizeRequestBody(
-        requestBody
-      );
-
 
     const parsed =
       ventureCreateSchema
         .safeParse(
-          normalizedBody
+          extracted.body
         );
 
-
-    if (
-      !parsed.success
-    ) {
-
+    if (!parsed.success) {
       return sendValidationError(
         res,
         parsed
       );
-
     }
-
 
     const input = {
       ...parsed.data,
@@ -2460,11 +2260,8 @@ async function createVenture(
     ---------------------------------------------------------- */
 
     const {
-      data:
-        existingSlug,
-
-      error:
-        duplicateError,
+      data: existingSlug,
+      error: duplicateError,
     } =
       await supabaseAdmin
         .from(
@@ -2479,44 +2276,29 @@ async function createVenture(
         )
         .maybeSingle();
 
-
-    if (
-      duplicateError
-    ) {
-
+    if (duplicateError) {
       console.error(
         "Check venture slug error:",
         duplicateError
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to validate the venture slug.",
         });
-
     }
 
-
-    if (
-      existingSlug
-    ) {
-
+    if (existingSlug) {
       return res
         .status(409)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "A venture with this slug already exists.",
         });
-
     }
 
 
@@ -2530,11 +2312,7 @@ async function createVenture(
         "logo"
       );
 
-
-    if (
-      logoFile
-    ) {
-
+    if (logoFile) {
       const uploaded =
         await uploadVentureImage(
           logoFile,
@@ -2542,15 +2320,12 @@ async function createVenture(
           input.slug
         );
 
-
       input.logoUrl =
         uploaded.publicUrl;
-
 
       uploadedUrls.push(
         uploaded.publicUrl
       );
-
     }
 
 
@@ -2564,11 +2339,7 @@ async function createVenture(
         "heroImage"
       );
 
-
-    if (
-      heroFile
-    ) {
-
+    if (heroFile) {
       const uploaded =
         await uploadVentureImage(
           heroFile,
@@ -2576,39 +2347,25 @@ async function createVenture(
           input.slug
         );
 
-
       input.heroImageUrl =
         uploaded.publicUrl;
-
 
       uploadedUrls.push(
         uploaded.publicUrl
       );
-
     }
 
 
     /* ----------------------------------------------------------
        FOUNDER IMAGES
-
-       Frontend fields:
-       founderImage_0
-       founderImage_1
-       founderImage_2
-       ...
     ---------------------------------------------------------- */
 
     const founderUploads =
-      getFounderImageFiles(
-        req
-      );
-
+      getFounderImageFiles(req);
 
     if (
-      founderUploads.length >
-      0
+      founderUploads.length > 0
     ) {
-
       const founderResult =
         await applyFounderImages({
           founders:
@@ -2620,21 +2377,18 @@ async function createVenture(
             input.slug,
         });
 
-
       input.founders =
         founderResult.founders;
-
 
       uploadedUrls.push(
         ...founderResult
           .uploadedUrls
       );
-
     }
 
 
     /* ----------------------------------------------------------
-       INSERT DATABASE RECORD
+       CREATE DATABASE PAYLOAD
     ---------------------------------------------------------- */
 
     const payload =
@@ -2642,6 +2396,10 @@ async function createVenture(
         input
       );
 
+
+    /* ----------------------------------------------------------
+       INSERT
+    ---------------------------------------------------------- */
 
     const {
       data,
@@ -2657,45 +2415,36 @@ async function createVenture(
         .select("*")
         .single();
 
-
-    if (
-      error
-    ) {
-
+    if (error) {
       console.error(
         "Create venture error:",
         error
       );
 
-
-      /*
-       * The database insert failed.
-       * Delete any images uploaded during this request.
-       */
-
       await deleteStorageUrls(
         uploadedUrls
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
+          success: false,
 
           message:
             "Unable to create the venture.",
+
+          error:
+            process.env.NODE_ENV ===
+            "development"
+              ? error.message
+              : undefined,
         });
-
     }
-
 
     return res
       .status(201)
       .json({
-        success:
-          true,
+        success: true,
 
         message:
           "Venture created successfully.",
@@ -2705,38 +2454,26 @@ async function createVenture(
             data
           ),
       });
-
   } catch (error) {
-
     console.error(
       "Create venture exception:",
       error
     );
 
-
-    /*
-     * Avoid leaving orphaned files in Supabase Storage
-     * when venture creation fails.
-     */
-
     await deleteStorageUrls(
       uploadedUrls
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
+        success: false,
 
         message:
           error?.message ||
           "Unable to create the venture.",
       });
-
   }
-
 }
 
 
@@ -2748,118 +2485,54 @@ async function updateVenture(
   req,
   res
 ) {
-
-  const newlyUploadedUrls =
-    [];
-
+  const newlyUploadedUrls = [];
 
   try {
-
     const id =
       String(
-        req.params.id ||
-        ""
+        req.params.id || ""
       ).trim();
 
-
     if (!id) {
-
       return res
         .status(400)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture ID is required.",
         });
-
     }
 
 
-    /*
-     * AdminVentures sends the complete venture payload
-     * in a FormData field named "venture".
-     */
+    /* ----------------------------------------------------------
+       PARSE REQUEST
+    ---------------------------------------------------------- */
 
-    let requestBody =
-      req.body ||
-      {};
+    const extracted =
+      extractVentureBody(req);
 
-
-    if (
-      Object.prototype
-        .hasOwnProperty
-        .call(
-          requestBody,
-          "venture"
-        )
-    ) {
-
-      const parsedVenture =
-        parseJsonField(
-          requestBody.venture,
-          null
-        );
-
-
-      if (
-        !parsedVenture ||
-        typeof parsedVenture !==
-          "object" ||
-        Array.isArray(
-          parsedVenture
-        )
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "The venture information is invalid.",
-          });
-
-      }
-
-
-      requestBody = {
-        ...requestBody,
-        ...parsedVenture,
-      };
-
-
-      delete requestBody.venture;
-
+    if (!extracted.success) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "The venture information is invalid.",
+        });
     }
-
-
-    const normalizedBody =
-      normalizeRequestBody(
-        requestBody
-      );
-
 
     const parsed =
       ventureUpdateSchema
         .safeParse(
-          normalizedBody
+          extracted.body
         );
 
-
-    if (
-      !parsed.success
-    ) {
-
+    if (!parsed.success) {
       return sendValidationError(
         res,
         parsed
       );
-
     }
-
 
     const input = {
       ...parsed.data,
@@ -2867,15 +2540,12 @@ async function updateVenture(
 
 
     /* ----------------------------------------------------------
-       LOAD CURRENT VENTURE
+       LOAD EXISTING VENTURE
     ---------------------------------------------------------- */
 
     const {
-      data:
-        existing,
-
-      error:
-        existingError,
+      data: existing,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -2888,66 +2558,46 @@ async function updateVenture(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
-
+    if (existingError) {
       console.error(
         "Load venture before update error:",
         existingError
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to load the venture.",
         });
-
     }
 
-
-    if (
-      !existing
-    ) {
-
+    if (!existing) {
       return res
         .status(404)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture not found.",
         });
-
     }
 
 
     /* ----------------------------------------------------------
-       CHECK SLUG
+       CHECK UPDATED SLUG
     ---------------------------------------------------------- */
 
     if (
       input.slug &&
       input.slug.toLowerCase() !==
         String(
-          existing.slug ||
-          ""
+          existing.slug || ""
         ).toLowerCase()
     ) {
-
       const {
-        data:
-          duplicateSlug,
-
-        error:
-          duplicateError,
+        data: duplicateSlug,
+        error: duplicateError,
       } =
         await supabaseAdmin
           .from(
@@ -2966,46 +2616,30 @@ async function updateVenture(
           )
           .maybeSingle();
 
-
-      if (
-        duplicateError
-      ) {
-
+      if (duplicateError) {
         console.error(
           "Check updated venture slug error:",
           duplicateError
         );
 
-
         return res
           .status(500)
           .json({
-            success:
-              false,
-
+            success: false,
             message:
               "Unable to validate the venture slug.",
           });
-
       }
 
-
-      if (
-        duplicateSlug
-      ) {
-
+      if (duplicateSlug) {
         return res
           .status(409)
           .json({
-            success:
-              false,
-
+            success: false,
             message:
               "Another venture already uses this slug.",
           });
-
       }
-
     }
 
 
@@ -3014,9 +2648,7 @@ async function updateVenture(
       existing.slug ||
       "venture";
 
-
-    const oldUrlsToDelete =
-      [];
+    const oldUrlsToDelete = [];
 
 
     /* ----------------------------------------------------------
@@ -3029,11 +2661,7 @@ async function updateVenture(
         "logo"
       );
 
-
-    if (
-      logoFile
-    ) {
-
+    if (logoFile) {
       const uploaded =
         await uploadVentureImage(
           logoFile,
@@ -3041,54 +2669,34 @@ async function updateVenture(
           ventureSlug
         );
 
-
       input.logoUrl =
         uploaded.publicUrl;
-
 
       newlyUploadedUrls.push(
         uploaded.publicUrl
       );
 
-
       if (
         existing.logo_url
       ) {
-
         oldUrlsToDelete.push(
           existing.logo_url
         );
-
       }
-
     } else if (
-      input.removeLogo ===
-      true
+      input.removeLogo === true
     ) {
-
-      input.logoUrl =
-        "";
-
+      input.logoUrl = "";
 
       if (
         existing.logo_url
       ) {
-
         oldUrlsToDelete.push(
           existing.logo_url
         );
-
       }
-
     } else {
-
-      /*
-       * Do not overwrite the current DB value when
-       * the administrator did not change the logo.
-       */
-
       delete input.logoUrl;
-
     }
 
 
@@ -3102,11 +2710,7 @@ async function updateVenture(
         "heroImage"
       );
 
-
-    if (
-      heroFile
-    ) {
-
+    if (heroFile) {
       const uploaded =
         await uploadVentureImage(
           heroFile,
@@ -3114,65 +2718,46 @@ async function updateVenture(
           ventureSlug
         );
 
-
       input.heroImageUrl =
         uploaded.publicUrl;
-
 
       newlyUploadedUrls.push(
         uploaded.publicUrl
       );
 
-
       if (
         existing.hero_image_url
       ) {
-
         oldUrlsToDelete.push(
           existing.hero_image_url
         );
-
       }
-
     } else if (
       input.removeHeroImage ===
       true
     ) {
-
-      input.heroImageUrl =
-        "";
-
+      input.heroImageUrl = "";
 
       if (
         existing.hero_image_url
       ) {
-
         oldUrlsToDelete.push(
           existing.hero_image_url
         );
-
       }
-
     } else {
-
-      /*
-       * Preserve the existing hero image.
-       */
-
       delete input.heroImageUrl;
-
     }
 
 
     /* ----------------------------------------------------------
-       FOUNDER IMAGES
+       FOUNDERS
     ---------------------------------------------------------- */
 
     if (
       input.founders !==
       undefined
     ) {
-
       const existingFounders =
         Array.isArray(
           existing.founders
@@ -3180,153 +2765,100 @@ async function updateVenture(
           ? existing.founders
           : [];
 
-
-      /*
-       * Preserve an existing founder image when:
-       *
-       * - no replacement was uploaded, and
-       * - removeImage is not true.
-       */
-
       input.founders =
         input.founders.map(
           (
             founder,
             index
           ) => {
-
             const oldFounder =
               existingFounders[
                 index
-              ] ||
-              {};
-
+              ] || {};
 
             const updatedFounder = {
               ...founder,
             };
 
-
             if (
               updatedFounder
                 .removeImage
             ) {
-
               if (
                 oldFounder.image
               ) {
-
                 oldUrlsToDelete.push(
                   oldFounder.image
                 );
-
               }
-
 
               updatedFounder.image =
                 "";
-
             } else if (
               !updatedFounder.image &&
               oldFounder.image
             ) {
-
               updatedFounder.image =
                 oldFounder.image;
-
             }
 
-
             return updatedFounder;
-
           }
         );
 
 
-      /*
-       * If founders were removed from the array,
-       * their previous images are no longer needed.
-       */
+      /* --------------------------------------------------------
+         REMOVED FOUNDERS
+      -------------------------------------------------------- */
 
       if (
         existingFounders.length >
         input.founders.length
       ) {
-
         existingFounders
           .slice(
             input.founders.length
           )
           .forEach(
             (founder) => {
-
               if (
                 founder?.image
               ) {
-
                 oldUrlsToDelete.push(
                   founder.image
                 );
-
               }
-
             }
           );
-
       }
 
 
-      /*
-       * Dynamic founder uploads:
-       *
-       * founderImage_0
-       * founderImage_1
-       * founderImage_2
-       * ...
-       */
+      /* --------------------------------------------------------
+         NEW FOUNDER PHOTOS
+      -------------------------------------------------------- */
 
       const founderUploads =
-        getFounderImageFiles(
-          req
-        );
-
+        getFounderImageFiles(req);
 
       if (
-        founderUploads.length >
-        0
+        founderUploads.length > 0
       ) {
-
-        /*
-         * Before replacing a founder photo,
-         * remember the current image so it can
-         * be removed only after the DB update
-         * succeeds.
-         */
-
         founderUploads.forEach(
           ({
             founderIndex,
           }) => {
-
             const oldImage =
               input.founders[
                 founderIndex
               ]?.image;
 
-
-            if (
-              oldImage
-            ) {
-
+            if (oldImage) {
               oldUrlsToDelete.push(
                 oldImage
               );
-
             }
-
           }
         );
-
 
         const founderResult =
           await applyFounderImages({
@@ -3338,23 +2870,19 @@ async function updateVenture(
             ventureSlug,
           });
 
-
         input.founders =
           founderResult.founders;
-
 
         newlyUploadedUrls.push(
           ...founderResult
             .uploadedUrls
         );
-
       }
-
     }
 
 
     /* ----------------------------------------------------------
-       UPDATE DATABASE
+       BUILD UPDATE
     ---------------------------------------------------------- */
 
     const payload =
@@ -3363,6 +2891,10 @@ async function updateVenture(
         existing
       );
 
+
+    /* ----------------------------------------------------------
+       UPDATE DATABASE
+    ---------------------------------------------------------- */
 
     const {
       data,
@@ -3382,48 +2914,29 @@ async function updateVenture(
         .select("*")
         .single();
 
-
-    if (
-      error
-    ) {
-
+    if (error) {
       console.error(
         "Update venture error:",
         error
       );
 
-
-      /*
-       * Database update failed.
-       *
-       * Remove only files uploaded during this
-       * request. Existing files remain untouched.
-       */
-
       await deleteStorageUrls(
         newlyUploadedUrls
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to update the venture.",
         });
-
     }
 
 
-    /*
-     * Database update succeeded.
-     *
-     * It is now safe to remove old images that
-     * were replaced or explicitly removed.
-     */
+    /* ----------------------------------------------------------
+       CLEAN OLD STORAGE
+    ---------------------------------------------------------- */
 
     await deleteStorageUrls(
       oldUrlsToDelete
@@ -3433,8 +2946,7 @@ async function updateVenture(
     return res
       .status(200)
       .json({
-        success:
-          true,
+        success: true,
 
         message:
           "Venture updated successfully.",
@@ -3444,42 +2956,30 @@ async function updateVenture(
             data
           ),
       });
-
   } catch (error) {
-
     console.error(
       "Update venture exception:",
       error
     );
 
-
-    /*
-     * An exception occurred after one or more
-     * new images may have been uploaded.
-     *
-     * Clean those new files so we do not leave
-     * orphaned objects in Supabase Storage.
-     */
-
     await deleteStorageUrls(
       newlyUploadedUrls
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
+        success: false,
 
         message:
           error?.message ||
           "Unable to update the venture.",
       });
-
   }
+}
 
-}/* ============================================================
+
+/* ============================================================
    DELETE VENTURE
 ============================================================ */
 
@@ -3487,41 +2987,30 @@ async function deleteVenture(
   req,
   res
 ) {
-
   try {
-
     const id =
       String(
-        req.params.id ||
-        ""
+        req.params.id || ""
       ).trim();
 
-
     if (!id) {
-
       return res
         .status(400)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture ID is required.",
         });
-
     }
 
 
     /* ----------------------------------------------------------
-       LOAD FULL VENTURE RECORD
+       LOAD VENTURE
     ---------------------------------------------------------- */
 
     const {
-      data:
-        existing,
-
-      error:
-        existingError,
+      data: existing,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3534,122 +3023,81 @@ async function deleteVenture(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
-
+    if (existingError) {
       console.error(
         "Load venture before delete error:",
         existingError
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to load the venture.",
         });
-
     }
 
-
-    if (
-      !existing
-    ) {
-
+    if (!existing) {
       return res
         .status(404)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Venture not found.",
         });
-
     }
 
 
     /* ----------------------------------------------------------
-       COLLECT STORAGE URLS
-
-       We collect the URLs before deleting the database record.
-
-       Storage cleanup happens only after the database delete
-       succeeds.
+       COLLECT STORAGE FILES
     ---------------------------------------------------------- */
 
-    const storageUrls =
-      [];
-
+    const storageUrls = [];
 
     if (
       existing.logo_url
     ) {
-
       storageUrls.push(
         existing.logo_url
       );
-
     }
-
 
     if (
       existing.hero_image_url
     ) {
-
       storageUrls.push(
         existing.hero_image_url
       );
-
     }
-
 
     if (
       Array.isArray(
         existing.founders
       )
     ) {
-
       existing.founders
         .forEach(
           (founder) => {
-
             if (
               founder?.image
             ) {
-
               storageUrls.push(
                 founder.image
               );
-
             }
-
           }
         );
-
     }
 
 
     /* ----------------------------------------------------------
-       DELETE DATABASE RECORD FIRST
-
-       This prevents a failed database delete from leaving
-       a venture record pointing to images that have already
-       been removed.
+       DELETE DATABASE RECORD
     ---------------------------------------------------------- */
 
     const {
-      data:
-        deletedVenture,
-
-      error:
-        deleteError,
+      data: deletedVenture,
+      error: deleteError,
     } =
       await supabaseAdmin
         .from(
@@ -3665,52 +3113,34 @@ async function deleteVenture(
         )
         .maybeSingle();
 
-
-    if (
-      deleteError
-    ) {
-
+    if (deleteError) {
       console.error(
         "Delete venture error:",
         deleteError
       );
 
-
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "Unable to delete the venture.",
         });
-
     }
 
-
-    if (
-      !deletedVenture
-    ) {
-
+    if (!deletedVenture) {
       return res
         .status(500)
         .json({
-          success:
-            false,
-
+          success: false,
           message:
             "The venture could not be confirmed as deleted.",
         });
-
     }
 
 
     /* ----------------------------------------------------------
-       CLEAN SUPABASE STORAGE
-
-       At this point the DB delete succeeded, so the logo,
-       hero image and founder photos can safely be removed.
+       CLEAN STORAGE
     ---------------------------------------------------------- */
 
     await deleteStorageUrls(
@@ -3718,15 +3148,10 @@ async function deleteVenture(
     );
 
 
-    /* ----------------------------------------------------------
-       RESPONSE
-    ---------------------------------------------------------- */
-
     return res
       .status(200)
       .json({
-        success:
-          true,
+        success: true,
 
         message:
           "Venture deleted successfully.",
@@ -3742,28 +3167,22 @@ async function deleteVenture(
             deletedVenture.slug,
         },
       });
-
   } catch (error) {
-
     console.error(
       "Delete venture exception:",
       error
     );
 
-
     return res
       .status(500)
       .json({
-        success:
-          false,
+        success: false,
 
         message:
           error?.message ||
           "Unable to delete the venture.",
       });
-
   }
-
 }
 
 

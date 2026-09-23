@@ -1576,7 +1576,7 @@ export default function Home() {
             >
 
               <source
-                src="/assets/tech.mp4"
+                src="/assets/tech-web.mp4"
                 type="video/mp4"
               />
 

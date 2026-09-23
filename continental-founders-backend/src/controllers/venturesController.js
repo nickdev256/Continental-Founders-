@@ -1362,7 +1362,52 @@ async function deleteStorageUrls(
 
 /* ============================================================
    FILE HELPERS
+
+   Supports multer upload.any().
+
+   Expected image fields:
+   logo
+   heroImage
+   founderImage_0
+   founderImage_1
+   founderImage_2
+   ...
 ============================================================ */
+
+function getRequestFiles(
+  req
+) {
+
+  if (
+    Array.isArray(
+      req.files
+    )
+  ) {
+    return req.files;
+  }
+
+
+  // Backwards-compatible fallback for object-shaped req.files.
+  if (
+    req.files &&
+    typeof req.files ===
+      "object"
+  ) {
+
+    return Object
+      .values(
+        req.files
+      )
+      .flat()
+      .filter(Boolean);
+
+  }
+
+
+  return [];
+
+}
+
 
 function getSingleFile(
   req,
@@ -1370,24 +1415,19 @@ function getSingleFile(
 ) {
 
   const files =
-    req.files?.[
-      fieldName
-    ];
+    getRequestFiles(
+      req
+    );
 
 
-  if (
-    Array.isArray(
-      files
-    ) &&
-    files.length > 0
-  ) {
-
-    return files[0];
-
-  }
-
-
-  return null;
+  return (
+    files.find(
+      (file) =>
+        file?.fieldname ===
+        fieldName
+    ) ||
+    null
+  );
 
 }
 
@@ -1398,16 +1438,85 @@ function getMultipleFiles(
 ) {
 
   const files =
-    req.files?.[
+    getRequestFiles(
+      req
+    );
+
+
+  return files.filter(
+    (file) =>
+      file?.fieldname ===
       fieldName
-    ];
+  );
+
+}
 
 
-  return Array.isArray(
-    files
-  )
-    ? files
-    : [];
+/* ============================================================
+   DYNAMIC FOUNDER IMAGE FILES
+
+   founderImage_0 = founder at index 0
+   founderImage_1 = founder at index 1
+   founderImage_2 = founder at index 2
+============================================================ */
+
+function getFounderImageFiles(
+  req
+) {
+
+  const files =
+    getRequestFiles(
+      req
+    );
+
+
+  return files
+    .map(
+      (file) => {
+
+        const match =
+          String(
+            file?.fieldname ||
+            ""
+          ).match(
+            /^founderImage_(\d+)$/
+          );
+
+
+        if (!match) {
+          return null;
+        }
+
+
+        const founderIndex =
+          Number(
+            match[1]
+          );
+
+
+        if (
+          !Number.isInteger(
+            founderIndex
+          ) ||
+          founderIndex < 0
+        ) {
+          return null;
+        }
+
+
+        return {
+          file,
+          founderIndex,
+        };
+
+      }
+    )
+    .filter(Boolean)
+    .sort(
+      (a, b) =>
+        a.founderIndex -
+        b.founderIndex
+    );
 
 }
 
@@ -1418,8 +1527,7 @@ function getMultipleFiles(
 
 async function applyFounderImages({
   founders,
-  founderFiles,
-  founderImageIndexes,
+  founderUploads,
   ventureSlug,
 }) {
 
@@ -1440,18 +1548,15 @@ async function applyFounderImages({
 
 
   for (
-    let fileIndex = 0;
-    fileIndex <
-      founderFiles.length;
-    fileIndex += 1
+    const uploadItem of
+    founderUploads
   ) {
 
-    const founderIndex =
-      Number(
-        founderImageIndexes[
-          fileIndex
-        ]
-      );
+    const {
+      file,
+      founderIndex,
+    } =
+      uploadItem;
 
 
     if (
@@ -1464,7 +1569,7 @@ async function applyFounderImages({
     ) {
 
       throw new Error(
-        "A founder image could not be matched to a founder."
+        `Founder image ${founderIndex} could not be matched to a founder.`
       );
 
     }
@@ -1472,9 +1577,7 @@ async function applyFounderImages({
 
     const uploaded =
       await uploadVentureImage(
-        founderFiles[
-          fileIndex
-        ],
+        file,
         "founders",
         ventureSlug
       );
@@ -1702,8 +1805,7 @@ function buildUpdatePayload(
   if (
     input.sector !==
     undefined
-  ) {
-    payload.sector =
+  ) {    payload.sector =
       input.sector;
   }
 
@@ -2260,9 +2362,72 @@ async function createVenture(
 
   try {
 
+    /*
+     * The AdminVentures frontend sends the venture
+     * object as JSON inside the multipart field:
+     *
+     * venture
+     *
+     * We therefore unpack that object before validation.
+     */
+
+    let requestBody =
+      req.body ||
+      {};
+
+
+    if (
+      Object.prototype
+        .hasOwnProperty
+        .call(
+          requestBody,
+          "venture"
+        )
+    ) {
+
+      const parsedVenture =
+        parseJsonField(
+          requestBody.venture,
+          null
+        );
+
+
+      if (
+        !parsedVenture ||
+        typeof parsedVenture !==
+          "object" ||
+        Array.isArray(
+          parsedVenture
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+
+            message:
+              "The venture information is invalid.",
+          });
+
+      }
+
+
+      requestBody = {
+        ...requestBody,
+        ...parsedVenture,
+      };
+
+
+      delete requestBody.venture;
+
+    }
+
+
     const normalizedBody =
       normalizeRequestBody(
-        req.body
+        requestBody
       );
 
 
@@ -2425,17 +2590,22 @@ async function createVenture(
 
     /* ----------------------------------------------------------
        FOUNDER IMAGES
+
+       Frontend fields:
+       founderImage_0
+       founderImage_1
+       founderImage_2
+       ...
     ---------------------------------------------------------- */
 
-    const founderFiles =
-      getMultipleFiles(
-        req,
-        "founderImages"
+    const founderUploads =
+      getFounderImageFiles(
+        req
       );
 
 
     if (
-      founderFiles.length >
+      founderUploads.length >
       0
     ) {
 
@@ -2444,10 +2614,7 @@ async function createVenture(
           founders:
             input.founders,
 
-          founderFiles,
-
-          founderImageIndexes:
-            input.founderImageIndexes,
+          founderUploads,
 
           ventureSlug:
             input.slug,
@@ -2459,7 +2626,8 @@ async function createVenture(
 
 
       uploadedUrls.push(
-        ...founderResult.uploadedUrls
+        ...founderResult
+          .uploadedUrls
       );
 
     }
@@ -2499,6 +2667,11 @@ async function createVenture(
         error
       );
 
+
+      /*
+       * The database insert failed.
+       * Delete any images uploaded during this request.
+       */
 
       await deleteStorageUrls(
         uploadedUrls
@@ -2540,6 +2713,11 @@ async function createVenture(
       error
     );
 
+
+    /*
+     * Avoid leaving orphaned files in Supabase Storage
+     * when venture creation fails.
+     */
 
     await deleteStorageUrls(
       uploadedUrls
@@ -2599,9 +2777,68 @@ async function updateVenture(
     }
 
 
+    /*
+     * AdminVentures sends the complete venture payload
+     * in a FormData field named "venture".
+     */
+
+    let requestBody =
+      req.body ||
+      {};
+
+
+    if (
+      Object.prototype
+        .hasOwnProperty
+        .call(
+          requestBody,
+          "venture"
+        )
+    ) {
+
+      const parsedVenture =
+        parseJsonField(
+          requestBody.venture,
+          null
+        );
+
+
+      if (
+        !parsedVenture ||
+        typeof parsedVenture !==
+          "object" ||
+        Array.isArray(
+          parsedVenture
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success:
+              false,
+
+            message:
+              "The venture information is invalid.",
+          });
+
+      }
+
+
+      requestBody = {
+        ...requestBody,
+        ...parsedVenture,
+      };
+
+
+      delete requestBody.venture;
+
+    }
+
+
     const normalizedBody =
       normalizeRequestBody(
-        req.body
+        requestBody
       );
 
 
@@ -2845,6 +3082,11 @@ async function updateVenture(
 
     } else {
 
+      /*
+       * Do not overwrite the current DB value when
+       * the administrator did not change the logo.
+       */
+
       delete input.logoUrl;
 
     }
@@ -2913,6 +3155,10 @@ async function updateVenture(
 
     } else {
 
+      /*
+       * Preserve the existing hero image.
+       */
+
       delete input.heroImageUrl;
 
     }
@@ -2936,9 +3182,10 @@ async function updateVenture(
 
 
       /*
-       * Preserve existing founder images where the CMS
-       * has not supplied a new image and has not requested
-       * image removal.
+       * Preserve an existing founder image when:
+       *
+       * - no replacement was uploaded, and
+       * - removeImage is not true.
        */
 
       input.founders =
@@ -2961,7 +3208,8 @@ async function updateVenture(
 
 
             if (
-              updatedFounder.removeImage
+              updatedFounder
+                .removeImage
             ) {
 
               if (
@@ -2996,8 +3244,8 @@ async function updateVenture(
 
 
       /*
-       * If founders were removed completely,
-       * their old images should also be cleaned up.
+       * If founders were removed from the array,
+       * their previous images are no longer needed.
        */
 
       if (
@@ -3028,44 +3276,56 @@ async function updateVenture(
       }
 
 
-      const founderFiles =
-        getMultipleFiles(
-          req,
-          "founderImages"
+      /*
+       * Dynamic founder uploads:
+       *
+       * founderImage_0
+       * founderImage_1
+       * founderImage_2
+       * ...
+       */
+
+      const founderUploads =
+        getFounderImageFiles(
+          req
         );
 
 
       if (
-        founderFiles.length >
+        founderUploads.length >
         0
       ) {
 
         /*
-         * Remember images that are being replaced.
+         * Before replacing a founder photo,
+         * remember the current image so it can
+         * be removed only after the DB update
+         * succeeds.
          */
 
-        input.founderImageIndexes
-          .forEach(
-            (founderIndex) => {
+        founderUploads.forEach(
+          ({
+            founderIndex,
+          }) => {
 
-              const oldImage =
-                input.founders[
-                  founderIndex
-                ]?.image;
+            const oldImage =
+              input.founders[
+                founderIndex
+              ]?.image;
 
 
-              if (
+            if (
+              oldImage
+            ) {
+
+              oldUrlsToDelete.push(
                 oldImage
-              ) {
-
-                oldUrlsToDelete.push(
-                  oldImage
-                );
-
-              }
+              );
 
             }
-          );
+
+          }
+        );
 
 
         const founderResult =
@@ -3073,10 +3333,7 @@ async function updateVenture(
             founders:
               input.founders,
 
-            founderFiles,
-
-            founderImageIndexes:
-              input.founderImageIndexes,
+            founderUploads,
 
             ventureSlug,
           });
@@ -3087,7 +3344,8 @@ async function updateVenture(
 
 
         newlyUploadedUrls.push(
-          ...founderResult.uploadedUrls
+          ...founderResult
+            .uploadedUrls
         );
 
       }
@@ -3136,9 +3394,10 @@ async function updateVenture(
 
 
       /*
-       * The DB update failed.
-       * Remove newly uploaded images,
-       * but leave old images untouched.
+       * Database update failed.
+       *
+       * Remove only files uploaded during this
+       * request. Existing files remain untouched.
        */
 
       await deleteStorageUrls(
@@ -3160,9 +3419,10 @@ async function updateVenture(
 
 
     /*
-     * The DB update succeeded.
-     * It is now safe to remove replaced
-     * or explicitly removed images.
+     * Database update succeeded.
+     *
+     * It is now safe to remove old images that
+     * were replaced or explicitly removed.
      */
 
     await deleteStorageUrls(
@@ -3193,6 +3453,14 @@ async function updateVenture(
     );
 
 
+    /*
+     * An exception occurred after one or more
+     * new images may have been uploaded.
+     *
+     * Clean those new files so we do not leave
+     * orphaned objects in Supabase Storage.
+     */
+
     await deleteStorageUrls(
       newlyUploadedUrls
     );
@@ -3211,10 +3479,7 @@ async function updateVenture(
 
   }
 
-}
-
-
-/* ============================================================
+}/* ============================================================
    DELETE VENTURE
 ============================================================ */
 
@@ -3248,7 +3513,7 @@ async function deleteVenture(
 
 
     /* ----------------------------------------------------------
-       LOAD FULL RECORD
+       LOAD FULL VENTURE RECORD
     ---------------------------------------------------------- */
 
     const {
@@ -3311,7 +3576,72 @@ async function deleteVenture(
 
 
     /* ----------------------------------------------------------
+       COLLECT STORAGE URLS
+
+       We collect the URLs before deleting the database record.
+
+       Storage cleanup happens only after the database delete
+       succeeds.
+    ---------------------------------------------------------- */
+
+    const storageUrls =
+      [];
+
+
+    if (
+      existing.logo_url
+    ) {
+
+      storageUrls.push(
+        existing.logo_url
+      );
+
+    }
+
+
+    if (
+      existing.hero_image_url
+    ) {
+
+      storageUrls.push(
+        existing.hero_image_url
+      );
+
+    }
+
+
+    if (
+      Array.isArray(
+        existing.founders
+      )
+    ) {
+
+      existing.founders
+        .forEach(
+          (founder) => {
+
+            if (
+              founder?.image
+            ) {
+
+              storageUrls.push(
+                founder.image
+              );
+
+            }
+
+          }
+        );
+
+    }
+
+
+    /* ----------------------------------------------------------
        DELETE DATABASE RECORD FIRST
+
+       This prevents a failed database delete from leaving
+       a venture record pointing to images that have already
+       been removed.
     ---------------------------------------------------------- */
 
     const {
@@ -3377,63 +3707,20 @@ async function deleteVenture(
 
 
     /* ----------------------------------------------------------
-       CLEAN STORAGE AFTER DB DELETE
+       CLEAN SUPABASE STORAGE
+
+       At this point the DB delete succeeded, so the logo,
+       hero image and founder photos can safely be removed.
     ---------------------------------------------------------- */
-
-    const storageUrls = [];
-
-
-    if (
-      existing.logo_url
-    ) {
-
-      storageUrls.push(
-        existing.logo_url
-      );
-
-    }
-
-
-    if (
-      existing.hero_image_url
-    ) {
-
-      storageUrls.push(
-        existing.hero_image_url
-      );
-
-    }
-
-
-    if (
-      Array.isArray(
-        existing.founders
-      )
-    ) {
-
-      existing.founders.forEach(
-        (founder) => {
-
-          if (
-            founder?.image
-          ) {
-
-            storageUrls.push(
-              founder.image
-            );
-
-          }
-
-        }
-      );
-
-    }
-
 
     await deleteStorageUrls(
       storageUrls
     );
 
+
+    /* ----------------------------------------------------------
+       RESPONSE
+    ---------------------------------------------------------- */
 
     return res
       .status(200)
@@ -3471,6 +3758,7 @@ async function deleteVenture(
           false,
 
         message:
+          error?.message ||
           "Unable to delete the venture.",
       });
 

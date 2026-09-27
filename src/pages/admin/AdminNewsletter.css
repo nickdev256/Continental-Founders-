@@ -29,13 +29,30 @@
 
   width: 100%;
   min-width: 0;
-  min-height: 100%;
+
+  /*
+   * IMPORTANT:
+   * Newsletter gets its own vertical scrolling area.
+   * This does NOT modify the admin sidebar.
+   */
+  height: 100%;
+  max-height: 100vh;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
   gap: 14px;
 
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  padding-bottom: 40px;
+
   color: var(--newsletter-text);
   box-sizing: border-box;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .admin-newsletter *,
@@ -51,6 +68,7 @@
 
 .admin-newsletter__header {
   width: 100%;
+
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -68,6 +86,7 @@
   margin-bottom: 5px;
 
   color: var(--newsletter-gold);
+
   font-size: 0.64rem;
   font-weight: 800;
   line-height: 1.2;
@@ -79,6 +98,7 @@
   margin: 0;
 
   color: var(--newsletter-navy);
+
   font-family: inherit;
   font-size: clamp(1.65rem, 3vw, 2.15rem);
   font-weight: 720;
@@ -91,6 +111,7 @@
   margin: 8px 0 0;
 
   color: var(--newsletter-muted);
+
   font-size: 0.86rem;
   line-height: 1.55;
 }
@@ -111,8 +132,10 @@
 
 .admin-newsletter__button {
   min-height: 40px;
+
   border: 1px solid transparent;
   border-radius: 6px;
+
   padding: 0 14px;
 
   display: inline-flex;
@@ -124,9 +147,11 @@
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1;
+
   text-decoration: none;
 
   cursor: pointer;
+
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
@@ -146,6 +171,7 @@
 
 .admin-newsletter__button--primary {
   border-color: var(--newsletter-navy);
+
   background: var(--newsletter-navy);
   color: #ffffff;
 }
@@ -157,6 +183,7 @@
 
 .admin-newsletter__button--secondary {
   border-color: var(--newsletter-border);
+
   background: #ffffff;
   color: var(--newsletter-navy);
 }
@@ -173,13 +200,14 @@
 .admin-newsletter__text-button {
   border: 0;
   padding: 4px 0;
+
   background: transparent;
+  color: var(--newsletter-navy);
 
   display: inline-flex;
   align-items: center;
   gap: 4px;
 
-  color: var(--newsletter-navy);
   font-family: inherit;
   font-size: 0.74rem;
   font-weight: 700;
@@ -205,6 +233,7 @@
 
   background: #ffffff;
   color: var(--newsletter-navy);
+
   cursor: pointer;
 }
 
@@ -216,12 +245,15 @@
 .admin-newsletter__tabs {
   width: 100%;
   min-width: 0;
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   gap: 3px;
 
   overflow-x: auto;
+  overflow-y: hidden;
+
   scrollbar-width: thin;
 
   border-bottom: 1px solid var(--newsletter-border);
@@ -233,6 +265,7 @@
 
   border: 0;
   border-bottom: 2px solid transparent;
+
   padding: 0 12px;
 
   display: inline-flex;
@@ -246,9 +279,11 @@
   font-family: inherit;
   font-size: 0.76rem;
   font-weight: 700;
+
   white-space: nowrap;
 
   cursor: pointer;
+
   transition:
     color 150ms ease,
     border-color 150ms ease;
@@ -280,6 +315,7 @@
 
 .admin-newsletter__section-heading {
   min-height: 82px;
+
   padding: 16px 18px;
 
   display: flex;
@@ -299,6 +335,7 @@
   margin: 0;
 
   color: var(--newsletter-navy);
+
   font-size: 1rem;
   font-weight: 750;
   line-height: 1.25;
@@ -306,9 +343,11 @@
 
 .admin-newsletter__section-heading p {
   max-width: 680px;
+
   margin: 5px 0 0;
 
   color: var(--newsletter-muted);
+
   font-size: 0.77rem;
   line-height: 1.5;
 }
@@ -322,6 +361,7 @@
 .admin-newsletter__wizard-error,
 .admin-newsletter__wizard-info {
   min-height: 42px;
+
   padding: 10px 13px;
 
   border: 1px solid;
@@ -339,6 +379,7 @@
 .admin-newsletter__message--success,
 .admin-newsletter__wizard-info {
   border-color: #cfe8da;
+
   background: var(--newsletter-success-bg);
   color: var(--newsletter-success);
 }
@@ -346,6 +387,7 @@
 .admin-newsletter__message--error,
 .admin-newsletter__wizard-error {
   border-color: #f0cccc;
+
   background: var(--newsletter-danger-bg);
   color: var(--newsletter-danger);
 }
@@ -376,6 +418,7 @@
 
   background: transparent;
   color: currentColor;
+
   cursor: pointer;
 }
 
@@ -395,6 +438,7 @@
 .admin-newsletter__stat {
   min-width: 0;
   min-height: 72px;
+
   padding: 12px 14px;
 
   border: 1px solid var(--newsletter-border);
@@ -434,15 +478,18 @@
   white-space: nowrap;
 
   color: var(--newsletter-muted);
+
   font-size: 0.68rem;
   font-weight: 650;
 }
 
 .admin-newsletter__stat strong {
   display: block;
+
   margin-top: 2px;
 
   color: var(--newsletter-navy);
+
   font-size: 1.18rem;
   font-weight: 800;
   line-height: 1;
@@ -455,8 +502,10 @@
 
 .admin-newsletter__card {
   min-width: 0;
+
   border: 1px solid var(--newsletter-border);
   border-radius: 8px;
+
   padding: 16px;
 
   background: #ffffff;
@@ -467,6 +516,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
+
   margin-bottom: 14px;
 }
 
@@ -483,21 +533,30 @@
   padding: 0 18px 14px;
 
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr);
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(280px, 0.75fr);
+
   gap: 12px;
 }
 
 .admin-newsletter__audience-summary {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
   gap: 8px;
 }
 
 .admin-newsletter__audience-summary > div {
   min-width: 0;
+
   padding: 12px;
 
   border-radius: 6px;
+
   background: var(--newsletter-surface-soft);
 }
 
@@ -505,25 +564,30 @@
   display: block;
 
   color: var(--newsletter-navy);
+
   font-size: 1.2rem;
   font-weight: 800;
 }
 
 .admin-newsletter__audience-summary span {
   display: block;
+
   margin-top: 3px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.69rem;
 }
 
 .admin-newsletter__quick-card {
   border-color: var(--newsletter-navy);
+
   background: var(--newsletter-navy);
   color: #ffffff;
 }
 
-.admin-newsletter__quick-card .admin-newsletter__section-label {
+.admin-newsletter__quick-card
+  .admin-newsletter__section-label {
   color: #d7b878;
 }
 
@@ -535,12 +599,15 @@
   margin: 7px 0 14px;
 
   color: rgba(255, 255, 255, 0.72);
+
   font-size: 0.76rem;
   line-height: 1.55;
 }
 
-.admin-newsletter__quick-card .admin-newsletter__button--primary {
+.admin-newsletter__quick-card
+  .admin-newsletter__button--primary {
   border-color: #ffffff;
+
   background: #ffffff;
   color: var(--newsletter-navy);
 }
@@ -548,6 +615,7 @@
 .admin-newsletter__quick-icon {
   width: 36px;
   height: 36px;
+
   margin-bottom: 13px;
 
   border-radius: 6px;
@@ -560,7 +628,8 @@
   color: #e4c98e;
 }
 
-.admin-newsletter__panel > .admin-newsletter__card {
+.admin-newsletter__panel >
+.admin-newsletter__card {
   margin: 0 18px 16px;
 }
 
@@ -576,6 +645,7 @@
 
 .admin-newsletter__recent-item {
   min-height: 54px;
+
   padding: 8px 0;
 
   border-bottom: 1px solid var(--newsletter-border);
@@ -600,6 +670,7 @@
 
 .admin-newsletter__recent-meta small {
   color: var(--newsletter-muted);
+
   font-size: 0.68rem;
 }
 
@@ -645,6 +716,7 @@
   white-space: nowrap;
 
   color: var(--newsletter-navy);
+
   font-size: 0.76rem;
   font-weight: 700;
 }
@@ -652,9 +724,11 @@
 .admin-newsletter__subscriber small,
 .admin-newsletter__subscriber div > span {
   display: block;
+
   margin-top: 2px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.66rem;
 }
 
@@ -665,6 +739,7 @@
 
 .admin-newsletter__status {
   min-height: 23px;
+
   padding: 0 8px;
 
   border-radius: 999px;
@@ -675,6 +750,7 @@
   font-size: 0.63rem;
   font-weight: 750;
   line-height: 1;
+
   text-transform: capitalize;
   white-space: nowrap;
 }
@@ -696,6 +772,7 @@
 
 .admin-newsletter__toolbar {
   min-height: 58px;
+
   padding: 10px 18px;
 
   border-top: 1px solid var(--newsletter-border);
@@ -711,11 +788,13 @@
 .admin-newsletter__search {
   min-width: 220px;
   max-width: 420px;
+
   height: 36px;
   flex: 1;
 
   border: 1px solid var(--newsletter-border);
   border-radius: 6px;
+
   padding: 0 10px;
 
   display: flex;
@@ -728,7 +807,9 @@
 
 .admin-newsletter__search:focus-within {
   border-color: var(--newsletter-gold);
-  box-shadow: 0 0 0 2px rgba(184, 137, 50, 0.1);
+
+  box-shadow:
+    0 0 0 2px rgba(184, 137, 50, 0.1);
 }
 
 .admin-newsletter__search input {
@@ -741,6 +822,7 @@
 
   background: transparent;
   color: var(--newsletter-text);
+
   font-family: inherit;
   font-size: 0.75rem;
 }
@@ -751,6 +833,7 @@
 
   border: 1px solid var(--newsletter-border);
   border-radius: 6px;
+
   padding: 0 30px 0 10px;
 
   background: #ffffff;
@@ -758,6 +841,7 @@
 
   font-family: inherit;
   font-size: 0.74rem;
+
   outline: none;
 }
 
@@ -772,13 +856,16 @@
 
 .admin-newsletter__table-card {
   min-width: 0;
+
   background: #ffffff;
 }
 
 .admin-newsletter__table-wrap {
   width: 100%;
   min-width: 0;
+
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .admin-newsletter__table {
@@ -795,27 +882,35 @@
 
 .admin-newsletter__table th {
   height: 42px;
+
   padding: 0 14px;
 
-  border-bottom: 1px solid var(--newsletter-border);
+  border-bottom:
+    1px solid var(--newsletter-border);
 
   color: #687480;
+
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.035em;
+
   text-align: left;
   text-transform: uppercase;
+
   white-space: nowrap;
 }
 
 .admin-newsletter__table td {
   min-height: 58px;
+
   padding: 11px 14px;
 
   border-bottom: 1px solid #edf0f2;
 
   color: var(--newsletter-text);
+
   font-size: 0.73rem;
+
   vertical-align: middle;
 }
 
@@ -827,7 +922,9 @@
 
 .admin-newsletter__table tbody tr:hover {
   background: #fbfaf7;
-  box-shadow: inset 3px 0 0 var(--newsletter-gold);
+
+  box-shadow:
+    inset 3px 0 0 var(--newsletter-gold);
 }
 
 .admin-newsletter__table tbody tr:last-child td {
@@ -851,6 +948,7 @@
 
   border: 1px solid var(--newsletter-border);
   border-radius: 5px;
+
   padding: 0 8px;
 
   display: inline-flex;
@@ -870,6 +968,7 @@
 
 .admin-newsletter__row-action:hover:not(:disabled) {
   border-color: #cbd1d6;
+
   background: #f7f8f9;
 }
 
@@ -893,6 +992,7 @@
 
 .admin-newsletter__state {
   min-height: 280px;
+
   padding: 32px 20px;
 
   display: flex;
@@ -901,11 +1001,13 @@
   justify-content: center;
 
   text-align: center;
+
   color: var(--newsletter-muted);
 }
 
 .admin-newsletter__state--compact {
   min-height: 150px;
+
   padding: 20px;
 }
 
@@ -913,11 +1015,13 @@
   margin: 10px 0 0;
 
   color: var(--newsletter-navy);
+
   font-size: 0.95rem;
 }
 
 .admin-newsletter__state p {
   max-width: 450px;
+
   margin: 6px 0 14px;
 
   font-size: 0.75rem;
@@ -925,7 +1029,8 @@
 }
 
 .admin-newsletter__loading-icon {
-  animation: newsletter-spin 1s linear infinite;
+  animation:
+    newsletter-spin 1s linear infinite;
 }
 
 @keyframes newsletter-spin {
@@ -941,6 +1046,7 @@
 
 .admin-newsletter__coming-soon {
   min-height: 390px;
+
   padding: 45px 24px;
 
   display: flex;
@@ -954,6 +1060,7 @@
 .admin-newsletter__coming-icon {
   width: 56px;
   height: 56px;
+
   margin-bottom: 14px;
 
   border-radius: 8px;
@@ -968,28 +1075,38 @@
 
 .admin-newsletter__coming-soon h3 {
   max-width: 520px;
+
   margin: 2px 0 0;
 
   color: var(--newsletter-navy);
+
   font-size: 1.08rem;
 }
 
 .admin-newsletter__coming-soon p {
   max-width: 590px;
+
   margin: 8px 0 18px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.77rem;
   line-height: 1.6;
 }
 
 
 /* ============================================================
-   CREATE PANEL
+   CREATE NEWSLETTER PANEL
+
+   These rules are important for scrolling.
+   The panel and wizard must grow naturally rather than clipping.
 ============================================================ */
 
 .admin-newsletter__create-panel {
-  overflow: hidden;
+  height: auto;
+  min-height: 0;
+
+  overflow: visible;
 }
 
 .admin-newsletter__create-heading {
@@ -1070,14 +1187,18 @@
   display: block;
 
   color: currentColor;
+
   font-size: 0.72rem;
   font-weight: 800;
+
   white-space: nowrap;
 }
 
 .admin-newsletter__wizard-step-copy small {
   display: block;
+
   max-width: 145px;
+
   margin-top: 2px;
 
   overflow: hidden;
@@ -1085,6 +1206,7 @@
   white-space: nowrap;
 
   color: #8a949e;
+
   font-size: 0.61rem;
 }
 
@@ -1093,8 +1215,9 @@
 }
 
 .admin-newsletter__wizard-step--active
-  .admin-newsletter__wizard-step-icon {
+.admin-newsletter__wizard-step-icon {
   border-color: var(--newsletter-navy);
+
   background: var(--newsletter-navy);
   color: #ffffff;
 }
@@ -1104,8 +1227,9 @@
 }
 
 .admin-newsletter__wizard-step--complete
-  .admin-newsletter__wizard-step-icon {
+.admin-newsletter__wizard-step-icon {
   border-color: var(--newsletter-success);
+
   background: var(--newsletter-success-bg);
   color: var(--newsletter-success);
 }
@@ -1141,19 +1265,32 @@
 
 /* ============================================================
    WIZARD BODY
+
+   Do not create a second clipped scroll container here.
 ============================================================ */
 
 .admin-newsletter__wizard-body {
+  height: auto;
+  min-height: 0;
+
   padding: 16px 18px;
+
+  overflow: visible;
 }
 
 .admin-newsletter__wizard-card {
   width: 100%;
+
+  height: auto;
+  min-height: 0;
+
+  overflow: visible;
 }
 
 .admin-newsletter__wizard-content-stack {
   display: flex;
   flex-direction: column;
+
   gap: 12px;
 }
 
@@ -1199,9 +1336,11 @@
 
 .admin-newsletter__form-heading p {
   max-width: 650px;
+
   margin: 4px 0 0;
 
   color: var(--newsletter-muted);
+
   font-size: 0.72rem;
   line-height: 1.5;
 }
@@ -1214,11 +1353,13 @@
 .admin-newsletter__form-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+
   gap: 13px;
 }
 
 .admin-newsletter__form-grid--two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
 }
 
 .admin-newsletter__field {
@@ -1226,6 +1367,7 @@
 
   display: flex;
   flex-direction: column;
+
   gap: 6px;
 }
 
@@ -1235,6 +1377,7 @@
 
 .admin-newsletter__field > span {
   color: var(--newsletter-text);
+
   font-size: 0.7rem;
   font-weight: 750;
 }
@@ -1264,14 +1407,17 @@
 .admin-newsletter__field input,
 .admin-newsletter__field select {
   height: 41px;
+
   padding: 0 11px;
 }
 
 .admin-newsletter__field textarea {
   min-height: 210px;
+
   padding: 11px;
 
   line-height: 1.55;
+
   resize: vertical;
 }
 
@@ -1284,11 +1430,14 @@
 .admin-newsletter__field select:focus,
 .admin-newsletter__field textarea:focus {
   border-color: var(--newsletter-gold);
-  box-shadow: 0 0 0 3px rgba(184, 137, 50, 0.1);
+
+  box-shadow:
+    0 0 0 3px rgba(184, 137, 50, 0.1);
 }
 
 .admin-newsletter__field-help {
   color: var(--newsletter-muted);
+
   font-size: 0.64rem;
   line-height: 1.45;
 }
@@ -1301,6 +1450,7 @@
 .admin-newsletter__featured-preview {
   width: 100%;
   max-width: 520px;
+
   overflow: hidden;
 
   border: 1px solid var(--newsletter-border);
@@ -1311,13 +1461,12 @@
 
 .admin-newsletter__featured-preview img {
   display: block;
+
   width: 100%;
   max-height: 280px;
+
   object-fit: cover;
-}
-
-
-/* ============================================================
+}/* ============================================================
    AUDIENCE OPTIONS
 ============================================================ */
 
@@ -1331,6 +1480,7 @@
   width: 100%;
   min-width: 0;
   min-height: 82px;
+
   padding: 12px;
 
   border: 1px solid var(--newsletter-border);
@@ -1361,8 +1511,11 @@
 
 .admin-newsletter__audience-option--selected {
   border-color: var(--newsletter-gold);
+
   background: #fdfaf5;
-  box-shadow: inset 3px 0 0 var(--newsletter-gold);
+
+  box-shadow:
+    inset 3px 0 0 var(--newsletter-gold);
 }
 
 .admin-newsletter__audience-option--disabled:not(
@@ -1385,13 +1538,14 @@
 }
 
 .admin-newsletter__audience-option--selected
-  .admin-newsletter__audience-radio {
+.admin-newsletter__audience-radio {
   border-color: var(--newsletter-gold);
 }
 
 .admin-newsletter__audience-radio > span {
   width: 9px;
   height: 9px;
+
   border-radius: 50%;
 
   background: var(--newsletter-gold);
@@ -1406,30 +1560,42 @@
   display: block;
 
   color: var(--newsletter-navy);
+
   font-size: 0.75rem;
 }
 
 .admin-newsletter__audience-option-copy small {
   display: block;
+
   margin-top: 3px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.65rem;
   line-height: 1.4;
 }
 
 .admin-newsletter__audience-option-count {
   flex: 0 0 auto;
+
   min-width: 38px;
 
   color: var(--newsletter-navy);
+
   font-size: 0.75rem;
   font-weight: 800;
+
   text-align: right;
 }
 
+
+/* ============================================================
+   RECIPIENT SUMMARY
+============================================================ */
+
 .admin-newsletter__recipient-summary {
   margin-top: 14px;
+
   padding: 13px;
 
   border: 1px solid #e5d5b6;
@@ -1468,20 +1634,24 @@
 
 .admin-newsletter__recipient-summary span {
   color: var(--newsletter-muted);
+
   font-size: 0.65rem;
   font-weight: 700;
 }
 
 .admin-newsletter__recipient-summary strong {
   display: block;
+
   margin: 2px 0;
 
   color: var(--newsletter-navy);
+
   font-size: 1.25rem;
 }
 
 .admin-newsletter__recipient-summary small {
   color: var(--newsletter-muted);
+
   font-size: 0.65rem;
   line-height: 1.4;
 }
@@ -1493,7 +1663,10 @@
 
 .admin-newsletter__delivery-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
   gap: 10px;
 }
 
@@ -1501,6 +1674,7 @@
   width: 100%;
   min-width: 0;
   min-height: 92px;
+
   padding: 13px;
 
   border: 1px solid var(--newsletter-border);
@@ -1520,7 +1694,8 @@
 
   transition:
     border-color 150ms ease,
-    background-color 150ms ease;
+    background-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .admin-newsletter__delivery-option:hover {
@@ -1529,7 +1704,11 @@
 
 .admin-newsletter__delivery-option--selected {
   border-color: var(--newsletter-gold);
+
   background: #fdfaf5;
+
+  box-shadow:
+    inset 3px 0 0 var(--newsletter-gold);
 }
 
 .admin-newsletter__delivery-option-icon {
@@ -1556,14 +1735,17 @@
   display: block;
 
   color: var(--newsletter-navy);
+
   font-size: 0.76rem;
 }
 
 .admin-newsletter__delivery-option-copy small {
   display: block;
+
   margin-top: 3px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.65rem;
   line-height: 1.4;
 }
@@ -1575,8 +1757,14 @@
   color: var(--newsletter-success);
 }
 
+
+/* ============================================================
+   SCHEDULE BOX
+============================================================ */
+
 .admin-newsletter__schedule-box {
   margin-top: 12px;
+
   padding: 13px;
 
   border: 1px solid var(--newsletter-border);
@@ -1604,7 +1792,8 @@
   color: var(--newsletter-gold-dark);
 }
 
-.admin-newsletter__schedule-box .admin-newsletter__field {
+.admin-newsletter__schedule-box
+.admin-newsletter__field {
   width: 100%;
   max-width: 420px;
 }
@@ -1616,13 +1805,19 @@
 
 .admin-newsletter__test-delivery {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
   align-items: end;
+
   gap: 9px;
 }
 
 .admin-newsletter__editor-notice {
   margin-top: 12px;
+
   padding: 10px 12px;
 
   border: 1px solid #e9d9ba;
@@ -1637,13 +1832,18 @@
 
 
 /* ============================================================
-   REVIEW
+   REVIEW LAYOUT
 ============================================================ */
 
 .admin-newsletter__review-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(270px, 0.6fr);
+
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(270px, 0.6fr);
+
   align-items: start;
+
   gap: 12px;
 }
 
@@ -1657,9 +1857,15 @@
   top: 12px;
 }
 
+
+/* ============================================================
+   REVIEW SECTIONS
+============================================================ */
+
 .admin-newsletter__review-sections {
   display: flex;
   flex-direction: column;
+
   gap: 10px;
 }
 
@@ -1672,9 +1878,11 @@
 
 .admin-newsletter__review-section-head {
   min-height: 46px;
+
   padding: 8px 11px;
 
-  border-bottom: 1px solid var(--newsletter-border);
+  border-bottom:
+    1px solid var(--newsletter-border);
 
   display: flex;
   align-items: center;
@@ -1702,7 +1910,10 @@
   padding: 12px;
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
   gap: 12px;
 }
 
@@ -1718,9 +1929,11 @@
 .admin-newsletter__review-content-preview span,
 .admin-newsletter__review-cta span {
   display: block;
+
   margin-bottom: 3px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.63rem;
   font-weight: 700;
 }
@@ -1731,9 +1944,15 @@
   overflow-wrap: anywhere;
 
   color: var(--newsletter-navy);
+
   font-size: 0.73rem;
   line-height: 1.4;
 }
+
+
+/* ============================================================
+   REVIEW CONTENT
+============================================================ */
 
 .admin-newsletter__review-content-preview {
   padding: 12px;
@@ -1749,6 +1968,7 @@
   flex: 0 0 100px;
 
   border-radius: 6px;
+
   object-fit: cover;
 }
 
@@ -1758,31 +1978,39 @@
 
 .admin-newsletter__review-content-preview p {
   max-height: 110px;
+
   margin: 0;
+
   overflow: hidden;
 
   color: var(--newsletter-text);
+
   font-size: 0.71rem;
   line-height: 1.55;
+
   white-space: pre-line;
 }
 
 .admin-newsletter__review-cta {
   margin: 0 12px 12px;
+
   padding: 10px;
 
   border-radius: 6px;
+
   background: var(--newsletter-surface-soft);
 }
 
 .admin-newsletter__review-cta strong,
 .admin-newsletter__review-cta small {
   display: block;
+
   overflow-wrap: anywhere;
 }
 
 .admin-newsletter__review-cta strong {
   color: var(--newsletter-navy);
+
   font-size: 0.72rem;
 }
 
@@ -1790,8 +2018,14 @@
   margin-top: 3px;
 
   color: var(--newsletter-muted);
+
   font-size: 0.65rem;
 }
+
+
+/* ============================================================
+   REVIEW SUMMARY
+============================================================ */
 
 .admin-newsletter__review-summary h3 {
   margin-bottom: 13px;
@@ -1807,7 +2041,8 @@
 .admin-newsletter__review-summary-list > div {
   padding: 9px 0;
 
-  border-bottom: 1px solid var(--newsletter-border);
+  border-bottom:
+    1px solid var(--newsletter-border);
 }
 
 .admin-newsletter__review-summary-list > div:last-child {
@@ -1818,25 +2053,30 @@
   display: block;
 
   color: var(--newsletter-muted);
+
   font-size: 0.63rem;
 }
 
 .admin-newsletter__review-summary-list strong {
   display: block;
+
   margin-top: 2px;
 
   overflow-wrap: anywhere;
 
   color: var(--newsletter-navy);
+
   font-size: 0.72rem;
 }
 
-.admin-newsletter__review-summary .admin-newsletter__button {
+.admin-newsletter__review-summary
+.admin-newsletter__button {
   margin-top: 7px;
 }
 
 .admin-newsletter__review-warning {
   margin-top: 10px;
+
   padding: 9px;
 
   border-radius: 6px;
@@ -1851,6 +2091,7 @@
 
 .admin-newsletter__review-warning svg {
   flex: 0 0 auto;
+
   margin-top: 1px;
 }
 
@@ -1864,20 +2105,42 @@
 
 /* ============================================================
    WIZARD NAVIGATION
+
+   Desktop:
+   Navigation remains visible at the bottom of the Newsletter
+   scroll area.
+
+   This only affects the Newsletter wizard.
+   It does NOT modify the admin sidebar.
 ============================================================ */
 
 .admin-newsletter__wizard-navigation {
   min-height: 68px;
+
   padding: 12px 18px;
 
-  border-top: 1px solid var(--newsletter-border);
+  border-top:
+    1px solid var(--newsletter-border);
 
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+
+  grid-template-columns:
+    minmax(120px, 1fr)
+    auto
+    minmax(120px, 1fr);
+
   align-items: center;
+
   gap: 12px;
 
   background: #fafbfb;
+
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+
+  box-shadow:
+    0 -6px 16px rgba(7, 24, 39, 0.06);
 }
 
 .admin-newsletter__wizard-navigation-left,
@@ -1886,6 +2149,7 @@
 
   display: flex;
   align-items: center;
+
   gap: 7px;
 }
 
@@ -1895,9 +2159,12 @@
 
 .admin-newsletter__wizard-navigation-center {
   color: var(--newsletter-muted);
+
   font-size: 0.67rem;
   font-weight: 700;
+
   text-align: center;
+
   white-space: nowrap;
 }
 
@@ -1910,7 +2177,10 @@
   padding: 0 18px 16px;
 
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
   gap: 12px;
 }
 
@@ -1921,11 +2191,13 @@
 .admin-newsletter__analytics-list > div {
   min-height: 40px;
 
-  border-bottom: 1px solid var(--newsletter-border);
+  border-bottom:
+    1px solid var(--newsletter-border);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 14px;
 }
 
@@ -1935,16 +2207,19 @@
 
 .admin-newsletter__analytics-list span {
   color: var(--newsletter-muted);
+
   font-size: 0.71rem;
 }
 
 .admin-newsletter__analytics-list strong {
   color: var(--newsletter-navy);
+
   font-size: 0.78rem;
 }
 
 .admin-newsletter__empty-analytics {
   min-height: 165px;
+
   padding: 20px;
 
   display: flex;
@@ -1953,11 +2228,13 @@
   justify-content: center;
 
   text-align: center;
+
   color: var(--newsletter-muted);
 }
 
 .admin-newsletter__empty-analytics p {
   max-width: 390px;
+
   margin: 8px 0 0;
 
   font-size: 0.7rem;
@@ -1971,7 +2248,9 @@
 
 .admin-newsletter__preview-overlay {
   position: fixed;
+
   z-index: 1000;
+
   inset: 0;
 
   padding: 24px;
@@ -1981,12 +2260,15 @@
   justify-content: center;
 
   background: rgba(5, 18, 30, 0.7);
+
   backdrop-filter: blur(3px);
 }
 
 .admin-newsletter__preview-modal {
   width: min(760px, 100%);
+
   max-height: calc(100dvh - 48px);
+
   overflow: hidden;
 
   border-radius: 9px;
@@ -1995,18 +2277,23 @@
   flex-direction: column;
 
   background: #ffffff;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.24);
 }
 
 .admin-newsletter__preview-header {
   min-height: 66px;
+
   padding: 12px 16px;
 
-  border-bottom: 1px solid var(--newsletter-border);
+  border-bottom:
+    1px solid var(--newsletter-border);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 16px;
 
   background: #ffffff;
@@ -2024,15 +2311,22 @@
   white-space: nowrap;
 
   color: var(--newsletter-navy);
+
   font-size: 0.92rem;
 }
 
 .admin-newsletter__email-preview {
   width: 100%;
+
   overflow-y: auto;
 
   background: #eef1f3;
 }
+
+
+/* ============================================================
+   EMAIL PREVIEW BRAND
+============================================================ */
 
 .admin-newsletter__email-brand {
   padding: 20px 30px;
@@ -2046,6 +2340,7 @@
 
 .admin-newsletter__email-brand strong {
   font-size: 0.83rem;
+
   letter-spacing: 0.08em;
 }
 
@@ -2053,15 +2348,23 @@
   margin-top: 3px;
 
   color: rgba(255, 255, 255, 0.68);
+
   font-size: 0.65rem;
 }
 
 .admin-newsletter__email-image {
   display: block;
+
   width: 100%;
   max-height: 360px;
+
   object-fit: cover;
 }
+
+
+/* ============================================================
+   EMAIL PREVIEW BODY
+============================================================ */
 
 .admin-newsletter__email-body {
   padding: 36px 42px;
@@ -2071,6 +2374,7 @@
 
 .admin-newsletter__email-kicker {
   color: var(--newsletter-gold);
+
   font-size: 0.62rem;
   font-weight: 850;
   letter-spacing: 0.14em;
@@ -2080,8 +2384,12 @@
   margin: 8px 0 0;
 
   color: var(--newsletter-navy);
-  font-size: clamp(1.55rem, 4vw, 2.2rem);
+
+  font-size:
+    clamp(1.55rem, 4vw, 2.2rem);
+
   line-height: 1.15;
+
   letter-spacing: -0.03em;
 }
 
@@ -2089,6 +2397,7 @@
   margin: 10px 0 0;
 
   color: #66737e;
+
   font-size: 0.8rem;
   line-height: 1.6;
 }
@@ -2097,6 +2406,7 @@
   margin-top: 22px;
 
   color: #344454;
+
   font-size: 0.82rem;
   line-height: 1.75;
 }
@@ -2107,7 +2417,9 @@
 
 .admin-newsletter__email-cta {
   min-height: 42px;
+
   margin-top: 8px;
+
   padding: 0 18px;
 
   border-radius: 5px;
@@ -2121,8 +2433,14 @@
 
   font-size: 0.75rem;
   font-weight: 750;
+
   text-decoration: none;
 }
+
+
+/* ============================================================
+   EMAIL PREVIEW FOOTER
+============================================================ */
 
 .admin-newsletter__email-footer {
   padding: 22px 30px;
@@ -2137,11 +2455,13 @@
   display: block;
 
   color: var(--newsletter-navy);
+
   font-size: 0.72rem;
 }
 
 .admin-newsletter__email-footer p {
   max-width: 440px;
+
   margin: 7px auto;
 
   font-size: 0.65rem;
@@ -2150,7 +2470,9 @@
 
 .admin-newsletter__email-footer span {
   color: var(--newsletter-gold-dark);
+
   font-size: 0.65rem;
+
   text-decoration: underline;
 }
 
@@ -2212,31 +2534,50 @@
 @media (max-width: 850px) {
   .admin-newsletter {
     gap: 12px;
+
+    height: 100%;
+    max-height: 100dvh;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding-bottom: 24px;
+
+    -webkit-overflow-scrolling: touch;
   }
 
   .admin-newsletter__header {
     align-items: flex-start;
+
     flex-direction: column;
+
     gap: 14px;
   }
 
   .admin-newsletter__header-actions {
     width: 100%;
+
     justify-content: flex-start;
   }
 
   .admin-newsletter__section-heading {
     align-items: flex-start;
+
     flex-direction: column;
+
     gap: 12px;
   }
 
   .admin-newsletter__create-heading-actions {
     width: 100%;
+
     justify-content: flex-start;
   }
 
-  /* Switch wizard to compact mobile/tablet display */
+
+  /* ----------------------------------------------------------
+     Compact tablet/mobile wizard display
+  ---------------------------------------------------------- */
 
   .admin-newsletter__wizard-steps {
     display: none;
@@ -2244,8 +2585,10 @@
 
   .admin-newsletter__wizard-mobile-head {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
+
     gap: 12px;
   }
 
@@ -2257,27 +2600,33 @@
     display: block;
 
     color: var(--newsletter-muted);
+
     font-size: 0.63rem;
     font-weight: 700;
   }
 
   .admin-newsletter__wizard-mobile-head strong {
     display: block;
+
     margin-top: 2px;
 
     color: var(--newsletter-navy);
+
     font-size: 0.78rem;
   }
 
   .admin-newsletter__wizard-mobile-head > span {
     color: var(--newsletter-gold-dark);
+
     font-size: 0.72rem;
     font-weight: 800;
   }
 
   .admin-newsletter__wizard-mobile-progress {
     height: 5px;
+
     margin-top: 9px;
+
     overflow: hidden;
 
     border-radius: 999px;
@@ -2289,20 +2638,29 @@
 
   .admin-newsletter__wizard-mobile-progress span {
     display: block;
+
     height: 100%;
 
     border-radius: inherit;
 
     background: var(--newsletter-gold);
 
-    transition: width 220ms ease;
+    transition:
+      width 220ms ease;
   }
+
+
+  /* ----------------------------------------------------------
+     Current step
+  ---------------------------------------------------------- */
 
   .admin-newsletter__current-step {
     min-height: 58px;
+
     padding: 10px 18px;
 
-    border-bottom: 1px solid var(--newsletter-border);
+    border-bottom:
+      1px solid var(--newsletter-border);
 
     display: flex;
     align-items: center;
@@ -2318,8 +2676,10 @@
 
   .admin-newsletter__current-step-copy span {
     color: var(--newsletter-gold);
+
     font-size: 0.59rem;
     font-weight: 850;
+
     letter-spacing: 0.08em;
   }
 
@@ -2327,6 +2687,7 @@
     margin-top: 2px;
 
     color: var(--newsletter-navy);
+
     font-size: 0.8rem;
   }
 
@@ -2334,17 +2695,35 @@
     margin-top: 1px;
 
     color: var(--newsletter-muted);
+
     font-size: 0.64rem;
   }
+
+
+  /* ----------------------------------------------------------
+     Forms
+  ---------------------------------------------------------- */
 
   .admin-newsletter__audience-options,
   .admin-newsletter__delivery-options {
     grid-template-columns: 1fr;
   }
 
+
+  /* ----------------------------------------------------------
+     Navigation
+     On tablet/mobile it returns to normal flow so it cannot
+     cover fields or buttons while scrolling.
+  ---------------------------------------------------------- */
+
   .admin-newsletter__wizard-navigation {
+    position: static;
+
     grid-template-columns: 1fr;
+
     gap: 8px;
+
+    box-shadow: none;
   }
 
   .admin-newsletter__wizard-navigation-left,
@@ -2359,495 +2738,1276 @@
   .admin-newsletter__wizard-navigation-center {
     display: none;
   }
+}/* ============================================================
+   AUDIENCE OPTIONS
+============================================================ */
+
+.admin-newsletter__audience-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.admin-newsletter__audience-option {
+  width: 100%;
+  min-width: 0;
+  min-height: 82px;
+
+  padding: 12px;
+
+  border: 1px solid var(--newsletter-border);
+  border-radius: 7px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  background: #ffffff;
+  color: var(--newsletter-text);
+
+  font-family: inherit;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.admin-newsletter__audience-option:hover {
+  border-color: #c9ced3;
+  background: #fbfbfb;
+}
+
+.admin-newsletter__audience-option--selected {
+  border-color: var(--newsletter-gold);
+
+  background: #fdfaf5;
+
+  box-shadow:
+    inset 3px 0 0 var(--newsletter-gold);
+}
+
+.admin-newsletter__audience-option--disabled:not(
+    .admin-newsletter__audience-option--selected
+  ) {
+  background: #fafafa;
+}
+
+.admin-newsletter__audience-radio {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+
+  border: 1.5px solid #bcc4ca;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-newsletter__audience-option--selected
+.admin-newsletter__audience-radio {
+  border-color: var(--newsletter-gold);
+}
+
+.admin-newsletter__audience-radio > span {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: var(--newsletter-gold);
+}
+
+.admin-newsletter__audience-option-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-newsletter__audience-option-copy strong {
+  display: block;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.75rem;
+}
+
+.admin-newsletter__audience-option-copy small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--newsletter-muted);
+
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
+.admin-newsletter__audience-option-count {
+  flex: 0 0 auto;
+
+  min-width: 38px;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.75rem;
+  font-weight: 800;
+
+  text-align: right;
 }
 
 
 /* ============================================================
-   LARGE PHONES / SMALL TABLETS
+   RECIPIENT SUMMARY
 ============================================================ */
 
-@media (max-width: 700px) {
-  .admin-newsletter__header h2 {
-    font-size: 1.55rem;
+.admin-newsletter__recipient-summary {
+  margin-top: 14px;
+
+  padding: 13px;
+
+  border: 1px solid #e5d5b6;
+  border-radius: 7px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  background: #fdf9f1;
+}
+
+.admin-newsletter__recipient-summary-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+
+  border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--newsletter-gold-soft);
+  color: var(--newsletter-gold-dark);
+}
+
+.admin-newsletter__recipient-summary > div:last-child {
+  min-width: 0;
+}
+
+.admin-newsletter__recipient-summary span,
+.admin-newsletter__recipient-summary small {
+  display: block;
+}
+
+.admin-newsletter__recipient-summary span {
+  color: var(--newsletter-muted);
+
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.admin-newsletter__recipient-summary strong {
+  display: block;
+
+  margin: 2px 0;
+
+  color: var(--newsletter-navy);
+
+  font-size: 1.25rem;
+}
+
+.admin-newsletter__recipient-summary small {
+  color: var(--newsletter-muted);
+
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   DELIVERY OPTIONS
+============================================================ */
+
+.admin-newsletter__delivery-options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.admin-newsletter__delivery-option {
+  width: 100%;
+  min-width: 0;
+  min-height: 92px;
+
+  padding: 13px;
+
+  border: 1px solid var(--newsletter-border);
+  border-radius: 7px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  background: #ffffff;
+  color: var(--newsletter-text);
+
+  font-family: inherit;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.admin-newsletter__delivery-option:hover {
+  border-color: #c7cdd2;
+}
+
+.admin-newsletter__delivery-option--selected {
+  border-color: var(--newsletter-gold);
+
+  background: #fdfaf5;
+
+  box-shadow:
+    inset 3px 0 0 var(--newsletter-gold);
+}
+
+.admin-newsletter__delivery-option-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+
+  border-radius: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--newsletter-gold-soft);
+  color: var(--newsletter-gold-dark);
+}
+
+.admin-newsletter__delivery-option-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-newsletter__delivery-option-copy strong {
+  display: block;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.76rem;
+}
+
+.admin-newsletter__delivery-option-copy small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--newsletter-muted);
+
+  font-size: 0.65rem;
+  line-height: 1.4;
+}
+
+.admin-newsletter__selection-indicator {
+  width: 22px;
+  flex: 0 0 22px;
+
+  color: var(--newsletter-success);
+}
+
+
+/* ============================================================
+   SCHEDULE BOX
+============================================================ */
+
+.admin-newsletter__schedule-box {
+  margin-top: 12px;
+
+  padding: 13px;
+
+  border: 1px solid var(--newsletter-border);
+  border-radius: 7px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  background: var(--newsletter-surface-soft);
+}
+
+.admin-newsletter__schedule-box-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+
+  border-radius: 6px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--newsletter-gold-soft);
+  color: var(--newsletter-gold-dark);
+}
+
+.admin-newsletter__schedule-box
+.admin-newsletter__field {
+  width: 100%;
+  max-width: 420px;
+}
+
+
+/* ============================================================
+   TEST DELIVERY
+============================================================ */
+
+.admin-newsletter__test-delivery {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+
+  align-items: end;
+
+  gap: 9px;
+}
+
+.admin-newsletter__editor-notice {
+  margin-top: 12px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #e9d9ba;
+  border-radius: 6px;
+
+  background: var(--newsletter-warning-bg);
+  color: var(--newsletter-warning);
+
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   REVIEW LAYOUT
+============================================================ */
+
+.admin-newsletter__review-layout {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(270px, 0.6fr);
+
+  align-items: start;
+
+  gap: 12px;
+}
+
+.admin-newsletter__review-main,
+.admin-newsletter__review-sidebar {
+  min-width: 0;
+}
+
+.admin-newsletter__review-sidebar {
+  position: sticky;
+  top: 12px;
+}
+
+
+/* ============================================================
+   REVIEW SECTIONS
+============================================================ */
+
+.admin-newsletter__review-sections {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.admin-newsletter__review-section {
+  overflow: hidden;
+
+  border: 1px solid var(--newsletter-border);
+  border-radius: 7px;
+}
+
+.admin-newsletter__review-section-head {
+  min-height: 46px;
+
+  padding: 8px 11px;
+
+  border-bottom:
+    1px solid var(--newsletter-border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  background: var(--newsletter-surface-soft);
+}
+
+.admin-newsletter__review-section-head > div {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--newsletter-navy);
+}
+
+.admin-newsletter__review-section-head strong {
+  font-size: 0.72rem;
+}
+
+.admin-newsletter__review-grid {
+  padding: 12px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.admin-newsletter__review-grid > div {
+  min-width: 0;
+}
+
+.admin-newsletter__review-grid-full {
+  grid-column: 1 / -1;
+}
+
+.admin-newsletter__review-grid span,
+.admin-newsletter__review-content-preview span,
+.admin-newsletter__review-cta span {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--newsletter-muted);
+
+  font-size: 0.63rem;
+  font-weight: 700;
+}
+
+.admin-newsletter__review-grid strong {
+  display: block;
+
+  overflow-wrap: anywhere;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   REVIEW CONTENT
+============================================================ */
+
+.admin-newsletter__review-content-preview {
+  padding: 12px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admin-newsletter__review-content-preview img {
+  width: 100px;
+  height: 72px;
+  flex: 0 0 100px;
+
+  border-radius: 6px;
+
+  object-fit: cover;
+}
+
+.admin-newsletter__review-content-preview > div {
+  min-width: 0;
+}
+
+.admin-newsletter__review-content-preview p {
+  max-height: 110px;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  color: var(--newsletter-text);
+
+  font-size: 0.71rem;
+  line-height: 1.55;
+
+  white-space: pre-line;
+}
+
+.admin-newsletter__review-cta {
+  margin: 0 12px 12px;
+
+  padding: 10px;
+
+  border-radius: 6px;
+
+  background: var(--newsletter-surface-soft);
+}
+
+.admin-newsletter__review-cta strong,
+.admin-newsletter__review-cta small {
+  display: block;
+
+  overflow-wrap: anywhere;
+}
+
+.admin-newsletter__review-cta strong {
+  color: var(--newsletter-navy);
+
+  font-size: 0.72rem;
+}
+
+.admin-newsletter__review-cta small {
+  margin-top: 3px;
+
+  color: var(--newsletter-muted);
+
+  font-size: 0.65rem;
+}
+
+
+/* ============================================================
+   REVIEW SUMMARY
+============================================================ */
+
+.admin-newsletter__review-summary h3 {
+  margin-bottom: 13px;
+}
+
+.admin-newsletter__review-summary-list {
+  margin-bottom: 12px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-newsletter__review-summary-list > div {
+  padding: 9px 0;
+
+  border-bottom:
+    1px solid var(--newsletter-border);
+}
+
+.admin-newsletter__review-summary-list > div:last-child {
+  border-bottom: 0;
+}
+
+.admin-newsletter__review-summary-list span {
+  display: block;
+
+  color: var(--newsletter-muted);
+
+  font-size: 0.63rem;
+}
+
+.admin-newsletter__review-summary-list strong {
+  display: block;
+
+  margin-top: 2px;
+
+  overflow-wrap: anywhere;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.72rem;
+}
+
+.admin-newsletter__review-summary
+.admin-newsletter__button {
+  margin-top: 7px;
+}
+
+.admin-newsletter__review-warning {
+  margin-top: 10px;
+
+  padding: 9px;
+
+  border-radius: 6px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+
+  background: var(--newsletter-warning-bg);
+  color: var(--newsletter-warning);
+}
+
+.admin-newsletter__review-warning svg {
+  flex: 0 0 auto;
+
+  margin-top: 1px;
+}
+
+.admin-newsletter__review-warning p {
+  margin: 0;
+
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+
+/* ============================================================
+   WIZARD NAVIGATION
+
+   Desktop:
+   Navigation remains visible at the bottom of the Newsletter
+   scroll area.
+
+   This only affects the Newsletter wizard.
+   It does NOT modify the admin sidebar.
+============================================================ */
+
+.admin-newsletter__wizard-navigation {
+  min-height: 68px;
+
+  padding: 12px 18px;
+
+  border-top:
+    1px solid var(--newsletter-border);
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(120px, 1fr)
+    auto
+    minmax(120px, 1fr);
+
+  align-items: center;
+
+  gap: 12px;
+
+  background: #fafbfb;
+
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+
+  box-shadow:
+    0 -6px 16px rgba(7, 24, 39, 0.06);
+}
+
+.admin-newsletter__wizard-navigation-left,
+.admin-newsletter__wizard-navigation-right {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.admin-newsletter__wizard-navigation-right {
+  justify-content: flex-end;
+}
+
+.admin-newsletter__wizard-navigation-center {
+  color: var(--newsletter-muted);
+
+  font-size: 0.67rem;
+  font-weight: 700;
+
+  text-align: center;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   ANALYTICS
+============================================================ */
+
+.admin-newsletter__analytics-grid {
+  padding: 0 18px 16px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.admin-newsletter__analytics-list {
+  margin-top: 12px;
+}
+
+.admin-newsletter__analytics-list > div {
+  min-height: 40px;
+
+  border-bottom:
+    1px solid var(--newsletter-border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 14px;
+}
+
+.admin-newsletter__analytics-list > div:last-child {
+  border-bottom: 0;
+}
+
+.admin-newsletter__analytics-list span {
+  color: var(--newsletter-muted);
+
+  font-size: 0.71rem;
+}
+
+.admin-newsletter__analytics-list strong {
+  color: var(--newsletter-navy);
+
+  font-size: 0.78rem;
+}
+
+.admin-newsletter__empty-analytics {
+  min-height: 165px;
+
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  color: var(--newsletter-muted);
+}
+
+.admin-newsletter__empty-analytics p {
+  max-width: 390px;
+
+  margin: 8px 0 0;
+
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   EMAIL PREVIEW OVERLAY
+============================================================ */
+
+.admin-newsletter__preview-overlay {
+  position: fixed;
+
+  z-index: 1000;
+
+  inset: 0;
+
+  padding: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(5, 18, 30, 0.7);
+
+  backdrop-filter: blur(3px);
+}
+
+.admin-newsletter__preview-modal {
+  width: min(760px, 100%);
+
+  max-height: calc(100dvh - 48px);
+
+  overflow: hidden;
+
+  border-radius: 9px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.24);
+}
+
+.admin-newsletter__preview-header {
+  min-height: 66px;
+
+  padding: 12px 16px;
+
+  border-bottom:
+    1px solid var(--newsletter-border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  background: #ffffff;
+}
+
+.admin-newsletter__preview-header > div {
+  min-width: 0;
+}
+
+.admin-newsletter__preview-header h3 {
+  margin: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.92rem;
+}
+
+.admin-newsletter__email-preview {
+  width: 100%;
+
+  overflow-y: auto;
+
+  background: #eef1f3;
+}
+
+
+/* ============================================================
+   EMAIL PREVIEW BRAND
+============================================================ */
+
+.admin-newsletter__email-brand {
+  padding: 20px 30px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: var(--newsletter-navy);
+  color: #ffffff;
+}
+
+.admin-newsletter__email-brand strong {
+  font-size: 0.83rem;
+
+  letter-spacing: 0.08em;
+}
+
+.admin-newsletter__email-brand span {
+  margin-top: 3px;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 0.65rem;
+}
+
+.admin-newsletter__email-image {
+  display: block;
+
+  width: 100%;
+  max-height: 360px;
+
+  object-fit: cover;
+}
+
+
+/* ============================================================
+   EMAIL PREVIEW BODY
+============================================================ */
+
+.admin-newsletter__email-body {
+  padding: 36px 42px;
+
+  background: #ffffff;
+}
+
+.admin-newsletter__email-kicker {
+  color: var(--newsletter-gold);
+
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.admin-newsletter__email-body h1 {
+  margin: 8px 0 0;
+
+  color: var(--newsletter-navy);
+
+  font-size:
+    clamp(1.55rem, 4vw, 2.2rem);
+
+  line-height: 1.15;
+
+  letter-spacing: -0.03em;
+}
+
+.admin-newsletter__email-preview-text {
+  margin: 10px 0 0;
+
+  color: #66737e;
+
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.admin-newsletter__email-content {
+  margin-top: 22px;
+
+  color: #344454;
+
+  font-size: 0.82rem;
+  line-height: 1.75;
+}
+
+.admin-newsletter__email-content p {
+  margin: 0 0 15px;
+}
+
+.admin-newsletter__email-cta {
+  min-height: 42px;
+
+  margin-top: 8px;
+
+  padding: 0 18px;
+
+  border-radius: 5px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--newsletter-navy);
+  color: #ffffff;
+
+  font-size: 0.75rem;
+  font-weight: 750;
+
+  text-decoration: none;
+}
+
+
+/* ============================================================
+   EMAIL PREVIEW FOOTER
+============================================================ */
+
+.admin-newsletter__email-footer {
+  padding: 22px 30px;
+
+  background: #f6f7f8;
+  color: #7a858e;
+
+  text-align: center;
+}
+
+.admin-newsletter__email-footer strong {
+  display: block;
+
+  color: var(--newsletter-navy);
+
+  font-size: 0.72rem;
+}
+
+.admin-newsletter__email-footer p {
+  max-width: 440px;
+
+  margin: 7px auto;
+
+  font-size: 0.65rem;
+  line-height: 1.5;
+}
+
+.admin-newsletter__email-footer span {
+  color: var(--newsletter-gold-dark);
+
+  font-size: 0.65rem;
+
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   LARGE LAPTOP / SMALL DESKTOP
+============================================================ */
+
+@media (max-width: 1180px) {
+  .admin-newsletter__wizard-step-copy small {
+    display: none;
   }
 
+  .admin-newsletter__wizard-connector {
+    margin: 0 7px;
+  }
+
+  .admin-newsletter__review-layout {
+    grid-template-columns:
+      minmax(0, 1.35fr)
+      minmax(250px, 0.65fr);
+  }
+}
+
+
+/* ============================================================
+   TABLET / SMALL LAPTOP
+============================================================ */
+
+@media (max-width: 1000px) {
   .admin-newsletter__stats {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .admin-newsletter__overview-grid {
-    padding-inline: 12px;
-  }
-
-  .admin-newsletter__panel > .admin-newsletter__card {
-    margin-inline: 12px;
-  }
-
-  .admin-newsletter__section-heading,
-  .admin-newsletter__stats,
-  .admin-newsletter__toolbar,
-  .admin-newsletter__wizard,
-  .admin-newsletter__wizard-body,
-  .admin-newsletter__wizard-navigation,
-  .admin-newsletter__analytics-grid {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .admin-newsletter__wizard-error,
-  .admin-newsletter__wizard-info {
-    margin-left: 12px;
-    margin-right: 12px;
-  }
-
-  .admin-newsletter__form-grid--two,
-  .admin-newsletter__review-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-newsletter__review-grid-full {
-    grid-column: auto;
-  }
-
-  .admin-newsletter__test-delivery {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-newsletter__test-delivery
-    .admin-newsletter__button {
-    width: 100%;
-  }
-
-  .admin-newsletter__toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .admin-newsletter__search,
-  .admin-newsletter__toolbar select {
-    width: 100%;
-    max-width: none;
-  }
-
-  .admin-newsletter__recent-item {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .admin-newsletter__recent-meta {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .admin-newsletter__wizard-navigation-left,
-  .admin-newsletter__wizard-navigation-right {
-    display: grid;
     grid-template-columns:
       repeat(2, minmax(0, 1fr));
   }
 
-  .admin-newsletter__wizard-navigation-left:has(
-      .admin-newsletter__button:only-child
-    ) {
+  .admin-newsletter__overview-grid,
+  .admin-newsletter__analytics-grid {
     grid-template-columns: 1fr;
   }
 
-  .admin-newsletter__wizard-nav-button {
-    width: 100%;
+  .admin-newsletter__review-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-newsletter__review-sidebar {
+    position: static;
+  }
+
+  .admin-newsletter__review-summary {
+    display: block;
   }
 }
 
 
 /* ============================================================
-   MOBILE
+   TABLET PORTRAIT
 ============================================================ */
 
-@media (max-width: 560px) {
+@media (max-width: 850px) {
   .admin-newsletter {
-    gap: 10px;
+    gap: 12px;
+
+    height: 100%;
+    max-height: 100dvh;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding-bottom: 24px;
+
+    -webkit-overflow-scrolling: touch;
   }
 
-  .admin-newsletter__header h2 {
-    font-size: 1.42rem;
+  .admin-newsletter__header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 14px;
   }
 
-  .admin-newsletter__header p {
-    font-size: 0.76rem;
-  }
-
-  .admin-newsletter__header-actions,
-  .admin-newsletter__create-heading-actions {
-    display: grid;
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-  .admin-newsletter__header-actions
-    .admin-newsletter__button,
-  .admin-newsletter__create-heading-actions
-    .admin-newsletter__button {
+  .admin-newsletter__header-actions {
     width: 100%;
-    padding-inline: 8px;
-  }
 
-  .admin-newsletter__tabs {
-    margin-inline: 0;
-  }
-
-  .admin-newsletter__tab {
-    min-height: 40px;
-    padding-inline: 10px;
-    font-size: 0.7rem;
-  }
-
-  .admin-newsletter__panel {
-    border-radius: 7px;
+    justify-content: flex-start;
   }
 
   .admin-newsletter__section-heading {
-    padding: 14px 12px;
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 12px;
   }
 
-  .admin-newsletter__section-heading h3 {
-    font-size: 0.94rem;
+  .admin-newsletter__create-heading-actions {
+    width: 100%;
+
+    justify-content: flex-start;
   }
 
-  .admin-newsletter__section-heading p {
-    font-size: 0.71rem;
+
+  /* ----------------------------------------------------------
+     Compact tablet/mobile wizard display
+  ---------------------------------------------------------- */
+
+  .admin-newsletter__wizard-steps {
+    display: none;
   }
 
-  .admin-newsletter__stats {
-    gap: 7px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+  .admin-newsletter__wizard-mobile-head {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
   }
 
-  .admin-newsletter__stat {
-    min-height: 68px;
-    padding: 9px;
-    gap: 8px;
+  .admin-newsletter__wizard-mobile-head > div {
+    min-width: 0;
   }
 
-  .admin-newsletter__stat-icon {
-    width: 32px;
-    height: 32px;
-    flex-basis: 32px;
+  .admin-newsletter__wizard-mobile-head span {
+    display: block;
+
+    color: var(--newsletter-muted);
+
+    font-size: 0.63rem;
+    font-weight: 700;
   }
 
-  .admin-newsletter__stat span {
-    font-size: 0.61rem;
+  .admin-newsletter__wizard-mobile-head strong {
+    display: block;
+
+    margin-top: 2px;
+
+    color: var(--newsletter-navy);
+
+    font-size: 0.78rem;
   }
 
-  .admin-newsletter__stat strong {
-    font-size: 1.05rem;
+  .admin-newsletter__wizard-mobile-head > span {
+    color: var(--newsletter-gold-dark);
+
+    font-size: 0.72rem;
+    font-weight: 800;
   }
 
-  .admin-newsletter__audience-summary {
+  .admin-newsletter__wizard-mobile-progress {
+    height: 5px;
+
+    margin-top: 9px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    display: block;
+
+    background: #e4e7e9;
+  }
+
+  .admin-newsletter__wizard-mobile-progress span {
+    display: block;
+
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: var(--newsletter-gold);
+
+    transition:
+      width 220ms ease;
+  }
+
+
+  /* ----------------------------------------------------------
+     Current step
+  ---------------------------------------------------------- */
+
+  .admin-newsletter__current-step {
+    min-height: 58px;
+
+    padding: 10px 18px;
+
+    border-bottom:
+      1px solid var(--newsletter-border);
+
+    display: flex;
+    align-items: center;
+
+    background: #ffffff;
+  }
+
+  .admin-newsletter__current-step-copy span,
+  .admin-newsletter__current-step-copy strong,
+  .admin-newsletter__current-step-copy small {
+    display: block;
+  }
+
+  .admin-newsletter__current-step-copy span {
+    color: var(--newsletter-gold);
+
+    font-size: 0.59rem;
+    font-weight: 850;
+
+    letter-spacing: 0.08em;
+  }
+
+  .admin-newsletter__current-step-copy strong {
+    margin-top: 2px;
+
+    color: var(--newsletter-navy);
+
+    font-size: 0.8rem;
+  }
+
+  .admin-newsletter__current-step-copy small {
+    margin-top: 1px;
+
+    color: var(--newsletter-muted);
+
+    font-size: 0.64rem;
+  }
+
+
+  /* ----------------------------------------------------------
+     Forms
+  ---------------------------------------------------------- */
+
+  .admin-newsletter__audience-options,
+  .admin-newsletter__delivery-options {
     grid-template-columns: 1fr;
   }
 
-  .admin-newsletter__card {
-    padding: 13px;
-  }
 
-  .admin-newsletter__form-heading {
-    gap: 9px;
-    margin-bottom: 15px;
-  }
+  /* ----------------------------------------------------------
+     Navigation
+     On tablet/mobile it returns to normal flow so it cannot
+     cover fields or buttons while scrolling.
+  ---------------------------------------------------------- */
 
-  .admin-newsletter__form-heading > span {
-    width: 32px;
-    height: 32px;
-    flex-basis: 32px;
-  }
+  .admin-newsletter__wizard-navigation {
+    position: static;
 
-  .admin-newsletter__form-heading h3 {
-    font-size: 0.9rem;
-  }
+    grid-template-columns: 1fr;
 
-  .admin-newsletter__form-heading p {
-    font-size: 0.68rem;
-  }
+    gap: 8px;
 
-  .admin-newsletter__field input,
-  .admin-newsletter__field select {
-    min-height: 44px;
-    height: 44px;
-  }
-
-  .admin-newsletter__field textarea {
-    min-height: 220px;
-  }
-
-  .admin-newsletter__audience-option,
-  .admin-newsletter__delivery-option {
-    min-height: 88px;
-    padding: 11px;
-  }
-
-  .admin-newsletter__schedule-box {
-    flex-direction: column;
-  }
-
-  .admin-newsletter__schedule-box .admin-newsletter__field {
-    max-width: none;
-  }
-
-  .admin-newsletter__review-content-preview {
-    flex-direction: column;
-  }
-
-  .admin-newsletter__review-content-preview img {
-    width: 100%;
-    height: auto;
-    max-height: 220px;
-    flex-basis: auto;
+    box-shadow: none;
   }
 
   .admin-newsletter__wizard-navigation-left,
   .admin-newsletter__wizard-navigation-right {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-newsletter__wizard-navigation {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .admin-newsletter__wizard-navigation
-    .admin-newsletter__button {
-    min-height: 44px;
-  }
-
-  .admin-newsletter__preview-overlay {
-    padding: 10px;
-  }
-
-  .admin-newsletter__preview-modal {
-    max-height: calc(100dvh - 20px);
-    border-radius: 7px;
-  }
-
-  .admin-newsletter__preview-header {
-    min-height: 58px;
-    padding: 10px 12px;
-  }
-
-  .admin-newsletter__email-brand {
-    padding: 17px 18px;
-  }
-
-  .admin-newsletter__email-body {
-    padding: 25px 18px;
-  }
-
-  .admin-newsletter__email-footer {
-    padding: 19px 16px;
-  }
-
-  .admin-newsletter__coming-soon {
-    min-height: 330px;
-    padding: 35px 18px;
-  }
-}
-
-
-/* ============================================================
-   SMALL PHONES
-============================================================ */
-
-@media (max-width: 390px) {
-  .admin-newsletter__header-actions,
-  .admin-newsletter__create-heading-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-newsletter__stats {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-newsletter__stat {
-    min-height: 62px;
-  }
-
-  .admin-newsletter__tab {
-    padding-inline: 9px;
-  }
-
-  .admin-newsletter__tab svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  .admin-newsletter__recipient-summary {
-    flex-direction: column;
-  }
-
-  .admin-newsletter__audience-option {
-    align-items: flex-start;
-  }
-
-  .admin-newsletter__audience-option-count {
-    min-width: auto;
-  }
-
-  .admin-newsletter__delivery-option {
-    align-items: flex-start;
-  }
-
-  .admin-newsletter__selection-indicator {
-    margin-left: auto;
-  }
-
-  .admin-newsletter__review-section-head {
-    align-items: flex-start;
-  }
-
-  .admin-newsletter__preview-overlay {
-    padding: 0;
-  }
-
-  .admin-newsletter__preview-modal {
     width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
-  }
-}
-
-
-/* ============================================================
-   EXTRA SMALL / 320PX DEVICES
-============================================================ */
-
-@media (max-width: 340px) {
-  .admin-newsletter__header h2 {
-    font-size: 1.28rem;
   }
 
-  .admin-newsletter__eyebrow,
-  .admin-newsletter__section-label {
-    font-size: 0.58rem;
+  .admin-newsletter__wizard-navigation-right {
+    justify-content: flex-end;
   }
 
-  .admin-newsletter__button {
-    padding-inline: 9px;
-    font-size: 0.7rem;
-  }
-
-  .admin-newsletter__wizard,
-  .admin-newsletter__wizard-body,
-  .admin-newsletter__wizard-navigation,
-  .admin-newsletter__section-heading,
-  .admin-newsletter__stats,
-  .admin-newsletter__toolbar {
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-
-  .admin-newsletter__wizard-error,
-  .admin-newsletter__wizard-info {
-    margin-left: 9px;
-    margin-right: 9px;
-  }
-
-  .admin-newsletter__card {
-    padding: 11px;
-  }
-
-  .admin-newsletter__audience-option,
-  .admin-newsletter__delivery-option {
-    gap: 7px;
-    padding: 9px;
-  }
-
-  .admin-newsletter__delivery-option-icon {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
-  }
-}
-
-
-/* ============================================================
-   LANDSCAPE PHONES
-============================================================ */
-
-@media (max-height: 520px) and (orientation: landscape) {
-  .admin-newsletter__preview-overlay {
-    padding: 6px;
-  }
-
-  .admin-newsletter__preview-modal {
-    max-height: calc(100dvh - 12px);
-  }
-
-  .admin-newsletter__preview-header {
-    min-height: 52px;
-  }
-
-  .admin-newsletter__email-body {
-    padding-top: 22px;
-    padding-bottom: 22px;
-  }
-}
-
-
-/* ============================================================
-   ACCESSIBILITY / REDUCED MOTION
-============================================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  .admin-newsletter *,
-  .admin-newsletter *::before,
-  .admin-newsletter *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-
-/* ============================================================
-   TOUCH DEVICES
-============================================================ */
-
-@media (hover: none) and (pointer: coarse) {
-  .admin-newsletter__button,
-  .admin-newsletter__tab,
-  .admin-newsletter__row-action,
-  .admin-newsletter__icon-button {
-    min-height: 44px;
-  }
-
-  .admin-newsletter__row-action {
-    padding-inline: 10px;
-  }
-
-  .admin-newsletter__text-button {
-    min-height: 36px;
-  }
-}
-
-
-/* ============================================================
-   PRINT
-============================================================ */
-
-@media print {
-  .admin-newsletter__header-actions,
-  .admin-newsletter__tabs,
-  .admin-newsletter__wizard-navigation,
-  .admin-newsletter__create-heading-actions,
-  .admin-newsletter__row-actions {
-    display: none !important;
-  }
-
-  .admin-newsletter__panel,
-  .admin-newsletter__card {
-    border-color: #cccccc;
-    box-shadow: none;
+  .admin-newsletter__wizard-navigation-center {
+    display: none;
   }
 }

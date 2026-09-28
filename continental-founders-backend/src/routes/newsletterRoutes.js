@@ -1,22 +1,36 @@
 const express = require("express");
+const multer = require("multer");
+
 
 const {
   /* ==========================================================
      PUBLIC SUBSCRIBER ACTIONS
   ========================================================== */
+
   subscribe,
   unsubscribe,
+
 
   /* ==========================================================
      SUBSCRIBER ADMINISTRATION
   ========================================================== */
+
   getSubscribers,
   updateSubscriber,
   deleteSubscriber,
 
+
+  /* ==========================================================
+     NEWSLETTER MEDIA
+  ========================================================== */
+
+  uploadNewsletterImage,
+
+
   /* ==========================================================
      CAMPAIGN ADMINISTRATION
   ========================================================== */
+
   getCampaigns,
   getCampaign,
   createCampaign,
@@ -24,27 +38,35 @@ const {
   deleteCampaign,
   duplicateCampaign,
 
+
   /* ==========================================================
      AUDIENCE
   ========================================================== */
+
   getCampaignRecipientCount,
+
 
   /* ==========================================================
      SCHEDULING
   ========================================================== */
+
   scheduleCampaign,
   cancelScheduledCampaign,
+
 
   /* ==========================================================
      DELIVERY
   ========================================================== */
+
   sendTestCampaign,
   sendCampaign,
   getCampaignDeliveries,
 
+
   /* ==========================================================
      ANALYTICS
   ========================================================== */
+
   getNewsletterAnalytics,
 } = require("../controllers/newsletterController");
 
@@ -55,6 +77,200 @@ const {
 
 
 const router = express.Router();
+
+
+/* ============================================================
+   NEWSLETTER IMAGE UPLOAD CONFIGURATION
+============================================================ */
+
+/*
+  Images are kept in memory temporarily.
+
+  The controller receives the image as:
+
+  req.file.buffer
+
+  and uploads that buffer directly to Supabase Storage.
+
+  Nothing is permanently written to the backend filesystem.
+*/
+
+const newsletterImageStorage =
+  multer.memoryStorage();
+
+
+const ALLOWED_NEWSLETTER_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ]);
+
+
+const MAX_NEWSLETTER_IMAGE_SIZE =
+  5 * 1024 * 1024;
+
+
+const newsletterImageUpload =
+  multer({
+    storage:
+      newsletterImageStorage,
+
+    limits: {
+      fileSize:
+        MAX_NEWSLETTER_IMAGE_SIZE,
+
+      files:
+        1,
+    },
+
+    fileFilter: (
+      req,
+      file,
+      callback
+    ) => {
+      const mimeType =
+        String(
+          file?.mimetype || ""
+        )
+          .trim()
+          .toLowerCase();
+
+      if (
+        !ALLOWED_NEWSLETTER_IMAGE_TYPES.has(
+          mimeType
+        )
+      ) {
+        const error =
+          new Error(
+            "Only JPG, PNG and WEBP images are allowed."
+          );
+
+        error.code =
+          "INVALID_NEWSLETTER_IMAGE_TYPE";
+
+        return callback(
+          error
+        );
+      }
+
+      return callback(
+        null,
+        true
+      );
+    },
+  });
+
+
+/* ============================================================
+   NEWSLETTER IMAGE UPLOAD MIDDLEWARE
+
+   Converts Multer errors into clean JSON responses instead of
+   allowing upload errors to become generic Express errors.
+============================================================ */
+
+function handleNewsletterImageUpload(
+  req,
+  res,
+  next
+) {
+  newsletterImageUpload.single(
+    "image"
+  )(
+    req,
+    res,
+    (error) => {
+      if (!error) {
+        return next();
+      }
+
+      if (
+        error instanceof
+        multer.MulterError
+      ) {
+        if (
+          error.code ===
+          "LIMIT_FILE_SIZE"
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+
+              message:
+                "The image is too large. Maximum size is 5 MB.",
+            });
+        }
+
+        if (
+          error.code ===
+          "LIMIT_FILE_COUNT"
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+
+              message:
+                "Please upload only one newsletter image at a time.",
+            });
+        }
+
+        if (
+          error.code ===
+          "LIMIT_UNEXPECTED_FILE"
+        ) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+
+              message:
+                'The image field must be named "image".',
+            });
+        }
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              error.message ||
+              "Unable to process the uploaded image.",
+          });
+      }
+
+      if (
+        error?.code ===
+        "INVALID_NEWSLETTER_IMAGE_TYPE"
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Only JPG, PNG and WEBP images are allowed.",
+          });
+      }
+
+      console.error(
+        "Newsletter image upload middleware error:",
+        error
+      );
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+
+          message:
+            "Unable to process the newsletter image.",
+        });
+    }
+  );
+}
 
 
 /* ============================================================
@@ -138,6 +354,13 @@ router.get(
             true,
 
           /*
+            Featured images can now be uploaded
+            through the protected backend route.
+          */
+          imageUpload:
+            true,
+
+          /*
             Change this to true only after
             actual campaign email delivery
             has been connected.
@@ -150,6 +373,47 @@ router.get(
           "Newsletter API is available.",
       });
   }
+);
+
+
+/* ============================================================
+   NEWSLETTER IMAGE UPLOAD
+
+   POST /api/newsletter/admin/upload-image
+
+   Authentication:
+   Admin authentication is required.
+
+   Content-Type:
+   multipart/form-data
+
+   Form field:
+   image
+
+   Supported formats:
+   JPG / JPEG
+   PNG
+   WEBP
+
+   Maximum file size:
+   5 MB
+
+   Example successful response:
+
+   {
+     "success": true,
+     "message": "Newsletter image uploaded successfully.",
+     "url": "https://...",
+     "publicUrl": "https://...",
+     "path": "campaigns/2026/..."
+   }
+============================================================ */
+
+router.post(
+  "/admin/upload-image",
+  requireAdmin,
+  handleNewsletterImageUpload,
+  uploadNewsletterImage
 );
 
 
@@ -251,12 +515,23 @@ router.get(
      "title": "Continental Founders Update",
      "subject": "Latest from Continental Founders",
      "previewText": "Founder stories, opportunities and updates.",
-     "featuredImage": "",
+     "featuredImage": "https://public-image-url...",
      "content": "Newsletter content...",
      "ctaText": "Learn More",
      "ctaLink": "https://www.continentalfounders.org",
      "audience": "all"
    }
+
+   NOTE:
+
+   featuredImage is no longer expected to be entered manually
+   by the administrator.
+
+   The frontend first uploads the selected image to:
+
+   POST /api/newsletter/admin/upload-image
+
+   The returned public URL is then stored in featuredImage.
 ============================================================ */
 
 router.post(
@@ -344,6 +619,7 @@ router.post(
    }
 
    IMPORTANT:
+
    The current controller validates the campaign but does not
    claim a successful send until the email provider is connected.
 ============================================================ */
@@ -361,6 +637,7 @@ router.post(
    POST /api/newsletter/campaigns/:id/send
 
    IMPORTANT:
+
    The current controller does not mark the campaign as sent
    until actual email delivery is implemented.
 ============================================================ */

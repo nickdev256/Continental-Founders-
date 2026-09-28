@@ -20,13 +20,27 @@ const DELIVERIES_TABLE =
 
 
 /* ============================================================
-   HELPERS
+   NEWSLETTER IMAGE STORAGE
 ============================================================ */
 
-function nowIso() {
-  return new Date().toISOString();
-}
+const NEWSLETTER_IMAGES_BUCKET =
+  process.env.NEWSLETTER_IMAGES_BUCKET ||
+  "newsletter-images";
 
+const MAX_NEWSLETTER_IMAGE_SIZE =
+  5 * 1024 * 1024;
+
+const NEWSLETTER_IMAGE_TYPES =
+  new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ]);
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
 
 function cleanString(
   value,
@@ -39,17 +53,8 @@ function cleanString(
     return fallback;
   }
 
-  return String(value).trim();
-}
-
-
-function cleanNullableString(
-  value
-) {
-  const cleaned =
-    cleanString(value);
-
-  return cleaned || null;
+  return String(value)
+    .trim();
 }
 
 
@@ -61,31 +66,192 @@ function normalizeEmail(
 }
 
 
-function isValidEmail(
-  value
+function normalizeStatus(
+  value,
+  fallback = "subscribed"
 ) {
+  const normalized =
+    cleanString(
+      value,
+      fallback
+    )
+      .toLowerCase();
+
+  const allowedStatuses =
+    new Set([
+      "subscribed",
+      "unsubscribed",
+    ]);
+
+  return allowedStatuses.has(
+    normalized
+  )
+    ? normalized
+    : fallback;
+}
+
+
+function normalizeCampaignStatus(
+  value,
+  fallback = "draft"
+) {
+  const normalized =
+    cleanString(
+      value,
+      fallback
+    )
+      .toLowerCase();
+
+  const allowedStatuses =
+    new Set([
+      "draft",
+      "scheduled",
+      "sending",
+      "sent",
+      "cancelled",
+      "failed",
+    ]);
+
+  return allowedStatuses.has(
+    normalized
+  )
+    ? normalized
+    : fallback;
+}
+
+
+function normalizeDeliveryMethod(
+  value,
+  fallback = "now"
+) {
+  const normalized =
+    cleanString(
+      value,
+      fallback
+    )
+      .toLowerCase();
+
+  const allowedMethods =
+    new Set([
+      "now",
+      "schedule",
+    ]);
+
+  return allowedMethods.has(
+    normalized
+  )
+    ? normalized
+    : fallback;
+}
+
+
+function normalizeAudience(
+  value,
+  fallback = "all"
+) {
+  const normalized =
+    cleanString(
+      value,
+      fallback
+    )
+      .toLowerCase();
+
+  const allowedAudiences =
+    new Set([
+      "all",
+      "active",
+      "recent",
+      "engaged",
+    ]);
+
+  return allowedAudiences.has(
+    normalized
+  )
+    ? normalized
+    : fallback;
+}
+
+
+function parseBoolean(
+  value,
+  fallback = false
+) {
+  if (
+    value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1"
+  ) {
+    return true;
+  }
+
+  if (
+    value === false ||
+    value === "false" ||
+    value === 0 ||
+    value === "0"
+  ) {
+    return false;
+  }
+
+  return fallback;
+}
+
+
+function parsePositiveInteger(
+  value,
+  fallback = 0
+) {
+  const parsed =
+    Number.parseInt(
+      value,
+      10
+    );
+
+  if (
+    Number.isNaN(parsed) ||
+    parsed < 0
+  ) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+
+function isValidEmail(
+  email
+) {
+  const normalized =
+    normalizeEmail(email);
+
+  if (!normalized) {
+    return false;
+  }
+
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-    value
+    normalized
   );
 }
 
 
-function isValidUrl(
+function isValidHttpUrl(
   value
 ) {
-  if (!value) {
+  const normalized =
+    cleanString(value);
+
+  if (!normalized) {
     return true;
   }
 
   try {
     const url =
-      new URL(value);
+      new URL(normalized);
 
-    return [
-      "http:",
-      "https:",
-    ].includes(
-      url.protocol
+    return (
+      url.protocol === "http:" ||
+      url.protocol === "https:"
     );
   } catch {
     return false;
@@ -93,22 +259,26 @@ function isValidUrl(
 }
 
 
-function normalizeStatus(
-  value
+function createToken(
+  bytes = 32
 ) {
-  return cleanString(value)
-    .toLowerCase();
-}
-
-
-function createToken() {
   return crypto
-    .randomBytes(32)
+    .randomBytes(bytes)
     .toString("hex");
 }
 
 
-function parseDateOrNull(
+function createUnsubscribeToken() {
+  return createToken(32);
+}
+
+
+function createCampaignTrackingToken() {
+  return createToken(24);
+}
+
+
+function safeDate(
   value
 ) {
   if (!value) {
@@ -126,41 +296,542 @@ function parseDateOrNull(
     return null;
   }
 
-  return date.toISOString();
+  return date;
 }
 
 
-function getCurrentAdminId(
-  req
+function toIsoDate(
+  value
 ) {
+  const date =
+    safeDate(value);
+
+  return date
+    ? date.toISOString()
+    : null;
+}
+
+
+function nowIso() {
+  return new Date()
+    .toISOString();
+}
+
+
+function createSlug(
+  value
+) {
+  const normalized =
+    cleanString(value)
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9]+/g,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      )
+      .slice(
+        0,
+        90
+      );
+
+  if (normalized) {
+    return normalized;
+  }
+
+  return `newsletter-${Date.now()}`;
+}
+
+
+function buildCampaignSlug(
+  title
+) {
+  const base =
+    createSlug(title);
+
+  const suffix =
+    crypto
+      .randomBytes(4)
+      .toString("hex");
+
+  return `${base}-${suffix}`;
+}
+
+
+function cleanNullableString(
+  value
+) {
+  const normalized =
+    cleanString(value);
+
+  return normalized ||
+    null;
+}
+
+
+function cleanLimitedString(
+  value,
+  maxLength,
+  fallback = ""
+) {
+  const normalized =
+    cleanString(
+      value,
+      fallback
+    );
+
+  return normalized.slice(
+    0,
+    maxLength
+  );
+}
+
+
+/* ============================================================
+   NEWSLETTER IMAGE HELPERS
+============================================================ */
+
+function getNewsletterImageExtension(
+  file
+) {
+  const mimeType =
+    cleanString(
+      file?.mimetype
+    )
+      .toLowerCase();
+
+  const extensionByMime = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  };
+
   return (
-    req.user?.id ||
-    req.admin?.id ||
-    req.user?.userId ||
+    extensionByMime[
+      mimeType
+    ] ||
     null
   );
 }
 
 
-function sendServerError(
-  res,
-  error,
-  fallbackMessage
+function safeNewsletterStorageName(
+  value
 ) {
-  console.error(
-    fallbackMessage,
-    error
+  const original =
+    cleanString(
+      value,
+      "newsletter-image"
+    );
+
+  const withoutExtension =
+    original.replace(
+      /\.[^/.]+$/,
+      ""
+    );
+
+  const cleaned =
+    withoutExtension
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9_-]+/g,
+        "-"
+      )
+      .replace(
+        /-+/g,
+        "-"
+      )
+      .replace(
+        /^[-_]+|[-_]+$/g,
+        ""
+      )
+      .slice(
+        0,
+        80
+      );
+
+  return (
+    cleaned ||
+    "newsletter-image"
   );
+}
 
-  return res
-    .status(500)
-    .json({
-      success: false,
 
-      message:
-        error?.message ||
-        fallbackMessage,
-    });
+function createNewsletterImagePath(
+  file
+) {
+  const extension =
+    getNewsletterImageExtension(
+      file
+    );
+
+  if (!extension) {
+    throw new Error(
+      "Unsupported newsletter image type."
+    );
+  }
+
+  const safeName =
+    safeNewsletterStorageName(
+      file?.originalname
+    );
+
+  const randomPart =
+    crypto
+      .randomBytes(10)
+      .toString("hex");
+
+  const timestamp =
+    Date.now();
+
+  const year =
+    new Date()
+      .getUTCFullYear();
+
+  return [
+    "campaigns",
+    String(year),
+    `${timestamp}-${safeName}-${randomPart}.${extension}`,
+  ].join("/");
+}
+
+
+/* ============================================================
+   UPLOAD NEWSLETTER FEATURED IMAGE
+============================================================ */
+
+async function uploadNewsletterImage(
+  req,
+  res
+) {
+  let uploadedStoragePath =
+    null;
+
+  try {
+    const file =
+      req.file;
+
+    /*
+     * Multer places the uploaded image
+     * in req.file when using:
+     *
+     * upload.single("image")
+     */
+
+    if (
+      !file ||
+      !file.buffer
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Please choose an image to upload.",
+        });
+    }
+
+
+    const mimeType =
+      cleanString(
+        file.mimetype
+      )
+        .toLowerCase();
+
+
+    /*
+     * Only formats suitable for the
+     * newsletter featured image are
+     * accepted.
+     */
+
+    if (
+      !NEWSLETTER_IMAGE_TYPES.has(
+        mimeType
+      )
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Only JPG, PNG and WEBP images are allowed.",
+        });
+    }
+
+
+    const fileSize =
+      Number(
+        file.size ||
+        file.buffer.length ||
+        0
+      );
+
+
+    if (
+      !Number.isFinite(
+        fileSize
+      ) ||
+      fileSize <= 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "The selected image is empty or invalid.",
+        });
+    }
+
+
+    if (
+      fileSize >
+      MAX_NEWSLETTER_IMAGE_SIZE
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "The image is too large. Maximum size is 5 MB.",
+        });
+    }
+
+
+    const storagePath =
+      createNewsletterImagePath(
+        file
+      );
+
+    uploadedStoragePath =
+      storagePath;
+
+
+    /*
+     * Upload the image buffer into the
+     * public Supabase Storage bucket.
+     */
+
+    const {
+      error:
+        uploadError,
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .upload(
+          storagePath,
+          file.buffer,
+          {
+            contentType:
+              mimeType,
+
+            cacheControl:
+              "31536000",
+
+            upsert:
+              false,
+          }
+        );
+
+
+    if (uploadError) {
+      console.error(
+        "Supabase newsletter image upload error:",
+        uploadError
+      );
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+
+          message:
+            uploadError.message ||
+            "Unable to upload the newsletter image.",
+        });
+    }
+
+
+    /*
+     * The newsletter-images bucket is
+     * public, so obtain its public URL.
+     */
+
+    const {
+      data:
+        publicUrlData,
+    } =
+      supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .getPublicUrl(
+          storagePath
+        );
+
+
+    const publicUrl =
+      cleanString(
+        publicUrlData
+          ?.publicUrl
+      );
+
+
+    /*
+     * If Supabase uploaded the object
+     * but no URL was returned, clean up
+     * the object instead of leaving an
+     * orphaned file in Storage.
+     */
+
+    if (!publicUrl) {
+      try {
+        await supabaseAdmin
+          .storage
+          .from(
+            NEWSLETTER_IMAGES_BUCKET
+          )
+          .remove([
+            storagePath,
+          ]);
+      } catch (
+        cleanupError
+      ) {
+        console.error(
+          "Newsletter image cleanup error:",
+          cleanupError
+        );
+      }
+
+      uploadedStoragePath =
+        null;
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+
+          message:
+            "The image was uploaded but its public URL could not be created.",
+        });
+    }
+
+
+    /*
+     * Upload completed successfully.
+     *
+     * Clear this so the catch block
+     * doesn't remove the successful
+     * upload.
+     */
+
+    uploadedStoragePath =
+      null;
+
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter image uploaded successfully.",
+
+        /*
+         * Keep both properties because
+         * the frontend uploader accepts
+         * either format.
+         */
+
+        url:
+          publicUrl,
+
+        publicUrl:
+          publicUrl,
+
+        path:
+          storagePath,
+
+        image: {
+          url:
+            publicUrl,
+
+          publicUrl:
+            publicUrl,
+
+          path:
+            storagePath,
+
+          originalName:
+            cleanString(
+              file.originalname
+            ),
+
+          mimeType:
+            mimeType,
+
+          size:
+            fileSize,
+        },
+      });
+  } catch (
+    error
+  ) {
+    /*
+     * If an unexpected failure happens
+     * after an object has been uploaded,
+     * try to remove the object.
+     */
+
+    if (
+      uploadedStoragePath
+    ) {
+      try {
+        await supabaseAdmin
+          .storage
+          .from(
+            NEWSLETTER_IMAGES_BUCKET
+          )
+          .remove([
+            uploadedStoragePath,
+          ]);
+      } catch (
+        cleanupError
+      ) {
+        console.error(
+          "Newsletter image cleanup failed:",
+          cleanupError
+        );
+      }
+    }
+
+
+    console.error(
+      "Newsletter image upload failed:",
+      error
+    );
+
+
+    return res
+      .status(500)
+      .json({
+        success: false,
+
+        message:
+          error?.message ||
+          "Unable to upload newsletter image.",
+      });
+  }
 }
 
 
@@ -169,52 +840,42 @@ function sendServerError(
 ============================================================ */
 
 function normalizeSubscriber(
-  subscriber
+  row
 ) {
-  if (!subscriber) {
+  if (!row) {
     return null;
   }
 
   return {
     id:
-      subscriber.id,
+      row.id,
 
     email:
-      subscriber.email,
+      row.email,
 
     status:
-      subscriber.status,
+      row.status,
 
     source:
-      subscriber.source,
-
-    unsubscribeToken:
-      subscriber.unsubscribe_token ||
-      null,
-
-    subscribed_at:
-      subscriber.subscribed_at,
+      row.source ||
+      "website",
 
     subscribedAt:
-      subscriber.subscribed_at,
-
-    unsubscribed_at:
-      subscriber.unsubscribed_at,
+      row.subscribed_at ||
+      row.created_at ||
+      null,
 
     unsubscribedAt:
-      subscriber.unsubscribed_at,
-
-    created_at:
-      subscriber.created_at,
+      row.unsubscribed_at ||
+      null,
 
     createdAt:
-      subscriber.created_at,
-
-    updated_at:
-      subscriber.updated_at,
+      row.created_at ||
+      null,
 
     updatedAt:
-      subscriber.updated_at,
+      row.updated_at ||
+      null,
   };
 }
 
@@ -224,143 +885,109 @@ function normalizeSubscriber(
 ============================================================ */
 
 function normalizeCampaign(
-  campaign
+  row
 ) {
-  if (!campaign) {
+  if (!row) {
     return null;
   }
 
   return {
     id:
-      campaign.id,
+      row.id,
+
+    slug:
+      row.slug ||
+      "",
 
     title:
-      campaign.title ||
+      row.title ||
       "",
 
     subject:
-      campaign.subject ||
+      row.subject ||
       "",
 
     previewText:
-      campaign.preview_text ||
+      row.preview_text ||
       "",
 
     featuredImage:
-      campaign.featured_image ||
+      row.featured_image ||
       "",
 
     content:
-      campaign.content ||
+      row.content ||
       "",
 
     ctaText:
-      campaign.cta_text ||
+      row.cta_text ||
       "",
 
     ctaLink:
-      campaign.cta_link ||
+      row.cta_link ||
       "",
 
     audience:
-      campaign.audience ||
+      row.audience ||
       "all",
 
+    deliveryMethod:
+      row.delivery_method ||
+      "now",
+
     status:
-      campaign.status ||
+      row.status ||
       "draft",
 
     scheduledAt:
-      campaign.scheduled_at ||
+      row.scheduled_at ||
       null,
 
     sentAt:
-      campaign.sent_at ||
+      row.sent_at ||
       null,
 
     recipientCount:
       Number(
-        campaign.recipient_count ||
+        row.recipient_count ||
         0
       ),
 
     deliveredCount:
       Number(
-        campaign.delivered_count ||
+        row.delivered_count ||
         0
       ),
 
     failedCount:
       Number(
-        campaign.failed_count ||
+        row.failed_count ||
         0
       ),
 
     openedCount:
       Number(
-        campaign.opened_count ||
+        row.opened_count ||
         0
       ),
 
     clickedCount:
       Number(
-        campaign.clicked_count ||
+        row.clicked_count ||
         0
       ),
 
     createdBy:
-      campaign.created_by ||
+      row.created_by ||
       null,
 
     createdAt:
-      campaign.created_at,
+      row.created_at ||
+      null,
 
     updatedAt:
-      campaign.updated_at,
-
-    scheduled_at:
-      campaign.scheduled_at ||
+      row.updated_at ||
       null,
-
-    sent_at:
-      campaign.sent_at ||
-      null,
-
-    recipient_count:
-      Number(
-        campaign.recipient_count ||
-        0
-      ),
-
-    delivered_count:
-      Number(
-        campaign.delivered_count ||
-        0
-      ),
-
-    failed_count:
-      Number(
-        campaign.failed_count ||
-        0
-      ),
-
-    opened_count:
-      Number(
-        campaign.opened_count ||
-        0
-      ),
-
-    clicked_count:
-      Number(
-        campaign.clicked_count ||
-        0
-      ),
-
-    created_at:
-      campaign.created_at,
-
-    updated_at:
-      campaign.updated_at,
   };
 }
 
@@ -370,66 +997,64 @@ function normalizeCampaign(
 ============================================================ */
 
 function normalizeDelivery(
-  delivery
+  row
 ) {
-  if (!delivery) {
+  if (!row) {
     return null;
   }
 
   return {
     id:
-      delivery.id,
+      row.id,
 
     campaignId:
-      delivery.campaign_id,
+      row.campaign_id,
 
     subscriberId:
-      delivery.subscriber_id,
+      row.subscriber_id ||
+      null,
 
     email:
-      delivery.email,
+      row.email ||
+      "",
 
     status:
-      delivery.status,
+      row.status ||
+      "pending",
 
     providerMessageId:
-      delivery.provider_message_id ||
+      row.provider_message_id ||
+      null,
+
+    errorMessage:
+      row.error_message ||
       null,
 
     sentAt:
-      delivery.sent_at ||
+      row.sent_at ||
       null,
 
     deliveredAt:
-      delivery.delivered_at ||
+      row.delivered_at ||
       null,
 
     openedAt:
-      delivery.opened_at ||
+      row.opened_at ||
       null,
 
     clickedAt:
-      delivery.clicked_at ||
-      null,
-
-    failedAt:
-      delivery.failed_at ||
-      null,
-
-    failureReason:
-      delivery.failure_reason ||
+      row.clicked_at ||
       null,
 
     createdAt:
-      delivery.created_at,
+      row.created_at ||
+      null,
 
     updatedAt:
-      delivery.updated_at,
+      row.updated_at ||
+      null,
   };
-}
-
-
-/* ============================================================
+}/* ============================================================
    NORMALIZE CAMPAIGN INPUT
 ============================================================ */
 
@@ -502,6 +1127,7 @@ function validateCampaign(
   ) {
     errors.push({
       field: "title",
+
       message:
         "Newsletter title is required.",
     });
@@ -513,6 +1139,7 @@ function validateCampaign(
   ) {
     errors.push({
       field: "title",
+
       message:
         "Newsletter title is too long.",
     });
@@ -524,6 +1151,7 @@ function validateCampaign(
   ) {
     errors.push({
       field: "subject",
+
       message:
         "Email subject is too long.",
     });
@@ -535,6 +1163,7 @@ function validateCampaign(
   ) {
     errors.push({
       field: "previewText",
+
       message:
         "Preview text is too long.",
     });
@@ -1255,13 +1884,10 @@ async function updateSubscriber(
     return sendServerError(
       res,
       error,
-      "Unable to update subscriber."
+      "Failed to update newsletter subscriber."
     );
   }
-}
-
-
-/* ============================================================
+}/* ============================================================
    DELETE SUBSCRIBER
 
    DELETE /api/newsletter/subscribers/:id
@@ -2020,6 +2646,10 @@ async function duplicateCampaign(
             existingCampaign.preview_text ||
             "",
 
+          /*
+           * Keep the same public featured-image
+           * URL when duplicating the campaign.
+           */
           featured_image:
             existingCampaign.featured_image ||
             null,
@@ -2057,6 +2687,12 @@ async function duplicateCampaign(
 
           clicked_count:
             0,
+
+          scheduled_at:
+            null,
+
+          sent_at:
+            null,
 
           created_by:
             getCurrentAdminId(
@@ -2100,76 +2736,7 @@ async function duplicateCampaign(
       "Unable to duplicate newsletter campaign."
     );
   }
-}
-
-
-/* ============================================================
-   COUNT CAMPAIGN RECIPIENTS
-============================================================ */
-
-async function getRecipientCount(
-  audience
-) {
-  /*
-    Subscriber segmentation has not yet been added
-    to the subscriber table.
-
-    Until tags/segments exist, only the "all" audience
-    can be resolved safely.
-  */
-
-  if (
-    audience !==
-    "all"
-  ) {
-    return {
-      count: 0,
-
-      supported:
-        false,
-    };
-  }
-
-  const {
-    count,
-    error,
-  } =
-    await supabaseAdmin
-      .from(
-        SUBSCRIBERS_TABLE
-      )
-      .select(
-        "id",
-        {
-          count:
-            "exact",
-
-          head:
-            true,
-        }
-      )
-      .eq(
-        "status",
-        "subscribed"
-      );
-
-  if (
-    error
-  ) {
-    throw error;
-  }
-
-  return {
-    count:
-      count || 0,
-
-    supported:
-      true,
-  };
-}
-
-
-/* ============================================================
+}/* ============================================================
    GET CAMPAIGN RECIPIENT COUNT
 
    GET /api/newsletter/campaigns/:id/recipients
@@ -2628,10 +3195,7 @@ async function cancelScheduledCampaign(
       "Unable to cancel newsletter schedule."
     );
   }
-}
-
-
-/* ============================================================
+}/* ============================================================
    SEND TEST
 
    POST /api/newsletter/campaigns/:id/test
@@ -3294,6 +3858,9 @@ module.exports = {
   getSubscribers,
   updateSubscriber,
   deleteSubscriber,
+
+  /* Newsletter Image Upload */
+  uploadNewsletterImage,
 
   /* Campaign */
   getCampaigns,

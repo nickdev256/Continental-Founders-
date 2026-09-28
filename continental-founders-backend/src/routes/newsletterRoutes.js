@@ -1,7 +1,6 @@
 const express = require("express");
 const multer = require("multer");
 
-
 const {
   /* ==========================================================
      PUBLIC SUBSCRIBER ACTIONS
@@ -9,7 +8,6 @@ const {
 
   subscribe,
   unsubscribe,
-
 
   /* ==========================================================
      SUBSCRIBER ADMINISTRATION
@@ -19,13 +17,11 @@ const {
   updateSubscriber,
   deleteSubscriber,
 
-
   /* ==========================================================
      NEWSLETTER MEDIA
   ========================================================== */
 
   uploadNewsletterImage,
-
 
   /* ==========================================================
      CAMPAIGN ADMINISTRATION
@@ -38,13 +34,11 @@ const {
   deleteCampaign,
   duplicateCampaign,
 
-
   /* ==========================================================
      AUDIENCE
   ========================================================== */
 
   getCampaignRecipientCount,
-
 
   /* ==========================================================
      SCHEDULING
@@ -53,7 +47,6 @@ const {
   scheduleCampaign,
   cancelScheduledCampaign,
 
-
   /* ==========================================================
      DELIVERY
   ========================================================== */
@@ -61,7 +54,6 @@ const {
   sendTestCampaign,
   sendCampaign,
   getCampaignDeliveries,
-
 
   /* ==========================================================
      ANALYTICS
@@ -84,15 +76,16 @@ const router = express.Router();
 ============================================================ */
 
 /*
-  Images are kept in memory temporarily.
+  Images are temporarily kept in memory.
 
-  The controller receives the image as:
+  The controller receives the uploaded image as:
 
   req.file.buffer
 
-  and uploads that buffer directly to Supabase Storage.
+  and uploads the buffer directly to Supabase Storage.
 
-  Nothing is permanently written to the backend filesystem.
+  Nothing is permanently written to the Render/backend
+  filesystem.
 */
 
 const newsletterImageStorage =
@@ -136,6 +129,7 @@ const newsletterImageUpload =
           .trim()
           .toLowerCase();
 
+
       if (
         !ALLOWED_NEWSLETTER_IMAGE_TYPES.has(
           mimeType
@@ -154,6 +148,7 @@ const newsletterImageUpload =
         );
       }
 
+
       return callback(
         null,
         true
@@ -165,8 +160,7 @@ const newsletterImageUpload =
 /* ============================================================
    NEWSLETTER IMAGE UPLOAD MIDDLEWARE
 
-   Converts Multer errors into clean JSON responses instead of
-   allowing upload errors to become generic Express errors.
+   Converts Multer errors into clean JSON responses.
 ============================================================ */
 
 function handleNewsletterImageUpload(
@@ -183,6 +177,7 @@ function handleNewsletterImageUpload(
       if (!error) {
         return next();
       }
+
 
       if (
         error instanceof
@@ -202,6 +197,7 @@ function handleNewsletterImageUpload(
             });
         }
 
+
         if (
           error.code ===
           "LIMIT_FILE_COUNT"
@@ -215,6 +211,7 @@ function handleNewsletterImageUpload(
                 "Please upload only one newsletter image at a time.",
             });
         }
+
 
         if (
           error.code ===
@@ -230,6 +227,7 @@ function handleNewsletterImageUpload(
             });
         }
 
+
         return res
           .status(400)
           .json({
@@ -240,6 +238,7 @@ function handleNewsletterImageUpload(
               "Unable to process the uploaded image.",
           });
       }
+
 
       if (
         error?.code ===
@@ -255,10 +254,12 @@ function handleNewsletterImageUpload(
           });
       }
 
+
       console.error(
         "Newsletter image upload middleware error:",
         error
       );
+
 
       return res
         .status(500)
@@ -294,8 +295,9 @@ router.post(
    UNSUBSCRIBE
 
    POST /api/newsletter/unsubscribe
+   GET  /api/newsletter/unsubscribe
 
-   Body can contain:
+   POST can receive:
 
    {
      "email": "subscriber@example.com"
@@ -306,9 +308,19 @@ router.post(
    {
      "token": "unsubscribe-token"
    }
+
+   GET is used by the unsubscribe link included in emails:
+
+   /api/newsletter/unsubscribe?token=...
 ============================================================ */
 
 router.post(
+  "/unsubscribe",
+  unsubscribe
+);
+
+
+router.get(
   "/unsubscribe",
   unsubscribe
 );
@@ -353,20 +365,16 @@ router.get(
           deliveryRecords:
             true,
 
-          /*
-            Featured images can now be uploaded
-            through the protected backend route.
-          */
           imageUpload:
             true,
 
           /*
-            Change this to true only after
-            actual campaign email delivery
-            has been connected.
+            The newsletter controller is now connected
+            to the existing Resend email utility.
           */
+
           emailDelivery:
-            false,
+            true,
         },
 
         message:
@@ -397,16 +405,6 @@ router.get(
 
    Maximum file size:
    5 MB
-
-   Example successful response:
-
-   {
-     "success": true,
-     "message": "Newsletter image uploaded successfully.",
-     "url": "https://...",
-     "publicUrl": "https://...",
-     "path": "campaigns/2026/..."
-   }
 ============================================================ */
 
 router.post(
@@ -509,12 +507,12 @@ router.get(
 
    POST /api/newsletter/campaigns
 
-   Example body:
+   Example:
 
    {
      "title": "Continental Founders Update",
      "subject": "Latest from Continental Founders",
-     "previewText": "Founder stories, opportunities and updates.",
+     "previewText": "Founder stories and opportunities.",
      "featuredImage": "https://public-image-url...",
      "content": "Newsletter content...",
      "ctaText": "Learn More",
@@ -522,16 +520,10 @@ router.get(
      "audience": "all"
    }
 
-   NOTE:
-
-   featuredImage is no longer expected to be entered manually
-   by the administrator.
-
-   The frontend first uploads the selected image to:
+   featuredImage is normally populated automatically after
+   uploading the selected image through:
 
    POST /api/newsletter/admin/upload-image
-
-   The returned public URL is then stored in featuredImage.
 ============================================================ */
 
 router.post(
@@ -544,8 +536,8 @@ router.post(
 /* ============================================================
    CAMPAIGN ACTION ROUTES
 
-   These routes intentionally appear before the general
-   /campaigns/:id handlers for clear route organization.
+   These routes appear before /campaigns/:id for clear route
+   organization.
 ============================================================ */
 
 
@@ -580,7 +572,7 @@ router.get(
 
    POST /api/newsletter/campaigns/:id/schedule
 
-   Example body:
+   Example:
 
    {
      "scheduledAt": "2026-10-01T09:00:00+03:00"
@@ -612,16 +604,13 @@ router.post(
 
    POST /api/newsletter/campaigns/:id/test
 
-   Example body:
+   Example:
 
    {
      "email": "admin@example.com"
    }
 
-   IMPORTANT:
-
-   The current controller validates the campaign but does not
-   claim a successful send until the email provider is connected.
+   The controller sends the test newsletter through Resend.
 ============================================================ */
 
 router.post(
@@ -636,10 +625,9 @@ router.post(
 
    POST /api/newsletter/campaigns/:id/send
 
-   IMPORTANT:
-
-   The current controller does not mark the campaign as sent
-   until actual email delivery is implemented.
+   The controller loads active subscribers, sends individual
+   emails through Resend, records the attempts, and updates
+   campaign statistics.
 ============================================================ */
 
 router.post(

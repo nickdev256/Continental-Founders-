@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 const {
   supabaseAdmin,
@@ -18,17 +19,9 @@ const CAMPAIGNS_TABLE =
 const DELIVERIES_TABLE =
   "newsletter_deliveries";
 
-
-/* ============================================================
-   NEWSLETTER IMAGE STORAGE
-============================================================ */
-
 const NEWSLETTER_IMAGES_BUCKET =
   process.env.NEWSLETTER_IMAGES_BUCKET ||
   "newsletter-images";
-
-const MAX_NEWSLETTER_IMAGE_SIZE =
-  5 * 1024 * 1024;
 
 const NEWSLETTER_IMAGE_TYPES =
   new Set([
@@ -37,10 +30,18 @@ const NEWSLETTER_IMAGE_TYPES =
     "image/webp",
   ]);
 
+const MAX_NEWSLETTER_IMAGE_SIZE =
+  5 * 1024 * 1024;
+
 
 /* ============================================================
    HELPERS
 ============================================================ */
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
 
 function cleanString(
   value,
@@ -53,8 +54,17 @@ function cleanString(
     return fallback;
   }
 
-  return String(value)
-    .trim();
+  return String(value).trim();
+}
+
+
+function cleanNullableString(
+  value
+) {
+  const cleaned =
+    cleanString(value);
+
+  return cleaned || null;
 }
 
 
@@ -66,192 +76,31 @@ function normalizeEmail(
 }
 
 
-function normalizeStatus(
-  value,
-  fallback = "subscribed"
-) {
-  const normalized =
-    cleanString(
-      value,
-      fallback
-    )
-      .toLowerCase();
-
-  const allowedStatuses =
-    new Set([
-      "subscribed",
-      "unsubscribed",
-    ]);
-
-  return allowedStatuses.has(
-    normalized
-  )
-    ? normalized
-    : fallback;
-}
-
-
-function normalizeCampaignStatus(
-  value,
-  fallback = "draft"
-) {
-  const normalized =
-    cleanString(
-      value,
-      fallback
-    )
-      .toLowerCase();
-
-  const allowedStatuses =
-    new Set([
-      "draft",
-      "scheduled",
-      "sending",
-      "sent",
-      "cancelled",
-      "failed",
-    ]);
-
-  return allowedStatuses.has(
-    normalized
-  )
-    ? normalized
-    : fallback;
-}
-
-
-function normalizeDeliveryMethod(
-  value,
-  fallback = "now"
-) {
-  const normalized =
-    cleanString(
-      value,
-      fallback
-    )
-      .toLowerCase();
-
-  const allowedMethods =
-    new Set([
-      "now",
-      "schedule",
-    ]);
-
-  return allowedMethods.has(
-    normalized
-  )
-    ? normalized
-    : fallback;
-}
-
-
-function normalizeAudience(
-  value,
-  fallback = "all"
-) {
-  const normalized =
-    cleanString(
-      value,
-      fallback
-    )
-      .toLowerCase();
-
-  const allowedAudiences =
-    new Set([
-      "all",
-      "active",
-      "recent",
-      "engaged",
-    ]);
-
-  return allowedAudiences.has(
-    normalized
-  )
-    ? normalized
-    : fallback;
-}
-
-
-function parseBoolean(
-  value,
-  fallback = false
-) {
-  if (
-    value === true ||
-    value === "true" ||
-    value === 1 ||
-    value === "1"
-  ) {
-    return true;
-  }
-
-  if (
-    value === false ||
-    value === "false" ||
-    value === 0 ||
-    value === "0"
-  ) {
-    return false;
-  }
-
-  return fallback;
-}
-
-
-function parsePositiveInteger(
-  value,
-  fallback = 0
-) {
-  const parsed =
-    Number.parseInt(
-      value,
-      10
-    );
-
-  if (
-    Number.isNaN(parsed) ||
-    parsed < 0
-  ) {
-    return fallback;
-  }
-
-  return parsed;
-}
-
-
 function isValidEmail(
-  email
+  value
 ) {
-  const normalized =
-    normalizeEmail(email);
-
-  if (!normalized) {
-    return false;
-  }
-
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-    normalized
+    value
   );
 }
 
 
-function isValidHttpUrl(
+function isValidUrl(
   value
 ) {
-  const normalized =
-    cleanString(value);
-
-  if (!normalized) {
+  if (!value) {
     return true;
   }
 
   try {
     const url =
-      new URL(normalized);
+      new URL(value);
 
-    return (
-      url.protocol === "http:" ||
-      url.protocol === "https:"
+    return [
+      "http:",
+      "https:",
+    ].includes(
+      url.protocol
     );
   } catch {
     return false;
@@ -259,26 +108,22 @@ function isValidHttpUrl(
 }
 
 
-function createToken(
-  bytes = 32
+function normalizeStatus(
+  value
 ) {
+  return cleanString(value)
+    .toLowerCase();
+}
+
+
+function createToken() {
   return crypto
-    .randomBytes(bytes)
+    .randomBytes(32)
     .toString("hex");
 }
 
 
-function createUnsubscribeToken() {
-  return createToken(32);
-}
-
-
-function createCampaignTrackingToken() {
-  return createToken(24);
-}
-
-
-function safeDate(
+function parseDateOrNull(
   value
 ) {
   if (!value) {
@@ -300,92 +145,34 @@ function safeDate(
 }
 
 
-function toIsoDate(
-  value
+function getCurrentAdminId(
+  req
 ) {
-  const date =
-    safeDate(value);
-
-  return date
-    ? date.toISOString()
-    : null;
-}
-
-
-function nowIso() {
-  return new Date()
-    .toISOString();
-}
-
-
-function createSlug(
-  value
-) {
-  const normalized =
-    cleanString(value)
-      .toLowerCase()
-      .replace(
-        /[^a-z0-9]+/g,
-        "-"
-      )
-      .replace(
-        /^-+|-+$/g,
-        ""
-      )
-      .slice(
-        0,
-        90
-      );
-
-  if (normalized) {
-    return normalized;
-  }
-
-  return `newsletter-${Date.now()}`;
-}
-
-
-function buildCampaignSlug(
-  title
-) {
-  const base =
-    createSlug(title);
-
-  const suffix =
-    crypto
-      .randomBytes(4)
-      .toString("hex");
-
-  return `${base}-${suffix}`;
-}
-
-
-function cleanNullableString(
-  value
-) {
-  const normalized =
-    cleanString(value);
-
-  return normalized ||
-    null;
-}
-
-
-function cleanLimitedString(
-  value,
-  maxLength,
-  fallback = ""
-) {
-  const normalized =
-    cleanString(
-      value,
-      fallback
-    );
-
-  return normalized.slice(
-    0,
-    maxLength
+  return (
+    req?.admin?.id ||
+    req?.user?.id ||
+    null
   );
+}
+
+
+function sendServerError(
+  res,
+  error,
+  fallbackMessage
+) {
+  console.error(
+    fallbackMessage,
+    error
+  );
+
+  return res
+    .status(500)
+    .json({
+      success: false,
+      message:
+        fallbackMessage,
+    });
 }
 
 
@@ -396,23 +183,16 @@ function cleanLimitedString(
 function getNewsletterImageExtension(
   file
 ) {
-  const mimeType =
-    cleanString(
-      file?.mimetype
-    )
-      .toLowerCase();
-
-  const extensionByMime = {
+  const extensions = {
     "image/jpeg": "jpg",
     "image/png": "png",
     "image/webp": "webp",
   };
 
   return (
-    extensionByMime[
-      mimeType
-    ] ||
-    null
+    extensions[
+      file?.mimetype
+    ] || ""
   );
 }
 
@@ -420,40 +200,28 @@ function getNewsletterImageExtension(
 function safeNewsletterStorageName(
   value
 ) {
-  const original =
+  return (
     cleanString(
       value,
       "newsletter-image"
-    );
-
-  const withoutExtension =
-    original.replace(
-      /\.[^/.]+$/,
-      ""
-    );
-
-  const cleaned =
-    withoutExtension
+    )
       .toLowerCase()
+      .replace(
+        /\.[^/.]+$/,
+        ""
+      )
       .replace(
         /[^a-z0-9_-]+/g,
         "-"
       )
       .replace(
-        /-+/g,
-        "-"
-      )
-      .replace(
-        /^[-_]+|[-_]+$/g,
+        /^-+|-+$/g,
         ""
       )
       .slice(
         0,
-        80
-      );
-
-  return (
-    cleaned ||
+        70
+      ) ||
     "newsletter-image"
   );
 }
@@ -467,596 +235,555 @@ function createNewsletterImagePath(
       file
     );
 
-  if (!extension) {
-    throw new Error(
-      "Unsupported newsletter image type."
-    );
-  }
-
   const safeName =
     safeNewsletterStorageName(
       file?.originalname
     );
 
-  const randomPart =
+  const random =
     crypto
       .randomBytes(10)
       .toString("hex");
-
-  const timestamp =
-    Date.now();
 
   const year =
     new Date()
       .getUTCFullYear();
 
-  return [
-    "campaigns",
-    String(year),
-    `${timestamp}-${safeName}-${randomPart}.${extension}`,
-  ].join("/");
+  return `campaigns/${year}/${Date.now()}-${safeName}-${random}.${extension}`;
 }
 
 
 /* ============================================================
-   UPLOAD NEWSLETTER FEATURED IMAGE
+   EMAIL / HTML HELPERS
 ============================================================ */
 
-async function uploadNewsletterImage(
-  req,
-  res
+function escapeHtml(
+  value
 ) {
-  let uploadedStoragePath =
-    null;
-
-  try {
-    const file =
-      req.file;
-
-    /*
-     * Multer places the uploaded image
-     * in req.file when using:
-     *
-     * upload.single("image")
-     */
-
-    if (
-      !file ||
-      !file.buffer
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Please choose an image to upload.",
-        });
-    }
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
 
 
-    const mimeType =
-      cleanString(
-        file.mimetype
-      )
-        .toLowerCase();
-
-
-    /*
-     * Only formats suitable for the
-     * newsletter featured image are
-     * accepted.
-     */
-
-    if (
-      !NEWSLETTER_IMAGE_TYPES.has(
-        mimeType
-      )
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Only JPG, PNG and WEBP images are allowed.",
-        });
-    }
-
-
-    const fileSize =
-      Number(
-        file.size ||
-        file.buffer.length ||
-        0
-      );
-
-
-    if (
-      !Number.isFinite(
-        fileSize
-      ) ||
-      fileSize <= 0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "The selected image is empty or invalid.",
-        });
-    }
-
-
-    if (
-      fileSize >
-      MAX_NEWSLETTER_IMAGE_SIZE
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "The image is too large. Maximum size is 5 MB.",
-        });
-    }
-
-
-    const storagePath =
-      createNewsletterImagePath(
-        file
-      );
-
-    uploadedStoragePath =
-      storagePath;
-
-
-    /*
-     * Upload the image buffer into the
-     * public Supabase Storage bucket.
-     */
-
-    const {
-      error:
-        uploadError,
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          NEWSLETTER_IMAGES_BUCKET
-        )
-        .upload(
-          storagePath,
-          file.buffer,
-          {
-            contentType:
-              mimeType,
-
-            cacheControl:
-              "31536000",
-
-            upsert:
-              false,
-          }
-        );
-
-
-    if (uploadError) {
-      console.error(
-        "Supabase newsletter image upload error:",
-        uploadError
-      );
-
-      return res
-        .status(500)
-        .json({
-          success: false,
-
-          message:
-            uploadError.message ||
-            "Unable to upload the newsletter image.",
-        });
-    }
-
-
-    /*
-     * The newsletter-images bucket is
-     * public, so obtain its public URL.
-     */
-
-    const {
-      data:
-        publicUrlData,
-    } =
-      supabaseAdmin
-        .storage
-        .from(
-          NEWSLETTER_IMAGES_BUCKET
-        )
-        .getPublicUrl(
-          storagePath
-        );
-
-
-    const publicUrl =
-      cleanString(
-        publicUrlData
-          ?.publicUrl
-      );
-
-
-    /*
-     * If Supabase uploaded the object
-     * but no URL was returned, clean up
-     * the object instead of leaving an
-     * orphaned file in Storage.
-     */
-
-    if (!publicUrl) {
-      try {
-        await supabaseAdmin
-          .storage
-          .from(
-            NEWSLETTER_IMAGES_BUCKET
-          )
-          .remove([
-            storagePath,
-          ]);
-      } catch (
-        cleanupError
-      ) {
-        console.error(
-          "Newsletter image cleanup error:",
-          cleanupError
-        );
-      }
-
-      uploadedStoragePath =
-        null;
-
-      return res
-        .status(500)
-        .json({
-          success: false,
-
-          message:
-            "The image was uploaded but its public URL could not be created.",
-        });
-    }
-
-
-    /*
-     * Upload completed successfully.
-     *
-     * Clear this so the catch block
-     * doesn't remove the successful
-     * upload.
-     */
-
-    uploadedStoragePath =
-      null;
-
-
-    return res
-      .status(201)
-      .json({
-        success: true,
-
-        message:
-          "Newsletter image uploaded successfully.",
-
-        /*
-         * Keep both properties because
-         * the frontend uploader accepts
-         * either format.
-         */
-
-        url:
-          publicUrl,
-
-        publicUrl:
-          publicUrl,
-
-        path:
-          storagePath,
-
-        image: {
-          url:
-            publicUrl,
-
-          publicUrl:
-            publicUrl,
-
-          path:
-            storagePath,
-
-          originalName:
-            cleanString(
-              file.originalname
-            ),
-
-          mimeType:
-            mimeType,
-
-          size:
-            fileSize,
-        },
-      });
-  } catch (
-    error
-  ) {
-    /*
-     * If an unexpected failure happens
-     * after an object has been uploaded,
-     * try to remove the object.
-     */
-
-    if (
-      uploadedStoragePath
-    ) {
-      try {
-        await supabaseAdmin
-          .storage
-          .from(
-            NEWSLETTER_IMAGES_BUCKET
-          )
-          .remove([
-            uploadedStoragePath,
-          ]);
-      } catch (
-        cleanupError
-      ) {
-        console.error(
-          "Newsletter image cleanup failed:",
-          cleanupError
-        );
-      }
-    }
-
-
-    console.error(
-      "Newsletter image upload failed:",
-      error
+function getPublicApiUrl() {
+  const configured =
+    cleanString(
+      process.env.PUBLIC_API_URL ||
+      process.env.API_URL ||
+      ""
+    ).replace(
+      /\/+$/,
+      ""
     );
 
-
-    return res
-      .status(500)
-      .json({
-        success: false,
-
-        message:
-          error?.message ||
-          "Unable to upload newsletter image.",
-      });
+  if (configured) {
+    return configured;
   }
+
+  return "https://continental-founders-1.onrender.com";
 }
 
 
-/* ============================================================
-   NORMALIZE SUBSCRIBER
-============================================================ */
-
-function normalizeSubscriber(
-  row
+function buildUnsubscribeUrl(
+  subscriber
 ) {
-  if (!row) {
-    return null;
+  const token =
+    cleanString(
+      subscriber?.unsubscribe_token
+    );
+
+  if (!token) {
+    return "";
+  }
+
+  return (
+    `${getPublicApiUrl()}` +
+    `/api/newsletter/unsubscribe?token=` +
+    encodeURIComponent(
+      token
+    )
+  );
+}
+
+
+function textToHtml(
+  value
+) {
+  const text =
+    cleanString(value);
+
+  if (!text) {
+    return "";
+  }
+
+  return text
+    .split(
+      /\n\s*\n/
+    )
+    .map(
+      (paragraph) =>
+        `<p style="margin:0 0 18px;line-height:1.75;color:#334155;font-size:16px;">${escapeHtml(
+          paragraph
+        ).replace(
+          /\n/g,
+          "<br>"
+        )}</p>`
+    )
+    .join("");
+}
+
+
+function buildNewsletterEmail({
+  campaign,
+  subscriber = null,
+  isTest = false,
+}) {
+  const title =
+    cleanString(
+      campaign?.title,
+      "Continental Founders"
+    );
+
+  const subject =
+    cleanString(
+      campaign?.subject,
+      title
+    );
+
+  const previewText =
+    cleanString(
+      campaign?.preview_text
+    );
+
+  const content =
+    cleanString(
+      campaign?.content
+    );
+
+  const featuredImage =
+    cleanString(
+      campaign?.featured_image
+    );
+
+  const ctaText =
+    cleanString(
+      campaign?.cta_text
+    );
+
+  const ctaLink =
+    cleanString(
+      campaign?.cta_link
+    );
+
+  const unsubscribeUrl =
+    subscriber
+      ? buildUnsubscribeUrl(
+          subscriber
+        )
+      : "";
+
+  const testBanner =
+    isTest
+      ? `
+        <div style="
+          background:#fff7ed;
+          color:#9a3412;
+          padding:10px 16px;
+          text-align:center;
+          font-size:13px;
+          font-weight:700;
+          border-bottom:1px solid #fed7aa;
+        ">
+          TEST NEWSLETTER — NOT A LIVE BROADCAST
+        </div>
+      `
+      : "";
+
+  const imageHtml =
+    featuredImage &&
+    isValidUrl(
+      featuredImage
+    )
+      ? `
+        <div style="margin:0 0 28px;">
+          <img
+            src="${escapeHtml(
+              featuredImage
+            )}"
+            alt="${escapeHtml(
+              title
+            )}"
+            style="
+              display:block;
+              width:100%;
+              max-width:680px;
+              height:auto;
+              border:0;
+              border-radius:16px;
+            "
+          />
+        </div>
+      `
+      : "";
+
+  const ctaHtml =
+    ctaText &&
+    ctaLink &&
+    isValidUrl(
+      ctaLink
+    )
+      ? `
+        <div style="
+          margin:32px 0;
+          text-align:center;
+        ">
+          <a
+            href="${escapeHtml(
+              ctaLink
+            )}"
+            style="
+              display:inline-block;
+              background:#0f766e;
+              color:#ffffff;
+              text-decoration:none;
+              padding:14px 24px;
+              border-radius:10px;
+              font-size:15px;
+              font-weight:700;
+            "
+          >
+            ${escapeHtml(
+              ctaText
+            )}
+          </a>
+        </div>
+      `
+      : "";
+
+  const unsubscribeHtml =
+    unsubscribeUrl
+      ? `
+        <p style="
+          margin:18px 0 0;
+          font-size:12px;
+          line-height:1.6;
+          color:#94a3b8;
+          text-align:center;
+        ">
+          You are receiving this email because you subscribed
+          to Continental Founders updates.
+          <br>
+          <a
+            href="${escapeHtml(
+              unsubscribeUrl
+            )}"
+            style="
+              color:#64748b;
+              text-decoration:underline;
+            "
+          >
+            Unsubscribe
+          </a>
+        </p>
+      `
+      : "";
+
+  const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1"
+        >
+        <title>
+          ${escapeHtml(
+            subject
+          )}
+        </title>
+      </head>
+
+      <body style="
+        margin:0;
+        padding:0;
+        background:#f8fafc;
+        font-family:Arial,Helvetica,sans-serif;
+      ">
+        <div style="
+          display:none;
+          max-height:0;
+          overflow:hidden;
+          opacity:0;
+          color:transparent;
+        ">
+          ${escapeHtml(
+            previewText
+          )}
+        </div>
+
+        <table
+          role="presentation"
+          width="100%"
+          cellspacing="0"
+          cellpadding="0"
+          border="0"
+          style="
+            width:100%;
+            background:#f8fafc;
+          "
+        >
+          <tr>
+            <td
+              align="center"
+              style="padding:32px 14px;"
+            >
+              <table
+                role="presentation"
+                width="100%"
+                cellspacing="0"
+                cellpadding="0"
+                border="0"
+                style="
+                  width:100%;
+                  max-width:720px;
+                  background:#ffffff;
+                  border-radius:18px;
+                  overflow:hidden;
+                  box-shadow:0 10px 30px rgba(15,23,42,.08);
+                "
+              >
+                <tr>
+                  <td>
+                    ${testBanner}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding:34px 34px 12px;
+                    text-align:center;
+                  ">
+                    <div style="
+                      font-size:13px;
+                      font-weight:800;
+                      letter-spacing:.12em;
+                      text-transform:uppercase;
+                      color:#0f766e;
+                      margin-bottom:12px;
+                    ">
+                      Continental Founders
+                    </div>
+
+                    <h1 style="
+                      margin:0;
+                      color:#0f172a;
+                      font-size:30px;
+                      line-height:1.2;
+                    ">
+                      ${escapeHtml(
+                        title
+                      )}
+                    </h1>
+
+                    ${
+                      previewText
+                        ? `
+                          <p style="
+                            margin:14px auto 0;
+                            max-width:580px;
+                            color:#64748b;
+                            font-size:15px;
+                            line-height:1.65;
+                          ">
+                            ${escapeHtml(
+                              previewText
+                            )}
+                          </p>
+                        `
+                        : ""
+                    }
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding:22px 34px 34px;
+                  ">
+                    ${imageHtml}
+
+                    ${textToHtml(
+                      content
+                    )}
+
+                    ${ctaHtml}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="
+                    padding:24px 34px 30px;
+                    border-top:1px solid #e2e8f0;
+                    background:#f8fafc;
+                  ">
+                    <p style="
+                      margin:0;
+                      text-align:center;
+                      color:#64748b;
+                      font-size:12px;
+                      line-height:1.7;
+                    ">
+                      Continental Founders
+                      <br>
+                      Building a more connected global founder ecosystem.
+                    </p>
+
+                    ${unsubscribeHtml}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+
+  const textParts = [
+    title,
+    "",
+    previewText,
+    "",
+    content,
+  ];
+
+  if (
+    ctaText &&
+    ctaLink
+  ) {
+    textParts.push(
+      "",
+      `${ctaText}: ${ctaLink}`
+    );
+  }
+
+  if (unsubscribeUrl) {
+    textParts.push(
+      "",
+      `Unsubscribe: ${unsubscribeUrl}`
+    );
   }
 
   return {
-    id:
-      row.id,
+    subject:
+      isTest
+        ? `[TEST] ${subject}`
+        : subject,
 
-    email:
-      row.email,
+    html,
 
-    status:
-      row.status,
-
-    source:
-      row.source ||
-      "website",
-
-    subscribedAt:
-      row.subscribed_at ||
-      row.created_at ||
-      null,
-
-    unsubscribedAt:
-      row.unsubscribed_at ||
-      null,
-
-    createdAt:
-      row.created_at ||
-      null,
-
-    updatedAt:
-      row.updated_at ||
-      null,
+    text:
+      textParts
+        .filter(
+          (item) =>
+            item !== null &&
+            item !== undefined
+        )
+        .join("\n")
+        .trim(),
   };
 }
 
 
 /* ============================================================
-   NORMALIZE CAMPAIGN
+   CAMPAIGN NORMALIZATION
 ============================================================ */
 
 function normalizeCampaign(
-  row
+  campaign
 ) {
-  if (!row) {
+  if (!campaign) {
     return null;
   }
 
   return {
     id:
-      row.id,
-
-    slug:
-      row.slug ||
-      "",
+      campaign.id,
 
     title:
-      row.title ||
-      "",
+      campaign.title || "",
 
     subject:
-      row.subject ||
-      "",
+      campaign.subject || "",
 
     previewText:
-      row.preview_text ||
-      "",
+      campaign.preview_text || "",
 
     featuredImage:
-      row.featured_image ||
-      "",
+      campaign.featured_image || "",
 
     content:
-      row.content ||
-      "",
+      campaign.content || "",
 
     ctaText:
-      row.cta_text ||
-      "",
+      campaign.cta_text || "",
 
     ctaLink:
-      row.cta_link ||
-      "",
+      campaign.cta_link || "",
 
     audience:
-      row.audience ||
-      "all",
-
-    deliveryMethod:
-      row.delivery_method ||
-      "now",
+      campaign.audience || "all",
 
     status:
-      row.status ||
-      "draft",
+      campaign.status || "draft",
 
     scheduledAt:
-      row.scheduled_at ||
-      null,
+      campaign.scheduled_at || null,
 
     sentAt:
-      row.sent_at ||
-      null,
-
-    recipientCount:
-      Number(
-        row.recipient_count ||
-        0
-      ),
-
-    deliveredCount:
-      Number(
-        row.delivered_count ||
-        0
-      ),
-
-    failedCount:
-      Number(
-        row.failed_count ||
-        0
-      ),
-
-    openedCount:
-      Number(
-        row.opened_count ||
-        0
-      ),
-
-    clickedCount:
-      Number(
-        row.clicked_count ||
-        0
-      ),
-
-    createdBy:
-      row.created_by ||
-      null,
+      campaign.sent_at || null,
 
     createdAt:
-      row.created_at ||
-      null,
+      campaign.created_at || null,
 
     updatedAt:
-      row.updated_at ||
-      null,
+      campaign.updated_at || null,
+
+    createdBy:
+      campaign.created_by || null,
+
+    recipientCount:
+      campaign.recipient_count || 0,
+
+    deliveredCount:
+      campaign.delivered_count || 0,
+
+    failedCount:
+      campaign.failed_count || 0,
   };
 }
 
-
-/* ============================================================
-   NORMALIZE DELIVERY
-============================================================ */
-
-function normalizeDelivery(
-  row
-) {
-  if (!row) {
-    return null;
-  }
-
-  return {
-    id:
-      row.id,
-
-    campaignId:
-      row.campaign_id,
-
-    subscriberId:
-      row.subscriber_id ||
-      null,
-
-    email:
-      row.email ||
-      "",
-
-    status:
-      row.status ||
-      "pending",
-
-    providerMessageId:
-      row.provider_message_id ||
-      null,
-
-    errorMessage:
-      row.error_message ||
-      null,
-
-    sentAt:
-      row.sent_at ||
-      null,
-
-    deliveredAt:
-      row.delivered_at ||
-      null,
-
-    openedAt:
-      row.opened_at ||
-      null,
-
-    clickedAt:
-      row.clicked_at ||
-      null,
-
-    createdAt:
-      row.created_at ||
-      null,
-
-    updatedAt:
-      row.updated_at ||
-      null,
-  };
-}/* ============================================================
-   NORMALIZE CAMPAIGN INPUT
-============================================================ */
 
 function normalizeCampaignInput(
   body = {}
@@ -1110,10 +837,6 @@ function normalizeCampaignInput(
 }
 
 
-/* ============================================================
-   VALIDATE CAMPAIGN
-============================================================ */
-
 function validateCampaign(
   input,
   {
@@ -1122,50 +845,30 @@ function validateCampaign(
 ) {
   const errors = [];
 
-  if (
-    !input.title
-  ) {
+  if (!input.title) {
     errors.push({
       field: "title",
-
       message:
         "Newsletter title is required.",
     });
   }
 
-  if (
-    input.title.length >
-    200
-  ) {
-    errors.push({
-      field: "title",
-
-      message:
-        "Newsletter title is too long.",
-    });
-  }
-
-  if (
-    input.subject.length >
-    250
-  ) {
+  if (!input.subject) {
     errors.push({
       field: "subject",
-
       message:
-        "Email subject is too long.",
+        "Email subject is required.",
     });
   }
 
   if (
-    input.previewText.length >
-    500
+    requireContent &&
+    !input.content
   ) {
     errors.push({
-      field: "previewText",
-
+      field: "content",
       message:
-        "Preview text is too long.",
+        "Newsletter content is required.",
     });
   }
 
@@ -1191,63 +894,414 @@ function validateCampaign(
     )
   ) {
     errors.push({
-      field:
-        "ctaLink",
-
+      field: "ctaLink",
       message:
         "CTA link must be a valid HTTP or HTTPS URL.",
     });
   }
 
-  const allowedAudiences = [
-    "all",
-    "founders",
-    "partners",
-    "universities",
-    "custom",
-  ];
+  const allowedAudiences =
+    new Set([
+      "all",
+      "founders",
+      "partners",
+      "universities",
+      "custom",
+    ]);
 
   if (
-    !allowedAudiences.includes(
+    !allowedAudiences.has(
       input.audience
     )
   ) {
     errors.push({
-      field:
-        "audience",
-
+      field: "audience",
       message:
-        "Invalid newsletter audience.",
-    });
-  }
-
-  if (
-    requireContent &&
-    !input.subject
-  ) {
-    errors.push({
-      field:
-        "subject",
-
-      message:
-        "Email subject is required before sending.",
-    });
-  }
-
-  if (
-    requireContent &&
-    !input.content
-  ) {
-    errors.push({
-      field:
-        "content",
-
-      message:
-        "Newsletter content is required before sending.",
+        "The selected newsletter audience is invalid.",
     });
   }
 
   return errors;
+}/* ============================================================
+   NEWSLETTER IMAGE HELPERS
+============================================================ */
+
+function getNewsletterImageExtension(file) {
+  return ({
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  })[file?.mimetype] || "";
+}
+
+
+function safeNewsletterStorageName(value) {
+  return (
+    cleanString(
+      value,
+      "newsletter-image"
+    )
+      .toLowerCase()
+      .replace(
+        /\.[^/.]+$/,
+        ""
+      )
+      .replace(
+        /[^a-z0-9_-]+/g,
+        "-"
+      )
+      .replace(
+        /^-+|-+$/g,
+        ""
+      )
+      .slice(
+        0,
+        70
+      ) ||
+    "newsletter-image"
+  );
+}
+
+
+function createNewsletterImagePath(file) {
+  const extension =
+    getNewsletterImageExtension(
+      file
+    );
+
+  const safeName =
+    safeNewsletterStorageName(
+      file?.originalname
+    );
+
+  return (
+    `campaigns/` +
+    `${new Date().getUTCFullYear()}/` +
+    `${Date.now()}-` +
+    `${safeName}-` +
+    `${crypto.randomBytes(10).toString("hex")}.` +
+    `${extension}`
+  );
+}
+
+
+/* ============================================================
+   UPLOAD NEWSLETTER IMAGE
+
+   POST /api/newsletter/admin/upload-image
+============================================================ */
+
+async function uploadNewsletterImage(
+  req,
+  res
+) {
+  let uploadedStoragePath =
+    null;
+
+  try {
+    const file =
+      req.file;
+
+    if (!file?.buffer) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Please choose an image to upload.",
+        });
+    }
+
+
+    if (
+      !NEWSLETTER_IMAGE_TYPES.has(
+        file.mimetype
+      )
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Only JPG, PNG and WEBP images are allowed.",
+        });
+    }
+
+
+    if (
+      file.size >
+      MAX_NEWSLETTER_IMAGE_SIZE
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "The image is too large. Maximum size is 5 MB.",
+        });
+    }
+
+
+    const storagePath =
+      createNewsletterImagePath(
+        file
+      );
+
+    uploadedStoragePath =
+      storagePath;
+
+
+    const {
+      error:
+        uploadError,
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .upload(
+          storagePath,
+          file.buffer,
+          {
+            contentType:
+              file.mimetype,
+
+            cacheControl:
+              "3600",
+
+            upsert:
+              false,
+          }
+        );
+
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+
+    const {
+      data:
+        publicUrlData,
+    } =
+      supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .getPublicUrl(
+          storagePath
+        );
+
+
+    const publicUrl =
+      publicUrlData
+        ?.publicUrl ||
+      "";
+
+
+    if (!publicUrl) {
+      throw new Error(
+        "The image uploaded, but its public URL could not be created."
+      );
+    }
+
+
+    uploadedStoragePath =
+      null;
+
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter image uploaded successfully.",
+
+        url:
+          publicUrl,
+
+        publicUrl,
+
+        path:
+          storagePath,
+
+        image: {
+          url:
+            publicUrl,
+
+          publicUrl,
+
+          path:
+            storagePath,
+
+          originalName:
+            file.originalname,
+
+          mimeType:
+            file.mimetype,
+
+          size:
+            file.size,
+        },
+      });
+
+  } catch (error) {
+    if (
+      uploadedStoragePath
+    ) {
+      try {
+        await supabaseAdmin
+          .storage
+          .from(
+            NEWSLETTER_IMAGES_BUCKET
+          )
+          .remove([
+            uploadedStoragePath,
+          ]);
+      } catch (
+        cleanupError
+      ) {
+        console.error(
+          "Unable to clean up failed newsletter image upload:",
+          cleanupError
+        );
+      }
+    }
+
+
+    return sendServerError(
+      res,
+      error,
+      "Unable to upload newsletter image."
+    );
+  }
+}
+
+
+/* ============================================================
+   NORMALIZE SUBSCRIBER
+============================================================ */
+
+function normalizeSubscriber(
+  subscriber
+) {
+  if (!subscriber) {
+    return null;
+  }
+
+
+  return {
+    id:
+      subscriber.id,
+
+    email:
+      subscriber.email,
+
+    status:
+      subscriber.status,
+
+    source:
+      subscriber.source,
+
+    unsubscribeToken:
+      subscriber.unsubscribe_token ||
+      null,
+
+    subscribed_at:
+      subscriber.subscribed_at,
+
+    subscribedAt:
+      subscriber.subscribed_at,
+
+    unsubscribed_at:
+      subscriber.unsubscribed_at,
+
+    unsubscribedAt:
+      subscriber.unsubscribed_at,
+
+    created_at:
+      subscriber.created_at,
+
+    createdAt:
+      subscriber.created_at,
+
+    updated_at:
+      subscriber.updated_at,
+
+    updatedAt:
+      subscriber.updated_at,
+  };
+}
+
+
+/* ============================================================
+   NORMALIZE DELIVERY
+============================================================ */
+
+function normalizeDelivery(
+  delivery
+) {
+  if (!delivery) {
+    return null;
+  }
+
+
+  return {
+    id:
+      delivery.id,
+
+    campaignId:
+      delivery.campaign_id,
+
+    subscriberId:
+      delivery.subscriber_id,
+
+    email:
+      delivery.email,
+
+    status:
+      delivery.status,
+
+    providerMessageId:
+      delivery.provider_message_id ||
+      null,
+
+    sentAt:
+      delivery.sent_at ||
+      null,
+
+    deliveredAt:
+      delivery.delivered_at ||
+      null,
+
+    openedAt:
+      delivery.opened_at ||
+      null,
+
+    clickedAt:
+      delivery.clicked_at ||
+      null,
+
+    failedAt:
+      delivery.failed_at ||
+      null,
+
+    failureReason:
+      delivery.failure_reason ||
+      null,
+
+    createdAt:
+      delivery.created_at,
+
+    updatedAt:
+      delivery.updated_at,
+  };
 }
 
 
@@ -1262,29 +1316,14 @@ async function subscribe(
   res
 ) {
   try {
-    let {
-      email,
-      source,
-    } =
-      req.body || {};
-
-    if (!email) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Email address is required.",
-        });
-    }
-
-    email =
+    const email =
       normalizeEmail(
-        email
+        req.body?.email
       );
 
+
     if (
+      !email ||
       !isValidEmail(
         email
       )
@@ -1299,28 +1338,20 @@ async function subscribe(
         });
     }
 
-    const safeSource =
+
+    const source =
       cleanString(
-        source,
-        "website_footer"
-      )
-        .toLowerCase()
-        .replace(
-          /[^a-z0-9_-]/g,
-          "_"
-        )
-        .slice(
-          0,
-          100
-        ) ||
-      "website_footer";
+        req.body?.source,
+        "website"
+      );
+
 
     const {
       data:
         existingSubscriber,
 
       error:
-        existingError,
+        lookupError,
     } =
       await supabaseAdmin
         .from(
@@ -1333,74 +1364,69 @@ async function subscribe(
         )
         .maybeSingle();
 
-    if (
-      existingError
-    ) {
-      throw existingError;
+
+    if (lookupError) {
+      throw lookupError;
     }
 
-    if (
-      existingSubscriber &&
-      existingSubscriber.status ===
-        "subscribed"
-    ) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-
-          message:
-            "You are already subscribed to Continental Founders updates.",
-
-          subscriber:
-            normalizeSubscriber(
-              existingSubscriber
-            ),
-        });
-    }
-
-    const now =
-      nowIso();
 
     if (
       existingSubscriber
     ) {
-      const updates = {
-        status:
-          "subscribed",
-
-        source:
-          safeSource,
-
-        subscribed_at:
-          now,
-
-        unsubscribed_at:
-          null,
-
-        updated_at:
-          now,
-      };
-
       if (
-        !existingSubscriber
-          .unsubscribe_token
+        existingSubscriber
+          .status ===
+        "subscribed"
       ) {
-        updates.unsubscribe_token =
-          createToken();
+        return res
+          .status(200)
+          .json({
+            success: true,
+
+            message:
+              "You are already subscribed to Continental Founders updates.",
+
+            subscriber:
+              normalizeSubscriber(
+                existingSubscriber
+              ),
+          });
       }
 
+
       const {
-        data,
-        error,
+        data:
+          restoredSubscriber,
+
+        error:
+          restoreError,
       } =
         await supabaseAdmin
           .from(
             SUBSCRIBERS_TABLE
           )
-          .update(
-            updates
-          )
+          .update({
+            status:
+              "subscribed",
+
+            source:
+              source ||
+              existingSubscriber
+                .source ||
+              "website",
+
+            subscribed_at:
+              nowIso(),
+
+            unsubscribed_at:
+              null,
+
+            unsubscribe_token:
+              createToken(),
+
+            updated_at:
+              nowIso(),
+          })
           .eq(
             "id",
             existingSubscriber.id
@@ -1408,11 +1434,11 @@ async function subscribe(
           .select("*")
           .single();
 
-      if (
-        error
-      ) {
-        throw error;
+
+      if (restoreError) {
+        throw restoreError;
       }
+
 
       return res
         .status(200)
@@ -1420,18 +1446,22 @@ async function subscribe(
           success: true,
 
           message:
-            "Welcome back. Your subscription has been restored.",
+            "Welcome back. Your newsletter subscription is active again.",
 
           subscriber:
             normalizeSubscriber(
-              data
+              restoredSubscriber
             ),
         });
     }
 
+
     const {
-      data,
-      error,
+      data:
+        subscriber,
+
+      error:
+        insertError,
     } =
       await supabaseAdmin
         .from(
@@ -1443,29 +1473,31 @@ async function subscribe(
           status:
             "subscribed",
 
-          source:
-            safeSource,
+          source,
 
           unsubscribe_token:
             createToken(),
 
           subscribed_at:
-            now,
+            nowIso(),
+
+          unsubscribed_at:
+            null,
 
           created_at:
-            now,
+            nowIso(),
 
           updated_at:
-            now,
+            nowIso(),
         })
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (insertError) {
+      throw insertError;
     }
+
 
     return res
       .status(201)
@@ -1473,29 +1505,29 @@ async function subscribe(
         success: true,
 
         message:
-          "Thank you for subscribing to Continental Founders.",
+          "Thank you for subscribing to Continental Founders updates.",
 
         subscriber:
           normalizeSubscriber(
-            data
+            subscriber
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
-      "We could not complete your subscription. Please try again."
+      "Unable to subscribe to the newsletter."
     );
   }
 }
 
 
 /* ============================================================
-   PUBLIC UNSUBSCRIBE
+   UNSUBSCRIBE
 
    POST /api/newsletter/unsubscribe
+   GET  /api/newsletter/unsubscribe
 ============================================================ */
 
 async function unsubscribe(
@@ -1505,13 +1537,17 @@ async function unsubscribe(
   try {
     const email =
       normalizeEmail(
-        req.body?.email
+        req.body?.email ||
+        req.query?.email
       );
+
 
     const token =
       cleanString(
-        req.body?.token
+        req.body?.token ||
+        req.query?.token
       );
+
 
     if (
       !email &&
@@ -1523,9 +1559,10 @@ async function unsubscribe(
           success: false,
 
           message:
-            "Email address or unsubscribe token is required.",
+            "An email address or unsubscribe token is required.",
         });
     }
+
 
     let query =
       supabaseAdmin
@@ -1534,6 +1571,7 @@ async function unsubscribe(
         )
         .select("*");
 
+
     if (token) {
       query =
         query.eq(
@@ -1541,28 +1579,13 @@ async function unsubscribe(
           token
         );
     } else {
-      if (
-        !isValidEmail(
-          email
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "Please enter a valid email address.",
-          });
-      }
-
       query =
         query.eq(
           "email",
           email
         );
     }
+
 
     const {
       data:
@@ -1574,29 +1597,23 @@ async function unsubscribe(
       await query
         .maybeSingle();
 
-    if (
-      lookupError
-    ) {
+
+    if (lookupError) {
       throw lookupError;
     }
 
-    /*
-      Avoid exposing whether an arbitrary email
-      exists in the subscriber database.
-    */
 
-    if (
-      !subscriber
-    ) {
+    if (!subscriber) {
       return res
-        .status(200)
+        .status(404)
         .json({
-          success: true,
+          success: false,
 
           message:
-            "Your unsubscribe request has been processed.",
+            "Newsletter subscription not found.",
         });
     }
+
 
     if (
       subscriber.status ===
@@ -1608,15 +1625,17 @@ async function unsubscribe(
           success: true,
 
           message:
-            "You are already unsubscribed.",
+            "This email address is already unsubscribed.",
         });
     }
 
-    const now =
-      nowIso();
 
     const {
-      error,
+      data:
+        updatedSubscriber,
+
+      error:
+        updateError,
     } =
       await supabaseAdmin
         .from(
@@ -1627,21 +1646,23 @@ async function unsubscribe(
             "unsubscribed",
 
           unsubscribed_at:
-            now,
+            nowIso(),
 
           updated_at:
-            now,
+            nowIso(),
         })
         .eq(
           "id",
           subscriber.id
-        );
+        )
+        .select("*")
+        .single();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (updateError) {
+      throw updateError;
     }
+
 
     return res
       .status(200)
@@ -1650,20 +1671,21 @@ async function unsubscribe(
 
         message:
           "You have been unsubscribed from Continental Founders updates.",
+
+        subscriber:
+          normalizeSubscriber(
+            updatedSubscriber
+          ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to process your unsubscribe request."
+      "Unable to unsubscribe from the newsletter."
     );
   }
-}
-
-
-/* ============================================================
+}/* ============================================================
    GET SUBSCRIBERS
 
    GET /api/newsletter/subscribers
@@ -1691,11 +1713,11 @@ async function getSubscribers(
           }
         );
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     const subscribers =
       Array.isArray(
@@ -1705,6 +1727,7 @@ async function getSubscribers(
             normalizeSubscriber
           )
         : [];
+
 
     return res
       .status(200)
@@ -1716,9 +1739,8 @@ async function getSubscribers(
 
         subscribers,
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -1744,10 +1766,12 @@ async function updateSubscriber(
     } =
       req.params;
 
+
     const status =
       normalizeStatus(
         req.body?.status
       );
+
 
     if (
       ![
@@ -1767,6 +1791,7 @@ async function updateSubscriber(
         });
     }
 
+
     const {
       data:
         existingSubscriber,
@@ -1785,11 +1810,11 @@ async function updateSubscriber(
         )
         .maybeSingle();
 
-    if (
-      existingError
-    ) {
+
+    if (existingError) {
       throw existingError;
     }
+
 
     if (
       !existingSubscriber
@@ -1804,8 +1829,10 @@ async function updateSubscriber(
         });
     }
 
+
     const now =
       nowIso();
+
 
     const updates = {
       status,
@@ -1813,6 +1840,7 @@ async function updateSubscriber(
       updated_at:
         now,
     };
+
 
     if (
       status ===
@@ -1824,6 +1852,7 @@ async function updateSubscriber(
       updates.unsubscribed_at =
         null;
 
+
       if (
         !existingSubscriber
           .unsubscribe_token
@@ -1833,6 +1862,7 @@ async function updateSubscriber(
       }
     }
 
+
     if (
       status ===
       "unsubscribed"
@@ -1840,6 +1870,7 @@ async function updateSubscriber(
       updates.unsubscribed_at =
         now;
     }
+
 
     const {
       data,
@@ -1859,11 +1890,11 @@ async function updateSubscriber(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     return res
       .status(200)
@@ -1878,16 +1909,18 @@ async function updateSubscriber(
             data
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
-      "Failed to update newsletter subscriber."
+      "Unable to update subscriber."
     );
   }
-}/* ============================================================
+}
+
+
+/* ============================================================
    DELETE SUBSCRIBER
 
    DELETE /api/newsletter/subscribers/:id
@@ -1902,6 +1935,7 @@ async function deleteSubscriber(
       id,
     } =
       req.params;
+
 
     const {
       data,
@@ -1921,15 +1955,13 @@ async function deleteSubscriber(
         )
         .maybeSingle();
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
 
-    if (
-      !data
-    ) {
+
+    if (!data) {
       return res
         .status(404)
         .json({
@@ -1939,6 +1971,7 @@ async function deleteSubscriber(
             "Subscriber not found.",
         });
     }
+
 
     return res
       .status(200)
@@ -1956,9 +1989,8 @@ async function deleteSubscriber(
             data.email,
         },
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -1996,11 +2028,11 @@ async function getCampaigns(
           }
         );
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     const campaigns =
       Array.isArray(
@@ -2010,6 +2042,7 @@ async function getCampaigns(
             normalizeCampaign
           )
         : [];
+
 
     return res
       .status(200)
@@ -2021,9 +2054,8 @@ async function getCampaigns(
 
         campaigns,
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -2049,6 +2081,7 @@ async function getCampaign(
     } =
       req.params;
 
+
     const {
       data,
       error,
@@ -2064,11 +2097,11 @@ async function getCampaign(
         )
         .maybeSingle();
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     if (!data) {
       return res
@@ -2081,6 +2114,7 @@ async function getCampaign(
         });
     }
 
+
     return res
       .status(200)
       .json({
@@ -2091,9 +2125,8 @@ async function getCampaign(
             data
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -2119,10 +2152,12 @@ async function createCampaign(
         req.body
       );
 
+
     const errors =
       validateCampaign(
         input
       );
+
 
     if (
       errors.length >
@@ -2140,8 +2175,10 @@ async function createCampaign(
         });
     }
 
+
     const now =
       nowIso();
+
 
     const {
       data,
@@ -2212,11 +2249,11 @@ async function createCampaign(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     return res
       .status(201)
@@ -2231,19 +2268,15 @@ async function createCampaign(
             data
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
       "Unable to create newsletter campaign."
     );
   }
-}
-
-
-/* ============================================================
+}/* ============================================================
    UPDATE CAMPAIGN
 
    PATCH /api/newsletter/campaigns/:id
@@ -2259,12 +2292,13 @@ async function updateCampaign(
     } =
       req.params;
 
+
     const {
       data:
         existingCampaign,
 
       error:
-        existingError,
+        lookupError,
     } =
       await supabaseAdmin
         .from(
@@ -2277,11 +2311,11 @@ async function updateCampaign(
         )
         .maybeSingle();
 
-    if (
-      existingError
-    ) {
-      throw existingError;
+
+    if (lookupError) {
+      throw lookupError;
     }
+
 
     if (
       !existingCampaign
@@ -2296,13 +2330,10 @@ async function updateCampaign(
         });
     }
 
+
     if (
-      [
-        "sending",
-        "sent",
-      ].includes(
-        existingCampaign.status
-      )
+      existingCampaign.status ===
+      "sent"
     ) {
       return res
         .status(409)
@@ -2310,11 +2341,27 @@ async function updateCampaign(
           success: false,
 
           message:
-            "A sending or sent newsletter cannot be edited.",
+            "A sent newsletter cannot be edited.",
         });
     }
 
-    const mergedInput =
+
+    if (
+      existingCampaign.status ===
+      "sending"
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent and cannot be edited.",
+        });
+    }
+
+
+    const input =
       normalizeCampaignInput({
         title:
           req.body?.title ??
@@ -2353,10 +2400,12 @@ async function updateCampaign(
           existingCampaign.audience,
       });
 
+
     const errors =
       validateCampaign(
-        mergedInput
+        input
       );
+
 
     if (
       errors.length >
@@ -2374,6 +2423,49 @@ async function updateCampaign(
         });
     }
 
+
+    const updates = {
+      title:
+        input.title,
+
+      subject:
+        input.subject,
+
+      preview_text:
+        input.previewText,
+
+      featured_image:
+        cleanNullableString(
+          input.featuredImage
+        ),
+
+      content:
+        input.content,
+
+      cta_text:
+        input.ctaText,
+
+      cta_link:
+        cleanNullableString(
+          input.ctaLink
+        ),
+
+      audience:
+        input.audience,
+
+      updated_at:
+        nowIso(),
+    };
+
+
+    /*
+      If a scheduled campaign is edited,
+      keep its schedule unless the frontend
+      explicitly cancels the schedule through
+      the cancel-schedule endpoint.
+    */
+
+
     const {
       data,
       error,
@@ -2382,38 +2474,9 @@ async function updateCampaign(
         .from(
           CAMPAIGNS_TABLE
         )
-        .update({
-          title:
-            mergedInput.title,
-
-          subject:
-            mergedInput.subject,
-
-          preview_text:
-            mergedInput.previewText,
-
-          featured_image:
-            cleanNullableString(
-              mergedInput.featuredImage
-            ),
-
-          content:
-            mergedInput.content,
-
-          cta_text:
-            mergedInput.ctaText,
-
-          cta_link:
-            cleanNullableString(
-              mergedInput.ctaLink
-            ),
-
-          audience:
-            mergedInput.audience,
-
-          updated_at:
-            nowIso(),
-        })
+        .update(
+          updates
+        )
         .eq(
           "id",
           id
@@ -2421,11 +2484,11 @@ async function updateCampaign(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
+
+    if (error) {
       throw error;
     }
+
 
     return res
       .status(200)
@@ -2440,9 +2503,8 @@ async function updateCampaign(
             data
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -2468,6 +2530,7 @@ async function deleteCampaign(
     } =
       req.params;
 
+
     const {
       data:
         campaign,
@@ -2488,11 +2551,11 @@ async function deleteCampaign(
         )
         .maybeSingle();
 
-    if (
-      lookupError
-    ) {
+
+    if (lookupError) {
       throw lookupError;
     }
+
 
     if (!campaign) {
       return res
@@ -2505,13 +2568,10 @@ async function deleteCampaign(
         });
     }
 
+
     if (
-      [
-        "sending",
-        "sent",
-      ].includes(
-        campaign.status
-      )
+      campaign.status ===
+      "sending"
     ) {
       return res
         .status(409)
@@ -2519,12 +2579,44 @@ async function deleteCampaign(
           success: false,
 
           message:
-            "Sending or sent campaigns cannot be deleted.",
+            "A newsletter that is currently being sent cannot be deleted.",
         });
     }
 
+
+    /*
+      Remove delivery records first.
+
+      This avoids foreign-key problems in databases
+      where newsletter_deliveries references the
+      campaign without ON DELETE CASCADE.
+    */
+
     const {
-      error,
+      error:
+        deliveryDeleteError,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .delete()
+        .eq(
+          "campaign_id",
+          id
+        );
+
+
+    if (
+      deliveryDeleteError
+    ) {
+      throw deliveryDeleteError;
+    }
+
+
+    const {
+      error:
+        campaignDeleteError,
     } =
       await supabaseAdmin
         .from(
@@ -2536,11 +2628,13 @@ async function deleteCampaign(
           id
         );
 
+
     if (
-      error
+      campaignDeleteError
     ) {
-      throw error;
+      throw campaignDeleteError;
     }
+
 
     return res
       .status(200)
@@ -2558,9 +2652,8 @@ async function deleteCampaign(
             campaign.title,
         },
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -2586,12 +2679,13 @@ async function duplicateCampaign(
     } =
       req.params;
 
+
     const {
       data:
-        existingCampaign,
+        sourceCampaign,
 
       error:
-        existingError,
+        lookupError,
     } =
       await supabaseAdmin
         .from(
@@ -2604,14 +2698,14 @@ async function duplicateCampaign(
         )
         .maybeSingle();
 
-    if (
-      existingError
-    ) {
-      throw existingError;
+
+    if (lookupError) {
+      throw lookupError;
     }
 
+
     if (
-      !existingCampaign
+      !sourceCampaign
     ) {
       return res
         .status(404)
@@ -2623,12 +2717,24 @@ async function duplicateCampaign(
         });
     }
 
+
     const now =
       nowIso();
 
+
+    const duplicatedTitle =
+      `${cleanString(
+        sourceCampaign.title,
+        "Newsletter"
+      )} Copy`;
+
+
     const {
-      data,
-      error,
+      data:
+        duplicatedCampaign,
+
+      error:
+        insertError,
     } =
       await supabaseAdmin
         .from(
@@ -2636,42 +2742,38 @@ async function duplicateCampaign(
         )
         .insert({
           title:
-            `${existingCampaign.title} (Copy)`,
+            duplicatedTitle,
 
           subject:
-            existingCampaign.subject ||
-            "",
+            sourceCampaign.subject,
 
           preview_text:
-            existingCampaign.preview_text ||
-            "",
+            sourceCampaign.preview_text,
 
-          /*
-           * Keep the same public featured-image
-           * URL when duplicating the campaign.
-           */
           featured_image:
-            existingCampaign.featured_image ||
-            null,
+            sourceCampaign.featured_image,
 
           content:
-            existingCampaign.content ||
-            "",
+            sourceCampaign.content,
 
           cta_text:
-            existingCampaign.cta_text ||
-            "",
+            sourceCampaign.cta_text,
 
           cta_link:
-            existingCampaign.cta_link ||
-            null,
+            sourceCampaign.cta_link,
 
           audience:
-            existingCampaign.audience ||
+            sourceCampaign.audience ||
             "all",
 
           status:
             "draft",
+
+          scheduled_at:
+            null,
+
+          sent_at:
+            null,
 
           recipient_count:
             0,
@@ -2688,12 +2790,6 @@ async function duplicateCampaign(
           clicked_count:
             0,
 
-          scheduled_at:
-            null,
-
-          sent_at:
-            null,
-
           created_by:
             getCurrentAdminId(
               req
@@ -2708,11 +2804,11 @@ async function duplicateCampaign(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (insertError) {
+      throw insertError;
     }
+
 
     return res
       .status(201)
@@ -2724,19 +2820,193 @@ async function duplicateCampaign(
 
         campaign:
           normalizeCampaign(
-            data
+            duplicatedCampaign
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
       "Unable to duplicate newsletter campaign."
     );
   }
-}/* ============================================================
+}
+
+
+/* ============================================================
+   AUDIENCE HELPERS
+============================================================ */
+
+async function getRecipientCount(
+  audience = "all"
+) {
+  const normalizedAudience =
+    cleanString(
+      audience,
+      "all"
+    ).toLowerCase();
+
+
+  /*
+    The current newsletter_subscribers table
+    supports the general active subscriber audience.
+
+    Segmented audiences can be enabled when the
+    subscriber table contains the corresponding
+    founder / partner / university classifications.
+  */
+
+  if (
+    normalizedAudience !==
+    "all"
+  ) {
+    return {
+      supported:
+        false,
+
+      count:
+        0,
+
+      audience:
+        normalizedAudience,
+    };
+  }
+
+
+  const {
+    count,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select(
+        "id",
+        {
+          count:
+            "exact",
+
+          head:
+            true,
+        }
+      )
+      .eq(
+        "status",
+        "subscribed"
+      );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return {
+    supported:
+      true,
+
+    count:
+      Number(
+        count || 0
+      ),
+
+    audience:
+      normalizedAudience,
+  };
+}
+
+
+/* ============================================================
+   LOAD CAMPAIGN RECIPIENTS
+============================================================ */
+
+async function getCampaignRecipients(
+  audience = "all"
+) {
+  const normalizedAudience =
+    cleanString(
+      audience,
+      "all"
+    ).toLowerCase();
+
+
+  if (
+    normalizedAudience !==
+    "all"
+  ) {
+    return {
+      supported:
+        false,
+
+      recipients:
+        [],
+
+      audience:
+        normalizedAudience,
+    };
+  }
+
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select("*")
+      .eq(
+        "status",
+        "subscribed"
+      )
+      .order(
+        "subscribed_at",
+        {
+          ascending:
+            true,
+        }
+      );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  const recipients =
+    Array.isArray(
+      data
+    )
+      ? data.filter(
+          (
+            subscriber
+          ) =>
+            subscriber?.email &&
+            isValidEmail(
+              normalizeEmail(
+                subscriber.email
+              )
+            )
+        )
+      : [];
+
+
+  return {
+    supported:
+      true,
+
+    recipients,
+
+    audience:
+      normalizedAudience,
+  };
+}
+
+
+/* ============================================================
    GET CAMPAIGN RECIPIENT COUNT
 
    GET /api/newsletter/campaigns/:id/recipients
@@ -2752,11 +3022,13 @@ async function getCampaignRecipientCount(
     } =
       req.params;
 
+
     const {
       data:
         campaign,
 
-      error,
+      error:
+        lookupError,
     } =
       await supabaseAdmin
         .from(
@@ -2771,11 +3043,11 @@ async function getCampaignRecipientCount(
         )
         .maybeSingle();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (lookupError) {
+      throw lookupError;
     }
+
 
     if (!campaign) {
       return res
@@ -2788,11 +3060,33 @@ async function getCampaignRecipientCount(
         });
     }
 
-    const result =
+
+    const recipients =
       await getRecipientCount(
         campaign.audience ||
         "all"
       );
+
+
+    if (
+      !recipients.supported
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "This audience cannot be counted until subscriber segmentation is configured.",
+
+          audience:
+            recipients.audience,
+
+          recipientCount:
+            0,
+        });
+    }
+
 
     return res
       .status(200)
@@ -2800,22 +3094,13 @@ async function getCampaignRecipientCount(
         success: true,
 
         audience:
-          campaign.audience,
+          recipients.audience,
 
         recipientCount:
-          result.count,
-
-        supported:
-          result.supported,
-
-        message:
-          result.supported
-            ? "Recipient count loaded successfully."
-            : "This audience requires subscriber segmentation before recipients can be resolved.",
+          recipients.count,
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -2841,29 +3126,28 @@ async function scheduleCampaign(
     } =
       req.params;
 
+
     const scheduledAt =
       parseDateOrNull(
         req.body?.scheduledAt ??
         req.body?.scheduled_at
       );
 
-    if (
-      !scheduledAt
-    ) {
+
+    if (!scheduledAt) {
       return res
         .status(400)
         .json({
           success: false,
 
           message:
-            "A valid schedule date and time is required.",
+            "Please provide a valid newsletter schedule date and time.",
         });
     }
 
+
     if (
-      new Date(
-        scheduledAt
-      ).getTime() <=
+      scheduledAt.getTime() <=
       Date.now()
     ) {
       return res
@@ -2872,9 +3156,10 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "The newsletter must be scheduled for a future date and time.",
+            "The newsletter schedule must be in the future.",
         });
     }
+
 
     const {
       data:
@@ -2894,11 +3179,11 @@ async function scheduleCampaign(
         )
         .maybeSingle();
 
-    if (
-      lookupError
-    ) {
+
+    if (lookupError) {
       throw lookupError;
     }
+
 
     if (!campaign) {
       return res
@@ -2911,13 +3196,10 @@ async function scheduleCampaign(
         });
     }
 
+
     if (
-      [
-        "sending",
-        "sent",
-      ].includes(
-        campaign.status
-      )
+      campaign.status ===
+      "sent"
     ) {
       return res
         .status(409)
@@ -2925,9 +3207,25 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "This newsletter can no longer be scheduled.",
+            "A sent newsletter cannot be scheduled again.",
         });
     }
+
+
+    if (
+      campaign.status ===
+      "sending"
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent.",
+        });
+    }
+
 
     const input =
       normalizeCampaignInput({
@@ -2956,6 +3254,7 @@ async function scheduleCampaign(
           campaign.audience,
       });
 
+
     const validationErrors =
       validateCampaign(
         input,
@@ -2964,6 +3263,7 @@ async function scheduleCampaign(
             true,
         }
       );
+
 
     if (
       validationErrors.length >
@@ -2983,11 +3283,13 @@ async function scheduleCampaign(
         });
     }
 
+
     const recipients =
       await getRecipientCount(
         campaign.audience ||
         "all"
       );
+
 
     if (
       !recipients.supported
@@ -3001,6 +3303,7 @@ async function scheduleCampaign(
             "This audience cannot be scheduled until subscriber segmentation is configured.",
         });
     }
+
 
     if (
       recipients.count ===
@@ -3016,9 +3319,13 @@ async function scheduleCampaign(
         });
     }
 
+
     const {
-      data,
-      error,
+      data:
+        updatedCampaign,
+
+      error:
+        updateError,
     } =
       await supabaseAdmin
         .from(
@@ -3029,7 +3336,8 @@ async function scheduleCampaign(
             "scheduled",
 
           scheduled_at:
-            scheduledAt,
+            scheduledAt
+              .toISOString(),
 
           recipient_count:
             recipients.count,
@@ -3044,11 +3352,11 @@ async function scheduleCampaign(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (updateError) {
+      throw updateError;
     }
+
 
     return res
       .status(200)
@@ -3058,14 +3366,16 @@ async function scheduleCampaign(
         message:
           "Newsletter scheduled successfully.",
 
+        recipientCount:
+          recipients.count,
+
         campaign:
           normalizeCampaign(
-            data
+            updatedCampaign
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
@@ -3076,7 +3386,7 @@ async function scheduleCampaign(
 
 
 /* ============================================================
-   CANCEL SCHEDULE
+   CANCEL SCHEDULED CAMPAIGN
 
    POST /api/newsletter/campaigns/:id/cancel-schedule
 ============================================================ */
@@ -3091,6 +3401,7 @@ async function cancelScheduledCampaign(
     } =
       req.params;
 
+
     const {
       data:
         campaign,
@@ -3102,20 +3413,18 @@ async function cancelScheduledCampaign(
         .from(
           CAMPAIGNS_TABLE
         )
-        .select(
-          "id, status"
-        )
+        .select("*")
         .eq(
           "id",
           id
         )
         .maybeSingle();
 
-    if (
-      lookupError
-    ) {
+
+    if (lookupError) {
       throw lookupError;
     }
+
 
     if (!campaign) {
       return res
@@ -3128,6 +3437,7 @@ async function cancelScheduledCampaign(
         });
     }
 
+
     if (
       campaign.status !==
       "scheduled"
@@ -3138,13 +3448,17 @@ async function cancelScheduledCampaign(
           success: false,
 
           message:
-            "Only scheduled campaigns can have their schedule cancelled.",
+            "This newsletter is not currently scheduled.",
         });
     }
 
+
     const {
-      data,
-      error,
+      data:
+        updatedCampaign,
+
+      error:
+        updateError,
     } =
       await supabaseAdmin
         .from(
@@ -3167,11 +3481,11 @@ async function cancelScheduledCampaign(
         .select("*")
         .single();
 
-    if (
-      error
-    ) {
-      throw error;
+
+    if (updateError) {
+      throw updateError;
     }
+
 
     return res
       .status(200)
@@ -3183,705 +3497,35 @@ async function cancelScheduledCampaign(
 
         campaign:
           normalizeCampaign(
-            data
+            updatedCampaign
           ),
       });
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
     return sendServerError(
       res,
       error,
       "Unable to cancel newsletter schedule."
     );
   }
-}/* ============================================================
-   SEND TEST
-
-   POST /api/newsletter/campaigns/:id/test
-============================================================ */
-
-async function sendTestCampaign(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-    const email =
-      normalizeEmail(
-        req.body?.email
-      );
-
-    if (
-      !isValidEmail(
-        email
-      )
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "A valid test email address is required.",
-        });
-    }
-
-    const {
-      data:
-        campaign,
-
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-    if (
-      error
-    ) {
-      throw error;
-    }
-
-    if (!campaign) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter campaign not found.",
-        });
-    }
-
-    const input =
-      normalizeCampaignInput({
-        title:
-          campaign.title,
-
-        subject:
-          campaign.subject,
-
-        previewText:
-          campaign.preview_text,
-
-        featuredImage:
-          campaign.featured_image,
-
-        content:
-          campaign.content,
-
-        ctaText:
-          campaign.cta_text,
-
-        ctaLink:
-          campaign.cta_link,
-
-        audience:
-          campaign.audience,
-      });
-
-    const validationErrors =
-      validateCampaign(
-        input,
-        {
-          requireContent:
-            true,
-        }
-      );
-
-    if (
-      validationErrors.length >
-      0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            validationErrors[0]
-              .message,
-
-          errors:
-            validationErrors,
-        });
-    }
-
-    /*
-      Email provider integration intentionally belongs
-      in the existing sendEmail utility/service.
-
-      Do not report a successful send until the provider
-      has actually accepted the message.
-    */
-
-    return res
-      .status(501)
-      .json({
-        success: false,
-
-        code:
-          "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
-
-        message:
-          "The newsletter campaign is valid, but test email delivery has not been connected to the email service yet.",
-
-        testRecipient:
-          email,
-
-        campaign:
-          normalizeCampaign(
-            campaign
-          ),
-      });
-  } catch (
-    error
-  ) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to prepare newsletter test email."
-    );
-  }
-}
-
-
-/* ============================================================
-   SEND CAMPAIGN
-
-   POST /api/newsletter/campaigns/:id/send
-============================================================ */
-
-async function sendCampaign(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-    const {
-      data:
-        campaign,
-
-      error:
-        lookupError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-    if (
-      lookupError
-    ) {
-      throw lookupError;
-    }
-
-    if (!campaign) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter campaign not found.",
-        });
-    }
-
-    if (
-      campaign.status ===
-      "sent"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "This newsletter has already been sent.",
-        });
-    }
-
-    if (
-      campaign.status ===
-      "sending"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "This newsletter is already being sent.",
-        });
-    }
-
-    const input =
-      normalizeCampaignInput({
-        title:
-          campaign.title,
-
-        subject:
-          campaign.subject,
-
-        previewText:
-          campaign.preview_text,
-
-        featuredImage:
-          campaign.featured_image,
-
-        content:
-          campaign.content,
-
-        ctaText:
-          campaign.cta_text,
-
-        ctaLink:
-          campaign.cta_link,
-
-        audience:
-          campaign.audience,
-      });
-
-    const validationErrors =
-      validateCampaign(
-        input,
-        {
-          requireContent:
-            true,
-        }
-      );
-
-    if (
-      validationErrors.length >
-      0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            validationErrors[0]
-              .message,
-
-          errors:
-            validationErrors,
-        });
-    }
-
-    const recipients =
-      await getRecipientCount(
-        campaign.audience ||
-        "all"
-      );
-
-    if (
-      !recipients.supported
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "This audience cannot be sent until subscriber segmentation is configured.",
-        });
-    }
-
-    if (
-      recipients.count ===
-      0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "There are no active subscribers available for this campaign.",
-        });
-    }
-
-    /*
-      IMPORTANT:
-
-      Do not mark the campaign as sent here until
-      actual email delivery has been connected.
-
-      Once the existing sendEmail utility/provider is
-      integrated, this handler should:
-
-      1. mark campaign as "sending"
-      2. load active subscribers
-      3. send messages in controlled batches
-      4. create newsletter_deliveries records
-      5. count successes/failures
-      6. mark campaign "sent"
-    */
-
-    return res
-      .status(501)
-      .json({
-        success: false,
-
-        code:
-          "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
-
-        message:
-          "The newsletter is ready to send, but campaign email delivery has not been connected to the email service yet.",
-
-        recipientCount:
-          recipients.count,
-
-        campaign:
-          normalizeCampaign(
-            campaign
-          ),
-      });
-  } catch (
-    error
-  ) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to prepare newsletter campaign for sending."
-    );
-  }
-}
-
-
-/* ============================================================
-   GET CAMPAIGN DELIVERIES
-
-   GET /api/newsletter/campaigns/:id/deliveries
-============================================================ */
-
-async function getCampaignDeliveries(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-    const {
-      data,
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          DELIVERIES_TABLE
-        )
-        .select("*")
-        .eq(
-          "campaign_id",
-          id
-        )
-        .order(
-          "created_at",
-          {
-            ascending:
-              false,
-          }
-        );
-
-    if (
-      error
-    ) {
-      throw error;
-    }
-
-    const deliveries =
-      Array.isArray(
-        data
-      )
-        ? data.map(
-            normalizeDelivery
-          )
-        : [];
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        count:
-          deliveries.length,
-
-        deliveries,
-      });
-  } catch (
-    error
-  ) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to load newsletter deliveries."
-    );
-  }
-}
-
-
-/* ============================================================
-   NEWSLETTER ANALYTICS
-
-   GET /api/newsletter/analytics
-============================================================ */
-
-async function getNewsletterAnalytics(
-  req,
-  res
-) {
-  try {
-    const [
-      subscriberResult,
-      campaignResult,
-    ] =
-      await Promise.all([
-        supabaseAdmin
-          .from(
-            SUBSCRIBERS_TABLE
-          )
-          .select(
-            "id, status"
-          ),
-
-        supabaseAdmin
-          .from(
-            CAMPAIGNS_TABLE
-          )
-          .select(
-            `
-              id,
-              status,
-              recipient_count,
-              delivered_count,
-              failed_count,
-              opened_count,
-              clicked_count
-            `
-          ),
-      ]);
-
-    if (
-      subscriberResult.error
-    ) {
-      throw subscriberResult.error;
-    }
-
-    if (
-      campaignResult.error
-    ) {
-      throw campaignResult.error;
-    }
-
-    const subscribers =
-      Array.isArray(
-        subscriberResult.data
-      )
-        ? subscriberResult.data
-        : [];
-
-    const campaigns =
-      Array.isArray(
-        campaignResult.data
-      )
-        ? campaignResult.data
-        : [];
-
-    const totalSubscribers =
-      subscribers.length;
-
-    const activeSubscribers =
-      subscribers.filter(
-        (subscriber) =>
-          subscriber.status ===
-          "subscribed"
-      ).length;
-
-    const unsubscribed =
-      subscribers.filter(
-        (subscriber) =>
-          subscriber.status ===
-          "unsubscribed"
-      ).length;
-
-    const sentCampaigns =
-      campaigns.filter(
-        (campaign) =>
-          campaign.status ===
-          "sent"
-      ).length;
-
-    const scheduledCampaigns =
-      campaigns.filter(
-        (campaign) =>
-          campaign.status ===
-          "scheduled"
-      ).length;
-
-    const draftCampaigns =
-      campaigns.filter(
-        (campaign) =>
-          campaign.status ===
-          "draft"
-      ).length;
-
-    const totals =
-      campaigns.reduce(
-        (
-          result,
-          campaign
-        ) => {
-          result.recipients +=
-            Number(
-              campaign.recipient_count ||
-              0
-            );
-
-          result.delivered +=
-            Number(
-              campaign.delivered_count ||
-              0
-            );
-
-          result.failed +=
-            Number(
-              campaign.failed_count ||
-              0
-            );
-
-          result.opened +=
-            Number(
-              campaign.opened_count ||
-              0
-            );
-
-          result.clicked +=
-            Number(
-              campaign.clicked_count ||
-              0
-            );
-
-          return result;
-        },
-        {
-          recipients: 0,
-          delivered: 0,
-          failed: 0,
-          opened: 0,
-          clicked: 0,
-        }
-      );
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        analytics: {
-          totalSubscribers,
-
-          activeSubscribers,
-
-          unsubscribed,
-
-          totalCampaigns:
-            campaigns.length,
-
-          sentCampaigns,
-
-          scheduledCampaigns,
-
-          draftCampaigns,
-
-          recipientCount:
-            totals.recipients,
-
-          deliveredCount:
-            totals.delivered,
-
-          failedCount:
-            totals.failed,
-
-          openedCount:
-            totals.opened,
-
-          clickedCount:
-            totals.clicked,
-        },
-      });
-  } catch (
-    error
-  ) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to load newsletter analytics."
-    );
-  }
-}
-
-
-/* ============================================================
-   EXPORTS
-============================================================ */
-
-module.exports = {
-  /* Subscriber */
+}module.exports = {
   subscribe,
   unsubscribe,
   getSubscribers,
   updateSubscriber,
   deleteSubscriber,
-
-  /* Newsletter Image Upload */
   uploadNewsletterImage,
-
-  /* Campaign */
   getCampaigns,
   getCampaign,
   createCampaign,
   updateCampaign,
   deleteCampaign,
   duplicateCampaign,
-
-  /* Audience */
   getCampaignRecipientCount,
-
-  /* Scheduling */
   scheduleCampaign,
   cancelScheduledCampaign,
-
-  /* Delivery */
   sendTestCampaign,
   sendCampaign,
   getCampaignDeliveries,
-
-  /* Analytics */
   getNewsletterAnalytics,
 };

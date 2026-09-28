@@ -19,42 +19,45 @@ const {
 
 const router = express.Router();
 
-// ============================================================
-// COMMON RATE-LIMIT SETTINGS
-// ============================================================
+/* ============================================================
+   COMMON RATE-LIMIT SETTINGS
+============================================================ */
 
 const commonLimiterOptions = {
   standardHeaders: true,
   legacyHeaders: false,
 };
 
-// ============================================================
-// REGISTRATION LIMITER
-//
-// Registration is rare for a CMS.
-// ============================================================
+/* ============================================================
+   REGISTRATION LIMITER
+
+   Registration is protected against abuse while allowing
+   enough attempts during CMS development and testing.
+
+   20 attempts per 15 minutes per client.
+============================================================ */
 
 const registerLimiter = rateLimit({
   ...commonLimiterOptions,
 
   windowMs:
-    60 * 60 * 1000,
+    15 * 60 * 1000,
 
   limit:
-    5,
+    20,
 
   message: {
     success: false,
     message:
-      "Too many registration attempts. Please try again later.",
+      "Too many registration attempts. Please wait a few minutes before trying again.",
   },
 });
 
-// ============================================================
-// LOGIN LIMITER
-//
-// Protects password authentication from repeated attempts.
-// ============================================================
+/* ============================================================
+   LOGIN LIMITER
+
+   Protects password authentication from repeated attempts.
+============================================================ */
 
 const loginLimiter = rateLimit({
   ...commonLimiterOptions,
@@ -72,12 +75,12 @@ const loginLimiter = rateLimit({
   },
 });
 
-// ============================================================
-// OTP VERIFICATION LIMITER
-//
-// The OTP record itself also enforces a maximum number
-// of incorrect attempts.
-// ============================================================
+/* ============================================================
+   OTP VERIFICATION LIMITER
+
+   The OTP record itself should also enforce its own maximum
+   number of incorrect verification attempts.
+============================================================ */
 
 const verifyOtpLimiter = rateLimit({
   ...commonLimiterOptions,
@@ -95,12 +98,12 @@ const verifyOtpLimiter = rateLimit({
   },
 });
 
-// ============================================================
-// OTP RESEND LIMITER
-//
-// Much stricter because every successful request can send
-// an email and create a new OTP.
-// ============================================================
+/* ============================================================
+   OTP RESEND LIMITER
+
+   This remains stricter because each successful request can
+   generate a new OTP and send another email.
+============================================================ */
 
 const resendOtpLimiter = rateLimit({
   ...commonLimiterOptions,
@@ -118,11 +121,11 @@ const resendOtpLimiter = rateLimit({
   },
 });
 
-// ============================================================
-// REGISTER
-//
-// POST /api/auth/register
-// ============================================================
+/* ============================================================
+   REGISTER
+
+   POST /api/auth/register
+============================================================ */
 
 router.post(
   "/register",
@@ -130,14 +133,14 @@ router.post(
   asyncHandler(register)
 );
 
-// ============================================================
-// LOGIN
-//
-// POST /api/auth/login
-//
-// Password is verified first.
-// A successful password check triggers OTP.
-// ============================================================
+/* ============================================================
+   LOGIN
+
+   POST /api/auth/login
+
+   Password authentication happens inside the controller.
+   A successful login can then trigger OTP verification.
+============================================================ */
 
 router.post(
   "/login",
@@ -145,11 +148,11 @@ router.post(
   asyncHandler(login)
 );
 
-// ============================================================
-// VERIFY OTP
-//
-// POST /api/auth/verify-otp
-// ============================================================
+/* ============================================================
+   VERIFY OTP
+
+   POST /api/auth/verify-otp
+============================================================ */
 
 router.post(
   "/verify-otp",
@@ -157,11 +160,11 @@ router.post(
   asyncHandler(verifyOtpCode)
 );
 
-// ============================================================
-// RESEND OTP
-//
-// POST /api/auth/resend-otp
-// ============================================================
+/* ============================================================
+   RESEND OTP
+
+   POST /api/auth/resend-otp
+============================================================ */
 
 router.post(
   "/resend-otp",
@@ -169,11 +172,11 @@ router.post(
   asyncHandler(resendOtp)
 );
 
-// ============================================================
-// CURRENT AUTHENTICATED CMS USER
-//
-// GET /api/auth/me
-// ============================================================
+/* ============================================================
+   CURRENT AUTHENTICATED CMS USER
+
+   GET /api/auth/me
+============================================================ */
 
 router.get(
   "/me",
@@ -181,11 +184,11 @@ router.get(
   asyncHandler(me)
 );
 
-// ============================================================
-// LOGOUT
-//
-// POST /api/auth/logout
-// ============================================================
+/* ============================================================
+   LOGOUT
+
+   POST /api/auth/logout
+============================================================ */
 
 router.post(
   "/logout",
@@ -193,8 +196,8 @@ router.post(
   asyncHandler(logout)
 );
 
-// ============================================================
-// EXPORT
-// ============================================================
+/* ============================================================
+   EXPORT
+============================================================ */
 
 module.exports = router;

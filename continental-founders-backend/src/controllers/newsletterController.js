@@ -3508,7 +3508,95 @@ async function cancelScheduledCampaign(
       "Unable to cancel newsletter schedule."
     );
   }
-}module.exports = {
+}
+
+async function sendTestCampaign(req, res) {
+  const email = normalizeEmail(req.body?.email);
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ success: false, message: "A valid test email address is required." });
+  }
+  try {
+    const { data: campaign, error } = await supabaseAdmin.from(CAMPAIGNS_TABLE)
+      .select("*").eq("id", req.params.id).maybeSingle();
+    if (error) throw error;
+    if (!campaign) return res.status(404).json({ success: false, message: "Newsletter campaign not found." });
+    return res.status(501).json({
+      success: false,
+      code: "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
+      message: "Test email delivery has not been connected to the email service yet.",
+      testRecipient: email,
+      campaign: normalizeCampaign(campaign),
+    });
+  } catch (error) {
+    return sendServerError(res, error, "Unable to prepare newsletter test email.");
+  }
+}
+
+async function sendCampaign(req, res) {
+  try {
+    const { data: campaign, error } = await supabaseAdmin.from(CAMPAIGNS_TABLE)
+      .select("*").eq("id", req.params.id).maybeSingle();
+    if (error) throw error;
+    if (!campaign) return res.status(404).json({ success: false, message: "Newsletter campaign not found." });
+    if (campaign.status === "sent" || campaign.status === "sending") {
+      return res.status(409).json({ success: false, message: "This newsletter has already been sent or is being sent." });
+    }
+    return res.status(501).json({
+      success: false,
+      code: "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
+      message: "Campaign email delivery has not been connected to the email service yet.",
+      campaign: normalizeCampaign(campaign),
+    });
+  } catch (error) {
+    return sendServerError(res, error, "Unable to prepare newsletter campaign for sending.");
+  }
+}
+
+async function getCampaignDeliveries(req, res) {
+  try {
+    const { data, error } = await supabaseAdmin.from(DELIVERIES_TABLE)
+      .select("*").eq("campaign_id", req.params.id)
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    const deliveries = Array.isArray(data) ? data.map(normalizeDelivery) : [];
+    return res.status(200).json({ success: true, count: deliveries.length, deliveries });
+  } catch (error) {
+    return sendServerError(res, error, "Unable to load newsletter deliveries.");
+  }
+}
+
+async function getNewsletterAnalytics(req, res) {
+  try {
+    const [subscriberResult, campaignResult] = await Promise.all([
+      supabaseAdmin.from(SUBSCRIBERS_TABLE).select("id, status"),
+      supabaseAdmin.from(CAMPAIGNS_TABLE).select("id, status, recipient_count, delivered_count, failed_count, opened_count, clicked_count"),
+    ]);
+    if (subscriberResult.error) throw subscriberResult.error;
+    if (campaignResult.error) throw campaignResult.error;
+    const subscribers = subscriberResult.data || [];
+    const campaigns = campaignResult.data || [];
+    const count = (rows, status) => rows.filter((row) => row.status === status).length;
+    const sum = (field) => campaigns.reduce((total, row) => total + Number(row[field] || 0), 0);
+    return res.status(200).json({ success: true, analytics: {
+      totalSubscribers: subscribers.length,
+      activeSubscribers: count(subscribers, "subscribed"),
+      unsubscribed: count(subscribers, "unsubscribed"),
+      totalCampaigns: campaigns.length,
+      sentCampaigns: count(campaigns, "sent"),
+      scheduledCampaigns: count(campaigns, "scheduled"),
+      draftCampaigns: count(campaigns, "draft"),
+      recipientCount: sum("recipient_count"),
+      deliveredCount: sum("delivered_count"),
+      failedCount: sum("failed_count"),
+      openedCount: sum("opened_count"),
+      clickedCount: sum("clicked_count"),
+    } });
+  } catch (error) {
+    return sendServerError(res, error, "Unable to load newsletter analytics.");
+  }
+}
+
+module.exports = {
   subscribe,
   unsubscribe,
   getSubscribers,

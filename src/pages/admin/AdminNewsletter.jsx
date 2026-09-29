@@ -42,6 +42,16 @@ import {
   getNewsletterSubscribers,
   updateNewsletterSubscriber,
   uploadNewsletterImage,
+  getNewsletterCampaigns,
+  getNewsletterAnalytics,
+  createNewsletterCampaign,
+  updateNewsletterCampaign,
+  deleteNewsletterCampaign,
+  duplicateNewsletterCampaign,
+  scheduleNewsletterCampaign,
+  cancelNewsletterSchedule,
+  sendNewsletterTest,
+  sendNewsletterCampaign,
 } from "../../services/adminApi";
 
 import "./AdminNewsletter.css";
@@ -83,13 +93,13 @@ const TABS = [
 const WIZARD_STEPS = [
   {
     id: 1,
-    label: "Details",
-    description: "Campaign information",
+    label: "Design",
+    description: "Write and style",
   },
   {
     id: 2,
-    label: "Content",
-    description: "Message and design",
+    label: "Details",
+    description: "Subject and preview",
   },
   {
     id: 3,
@@ -419,10 +429,12 @@ export default function AdminNewsletter() {
      CAMPAIGN STATE
   ========================================================== */
 
-  const [
-    campaigns,
-    setCampaigns,
-  ] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
+  const [campaignId, setCampaignId] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [campaignSearch, setCampaignSearch] = useState("");
+  const [campaignStatus, setCampaignStatus] = useState("all");
+  const sendingRef = useRef(false);
 
 
   const [
@@ -566,6 +578,74 @@ export default function AdminNewsletter() {
   useEffect(() => {
     loadSubscribers();
   }, [loadSubscribers]);
+
+  const loadCampaignData = useCallback(async () => {
+    try {
+      const [campaignResult, analyticsResult] = await Promise.allSettled([
+        getNewsletterCampaigns(), getNewsletterAnalytics(),
+      ]);
+      if (campaignResult.status === "fulfilled") {
+        setCampaigns(Array.isArray(campaignResult.value.campaigns) ? campaignResult.value.campaigns : []);
+      } else throw campaignResult.reason;
+      if (analyticsResult.status === "fulfilled") setAnalytics(analyticsResult.value.analytics || null);
+    } catch (requestError) {
+      setError(requestError.message || "Unable to load campaign data.");
+    }
+  }, []);
+
+  useEffect(() => { loadCampaignData(); }, [loadCampaignData]);
+
+  async function persistCampaign() {
+    if (!campaignForm.title.trim() || !campaignForm.subject.trim()) {
+      throw new Error("Add the newsletter title and email subject in Details before saving.");
+    }
+    const result = campaignId
+      ? await updateNewsletterCampaign(campaignId, campaignForm)
+      : await createNewsletterCampaign(campaignForm);
+    if (!result.campaign?.id) throw new Error("The server did not return a saved campaign.");
+    setCampaignId(result.campaign.id);
+    setCampaigns((current) => [result.campaign, ...current.filter((item) => item.id !== result.campaign.id)]);
+    return result.campaign;
+  }
+
+  function editCampaign(campaign) {
+    setCampaignId(campaign.id);
+    setCampaignForm({
+      ...EMPTY_CAMPAIGN,
+      title: campaign.title || "", subject: campaign.subject || "",
+      previewText: campaign.previewText || "", featuredImage: campaign.featuredImage || "",
+      content: campaign.content || "", ctaText: campaign.ctaText || "",
+      ctaLink: campaign.ctaLink || "", audience: campaign.audience || "all",
+      deliveryMethod: campaign.status === "scheduled" ? "schedule" : "now",
+      scheduledAt: campaign.scheduledAt ? new Date(campaign.scheduledAt).toISOString().slice(0, 16) : "",
+    });
+    setFeaturedImagePreview(campaign.featuredImage || "");
+    setWizardStep(1);
+    setActiveTab("create");
+  }
+
+  async function campaignAction(action, campaign) {
+    try {
+      if (action === "delete") {
+        if (!window.confirm(`Delete “${campaign.title}”? This cannot be undone.`)) return;
+        await deleteNewsletterCampaign(campaign.id);
+        setCampaigns((current) => current.filter((item) => item.id !== campaign.id));
+        setSuccessMessage("Campaign deleted.");
+      } else if (action === "duplicate") {
+        const response = await duplicateNewsletterCampaign(campaign.id);
+        setCampaigns((current) => [response.campaign, ...current]);
+        setSuccessMessage("Campaign duplicated as a draft.");
+      } else if (action === "cancel") {
+        const response = await cancelNewsletterSchedule(campaign.id);
+        setCampaigns((current) => current.map((item) => item.id === campaign.id ? response.campaign : item));
+        setSuccessMessage("Schedule cancelled.");
+      }
+      await loadCampaignData();
+    } catch (requestError) {
+      setError(requestError.message || "Campaign action failed.");
+    }
+  }
+
 
 
   /* ==========================================================
@@ -1013,6 +1093,7 @@ export default function AdminNewsletter() {
     setCampaignForm({
       ...EMPTY_CAMPAIGN,
     });
+    setCampaignId(null);
 
     setWizardStep(1);
 
@@ -1054,21 +1135,6 @@ export default function AdminNewsletter() {
   ) {
     if (step === 1) {
       if (
-        !campaignForm.title.trim()
-      ) {
-        return "Enter a newsletter title before continuing.";
-      }
-
-      if (
-        !campaignForm.subject.trim()
-      ) {
-        return "Enter an email subject before continuing.";
-      }
-    }
-
-
-    if (step === 2) {
-      if (
         !campaignForm.content.trim()
       ) {
         return "Write the newsletter message before continuing.";
@@ -1108,6 +1174,22 @@ export default function AdminNewsletter() {
         } catch {
           return "Enter a valid website link for the call-to-action.";
         }
+      }
+    }
+
+
+
+    if (step === 2) {
+      if (
+        !campaignForm.title.trim()
+      ) {
+        return "Enter a newsletter title before continuing.";
+      }
+
+      if (
+        !campaignForm.subject.trim()
+      ) {
+        return "Enter an email subject before continuing.";
       }
     }
 
@@ -1527,33 +1609,12 @@ export default function AdminNewsletter() {
 
   async function handleSaveDraft() {
     setSavingDraft(true);
-
     setWizardError("");
-
     try {
-      /*
-       * Campaign persistence will be connected
-       * to the newsletter campaign API.
-       *
-       * We deliberately do not pretend that the
-       * campaign has been stored remotely yet.
-       */
-
-      await Promise.resolve();
-
-      setSuccessMessage(
-        "The newsletter is ready to be connected to campaign draft storage."
-      );
+      await persistCampaign();
+      setSuccessMessage("Newsletter draft saved.");
     } catch (requestError) {
-      console.error(
-        "Failed to save newsletter draft:",
-        requestError
-      );
-
-      setWizardError(
-        requestError?.message ||
-          "Unable to save this newsletter draft."
-      );
+      setWizardError(requestError.message || "Unable to save this draft.");
     } finally {
       setSavingDraft(false);
     }
@@ -1585,20 +1646,13 @@ export default function AdminNewsletter() {
     setWizardError("");
 
     try {
-      /*
-       * Real email delivery is intentionally
-       * not simulated here.
-       *
-       * This action should call the backend
-       * test-delivery endpoint once the email
-       * provider is configured.
-       */
-
-      await Promise.resolve();
-
-      setSuccessMessage(
-        `Test delivery is ready to be connected for ${email}.`
-      );
+      for (const step of [1, 2]) {
+        const issue = validateWizardStep(step);
+        if (issue) { setWizardStep(step); throw new Error(issue); }
+      }
+      const saved = await persistCampaign();
+      await sendNewsletterTest(saved.id, email);
+      setSuccessMessage(`Test newsletter sent to ${email}.`);
     } catch (requestError) {
       console.error(
         "Failed to send test newsletter:",
@@ -1640,11 +1694,20 @@ export default function AdminNewsletter() {
     setWizardError("");
 
     try {
-      await Promise.resolve();
-
-      setSuccessMessage(
-        "Newsletter scheduling is ready to be connected to the campaign API."
-      );
+      for (let step = 1; step <= 3; step += 1) {
+        const issue = validateWizardStep(step);
+        if (issue) { setWizardStep(step); throw new Error(issue); }
+      }
+      const date = new Date(campaignForm.scheduledAt);
+      if (Number.isNaN(date.getTime()) || date <= new Date()) {
+        setWizardStep(4);
+        throw new Error("Choose a future date and time for delivery.");
+      }
+      const saved = await persistCampaign();
+      const data = await scheduleNewsletterCampaign(saved.id, date.toISOString());
+      if (data.campaign) setCampaigns((current) => [data.campaign, ...current.filter((item) => item.id !== data.campaign.id)]);
+      setSuccessMessage("Newsletter scheduled successfully.");
+      setActiveTab("campaigns");
     } catch (requestError) {
       console.error(
         "Failed to schedule newsletter:",
@@ -1692,27 +1755,24 @@ export default function AdminNewsletter() {
     }
 
 
-    setSendingCampaign(
-      true
-    );
+    if (sendingRef.current) return;
+    sendingRef.current = true;
+    setSendingCampaign(true);
 
     setWizardError("");
 
     try {
-      /*
-       * The backend currently needs a configured
-       * newsletter delivery provider before a
-       * real campaign can be broadcast.
-       *
-       * Do not mark subscribers as emailed until
-       * the backend confirms delivery.
-       */
-
-      await Promise.resolve();
-
-      setSuccessMessage(
-        "The newsletter is complete. Connect the campaign delivery endpoint before broadcasting it to subscribers."
+      const activeRecipients = subscribers.filter(isActiveSubscriber).length;
+      if (activeRecipients === 0) throw new Error("There are no active subscribers to email.");
+      const confirmed = window.confirm(
+        `Send “${campaignForm.subject}” to the selected audience? This action cannot be undone.`
       );
+      if (!confirmed) return;
+      const saved = await persistCampaign();
+      const data = await sendNewsletterCampaign(saved.id);
+      if (data.campaign) setCampaigns((current) => [data.campaign, ...current.filter((item) => item.id !== data.campaign.id)]);
+      setSuccessMessage(data.message || "Newsletter submitted for delivery.");
+      setActiveTab("campaigns");
     } catch (requestError) {
       console.error(
         "Failed to send newsletter:",
@@ -1724,9 +1784,8 @@ export default function AdminNewsletter() {
           "Unable to send this newsletter."
       );
     } finally {
-      setSendingCampaign(
-        false
-      );
+      sendingRef.current = false;
+      setSendingCampaign(false);
     }
   }
 
@@ -1744,15 +1803,11 @@ export default function AdminNewsletter() {
           </span>
 
           <h1>
-            Newsletter & Communications
+            Newsletter Studio
           </h1>
 
           <p>
-            Manage subscribers, prepare
-            newsletters and monitor
-            communication activity across
-            the Continental Founders
-            ecosystem.
+            Stories, updates and opportunities for the Continental Founders community.
           </p>
         </div>
 
@@ -1789,6 +1844,7 @@ export default function AdminNewsletter() {
             type="button"
             className="admin-newsletter__button admin-newsletter__button--primary"
             onClick={() => {
+              resetCampaign();
               setActiveTab(
                 "create"
               );
@@ -1845,6 +1901,7 @@ export default function AdminNewsletter() {
                     : ""
                 }`}
                 onClick={() => {
+                  if (tab.id === "create" && activeTab !== "create") resetCampaign();
                   setActiveTab(
                     tab.id
                   );
@@ -2024,6 +2081,56 @@ export default function AdminNewsletter() {
           )}
         </section>
 
+
+        <section className="admin-newsletter__panel admin-newsletter__overview-campaigns">
+          <div className="admin-newsletter__section-head">
+            <div>
+              <span className="admin-newsletter__section-label">CAMPAIGNS</span>
+              <h2>Recent campaigns</h2>
+              <p>Your latest newsletter activity in one place.</p>
+            </div>
+            <button
+              type="button"
+              className="admin-newsletter__text-button"
+              onClick={() => setActiveTab("campaigns")}
+            >
+              View all <ChevronRight size={16} />
+            </button>
+          </div>
+          {campaigns.length === 0 ? (
+            <div className="admin-newsletter__campaign-empty admin-newsletter__campaign-empty--compact">
+              <div className="admin-newsletter__campaign-empty-icon"><Mail size={24} /></div>
+              <h3>Your campaigns will appear here</h3>
+              <p>Create your first newsletter to begin building your communications archive.</p>
+              <button
+                type="button"
+                className="admin-newsletter__button admin-newsletter__button--primary"
+                onClick={() => { resetCampaign(); setActiveTab("create"); }}
+              >
+                <Plus size={16} /> Create newsletter
+              </button>
+            </div>
+          ) : (
+            <div className="admin-newsletter__campaign-list">
+              {campaigns.slice(0, 3).map((campaign) => (
+                <article key={campaign.id} className="admin-newsletter__campaign-card">
+                  <span className="admin-newsletter__campaign-card-icon"><Mail size={19} /></span>
+                  <div className="admin-newsletter__campaign-card-copy">
+                    <h3>{campaign.title || "Untitled Newsletter"}</h3>
+                    <p>{campaign.subject || "No email subject"}</p>
+                  </div>
+                  <span className="admin-newsletter__status">
+                    {campaign.status || "Draft"}
+                  </span>
+                  <div className="admin-newsletter__campaign-card-meta">
+                    <strong>{formatNumber(campaign.recipientCount || campaign.recipients || 0)}</strong>
+                    <span>recipients</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
         <div className="admin-newsletter__overview-grid">
           <section className="admin-newsletter__panel">
@@ -2603,136 +2710,68 @@ export default function AdminNewsletter() {
   ========================================================== */
 
   function renderCampaigns() {
+    const visible = campaigns.filter((campaign) => {
+      const matchesStatus = campaignStatus === "all" || campaign.status === campaignStatus;
+      const query = campaignSearch.trim().toLowerCase();
+      return matchesStatus && (!query || `${campaign.title} ${campaign.subject}`.toLowerCase().includes(query));
+    });
     return (
       <section className="admin-newsletter__panel">
         <div className="admin-newsletter__section-head">
-          <div>
-            <span className="admin-newsletter__section-label">
-              CAMPAIGNS
-            </span>
-
-            <h2>
-              Newsletter Campaigns
-            </h2>
-
-            <p>
-              Create, review and manage
-              Continental Founders
-              newsletters.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            className="admin-newsletter__button admin-newsletter__button--primary"
-            onClick={() => {
-              resetCampaign();
-
-              setActiveTab(
-                "create"
-              );
-            }}
-          >
-            <Plus
-              size={16}
-            />
-
-            New Newsletter
-          </button>
+          <div><span className="admin-newsletter__section-label">CAMPAIGNS</span>
+            <h2>Newsletter campaigns</h2>
+            <p>Manage drafts, scheduled messages and completed sends.</p></div>
+          <button type="button" className="admin-newsletter__button admin-newsletter__button--primary"
+            onClick={() => { resetCampaign(); setActiveTab("create"); }}><Plus size={16} /> New newsletter</button>
         </div>
-
-
-        {campaigns.length ===
-        0 ? (
+        <div className="admin-newsletter__toolbar">
+          <label className="admin-newsletter__search"><Search size={17} />
+            <input value={campaignSearch} onChange={(event) => setCampaignSearch(event.target.value)}
+              placeholder="Search campaigns" aria-label="Search campaigns" /></label>
+          <label className="admin-newsletter__filter">
+            <span className="admin-newsletter__sr-only">Campaign status</span>
+            <select value={campaignStatus} onChange={(event) => setCampaignStatus(event.target.value)}>
+              <option value="all">All statuses</option><option value="draft">Drafts</option>
+              <option value="scheduled">Scheduled</option><option value="sending">Sending</option>
+              <option value="sent">Sent</option><option value="failed">Failed</option>
+            </select>
+          </label>
+        </div>
+        {visible.length === 0 ? (
           <div className="admin-newsletter__campaign-empty">
-            <div className="admin-newsletter__campaign-empty-icon">
-              <Megaphone
-                size={30}
-              />
-            </div>
-
-            <span className="admin-newsletter__section-label">
-              NEWSLETTER CAMPAIGNS
-            </span>
-
-            <h3>
-              No campaigns yet
-            </h3>
-
-            <p>
-              Your newsletter campaigns
-              will appear here after campaign
-              storage is connected and the
-              first newsletter is saved.
-            </p>
-
-            <button
-              type="button"
-              className="admin-newsletter__button admin-newsletter__button--primary"
-              onClick={() => {
-                resetCampaign();
-
-                setActiveTab(
-                  "create"
-                );
-              }}
-            >
-              <Plus
-                size={16}
-              />
-
-              Create First Newsletter
-            </button>
+            <div className="admin-newsletter__campaign-empty-icon"><Megaphone size={30} /></div>
+            <h3>{campaigns.length ? "No campaigns match your filters" : "No campaigns yet"}</h3>
+            <p>{campaigns.length ? "Try another search or status." : "Create a newsletter to get started."}</p>
           </div>
         ) : (
           <div className="admin-newsletter__campaign-list">
-            {campaigns.map(
-              (campaign) => (
-                <article
-                  key={
-                    campaign.id
-                  }
-                  className="admin-newsletter__campaign-card"
-                >
-                  <div className="admin-newsletter__campaign-card-icon">
-                    <Mail
-                      size={19}
-                    />
-                  </div>
-
-                  <div className="admin-newsletter__campaign-card-copy">
-                    <span>
-                      {campaign.status ||
-                        "Draft"}
-                    </span>
-
-                    <h3>
-                      {campaign.title ||
-                        "Untitled Newsletter"}
-                    </h3>
-
-                    <p>
-                      {campaign.subject ||
-                        "No email subject"}
-                    </p>
-                  </div>
-
-                  <div className="admin-newsletter__campaign-card-meta">
-                    <strong>
-                      {formatNumber(
-                        campaign.recipientCount ||
-                          campaign.recipients ||
-                          0
-                      )}
-                    </strong>
-
-                    <span>
-                      recipients
-                    </span>
-                  </div>
-                </article>
-              )
-            )}
+            {visible.map((campaign) => (
+              <article key={campaign.id} className="admin-newsletter__campaign-card">
+                <div className="admin-newsletter__campaign-card-icon"><Mail size={19} /></div>
+                <div className="admin-newsletter__campaign-card-copy">
+                  <span className={`admin-newsletter__campaign-status admin-newsletter__campaign-status--${campaign.status}`}>
+                    {campaign.status || "draft"}</span>
+                  <h3>{campaign.title || "Untitled Newsletter"}</h3>
+                  <p>{campaign.subject || "No email subject"}</p>
+                  <small>{campaign.scheduledAt ? `Scheduled: ${formatDateTime(campaign.scheduledAt)}` :
+                    campaign.sentAt ? `Sent: ${formatDateTime(campaign.sentAt)}` :
+                    `Updated: ${formatDate(campaign.updatedAt || campaign.createdAt)}`}</small>
+                </div>
+                <div className="admin-newsletter__campaign-card-meta">
+                  <strong>{formatNumber(campaign.recipientCount || 0)}</strong><span>recipients</span>
+                </div>
+                <div className="admin-newsletter__campaign-actions">
+                  {(campaign.status === "draft" || campaign.status === "scheduled") &&
+                    <button type="button" onClick={() => editCampaign(campaign)}>Edit</button>}
+                  {campaign.status === "scheduled" &&
+                    <button type="button" onClick={() => campaignAction("cancel", campaign)}>Cancel schedule</button>}
+                  <button type="button" onClick={() => campaignAction("duplicate", campaign)}>Duplicate</button>
+                  {campaign.status !== "sending" &&
+                    <button type="button" className="admin-newsletter__danger-text"
+                      onClick={() => campaignAction("delete", campaign)}>Delete</button>}
+                </div>
+              </article>
+            ))}
           </div>
         )}
       </section>
@@ -3005,14 +3044,27 @@ export default function AdminNewsletter() {
     return (
       <div className="admin-newsletter__wizard-content-stack">
         <section className="admin-newsletter__card admin-newsletter__wizard-card">
+          <div className="admin-newsletter__form-heading"><span>START</span><div>
+            <h3>Name your newsletter</h3><p>These details are needed to save a draft.</p>
+          </div></div>
+          <div className="admin-newsletter__form-grid admin-newsletter__form-grid--two">
+            <label className="admin-newsletter__field"><span>Newsletter title *</span>
+              <input value={campaignForm.title} onChange={(event) => updateCampaignField("title", event.target.value)}
+                placeholder="Continental Founders update" /></label>
+            <label className="admin-newsletter__field"><span>Email subject *</span>
+              <input value={campaignForm.subject} onChange={(event) => updateCampaignField("subject", event.target.value)}
+                placeholder="This month's stories and opportunities" /></label>
+          </div>
+        </section>
+        <section className="admin-newsletter__card admin-newsletter__wizard-card">
           <div className="admin-newsletter__form-heading">
             <span>
-              02
+              01
             </span>
 
             <div>
               <h3>
-                Content & Design
+                Design your newsletter
               </h3>
 
               <p>
@@ -4213,10 +4265,10 @@ export default function AdminNewsletter() {
   function renderWizardStep() {
     switch (wizardStep) {
       case 1:
-        return renderDetailsStep();
+        return renderContentStep();
 
       case 2:
-        return renderContentStep();
+        return renderDetailsStep();
 
       case 3:
         return renderAudienceStep();
@@ -4406,7 +4458,7 @@ export default function AdminNewsletter() {
               )}
 
               {sendingCampaign
-                ? "Preparing..."
+                ? "Sending..."
                 : "Send Newsletter"}
             </button>
           )}
@@ -4434,9 +4486,8 @@ export default function AdminNewsletter() {
             </h2>
 
             <p>
-              Build your newsletter step
-              by step, review it and
-              prepare it for delivery.
+              Start with your message and see the design take shape as you write.
+              Then add email details, choose your audience and review before sending.
             </p>
           </div>
 
@@ -4505,7 +4556,37 @@ export default function AdminNewsletter() {
             </strong>
           </div>
 
-          {renderWizardStep()}
+          <div className={wizardStep === 1 ? "admin-newsletter__editor-layout" : ""}>
+            <div className="admin-newsletter__editor-fields">{renderWizardStep()}</div>
+            {wizardStep === 1 && (
+              <aside className="admin-newsletter__live-preview" aria-label="Live newsletter preview">
+                <div className="admin-newsletter__live-preview-heading">
+                  <span>LIVE PREVIEW</span>
+                  <button type="button" className="admin-newsletter__text-button" onClick={() => setPreviewOpen(true)}>
+                    <Eye size={15} /> Full preview
+                  </button>
+                </div>
+                <div className="admin-newsletter__live-email">
+                  <div className="admin-newsletter__live-email-brand">CONTINENTAL FOUNDERS</div>
+                  {(featuredImagePreview || campaignForm.featuredImage) && (
+                    <img src={featuredImagePreview || campaignForm.featuredImage} alt="Newsletter featured" />
+                  )}
+                  <div className="admin-newsletter__live-email-body">
+                    <span>INSIGHTS & NEWS</span>
+                    <h3>{campaignForm.title || "Your newsletter title"}</h3>
+                    <p className="admin-newsletter__live-email-intro">{campaignForm.previewText || "A preview of your message will appear here as you write."}</p>
+                    <div className="admin-newsletter__live-email-content">
+                      {campaignForm.content ? campaignForm.content.split(/\n{2,}/).filter(Boolean).map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                      )) : <p>Your story starts here. Add your message on the left.</p>}
+                    </div>
+                    {campaignForm.ctaText && <span className="admin-newsletter__live-email-cta">{campaignForm.ctaText}</span>}
+                  </div>
+                  <div className="admin-newsletter__live-email-footer">Continental Founders · Empowering global founders</div>
+                </div>
+              </aside>
+            )}
+          </div>
         </div>
 
 
@@ -4517,130 +4598,33 @@ export default function AdminNewsletter() {
   ========================================================== */
 
   function renderAnalytics() {
-    const analyticsCards = [
-      {
-        label:
-          "Campaigns Sent",
-        value: 0,
-        helper:
-          "No completed campaigns yet",
-        icon: Send,
-      },
-      {
-        label:
-          "Emails Delivered",
-        value: 0,
-        helper:
-          "Delivery tracking not connected",
-        icon: MailCheck,
-      },
-      {
-        label:
-          "Email Opens",
-        value: 0,
-        helper:
-          "Open tracking not connected",
-        icon: Eye,
-      },
-      {
-        label:
-          "Link Clicks",
-        value: 0,
-        helper:
-          "Click tracking not connected",
-        icon:
-          MousePointerClick,
-      },
+    const cards = [
+      { label: "Campaigns sent", value: analytics?.sentCampaigns, icon: Send },
+      { label: "Emails accepted", value: analytics?.deliveredCount, icon: MailCheck },
+      { label: "Failed sends", value: analytics?.failedCount, icon: XCircle },
+      { label: "Active subscribers", value: analytics?.activeSubscribers, icon: Users },
     ];
-
-
-    return (
-      <div className="admin-newsletter__analytics">
-        <section className="admin-newsletter__stats-grid">
-          {analyticsCards.map(
-            (card) => {
-              const Icon =
-                card.icon;
-
-              return (
-                <article
-                  key={
-                    card.label
-                  }
-                  className="admin-newsletter__stat-card"
-                >
-                  <div className="admin-newsletter__stat-icon">
-                    <Icon
-                      size={19}
-                    />
-                  </div>
-
-                  <div className="admin-newsletter__stat-copy">
-                    <span>
-                      {card.label}
-                    </span>
-
-                    <strong>
-                      {formatNumber(
-                        card.value
-                      )}
-                    </strong>
-
-                    <small>
-                      {card.helper}
-                    </small>
-                  </div>
-                </article>
-              );
-            }
-          )}
-        </section>
-
-
-        <section className="admin-newsletter__panel">
-          <div className="admin-newsletter__section-head">
-            <div>
-              <span className="admin-newsletter__section-label">
-                PERFORMANCE
-              </span>
-
-              <h2>
-                Newsletter Analytics
-              </h2>
-
-              <p>
-                Campaign delivery,
-                engagement and subscriber
-                activity will appear here
-                after newsletter delivery
-                tracking is connected.
-              </p>
-            </div>
-          </div>
-
-
-          <div className="admin-newsletter__analytics-empty">
-            <div className="admin-newsletter__analytics-empty-icon">
-              <BarChart3
-                size={30}
-              />
-            </div>
-
-            <h3>
-              Analytics will appear here
-            </h3>
-
-            <p>
-              Delivery, open and click
-              statistics will become
-              available once real campaign
-              sending and provider event
-              tracking are connected.
-            </p>
-          </div>
-        </section>
-      </div>
-    );
+    return <div className="admin-newsletter__analytics">
+      <section className="admin-newsletter__stats-grid">{cards.map((card) => {
+        const Icon = card.icon;
+        return <article className="admin-newsletter__stat-card" key={card.label}>
+          <div className="admin-newsletter__stat-icon"><Icon size={19} /></div>
+          <div className="admin-newsletter__stat-copy"><span>{card.label}</span>
+            <strong>{card.value == null ? "—" : formatNumber(card.value)}</strong></div>
+        </article>;
+      })}</section>
+      <section className="admin-newsletter__panel">
+        <div className="admin-newsletter__section-head"><div>
+          <span className="admin-newsletter__section-label">PERFORMANCE</span><h2>Campaign insights</h2>
+          <p>Sending totals come from recorded campaign attempts.</p></div>
+          <button type="button" className="admin-newsletter__button admin-newsletter__button--secondary"
+            onClick={loadCampaignData}><RefreshCcw size={16} /> Refresh</button></div>
+        <div className="admin-newsletter__analytics-empty"><div className="admin-newsletter__analytics-empty-icon">
+          <BarChart3 size={30} /></div><h3>Open and click tracking is not connected</h3>
+          <p>Delivery counts are available above. Opens and clicks require provider event webhooks, so this page does not invent those numbers.</p>
+        </div>
+      </section>
+    </div>;
   }
 
 

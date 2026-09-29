@@ -551,6 +551,17 @@ export default function AdminGallery() {
   ] = useState([]);
 
   const [
+    uploadProgress,
+    setUploadProgress,
+  ] = useState({
+    total: 0,
+    completed: 0,
+    successful: 0,
+    failed: 0,
+    currentName: "",
+  });
+
+  const [
     submitting,
     setSubmitting,
   ] = useState(false);
@@ -646,25 +657,9 @@ export default function AdminGallery() {
 
 
   // ==========================================================
-  // CLEAN OBJECT URLS
+  // PREVIEW CLEANUP
+  // Object URLs are revoked when a file is removed or the modal closes.
   // ==========================================================
-
-  useEffect(() => {
-    return () => {
-      files.forEach(
-        (item) => {
-          if (
-            item.preview
-          ) {
-            URL.revokeObjectURL(
-              item.preview
-            );
-          }
-        }
-      );
-    };
-  }, [files]);
-
 
   // ==========================================================
   // CATEGORIES
@@ -940,67 +935,47 @@ export default function AdminGallery() {
 
   const handleFiles =
     (incomingFiles) => {
-      const selected =
-        Array.from(
-          incomingFiles ||
-          []
-        );
+      const selected = Array.from(incomingFiles || []);
 
-      if (
-        selected.length ===
-        0
-      ) {
+      if (selected.length === 0) {
         return;
       }
 
-      const validFiles = [];
-      const errors = [];
+      setError("");
 
-      selected.forEach(
-        (file) => {
-          const result =
-            validateFile(
-              file
-            );
+      setFiles((current) => {
+        const existingIds = new Set(
+          current.map((item) => item.id)
+        );
 
-          if (
-            !result.valid
-          ) {
-            errors.push(
-              `${file.name}: ${result.message}`
-            );
+        const validFiles = [];
+        const errors = [];
 
+        selected.forEach((file) => {
+          const result = validateFile(file);
+          const fileId = `${file.name}-${file.size}-${file.lastModified}`;
+
+          if (!result.valid) {
+            errors.push(`${file.name}: ${result.message}`);
             return;
           }
 
-          validFiles.push(
-            createLocalFile(
-              file
-            )
-          );
+          if (existingIds.has(fileId)) {
+            errors.push(`${file.name}: already selected.`);
+            return;
+          }
+
+          const localFile = createLocalFile(file);
+          existingIds.add(localFile.id);
+          validFiles.push(localFile);
+        });
+
+        if (errors.length > 0) {
+          setError(errors.join(" "));
         }
-      );
 
-      if (
-        errors.length >
-        0
-      ) {
-        setError(
-          errors.join(" ")
-        );
-      }
-
-      if (
-        validFiles.length >
-        0
-      ) {
-        setFiles(
-          (current) => [
-            ...current,
-            ...validFiles,
-          ]
-        );
-      }
+        return [...current, ...validFiles];
+      });
     };
 
 
@@ -1089,6 +1064,14 @@ export default function AdminGallery() {
 
       setFiles([]);
 
+      setUploadProgress({
+        total: 0,
+        completed: 0,
+        successful: 0,
+        failed: 0,
+        currentName: "",
+      });
+
       setEditItem(null);
 
       setError("");
@@ -1124,6 +1107,14 @@ export default function AdminGallery() {
         EMPTY_FORM
       );
 
+      setUploadProgress({
+        total: 0,
+        completed: 0,
+        successful: 0,
+        failed: 0,
+        currentName: "",
+      });
+
       setUploadOpen(false);
     };
 
@@ -1135,143 +1126,128 @@ export default function AdminGallery() {
   const handleCreate =
     async (event) => {
       event.preventDefault();
-
       setError("");
 
-      if (
-        files.length ===
-        0
-      ) {
-        setError(
-          "Select at least one photo."
-        );
-
+      if (files.length === 0) {
+        setError("Select at least one photo.");
         return;
       }
 
-      if (
-        !cleanString(
-          form.title
-        )
-      ) {
-        setError(
-          "Enter a title."
-        );
-
+      if (!cleanString(form.title)) {
+        setError("Enter a title.");
         return;
       }
 
-      if (
-        !cleanString(
-          form.category
-        )
-      ) {
-        setError(
-          "Enter a category."
-        );
-
+      if (!cleanString(form.category)) {
+        setError("Enter a category.");
         return;
       }
 
       setSubmitting(true);
+      setUploadProgress({
+        total: files.length,
+        completed: 0,
+        successful: 0,
+        failed: 0,
+        currentName: "",
+      });
+
+      const failures = [];
+      let successful = 0;
 
       try {
-        /*
-         * Each selected image becomes
-         * its own gallery record.
-         *
-         * This allows each image to be
-         * edited, published or deleted
-         * independently later.
-         */
+        for (let index = 0; index < files.length; index += 1) {
+          const item = files[index];
 
-        for (
-          const item of files
-        ) {
-          const body =
-            new FormData();
+          setUploadProgress((current) => ({
+            ...current,
+            currentName: item.file.name,
+          }));
 
-          body.append(
-            "image",
-            item.file
-          );
+          const body = new FormData();
+          body.append("image", item.file);
+          body.append("title", cleanString(form.title));
+          body.append("caption", cleanString(form.caption));
+          body.append("category", cleanString(form.category));
+          body.append("status", form.status);
+          body.append("altText", cleanString(form.altText));
 
-          body.append(
-            "title",
-            cleanString(
-              form.title
-            )
-          );
-
-          body.append(
-            "caption",
-            cleanString(
-              form.caption
-            )
-          );
-
-          body.append(
-            "category",
-            cleanString(
-              form.category
-            )
-          );
-
-          body.append(
-            "status",
-            form.status
-          );
-
-          body.append(
-            "altText",
-            cleanString(
-              form.altText
-            )
-          );
-
-          if (
-            form.eventDate
-          ) {
-            body.append(
-              "eventDate",
-              form.eventDate
-            );
+          if (form.eventDate) {
+            body.append("eventDate", form.eventDate);
           }
 
-          await request(
-            "/api/gallery/admin",
-            {
-              method:
-                "POST",
-
+          try {
+            await request("/api/gallery/admin", {
+              method: "POST",
               body,
-            }
-          );
+            });
+
+            successful += 1;
+            setUploadProgress((current) => ({
+              ...current,
+              completed: current.completed + 1,
+              successful: current.successful + 1,
+            }));
+          } catch (requestError) {
+            failures.push({
+              name: item.file.name,
+              message: requestError?.message || "Upload failed.",
+            });
+
+            setUploadProgress((current) => ({
+              ...current,
+              completed: current.completed + 1,
+              failed: current.failed + 1,
+            }));
+          }
         }
 
-        setSuccess(
-          files.length === 1
-            ? "Photo uploaded successfully."
-            : `${files.length} photos uploaded successfully.`
-        );
+        if (successful > 0) {
+          await loadGallery();
+        }
 
-        closeUpload();
+        if (failures.length === 0) {
+          setSuccess(
+            successful === 1
+              ? "Photo uploaded successfully."
+              : `${successful} photos uploaded successfully.`
+          );
 
-        await loadGallery();
-      } catch (
-        requestError
-      ) {
-        console.error(
-          "Gallery upload error:",
-          requestError
-        );
+          files.forEach((item) => {
+            if (item.preview) URL.revokeObjectURL(item.preview);
+          });
 
-        setError(
-          requestError?.message ||
-          "Unable to upload photo."
-        );
+          setFiles([]);
+          setForm(EMPTY_FORM);
+          setUploadOpen(false);
+        } else {
+          setSuccess(
+            successful > 0
+              ? `${successful} of ${files.length} photos uploaded successfully.`
+              : ""
+          );
+
+          setError(
+            `${failures.length} photo${failures.length === 1 ? "" : "s"} failed: ` +
+              failures.map((item) => `${item.name} (${item.message})`).join("; ")
+          );
+
+          const failedNames = new Set(failures.map((item) => item.name));
+          setFiles((current) => {
+            current.forEach((item) => {
+              if (!failedNames.has(item.file.name) && item.preview) {
+                URL.revokeObjectURL(item.preview);
+              }
+            });
+            return current.filter((item) => failedNames.has(item.file.name));
+          });
+        }
       } finally {
         setSubmitting(false);
+        setUploadProgress((current) => ({
+          ...current,
+          currentName: "",
+        }));
       }
     };
 
@@ -2800,12 +2776,18 @@ export default function AdminGallery() {
                 ) =>
                   event.preventDefault()
                 }
-                onDrop={
-                  handleDrop
-                }
-                onClick={() =>
-                  fileInputRef.current?.click()
-                }
+                onDrop={(event) => {
+                  if (submitting) {
+                    event.preventDefault();
+                    return;
+                  }
+                  handleDrop(event);
+                }}
+                onClick={() => {
+                  if (!submitting) {
+                    fileInputRef.current?.click();
+                  }
+                }}
               >
 
                 <Upload
@@ -2837,6 +2819,7 @@ export default function AdminGallery() {
                   onChange={
                     handleFileInput
                   }
+                  disabled={submitting}
                 />
 
               </div>
@@ -2868,6 +2851,7 @@ export default function AdminGallery() {
                               item.id
                             )
                           }
+                          disabled={submitting}
                         >
                           <X
                             size={13}
@@ -2884,12 +2868,45 @@ export default function AdminGallery() {
                     onClick={() =>
                       fileInputRef.current?.click()
                     }
+                    disabled={submitting}
                   >
                     <Plus
                       size={22}
                     />
                   </button>
 
+                </div>
+              )}
+
+              {files.length > 0 && (
+                <div className="admin-gallery-upload__summary">
+                  <span>
+                    {files.length} photo{files.length === 1 ? "" : "s"} selected
+                  </span>
+                  <span>Maximum 10MB per image</span>
+                </div>
+              )}
+
+              {submitting && uploadProgress.total > 0 && (
+                <div className="admin-gallery-upload__progress" aria-live="polite">
+                  <div className="admin-gallery-upload__progress-head">
+                    <strong>Uploading photos</strong>
+                    <span>
+                      {uploadProgress.completed} / {uploadProgress.total}
+                    </span>
+                  </div>
+                  <div className="admin-gallery-upload__progress-track">
+                    <span
+                      style={{
+                        width: `${Math.round((uploadProgress.completed / uploadProgress.total) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <small>
+                    {uploadProgress.currentName
+                      ? `Uploading ${uploadProgress.currentName}`
+                      : "Finishing upload..."}
+                  </small>
                 </div>
               )}
 
@@ -3107,7 +3124,9 @@ export default function AdminGallery() {
                       size={17}
                     />
 
-                    Upload Photos
+                    {files.length > 1
+                      ? `Upload ${files.length} Photos`
+                      : "Upload Photo"}
                   </>
                 )}
               </button>

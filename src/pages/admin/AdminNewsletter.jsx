@@ -63,8 +63,10 @@ import "./AdminNewsletter.css";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "campaigns", label: "Newsletters", icon: Megaphone },
   { id: "subscribers", label: "Subscribers", icon: Users },
+  { id: "campaigns", label: "Campaigns", icon: Megaphone },
+  { id: "create", label: "Create Newsletter", icon: Plus },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 
@@ -2036,391 +2038,75 @@ export default function AdminNewsletter() {
 
   function renderOverview() {
     const overviewCards = [
-      {
-        label:
-          "Total Subscribers",
-        value:
-          statistics.total,
-        helper:
-          "All newsletter contacts",
-        icon: Users,
-      },
-      {
-        label:
-          "Active Subscribers",
-        value:
-          statistics.subscribed,
-        helper:
-          `${statistics.activeRate}% of total contacts`,
-        icon: UserCheck,
-      },
-      {
-        label:
-          "Unsubscribed",
-        value:
-          statistics.unsubscribed,
-        helper:
-          "Inactive newsletter contacts",
-        icon: UserX,
-      },
-      {
-        label:
-          "Campaigns",
-        value:
-          campaigns.length,
-        helper:
-          "Newsletter campaigns",
-        icon: Megaphone,
-      },
+      { label: "Total subscribers", value: statistics.total, helper: "All contacts", icon: Users },
+      { label: "Active subscribers", value: statistics.subscribed, helper: `${statistics.activeRate}% of contacts`, icon: UserCheck },
+      { label: "Unsubscribed", value: statistics.unsubscribed, helper: "Inactive contacts", icon: UserX },
+      { label: "Campaigns", value: campaigns.length, helper: "All campaigns", icon: FileText },
     ];
 
     return (
       <div className="admin-newsletter__overview">
-        <section className="admin-newsletter__stats-grid">
-          {overviewCards.map(
-            (card) => {
-              const Icon =
-                card.icon;
+        <div className="admin-newsletter__overview-main">
+          <section className="admin-newsletter__stats-grid" aria-label="Newsletter statistics">
+            {overviewCards.map(({ label, value, helper, icon: Icon }) => (
+              <article className="admin-newsletter__stat-card" key={label}>
+                <span className="admin-newsletter__stat-icon"><Icon size={22} /></span>
+                <div className="admin-newsletter__stat-copy">
+                  <span>{label}</span>
+                  <strong>{formatNumber(value)}</strong>
+                  <small>{helper}</small>
+                </div>
+              </article>
+            ))}
+          </section>
 
-              return (
-                <article
-                  key={
-                    card.label
-                  }
-                  className="admin-newsletter__stat-card"
-                >
-                  <div className="admin-newsletter__stat-icon">
-                    <Icon
-                      size={19}
-                    />
-                  </div>
-
-                  <div className="admin-newsletter__stat-copy">
-                    <span>
-                      {card.label}
-                    </span>
-
-                    <strong>
-                      {formatNumber(
-                        card.value
-                      )}
-                    </strong>
-
-                    <small>
-                      {card.helper}
-                    </small>
-                  </div>
-                </article>
-              );
-            }
-          )}
-        </section>
-
-
-        <section className="admin-newsletter__panel admin-newsletter__overview-campaigns">
-          <div className="admin-newsletter__section-head">
-            <div>
-              <span className="admin-newsletter__section-label">CAMPAIGNS</span>
-              <h2>Recent campaigns</h2>
-              <p>Your latest newsletter activity in one place.</p>
-            </div>
-            <button
-              type="button"
-              className="admin-newsletter__text-button"
-              onClick={() => setActiveTab("campaigns")}
-            >
-              View all <ChevronRight size={16} />
-            </button>
-          </div>
-          {campaigns.length === 0 ? (
-            <div className="admin-newsletter__campaign-empty admin-newsletter__campaign-empty--compact">
-              <div className="admin-newsletter__campaign-empty-icon"><Mail size={24} /></div>
-              <h3>Your campaigns will appear here</h3>
-              <p>Create your first newsletter to begin building your communications archive.</p>
-              <button
-                type="button"
-                className="admin-newsletter__button admin-newsletter__button--primary"
-                onClick={() => { resetCampaign(); setActiveTab("create"); }}
-              >
-                <Plus size={16} /> Create newsletter
-              </button>
-            </div>
-          ) : (
-            <div className="admin-newsletter__campaign-list">
-              {campaigns.slice(0, 3).map((campaign) => (
-                <article key={campaign.id} className="admin-newsletter__campaign-card">
-                  <span className="admin-newsletter__campaign-card-icon"><Mail size={19} /></span>
-                  <div className="admin-newsletter__campaign-card-copy">
-                    <h3>{campaign.title || "Untitled Newsletter"}</h3>
-                    <p>{campaign.subject || "No email subject"}</p>
-                  </div>
-                  <span className="admin-newsletter__status">
-                    {campaign.status || "Draft"}
-                  </span>
-                  <div className="admin-newsletter__campaign-card-meta">
-                    <strong>{formatNumber(campaign.recipientCount || campaign.recipients || 0)}</strong>
-                    <span>recipients</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <div className="admin-newsletter__overview-grid">
-          <section className="admin-newsletter__panel">
+          <section className="admin-newsletter__panel admin-newsletter__overview-campaigns">
             <div className="admin-newsletter__section-head">
-              <div>
-                <span className="admin-newsletter__section-label">
-                  SUBSCRIBERS
-                </span>
-
-                <h2>
-                  Recent Subscribers
-                </h2>
-
-                <p>
-                  The latest contacts
-                  joining Continental
-                  Founders communications.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                className="admin-newsletter__text-button"
-                onClick={() =>
-                  setActiveTab(
-                    "subscribers"
-                  )
-                }
-              >
-                View all
-              </button>
+              <div><h2>Recent campaigns</h2></div>
+              <button type="button" className="admin-newsletter__text-button" onClick={() => setActiveTab("campaigns")}>View all campaigns <ChevronRight size={17} /></button>
             </div>
-
-
-            {loading ? (
-              <div className="admin-newsletter__state">
-                <Loader2
-                  size={22}
-                  className="admin-newsletter__spin"
-                />
-
-                <strong>
-                  Loading subscribers...
-                </strong>
-              </div>
-            ) : recentSubscribers.length ===
-              0 ? (
-              <div className="admin-newsletter__state">
-                <Users
-                  size={24}
-                />
-
-                <strong>
-                  No subscribers yet
-                </strong>
-
-                <p>
-                  New subscribers will
-                  appear here when people
-                  join your newsletter.
-                </p>
+            {campaigns.length === 0 ? (
+              <div className="admin-newsletter__campaign-empty admin-newsletter__campaign-empty--compact">
+                <div className="admin-newsletter__campaign-empty-icon"><Mail size={24} /></div>
+                <h3>Your campaigns will appear here</h3>
+                <p>Create your first newsletter to build your communications archive.</p>
+                <button type="button" className="admin-newsletter__button admin-newsletter__button--primary" onClick={() => { resetCampaign(); setActiveTab("create"); }}><Plus size={16} /> Create newsletter</button>
               </div>
             ) : (
-              <div className="admin-newsletter__recent-list">
-                {recentSubscribers.map(
-                  (
-                    subscriber
-                  ) => {
-                    const status =
-                      getSubscriberStatus(
-                        subscriber
-                      );
-
-                    return (
-                      <div
-                        key={
-                          getSubscriberId(
-                            subscriber
-                          )
-                        }
-                        className="admin-newsletter__recent-item"
-                      >
-                        <div className="admin-newsletter__subscriber-avatar">
-                          {(
-                            getSubscriberName(
-                              subscriber
-                            ) ||
-                            getSubscriberEmail(
-                              subscriber
-                            ) ||
-                            "S"
-                          )
-                            .charAt(0)
-                            .toUpperCase()}
-                        </div>
-
-                        <div className="admin-newsletter__recent-copy">
-                          <strong>
-                            {getSubscriberName(
-                              subscriber
-                            ) ||
-                              "Subscriber"}
-                          </strong>
-
-                          <span>
-                            {getSubscriberEmail(
-                              subscriber
-                            )}
-                          </span>
-                        </div>
-
-                        <div className="admin-newsletter__recent-meta">
-                          <span
-                            className={`admin-newsletter__status admin-newsletter__status--${status}`}
-                          >
-                            {status ===
-                            "subscribed"
-                              ? "Subscribed"
-                              : "Unsubscribed"}
-                          </span>
-
-                          <small>
-                            {formatDate(
-                              getSubscriberCreatedAt(
-                                subscriber
-                              )
-                            )}
-                          </small>
-                        </div>
-                      </div>
-                    );
-                  }
-                )}
+              <div className="admin-newsletter__campaign-table-wrap">
+                <table className="admin-newsletter__campaign-table">
+                  <thead><tr><th scope="col">Campaign</th><th scope="col">Audience</th><th scope="col">Status</th><th scope="col">Date</th></tr></thead>
+                  <tbody>{campaigns.slice(0, 4).map((campaign) => (
+                    <tr key={campaign.id}>
+                      <td><div className="admin-newsletter__campaign-title-cell">
+                        {campaign.featuredImage ? <img src={campaign.featuredImage} alt="" /> : <span className="admin-newsletter__campaign-thumb"><Mail size={20} /></span>}
+                        <div><strong>{campaign.title || "Untitled Newsletter"}</strong><small>{campaign.subject || "No email subject"}</small></div>
+                      </div></td>
+                      <td>{formatAudience(campaign.audience)}<small>{formatNumber(campaign.recipientCount || campaign.recipients || 0)} recipients</small></td>
+                      <td><span className={`admin-newsletter__campaign-status admin-newsletter__campaign-status--${campaign.status || "draft"}`}>{campaign.status || "draft"}</span></td>
+                      <td>{formatDate(campaign.sentAt || campaign.scheduledAt || campaign.updatedAt || campaign.createdAt)}</td>
+                    </tr>
+                  ))}</tbody>
+                </table>
               </div>
             )}
           </section>
-
-
-          <section className="admin-newsletter__panel admin-newsletter__quick-panel">
-            <div className="admin-newsletter__section-head">
-              <div>
-                <span className="admin-newsletter__section-label">
-                  COMMUNICATIONS
-                </span>
-
-                <h2>
-                  Quick Actions
-                </h2>
-
-                <p>
-                  Prepare and manage
-                  newsletter communication.
-                </p>
-              </div>
-            </div>
-
-
-            <div className="admin-newsletter__quick-actions">
-              <button
-                type="button"
-                className="admin-newsletter__quick-action"
-                onClick={() => {
-                  resetCampaign();
-
-                  setActiveTab(
-                    "create"
-                  );
-                }}
-              >
-                <span className="admin-newsletter__quick-action-icon">
-                  <Plus
-                    size={20}
-                  />
-                </span>
-
-                <span>
-                  <strong>
-                    Create Newsletter
-                  </strong>
-
-                  <small>
-                    Start a new
-                    communication
-                  </small>
-                </span>
-
-                <ChevronRight
-                  size={17}
-                />
-              </button>
-
-
-              <button
-                type="button"
-                className="admin-newsletter__quick-action"
-                onClick={() =>
-                  setActiveTab(
-                    "subscribers"
-                  )
-                }
-              >
-                <span className="admin-newsletter__quick-action-icon">
-                  <Users
-                    size={20}
-                  />
-                </span>
-
-                <span>
-                  <strong>
-                    Manage Subscribers
-                  </strong>
-
-                  <small>
-                    Review active and
-                    inactive contacts
-                  </small>
-                </span>
-
-                <ChevronRight
-                  size={17}
-                />
-              </button>
-
-
-              <button
-                type="button"
-                className="admin-newsletter__quick-action"
-                onClick={
-                  handleExportSubscribers
-                }
-              >
-                <span className="admin-newsletter__quick-action-icon">
-                  <Download
-                    size={20}
-                  />
-                </span>
-
-                <span>
-                  <strong>
-                    Export Subscribers
-                  </strong>
-
-                  <small>
-                    Download the contact
-                    list as CSV
-                  </small>
-                </span>
-
-                <ChevronRight
-                  size={17}
-                />
-              </button>
-            </div>
-          </section>
         </div>
+
+        <aside className="admin-newsletter__story-panel">
+          <span className="admin-newsletter__story-rule" />
+          <h2>Your next story<br />starts here.</h2>
+          <p>Share progress, celebrate our community and spotlight new opportunities in one beautifully crafted newsletter.</p>
+          <button type="button" className="admin-newsletter__button admin-newsletter__button--gold" onClick={() => { resetCampaign(); setActiveTab("create"); setWizardStep(1); }}><Plus size={19} /> Create newsletter</button>
+          <div className="admin-newsletter__story-preview" aria-label="Newsletter preview example">
+            <div className="admin-newsletter__story-preview-top"><strong>CONTINENTAL FOUNDERS</strong><span>INSIGHTS & NEWS</span></div>
+            <div className="admin-newsletter__story-preview-art" aria-hidden="true"><span>CF</span></div>
+            <span className="admin-newsletter__story-preview-kicker">COMMUNITY · OPPORTUNITY · IMPACT</span>
+            <h3>Stories that move us forward</h3>
+            <p>Connect founders, universities and partners with the ideas shaping tomorrow.</p>
+            <span className="admin-newsletter__story-preview-link">Read the latest stories →</span>
+          </div>
+        </aside>
       </div>
     );
   }

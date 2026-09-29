@@ -62,60 +62,17 @@ import "./AdminNewsletter.css";
 ============================================================ */
 
 const TABS = [
-  {
-    id: "overview",
-    label: "Overview",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "subscribers",
-    label: "Subscribers",
-    icon: Users,
-  },
-  {
-    id: "campaigns",
-    label: "Campaigns",
-    icon: Megaphone,
-  },
-  {
-    id: "create",
-    label: "Create Newsletter",
-    icon: Plus,
-  },
-  {
-    id: "analytics",
-    label: "Analytics",
-    icon: BarChart3,
-  },
+  { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "campaigns", label: "Newsletters", icon: Megaphone },
+  { id: "subscribers", label: "Subscribers", icon: Users },
 ];
 
 
 const WIZARD_STEPS = [
-  {
-    id: 1,
-    label: "Design",
-    description: "Write and style",
-  },
-  {
-    id: 2,
-    label: "Details",
-    description: "Subject and preview",
-  },
-  {
-    id: 3,
-    label: "Audience",
-    description: "Choose recipients",
-  },
-  {
-    id: 4,
-    label: "Delivery",
-    description: "Send or schedule",
-  },
-  {
-    id: 5,
-    label: "Review",
-    description: "Final confirmation",
-  },
+  { id: 1, label: "Design", description: "Write and style" },
+  { id: 2, label: "Details", description: "Subject and preview" },
+  { id: 3, label: "Delivery", description: "Send or schedule" },
+  { id: 4, label: "Review", description: "Final confirmation" },
 ];
 
 
@@ -124,6 +81,7 @@ const EMPTY_CAMPAIGN = {
   subject: "",
   previewText: "",
   featuredImage: "",
+  images: [],
   content: "",
   ctaText: "",
   ctaLink: "",
@@ -494,6 +452,9 @@ export default function AdminNewsletter() {
   const imageInputRef =
     useRef(null);
 
+  const galleryInputRef =
+    useRef(null);
+
 
   const [
     featuredImageFile,
@@ -600,8 +561,8 @@ export default function AdminNewsletter() {
       throw new Error("Add the newsletter title and email subject in Details before saving.");
     }
     const result = campaignId
-      ? await updateNewsletterCampaign(campaignId, campaignForm)
-      : await createNewsletterCampaign(campaignForm);
+      ? await updateNewsletterCampaign(campaignId, { ...campaignForm, audience: "all" })
+      : await createNewsletterCampaign({ ...campaignForm, audience: "all" });
     if (!result.campaign?.id) throw new Error("The server did not return a saved campaign.");
     setCampaignId(result.campaign.id);
     setCampaigns((current) => [result.campaign, ...current.filter((item) => item.id !== result.campaign.id)]);
@@ -614,6 +575,7 @@ export default function AdminNewsletter() {
       ...EMPTY_CAMPAIGN,
       title: campaign.title || "", subject: campaign.subject || "",
       previewText: campaign.previewText || "", featuredImage: campaign.featuredImage || "",
+      images: Array.isArray(campaign.images) ? campaign.images : [],
       content: campaign.content || "", ctaText: campaign.ctaText || "",
       ctaLink: campaign.ctaLink || "", audience: campaign.audience || "all",
       deliveryMethod: campaign.status === "scheduled" ? "schedule" : "now",
@@ -1075,6 +1037,88 @@ export default function AdminNewsletter() {
 
 
   /* ==========================================================
+     CONTENT GALLERY IMAGES
+  ========================================================== */
+
+  async function processGalleryImages(files) {
+    const selectedFiles = Array.from(files || []);
+    if (!selectedFiles.length) return;
+
+    setImageUploadError("");
+    setWizardError("");
+    setProcessingImage(true);
+
+    try {
+      const uploadedUrls = [];
+
+      for (const file of selectedFiles) {
+        if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+          throw new Error(`${file.name}: only JPG, PNG or WEBP images are allowed.`);
+        }
+
+        if (file.size > MAX_FEATURED_IMAGE_SIZE) {
+          throw new Error(`${file.name}: each image must be 5 MB or smaller.`);
+        }
+
+        const response = await uploadNewsletterImage(file);
+        const imageUrl =
+          response?.url ||
+          response?.publicUrl ||
+          response?.imageUrl ||
+          response?.image?.url ||
+          response?.image?.publicUrl ||
+          "";
+
+        if (!imageUrl) {
+          throw new Error(`The server did not return a URL for ${file.name}.`);
+        }
+
+        uploadedUrls.push(imageUrl);
+      }
+
+      setCampaignForm((current) => ({
+        ...current,
+        audience: "all",
+        images: [...(Array.isArray(current.images) ? current.images : []), ...uploadedUrls],
+      }));
+
+      setSuccessMessage(
+        uploadedUrls.length === 1
+          ? "Newsletter image added."
+          : `${uploadedUrls.length} newsletter images added.`
+      );
+    } catch (imageError) {
+      console.error("Failed to upload newsletter images:", imageError);
+      setImageUploadError(imageError?.message || "Unable to upload the newsletter images.");
+    } finally {
+      setProcessingImage(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  }
+
+  function removeGalleryImage(index) {
+    setCampaignForm((current) => ({
+      ...current,
+      images: (Array.isArray(current.images) ? current.images : []).filter((_, itemIndex) => itemIndex !== index),
+    }));
+  }
+
+  function moveGalleryImage(index, direction) {
+    setCampaignForm((current) => {
+      const images = [...(Array.isArray(current.images) ? current.images : [])];
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= images.length) return current;
+      [images[index], images[nextIndex]] = [images[nextIndex], images[index]];
+      return { ...current, images };
+    });
+  }
+
+  function openGalleryPicker() {
+    galleryInputRef.current?.click();
+  }
+
+
+  /* ==========================================================
      RESET CAMPAIGN
   ========================================================== */
 
@@ -1195,15 +1239,6 @@ export default function AdminNewsletter() {
 
 
     if (step === 3) {
-      if (
-        !campaignForm.audience
-      ) {
-        return "Choose the audience for this newsletter.";
-      }
-    }
-
-
-    if (step === 4) {
       if (
         campaignForm.deliveryMethod ===
           "schedule" &&
@@ -1684,7 +1719,7 @@ export default function AdminNewsletter() {
         validationMessage
       );
 
-      setWizardStep(4);
+      setWizardStep(3);
 
       return;
     }
@@ -1694,13 +1729,13 @@ export default function AdminNewsletter() {
     setWizardError("");
 
     try {
-      for (let step = 1; step <= 3; step += 1) {
+      for (let step = 1; step <= 2; step += 1) {
         const issue = validateWizardStep(step);
         if (issue) { setWizardStep(step); throw new Error(issue); }
       }
       const date = new Date(campaignForm.scheduledAt);
       if (Number.isNaN(date.getTime()) || date <= new Date()) {
-        setWizardStep(4);
+        setWizardStep(3);
         throw new Error("Choose a future date and time for delivery.");
       }
       const saved = await persistCampaign();
@@ -1731,7 +1766,7 @@ export default function AdminNewsletter() {
   async function handleSendCampaign() {
     for (
       let step = 1;
-      step <= 4;
+      step <= 3;
       step += 1
     ) {
       const validationMessage =
@@ -1765,7 +1800,7 @@ export default function AdminNewsletter() {
       const activeRecipients = subscribers.filter(isActiveSubscriber).length;
       if (activeRecipients === 0) throw new Error("There are no active subscribers to email.");
       const confirmed = window.confirm(
-        `Send “${campaignForm.subject}” to the selected audience? This action cannot be undone.`
+        `Send “${campaignForm.subject}” to all ${activeRecipients.toLocaleString()} active subscribers? This action cannot be undone.`
       );
       if (!confirmed) return;
       const saved = await persistCampaign();
@@ -3288,6 +3323,63 @@ export default function AdminNewsletter() {
             </div>
 
 
+            <div className="admin-newsletter__field admin-newsletter__field--full">
+              <span>Content Images</span>
+
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="admin-newsletter__image-file-input"
+                onChange={(event) => processGalleryImages(event.target.files)}
+              />
+
+              <div className="admin-newsletter__image-upload">
+                <div className="admin-newsletter__image-upload-icon">
+                  {processingImage ? <Loader2 size={26} className="admin-newsletter__spin" /> : <ImagePlus size={26} />}
+                </div>
+                <div className="admin-newsletter__image-upload-copy">
+                  <strong>Add more images to the newsletter</strong>
+                  <p>Choose one or several images. They will appear in the email in the order shown below.</p>
+                  <small>JPG, PNG or WEBP • Maximum 5 MB per image</small>
+                </div>
+                <button
+                  type="button"
+                  className="admin-newsletter__button admin-newsletter__button--secondary"
+                  onClick={openGalleryPicker}
+                  disabled={processingImage}
+                >
+                  <Plus size={16} /> Add Images
+                </button>
+              </div>
+
+              {Array.isArray(campaignForm.images) && campaignForm.images.length > 0 && (
+                <div className="admin-newsletter__wizard-content-stack">
+                  {campaignForm.images.map((imageUrl, index) => (
+                    <div className="admin-newsletter__uploaded-image" key={`${imageUrl}-${index}`}>
+                      <div className="admin-newsletter__uploaded-image-preview">
+                        <img src={imageUrl} alt={`Newsletter content ${index + 1}`} />
+                        <span className="admin-newsletter__uploaded-image-badge">Image {index + 1}</span>
+                      </div>
+                      <div className="admin-newsletter__uploaded-image-info">
+                        <div className="admin-newsletter__uploaded-image-details">
+                          <span className="admin-newsletter__uploaded-image-icon"><FileImage size={19} /></span>
+                          <div><strong>Content image {index + 1}</strong><span>Saved newsletter image</span></div>
+                        </div>
+                        <div className="admin-newsletter__uploaded-image-actions">
+                          <button type="button" className="admin-newsletter__button admin-newsletter__button--secondary" onClick={() => moveGalleryImage(index, -1)} disabled={index === 0}>Move Up</button>
+                          <button type="button" className="admin-newsletter__button admin-newsletter__button--secondary" onClick={() => moveGalleryImage(index, 1)} disabled={index === campaignForm.images.length - 1}>Move Down</button>
+                          <button type="button" className="admin-newsletter__button admin-newsletter__button--danger" onClick={() => removeGalleryImage(index)}><Trash2 size={15} /> Remove</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+
             <label className="admin-newsletter__field admin-newsletter__field--full">
               <span>
                 Newsletter Message *
@@ -3580,7 +3672,7 @@ export default function AdminNewsletter() {
         <section className="admin-newsletter__card admin-newsletter__wizard-card">
           <div className="admin-newsletter__form-heading">
             <span>
-              04
+              03
             </span>
 
             <div>
@@ -3591,7 +3683,7 @@ export default function AdminNewsletter() {
               <p>
                 Choose when this newsletter
                 should be delivered to the
-                selected audience.
+                all active subscribers.
               </p>
             </div>
           </div>
@@ -3843,7 +3935,7 @@ export default function AdminNewsletter() {
           <section className="admin-newsletter__card admin-newsletter__wizard-card">
             <div className="admin-newsletter__form-heading">
               <span>
-                05
+                04
               </span>
 
               <div>
@@ -4271,12 +4363,9 @@ export default function AdminNewsletter() {
         return renderDetailsStep();
 
       case 3:
-        return renderAudienceStep();
-
-      case 4:
         return renderDeliveryStep();
 
-      case 5:
+      case 4:
         return renderReviewStep();
 
       default:
@@ -4487,7 +4576,7 @@ export default function AdminNewsletter() {
 
             <p>
               Start with your message and see the design take shape as you write.
-              Then add email details, choose your audience and review before sending.
+              Add your message and images, confirm the email details, then review before sending to all active subscribers.
             </p>
           </div>
 
@@ -4580,6 +4669,9 @@ export default function AdminNewsletter() {
                         <p key={index}>{paragraph}</p>
                       )) : <p>Your story starts here. Add your message on the left.</p>}
                     </div>
+                    {Array.isArray(campaignForm.images) && campaignForm.images.map((imageUrl, index) => (
+                      <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`Newsletter content ${index + 1}`} />
+                    ))}
                     {campaignForm.ctaText && <span className="admin-newsletter__live-email-cta">{campaignForm.ctaText}</span>}
                   </div>
                   <div className="admin-newsletter__live-email-footer">Continental Founders · Empowering global founders</div>
@@ -4808,6 +4900,17 @@ export default function AdminNewsletter() {
                   </p>
                 )}
               </div>
+
+
+              {Array.isArray(campaignForm.images) && campaignForm.images.length > 0 && (
+                <div className="admin-newsletter__email-content">
+                  {campaignForm.images.map((imageUrl, index) => (
+                    <div className="admin-newsletter__email-image-wrap" key={`${imageUrl}-${index}`}>
+                      <img src={imageUrl} alt={`Newsletter content ${index + 1}`} className="admin-newsletter__email-image" />
+                    </div>
+                  ))}
+                </div>
+              )}
 
 
               {campaignForm.ctaText &&

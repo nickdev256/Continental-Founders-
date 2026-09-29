@@ -1,13 +1,15 @@
 const crypto = require("crypto");
-const sendEmail = require("../utils/sendEmail");
+const path = require("path");
 
 const {
   supabaseAdmin,
 } = require("../config/supabase");
 
+const sendEmail = require("../utils/sendEmail");
+
 
 /* ============================================================
-   TABLES
+   NEWSLETTER CONFIGURATION
 ============================================================ */
 
 const SUBSCRIBERS_TABLE =
@@ -19,23 +21,61 @@ const CAMPAIGNS_TABLE =
 const DELIVERIES_TABLE =
   "newsletter_deliveries";
 
-const NEWSLETTER_IMAGES_BUCKET =
-  process.env.NEWSLETTER_IMAGES_BUCKET ||
-  "newsletter-images";
 
-const NEWSLETTER_IMAGE_TYPES =
+const NEWSLETTER_IMAGES_BUCKET =
+  String(
+    process.env.NEWSLETTER_IMAGES_BUCKET ||
+      "newsletter-images"
+  ).trim();
+
+
+const MAX_NEWSLETTER_IMAGE_SIZE =
+  5 * 1024 * 1024;
+
+
+const ALLOWED_NEWSLETTER_IMAGE_TYPES =
   new Set([
     "image/jpeg",
     "image/png",
     "image/webp",
   ]);
 
-const MAX_NEWSLETTER_IMAGE_SIZE =
-  5 * 1024 * 1024;
+
+const ALLOWED_NEWSLETTER_IMAGE_EXTENSIONS =
+  new Set([
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+  ]);
 
 
 /* ============================================================
-   HELPERS
+   NEWSLETTER STATUS
+============================================================ */
+
+const CAMPAIGN_STATUS = {
+  DRAFT: "draft",
+  SCHEDULED: "scheduled",
+  SENDING: "sending",
+  SENT: "sent",
+  FAILED: "failed",
+};
+
+
+/* ============================================================
+   FIXED AUDIENCE
+
+   Continental Founders now uses one newsletter audience:
+   all active subscribers.
+============================================================ */
+
+const DEFAULT_AUDIENCE =
+  "all";
+
+
+/* ============================================================
+   BASIC HELPERS
 ============================================================ */
 
 function nowIso() {
@@ -79,8 +119,11 @@ function normalizeEmail(
 function isValidEmail(
   value
 ) {
+  const email =
+    normalizeEmail(value);
+
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-    value
+    email
   );
 }
 
@@ -88,31 +131,24 @@ function isValidEmail(
 function isValidUrl(
   value
 ) {
-  if (!value) {
-    return true;
+  const cleaned =
+    cleanString(value);
+
+  if (!cleaned) {
+    return false;
   }
 
   try {
-    const url =
-      new URL(value);
+    const parsed =
+      new URL(cleaned);
 
-    return [
-      "http:",
-      "https:",
-    ].includes(
-      url.protocol
+    return (
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
     );
   } catch {
     return false;
   }
-}
-
-
-function normalizeStatus(
-  value
-) {
-  return cleanString(value)
-    .toLowerCase();
 }
 
 
@@ -141,120 +177,20 @@ function parseDateOrNull(
     return null;
   }
 
-  return date;
+  return date.toISOString();
 }
 
 
-function getCurrentAdminId(
-  req
-) {
-  return (
-    req?.admin?.id ||
-    req?.user?.id ||
-    null
+function sleep(ms) {
+  return new Promise(
+    (resolve) =>
+      setTimeout(resolve, ms)
   );
-}
-
-
-function sendServerError(
-  res,
-  error,
-  fallbackMessage
-) {
-  console.error(
-    fallbackMessage,
-    error
-  );
-
-  return res
-    .status(500)
-    .json({
-      success: false,
-      message:
-        fallbackMessage,
-    });
 }
 
 
 /* ============================================================
-   NEWSLETTER IMAGE HELPERS
-============================================================ */
-
-function getNewsletterImageExtension(
-  file
-) {
-  const extensions = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-  };
-
-  return (
-    extensions[
-      file?.mimetype
-    ] || ""
-  );
-}
-
-
-function safeNewsletterStorageName(
-  value
-) {
-  return (
-    cleanString(
-      value,
-      "newsletter-image"
-    )
-      .toLowerCase()
-      .replace(
-        /\.[^/.]+$/,
-        ""
-      )
-      .replace(
-        /[^a-z0-9_-]+/g,
-        "-"
-      )
-      .replace(
-        /^-+|-+$/g,
-        ""
-      )
-      .slice(
-        0,
-        70
-      ) ||
-    "newsletter-image"
-  );
-}
-
-
-function createNewsletterImagePath(
-  file
-) {
-  const extension =
-    getNewsletterImageExtension(
-      file
-    );
-
-  const safeName =
-    safeNewsletterStorageName(
-      file?.originalname
-    );
-
-  const random =
-    crypto
-      .randomBytes(10)
-      .toString("hex");
-
-  const year =
-    new Date()
-      .getUTCFullYear();
-
-  return `campaigns/${year}/${Date.now()}-${safeName}-${random}.${extension}`;
-}
-
-
-/* ============================================================
-   EMAIL / HTML HELPERS
+   HTML ESCAPING
 ============================================================ */
 
 function escapeHtml(
@@ -286,901 +222,144 @@ function escapeHtml(
 }
 
 
-function getPublicApiUrl() {
-  const configured =
-    cleanString(
-      process.env.PUBLIC_API_URL ||
-      process.env.API_URL ||
-      ""
-    ).replace(
-      /\/+$/,
-      ""
-    );
+/* ============================================================
+   ADMIN ID
+============================================================ */
 
-  if (configured) {
-    return configured;
-  }
-
-  return "https://continental-founders-1.onrender.com";
-}
-
-
-function buildUnsubscribeUrl(
-  subscriber
+function getCurrentAdminId(
+  req
 ) {
-  const token =
-    cleanString(
-      subscriber?.unsubscribe_token
-    );
-
-  if (!token) {
-    return "";
-  }
-
   return (
-    `${getPublicApiUrl()}` +
-    `/api/newsletter/unsubscribe?token=` +
-    encodeURIComponent(
-      token
-    )
+    req?.admin?.id ||
+    req?.user?.id ||
+    null
   );
 }
 
 
-function textToHtml(
+/* ============================================================
+   SERVER ERROR HELPER
+============================================================ */
+
+function sendServerError(
+  res,
+  error,
+  fallbackMessage =
+    "Something went wrong."
+) {
+  console.error(
+    "[NEWSLETTER]",
+    error
+  );
+
+  return res
+    .status(500)
+    .json({
+      success: false,
+
+      message:
+        error?.message ||
+        fallbackMessage,
+    });
+}
+
+
+/* ============================================================
+   NORMALIZE IMAGE ARRAY
+
+   Supports:
+   [
+     "https://...",
+     "https://..."
+   ]
+
+   and also tolerates:
+   [
+     { url: "https://..." }
+   ]
+============================================================ */
+
+function normalizeImages(
   value
 ) {
-  const text =
-    cleanString(value);
-
-  if (!text) {
-    return "";
-  }
-
-  return text
-    .split(
-      /\n\s*\n/
-    )
-    .map(
-      (paragraph) =>
-        `<p style="margin:0 0 18px;line-height:1.75;color:#334155;font-size:16px;">${escapeHtml(
-          paragraph
-        ).replace(
-          /\n/g,
-          "<br>"
-        )}</p>`
-    )
-    .join("");
-}
-
-
-function buildNewsletterEmail({
-  campaign,
-  subscriber = null,
-  isTest = false,
-}) {
-  const title =
-    cleanString(
-      campaign?.title,
-      "Continental Founders"
-    );
-
-  const subject =
-    cleanString(
-      campaign?.subject,
-      title
-    );
-
-  const previewText =
-    cleanString(
-      campaign?.preview_text
-    );
-
-  const content =
-    cleanString(
-      campaign?.content
-    );
-
-  const featuredImage =
-    cleanString(
-      campaign?.featured_image
-    );
-
-  const ctaText =
-    cleanString(
-      campaign?.cta_text
-    );
-
-  const ctaLink =
-    cleanString(
-      campaign?.cta_link
-    );
-
-  const unsubscribeUrl =
-    subscriber
-      ? buildUnsubscribeUrl(
-          subscriber
-        )
-      : "";
-
-  const testBanner =
-    isTest
-      ? `
-        <div style="
-          background:#fff7ed;
-          color:#9a3412;
-          padding:10px 16px;
-          text-align:center;
-          font-size:13px;
-          font-weight:700;
-          border-bottom:1px solid #fed7aa;
-        ">
-          TEST NEWSLETTER — NOT A LIVE BROADCAST
-        </div>
-      `
-      : "";
-
-  const imageHtml =
-    featuredImage &&
-    isValidUrl(
-      featuredImage
-    )
-      ? `
-        <div style="margin:0 0 28px;">
-          <img
-            src="${escapeHtml(
-              featuredImage
-            )}"
-            alt="${escapeHtml(
-              title
-            )}"
-            style="
-              display:block;
-              width:100%;
-              max-width:680px;
-              height:auto;
-              border:0;
-              border-radius:16px;
-            "
-          />
-        </div>
-      `
-      : "";
-
-  const ctaHtml =
-    ctaText &&
-    ctaLink &&
-    isValidUrl(
-      ctaLink
-    )
-      ? `
-        <div style="
-          margin:32px 0;
-          text-align:center;
-        ">
-          <a
-            href="${escapeHtml(
-              ctaLink
-            )}"
-            style="
-              display:inline-block;
-              background:#0f766e;
-              color:#ffffff;
-              text-decoration:none;
-              padding:14px 24px;
-              border-radius:10px;
-              font-size:15px;
-              font-weight:700;
-            "
-          >
-            ${escapeHtml(
-              ctaText
-            )}
-          </a>
-        </div>
-      `
-      : "";
-
-  const unsubscribeHtml =
-    unsubscribeUrl
-      ? `
-        <p style="
-          margin:18px 0 0;
-          font-size:12px;
-          line-height:1.6;
-          color:#94a3b8;
-          text-align:center;
-        ">
-          You are receiving this email because you subscribed
-          to Continental Founders updates.
-          <br>
-          <a
-            href="${escapeHtml(
-              unsubscribeUrl
-            )}"
-            style="
-              color:#64748b;
-              text-decoration:underline;
-            "
-          >
-            Unsubscribe
-          </a>
-        </p>
-      `
-      : "";
-
-  const html = `
-    <!doctype html>
-    <html>
-      <head>
-        <meta charset="utf-8">
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1"
-        >
-        <title>
-          ${escapeHtml(
-            subject
-          )}
-        </title>
-      </head>
-
-      <body style="
-        margin:0;
-        padding:0;
-        background:#f8fafc;
-        font-family:Arial,Helvetica,sans-serif;
-      ">
-        <div style="
-          display:none;
-          max-height:0;
-          overflow:hidden;
-          opacity:0;
-          color:transparent;
-        ">
-          ${escapeHtml(
-            previewText
-          )}
-        </div>
-
-        <table
-          role="presentation"
-          width="100%"
-          cellspacing="0"
-          cellpadding="0"
-          border="0"
-          style="
-            width:100%;
-            background:#f8fafc;
-          "
-        >
-          <tr>
-            <td
-              align="center"
-              style="padding:32px 14px;"
-            >
-              <table
-                role="presentation"
-                width="100%"
-                cellspacing="0"
-                cellpadding="0"
-                border="0"
-                style="
-                  width:100%;
-                  max-width:720px;
-                  background:#ffffff;
-                  border-radius:18px;
-                  overflow:hidden;
-                  box-shadow:0 10px 30px rgba(15,23,42,.08);
-                "
-              >
-                <tr>
-                  <td>
-                    ${testBanner}
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding:34px 34px 12px;
-                    text-align:center;
-                  ">
-                    <div style="
-                      font-size:13px;
-                      font-weight:800;
-                      letter-spacing:.12em;
-                      text-transform:uppercase;
-                      color:#0f766e;
-                      margin-bottom:12px;
-                    ">
-                      Continental Founders
-                    </div>
-
-                    <h1 style="
-                      margin:0;
-                      color:#0f172a;
-                      font-size:30px;
-                      line-height:1.2;
-                    ">
-                      ${escapeHtml(
-                        title
-                      )}
-                    </h1>
-
-                    ${
-                      previewText
-                        ? `
-                          <p style="
-                            margin:14px auto 0;
-                            max-width:580px;
-                            color:#64748b;
-                            font-size:15px;
-                            line-height:1.65;
-                          ">
-                            ${escapeHtml(
-                              previewText
-                            )}
-                          </p>
-                        `
-                        : ""
-                    }
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding:22px 34px 34px;
-                  ">
-                    ${imageHtml}
-
-                    ${textToHtml(
-                      content
-                    )}
-
-                    ${ctaHtml}
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="
-                    padding:24px 34px 30px;
-                    border-top:1px solid #e2e8f0;
-                    background:#f8fafc;
-                  ">
-                    <p style="
-                      margin:0;
-                      text-align:center;
-                      color:#64748b;
-                      font-size:12px;
-                      line-height:1.7;
-                    ">
-                      Continental Founders
-                      <br>
-                      Building a more connected global founder ecosystem.
-                    </p>
-
-                    ${unsubscribeHtml}
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </body>
-    </html>
-  `;
-
-  const textParts = [
-    title,
-    "",
-    previewText,
-    "",
-    content,
-  ];
+  let source = value;
 
   if (
-    ctaText &&
-    ctaLink
+    typeof source === "string"
   ) {
-    textParts.push(
-      "",
-      `${ctaText}: ${ctaLink}`
-    );
+    try {
+      source =
+        JSON.parse(source);
+    } catch {
+      source = [];
+    }
   }
 
-  if (unsubscribeUrl) {
-    textParts.push(
-      "",
-      `Unsubscribe: ${unsubscribeUrl}`
-    );
-  }
-
-  return {
-    subject:
-      isTest
-        ? `[TEST] ${subject}`
-        : subject,
-
-    html,
-
-    text:
-      textParts
-        .filter(
-          (item) =>
-            item !== null &&
-            item !== undefined
-        )
-        .join("\n")
-        .trim(),
-  };
-}
-
-
-/* ============================================================
-   CAMPAIGN NORMALIZATION
-============================================================ */
-
-function normalizeCampaign(
-  campaign
-) {
-  if (!campaign) {
-    return null;
-  }
-
-  return {
-    id:
-      campaign.id,
-
-    title:
-      campaign.title || "",
-
-    subject:
-      campaign.subject || "",
-
-    previewText:
-      campaign.preview_text || "",
-
-    featuredImage:
-      campaign.featured_image || "",
-
-    content:
-      campaign.content || "",
-
-    ctaText:
-      campaign.cta_text || "",
-
-    ctaLink:
-      campaign.cta_link || "",
-
-    audience:
-      campaign.audience || "all",
-
-    status:
-      campaign.status || "draft",
-
-    scheduledAt:
-      campaign.scheduled_at || null,
-
-    sentAt:
-      campaign.sent_at || null,
-
-    createdAt:
-      campaign.created_at || null,
-
-    updatedAt:
-      campaign.updated_at || null,
-
-    createdBy:
-      campaign.created_by || null,
-
-    recipientCount:
-      campaign.recipient_count || 0,
-
-    deliveredCount:
-      campaign.delivered_count || 0,
-
-    failedCount:
-      campaign.failed_count || 0,
-  };
-}
-
-
-function normalizeCampaignInput(
-  body = {}
-) {
-  return {
-    title:
-      cleanString(
-        body.title
-      ),
-
-    subject:
-      cleanString(
-        body.subject
-      ),
-
-    previewText:
-      cleanString(
-        body.previewText ??
-        body.preview_text
-      ),
-
-    featuredImage:
-      cleanString(
-        body.featuredImage ??
-        body.featured_image
-      ),
-
-    content:
-      cleanString(
-        body.content
-      ),
-
-    ctaText:
-      cleanString(
-        body.ctaText ??
-        body.cta_text
-      ),
-
-    ctaLink:
-      cleanString(
-        body.ctaLink ??
-        body.cta_link
-      ),
-
-    audience:
-      cleanString(
-        body.audience,
-        "all"
-      ).toLowerCase(),
-  };
-}
-
-
-function validateCampaign(
-  input,
-  {
-    requireContent = false,
-  } = {}
-) {
-  const errors = [];
-
-  if (!input.title) {
-    errors.push({
-      field: "title",
-      message:
-        "Newsletter title is required.",
-    });
-  }
-
-  if (!input.subject) {
-    errors.push({
-      field: "subject",
-      message:
-        "Email subject is required.",
-    });
-  }
 
   if (
-    requireContent &&
-    !input.content
+    !Array.isArray(source)
   ) {
-    errors.push({
-      field: "content",
-      message:
-        "Newsletter content is required.",
-    });
+    return [];
   }
 
-  if (
-    input.featuredImage &&
-    !isValidUrl(
-      input.featuredImage
-    )
+
+  const seen =
+    new Set();
+
+  const result = [];
+
+
+  for (
+    const item of source
   ) {
-    errors.push({
-      field:
-        "featuredImage",
+    let url = "";
 
-      message:
-        "Featured image must be a valid HTTP or HTTPS URL.",
-    });
-  }
-
-  if (
-    input.ctaLink &&
-    !isValidUrl(
-      input.ctaLink
-    )
-  ) {
-    errors.push({
-      field: "ctaLink",
-      message:
-        "CTA link must be a valid HTTP or HTTPS URL.",
-    });
-  }
-
-  const allowedAudiences =
-    new Set([
-      "all",
-      "founders",
-      "partners",
-      "universities",
-      "custom",
-    ]);
-
-  if (
-    !allowedAudiences.has(
-      input.audience
-    )
-  ) {
-    errors.push({
-      field: "audience",
-      message:
-        "The selected newsletter audience is invalid.",
-    });
-  }
-
-  return errors;
-}/* ============================================================
-   NEWSLETTER IMAGE HELPERS
-============================================================ */
-
-function getNewsletterImageExtension(file) {
-  return ({
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-  })[file?.mimetype] || "";
-}
+    if (
+      typeof item ===
+      "string"
+    ) {
+      url =
+        cleanString(item);
+    } else if (
+      item &&
+      typeof item ===
+        "object"
+    ) {
+      url =
+        cleanString(
+          item.url ||
+            item.publicUrl ||
+            item.imageUrl
+        );
+    }
 
 
-function safeNewsletterStorageName(value) {
-  return (
-    cleanString(
-      value,
-      "newsletter-image"
-    )
-      .toLowerCase()
-      .replace(
-        /\.[^/.]+$/,
-        ""
-      )
-      .replace(
-        /[^a-z0-9_-]+/g,
-        "-"
-      )
-      .replace(
-        /^-+|-+$/g,
-        ""
-      )
-      .slice(
-        0,
-        70
-      ) ||
-    "newsletter-image"
-  );
-}
-
-
-function createNewsletterImagePath(file) {
-  const extension =
-    getNewsletterImageExtension(
-      file
-    );
-
-  const safeName =
-    safeNewsletterStorageName(
-      file?.originalname
-    );
-
-  return (
-    `campaigns/` +
-    `${new Date().getUTCFullYear()}/` +
-    `${Date.now()}-` +
-    `${safeName}-` +
-    `${crypto.randomBytes(10).toString("hex")}.` +
-    `${extension}`
-  );
-}
-
-
-/* ============================================================
-   UPLOAD NEWSLETTER IMAGE
-
-   POST /api/newsletter/admin/upload-image
-============================================================ */
-
-async function uploadNewsletterImage(
-  req,
-  res
-) {
-  let uploadedStoragePath =
-    null;
-
-  try {
-    const file =
-      req.file;
-
-    if (!file?.buffer) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Please choose an image to upload.",
-        });
+    if (!url) {
+      continue;
     }
 
 
     if (
-      !NEWSLETTER_IMAGE_TYPES.has(
-        file.mimetype
-      )
+      !isValidUrl(url)
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Only JPG, PNG and WEBP images are allowed.",
-        });
+      continue;
     }
 
 
     if (
-      file.size >
-      MAX_NEWSLETTER_IMAGE_SIZE
+      seen.has(url)
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "The image is too large. Maximum size is 5 MB.",
-        });
+      continue;
     }
 
 
-    const storagePath =
-      createNewsletterImagePath(
-        file
-      );
+    seen.add(url);
 
-    uploadedStoragePath =
-      storagePath;
-
-
-    const {
-      error:
-        uploadError,
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          NEWSLETTER_IMAGES_BUCKET
-        )
-        .upload(
-          storagePath,
-          file.buffer,
-          {
-            contentType:
-              file.mimetype,
-
-            cacheControl:
-              "3600",
-
-            upsert:
-              false,
-          }
-        );
-
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-
-    const {
-      data:
-        publicUrlData,
-    } =
-      supabaseAdmin
-        .storage
-        .from(
-          NEWSLETTER_IMAGES_BUCKET
-        )
-        .getPublicUrl(
-          storagePath
-        );
-
-
-    const publicUrl =
-      publicUrlData
-        ?.publicUrl ||
-      "";
-
-
-    if (!publicUrl) {
-      throw new Error(
-        "The image uploaded, but its public URL could not be created."
-      );
-    }
-
-
-    uploadedStoragePath =
-      null;
-
-
-    return res
-      .status(201)
-      .json({
-        success: true,
-
-        message:
-          "Newsletter image uploaded successfully.",
-
-        url:
-          publicUrl,
-
-        publicUrl,
-
-        path:
-          storagePath,
-
-        image: {
-          url:
-            publicUrl,
-
-          publicUrl,
-
-          path:
-            storagePath,
-
-          originalName:
-            file.originalname,
-
-          mimeType:
-            file.mimetype,
-
-          size:
-            file.size,
-        },
-      });
-
-  } catch (error) {
-    if (
-      uploadedStoragePath
-    ) {
-      try {
-        await supabaseAdmin
-          .storage
-          .from(
-            NEWSLETTER_IMAGES_BUCKET
-          )
-          .remove([
-            uploadedStoragePath,
-          ]);
-      } catch (
-        cleanupError
-      ) {
-        console.error(
-          "Unable to clean up failed newsletter image upload:",
-          cleanupError
-        );
-      }
-    }
-
-
-    return sendServerError(
-      res,
-      error,
-      "Unable to upload newsletter image."
-    );
+    result.push(url);
   }
+
+
+  return result;
 }
 
 
@@ -1195,47 +374,152 @@ function normalizeSubscriber(
     return null;
   }
 
-
   return {
     id:
       subscriber.id,
 
     email:
-      subscriber.email,
+      subscriber.email || "",
+
+    name:
+      subscriber.name || "",
 
     status:
-      subscriber.status,
+      subscriber.status ||
+      "subscribed",
+
+    token:
+      subscriber.token || "",
 
     source:
-      subscriber.source,
-
-    unsubscribeToken:
-      subscriber.unsubscribe_token ||
-      null,
-
-    subscribed_at:
-      subscriber.subscribed_at,
+      subscriber.source || "",
 
     subscribedAt:
-      subscriber.subscribed_at,
-
-    unsubscribed_at:
-      subscriber.unsubscribed_at,
+      subscriber.subscribed_at ||
+      null,
 
     unsubscribedAt:
-      subscriber.unsubscribed_at,
-
-    created_at:
-      subscriber.created_at,
+      subscriber.unsubscribed_at ||
+      null,
 
     createdAt:
-      subscriber.created_at,
-
-    updated_at:
-      subscriber.updated_at,
+      subscriber.created_at ||
+      null,
 
     updatedAt:
-      subscriber.updated_at,
+      subscriber.updated_at ||
+      null,
+  };
+}
+
+
+/* ============================================================
+   NORMALIZE CAMPAIGN
+============================================================ */
+
+function normalizeCampaign(
+  campaign
+) {
+  if (!campaign) {
+    return null;
+  }
+
+
+  const images =
+    normalizeImages(
+      campaign.images
+    );
+
+
+  return {
+    id:
+      campaign.id,
+
+    title:
+      campaign.title || "",
+
+    subject:
+      campaign.subject || "",
+
+    previewText:
+      campaign.preview_text ||
+      "",
+
+    featuredImage:
+      campaign.featured_image ||
+      "",
+
+    images,
+
+    content:
+      campaign.content || "",
+
+    ctaText:
+      campaign.cta_text || "",
+
+    ctaLink:
+      campaign.cta_link || "",
+
+    /*
+     * We intentionally expose only
+     * the single supported audience.
+     */
+    audience:
+      DEFAULT_AUDIENCE,
+
+    status:
+      campaign.status ||
+      CAMPAIGN_STATUS.DRAFT,
+
+    scheduledAt:
+      campaign.scheduled_at ||
+      null,
+
+    sentAt:
+      campaign.sent_at ||
+      null,
+
+    recipientCount:
+      Number(
+        campaign.recipient_count ||
+          0
+      ),
+
+    deliveredCount:
+      Number(
+        campaign.delivered_count ||
+          0
+      ),
+
+    failedCount:
+      Number(
+        campaign.failed_count ||
+          0
+      ),
+
+    openedCount:
+      Number(
+        campaign.opened_count ||
+          0
+      ),
+
+    clickedCount:
+      Number(
+        campaign.clicked_count ||
+          0
+      ),
+
+    createdBy:
+      campaign.created_by ||
+      null,
+
+    createdAt:
+      campaign.created_at ||
+      null,
+
+    updatedAt:
+      campaign.updated_at ||
+      null,
   };
 }
 
@@ -1251,22 +535,23 @@ function normalizeDelivery(
     return null;
   }
 
-
   return {
     id:
       delivery.id,
 
     campaignId:
-      delivery.campaign_id,
+      delivery.campaign_id ||
+      null,
 
     subscriberId:
-      delivery.subscriber_id,
+      delivery.subscriber_id ||
+      null,
 
     email:
-      delivery.email,
+      delivery.email || "",
 
     status:
-      delivery.status,
+      delivery.status || "",
 
     providerMessageId:
       delivery.provider_message_id ||
@@ -1297,18 +582,813 @@ function normalizeDelivery(
       null,
 
     createdAt:
-      delivery.created_at,
+      delivery.created_at ||
+      null,
 
     updatedAt:
-      delivery.updated_at,
+      delivery.updated_at ||
+      null,
   };
 }
 
 
 /* ============================================================
-   SUBSCRIBE
+   NORMALIZE CAMPAIGN INPUT
+============================================================ */
 
-   POST /api/newsletter/subscribe
+function normalizeCampaignInput(
+  body = {}
+) {
+  return {
+    title:
+      cleanString(
+        body.title
+      ),
+
+    subject:
+      cleanString(
+        body.subject
+      ),
+
+    previewText:
+      cleanString(
+        body.previewText ??
+          body.preview_text
+      ),
+
+    featuredImage:
+      cleanString(
+        body.featuredImage ??
+          body.featured_image
+      ),
+
+    images:
+      normalizeImages(
+        body.images
+      ),
+
+    content:
+      cleanString(
+        body.content
+      ),
+
+    ctaText:
+      cleanString(
+        body.ctaText ??
+          body.cta_text
+      ),
+
+    ctaLink:
+      cleanString(
+        body.ctaLink ??
+          body.cta_link
+      ),
+
+    /*
+     * Ignore any audience sent
+     * by the browser.
+     */
+    audience:
+      DEFAULT_AUDIENCE,
+
+    scheduledAt:
+      body.scheduledAt ??
+      body.scheduled_at ??
+      null,
+  };
+}
+
+
+/* ============================================================
+   VALIDATE CAMPAIGN
+============================================================ */
+
+function validateCampaign(
+  campaign
+) {
+  const errors = [];
+
+
+  if (
+    !campaign.title
+  ) {
+    errors.push(
+      "Newsletter title is required."
+    );
+  }
+
+
+  if (
+    !campaign.subject
+  ) {
+    errors.push(
+      "Email subject is required."
+    );
+  }
+
+
+  if (
+    !campaign.content
+  ) {
+    errors.push(
+      "Newsletter content is required."
+    );
+  }
+
+
+  if (
+    campaign.featuredImage &&
+    !isValidUrl(
+      campaign.featuredImage
+    )
+  ) {
+    errors.push(
+      "Featured image must be a valid HTTP or HTTPS URL."
+    );
+  }
+
+
+  if (
+    !Array.isArray(
+      campaign.images
+    )
+  ) {
+    errors.push(
+      "Newsletter images must be an array."
+    );
+  } else {
+    for (
+      const imageUrl of
+      campaign.images
+    ) {
+      if (
+        !isValidUrl(
+          imageUrl
+        )
+      ) {
+        errors.push(
+          "Every newsletter image must be a valid HTTP or HTTPS URL."
+        );
+
+        break;
+      }
+    }
+  }
+
+
+  if (
+    campaign.ctaLink &&
+    !isValidUrl(
+      campaign.ctaLink
+    )
+  ) {
+    errors.push(
+      "Call-to-action link must be a valid HTTP or HTTPS URL."
+    );
+  }
+
+
+  return errors;
+}
+
+
+/* ============================================================
+   ACTIVE SUBSCRIBER COUNT
+============================================================ */
+
+async function getRecipientCount() {
+  const {
+    count,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true,
+        }
+      )
+      .eq(
+        "status",
+        "subscribed"
+      );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return {
+    count:
+      Number(count || 0),
+
+    supported:
+      true,
+
+    audience:
+      DEFAULT_AUDIENCE,
+  };
+}
+
+
+/* ============================================================
+   IMAGE FILE HELPERS
+============================================================ */
+
+function getNewsletterImageExtension(
+  file
+) {
+  const originalName =
+    cleanString(
+      file?.originalname
+    );
+
+  let extension =
+    path
+      .extname(
+        originalName
+      )
+      .toLowerCase();
+
+
+  if (
+    ALLOWED_NEWSLETTER_IMAGE_EXTENSIONS.has(
+      extension
+    )
+  ) {
+    return extension;
+  }
+
+
+  const mimeType =
+    cleanString(
+      file?.mimetype
+    ).toLowerCase();
+
+
+  if (
+    mimeType ===
+    "image/jpeg"
+  ) {
+    return ".jpg";
+  }
+
+
+  if (
+    mimeType ===
+    "image/png"
+  ) {
+    return ".png";
+  }
+
+
+  if (
+    mimeType ===
+    "image/webp"
+  ) {
+    return ".webp";
+  }
+
+
+  return "";
+}
+
+
+function validateNewsletterImageFile(
+  file
+) {
+  if (!file) {
+    return {
+      valid: false,
+      message:
+        "Please choose an image to upload.",
+    };
+  }
+
+
+  if (
+    !Buffer.isBuffer(
+      file.buffer
+    ) ||
+    file.buffer.length === 0
+  ) {
+    return {
+      valid: false,
+      message:
+        "The uploaded image is empty.",
+    };
+  }
+
+
+  const mimeType =
+    cleanString(
+      file.mimetype
+    ).toLowerCase();
+
+
+  if (
+    !ALLOWED_NEWSLETTER_IMAGE_TYPES.has(
+      mimeType
+    )
+  ) {
+    return {
+      valid: false,
+      message:
+        "Only JPG, PNG and WEBP images are allowed.",
+    };
+  }
+
+
+  if (
+    file.buffer.length >
+    MAX_NEWSLETTER_IMAGE_SIZE
+  ) {
+    return {
+      valid: false,
+      message:
+        "The image is too large. Maximum size is 5 MB.",
+    };
+  }
+
+
+  const extension =
+    getNewsletterImageExtension(
+      file
+    );
+
+
+  if (!extension) {
+    return {
+      valid: false,
+      message:
+        "Unable to determine the image format.",
+    };
+  }
+
+
+  return {
+    valid: true,
+    extension,
+    mimeType,
+  };
+}
+
+
+/* ============================================================
+   PUBLIC API URL
+============================================================ */
+
+function getPublicApiUrl() {
+  return String(
+    process.env.PUBLIC_API_URL ||
+      process.env.API_URL ||
+      process.env.SERVER_URL ||
+      "https://continental-founders-1.onrender.com"
+  )
+    .trim()
+    .replace(
+      /\/+$/,
+      ""
+    );
+}
+
+
+/* ============================================================
+   UNSUBSCRIBE URL
+============================================================ */
+
+function buildUnsubscribeUrl(
+  subscriber
+) {
+  const baseUrl =
+    getPublicApiUrl();
+
+
+  if (
+    subscriber?.token
+  ) {
+    return (
+      `${baseUrl}` +
+      `/api/newsletter/unsubscribe?token=` +
+      encodeURIComponent(
+        subscriber.token
+      )
+    );
+  }
+
+
+  return (
+    `${baseUrl}` +
+    `/api/newsletter/unsubscribe?email=` +
+    encodeURIComponent(
+      subscriber?.email ||
+        ""
+    )
+  );
+}
+
+
+/* ============================================================
+   NEWSLETTER IMAGE HTML
+============================================================ */
+
+function buildNewsletterImagesHtml(
+  campaign
+) {
+  const images = [];
+
+
+  if (
+    campaign.featured_image
+  ) {
+    images.push(
+      campaign.featured_image
+    );
+  }
+
+
+  for (
+    const url of
+    normalizeImages(
+      campaign.images
+    )
+  ) {
+    if (
+      !images.includes(url)
+    ) {
+      images.push(url);
+    }
+  }
+
+
+  if (
+    images.length === 0
+  ) {
+    return "";
+  }
+
+
+  return images
+    .map(
+      (url) => `
+        <tr>
+          <td
+            style="
+              padding:0 32px 24px 32px;
+            "
+          >
+            <img
+              src="${escapeHtml(url)}"
+              alt=""
+              style="
+                display:block;
+                width:100%;
+                max-width:636px;
+                height:auto;
+                border:0;
+                border-radius:12px;
+              "
+            />
+          </td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+
+/* ============================================================
+   NEWSLETTER EMAIL HTML
+============================================================ */
+
+function buildNewsletterHtml(
+  campaign,
+  subscriber = null
+) {
+  const title =
+    escapeHtml(
+      campaign.title ||
+        ""
+    );
+
+
+  const previewText =
+    escapeHtml(
+      campaign.preview_text ||
+        ""
+    );
+
+
+  const content =
+    escapeHtml(
+      campaign.content ||
+        ""
+    ).replace(
+      /\r?\n/g,
+      "<br />"
+    );
+
+
+  const ctaText =
+    escapeHtml(
+      campaign.cta_text ||
+        ""
+    );
+
+
+  const ctaLink =
+    campaign.cta_link &&
+    isValidUrl(
+      campaign.cta_link
+    )
+      ? escapeHtml(
+          campaign.cta_link
+        )
+      : "";
+
+
+  const unsubscribeUrl =
+    subscriber
+      ? buildUnsubscribeUrl(
+          subscriber
+        )
+      : "";
+
+
+  const imageHtml =
+    buildNewsletterImagesHtml(
+      campaign
+    );
+
+
+  const ctaHtml =
+    ctaText &&
+    ctaLink
+      ? `
+        <tr>
+          <td
+            align="center"
+            style="
+              padding:8px 32px 32px 32px;
+            "
+          >
+            <a
+              href="${ctaLink}"
+              style="
+                display:inline-block;
+                padding:14px 24px;
+                border-radius:8px;
+                background:#0d2238;
+                color:#ffffff;
+                font-family:Arial,sans-serif;
+                font-size:15px;
+                font-weight:700;
+                text-decoration:none;
+              "
+            >
+              ${ctaText}
+            </a>
+          </td>
+        </tr>
+      `
+      : "";
+
+
+  const unsubscribeHtml =
+    unsubscribeUrl
+      ? `
+        <p
+          style="
+            margin:12px 0 0 0;
+            font-size:12px;
+            line-height:18px;
+          "
+        >
+          <a
+            href="${escapeHtml(
+              unsubscribeUrl
+            )}"
+            style="
+              color:#64748b;
+              text-decoration:underline;
+            "
+          >
+            Unsubscribe
+          </a>
+        </p>
+      `
+      : "";
+
+
+  return `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+
+    <title>${title}</title>
+  </head>
+
+  <body
+    style="
+      margin:0;
+      padding:0;
+      background:#f3f5f7;
+    "
+  >
+    <div
+      style="
+        display:none;
+        max-height:0;
+        overflow:hidden;
+        opacity:0;
+      "
+    >
+      ${previewText}
+    </div>
+
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      style="
+        width:100%;
+        background:#f3f5f7;
+      "
+    >
+      <tr>
+        <td
+          align="center"
+          style="
+            padding:32px 16px;
+          "
+        >
+
+          <table
+            role="presentation"
+            width="700"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            style="
+              width:100%;
+              max-width:700px;
+              background:#ffffff;
+              border-radius:16px;
+              overflow:hidden;
+              box-shadow:
+                0 8px 28px
+                rgba(15,23,42,.08);
+            "
+          >
+
+            <tr>
+              <td
+                style="
+                  padding:30px 32px 18px 32px;
+                  font-family:Arial,sans-serif;
+                "
+              >
+                <div
+                  style="
+                    color:#0d2238;
+                    font-size:13px;
+                    font-weight:700;
+                    letter-spacing:1.4px;
+                    text-transform:uppercase;
+                  "
+                >
+                  Continental Founders
+                </div>
+              </td>
+            </tr>
+
+            ${imageHtml}
+
+            <tr>
+              <td
+                style="
+                  padding:8px 32px 18px 32px;
+                  font-family:Arial,sans-serif;
+                "
+              >
+                <h1
+                  style="
+                    margin:0;
+                    color:#0f172a;
+                    font-size:30px;
+                    line-height:38px;
+                    font-weight:700;
+                  "
+                >
+                  ${title}
+                </h1>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  padding:0 32px 28px 32px;
+                  color:#334155;
+                  font-family:Arial,sans-serif;
+                  font-size:16px;
+                  line-height:27px;
+                "
+              >
+                ${content}
+              </td>
+            </tr>
+
+            ${ctaHtml}
+
+            <tr>
+              <td
+                style="
+                  padding:24px 32px 30px 32px;
+                  border-top:1px solid #e2e8f0;
+                  color:#64748b;
+                  font-family:Arial,sans-serif;
+                  font-size:12px;
+                  line-height:18px;
+                "
+              >
+                Continental Founders<br />
+
+                Building a global ecosystem
+                for founders.
+
+                ${unsubscribeHtml}
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+  `.trim();
+}
+
+
+/* ============================================================
+   NEWSLETTER PLAIN TEXT
+============================================================ */
+
+function buildNewsletterText(
+  campaign,
+  subscriber = null
+) {
+  const lines = [
+    campaign.title || "",
+    "",
+    campaign.content || "",
+  ];
+
+
+  if (
+    campaign.cta_text &&
+    campaign.cta_link
+  ) {
+    lines.push(
+      "",
+      `${campaign.cta_text}: ${campaign.cta_link}`
+    );
+  }
+
+
+  if (subscriber) {
+    lines.push(
+      "",
+      `Unsubscribe: ${buildUnsubscribeUrl(
+        subscriber
+      )}`
+    );
+  }
+
+
+  return lines
+    .join("\n")
+    .trim();
+}
+
+
+/* ============================================================
+   SUBSCRIBE
 ============================================================ */
 
 async function subscribe(
@@ -1321,37 +1401,28 @@ async function subscribe(
         req.body?.email
       );
 
+    const name =
+      cleanString(
+        req.body?.name
+      );
+
 
     if (
-      !email ||
-      !isValidEmail(
-        email
-      )
+      !isValidEmail(email)
     ) {
       return res
         .status(400)
         .json({
           success: false,
-
           message:
             "Please enter a valid email address.",
         });
     }
 
 
-    const source =
-      cleanString(
-        req.body?.source,
-        "website"
-      );
-
-
     const {
-      data:
-        existingSubscriber,
-
-      error:
-        lookupError,
+      data: existing,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -1365,63 +1436,38 @@ async function subscribe(
         .maybeSingle();
 
 
-    if (lookupError) {
-      throw lookupError;
+    if (existingError) {
+      throw existingError;
     }
 
 
-    if (
-      existingSubscriber
-    ) {
-      if (
-        existingSubscriber
-          .status ===
-        "subscribed"
-      ) {
-        return res
-          .status(200)
-          .json({
-            success: true,
-
-            message:
-              "You are already subscribed to Continental Founders updates.",
-
-            subscriber:
-              normalizeSubscriber(
-                existingSubscriber
-              ),
-          });
-      }
-
-
+    if (existing) {
       const {
-        data:
-          restoredSubscriber,
-
-        error:
-          restoreError,
+        data,
+        error,
       } =
         await supabaseAdmin
           .from(
             SUBSCRIBERS_TABLE
           )
           .update({
+            name:
+              name ||
+              existing.name ||
+              "",
+
             status:
               "subscribed",
-
-            source:
-              source ||
-              existingSubscriber
-                .source ||
-              "website",
-
-            subscribed_at:
-              nowIso(),
 
             unsubscribed_at:
               null,
 
-            unsubscribe_token:
+            subscribed_at:
+              existing.subscribed_at ||
+              nowIso(),
+
+            token:
+              existing.token ||
               createToken(),
 
             updated_at:
@@ -1429,14 +1475,14 @@ async function subscribe(
           })
           .eq(
             "id",
-            existingSubscriber.id
+            existing.id
           )
           .select("*")
           .single();
 
 
-      if (restoreError) {
-        throw restoreError;
+      if (error) {
+        throw error;
       }
 
 
@@ -1446,22 +1492,23 @@ async function subscribe(
           success: true,
 
           message:
-            "Welcome back. Your newsletter subscription is active again.",
+            "You are subscribed to Continental Founders updates.",
 
           subscriber:
             normalizeSubscriber(
-              restoredSubscriber
+              data
             ),
         });
     }
 
 
-    const {
-      data:
-        subscriber,
+    const timestamp =
+      nowIso();
 
-      error:
-        insertError,
+
+    const {
+      data,
+      error,
     } =
       await supabaseAdmin
         .from(
@@ -1470,32 +1517,38 @@ async function subscribe(
         .insert({
           email,
 
+          name,
+
           status:
             "subscribed",
 
-          source,
-
-          unsubscribe_token:
+          token:
             createToken(),
 
+          source:
+            cleanString(
+              req.body?.source,
+              "website"
+            ),
+
           subscribed_at:
-            nowIso(),
+            timestamp,
 
           unsubscribed_at:
             null,
 
           created_at:
-            nowIso(),
+            timestamp,
 
           updated_at:
-            nowIso(),
+            timestamp,
         })
         .select("*")
         .single();
 
 
-    if (insertError) {
-      throw insertError;
+    if (error) {
+      throw error;
     }
 
 
@@ -1505,19 +1558,18 @@ async function subscribe(
         success: true,
 
         message:
-          "Thank you for subscribing to Continental Founders updates.",
+          "You are subscribed to Continental Founders updates.",
 
         subscriber:
           normalizeSubscriber(
-            subscriber
+            data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to subscribe to the newsletter."
+      "Unable to subscribe right now."
     );
   }
 }
@@ -1526,8 +1578,14 @@ async function subscribe(
 /* ============================================================
    UNSUBSCRIBE
 
-   POST /api/newsletter/unsubscribe
-   GET  /api/newsletter/unsubscribe
+   Supports:
+   POST body:
+     { email }
+     { token }
+
+   and public GET:
+     ?email=
+     ?token=
 ============================================================ */
 
 async function unsubscribe(
@@ -1538,14 +1596,13 @@ async function unsubscribe(
     const email =
       normalizeEmail(
         req.body?.email ||
-        req.query?.email
+          req.query?.email
       );
-
 
     const token =
       cleanString(
         req.body?.token ||
-        req.query?.token
+          req.query?.token
       );
 
 
@@ -1575,7 +1632,7 @@ async function unsubscribe(
     if (token) {
       query =
         query.eq(
-          "unsubscribe_token",
+          "token",
           token
         );
     } else {
@@ -1588,52 +1645,39 @@ async function unsubscribe(
 
 
     const {
-      data:
-        subscriber,
-
-      error:
-        lookupError,
+      data: subscriber,
+      error,
     } =
       await query
         .maybeSingle();
 
 
-    if (lookupError) {
-      throw lookupError;
+    if (error) {
+      throw error;
     }
 
 
+    /*
+     * Do not reveal whether an
+     * arbitrary email exists.
+     */
     if (!subscriber) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter subscription not found.",
-        });
-    }
-
-
-    if (
-      subscriber.status ===
-      "unsubscribed"
-    ) {
       return res
         .status(200)
         .json({
           success: true,
 
           message:
-            "This email address is already unsubscribed.",
+            "Your unsubscribe request has been processed.",
         });
     }
 
 
-    const {
-      data:
-        updatedSubscriber,
+    const timestamp =
+      nowIso();
 
+
+    const {
       error:
         updateError,
     } =
@@ -1646,17 +1690,15 @@ async function unsubscribe(
             "unsubscribed",
 
           unsubscribed_at:
-            nowIso(),
+            timestamp,
 
           updated_at:
-            nowIso(),
+            timestamp,
         })
         .eq(
           "id",
           subscriber.id
-        )
-        .select("*")
-        .single();
+        );
 
 
     if (updateError) {
@@ -1671,24 +1713,19 @@ async function unsubscribe(
 
         message:
           "You have been unsubscribed from Continental Founders updates.",
-
-        subscriber:
-          normalizeSubscriber(
-            updatedSubscriber
-          ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to unsubscribe from the newsletter."
+      "Unable to process the unsubscribe request."
     );
   }
-}/* ============================================================
-   GET SUBSCRIBERS
+}
 
-   GET /api/newsletter/subscribers
+
+/* ============================================================
+   GET SUBSCRIBERS
 ============================================================ */
 
 async function getSubscribers(
@@ -1706,7 +1743,7 @@ async function getSubscribers(
         )
         .select("*")
         .order(
-          "subscribed_at",
+          "created_at",
           {
             ascending:
               false,
@@ -1720,13 +1757,17 @@ async function getSubscribers(
 
 
     const subscribers =
-      Array.isArray(
-        data
-      )
-        ? data.map(
-            normalizeSubscriber
-          )
-        : [];
+      (data || []).map(
+        normalizeSubscriber
+      );
+
+
+    const activeCount =
+      subscribers.filter(
+        (subscriber) =>
+          subscriber.status ===
+          "subscribed"
+      ).length;
 
 
     return res
@@ -1734,17 +1775,18 @@ async function getSubscribers(
       .json({
         success: true,
 
+        subscribers,
+
         count:
           subscribers.length,
 
-        subscribers,
+        activeCount,
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Failed to load newsletter subscribers."
+      "Unable to load newsletter subscribers."
     );
   }
 }
@@ -1752,8 +1794,6 @@ async function getSubscribers(
 
 /* ============================================================
    UPDATE SUBSCRIBER
-
-   PATCH /api/newsletter/subscribers/:id
 ============================================================ */
 
 async function updateSubscriber(
@@ -1761,114 +1801,117 @@ async function updateSubscriber(
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
-
-
-    const status =
-      normalizeStatus(
-        req.body?.status
+    const id =
+      cleanString(
+        req.params?.id
       );
 
 
-    if (
-      ![
-        "subscribed",
-        "unsubscribed",
-      ].includes(
-        status
-      )
-    ) {
+    if (!id) {
       return res
         .status(400)
         .json({
           success: false,
-
           message:
-            "Status must be subscribed or unsubscribed.",
+            "Subscriber ID is required.",
         });
     }
-
-
-    const {
-      data:
-        existingSubscriber,
-
-      error:
-        existingError,
-    } =
-      await supabaseAdmin
-        .from(
-          SUBSCRIBERS_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (existingError) {
-      throw existingError;
-    }
-
-
-    if (
-      !existingSubscriber
-    ) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Subscriber not found.",
-        });
-    }
-
-
-    const now =
-      nowIso();
 
 
     const updates = {
-      status,
-
       updated_at:
-        now,
+        nowIso(),
     };
 
 
     if (
-      status ===
-      "subscribed"
+      req.body?.name !==
+      undefined
     ) {
-      updates.subscribed_at =
-        now;
-
-      updates.unsubscribed_at =
-        null;
-
-
-      if (
-        !existingSubscriber
-          .unsubscribe_token
-      ) {
-        updates.unsubscribe_token =
-          createToken();
-      }
+      updates.name =
+        cleanString(
+          req.body.name
+        );
     }
 
 
     if (
-      status ===
-      "unsubscribed"
+      req.body?.email !==
+      undefined
     ) {
-      updates.unsubscribed_at =
-        now;
+      const email =
+        normalizeEmail(
+          req.body.email
+        );
+
+
+      if (
+        !isValidEmail(
+          email
+        )
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Please enter a valid email address.",
+          });
+      }
+
+
+      updates.email =
+        email;
+    }
+
+
+    if (
+      req.body?.status !==
+      undefined
+    ) {
+      const status =
+        cleanString(
+          req.body.status
+        ).toLowerCase();
+
+
+      if (
+        ![
+          "subscribed",
+          "unsubscribed",
+        ].includes(
+          status
+        )
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Subscriber status must be subscribed or unsubscribed.",
+          });
+      }
+
+
+      updates.status =
+        status;
+
+
+      if (
+        status ===
+        "subscribed"
+      ) {
+        updates.unsubscribed_at =
+          null;
+
+        updates.subscribed_at =
+          nowIso();
+      } else {
+        updates.unsubscribed_at =
+          nowIso();
+      }
     }
 
 
@@ -1909,7 +1952,6 @@ async function updateSubscriber(
             data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
@@ -1922,8 +1964,6 @@ async function updateSubscriber(
 
 /* ============================================================
    DELETE SUBSCRIBER
-
-   DELETE /api/newsletter/subscribers/:id
 ============================================================ */
 
 async function deleteSubscriber(
@@ -1931,14 +1971,24 @@ async function deleteSubscriber(
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Subscriber ID is required.",
+        });
+    }
 
 
     const {
-      data,
       error,
     } =
       await supabaseAdmin
@@ -1949,27 +1999,11 @@ async function deleteSubscriber(
         .eq(
           "id",
           id
-        )
-        .select(
-          "id, email"
-        )
-        .maybeSingle();
+        );
 
 
     if (error) {
       throw error;
-    }
-
-
-    if (!data) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Subscriber not found.",
-        });
     }
 
 
@@ -1980,16 +2014,7 @@ async function deleteSubscriber(
 
         message:
           "Subscriber deleted successfully.",
-
-        deletedSubscriber: {
-          id:
-            data.id,
-
-          email:
-            data.email,
-        },
       });
-
   } catch (error) {
     return sendServerError(
       res,
@@ -1997,13 +2022,231 @@ async function deleteSubscriber(
       "Unable to delete subscriber."
     );
   }
+}/* ============================================================
+   UPLOAD NEWSLETTER IMAGE
+
+   Uploads one image at a time to Supabase Storage.
+   The frontend can call this endpoint repeatedly when the
+   newsletter contains several images.
+
+   Each upload returns a permanent public URL which can then
+   be placed inside the campaign's `images` array.
+============================================================ */
+
+async function uploadNewsletterImage(
+  req,
+  res
+) {
+  try {
+    const file =
+      req.file;
+
+
+    const validation =
+      validateNewsletterImageFile(
+        file
+      );
+
+
+    if (
+      !validation.valid
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validation.message,
+        });
+    }
+
+
+    const adminId =
+      getCurrentAdminId(
+        req
+      );
+
+
+    if (!adminId) {
+      return res
+        .status(401)
+        .json({
+          success: false,
+
+          message:
+            "Administrator authentication is required.",
+        });
+    }
+
+
+    const extension =
+      validation.extension;
+
+
+    const storagePath =
+      [
+        "newsletters",
+        String(adminId),
+        new Date()
+          .toISOString()
+          .slice(
+            0,
+            10
+          ),
+        `${Date.now()}-${crypto
+          .randomBytes(10)
+          .toString("hex")}${extension}`,
+      ].join("/");
+
+
+    const {
+      data: uploadData,
+      error: uploadError,
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .upload(
+          storagePath,
+          file.buffer,
+          {
+            contentType:
+              validation.mimeType,
+
+            cacheControl:
+              "3600",
+
+            upsert:
+              false,
+          }
+        );
+
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+
+    const {
+      data: publicUrlData,
+    } =
+      supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .getPublicUrl(
+          uploadData?.path ||
+            storagePath
+        );
+
+
+    const publicUrl =
+      cleanString(
+        publicUrlData?.publicUrl
+      );
+
+
+    if (
+      !publicUrl ||
+      !isValidUrl(
+        publicUrl
+      )
+    ) {
+      /*
+       * The upload succeeded but we
+       * cannot use it without a valid
+       * public URL. Clean it up.
+       */
+      try {
+        await supabaseAdmin
+          .storage
+          .from(
+            NEWSLETTER_IMAGES_BUCKET
+          )
+          .remove([
+            uploadData?.path ||
+              storagePath,
+          ]);
+      } catch (
+        cleanupError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to clean up image after public URL failure:",
+          cleanupError
+        );
+      }
+
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+
+          message:
+            "The image uploaded, but its public URL could not be created.",
+        });
+    }
+
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter image uploaded successfully.",
+
+        url:
+          publicUrl,
+
+        publicUrl:
+          publicUrl,
+
+        imageUrl:
+          publicUrl,
+
+        image: {
+          url:
+            publicUrl,
+
+          publicUrl:
+            publicUrl,
+
+          path:
+            uploadData?.path ||
+            storagePath,
+
+          bucket:
+            NEWSLETTER_IMAGES_BUCKET,
+
+          mimeType:
+            validation.mimeType,
+
+          size:
+            file.buffer.length,
+
+          originalName:
+            cleanString(
+              file.originalname
+            ),
+        },
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to upload newsletter image."
+    );
+  }
 }
 
 
 /* ============================================================
    GET CAMPAIGNS
-
-   GET /api/newsletter/campaigns
 ============================================================ */
 
 async function getCampaigns(
@@ -2035,13 +2278,9 @@ async function getCampaigns(
 
 
     const campaigns =
-      Array.isArray(
-        data
-      )
-        ? data.map(
-            normalizeCampaign
-          )
-        : [];
+      (data || []).map(
+        normalizeCampaign
+      );
 
 
     return res
@@ -2049,26 +2288,23 @@ async function getCampaigns(
       .json({
         success: true,
 
+        campaigns,
+
         count:
           campaigns.length,
-
-        campaigns,
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Failed to load newsletter campaigns."
+      "Unable to load newsletters."
     );
   }
 }
 
 
 /* ============================================================
-   GET CAMPAIGN
-
-   GET /api/newsletter/campaigns/:id
+   GET SINGLE CAMPAIGN
 ============================================================ */
 
 async function getCampaign(
@@ -2076,10 +2312,22 @@ async function getCampaign(
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
 
 
     const {
@@ -2110,7 +2358,7 @@ async function getCampaign(
           success: false,
 
           message:
-            "Newsletter campaign not found.",
+            "Newsletter not found.",
         });
     }
 
@@ -2125,21 +2373,20 @@ async function getCampaign(
             data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to load newsletter campaign."
+      "Unable to load newsletter."
     );
   }
 }
 
 
 /* ============================================================
-   CREATE CAMPAIGN / SAVE DRAFT
+   CREATE CAMPAIGN
 
-   POST /api/newsletter/campaigns
+   Audience is always "all".
 ============================================================ */
 
 async function createCampaign(
@@ -2149,7 +2396,7 @@ async function createCampaign(
   try {
     const input =
       normalizeCampaignInput(
-        req.body
+        req.body || {}
       );
 
 
@@ -2160,8 +2407,7 @@ async function createCampaign(
 
 
     if (
-      errors.length >
-      0
+      errors.length > 0
     ) {
       return res
         .status(400)
@@ -2169,14 +2415,20 @@ async function createCampaign(
           success: false,
 
           message:
-            errors[0].message,
+            errors[0],
 
           errors,
         });
     }
 
 
-    const now =
+    const adminId =
+      getCurrentAdminId(
+        req
+      );
+
+
+    const timestamp =
       nowIso();
 
 
@@ -2199,9 +2451,14 @@ async function createCampaign(
             input.previewText,
 
           featured_image:
-            cleanNullableString(
-              input.featuredImage
-            ),
+            input.featuredImage ||
+            null,
+
+          /*
+           * New JSONB field.
+           */
+          images:
+            input.images,
 
           content:
             input.content,
@@ -2210,564 +2467,18 @@ async function createCampaign(
             input.ctaText,
 
           cta_link:
-            cleanNullableString(
-              input.ctaLink
-            ),
+            input.ctaLink ||
+            null,
 
+          /*
+           * There is now only one
+           * supported audience.
+           */
           audience:
-            input.audience,
+            DEFAULT_AUDIENCE,
 
           status:
-            "draft",
-
-          recipient_count:
-            0,
-
-          delivered_count:
-            0,
-
-          failed_count:
-            0,
-
-          opened_count:
-            0,
-
-          clicked_count:
-            0,
-
-          created_by:
-            getCurrentAdminId(
-              req
-            ),
-
-          created_at:
-            now,
-
-          updated_at:
-            now,
-        })
-        .select("*")
-        .single();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    return res
-      .status(201)
-      .json({
-        success: true,
-
-        message:
-          "Newsletter draft created successfully.",
-
-        campaign:
-          normalizeCampaign(
-            data
-          ),
-      });
-
-  } catch (error) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to create newsletter campaign."
-    );
-  }
-}/* ============================================================
-   UPDATE CAMPAIGN
-
-   PATCH /api/newsletter/campaigns/:id
-============================================================ */
-
-async function updateCampaign(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-
-    const {
-      data:
-        existingCampaign,
-
-      error:
-        lookupError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (lookupError) {
-      throw lookupError;
-    }
-
-
-    if (
-      !existingCampaign
-    ) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter campaign not found.",
-        });
-    }
-
-
-    if (
-      existingCampaign.status ===
-      "sent"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "A sent newsletter cannot be edited.",
-        });
-    }
-
-
-    if (
-      existingCampaign.status ===
-      "sending"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "This newsletter is currently being sent and cannot be edited.",
-        });
-    }
-
-
-    const input =
-      normalizeCampaignInput({
-        title:
-          req.body?.title ??
-          existingCampaign.title,
-
-        subject:
-          req.body?.subject ??
-          existingCampaign.subject,
-
-        previewText:
-          req.body?.previewText ??
-          req.body?.preview_text ??
-          existingCampaign.preview_text,
-
-        featuredImage:
-          req.body?.featuredImage ??
-          req.body?.featured_image ??
-          existingCampaign.featured_image,
-
-        content:
-          req.body?.content ??
-          existingCampaign.content,
-
-        ctaText:
-          req.body?.ctaText ??
-          req.body?.cta_text ??
-          existingCampaign.cta_text,
-
-        ctaLink:
-          req.body?.ctaLink ??
-          req.body?.cta_link ??
-          existingCampaign.cta_link,
-
-        audience:
-          req.body?.audience ??
-          existingCampaign.audience,
-      });
-
-
-    const errors =
-      validateCampaign(
-        input
-      );
-
-
-    if (
-      errors.length >
-      0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            errors[0].message,
-
-          errors,
-        });
-    }
-
-
-    const updates = {
-      title:
-        input.title,
-
-      subject:
-        input.subject,
-
-      preview_text:
-        input.previewText,
-
-      featured_image:
-        cleanNullableString(
-          input.featuredImage
-        ),
-
-      content:
-        input.content,
-
-      cta_text:
-        input.ctaText,
-
-      cta_link:
-        cleanNullableString(
-          input.ctaLink
-        ),
-
-      audience:
-        input.audience,
-
-      updated_at:
-        nowIso(),
-    };
-
-
-    /*
-      If a scheduled campaign is edited,
-      keep its schedule unless the frontend
-      explicitly cancels the schedule through
-      the cancel-schedule endpoint.
-    */
-
-
-    const {
-      data,
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .update(
-          updates
-        )
-        .eq(
-          "id",
-          id
-        )
-        .select("*")
-        .single();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        message:
-          "Newsletter campaign updated successfully.",
-
-        campaign:
-          normalizeCampaign(
-            data
-          ),
-      });
-
-  } catch (error) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to update newsletter campaign."
-    );
-  }
-}
-
-
-/* ============================================================
-   DELETE CAMPAIGN
-
-   DELETE /api/newsletter/campaigns/:id
-============================================================ */
-
-async function deleteCampaign(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-
-    const {
-      data:
-        campaign,
-
-      error:
-        lookupError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .select(
-          "id, title, status"
-        )
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (lookupError) {
-      throw lookupError;
-    }
-
-
-    if (!campaign) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter campaign not found.",
-        });
-    }
-
-
-    if (
-      campaign.status ===
-      "sending"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "A newsletter that is currently being sent cannot be deleted.",
-        });
-    }
-
-
-    /*
-      Remove delivery records first.
-
-      This avoids foreign-key problems in databases
-      where newsletter_deliveries references the
-      campaign without ON DELETE CASCADE.
-    */
-
-    const {
-      error:
-        deliveryDeleteError,
-    } =
-      await supabaseAdmin
-        .from(
-          DELIVERIES_TABLE
-        )
-        .delete()
-        .eq(
-          "campaign_id",
-          id
-        );
-
-
-    if (
-      deliveryDeleteError
-    ) {
-      throw deliveryDeleteError;
-    }
-
-
-    const {
-      error:
-        campaignDeleteError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .delete()
-        .eq(
-          "id",
-          id
-        );
-
-
-    if (
-      campaignDeleteError
-    ) {
-      throw campaignDeleteError;
-    }
-
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        message:
-          "Newsletter campaign deleted successfully.",
-
-        deletedCampaign: {
-          id:
-            campaign.id,
-
-          title:
-            campaign.title,
-        },
-      });
-
-  } catch (error) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to delete newsletter campaign."
-    );
-  }
-}
-
-
-/* ============================================================
-   DUPLICATE CAMPAIGN
-
-   POST /api/newsletter/campaigns/:id/duplicate
-============================================================ */
-
-async function duplicateCampaign(
-  req,
-  res
-) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
-
-
-    const {
-      data:
-        sourceCampaign,
-
-      error:
-        lookupError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (lookupError) {
-      throw lookupError;
-    }
-
-
-    if (
-      !sourceCampaign
-    ) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "Newsletter campaign not found.",
-        });
-    }
-
-
-    const now =
-      nowIso();
-
-
-    const duplicatedTitle =
-      `${cleanString(
-        sourceCampaign.title,
-        "Newsletter"
-      )} Copy`;
-
-
-    const {
-      data:
-        duplicatedCampaign,
-
-      error:
-        insertError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .insert({
-          title:
-            duplicatedTitle,
-
-          subject:
-            sourceCampaign.subject,
-
-          preview_text:
-            sourceCampaign.preview_text,
-
-          featured_image:
-            sourceCampaign.featured_image,
-
-          content:
-            sourceCampaign.content,
-
-          cta_text:
-            sourceCampaign.cta_text,
-
-          cta_link:
-            sourceCampaign.cta_link,
-
-          audience:
-            sourceCampaign.audience ||
-            "all",
-
-          status:
-            "draft",
+            CAMPAIGN_STATUS.DRAFT,
 
           scheduled_at:
             null,
@@ -2791,22 +2502,20 @@ async function duplicateCampaign(
             0,
 
           created_by:
-            getCurrentAdminId(
-              req
-            ),
+            adminId,
 
           created_at:
-            now,
+            timestamp,
 
           updated_at:
-            now,
+            timestamp,
         })
         .select("*")
         .single();
 
 
-    if (insertError) {
-      throw insertError;
+    if (error) {
+      throw error;
     }
 
 
@@ -2816,226 +2525,364 @@ async function duplicateCampaign(
         success: true,
 
         message:
-          "Newsletter campaign duplicated successfully.",
+          "Newsletter created successfully.",
 
         campaign:
           normalizeCampaign(
-            duplicatedCampaign
+            data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to duplicate newsletter campaign."
+      "Unable to create newsletter."
     );
   }
 }
 
 
 /* ============================================================
-   AUDIENCE HELPERS
+   UPDATE CAMPAIGN
+
+   Sent newsletters are historical records and should normally
+   be duplicated rather than edited. Drafts, scheduled and
+   failed newsletters may be edited.
+
+   A sent newsletter CAN still be deleted through
+   deleteCampaign().
 ============================================================ */
 
-async function getRecipientCount(
-  audience = "all"
-) {
-  const normalizedAudience =
-    cleanString(
-      audience,
-      "all"
-    ).toLowerCase();
-
-
-  /*
-    The current newsletter_subscribers table
-    supports the general active subscriber audience.
-
-    Segmented audiences can be enabled when the
-    subscriber table contains the corresponding
-    founder / partner / university classifications.
-  */
-
-  if (
-    normalizedAudience !==
-    "all"
-  ) {
-    return {
-      supported:
-        false,
-
-      count:
-        0,
-
-      audience:
-        normalizedAudience,
-    };
-  }
-
-
-  const {
-    count,
-    error,
-  } =
-    await supabaseAdmin
-      .from(
-        SUBSCRIBERS_TABLE
-      )
-      .select(
-        "id",
-        {
-          count:
-            "exact",
-
-          head:
-            true,
-        }
-      )
-      .eq(
-        "status",
-        "subscribed"
-      );
-
-
-  if (error) {
-    throw error;
-  }
-
-
-  return {
-    supported:
-      true,
-
-    count:
-      Number(
-        count || 0
-      ),
-
-    audience:
-      normalizedAudience,
-  };
-}
-
-
-/* ============================================================
-   LOAD CAMPAIGN RECIPIENTS
-============================================================ */
-
-async function getCampaignRecipients(
-  audience = "all"
-) {
-  const normalizedAudience =
-    cleanString(
-      audience,
-      "all"
-    ).toLowerCase();
-
-
-  if (
-    normalizedAudience !==
-    "all"
-  ) {
-    return {
-      supported:
-        false,
-
-      recipients:
-        [],
-
-      audience:
-        normalizedAudience,
-    };
-  }
-
-
-  const {
-    data,
-    error,
-  } =
-    await supabaseAdmin
-      .from(
-        SUBSCRIBERS_TABLE
-      )
-      .select("*")
-      .eq(
-        "status",
-        "subscribed"
-      )
-      .order(
-        "subscribed_at",
-        {
-          ascending:
-            true,
-        }
-      );
-
-
-  if (error) {
-    throw error;
-  }
-
-
-  const recipients =
-    Array.isArray(
-      data
-    )
-      ? data.filter(
-          (
-            subscriber
-          ) =>
-            subscriber?.email &&
-            isValidEmail(
-              normalizeEmail(
-                subscriber.email
-              )
-            )
-        )
-      : [];
-
-
-  return {
-    supported:
-      true,
-
-    recipients,
-
-    audience:
-      normalizedAudience,
-  };
-}
-
-
-/* ============================================================
-   GET CAMPAIGN RECIPIENT COUNT
-
-   GET /api/newsletter/campaigns/:id/recipients
-============================================================ */
-
-async function getCampaignRecipientCount(
+async function updateCampaign(
   req,
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
 
 
     const {
-      data:
-        campaign,
-
+      data: existing,
       error:
-        lookupError,
+        existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+
+    if (
+      existingError
+    ) {
+      throw existingError;
+    }
+
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent and cannot be edited.",
+        });
+    }
+
+
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "A sent newsletter cannot be edited. Duplicate it to create a new draft, or delete it if you no longer want it in the Newsletter Studio.",
+        });
+    }
+
+
+    /*
+     * Preserve existing values when a
+     * field was not supplied.
+     */
+    const mergedInput = {
+      title:
+        req.body?.title !==
+        undefined
+          ? req.body.title
+          : existing.title,
+
+      subject:
+        req.body?.subject !==
+        undefined
+          ? req.body.subject
+          : existing.subject,
+
+      previewText:
+        req.body?.previewText !==
+          undefined ||
+        req.body?.preview_text !==
+          undefined
+          ? (
+              req.body
+                ?.previewText ??
+              req.body
+                ?.preview_text
+            )
+          : existing.preview_text,
+
+      featuredImage:
+        req.body?.featuredImage !==
+          undefined ||
+        req.body?.featured_image !==
+          undefined
+          ? (
+              req.body
+                ?.featuredImage ??
+              req.body
+                ?.featured_image
+            )
+          : existing.featured_image,
+
+      images:
+        req.body?.images !==
+        undefined
+          ? req.body.images
+          : existing.images,
+
+      content:
+        req.body?.content !==
+        undefined
+          ? req.body.content
+          : existing.content,
+
+      ctaText:
+        req.body?.ctaText !==
+          undefined ||
+        req.body?.cta_text !==
+          undefined
+          ? (
+              req.body
+                ?.ctaText ??
+              req.body
+                ?.cta_text
+            )
+          : existing.cta_text,
+
+      ctaLink:
+        req.body?.ctaLink !==
+          undefined ||
+        req.body?.cta_link !==
+          undefined
+          ? (
+              req.body
+                ?.ctaLink ??
+              req.body
+                ?.cta_link
+            )
+          : existing.cta_link,
+
+      /*
+       * Ignore audience from the
+       * frontend completely.
+       */
+      audience:
+        DEFAULT_AUDIENCE,
+    };
+
+
+    const input =
+      normalizeCampaignInput(
+        mergedInput
+      );
+
+
+    const errors =
+      validateCampaign(
+        input
+      );
+
+
+    if (
+      errors.length > 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            errors[0],
+
+          errors,
+        });
+    }
+
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .update({
+          title:
+            input.title,
+
+          subject:
+            input.subject,
+
+          preview_text:
+            input.previewText,
+
+          featured_image:
+            input.featuredImage ||
+            null,
+
+          images:
+            input.images,
+
+          content:
+            input.content,
+
+          cta_text:
+            input.ctaText,
+
+          cta_link:
+            input.ctaLink ||
+            null,
+
+          audience:
+            DEFAULT_AUDIENCE,
+
+          updated_at:
+            nowIso(),
+        })
+        .eq(
+          "id",
+          id
+        )
+        .select("*")
+        .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter updated successfully.",
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to update newsletter."
+    );
+  }
+}
+
+
+/* ============================================================
+   DELETE CAMPAIGN
+
+   IMPORTANT:
+   Draft, scheduled, failed AND sent newsletters can be deleted.
+
+   Only a newsletter actively being sent is protected.
+
+   Deleting a sent newsletter removes the CMS/database record.
+   It cannot recall emails that subscribers already received.
+============================================================ */
+
+async function deleteCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
+
+
+    const {
+      data: campaign,
+      error:
+        campaignError,
     } =
       await supabaseAdmin
         .from(
           CAMPAIGNS_TABLE
         )
         .select(
-          "id, audience"
+          "id,title,status"
         )
         .eq(
           "id",
@@ -3044,8 +2891,10 @@ async function getCampaignRecipientCount(
         .maybeSingle();
 
 
-    if (lookupError) {
-      throw lookupError;
+    if (
+      campaignError
+    ) {
+      throw campaignError;
     }
 
 
@@ -3056,35 +2905,73 @@ async function getCampaignRecipientCount(
           success: false,
 
           message:
-            "Newsletter campaign not found.",
+            "Newsletter not found.",
         });
     }
 
 
-    const recipients =
-      await getRecipientCount(
-        campaign.audience ||
-        "all"
-      );
-
-
     if (
-      !recipients.supported
+      campaign.status ===
+      CAMPAIGN_STATUS.SENDING
     ) {
       return res
-        .status(400)
+        .status(409)
         .json({
           success: false,
 
           message:
-            "This audience cannot be counted until subscriber segmentation is configured.",
-
-          audience:
-            recipients.audience,
-
-          recipientCount:
-            0,
+            "This newsletter is currently being sent. Wait for sending to finish before deleting it.",
         });
+    }
+
+
+    /*
+     * Remove delivery records first.
+     *
+     * This makes deletion work even when the database
+     * foreign key does not use ON DELETE CASCADE.
+     */
+    const {
+      error:
+        deliveriesError,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .delete()
+        .eq(
+          "campaign_id",
+          id
+        );
+
+
+    if (
+      deliveriesError
+    ) {
+      throw deliveriesError;
+    }
+
+
+    const {
+      error:
+        deleteError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .delete()
+        .eq(
+          "id",
+          id
+        );
+
+
+    if (
+      deleteError
+    ) {
+      throw deleteError;
     }
 
 
@@ -3093,13 +2980,329 @@ async function getCampaignRecipientCount(
       .json({
         success: true,
 
+        message:
+          campaign.status ===
+          CAMPAIGN_STATUS.SENT
+            ? "Published newsletter deleted from the Newsletter Studio. Emails already sent to subscribers are not affected."
+            : "Newsletter deleted successfully.",
+
+        deletedCampaign: {
+          id:
+            campaign.id,
+
+          title:
+            campaign.title,
+
+          status:
+            campaign.status,
+        },
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to delete newsletter."
+    );
+  }
+}
+
+
+/* ============================================================
+   DUPLICATE CAMPAIGN
+
+   This is the recommended way to reuse a sent newsletter.
+
+   Multiple images are preserved.
+============================================================ */
+
+async function duplicateCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
+
+
+    const {
+      data: existing,
+      error:
+        existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+
+    if (
+      existingError
+    ) {
+      throw existingError;
+    }
+
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    const adminId =
+      getCurrentAdminId(
+        req
+      );
+
+
+    const timestamp =
+      nowIso();
+
+
+    const originalTitle =
+      cleanString(
+        existing.title,
+        "Newsletter"
+      );
+
+
+    const duplicateTitle =
+      `${originalTitle} — Copy`;
+
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .insert({
+          title:
+            duplicateTitle,
+
+          subject:
+            existing.subject ||
+            "",
+
+          preview_text:
+            existing.preview_text ||
+            "",
+
+          featured_image:
+            existing.featured_image ||
+            null,
+
+          /*
+           * Preserve every additional
+           * newsletter image.
+           */
+          images:
+            normalizeImages(
+              existing.images
+            ),
+
+          content:
+            existing.content ||
+            "",
+
+          cta_text:
+            existing.cta_text ||
+            "",
+
+          cta_link:
+            existing.cta_link ||
+            null,
+
+          audience:
+            DEFAULT_AUDIENCE,
+
+          status:
+            CAMPAIGN_STATUS.DRAFT,
+
+          scheduled_at:
+            null,
+
+          sent_at:
+            null,
+
+          recipient_count:
+            0,
+
+          delivered_count:
+            0,
+
+          failed_count:
+            0,
+
+          opened_count:
+            0,
+
+          clicked_count:
+            0,
+
+          created_by:
+            adminId,
+
+          created_at:
+            timestamp,
+
+          updated_at:
+            timestamp,
+        })
+        .select("*")
+        .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter duplicated successfully.",
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to duplicate newsletter."
+    );
+  }
+}
+
+
+/* ============================================================
+   GET CAMPAIGN RECIPIENT COUNT
+
+   There is only one audience:
+   all active subscribers.
+============================================================ */
+
+async function getCampaignRecipientCount(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
+
+
+    const {
+      data: campaign,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,title,status"
+        )
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+
+    if (
+      campaignError
+    ) {
+      throw campaignError;
+    }
+
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    const recipientInfo =
+      await getRecipientCount();
+
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        campaignId:
+          campaign.id,
+
         audience:
-          recipients.audience,
+          DEFAULT_AUDIENCE,
+
+        count:
+          recipientInfo.count,
 
         recipientCount:
-          recipients.count,
-      });
+          recipientInfo.count,
 
+        supported:
+          true,
+
+        label:
+          "All Active Subscribers",
+      });
   } catch (error) {
     return sendServerError(
       res,
@@ -3112,8 +3315,6 @@ async function getCampaignRecipientCount(
 
 /* ============================================================
    SCHEDULE CAMPAIGN
-
-   POST /api/newsletter/campaigns/:id/schedule
 ============================================================ */
 
 async function scheduleCampaign(
@@ -3121,16 +3322,30 @@ async function scheduleCampaign(
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
 
 
     const scheduledAt =
       parseDateOrNull(
-        req.body?.scheduledAt ??
-        req.body?.scheduled_at
+        req.body
+          ?.scheduledAt ??
+          req.body
+            ?.scheduled_at
       );
 
 
@@ -3141,13 +3356,15 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "Please provide a valid newsletter schedule date and time.",
+            "Please provide a valid delivery date and time.",
         });
     }
 
 
     if (
-      scheduledAt.getTime() <=
+      new Date(
+        scheduledAt
+      ).getTime() <=
       Date.now()
     ) {
       return res
@@ -3156,17 +3373,15 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "The newsletter schedule must be in the future.",
+            "Scheduled delivery must be in the future.",
         });
     }
 
 
     const {
-      data:
-        campaign,
-
+      data: existing,
       error:
-        lookupError,
+        existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3180,41 +3395,28 @@ async function scheduleCampaign(
         .maybeSingle();
 
 
-    if (lookupError) {
-      throw lookupError;
+    if (
+      existingError
+    ) {
+      throw existingError;
     }
 
 
-    if (!campaign) {
+    if (!existing) {
       return res
         .status(404)
         .json({
           success: false,
 
           message:
-            "Newsletter campaign not found.",
+            "Newsletter not found.",
         });
     }
 
 
     if (
-      campaign.status ===
-      "sent"
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "A sent newsletter cannot be scheduled again.",
-        });
-    }
-
-
-    if (
-      campaign.status ===
-      "sending"
+      existing.status ===
+      CAMPAIGN_STATUS.SENDING
     ) {
       return res
         .status(409)
@@ -3227,41 +3429,52 @@ async function scheduleCampaign(
     }
 
 
-    const input =
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "A sent newsletter cannot be scheduled again. Duplicate it to create a new newsletter.",
+        });
+    }
+
+
+    const normalized =
       normalizeCampaignInput({
         title:
-          campaign.title,
+          existing.title,
 
         subject:
-          campaign.subject,
+          existing.subject,
 
         previewText:
-          campaign.preview_text,
+          existing.preview_text,
 
         featuredImage:
-          campaign.featured_image,
+          existing.featured_image,
+
+        images:
+          existing.images,
 
         content:
-          campaign.content,
+          existing.content,
 
         ctaText:
-          campaign.cta_text,
+          existing.cta_text,
 
         ctaLink:
-          campaign.cta_link,
-
-        audience:
-          campaign.audience,
+          existing.cta_link,
       });
 
 
     const validationErrors =
       validateCampaign(
-        input,
-        {
-          requireContent:
-            true,
-        }
+        normalized
       );
 
 
@@ -3275,8 +3488,7 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            validationErrors[0]
-              .message,
+            validationErrors[0],
 
           errors:
             validationErrors,
@@ -3284,15 +3496,13 @@ async function scheduleCampaign(
     }
 
 
-    const recipients =
-      await getRecipientCount(
-        campaign.audience ||
-        "all"
-      );
+    const recipientInfo =
+      await getRecipientCount();
 
 
     if (
-      !recipients.supported
+      recipientInfo.count <
+      1
     ) {
       return res
         .status(400)
@@ -3300,47 +3510,31 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "This audience cannot be scheduled until subscriber segmentation is configured.",
-        });
-    }
-
-
-    if (
-      recipients.count ===
-      0
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "There are no active subscribers available for this campaign.",
+            "There are no active subscribers to receive this newsletter.",
         });
     }
 
 
     const {
-      data:
-        updatedCampaign,
-
-      error:
-        updateError,
+      data,
+      error,
     } =
       await supabaseAdmin
         .from(
           CAMPAIGNS_TABLE
         )
         .update({
+          audience:
+            DEFAULT_AUDIENCE,
+
           status:
-            "scheduled",
+            CAMPAIGN_STATUS.SCHEDULED,
 
           scheduled_at:
-            scheduledAt
-              .toISOString(),
+            scheduledAt,
 
           recipient_count:
-            recipients.count,
+            recipientInfo.count,
 
           updated_at:
             nowIso(),
@@ -3353,8 +3547,8 @@ async function scheduleCampaign(
         .single();
 
 
-    if (updateError) {
-      throw updateError;
+    if (error) {
+      throw error;
     }
 
 
@@ -3366,20 +3560,16 @@ async function scheduleCampaign(
         message:
           "Newsletter scheduled successfully.",
 
-        recipientCount:
-          recipients.count,
-
         campaign:
           normalizeCampaign(
-            updatedCampaign
+            data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to schedule newsletter campaign."
+      "Unable to schedule newsletter."
     );
   }
 }
@@ -3387,8 +3577,6 @@ async function scheduleCampaign(
 
 /* ============================================================
    CANCEL SCHEDULED CAMPAIGN
-
-   POST /api/newsletter/campaigns/:id/cancel-schedule
 ============================================================ */
 
 async function cancelScheduledCampaign(
@@ -3396,18 +3584,28 @@ async function cancelScheduledCampaign(
   res
 ) {
   try {
-    const {
-      id,
-    } =
-      req.params;
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
 
 
     const {
-      data:
-        campaign,
-
+      data: existing,
       error:
-        lookupError,
+        existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3421,26 +3619,28 @@ async function cancelScheduledCampaign(
         .maybeSingle();
 
 
-    if (lookupError) {
-      throw lookupError;
+    if (
+      existingError
+    ) {
+      throw existingError;
     }
 
 
-    if (!campaign) {
+    if (!existing) {
       return res
         .status(404)
         .json({
           success: false,
 
           message:
-            "Newsletter campaign not found.",
+            "Newsletter not found.",
         });
     }
 
 
     if (
-      campaign.status !==
-      "scheduled"
+      existing.status !==
+      CAMPAIGN_STATUS.SCHEDULED
     ) {
       return res
         .status(409)
@@ -3448,17 +3648,14 @@ async function cancelScheduledCampaign(
           success: false,
 
           message:
-            "This newsletter is not currently scheduled.",
+            "Only a scheduled newsletter can have its schedule cancelled.",
         });
     }
 
 
     const {
-      data:
-        updatedCampaign,
-
-      error:
-        updateError,
+      data,
+      error,
     } =
       await supabaseAdmin
         .from(
@@ -3466,7 +3663,7 @@ async function cancelScheduledCampaign(
         )
         .update({
           status:
-            "draft",
+            CAMPAIGN_STATUS.DRAFT,
 
           scheduled_at:
             null,
@@ -3482,8 +3679,8 @@ async function cancelScheduledCampaign(
         .single();
 
 
-    if (updateError) {
-      throw updateError;
+    if (error) {
+      throw error;
     }
 
 
@@ -3497,10 +3694,9 @@ async function cancelScheduledCampaign(
 
         campaign:
           normalizeCampaign(
-            updatedCampaign
+            data
           ),
       });
-
   } catch (error) {
     return sendServerError(
       res,
@@ -3510,110 +3706,1561 @@ async function cancelScheduledCampaign(
   }
 }
 
-async function sendTestCampaign(req, res) {
-  const email = normalizeEmail(req.body?.email);
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ success: false, message: "A valid test email address is required." });
-  }
-  try {
-    const { data: campaign, error } = await supabaseAdmin.from(CAMPAIGNS_TABLE)
-      .select("*").eq("id", req.params.id).maybeSingle();
-    if (error) throw error;
-    if (!campaign) return res.status(404).json({ success: false, message: "Newsletter campaign not found." });
-    return res.status(501).json({
-      success: false,
-      code: "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
-      message: "Test email delivery has not been connected to the email service yet.",
-      testRecipient: email,
-      campaign: normalizeCampaign(campaign),
-    });
-  } catch (error) {
-    return sendServerError(res, error, "Unable to prepare newsletter test email.");
-  }
-}
 
-async function sendCampaign(req, res) {
+/* ============================================================
+   GET CAMPAIGN DELIVERIES
+============================================================ */
+
+async function getCampaignDeliveries(
+  req,
+  res
+) {
   try {
-    const { data: campaign, error } = await supabaseAdmin.from(CAMPAIGNS_TABLE)
-      .select("*").eq("id", req.params.id).maybeSingle();
-    if (error) throw error;
-    if (!campaign) return res.status(404).json({ success: false, message: "Newsletter campaign not found." });
-    if (campaign.status === "sent" || campaign.status === "sending") {
-      return res.status(409).json({ success: false, message: "This newsletter has already been sent or is being sent." });
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
     }
-    return res.status(501).json({
-      success: false,
-      code: "NEWSLETTER_DELIVERY_NOT_CONFIGURED",
-      message: "Campaign email delivery has not been connected to the email service yet.",
-      campaign: normalizeCampaign(campaign),
+
+
+    const {
+      data: campaign,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,title,status"
+        )
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+
+    if (
+      campaignError
+    ) {
+      throw campaignError;
+    }
+
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .select("*")
+        .eq(
+          "campaign_id",
+          id
+        )
+        .order(
+          "created_at",
+          {
+            ascending:
+              false,
+          }
+        );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const deliveries =
+      (data || []).map(
+        normalizeDelivery
+      );
+
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        campaign: {
+          id:
+            campaign.id,
+
+          title:
+            campaign.title,
+
+          status:
+            campaign.status,
+        },
+
+        deliveries,
+
+        count:
+          deliveries.length,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter delivery records."
+    );
+  }
+}/* ============================================================
+   LOAD CAMPAIGN FOR DELIVERY
+============================================================ */
+
+async function loadCampaignForDelivery(
+  id
+) {
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        CAMPAIGNS_TABLE
+      )
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .maybeSingle();
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return data || null;
+}
+
+
+/* ============================================================
+   VALIDATE CAMPAIGN BEFORE DELIVERY
+============================================================ */
+
+function validateCampaignForDelivery(
+  campaign
+) {
+  if (!campaign) {
+    return [
+      "Newsletter not found.",
+    ];
+  }
+
+
+  const normalized =
+    normalizeCampaignInput({
+      title:
+        campaign.title,
+
+      subject:
+        campaign.subject,
+
+      previewText:
+        campaign.preview_text,
+
+      featuredImage:
+        campaign.featured_image,
+
+      images:
+        campaign.images,
+
+      content:
+        campaign.content,
+
+      ctaText:
+        campaign.cta_text,
+
+      ctaLink:
+        campaign.cta_link,
     });
+
+
+  return validateCampaign(
+    normalized
+  );
+}
+
+
+/* ============================================================
+   SEND TEST CAMPAIGN
+
+   Sends the newsletter to ONE test email only.
+
+   It does NOT:
+   - mark the campaign as sent
+   - create normal subscriber delivery statistics
+   - affect recipient counts
+============================================================ */
+
+async function sendTestCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter ID is required.",
+        });
+    }
+
+
+    const email =
+      normalizeEmail(
+        req.body?.email
+      );
+
+
+    if (
+      !isValidEmail(
+        email
+      )
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Please enter a valid test email address.",
+        });
+    }
+
+
+    const campaign =
+      await loadCampaignForDelivery(
+        id
+      );
+
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent.",
+        });
+    }
+
+
+    const validationErrors =
+      validateCampaignForDelivery(
+        campaign
+      );
+
+
+    if (
+      validationErrors.length >
+      0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validationErrors[0],
+
+          errors:
+            validationErrors,
+        });
+    }
+
+
+    /*
+     * Test emails intentionally do not
+     * contain a real subscriber
+     * unsubscribe token.
+     */
+    const html =
+      buildNewsletterHtml(
+        campaign,
+        null
+      );
+
+
+    const text =
+      buildNewsletterText(
+        campaign,
+        null
+      );
+
+
+    const subject =
+      `[TEST] ${cleanString(
+        campaign.subject
+      )}`;
+
+
+    const result =
+      await sendEmail({
+        to:
+          email,
+
+        subject,
+
+        html,
+
+        text,
+      });
+
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          `Test newsletter accepted for sending to ${email}.`,
+
+        email,
+
+        providerMessageId:
+          result?.messageId ||
+          null,
+
+        campaign:
+          normalizeCampaign(
+            campaign
+          ),
+      });
   } catch (error) {
-    return sendServerError(res, error, "Unable to prepare newsletter campaign for sending.");
+    return sendServerError(
+      res,
+      error,
+      "Unable to send the test newsletter."
+    );
   }
 }
 
-async function getCampaignDeliveries(req, res) {
+
+/* ============================================================
+   GET ACTIVE SUBSCRIBERS FOR DELIVERY
+============================================================ */
+
+async function getActiveSubscribersForDelivery() {
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select("*")
+      .eq(
+        "status",
+        "subscribed"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true,
+        }
+      );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return (
+    data || []
+  ).filter(
+    (subscriber) =>
+      isValidEmail(
+        subscriber.email
+      )
+  );
+}
+
+
+/* ============================================================
+   CREATE DELIVERY RECORD
+============================================================ */
+
+async function createDeliveryRecord({
+  campaignId,
+  subscriber,
+  status,
+  providerMessageId = null,
+  failureReason = null,
+  sentAt = null,
+  failedAt = null,
+}) {
+  const timestamp =
+    nowIso();
+
+
+  const payload = {
+    campaign_id:
+      campaignId,
+
+    subscriber_id:
+      subscriber?.id ||
+      null,
+
+    email:
+      normalizeEmail(
+        subscriber?.email
+      ),
+
+    status,
+
+    provider_message_id:
+      providerMessageId,
+
+    failure_reason:
+      failureReason,
+
+    sent_at:
+      sentAt,
+
+    delivered_at:
+      null,
+
+    opened_at:
+      null,
+
+    clicked_at:
+      null,
+
+    failed_at:
+      failedAt,
+
+    created_at:
+      timestamp,
+
+    updated_at:
+      timestamp,
+  };
+
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        DELIVERIES_TABLE
+      )
+      .insert(
+        payload
+      )
+      .select("*")
+      .single();
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return data;
+}
+
+
+/* ============================================================
+   SAFE DELIVERY RECORD
+
+   Email delivery should not be incorrectly reported as failed
+   simply because analytics logging had a separate database
+   problem.
+
+   We therefore log delivery-record failures separately.
+============================================================ */
+
+async function safelyCreateDeliveryRecord(
+  payload
+) {
   try {
-    const { data, error } = await supabaseAdmin.from(DELIVERIES_TABLE)
-      .select("*").eq("campaign_id", req.params.id)
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    const deliveries = Array.isArray(data) ? data.map(normalizeDelivery) : [];
-    return res.status(200).json({ success: true, count: deliveries.length, deliveries });
+    return await createDeliveryRecord(
+      payload
+    );
   } catch (error) {
-    return sendServerError(res, error, "Unable to load newsletter deliveries.");
+    console.error(
+      "[NEWSLETTER] Unable to create delivery record:",
+      {
+        campaignId:
+          payload?.campaignId ||
+          null,
+
+        email:
+          payload?.subscriber?.email ||
+          null,
+
+        status:
+          payload?.status ||
+          null,
+
+        message:
+          error?.message ||
+          "Unknown delivery-record error",
+      }
+    );
+
+    return null;
   }
 }
 
-async function getNewsletterAnalytics(req, res) {
-  try {
-    const [subscriberResult, campaignResult] = await Promise.all([
-      supabaseAdmin.from(SUBSCRIBERS_TABLE).select("id, status"),
-      supabaseAdmin.from(CAMPAIGNS_TABLE).select("id, status, recipient_count, delivered_count, failed_count, opened_count, clicked_count"),
-    ]);
-    if (subscriberResult.error) throw subscriberResult.error;
-    if (campaignResult.error) throw campaignResult.error;
-    const subscribers = subscriberResult.data || [];
-    const campaigns = campaignResult.data || [];
-    const count = (rows, status) => rows.filter((row) => row.status === status).length;
-    const sum = (field) => campaigns.reduce((total, row) => total + Number(row[field] || 0), 0);
-    return res.status(200).json({ success: true, analytics: {
-      totalSubscribers: subscribers.length,
-      activeSubscribers: count(subscribers, "subscribed"),
-      unsubscribed: count(subscribers, "unsubscribed"),
-      totalCampaigns: campaigns.length,
-      sentCampaigns: count(campaigns, "sent"),
-      scheduledCampaigns: count(campaigns, "scheduled"),
-      draftCampaigns: count(campaigns, "draft"),
-      recipientCount: sum("recipient_count"),
-      deliveredCount: sum("delivered_count"),
-      failedCount: sum("failed_count"),
-      openedCount: sum("opened_count"),
-      clickedCount: sum("clicked_count"),
-    } });
-  } catch (error) {
-    return sendServerError(res, error, "Unable to load newsletter analytics.");
+
+/* ============================================================
+   UPDATE CAMPAIGN DELIVERY PROGRESS
+============================================================ */
+
+async function updateCampaignDeliveryProgress(
+  campaignId,
+  {
+    recipientCount,
+    acceptedCount,
+    failedCount,
+  }
+) {
+  const {
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        CAMPAIGNS_TABLE
+      )
+      .update({
+        recipient_count:
+          recipientCount,
+
+        /*
+         * Existing database field name is
+         * delivered_count.
+         *
+         * Until provider webhooks are added,
+         * this stores emails accepted by Resend,
+         * not independently confirmed inbox
+         * deliveries.
+         */
+        delivered_count:
+          acceptedCount,
+
+        failed_count:
+          failedCount,
+
+        updated_at:
+          nowIso(),
+      })
+      .eq(
+        "id",
+        campaignId
+      );
+
+
+  if (error) {
+    throw error;
   }
 }
+
+
+/* ============================================================
+   SEND CAMPAIGN
+
+   Broadcasts to ALL ACTIVE SUBSCRIBERS.
+
+   There is no audience selector anymore.
+
+   Important:
+   `sendEmail()` success means Resend accepted the email.
+   It does not yet mean the recipient's mail server confirmed
+   final delivery.
+============================================================ */
+
+async function sendCampaign(
+  req,
+  res
+) {
+  const id =
+    cleanString(
+      req.params?.id
+    );
+
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+
+        message:
+          "Newsletter ID is required.",
+      });
+  }
+
+
+  let campaign = null;
+
+  let campaignMarkedSending =
+    false;
+
+
+  try {
+    campaign =
+      await loadCampaignForDelivery(
+        id
+      );
+
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter not found.",
+        });
+    }
+
+
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is already being sent.",
+        });
+    }
+
+
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter has already been sent. Duplicate it if you want to send it again.",
+        });
+    }
+
+
+    const validationErrors =
+      validateCampaignForDelivery(
+        campaign
+      );
+
+
+    if (
+      validationErrors.length >
+      0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validationErrors[0],
+
+          errors:
+            validationErrors,
+        });
+    }
+
+
+    const subscribers =
+      await getActiveSubscribersForDelivery();
+
+
+    const recipientCount =
+      subscribers.length;
+
+
+    if (
+      recipientCount === 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "There are no active subscribers to receive this newsletter.",
+        });
+    }
+
+
+    /*
+     * Mark the campaign as sending BEFORE
+     * beginning the broadcast.
+     *
+     * This also prevents an administrator
+     * deleting the campaign during delivery.
+     */
+    const {
+      data:
+        sendingCampaign,
+
+      error:
+        sendingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .update({
+          audience:
+            DEFAULT_AUDIENCE,
+
+          status:
+            CAMPAIGN_STATUS.SENDING,
+
+          scheduled_at:
+            null,
+
+          recipient_count:
+            recipientCount,
+
+          delivered_count:
+            0,
+
+          failed_count:
+            0,
+
+          sent_at:
+            null,
+
+          updated_at:
+            nowIso(),
+        })
+        .eq(
+          "id",
+          id
+        )
+        .select("*")
+        .single();
+
+
+    if (sendingError) {
+      throw sendingError;
+    }
+
+
+    campaign =
+      sendingCampaign;
+
+
+    campaignMarkedSending =
+      true;
+
+
+    let acceptedCount = 0;
+
+    let failedCount = 0;
+
+
+    const failures = [];
+
+
+    /*
+     * Sequential delivery is intentional.
+     *
+     * It keeps this implementation simple
+     * and avoids launching every request at
+     * exactly the same time.
+     *
+     * For a much larger subscriber list,
+     * this should eventually move to a
+     * queue/background worker or provider
+     * broadcast feature.
+     */
+    for (
+      let index = 0;
+      index <
+      subscribers.length;
+      index += 1
+    ) {
+      const subscriber =
+        subscribers[index];
+
+
+      const email =
+        normalizeEmail(
+          subscriber.email
+        );
+
+
+      try {
+        const html =
+          buildNewsletterHtml(
+            campaign,
+            subscriber
+          );
+
+
+        const text =
+          buildNewsletterText(
+            campaign,
+            subscriber
+          );
+
+
+        const result =
+          await sendEmail({
+            to:
+              email,
+
+            subject:
+              campaign.subject,
+
+            html,
+
+            text,
+          });
+
+
+        const sentAt =
+          nowIso();
+
+
+        acceptedCount += 1;
+
+
+        await safelyCreateDeliveryRecord({
+          campaignId:
+            id,
+
+          subscriber,
+
+          status:
+            "sent",
+
+          providerMessageId:
+            result?.messageId ||
+            null,
+
+          failureReason:
+            null,
+
+          sentAt,
+
+          failedAt:
+            null,
+        });
+      } catch (
+        deliveryError
+      ) {
+        failedCount += 1;
+
+
+        const failureReason =
+          cleanString(
+            deliveryError?.message,
+            "Unable to send email."
+          );
+
+
+        failures.push({
+          email,
+
+          message:
+            failureReason,
+        });
+
+
+        await safelyCreateDeliveryRecord({
+          campaignId:
+            id,
+
+          subscriber,
+
+          status:
+            "failed",
+
+          providerMessageId:
+            null,
+
+          failureReason,
+
+          sentAt:
+            null,
+
+          failedAt:
+            nowIso(),
+        });
+      }
+
+
+      /*
+       * Persist progress after every email.
+       * If the request fails later, the CMS
+       * still has useful counts.
+       */
+      await updateCampaignDeliveryProgress(
+        id,
+        {
+          recipientCount,
+
+          acceptedCount,
+
+          failedCount,
+        }
+      );
+
+
+      /*
+       * Small spacing between provider calls.
+       * Skip the delay after the final email.
+       */
+      if (
+        index <
+        subscribers.length - 1
+      ) {
+        await sleep(
+          550
+        );
+      }
+    }
+
+
+    const finalStatus =
+      acceptedCount > 0
+        ? CAMPAIGN_STATUS.SENT
+        : CAMPAIGN_STATUS.FAILED;
+
+
+    const completedAt =
+      nowIso();
+
+
+    const {
+      data:
+        completedCampaign,
+
+      error:
+        completedError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .update({
+          audience:
+            DEFAULT_AUDIENCE,
+
+          status:
+            finalStatus,
+
+          scheduled_at:
+            null,
+
+          /*
+           * Set sent_at only when at least
+           * one message was accepted.
+           */
+          sent_at:
+            acceptedCount > 0
+              ? completedAt
+              : null,
+
+          recipient_count:
+            recipientCount,
+
+          delivered_count:
+            acceptedCount,
+
+          failed_count:
+            failedCount,
+
+          updated_at:
+            completedAt,
+        })
+        .eq(
+          "id",
+          id
+        )
+        .select("*")
+        .single();
+
+
+    if (completedError) {
+      throw completedError;
+    }
+
+
+    /*
+     * If some recipients failed but others
+     * were accepted, the overall campaign
+     * remains "sent" while failed_count tells
+     * the administrator what happened.
+     */
+    const message =
+      acceptedCount ===
+      recipientCount
+        ? `Newsletter accepted for sending to all ${recipientCount} active subscribers.`
+        : acceptedCount > 0
+          ? `Newsletter sending completed. ${acceptedCount} message(s) were accepted and ${failedCount} failed.`
+          : "The newsletter could not be sent to any active subscriber.";
+
+
+    return res
+      .status(
+        acceptedCount > 0
+          ? 200
+          : 502
+      )
+      .json({
+        success:
+          acceptedCount > 0,
+
+        message,
+
+        audience:
+          DEFAULT_AUDIENCE,
+
+        recipientCount,
+
+        /*
+         * Use acceptedCount in the API so the
+         * frontend can label this honestly.
+         */
+        acceptedCount,
+
+        failedCount,
+
+        failures,
+
+        campaign:
+          normalizeCampaign(
+            completedCampaign
+          ),
+      });
+  } catch (error) {
+    console.error(
+      "[NEWSLETTER] Campaign delivery failed:",
+      error
+    );
+
+
+    /*
+     * If the campaign had already entered
+     * "sending", make sure it does not remain
+     * permanently locked there after an
+     * unexpected server failure.
+     */
+    if (
+      campaignMarkedSending
+    ) {
+      try {
+        await supabaseAdmin
+          .from(
+            CAMPAIGNS_TABLE
+          )
+          .update({
+            status:
+              CAMPAIGN_STATUS.FAILED,
+
+            updated_at:
+              nowIso(),
+          })
+          .eq(
+            "id",
+            id
+          );
+      } catch (
+        statusError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to mark campaign as failed:",
+          statusError
+        );
+      }
+    }
+
+
+    return res
+      .status(500)
+      .json({
+        success: false,
+
+        message:
+          error?.message ||
+          "Unable to send newsletter.",
+      });
+  }
+}
+
+
+/* ============================================================
+   NEWSLETTER ANALYTICS
+============================================================ */
+
+async function getNewsletterAnalytics(
+  req,
+  res
+) {
+  try {
+    const [
+      subscribersResult,
+      campaignsResult,
+      deliveriesResult,
+    ] =
+      await Promise.all([
+        supabaseAdmin
+          .from(
+            SUBSCRIBERS_TABLE
+          )
+          .select("*"),
+
+        supabaseAdmin
+          .from(
+            CAMPAIGNS_TABLE
+          )
+          .select("*"),
+
+        supabaseAdmin
+          .from(
+            DELIVERIES_TABLE
+          )
+          .select("*"),
+      ]);
+
+
+    if (
+      subscribersResult.error
+    ) {
+      throw subscribersResult.error;
+    }
+
+
+    if (
+      campaignsResult.error
+    ) {
+      throw campaignsResult.error;
+    }
+
+
+    if (
+      deliveriesResult.error
+    ) {
+      throw deliveriesResult.error;
+    }
+
+
+    const subscribers =
+      subscribersResult.data ||
+      [];
+
+
+    const campaigns =
+      campaignsResult.data ||
+      [];
+
+
+    const deliveries =
+      deliveriesResult.data ||
+      [];
+
+
+    const activeSubscribers =
+      subscribers.filter(
+        (subscriber) =>
+          subscriber.status ===
+          "subscribed"
+      ).length;
+
+
+    const unsubscribedSubscribers =
+      subscribers.filter(
+        (subscriber) =>
+          subscriber.status ===
+          "unsubscribed"
+      ).length;
+
+
+    const draftCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.DRAFT
+      ).length;
+
+
+    const scheduledCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SCHEDULED
+      ).length;
+
+
+    const sendingCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SENDING
+      ).length;
+
+
+    const sentCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SENT
+      ).length;
+
+
+    const failedCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.FAILED
+      ).length;
+
+
+    const acceptedDeliveries =
+      deliveries.filter(
+        (delivery) =>
+          delivery.status ===
+          "sent" ||
+          delivery.status ===
+          "delivered"
+      ).length;
+
+
+    const failedDeliveries =
+      deliveries.filter(
+        (delivery) =>
+          delivery.status ===
+          "failed"
+      ).length;
+
+
+    /*
+     * These become meaningful when provider
+     * webhooks update the corresponding
+     * delivery timestamps.
+     */
+    const confirmedDelivered =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.delivered_at
+          )
+      ).length;
+
+
+    const openedDeliveries =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.opened_at
+          )
+      ).length;
+
+
+    const clickedDeliveries =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.clicked_at
+          )
+      ).length;
+
+
+    const totalRecipients =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.recipient_count ||
+              0
+          ),
+        0
+      );
+
+
+    const totalAccepted =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.delivered_count ||
+              0
+          ),
+        0
+      );
+
+
+    const totalFailed =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.failed_count ||
+              0
+          ),
+        0
+      );
+
+
+    const latestSentCampaign =
+      campaigns
+        .filter(
+          (campaign) =>
+            campaign.sent_at
+        )
+        .sort(
+          (a, b) =>
+            new Date(
+              b.sent_at
+            ).getTime() -
+            new Date(
+              a.sent_at
+            ).getTime()
+        )[0] ||
+      null;
+
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        analytics: {
+          audience:
+            DEFAULT_AUDIENCE,
+
+          audienceLabel:
+            "All Active Subscribers",
+
+          subscribers: {
+            total:
+              subscribers.length,
+
+            active:
+              activeSubscribers,
+
+            unsubscribed:
+              unsubscribedSubscribers,
+          },
+
+          campaigns: {
+            total:
+              campaigns.length,
+
+            draft:
+              draftCampaigns,
+
+            scheduled:
+              scheduledCampaigns,
+
+            sending:
+              sendingCampaigns,
+
+            sent:
+              sentCampaigns,
+
+            failed:
+              failedCampaigns,
+          },
+
+          delivery: {
+            /*
+             * accepted = provider accepted
+             * the message for sending.
+             */
+            recipients:
+              totalRecipients,
+
+            accepted:
+              totalAccepted,
+
+            failed:
+              totalFailed,
+
+            deliveryRecords:
+              deliveries.length,
+
+            acceptedRecords:
+              acceptedDeliveries,
+
+            failedRecords:
+              failedDeliveries,
+
+            confirmedDelivered,
+
+            opened:
+              openedDeliveries,
+
+            clicked:
+              clickedDeliveries,
+          },
+
+          latestNewsletter:
+            latestSentCampaign
+              ? normalizeCampaign(
+                  latestSentCampaign
+                )
+              : null,
+        },
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter analytics."
+    );
+  }
+}
+
+
+/* ============================================================
+   MODULE EXPORTS
+============================================================ */
 
 module.exports = {
+  /* ----------------------------------------------------------
+     PUBLIC SUBSCRIBER ACTIONS
+  ---------------------------------------------------------- */
+
   subscribe,
+
   unsubscribe,
+
+
+  /* ----------------------------------------------------------
+     ADMIN SUBSCRIBER MANAGEMENT
+  ---------------------------------------------------------- */
+
   getSubscribers,
+
   updateSubscriber,
+
   deleteSubscriber,
+
+
+  /* ----------------------------------------------------------
+     IMAGE UPLOAD
+  ---------------------------------------------------------- */
+
   uploadNewsletterImage,
+
+
+  /* ----------------------------------------------------------
+     CAMPAIGN MANAGEMENT
+  ---------------------------------------------------------- */
+
   getCampaigns,
+
   getCampaign,
+
   createCampaign,
+
   updateCampaign,
+
   deleteCampaign,
+
   duplicateCampaign,
+
   getCampaignRecipientCount,
+
+
+  /* ----------------------------------------------------------
+     SCHEDULING
+  ---------------------------------------------------------- */
+
   scheduleCampaign,
+
   cancelScheduledCampaign,
+
+
+  /* ----------------------------------------------------------
+     DELIVERY
+  ---------------------------------------------------------- */
+
   sendTestCampaign,
+
   sendCampaign,
+
   getCampaignDeliveries,
+
+
+  /* ----------------------------------------------------------
+     ANALYTICS
+  ---------------------------------------------------------- */
+
   getNewsletterAnalytics,
 };

@@ -75,6 +75,19 @@ const DEFAULT_AUDIENCE =
 
 
 /* ============================================================
+   DEFAULT CONTENT TYPE
+
+   The existing newsletter_campaigns database table requires
+   content_type to contain a non-null value.
+
+   The current Newsletter Studio uses the standard format.
+============================================================ */
+
+const DEFAULT_CONTENT_TYPE =
+  "standard";
+
+
+/* ============================================================
    BASIC HELPERS
 ============================================================ */
 
@@ -273,7 +286,7 @@ function sendServerError(
      "https://..."
    ]
 
-   and also tolerates:
+   Also tolerates:
    [
      { url: "https://..." }
    ]
@@ -295,19 +308,16 @@ function normalizeImages(
     }
   }
 
-
   if (
     !Array.isArray(source)
   ) {
     return [];
   }
 
-
   const seen =
     new Set();
 
   const result = [];
-
 
   for (
     const item of source
@@ -333,11 +343,9 @@ function normalizeImages(
         );
     }
 
-
     if (!url) {
       continue;
     }
-
 
     if (
       !isValidUrl(url)
@@ -345,19 +353,16 @@ function normalizeImages(
       continue;
     }
 
-
     if (
       seen.has(url)
     ) {
       continue;
     }
 
-
     seen.add(url);
 
     result.push(url);
   }
-
 
   return result;
 }
@@ -424,12 +429,10 @@ function normalizeCampaign(
     return null;
   }
 
-
   const images =
     normalizeImages(
       campaign.images
     );
-
 
   return {
     id:
@@ -454,16 +457,20 @@ function normalizeCampaign(
     content:
       campaign.content || "",
 
+    /*
+     * IMPORTANT:
+     * Existing database schema requires content_type.
+     */
+    contentType:
+      campaign.content_type ||
+      DEFAULT_CONTENT_TYPE,
+
     ctaText:
       campaign.cta_text || "",
 
     ctaLink:
       campaign.cta_link || "",
 
-    /*
-     * We intentionally expose only
-     * the single supported audience.
-     */
     audience:
       DEFAULT_AUDIENCE,
 
@@ -486,6 +493,12 @@ function normalizeCampaign(
       ),
 
     deliveredCount:
+      Number(
+        campaign.delivered_count ||
+          0
+      ),
+
+    acceptedCount:
       Number(
         campaign.delivered_count ||
           0
@@ -632,6 +645,17 @@ function normalizeCampaignInput(
         body.content
       ),
 
+    /*
+     * This fixes the NOT NULL database error.
+     */
+    contentType:
+      cleanString(
+        body.contentType ??
+          body.content_type,
+        DEFAULT_CONTENT_TYPE
+      ) ||
+      DEFAULT_CONTENT_TYPE,
+
     ctaText:
       cleanString(
         body.ctaText ??
@@ -645,8 +669,7 @@ function normalizeCampaignInput(
       ),
 
     /*
-     * Ignore any audience sent
-     * by the browser.
+     * Audience sent by the browser is deliberately ignored.
      */
     audience:
       DEFAULT_AUDIENCE,
@@ -668,7 +691,6 @@ function validateCampaign(
 ) {
   const errors = [];
 
-
   if (
     !campaign.title
   ) {
@@ -676,7 +698,6 @@ function validateCampaign(
       "Newsletter title is required."
     );
   }
-
 
   if (
     !campaign.subject
@@ -686,7 +707,6 @@ function validateCampaign(
     );
   }
 
-
   if (
     !campaign.content
   ) {
@@ -695,6 +715,13 @@ function validateCampaign(
     );
   }
 
+  if (
+    !campaign.contentType
+  ) {
+    errors.push(
+      "Newsletter content type is required."
+    );
+  }
 
   if (
     campaign.featuredImage &&
@@ -706,7 +733,6 @@ function validateCampaign(
       "Featured image must be a valid HTTP or HTTPS URL."
     );
   }
-
 
   if (
     !Array.isArray(
@@ -735,7 +761,6 @@ function validateCampaign(
     }
   }
 
-
   if (
     campaign.ctaLink &&
     !isValidUrl(
@@ -746,7 +771,6 @@ function validateCampaign(
       "Call-to-action link must be a valid HTTP or HTTPS URL."
     );
   }
-
 
   return errors;
 }
@@ -777,11 +801,9 @@ async function getRecipientCount() {
         "subscribed"
       );
 
-
   if (error) {
     throw error;
   }
-
 
   return {
     count:
@@ -815,7 +837,6 @@ function getNewsletterImageExtension(
       )
       .toLowerCase();
 
-
   if (
     ALLOWED_NEWSLETTER_IMAGE_EXTENSIONS.has(
       extension
@@ -824,12 +845,10 @@ function getNewsletterImageExtension(
     return extension;
   }
 
-
   const mimeType =
     cleanString(
       file?.mimetype
     ).toLowerCase();
-
 
   if (
     mimeType ===
@@ -838,7 +857,6 @@ function getNewsletterImageExtension(
     return ".jpg";
   }
 
-
   if (
     mimeType ===
     "image/png"
@@ -846,14 +864,12 @@ function getNewsletterImageExtension(
     return ".png";
   }
 
-
   if (
     mimeType ===
     "image/webp"
   ) {
     return ".webp";
   }
-
 
   return "";
 }
@@ -870,7 +886,6 @@ function validateNewsletterImageFile(
     };
   }
 
-
   if (
     !Buffer.isBuffer(
       file.buffer
@@ -884,12 +899,10 @@ function validateNewsletterImageFile(
     };
   }
 
-
   const mimeType =
     cleanString(
       file.mimetype
     ).toLowerCase();
-
 
   if (
     !ALLOWED_NEWSLETTER_IMAGE_TYPES.has(
@@ -903,7 +916,6 @@ function validateNewsletterImageFile(
     };
   }
 
-
   if (
     file.buffer.length >
     MAX_NEWSLETTER_IMAGE_SIZE
@@ -915,12 +927,10 @@ function validateNewsletterImageFile(
     };
   }
 
-
   const extension =
     getNewsletterImageExtension(
       file
     );
-
 
   if (!extension) {
     return {
@@ -929,7 +939,6 @@ function validateNewsletterImageFile(
         "Unable to determine the image format.",
     };
   }
-
 
   return {
     valid: true,
@@ -968,7 +977,6 @@ function buildUnsubscribeUrl(
   const baseUrl =
     getPublicApiUrl();
 
-
   if (
     subscriber?.token
   ) {
@@ -980,7 +988,6 @@ function buildUnsubscribeUrl(
       )
     );
   }
-
 
   return (
     `${baseUrl}` +
@@ -1002,7 +1009,6 @@ function buildNewsletterImagesHtml(
 ) {
   const images = [];
 
-
   if (
     campaign.featured_image
   ) {
@@ -1010,7 +1016,6 @@ function buildNewsletterImagesHtml(
       campaign.featured_image
     );
   }
-
 
   for (
     const url of
@@ -1025,13 +1030,11 @@ function buildNewsletterImagesHtml(
     }
   }
 
-
   if (
     images.length === 0
   ) {
     return "";
   }
-
 
   return images
     .map(
@@ -1076,13 +1079,11 @@ function buildNewsletterHtml(
         ""
     );
 
-
   const previewText =
     escapeHtml(
       campaign.preview_text ||
         ""
     );
-
 
   const content =
     escapeHtml(
@@ -1093,13 +1094,11 @@ function buildNewsletterHtml(
       "<br />"
     );
 
-
   const ctaText =
     escapeHtml(
       campaign.cta_text ||
         ""
     );
-
 
   const ctaLink =
     campaign.cta_link &&
@@ -1111,7 +1110,6 @@ function buildNewsletterHtml(
         )
       : "";
 
-
   const unsubscribeUrl =
     subscriber
       ? buildUnsubscribeUrl(
@@ -1119,12 +1117,10 @@ function buildNewsletterHtml(
         )
       : "";
 
-
   const imageHtml =
     buildNewsletterImagesHtml(
       campaign
     );
-
 
   const ctaHtml =
     ctaText &&
@@ -1158,7 +1154,6 @@ function buildNewsletterHtml(
       `
       : "";
 
-
   const unsubscribeHtml =
     unsubscribeUrl
       ? `
@@ -1183,7 +1178,6 @@ function buildNewsletterHtml(
         </p>
       `
       : "";
-
 
   return `
 <!doctype html>
@@ -1359,7 +1353,6 @@ function buildNewsletterText(
     campaign.content || "",
   ];
 
-
   if (
     campaign.cta_text &&
     campaign.cta_link
@@ -1370,7 +1363,6 @@ function buildNewsletterText(
     );
   }
 
-
   if (subscriber) {
     lines.push(
       "",
@@ -1379,7 +1371,6 @@ function buildNewsletterText(
       )}`
     );
   }
-
 
   return lines
     .join("\n")
@@ -1406,7 +1397,6 @@ async function subscribe(
         req.body?.name
       );
 
-
     if (
       !isValidEmail(email)
     ) {
@@ -1418,7 +1408,6 @@ async function subscribe(
             "Please enter a valid email address.",
         });
     }
-
 
     const {
       data: existing,
@@ -1435,11 +1424,9 @@ async function subscribe(
         )
         .maybeSingle();
 
-
     if (existingError) {
       throw existingError;
     }
-
 
     if (existing) {
       const {
@@ -1480,11 +1467,9 @@ async function subscribe(
           .select("*")
           .single();
 
-
       if (error) {
         throw error;
       }
-
 
       return res
         .status(200)
@@ -1501,10 +1486,8 @@ async function subscribe(
         });
     }
 
-
     const timestamp =
       nowIso();
-
 
     const {
       data,
@@ -1546,11 +1529,9 @@ async function subscribe(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(201)
@@ -1577,15 +1558,6 @@ async function subscribe(
 
 /* ============================================================
    UNSUBSCRIBE
-
-   Supports:
-   POST body:
-     { email }
-     { token }
-
-   and public GET:
-     ?email=
-     ?token=
 ============================================================ */
 
 async function unsubscribe(
@@ -1605,7 +1577,6 @@ async function unsubscribe(
           req.query?.token
       );
 
-
     if (
       !email &&
       !token
@@ -1620,14 +1591,12 @@ async function unsubscribe(
         });
     }
 
-
     let query =
       supabaseAdmin
         .from(
           SUBSCRIBERS_TABLE
         )
         .select("*");
-
 
     if (token) {
       query =
@@ -1643,7 +1612,6 @@ async function unsubscribe(
         );
     }
 
-
     const {
       data: subscriber,
       error,
@@ -1651,16 +1619,10 @@ async function unsubscribe(
       await query
         .maybeSingle();
 
-
     if (error) {
       throw error;
     }
 
-
-    /*
-     * Do not reveal whether an
-     * arbitrary email exists.
-     */
     if (!subscriber) {
       return res
         .status(200)
@@ -1672,10 +1634,8 @@ async function unsubscribe(
         });
     }
 
-
     const timestamp =
       nowIso();
-
 
     const {
       error:
@@ -1700,11 +1660,9 @@ async function unsubscribe(
           subscriber.id
         );
 
-
     if (updateError) {
       throw updateError;
     }
-
 
     return res
       .status(200)
@@ -1750,17 +1708,14 @@ async function getSubscribers(
           }
         );
 
-
     if (error) {
       throw error;
     }
-
 
     const subscribers =
       (data || []).map(
         normalizeSubscriber
       );
-
 
     const activeCount =
       subscribers.filter(
@@ -1768,7 +1723,6 @@ async function getSubscribers(
           subscriber.status ===
           "subscribed"
       ).length;
-
 
     return res
       .status(200)
@@ -1806,7 +1760,6 @@ async function updateSubscriber(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -1817,12 +1770,10 @@ async function updateSubscriber(
         });
     }
 
-
     const updates = {
       updated_at:
         nowIso(),
     };
-
 
     if (
       req.body?.name !==
@@ -1834,7 +1785,6 @@ async function updateSubscriber(
         );
     }
 
-
     if (
       req.body?.email !==
       undefined
@@ -1843,7 +1793,6 @@ async function updateSubscriber(
         normalizeEmail(
           req.body.email
         );
-
 
       if (
         !isValidEmail(
@@ -1860,11 +1809,9 @@ async function updateSubscriber(
           });
       }
 
-
       updates.email =
         email;
     }
-
 
     if (
       req.body?.status !==
@@ -1874,7 +1821,6 @@ async function updateSubscriber(
         cleanString(
           req.body.status
         ).toLowerCase();
-
 
       if (
         ![
@@ -1894,10 +1840,8 @@ async function updateSubscriber(
           });
       }
 
-
       updates.status =
         status;
-
 
       if (
         status ===
@@ -1913,7 +1857,6 @@ async function updateSubscriber(
           nowIso();
       }
     }
-
 
     const {
       data,
@@ -1933,11 +1876,9 @@ async function updateSubscriber(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -1976,7 +1917,6 @@ async function deleteSubscriber(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -1986,7 +1926,6 @@ async function deleteSubscriber(
             "Subscriber ID is required.",
         });
     }
-
 
     const {
       error,
@@ -2001,11 +1940,9 @@ async function deleteSubscriber(
           id
         );
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -2022,15 +1959,14 @@ async function deleteSubscriber(
       "Unable to delete subscriber."
     );
   }
-}/* ============================================================
+}
+
+
+/* ============================================================
    UPLOAD NEWSLETTER IMAGE
 
-   Uploads one image at a time to Supabase Storage.
-   The frontend can call this endpoint repeatedly when the
-   newsletter contains several images.
-
-   Each upload returns a permanent public URL which can then
-   be placed inside the campaign's `images` array.
+   One image is uploaded per request. The frontend can call this
+   endpoint repeatedly and save the returned URLs in `images`.
 ============================================================ */
 
 async function uploadNewsletterImage(
@@ -2041,12 +1977,10 @@ async function uploadNewsletterImage(
     const file =
       req.file;
 
-
     const validation =
       validateNewsletterImageFile(
         file
       );
-
 
     if (
       !validation.valid
@@ -2061,12 +1995,10 @@ async function uploadNewsletterImage(
         });
     }
 
-
     const adminId =
       getCurrentAdminId(
         req
       );
-
 
     if (!adminId) {
       return res
@@ -2079,10 +2011,8 @@ async function uploadNewsletterImage(
         });
     }
 
-
     const extension =
       validation.extension;
-
 
     const storagePath =
       [
@@ -2098,7 +2028,6 @@ async function uploadNewsletterImage(
           .randomBytes(10)
           .toString("hex")}${extension}`,
       ].join("/");
-
 
     const {
       data: uploadData,
@@ -2124,11 +2053,9 @@ async function uploadNewsletterImage(
           }
         );
 
-
     if (uploadError) {
       throw uploadError;
     }
-
 
     const {
       data: publicUrlData,
@@ -2143,12 +2070,10 @@ async function uploadNewsletterImage(
             storagePath
         );
 
-
     const publicUrl =
       cleanString(
         publicUrlData?.publicUrl
       );
-
 
     if (
       !publicUrl ||
@@ -2156,11 +2081,6 @@ async function uploadNewsletterImage(
         publicUrl
       )
     ) {
-      /*
-       * The upload succeeded but we
-       * cannot use it without a valid
-       * public URL. Clean it up.
-       */
       try {
         await supabaseAdmin
           .storage
@@ -2180,7 +2100,6 @@ async function uploadNewsletterImage(
         );
       }
 
-
       return res
         .status(500)
         .json({
@@ -2190,7 +2109,6 @@ async function uploadNewsletterImage(
             "The image uploaded, but its public URL could not be created.",
         });
     }
-
 
     return res
       .status(201)
@@ -2242,10 +2160,7 @@ async function uploadNewsletterImage(
       "Unable to upload newsletter image."
     );
   }
-}
-
-
-/* ============================================================
+}/* ============================================================
    GET CAMPAIGNS
 ============================================================ */
 
@@ -2266,22 +2181,18 @@ async function getCampaigns(
         .order(
           "created_at",
           {
-            ascending:
-              false,
+            ascending: false,
           }
         );
-
 
     if (error) {
       throw error;
     }
 
-
     const campaigns =
       (data || []).map(
         normalizeCampaign
       );
-
 
     return res
       .status(200)
@@ -2297,7 +2208,7 @@ async function getCampaigns(
     return sendServerError(
       res,
       error,
-      "Unable to load newsletters."
+      "Unable to load newsletter campaigns."
     );
   }
 }
@@ -2317,7 +2228,6 @@ async function getCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -2325,10 +2235,9 @@ async function getCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
-
 
     const {
       data,
@@ -2345,11 +2254,9 @@ async function getCampaign(
         )
         .maybeSingle();
 
-
     if (error) {
       throw error;
     }
-
 
     if (!data) {
       return res
@@ -2358,10 +2265,9 @@ async function getCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
-
 
     return res
       .status(200)
@@ -2377,7 +2283,7 @@ async function getCampaign(
     return sendServerError(
       res,
       error,
-      "Unable to load newsletter."
+      "Unable to load newsletter campaign."
     );
   }
 }
@@ -2386,7 +2292,11 @@ async function getCampaign(
 /* ============================================================
    CREATE CAMPAIGN
 
-   Audience is always "all".
+   Drafts can be created before the newsletter is complete.
+
+   IMPORTANT:
+   content_type is explicitly written because the existing
+   newsletter_campaigns table requires a non-null value.
 ============================================================ */
 
 async function createCampaign(
@@ -2399,38 +2309,35 @@ async function createCampaign(
         req.body || {}
       );
 
-
-    const errors =
-      validateCampaign(
-        input
-      );
-
-
-    if (
-      errors.length > 0
-    ) {
+    if (!input.title) {
       return res
         .status(400)
         .json({
           success: false,
 
           message:
-            errors[0],
-
-          errors,
+            "Newsletter title is required.",
         });
     }
 
+    if (!input.subject) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Email subject is required.",
+        });
+    }
 
     const adminId =
       getCurrentAdminId(
         req
       );
 
-
     const timestamp =
       nowIso();
-
 
     const {
       data,
@@ -2454,14 +2361,18 @@ async function createCampaign(
             input.featuredImage ||
             null,
 
-          /*
-           * New JSONB field.
-           */
           images:
             input.images,
 
           content:
             input.content,
+
+          /*
+           * Required database field.
+           */
+          content_type:
+            input.contentType ||
+            DEFAULT_CONTENT_TYPE,
 
           cta_text:
             input.ctaText,
@@ -2471,8 +2382,7 @@ async function createCampaign(
             null,
 
           /*
-           * There is now only one
-           * supported audience.
+           * Audience is fixed by the server.
            */
           audience:
             DEFAULT_AUDIENCE,
@@ -2513,11 +2423,9 @@ async function createCampaign(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(201)
@@ -2525,7 +2433,7 @@ async function createCampaign(
         success: true,
 
         message:
-          "Newsletter created successfully.",
+          "Newsletter draft created successfully.",
 
         campaign:
           normalizeCampaign(
@@ -2536,7 +2444,7 @@ async function createCampaign(
     return sendServerError(
       res,
       error,
-      "Unable to create newsletter."
+      "Unable to create newsletter campaign."
     );
   }
 }
@@ -2544,13 +2452,6 @@ async function createCampaign(
 
 /* ============================================================
    UPDATE CAMPAIGN
-
-   Sent newsletters are historical records and should normally
-   be duplicated rather than edited. Drafts, scheduled and
-   failed newsletters may be edited.
-
-   A sent newsletter CAN still be deleted through
-   deleteCampaign().
 ============================================================ */
 
 async function updateCampaign(
@@ -2563,7 +2464,6 @@ async function updateCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -2571,15 +2471,13 @@ async function updateCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
 
-
     const {
       data: existing,
-      error:
-        existingError,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -2592,13 +2490,9 @@ async function updateCampaign(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
+    if (existingError) {
       throw existingError;
     }
-
 
     if (!existing) {
       return res
@@ -2607,11 +2501,13 @@ async function updateCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
-
+    /*
+     * A campaign currently being delivered must not be edited.
+     */
     if (
       existing.status ===
       CAMPAIGN_STATUS.SENDING
@@ -2626,7 +2522,10 @@ async function updateCampaign(
         });
     }
 
-
+    /*
+     * Historical sent newsletters should remain unchanged.
+     * Duplicate them if they need to be reused.
+     */
     if (
       existing.status ===
       CAMPAIGN_STATUS.SENT
@@ -2637,14 +2536,13 @@ async function updateCampaign(
           success: false,
 
           message:
-            "A sent newsletter cannot be edited. Duplicate it to create a new draft, or delete it if you no longer want it in the Newsletter Studio.",
+            "A sent newsletter cannot be edited. Duplicate it to create a new draft.",
         });
     }
 
-
     /*
-     * Preserve existing values when a
-     * field was not supplied.
+     * Merge the existing campaign with only the fields supplied
+     * by the frontend.
      */
     const mergedInput = {
       title:
@@ -2697,6 +2595,25 @@ async function updateCampaign(
           ? req.body.content
           : existing.content,
 
+      /*
+       * Preserve existing content type unless explicitly changed.
+       */
+      contentType:
+        req.body?.contentType !==
+          undefined ||
+        req.body?.content_type !==
+          undefined
+          ? (
+              req.body
+                ?.contentType ??
+              req.body
+                ?.content_type
+            )
+          : (
+              existing.content_type ||
+              DEFAULT_CONTENT_TYPE
+            ),
+
       ctaText:
         req.body?.ctaText !==
           undefined ||
@@ -2723,42 +2640,36 @@ async function updateCampaign(
             )
           : existing.cta_link,
 
-      /*
-       * Ignore audience from the
-       * frontend completely.
-       */
       audience:
         DEFAULT_AUDIENCE,
     };
-
 
     const input =
       normalizeCampaignInput(
         mergedInput
       );
 
-
-    const errors =
-      validateCampaign(
-        input
-      );
-
-
-    if (
-      errors.length > 0
-    ) {
+    if (!input.title) {
       return res
         .status(400)
         .json({
           success: false,
 
           message:
-            errors[0],
-
-          errors,
+            "Newsletter title is required.",
         });
     }
 
+    if (!input.subject) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Email subject is required.",
+        });
+    }
 
     const {
       data,
@@ -2788,6 +2699,13 @@ async function updateCampaign(
           content:
             input.content,
 
+          /*
+           * Required database field.
+           */
+          content_type:
+            input.contentType ||
+            DEFAULT_CONTENT_TYPE,
+
           cta_text:
             input.ctaText,
 
@@ -2808,11 +2726,9 @@ async function updateCampaign(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -2820,7 +2736,7 @@ async function updateCampaign(
         success: true,
 
         message:
-          "Newsletter updated successfully.",
+          "Newsletter campaign updated successfully.",
 
         campaign:
           normalizeCampaign(
@@ -2831,7 +2747,7 @@ async function updateCampaign(
     return sendServerError(
       res,
       error,
-      "Unable to update newsletter."
+      "Unable to update newsletter campaign."
     );
   }
 }
@@ -2840,13 +2756,10 @@ async function updateCampaign(
 /* ============================================================
    DELETE CAMPAIGN
 
-   IMPORTANT:
-   Draft, scheduled, failed AND sent newsletters can be deleted.
+   Sent campaigns may be removed from the CMS.
 
-   Only a newsletter actively being sent is protected.
-
-   Deleting a sent newsletter removes the CMS/database record.
-   It cannot recall emails that subscribers already received.
+   Deleting a sent campaign DOES NOT recall emails that have
+   already reached recipients.
 ============================================================ */
 
 async function deleteCampaign(
@@ -2859,7 +2772,6 @@ async function deleteCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -2867,15 +2779,13 @@ async function deleteCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
 
-
     const {
-      data: campaign,
-      error:
-        campaignError,
+      data: existing,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -2890,28 +2800,23 @@ async function deleteCampaign(
         )
         .maybeSingle();
 
-
-    if (
-      campaignError
-    ) {
-      throw campaignError;
+    if (existingError) {
+      throw existingError;
     }
 
-
-    if (!campaign) {
+    if (!existing) {
       return res
         .status(404)
         .json({
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
-
     if (
-      campaign.status ===
+      existing.status ===
       CAMPAIGN_STATUS.SENDING
     ) {
       return res
@@ -2920,20 +2825,16 @@ async function deleteCampaign(
           success: false,
 
           message:
-            "This newsletter is currently being sent. Wait for sending to finish before deleting it.",
+            "A newsletter that is currently being sent cannot be deleted.",
         });
     }
 
-
     /*
      * Remove delivery records first.
-     *
-     * This makes deletion work even when the database
-     * foreign key does not use ON DELETE CASCADE.
      */
     const {
       error:
-        deliveriesError,
+        deliveryDeleteError,
     } =
       await supabaseAdmin
         .from(
@@ -2945,17 +2846,15 @@ async function deleteCampaign(
           id
         );
 
-
     if (
-      deliveriesError
+      deliveryDeleteError
     ) {
-      throw deliveriesError;
+      throw deliveryDeleteError;
     }
-
 
     const {
       error:
-        deleteError,
+        campaignDeleteError,
     } =
       await supabaseAdmin
         .from(
@@ -2967,13 +2866,11 @@ async function deleteCampaign(
           id
         );
 
-
     if (
-      deleteError
+      campaignDeleteError
     ) {
-      throw deleteError;
+      throw campaignDeleteError;
     }
-
 
     return res
       .status(200)
@@ -2981,27 +2878,16 @@ async function deleteCampaign(
         success: true,
 
         message:
-          campaign.status ===
+          existing.status ===
           CAMPAIGN_STATUS.SENT
-            ? "Published newsletter deleted from the Newsletter Studio. Emails already sent to subscribers are not affected."
-            : "Newsletter deleted successfully.",
-
-        deletedCampaign: {
-          id:
-            campaign.id,
-
-          title:
-            campaign.title,
-
-          status:
-            campaign.status,
-        },
+            ? "Sent newsletter record deleted successfully. Emails already sent to subscribers are unaffected."
+            : "Newsletter campaign deleted successfully.",
       });
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to delete newsletter."
+      "Unable to delete newsletter campaign."
     );
   }
 }
@@ -3009,10 +2895,6 @@ async function deleteCampaign(
 
 /* ============================================================
    DUPLICATE CAMPAIGN
-
-   This is the recommended way to reuse a sent newsletter.
-
-   Multiple images are preserved.
 ============================================================ */
 
 async function duplicateCampaign(
@@ -3025,7 +2907,6 @@ async function duplicateCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -3033,15 +2914,13 @@ async function duplicateCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
 
-
     const {
       data: existing,
-      error:
-        existingError,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3054,13 +2933,9 @@ async function duplicateCampaign(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
+    if (existingError) {
       throw existingError;
     }
-
 
     if (!existing) {
       return res
@@ -3069,31 +2944,17 @@ async function duplicateCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
+    const timestamp =
+      nowIso();
 
     const adminId =
       getCurrentAdminId(
         req
       );
-
-
-    const timestamp =
-      nowIso();
-
-
-    const originalTitle =
-      cleanString(
-        existing.title,
-        "Newsletter"
-      );
-
-
-    const duplicateTitle =
-      `${originalTitle} — Copy`;
-
 
     const {
       data,
@@ -3105,7 +2966,10 @@ async function duplicateCampaign(
         )
         .insert({
           title:
-            duplicateTitle,
+            `${cleanString(
+              existing.title,
+              "Newsletter"
+            )} Copy`,
 
           subject:
             existing.subject ||
@@ -3119,10 +2983,6 @@ async function duplicateCampaign(
             existing.featured_image ||
             null,
 
-          /*
-           * Preserve every additional
-           * newsletter image.
-           */
           images:
             normalizeImages(
               existing.images
@@ -3131,6 +2991,13 @@ async function duplicateCampaign(
           content:
             existing.content ||
             "",
+
+          /*
+           * Preserve the required content type.
+           */
+          content_type:
+            existing.content_type ||
+            DEFAULT_CONTENT_TYPE,
 
           cta_text:
             existing.cta_text ||
@@ -3179,11 +3046,9 @@ async function duplicateCampaign(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(201)
@@ -3202,7 +3067,7 @@ async function duplicateCampaign(
     return sendServerError(
       res,
       error,
-      "Unable to duplicate newsletter."
+      "Unable to duplicate newsletter campaign."
     );
   }
 }
@@ -3210,9 +3075,6 @@ async function duplicateCampaign(
 
 /* ============================================================
    GET CAMPAIGN RECIPIENT COUNT
-
-   There is only one audience:
-   all active subscribers.
 ============================================================ */
 
 async function getCampaignRecipientCount(
@@ -3225,7 +3087,6 @@ async function getCampaignRecipientCount(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -3233,10 +3094,9 @@ async function getCampaignRecipientCount(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
-
 
     const {
       data: campaign,
@@ -3248,7 +3108,7 @@ async function getCampaignRecipientCount(
           CAMPAIGNS_TABLE
         )
         .select(
-          "id,title,status"
+          "id,status"
         )
         .eq(
           "id",
@@ -3256,13 +3116,11 @@ async function getCampaignRecipientCount(
         )
         .maybeSingle();
 
-
     if (
       campaignError
     ) {
       throw campaignError;
     }
-
 
     if (!campaign) {
       return res
@@ -3271,14 +3129,12 @@ async function getCampaignRecipientCount(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
-
-    const recipientInfo =
+    const result =
       await getRecipientCount();
-
 
     return res
       .status(200)
@@ -3286,22 +3142,22 @@ async function getCampaignRecipientCount(
         success: true,
 
         campaignId:
-          campaign.id,
+          id,
 
         audience:
           DEFAULT_AUDIENCE,
 
-        count:
-          recipientInfo.count,
+        audienceLabel:
+          "All Active Subscribers",
 
         recipientCount:
-          recipientInfo.count,
+          result.count,
+
+        count:
+          result.count,
 
         supported:
           true,
-
-        label:
-          "All Active Subscribers",
       });
   } catch (error) {
     return sendServerError(
@@ -3327,7 +3183,6 @@ async function scheduleCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -3335,10 +3190,9 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
-
 
     const scheduledAt =
       parseDateOrNull(
@@ -3348,7 +3202,6 @@ async function scheduleCampaign(
             ?.scheduled_at
       );
 
-
     if (!scheduledAt) {
       return res
         .status(400)
@@ -3356,10 +3209,9 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "Please provide a valid delivery date and time.",
+            "Please provide a valid schedule date and time.",
         });
     }
-
 
     if (
       new Date(
@@ -3373,15 +3225,13 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "Scheduled delivery must be in the future.",
+            "The scheduled send time must be in the future.",
         });
     }
 
-
     const {
       data: existing,
-      error:
-        existingError,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3394,13 +3244,9 @@ async function scheduleCampaign(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
+    if (existingError) {
       throw existingError;
     }
-
 
     if (!existing) {
       return res
@@ -3409,14 +3255,15 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
-
     if (
       existing.status ===
-      CAMPAIGN_STATUS.SENDING
+        CAMPAIGN_STATUS.SENDING ||
+      existing.status ===
+        CAMPAIGN_STATUS.SENT
     ) {
       return res
         .status(409)
@@ -3424,26 +3271,16 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "This newsletter is currently being sent.",
+            existing.status ===
+            CAMPAIGN_STATUS.SENT
+              ? "A sent newsletter cannot be scheduled again. Duplicate it first."
+              : "This newsletter is currently being sent.",
         });
     }
 
-
-    if (
-      existing.status ===
-      CAMPAIGN_STATUS.SENT
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "A sent newsletter cannot be scheduled again. Duplicate it to create a new newsletter.",
-        });
-    }
-
-
+    /*
+     * Normalize the complete existing record before validation.
+     */
     const normalized =
       normalizeCampaignInput({
         title:
@@ -3464,19 +3301,26 @@ async function scheduleCampaign(
         content:
           existing.content,
 
+        contentType:
+          existing.content_type ||
+          DEFAULT_CONTENT_TYPE,
+
         ctaText:
           existing.cta_text,
 
         ctaLink:
           existing.cta_link,
-      });
 
+        audience:
+          DEFAULT_AUDIENCE,
+
+        scheduledAt,
+      });
 
     const validationErrors =
       validateCampaign(
         normalized
       );
-
 
     if (
       validationErrors.length >
@@ -3495,14 +3339,14 @@ async function scheduleCampaign(
         });
     }
 
-
-    const recipientInfo =
+    const {
+      count:
+        recipientCount,
+    } =
       await getRecipientCount();
 
-
     if (
-      recipientInfo.count <
-      1
+      recipientCount <= 0
     ) {
       return res
         .status(400)
@@ -3510,10 +3354,9 @@ async function scheduleCampaign(
           success: false,
 
           message:
-            "There are no active subscribers to receive this newsletter.",
+            "There are no active newsletter subscribers to receive this campaign.",
         });
     }
-
 
     const {
       data,
@@ -3524,17 +3367,24 @@ async function scheduleCampaign(
           CAMPAIGNS_TABLE
         )
         .update({
+          status:
+            CAMPAIGN_STATUS.SCHEDULED,
+
           audience:
             DEFAULT_AUDIENCE,
 
-          status:
-            CAMPAIGN_STATUS.SCHEDULED,
+          /*
+           * Ensure legacy rows also receive the required value.
+           */
+          content_type:
+            existing.content_type ||
+            DEFAULT_CONTENT_TYPE,
 
           scheduled_at:
             scheduledAt,
 
           recipient_count:
-            recipientInfo.count,
+            recipientCount,
 
           updated_at:
             nowIso(),
@@ -3546,11 +3396,9 @@ async function scheduleCampaign(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -3559,6 +3407,11 @@ async function scheduleCampaign(
 
         message:
           "Newsletter scheduled successfully.",
+
+        recipientCount,
+
+        audience:
+          DEFAULT_AUDIENCE,
 
         campaign:
           normalizeCampaign(
@@ -3569,7 +3422,7 @@ async function scheduleCampaign(
     return sendServerError(
       res,
       error,
-      "Unable to schedule newsletter."
+      "Unable to schedule newsletter campaign."
     );
   }
 }
@@ -3589,7 +3442,6 @@ async function cancelScheduledCampaign(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -3597,15 +3449,13 @@ async function cancelScheduledCampaign(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
 
-
     const {
       data: existing,
-      error:
-        existingError,
+      error: existingError,
     } =
       await supabaseAdmin
         .from(
@@ -3618,13 +3468,9 @@ async function cancelScheduledCampaign(
         )
         .maybeSingle();
 
-
-    if (
-      existingError
-    ) {
+    if (existingError) {
       throw existingError;
     }
-
 
     if (!existing) {
       return res
@@ -3633,10 +3479,9 @@ async function cancelScheduledCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
-
 
     if (
       existing.status !==
@@ -3651,7 +3496,6 @@ async function cancelScheduledCampaign(
             "Only a scheduled newsletter can have its schedule cancelled.",
         });
     }
-
 
     const {
       data,
@@ -3668,6 +3512,9 @@ async function cancelScheduledCampaign(
           scheduled_at:
             null,
 
+          recipient_count:
+            0,
+
           updated_at:
             nowIso(),
         })
@@ -3678,11 +3525,9 @@ async function cancelScheduledCampaign(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -3721,7 +3566,6 @@ async function getCampaignDeliveries(
         req.params?.id
       );
 
-
     if (!id) {
       return res
         .status(400)
@@ -3729,10 +3573,9 @@ async function getCampaignDeliveries(
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
-
 
     const {
       data: campaign,
@@ -3744,7 +3587,7 @@ async function getCampaignDeliveries(
           CAMPAIGNS_TABLE
         )
         .select(
-          "id,title,status"
+          "id,title,subject,status"
         )
         .eq(
           "id",
@@ -3752,13 +3595,11 @@ async function getCampaignDeliveries(
         )
         .maybeSingle();
 
-
     if (
       campaignError
     ) {
       throw campaignError;
     }
-
 
     if (!campaign) {
       return res
@@ -3767,10 +3608,9 @@ async function getCampaignDeliveries(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
-
 
     const {
       data,
@@ -3788,22 +3628,41 @@ async function getCampaignDeliveries(
         .order(
           "created_at",
           {
-            ascending:
-              false,
+            ascending: false,
           }
         );
-
 
     if (error) {
       throw error;
     }
-
 
     const deliveries =
       (data || []).map(
         normalizeDelivery
       );
 
+    const acceptedCount =
+      deliveries.filter(
+        (delivery) =>
+          [
+            "sent",
+            "accepted",
+            "delivered",
+          ].includes(
+            cleanString(
+              delivery.status
+            ).toLowerCase()
+          )
+      ).length;
+
+    const failedCount =
+      deliveries.filter(
+        (delivery) =>
+          cleanString(
+            delivery.status
+          ).toLowerCase() ===
+          "failed"
+      ).length;
 
     return res
       .status(200)
@@ -3815,22 +3674,32 @@ async function getCampaignDeliveries(
             campaign.id,
 
           title:
-            campaign.title,
+            campaign.title ||
+            "",
+
+          subject:
+            campaign.subject ||
+            "",
 
           status:
-            campaign.status,
+            campaign.status ||
+            CAMPAIGN_STATUS.DRAFT,
         },
 
         deliveries,
 
         count:
           deliveries.length,
+
+        acceptedCount,
+
+        failedCount,
       });
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to load newsletter delivery records."
+      "Unable to load newsletter deliveries."
     );
   }
 }/* ============================================================
@@ -3838,8 +3707,17 @@ async function getCampaignDeliveries(
 ============================================================ */
 
 async function loadCampaignForDelivery(
-  id
+  campaignId
 ) {
+  const id =
+    cleanString(
+      campaignId
+    );
+
+  if (!id) {
+    return null;
+  }
+
   const {
     data,
     error,
@@ -3855,18 +3733,16 @@ async function loadCampaignForDelivery(
       )
       .maybeSingle();
 
-
   if (error) {
     throw error;
   }
-
 
   return data || null;
 }
 
 
 /* ============================================================
-   VALIDATE CAMPAIGN BEFORE DELIVERY
+   VALIDATE CAMPAIGN FOR DELIVERY
 ============================================================ */
 
 function validateCampaignForDelivery(
@@ -3874,10 +3750,9 @@ function validateCampaignForDelivery(
 ) {
   if (!campaign) {
     return [
-      "Newsletter not found.",
+      "Newsletter campaign not found.",
     ];
   }
-
 
   const normalized =
     normalizeCampaignInput({
@@ -3899,13 +3774,22 @@ function validateCampaignForDelivery(
       content:
         campaign.content,
 
+      /*
+       * Required by the current database schema.
+       */
+      contentType:
+        campaign.content_type ||
+        DEFAULT_CONTENT_TYPE,
+
       ctaText:
         campaign.cta_text,
 
       ctaLink:
         campaign.cta_link,
-    });
 
+      audience:
+        DEFAULT_AUDIENCE,
+    });
 
   return validateCampaign(
     normalized
@@ -3916,12 +3800,12 @@ function validateCampaignForDelivery(
 /* ============================================================
    SEND TEST CAMPAIGN
 
-   Sends the newsletter to ONE test email only.
+   Sends the newsletter to one email address only.
 
    It does NOT:
    - mark the campaign as sent
-   - create normal subscriber delivery statistics
-   - affect recipient counts
+   - change recipient counts
+   - send to subscribers
 ============================================================ */
 
 async function sendTestCampaign(
@@ -3929,34 +3813,33 @@ async function sendTestCampaign(
   res
 ) {
   try {
-    const id =
+    const campaignId =
       cleanString(
         req.params?.id
       );
 
-
-    if (!id) {
+    if (!campaignId) {
       return res
         .status(400)
         .json({
           success: false,
 
           message:
-            "Newsletter ID is required.",
+            "Campaign ID is required.",
         });
     }
 
-
+    /*
+     * Support both email and testEmail from the frontend.
+     */
     const email =
       normalizeEmail(
-        req.body?.email
+        req.body?.email ||
+          req.body?.testEmail
       );
 
-
     if (
-      !isValidEmail(
-        email
-      )
+      !isValidEmail(email)
     ) {
       return res
         .status(400)
@@ -3964,16 +3847,14 @@ async function sendTestCampaign(
           success: false,
 
           message:
-            "Please enter a valid test email address.",
+            "Please provide a valid test email address.",
         });
     }
 
-
     const campaign =
       await loadCampaignForDelivery(
-        id
+        campaignId
       );
-
 
     if (!campaign) {
       return res
@@ -3982,10 +3863,9 @@ async function sendTestCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
-
 
     if (
       campaign.status ===
@@ -4001,12 +3881,10 @@ async function sendTestCampaign(
         });
     }
 
-
     const validationErrors =
       validateCampaignForDelivery(
         campaign
       );
-
 
     if (
       validationErrors.length >
@@ -4025,18 +3903,11 @@ async function sendTestCampaign(
         });
     }
 
-
-    /*
-     * Test emails intentionally do not
-     * contain a real subscriber
-     * unsubscribe token.
-     */
     const html =
       buildNewsletterHtml(
         campaign,
         null
       );
-
 
     const text =
       buildNewsletterText(
@@ -4044,25 +3915,44 @@ async function sendTestCampaign(
         null
       );
 
-
-    const subject =
-      `[TEST] ${cleanString(
-        campaign.subject
-      )}`;
-
-
     const result =
       await sendEmail({
         to:
           email,
 
-        subject,
+        subject:
+          campaign.subject,
 
         html,
 
         text,
       });
 
+    /*
+     * Support sendEmail utilities that explicitly return
+     * { success: false } instead of throwing.
+     */
+    if (
+      result &&
+      result.success === false
+    ) {
+      return res
+        .status(502)
+        .json({
+          success: false,
+
+          message:
+            result.message ||
+            result.error ||
+            "The email provider did not accept the test email.",
+        });
+    }
+
+    const providerMessageId =
+      result?.messageId ||
+      result?.id ||
+      result?.data?.id ||
+      null;
 
     return res
       .status(200)
@@ -4070,18 +3960,11 @@ async function sendTestCampaign(
         success: true,
 
         message:
-          `Test newsletter accepted for sending to ${email}.`,
+          `Test newsletter sent to ${email}.`,
 
         email,
 
-        providerMessageId:
-          result?.messageId ||
-          null,
-
-        campaign:
-          normalizeCampaign(
-            campaign
-          ),
+        providerMessageId,
       });
   } catch (error) {
     return sendServerError(
@@ -4095,6 +3978,9 @@ async function sendTestCampaign(
 
 /* ============================================================
    GET ACTIVE SUBSCRIBERS FOR DELIVERY
+
+   Fixed audience:
+   ALL ACTIVE SUBSCRIBERS
 ============================================================ */
 
 async function getActiveSubscribersForDelivery() {
@@ -4118,11 +4004,9 @@ async function getActiveSubscribersForDelivery() {
         }
       );
 
-
   if (error) {
     throw error;
   }
-
 
   return (
     data || []
@@ -4141,7 +4025,8 @@ async function getActiveSubscribersForDelivery() {
 
 async function createDeliveryRecord({
   campaignId,
-  subscriber,
+  subscriberId,
+  email,
   status,
   providerMessageId = null,
   failureReason = null,
@@ -4151,31 +4036,37 @@ async function createDeliveryRecord({
   const timestamp =
     nowIso();
 
-
   const payload = {
     campaign_id:
       campaignId,
 
     subscriber_id:
-      subscriber?.id ||
+      subscriberId ||
       null,
 
     email:
       normalizeEmail(
-        subscriber?.email
+        email
       ),
 
     status,
 
     provider_message_id:
-      providerMessageId,
+      providerMessageId ||
+      null,
 
     failure_reason:
-      failureReason,
+      failureReason ||
+      null,
 
     sent_at:
-      sentAt,
+      sentAt ||
+      null,
 
+    /*
+     * Provider acceptance is not the same as confirmed delivery.
+     * Leave delivered_at empty until webhook support is added.
+     */
     delivered_at:
       null,
 
@@ -4186,7 +4077,8 @@ async function createDeliveryRecord({
       null,
 
     failed_at:
-      failedAt,
+      failedAt ||
+      null,
 
     created_at:
       timestamp,
@@ -4194,7 +4086,6 @@ async function createDeliveryRecord({
     updated_at:
       timestamp,
   };
-
 
   const {
     data,
@@ -4210,11 +4101,9 @@ async function createDeliveryRecord({
       .select("*")
       .single();
 
-
   if (error) {
     throw error;
   }
-
 
   return data;
 }
@@ -4223,11 +4112,8 @@ async function createDeliveryRecord({
 /* ============================================================
    SAFE DELIVERY RECORD
 
-   Email delivery should not be incorrectly reported as failed
-   simply because analytics logging had a separate database
-   problem.
-
-   We therefore log delivery-record failures separately.
+   A tracking-row failure should be logged separately from the
+   provider send result.
 ============================================================ */
 
 async function safelyCreateDeliveryRecord(
@@ -4240,23 +4126,7 @@ async function safelyCreateDeliveryRecord(
   } catch (error) {
     console.error(
       "[NEWSLETTER] Unable to create delivery record:",
-      {
-        campaignId:
-          payload?.campaignId ||
-          null,
-
-        email:
-          payload?.subscriber?.email ||
-          null,
-
-        status:
-          payload?.status ||
-          null,
-
-        message:
-          error?.message ||
-          "Unknown delivery-record error",
-      }
+      error
     );
 
     return null;
@@ -4271,99 +4141,119 @@ async function safelyCreateDeliveryRecord(
 async function updateCampaignDeliveryProgress(
   campaignId,
   {
+    status,
     recipientCount,
     acceptedCount,
     failedCount,
+    sentAt,
   }
 ) {
+  const updates = {
+    audience:
+      DEFAULT_AUDIENCE,
+
+    content_type:
+      DEFAULT_CONTENT_TYPE,
+
+    recipient_count:
+      Number(
+        recipientCount ||
+          0
+      ),
+
+    /*
+     * Existing schema uses delivered_count.
+     *
+     * Until provider webhooks are implemented, this field is
+     * being used as the provider-accepted count for backwards
+     * compatibility with the existing database.
+     */
+    delivered_count:
+      Number(
+        acceptedCount ||
+          0
+      ),
+
+    failed_count:
+      Number(
+        failedCount ||
+          0
+      ),
+
+    updated_at:
+      nowIso(),
+  };
+
+  if (status) {
+    updates.status =
+      status;
+  }
+
+  if (
+    sentAt !==
+    undefined
+  ) {
+    updates.sent_at =
+      sentAt;
+  }
+
   const {
+    data,
     error,
   } =
     await supabaseAdmin
       .from(
         CAMPAIGNS_TABLE
       )
-      .update({
-        recipient_count:
-          recipientCount,
-
-        /*
-         * Existing database field name is
-         * delivered_count.
-         *
-         * Until provider webhooks are added,
-         * this stores emails accepted by Resend,
-         * not independently confirmed inbox
-         * deliveries.
-         */
-        delivered_count:
-          acceptedCount,
-
-        failed_count:
-          failedCount,
-
-        updated_at:
-          nowIso(),
-      })
+      .update(
+        updates
+      )
       .eq(
         "id",
         campaignId
-      );
-
+      )
+      .select("*")
+      .single();
 
   if (error) {
     throw error;
   }
+
+  return data;
 }
 
 
 /* ============================================================
-   SEND CAMPAIGN
-
-   Broadcasts to ALL ACTIVE SUBSCRIBERS.
-
-   There is no audience selector anymore.
-
-   Important:
-   `sendEmail()` success means Resend accepted the email.
-   It does not yet mean the recipient's mail server confirmed
-   final delivery.
+   SEND CAMPAIGN TO ALL ACTIVE SUBSCRIBERS
 ============================================================ */
 
 async function sendCampaign(
   req,
   res
 ) {
-  const id =
-    cleanString(
-      req.params?.id
-    );
-
-
-  if (!id) {
-    return res
-      .status(400)
-      .json({
-        success: false,
-
-        message:
-          "Newsletter ID is required.",
-      });
-  }
-
-
-  let campaign = null;
-
-  let campaignMarkedSending =
-    false;
-
+  let campaignId = "";
 
   try {
-    campaign =
-      await loadCampaignForDelivery(
-        id
+    campaignId =
+      cleanString(
+        req.params?.id
       );
 
+    if (!campaignId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const campaign =
+      await loadCampaignForDelivery(
+        campaignId
+      );
 
     if (!campaign) {
       return res
@@ -4372,10 +4262,26 @@ async function sendCampaign(
           success: false,
 
           message:
-            "Newsletter not found.",
+            "Newsletter campaign not found.",
         });
     }
 
+    /*
+     * Prevent duplicate sends.
+     */
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter has already been sent. Duplicate it if you want to send it again.",
+        });
+    }
 
     if (
       campaign.status ===
@@ -4391,27 +4297,10 @@ async function sendCampaign(
         });
     }
 
-
-    if (
-      campaign.status ===
-      CAMPAIGN_STATUS.SENT
-    ) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-
-          message:
-            "This newsletter has already been sent. Duplicate it if you want to send it again.",
-        });
-    }
-
-
     const validationErrors =
       validateCampaignForDelivery(
         campaign
       );
-
 
     if (
       validationErrors.length >
@@ -4430,14 +4319,11 @@ async function sendCampaign(
         });
     }
 
-
     const subscribers =
       await getActiveSubscribersForDelivery();
 
-
     const recipientCount =
       subscribers.length;
-
 
     if (
       recipientCount === 0
@@ -4448,94 +4334,42 @@ async function sendCampaign(
           success: false,
 
           message:
-            "There are no active subscribers to receive this newsletter.",
+            "There are no active newsletter subscribers to receive this campaign.",
         });
     }
 
-
     /*
-     * Mark the campaign as sending BEFORE
-     * beginning the broadcast.
-     *
-     * This also prevents an administrator
-     * deleting the campaign during delivery.
+     * Mark the campaign as sending before processing recipients.
      */
-    const {
-      data:
-        sendingCampaign,
+    await updateCampaignDeliveryProgress(
+      campaignId,
+      {
+        status:
+          CAMPAIGN_STATUS.SENDING,
 
-      error:
-        sendingError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .update({
-          audience:
-            DEFAULT_AUDIENCE,
+        recipientCount,
 
-          status:
-            CAMPAIGN_STATUS.SENDING,
+        acceptedCount:
+          0,
 
-          scheduled_at:
-            null,
+        failedCount:
+          0,
 
-          recipient_count:
-            recipientCount,
-
-          delivered_count:
-            0,
-
-          failed_count:
-            0,
-
-          sent_at:
-            null,
-
-          updated_at:
-            nowIso(),
-        })
-        .eq(
-          "id",
-          id
-        )
-        .select("*")
-        .single();
-
-
-    if (sendingError) {
-      throw sendingError;
-    }
-
-
-    campaign =
-      sendingCampaign;
-
-
-    campaignMarkedSending =
-      true;
-
+        sentAt:
+          null,
+      }
+    );
 
     let acceptedCount = 0;
-
     let failedCount = 0;
 
-
-    const failures = [];
-
+    const results = [];
 
     /*
-     * Sequential delivery is intentional.
+     * Send sequentially.
      *
-     * It keeps this implementation simple
-     * and avoids launching every request at
-     * exactly the same time.
-     *
-     * For a much larger subscriber list,
-     * this should eventually move to a
-     * queue/background worker or provider
-     * broadcast feature.
+     * This is intentionally conservative for the current small
+     * mailing list and helps avoid provider rate-limit bursts.
      */
     for (
       let index = 0;
@@ -4546,12 +4380,10 @@ async function sendCampaign(
       const subscriber =
         subscribers[index];
 
-
       const email =
         normalizeEmail(
           subscriber.email
         );
-
 
       try {
         const html =
@@ -4560,13 +4392,11 @@ async function sendCampaign(
             subscriber
           );
 
-
         const text =
           buildNewsletterText(
             campaign,
             subscriber
           );
-
 
         const result =
           await sendEmail({
@@ -4581,61 +4411,83 @@ async function sendCampaign(
             text,
           });
 
+        if (
+          result &&
+          result.success === false
+        ) {
+          throw new Error(
+            result.message ||
+              result.error ||
+              "The email provider rejected the message."
+          );
+        }
+
+        const providerMessageId =
+          result?.messageId ||
+          result?.id ||
+          result?.data?.id ||
+          null;
+
+        acceptedCount += 1;
 
         const sentAt =
           nowIso();
 
-
-        acceptedCount += 1;
-
-
         await safelyCreateDeliveryRecord({
-          campaignId:
-            id,
+          campaignId,
 
-          subscriber,
+          subscriberId:
+            subscriber.id,
 
+          email,
+
+          /*
+           * "sent" means the provider accepted our send request.
+           * It does not prove inbox delivery.
+           */
           status:
             "sent",
 
-          providerMessageId:
-            result?.messageId ||
-            null,
-
-          failureReason:
-            null,
+          providerMessageId,
 
           sentAt,
 
           failedAt:
             null,
+
+          failureReason:
+            null,
+        });
+
+        results.push({
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          status:
+            "sent",
+
+          providerMessageId,
         });
       } catch (
-        deliveryError
+        recipientError
       ) {
         failedCount += 1;
 
-
         const failureReason =
           cleanString(
-            deliveryError?.message,
-            "Unable to send email."
+            recipientError?.message,
+            "Unable to send newsletter."
           );
 
-
-        failures.push({
-          email,
-
-          message:
-            failureReason,
-        });
-
-
         await safelyCreateDeliveryRecord({
-          campaignId:
-            id,
+          campaignId,
 
-          subscriber,
+          subscriberId:
+            subscriber.id,
+
+          email,
 
           status:
             "failed",
@@ -4643,213 +4495,188 @@ async function sendCampaign(
           providerMessageId:
             null,
 
-          failureReason,
-
           sentAt:
             null,
 
           failedAt:
             nowIso(),
+
+          failureReason,
         });
+
+        results.push({
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          status:
+            "failed",
+
+          error:
+            failureReason,
+        });
+
+        console.error(
+          `[NEWSLETTER] Failed to send campaign ${campaignId} to ${email}:`,
+          recipientError
+        );
       }
 
-
       /*
-       * Persist progress after every email.
-       * If the request fails later, the CMS
-       * still has useful counts.
+       * Update progress after each recipient.
        */
-      await updateCampaignDeliveryProgress(
-        id,
-        {
-          recipientCount,
+      try {
+        await updateCampaignDeliveryProgress(
+          campaignId,
+          {
+            status:
+              CAMPAIGN_STATUS.SENDING,
 
-          acceptedCount,
+            recipientCount,
 
-          failedCount,
-        }
-      );
+            acceptedCount,
 
+            failedCount,
+
+            sentAt:
+              null,
+          }
+        );
+      } catch (
+        progressError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to update campaign send progress:",
+          progressError
+        );
+      }
 
       /*
-       * Small spacing between provider calls.
-       * Skip the delay after the final email.
+       * Avoid unnecessary delay after the final recipient.
        */
       if (
         index <
-        subscribers.length - 1
+        subscribers.length -
+          1
       ) {
-        await sleep(
-          550
-        );
+        await sleep(550);
       }
     }
 
-
+    /*
+     * If at least one email was accepted by the provider,
+     * consider the campaign send operation completed.
+     *
+     * If every send failed, mark the campaign failed.
+     */
     const finalStatus =
       acceptedCount > 0
         ? CAMPAIGN_STATUS.SENT
         : CAMPAIGN_STATUS.FAILED;
 
+    const sentAt =
+      acceptedCount > 0
+        ? nowIso()
+        : null;
 
-    const completedAt =
-      nowIso();
-
-
-    const {
-      data:
-        completedCampaign,
-
-      error:
-        completedError,
-    } =
-      await supabaseAdmin
-        .from(
-          CAMPAIGNS_TABLE
-        )
-        .update({
-          audience:
-            DEFAULT_AUDIENCE,
-
+    const finalCampaign =
+      await updateCampaignDeliveryProgress(
+        campaignId,
+        {
           status:
             finalStatus,
 
-          scheduled_at:
-            null,
+          recipientCount,
 
-          /*
-           * Set sent_at only when at least
-           * one message was accepted.
-           */
-          sent_at:
-            acceptedCount > 0
-              ? completedAt
-              : null,
+          acceptedCount,
 
-          recipient_count:
-            recipientCount,
+          failedCount,
 
-          delivered_count:
-            acceptedCount,
-
-          failed_count:
-            failedCount,
-
-          updated_at:
-            completedAt,
-        })
-        .eq(
-          "id",
-          id
-        )
-        .select("*")
-        .single();
-
-
-    if (completedError) {
-      throw completedError;
-    }
-
-
-    /*
-     * If some recipients failed but others
-     * were accepted, the overall campaign
-     * remains "sent" while failed_count tells
-     * the administrator what happened.
-     */
-    const message =
-      acceptedCount ===
-      recipientCount
-        ? `Newsletter accepted for sending to all ${recipientCount} active subscribers.`
-        : acceptedCount > 0
-          ? `Newsletter sending completed. ${acceptedCount} message(s) were accepted and ${failedCount} failed.`
-          : "The newsletter could not be sent to any active subscriber.";
-
+          sentAt,
+        }
+      );
 
     return res
-      .status(
-        acceptedCount > 0
-          ? 200
-          : 502
-      )
+      .status(200)
       .json({
         success:
           acceptedCount > 0,
 
-        message,
+        message:
+          acceptedCount > 0
+            ? failedCount > 0
+              ? `Newsletter send completed. ${acceptedCount} accepted and ${failedCount} failed.`
+              : `Newsletter accepted for all ${acceptedCount} active subscribers.`
+            : "The newsletter could not be sent to any active subscriber.",
 
         audience:
           DEFAULT_AUDIENCE,
 
+        audienceLabel:
+          "All Active Subscribers",
+
         recipientCount,
 
-        /*
-         * Use acceptedCount in the API so the
-         * frontend can label this honestly.
-         */
         acceptedCount,
 
         failedCount,
 
-        failures,
-
         campaign:
           normalizeCampaign(
-            completedCampaign
+            finalCampaign
           ),
+
+        results,
       });
   } catch (error) {
-    console.error(
-      "[NEWSLETTER] Campaign delivery failed:",
-      error
-    );
-
-
     /*
-     * If the campaign had already entered
-     * "sending", make sure it does not remain
-     * permanently locked there after an
-     * unexpected server failure.
+     * If the operation crashes after the campaign has been
+     * identified, make a best effort to mark it failed.
      */
-    if (
-      campaignMarkedSending
-    ) {
+    if (campaignId) {
       try {
-        await supabaseAdmin
-          .from(
-            CAMPAIGNS_TABLE
-          )
-          .update({
-            status:
-              CAMPAIGN_STATUS.FAILED,
-
-            updated_at:
-              nowIso(),
-          })
-          .eq(
-            "id",
-            id
+        const current =
+          await loadCampaignForDelivery(
+            campaignId
           );
+
+        if (
+          current &&
+          current.status ===
+            CAMPAIGN_STATUS.SENDING
+        ) {
+          await supabaseAdmin
+            .from(
+              CAMPAIGNS_TABLE
+            )
+            .update({
+              status:
+                CAMPAIGN_STATUS.FAILED,
+
+              updated_at:
+                nowIso(),
+            })
+            .eq(
+              "id",
+              campaignId
+            );
+        }
       } catch (
-        statusError
+        recoveryError
       ) {
         console.error(
-          "[NEWSLETTER] Unable to mark campaign as failed:",
-          statusError
+          "[NEWSLETTER] Unable to recover failed campaign state:",
+          recoveryError
         );
       }
     }
 
-
-    return res
-      .status(500)
-      .json({
-        success: false,
-
-        message:
-          error?.message ||
-          "Unable to send newsletter.",
-      });
+    return sendServerError(
+      res,
+      error,
+      "Unable to send newsletter campaign."
+    );
   }
 }
 
@@ -4863,83 +4690,117 @@ async function getNewsletterAnalytics(
   res
 ) {
   try {
-    const [
-      subscribersResult,
-      campaignsResult,
-      deliveriesResult,
-    ] =
-      await Promise.all([
-        supabaseAdmin
-          .from(
-            SUBSCRIBERS_TABLE
-          )
-          .select("*"),
-
-        supabaseAdmin
-          .from(
-            CAMPAIGNS_TABLE
-          )
-          .select("*"),
-
-        supabaseAdmin
-          .from(
-            DELIVERIES_TABLE
-          )
-          .select("*"),
-      ]);
-
+    /*
+     * Load subscriber totals.
+     */
+    const {
+      data:
+        subscriberRows,
+      error:
+        subscriberError,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .select(
+          "id,status,created_at"
+        );
 
     if (
-      subscribersResult.error
+      subscriberError
     ) {
-      throw subscribersResult.error;
+      throw subscriberError;
     }
 
+    /*
+     * Load campaign totals.
+     */
+    const {
+      data:
+        campaignRows,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,status,recipient_count,delivered_count,failed_count,opened_count,clicked_count,created_at,sent_at"
+        );
 
     if (
-      campaignsResult.error
+      campaignError
     ) {
-      throw campaignsResult.error;
+      throw campaignError;
     }
 
+    /*
+     * Load delivery totals.
+     */
+    const {
+      data:
+        deliveryRows,
+      error:
+        deliveryError,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .select(
+          "id,status,sent_at,delivered_at,opened_at,clicked_at,failed_at"
+        );
 
     if (
-      deliveriesResult.error
+      deliveryError
     ) {
-      throw deliveriesResult.error;
+      throw deliveryError;
     }
-
 
     const subscribers =
-      subscribersResult.data ||
-      [];
-
+      subscriberRows || [];
 
     const campaigns =
-      campaignsResult.data ||
-      [];
-
+      campaignRows || [];
 
     const deliveries =
-      deliveriesResult.data ||
-      [];
+      deliveryRows || [];
 
+
+    /* --------------------------------------------------------
+       SUBSCRIBERS
+    --------------------------------------------------------- */
+
+    const totalSubscribers =
+      subscribers.length;
 
     const activeSubscribers =
       subscribers.filter(
         (subscriber) =>
-          subscriber.status ===
+          cleanString(
+            subscriber.status
+          ).toLowerCase() ===
           "subscribed"
       ).length;
-
 
     const unsubscribedSubscribers =
       subscribers.filter(
         (subscriber) =>
-          subscriber.status ===
+          cleanString(
+            subscriber.status
+          ).toLowerCase() ===
           "unsubscribed"
       ).length;
 
+
+    /* --------------------------------------------------------
+       CAMPAIGNS
+    --------------------------------------------------------- */
+
+    const totalCampaigns =
+      campaigns.length;
 
     const draftCampaigns =
       campaigns.filter(
@@ -4948,14 +4809,12 @@ async function getNewsletterAnalytics(
           CAMPAIGN_STATUS.DRAFT
       ).length;
 
-
     const scheduledCampaigns =
       campaigns.filter(
         (campaign) =>
           campaign.status ===
           CAMPAIGN_STATUS.SCHEDULED
       ).length;
-
 
     const sendingCampaigns =
       campaigns.filter(
@@ -4964,14 +4823,12 @@ async function getNewsletterAnalytics(
           CAMPAIGN_STATUS.SENDING
       ).length;
 
-
     const sentCampaigns =
       campaigns.filter(
         (campaign) =>
           campaign.status ===
           CAMPAIGN_STATUS.SENT
       ).length;
-
 
     const failedCampaigns =
       campaigns.filter(
@@ -4981,57 +4838,14 @@ async function getNewsletterAnalytics(
       ).length;
 
 
-    const acceptedDeliveries =
-      deliveries.filter(
-        (delivery) =>
-          delivery.status ===
-          "sent" ||
-          delivery.status ===
-          "delivered"
-      ).length;
+    /* --------------------------------------------------------
+       DELIVERY
 
+       "sent" currently means provider accepted the send request.
+       Confirmed delivered/opened/clicked data requires webhooks.
+    --------------------------------------------------------- */
 
-    const failedDeliveries =
-      deliveries.filter(
-        (delivery) =>
-          delivery.status ===
-          "failed"
-      ).length;
-
-
-    /*
-     * These become meaningful when provider
-     * webhooks update the corresponding
-     * delivery timestamps.
-     */
-    const confirmedDelivered =
-      deliveries.filter(
-        (delivery) =>
-          Boolean(
-            delivery.delivered_at
-          )
-      ).length;
-
-
-    const openedDeliveries =
-      deliveries.filter(
-        (delivery) =>
-          Boolean(
-            delivery.opened_at
-          )
-      ).length;
-
-
-    const clickedDeliveries =
-      deliveries.filter(
-        (delivery) =>
-          Boolean(
-            delivery.clicked_at
-          )
-      ).length;
-
-
-    const totalRecipients =
+    const recipients =
       campaigns.reduce(
         (
           total,
@@ -5045,8 +4859,7 @@ async function getNewsletterAnalytics(
         0
       );
 
-
-    const totalAccepted =
+    const acceptedFromCampaigns =
       campaigns.reduce(
         (
           total,
@@ -5060,8 +4873,7 @@ async function getNewsletterAnalytics(
         0
       );
 
-
-    const totalFailed =
+    const failedFromCampaigns =
       campaigns.reduce(
         (
           total,
@@ -5075,107 +4887,193 @@ async function getNewsletterAnalytics(
         0
       );
 
+    const acceptedDeliveryRows =
+      deliveries.filter(
+        (delivery) =>
+          [
+            "sent",
+            "accepted",
+            "delivered",
+          ].includes(
+            cleanString(
+              delivery.status
+            ).toLowerCase()
+          )
+      ).length;
 
-    const latestSentCampaign =
-      campaigns
-        .filter(
-          (campaign) =>
-            campaign.sent_at
-        )
-        .sort(
-          (a, b) =>
-            new Date(
-              b.sent_at
-            ).getTime() -
-            new Date(
-              a.sent_at
-            ).getTime()
-        )[0] ||
-      null;
+    const failedDeliveryRows =
+      deliveries.filter(
+        (delivery) =>
+          cleanString(
+            delivery.status
+          ).toLowerCase() ===
+          "failed"
+      ).length;
 
+    const confirmedDelivered =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.delivered_at
+          )
+      ).length;
+
+    const opened =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.opened_at
+          )
+      ).length;
+
+    const clicked =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.clicked_at
+          )
+      ).length;
+
+    /*
+     * Prefer actual delivery rows when available.
+     * Otherwise use campaign aggregate fields.
+     */
+    const accepted =
+      deliveries.length > 0
+        ? acceptedDeliveryRows
+        : acceptedFromCampaigns;
+
+    const failed =
+      deliveries.length > 0
+        ? failedDeliveryRows
+        : failedFromCampaigns;
+
+    const acceptanceRate =
+      recipients > 0
+        ? Number(
+            (
+              (
+                accepted /
+                recipients
+              ) *
+              100
+            ).toFixed(2)
+          )
+        : 0;
+
+    const failureRate =
+      recipients > 0
+        ? Number(
+            (
+              (
+                failed /
+                recipients
+              ) *
+              100
+            ).toFixed(2)
+          )
+        : 0;
+
+
+    /* --------------------------------------------------------
+       RESPONSE
+    --------------------------------------------------------- */
 
     return res
       .status(200)
       .json({
         success: true,
 
-        analytics: {
-          audience:
-            DEFAULT_AUDIENCE,
+        subscribers: {
+          total:
+            totalSubscribers,
 
-          audienceLabel:
-            "All Active Subscribers",
+          active:
+            activeSubscribers,
 
-          subscribers: {
-            total:
-              subscribers.length,
-
-            active:
-              activeSubscribers,
-
-            unsubscribed:
-              unsubscribedSubscribers,
-          },
-
-          campaigns: {
-            total:
-              campaigns.length,
-
-            draft:
-              draftCampaigns,
-
-            scheduled:
-              scheduledCampaigns,
-
-            sending:
-              sendingCampaigns,
-
-            sent:
-              sentCampaigns,
-
-            failed:
-              failedCampaigns,
-          },
-
-          delivery: {
-            /*
-             * accepted = provider accepted
-             * the message for sending.
-             */
-            recipients:
-              totalRecipients,
-
-            accepted:
-              totalAccepted,
-
-            failed:
-              totalFailed,
-
-            deliveryRecords:
-              deliveries.length,
-
-            acceptedRecords:
-              acceptedDeliveries,
-
-            failedRecords:
-              failedDeliveries,
-
-            confirmedDelivered,
-
-            opened:
-              openedDeliveries,
-
-            clicked:
-              clickedDeliveries,
-          },
-
-          latestNewsletter:
-            latestSentCampaign
-              ? normalizeCampaign(
-                  latestSentCampaign
-                )
-              : null,
+          unsubscribed:
+            unsubscribedSubscribers,
         },
+
+        campaigns: {
+          total:
+            totalCampaigns,
+
+          draft:
+            draftCampaigns,
+
+          scheduled:
+            scheduledCampaigns,
+
+          sending:
+            sendingCampaigns,
+
+          sent:
+            sentCampaigns,
+
+          failed:
+            failedCampaigns,
+        },
+
+        delivery: {
+          recipients,
+
+          /*
+           * Provider accepted.
+           */
+          accepted,
+
+          failed,
+
+          /*
+           * These remain zero unless delivery/webhook events
+           * populate the relevant timestamps.
+           */
+          confirmedDelivered,
+
+          opened,
+
+          clicked,
+
+          acceptanceRate,
+
+          failureRate,
+        },
+
+        /*
+         * Compatibility values for older admin UI code.
+         */
+        totalSubscribers,
+
+        activeSubscribers,
+
+        totalCampaigns,
+
+        draftCampaigns,
+
+        scheduledCampaigns,
+
+        sentCampaigns,
+
+        failedCampaigns,
+
+        totalRecipients:
+          recipients,
+
+        totalAccepted:
+          accepted,
+
+        totalDelivered:
+          accepted,
+
+        totalFailed:
+          failed,
+
+        totalOpened:
+          opened,
+
+        totalClicked:
+          clicked,
       });
   } catch (error) {
     return sendServerError(
@@ -5188,79 +5086,62 @@ async function getNewsletterAnalytics(
 
 
 /* ============================================================
-   MODULE EXPORTS
+   EXPORTS
 ============================================================ */
 
 module.exports = {
-  /* ----------------------------------------------------------
-     PUBLIC SUBSCRIBER ACTIONS
-  ---------------------------------------------------------- */
-
+  /*
+   * Public subscriber endpoints
+   */
   subscribe,
-
   unsubscribe,
 
-
-  /* ----------------------------------------------------------
-     ADMIN SUBSCRIBER MANAGEMENT
-  ---------------------------------------------------------- */
-
+  /*
+   * Admin subscriber management
+   */
   getSubscribers,
-
   updateSubscriber,
-
   deleteSubscriber,
 
-
-  /* ----------------------------------------------------------
-     IMAGE UPLOAD
-  ---------------------------------------------------------- */
-
+  /*
+   * Newsletter images
+   */
   uploadNewsletterImage,
 
-
-  /* ----------------------------------------------------------
-     CAMPAIGN MANAGEMENT
-  ---------------------------------------------------------- */
-
+  /*
+   * Campaign management
+   */
   getCampaigns,
-
   getCampaign,
-
   createCampaign,
-
   updateCampaign,
-
   deleteCampaign,
-
   duplicateCampaign,
 
+  /*
+   * Audience / recipients
+   */
   getCampaignRecipientCount,
 
-
-  /* ----------------------------------------------------------
-     SCHEDULING
-  ---------------------------------------------------------- */
-
+  /*
+   * Scheduling
+   */
   scheduleCampaign,
-
   cancelScheduledCampaign,
 
-
-  /* ----------------------------------------------------------
-     DELIVERY
-  ---------------------------------------------------------- */
-
+  /*
+   * Sending
+   */
   sendTestCampaign,
-
   sendCampaign,
 
+  /*
+   * Delivery records
+   */
   getCampaignDeliveries,
 
-
-  /* ----------------------------------------------------------
-     ANALYTICS
-  ---------------------------------------------------------- */
-
+  /*
+   * Analytics
+   */
   getNewsletterAnalytics,
 };

@@ -13,6 +13,7 @@ import {
   ExternalLink,
   GraduationCap,
   Handshake,
+  Images,
   LayoutDashboard,
   Mail,
   MessageSquareText,
@@ -25,81 +26,131 @@ import { Link } from "react-router-dom";
 
 import "./AdminDashboard.css";
 
-// ============================================================
-// API CONFIGURATION
-// ============================================================
 
-const API_URL =
+/* ============================================================
+   API CONFIGURATION
+============================================================ */
+
+const API_URL = (
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  "http://localhost:5000"
+).replace(/\/+$/, "");
 
-// ============================================================
-// DEFAULT DASHBOARD STATE
-// ============================================================
+
+/* ============================================================
+   DEFAULT DASHBOARD STATE
+============================================================ */
 
 const DEFAULT_DASHBOARD = {
   upcomingEvents: 0,
+
   publishedInsights: 0,
+
   newsletterSubscribers: 0,
+
   newContacts: 0,
+
   totalContacts: 0,
+
   partnerships: 0,
+
   newPartnerships: 0,
+
+  totalGalleryPhotos: 0,
+
+  publishedGalleryPhotos: 0,
+
   recentActivity: [],
 };
 
-// ============================================================
-// QUICK ACCESS
-// ============================================================
+
+/* ============================================================
+   QUICK ACCESS
+============================================================ */
 
 const quickAccess = [
   {
     title: "Events",
+
     description:
       "Create, publish and manage Continental Founders events.",
+
     icon: CalendarDays,
+
     to: "/admin/events",
   },
+
   {
     title: "Insights",
+
     description:
       "Publish articles, research and founder insights.",
+
     icon: Newspaper,
+
     to: "/admin/insights",
   },
+
+  {
+    title: "Gallery",
+
+    description:
+      "Upload, publish and manage photos from events, programs and partnerships.",
+
+    icon: Images,
+
+    to: "/admin/gallery",
+  },
+
   {
     title: "Newsletter",
+
     description:
       "Manage subscribers and newsletter outreach.",
+
     icon: Mail,
+
     to: "/admin/newsletter",
   },
+
   {
     title: "Contacts",
+
     description:
       "Review contact enquiries and website messages.",
+
     icon: MessageSquareText,
+
     to: "/admin/contacts",
   },
+
   {
     title: "Universities",
+
     description:
       "Manage university partners and institutions.",
+
     icon: GraduationCap,
+
     to: "/admin/universities",
   },
+
   {
     title: "Leadership",
+
     description:
       "Manage leadership and organizational profiles.",
+
     icon: Users,
+
     to: "/admin/leadership",
   },
 ];
 
-// ============================================================
-// NUMBER HELPERS
-// ============================================================
+
+/* ============================================================
+   NUMBER HELPERS
+============================================================ */
 
 function getNumber(...values) {
   for (const value of values) {
@@ -111,9 +162,12 @@ function getNumber(...values) {
       continue;
     }
 
-    const parsed = Number(value);
+    const parsed =
+      Number(value);
 
-    if (Number.isFinite(parsed)) {
+    if (
+      Number.isFinite(parsed)
+    ) {
       return parsed;
     }
   }
@@ -121,17 +175,23 @@ function getNumber(...values) {
   return 0;
 }
 
+
 function formatNumber(value) {
-  return new Intl.NumberFormat("en-US").format(
+  return new Intl.NumberFormat(
+    "en-US"
+  ).format(
     getNumber(value)
   );
 }
 
-// ============================================================
-// NORMALIZE BACKEND RESPONSE
-// ============================================================
 
-function normalizeDashboardData(payload) {
+/* ============================================================
+   NORMALIZE BACKEND RESPONSE
+============================================================ */
+
+function normalizeDashboardData(
+  payload
+) {
   const source =
     payload?.data ||
     payload?.dashboard ||
@@ -146,101 +206,143 @@ function normalizeDashboardData(payload) {
 
   let recentActivity = [];
 
-  if (Array.isArray(source.recentActivity)) {
-    recentActivity = source.recentActivity;
+  if (
+    Array.isArray(
+      source.recentActivity
+    )
+  ) {
+    recentActivity =
+      source.recentActivity;
   } else if (
-    Array.isArray(source.recent_activity)
+    Array.isArray(
+      source.recent_activity
+    )
   ) {
     recentActivity =
       source.recent_activity;
   } else if (
-    Array.isArray(source.activity)
+    Array.isArray(
+      source.activity
+    )
   ) {
-    recentActivity = source.activity;
+    recentActivity =
+      source.activity;
   }
 
+
   return {
-    upcomingEvents: getNumber(
-      stats.upcomingEvents,
-      stats.upcoming_events,
-      stats.upcomingEventCount,
-      stats.upcoming_event_count,
-      source.upcomingEvents,
-      source.upcoming_events
-    ),
+    upcomingEvents:
+      getNumber(
+        stats.upcomingEvents,
+        stats.upcoming_events,
+        stats.upcomingEventCount,
+        stats.upcoming_event_count,
+        source.upcomingEvents,
+        source.upcoming_events
+      ),
 
-    publishedInsights: getNumber(
-      stats.publishedInsights,
-      stats.published_insights,
-      stats.publishedInsightCount,
-      stats.published_insight_count,
-      source.publishedInsights,
-      source.published_insights
-    ),
+    publishedInsights:
+      getNumber(
+        stats.publishedInsights,
+        stats.published_insights,
+        stats.publishedInsightCount,
+        stats.published_insight_count,
+        source.publishedInsights,
+        source.published_insights
+      ),
 
-    newsletterSubscribers: getNumber(
-      stats.newsletterSubscribers,
-      stats.newsletter_subscribers,
-      stats.activeSubscribers,
-      stats.active_subscribers,
-      stats.subscribers,
-      stats.totalSubscribers,
-      source.newsletterSubscribers,
-      source.newsletter_subscribers
-    ),
+    newsletterSubscribers:
+      getNumber(
+        stats.newsletterSubscribers,
+        stats.newsletter_subscribers,
+        stats.activeSubscribers,
+        stats.active_subscribers,
+        stats.subscribers,
+        stats.totalSubscribers,
+        source.newsletterSubscribers,
+        source.newsletter_subscribers
+      ),
 
-    newContacts: getNumber(
-      stats.newContacts,
-      stats.new_contacts,
-      source.newContacts,
-      source.new_contacts
-    ),
+    newContacts:
+      getNumber(
+        stats.newContacts,
+        stats.new_contacts,
+        source.newContacts,
+        source.new_contacts
+      ),
 
-    totalContacts: getNumber(
-      stats.contacts,
-      stats.totalContacts,
-      stats.total_contacts,
-      source.totalContacts,
-      source.total_contacts
-    ),
+    totalContacts:
+      getNumber(
+        stats.contacts,
+        stats.totalContacts,
+        stats.total_contacts,
+        source.totalContacts,
+        source.total_contacts
+      ),
 
-    partnerships: getNumber(
-      stats.partnerships,
-      stats.totalPartnerships,
-      stats.total_partnerships,
-      source.partnerships,
-      source.totalPartnerships,
-      source.total_partnerships
-    ),
+    partnerships:
+      getNumber(
+        stats.partnerships,
+        stats.totalPartnerships,
+        stats.total_partnerships,
+        source.partnerships,
+        source.totalPartnerships,
+        source.total_partnerships
+      ),
 
-    newPartnerships: getNumber(
-      stats.newPartnerships,
-      stats.new_partnerships,
-      source.newPartnerships,
-      source.new_partnerships
-    ),
+    newPartnerships:
+      getNumber(
+        stats.newPartnerships,
+        stats.new_partnerships,
+        source.newPartnerships,
+        source.new_partnerships
+      ),
+
+    totalGalleryPhotos:
+      getNumber(
+        stats.totalGalleryPhotos,
+        stats.total_gallery_photos,
+        stats.galleryPhotos,
+        stats.gallery_photos,
+        source.totalGalleryPhotos,
+        source.total_gallery_photos
+      ),
+
+    publishedGalleryPhotos:
+      getNumber(
+        stats.publishedGalleryPhotos,
+        stats.published_gallery_photos,
+        source.publishedGalleryPhotos,
+        source.published_gallery_photos
+      ),
 
     recentActivity,
   };
 }
 
-// ============================================================
-// ACTIVITY HELPERS
-// ============================================================
+
+/* ============================================================
+   ACTIVITY HELPERS
+============================================================ */
 
 function getActivityIcon(item) {
-  const type = String(
-    item?.type ||
-      item?.category ||
-      item?.entity ||
-      ""
-  )
-    .trim()
-    .toLowerCase();
+  const type =
+    String(
+      item?.type ||
+        item?.category ||
+        item?.entity ||
+        ""
+    )
+      .trim()
+      .toLowerCase();
 
-  if (type.includes("event")) {
+
+  if (
+    type.includes("event")
+  ) {
     return CalendarDays;
   }
+
 
   if (
     type.includes("insight") ||
@@ -250,12 +352,23 @@ function getActivityIcon(item) {
     return Newspaper;
   }
 
+
+  if (
+    type.includes("gallery") ||
+    type.includes("photo") ||
+    type.includes("image")
+  ) {
+    return Images;
+  }
+
+
   if (
     type.includes("newsletter") ||
     type.includes("subscriber")
   ) {
     return Mail;
   }
+
 
   if (
     type.includes("contact") ||
@@ -265,6 +378,7 @@ function getActivityIcon(item) {
     return MessageSquareText;
   }
 
+
   if (
     type.includes("partner") ||
     type.includes("partnership")
@@ -272,12 +386,17 @@ function getActivityIcon(item) {
     return Handshake;
   }
 
-  if (type.includes("university")) {
+
+  if (
+    type.includes("university")
+  ) {
     return GraduationCap;
   }
 
+
   return Activity;
 }
+
 
 function getActivityTitle(item) {
   return (
@@ -289,7 +408,10 @@ function getActivityTitle(item) {
   );
 }
 
-function getActivityDescription(item) {
+
+function getActivityDescription(
+  item
+) {
   return (
     item?.description ||
     item?.details ||
@@ -297,6 +419,7 @@ function getActivityDescription(item) {
     ""
   );
 }
+
 
 function getActivityTime(item) {
   const value =
@@ -311,11 +434,19 @@ function getActivityTime(item) {
     return "";
   }
 
-  const parsedDate = new Date(value);
 
-  if (Number.isNaN(parsedDate.getTime())) {
+  const parsedDate =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime()
+    )
+  ) {
     return String(value);
   }
+
 
   return new Intl.DateTimeFormat(
     "en-US",
@@ -327,9 +458,10 @@ function getActivityTime(item) {
   ).format(parsedDate);
 }
 
-// ============================================================
-// STAT CARD
-// ============================================================
+
+/* ============================================================
+   STAT CARD
+============================================================ */
 
 function StatCard({
   icon: Icon,
@@ -365,12 +497,16 @@ function StatCard({
   );
 }
 
-// ============================================================
-// QUICK ACCESS CARD
-// ============================================================
 
-function QuickAccessCard({ item }) {
-  const Icon = item.icon;
+/* ============================================================
+   QUICK ACCESS CARD
+============================================================ */
+
+function QuickAccessCard({
+  item,
+}) {
+  const Icon =
+    item.icon;
 
   return (
     <Link
@@ -385,9 +521,13 @@ function QuickAccessCard({ item }) {
       </div>
 
       <div className="admin-dashboard__quick-copy">
-        <h3>{item.title}</h3>
+        <h3>
+          {item.title}
+        </h3>
 
-        <p>{item.description}</p>
+        <p>
+          {item.description}
+        </p>
       </div>
 
       <ArrowUpRight
@@ -399,9 +539,10 @@ function QuickAccessCard({ item }) {
   );
 }
 
-// ============================================================
-// ADMIN DASHBOARD
-// ============================================================
+
+/* ============================================================
+   ADMIN DASHBOARD
+============================================================ */
 
 function AdminDashboard() {
   const [
@@ -431,9 +572,10 @@ function AdminDashboard() {
     setLastUpdated,
   ] = useState(null);
 
-  // ==========================================================
-  // LOAD DASHBOARD
-  // ==========================================================
+
+  /* ==========================================================
+     LOAD DASHBOARD
+  ========================================================== */
 
   const loadDashboard =
     useCallback(
@@ -453,7 +595,8 @@ function AdminDashboard() {
             await fetch(
               `${API_URL}/api/admin/dashboard/stats`,
               {
-                method: "GET",
+                method:
+                  "GET",
 
                 headers: {
                   Accept:
@@ -468,10 +611,12 @@ function AdminDashboard() {
               }
             );
 
+
           const contentType =
             response.headers.get(
               "content-type"
             ) || "";
+
 
           if (
             !contentType.includes(
@@ -483,19 +628,24 @@ function AdminDashboard() {
             );
           }
 
+
           const result =
             await response.json();
 
+
           if (
-            response.status === 401
+            response.status ===
+            401
           ) {
             throw new Error(
               "Your CMS session is not authenticated. Please sign in again."
             );
           }
 
+
           if (
-            response.status === 403
+            response.status ===
+            403
           ) {
             throw new Error(
               result?.message ||
@@ -503,7 +653,10 @@ function AdminDashboard() {
             );
           }
 
-          if (!response.ok) {
+
+          if (
+            !response.ok
+          ) {
             throw new Error(
               result?.message ||
                 result?.error ||
@@ -511,11 +664,13 @@ function AdminDashboard() {
             );
           }
 
+
           setDashboard(
             normalizeDashboardData(
               result
             )
           );
+
 
           setLastUpdated(
             new Date()
@@ -528,29 +683,33 @@ function AdminDashboard() {
             requestError
           );
 
+
           setError(
             requestError?.message ||
               "Unable to load dashboard information."
           );
         } finally {
           setLoading(false);
+
           setRefreshing(false);
         }
       },
       []
     );
 
-  // ==========================================================
-  // INITIAL LOAD
-  // ==========================================================
+
+  /* ==========================================================
+     INITIAL LOAD
+  ========================================================== */
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
 
-  // ==========================================================
-  // DASHBOARD STATS
-  // ==========================================================
+
+  /* ==========================================================
+     DASHBOARD STATS
+  ========================================================== */
 
   const stats =
     useMemo(
@@ -581,6 +740,22 @@ function AdminDashboard() {
 
           helper:
             "Live publications",
+        },
+
+        {
+          label:
+            "Gallery Photos",
+
+          value:
+            dashboard.publishedGalleryPhotos,
+
+          icon:
+            Images,
+
+          helper:
+            `${formatNumber(
+              dashboard.totalGalleryPhotos
+            )} total photos`,
         },
 
         {
@@ -632,6 +807,8 @@ function AdminDashboard() {
       [
         dashboard.upcomingEvents,
         dashboard.publishedInsights,
+        dashboard.publishedGalleryPhotos,
+        dashboard.totalGalleryPhotos,
         dashboard.newsletterSubscribers,
         dashboard.newContacts,
         dashboard.totalContacts,
@@ -640,9 +817,10 @@ function AdminDashboard() {
       ]
     );
 
-  // ==========================================================
-  // RECENT ACTIVITY
-  // ==========================================================
+
+  /* ==========================================================
+     RECENT ACTIVITY
+  ========================================================== */
 
   const recentActivity =
     useMemo(() => {
@@ -654,22 +832,25 @@ function AdminDashboard() {
         return [];
       }
 
+
       return dashboard
         .recentActivity
-        .slice(0, 6);
+        .slice(0, 8);
     }, [
       dashboard.recentActivity,
     ]);
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
     <main className="admin-dashboard">
-      {/* ====================================================
+
+      {/* ======================================================
           HERO
-      ==================================================== */}
+      ====================================================== */}
 
       <section className="admin-dashboard__hero">
         <div className="admin-dashboard__hero-copy">
@@ -686,11 +867,13 @@ function AdminDashboard() {
           <p>
             Manage institutional
             content, events, insights,
-            partnerships, subscribers
-            and your digital presence
-            from one workspace.
+            gallery, partnerships,
+            subscribers and your
+            digital presence from one
+            workspace.
           </p>
         </div>
+
 
         <div className="admin-dashboard__hero-actions">
           <div className="admin-dashboard__workspace-badge">
@@ -703,6 +886,7 @@ function AdminDashboard() {
               CMS Workspace
             </span>
           </div>
+
 
           <button
             type="button"
@@ -734,6 +918,7 @@ function AdminDashboard() {
           </button>
         </div>
 
+
         <div
           className="admin-dashboard__hero-decoration"
           aria-hidden="true"
@@ -748,9 +933,10 @@ function AdminDashboard() {
         </div>
       </section>
 
-      {/* ====================================================
+
+      {/* ======================================================
           ERROR
-      ==================================================== */}
+      ====================================================== */}
 
       {error && (
         <section
@@ -785,9 +971,10 @@ function AdminDashboard() {
         </section>
       )}
 
-      {/* ====================================================
+
+      {/* ======================================================
           STATS
-      ==================================================== */}
+      ====================================================== */}
 
       <section
         className="admin-dashboard__stats"
@@ -816,9 +1003,10 @@ function AdminDashboard() {
         )}
       </section>
 
-      {/* ====================================================
+
+      {/* ======================================================
           QUICK ACCESS
-      ==================================================== */}
+      ====================================================== */}
 
       <section className="admin-dashboard__block">
         <header className="admin-dashboard__block-header">
@@ -838,6 +1026,7 @@ function AdminDashboard() {
           </span>
         </header>
 
+
         <div className="admin-dashboard__quick-grid">
           {quickAccess.map(
             (item) => (
@@ -854,14 +1043,16 @@ function AdminDashboard() {
         </div>
       </section>
 
-      {/* ====================================================
+
+      {/* ======================================================
           LOWER DASHBOARD
-      ==================================================== */}
+      ====================================================== */}
 
       <section className="admin-dashboard__lower-grid">
-        {/* ==================================================
+
+        {/* ====================================================
             RECENT ACTIVITY
-        ================================================== */}
+        ==================================================== */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
@@ -880,6 +1071,7 @@ function AdminDashboard() {
               strokeWidth={1.8}
             />
           </header>
+
 
           {loading ? (
             <div className="admin-dashboard__activity-empty">
@@ -920,6 +1112,7 @@ function AdminDashboard() {
                       item
                     );
 
+
                   return (
                     <div
                       key={
@@ -938,6 +1131,7 @@ function AdminDashboard() {
                         />
                       </div>
 
+
                       <div className="admin-dashboard__activity-copy">
                         <strong>
                           {title}
@@ -951,6 +1145,7 @@ function AdminDashboard() {
                           </span>
                         )}
                       </div>
+
 
                       {time && (
                         <time>
@@ -977,9 +1172,10 @@ function AdminDashboard() {
           )}
         </article>
 
-        {/* ==================================================
+
+        {/* ====================================================
             SYSTEM STATUS
-        ================================================== */}
+        ==================================================== */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
@@ -998,6 +1194,7 @@ function AdminDashboard() {
               strokeWidth={1.8}
             />
           </header>
+
 
           <div
             className={
@@ -1020,6 +1217,7 @@ function AdminDashboard() {
               )}
             </div>
 
+
             <div>
               <strong>
                 {error
@@ -1037,11 +1235,13 @@ function AdminDashboard() {
                 lastUpdated && (
                   <small>
                     Last updated{" "}
+
                     {lastUpdated.toLocaleTimeString(
                       [],
                       {
                         hour:
                           "2-digit",
+
                         minute:
                           "2-digit",
                       }
@@ -1051,7 +1251,22 @@ function AdminDashboard() {
             </div>
           </div>
 
+
           <div className="admin-dashboard__system-links">
+            <Link
+              to="/gallery"
+              className="admin-dashboard__system-link"
+            >
+              <span>
+                View Public Gallery
+              </span>
+
+              <ExternalLink
+                size={12}
+              />
+            </Link>
+
+
             <Link
               to="/strategic-partners"
               className="admin-dashboard__system-link"
@@ -1064,6 +1279,7 @@ function AdminDashboard() {
                 size={12}
               />
             </Link>
+
 
             <Link
               to="/"
@@ -1083,5 +1299,6 @@ function AdminDashboard() {
     </main>
   );
 }
+
 
 export default AdminDashboard;

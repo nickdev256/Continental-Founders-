@@ -60,6 +60,8 @@ import EventDetails from "./pages/EventDetails";
 import Insights from "./pages/Insights";
 import InsightDetails from "./pages/InsightDetails";
 
+import Gallery from "./pages/Gallery";
+
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
@@ -83,6 +85,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminVentures from "./pages/admin/AdminVentures";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminInsights from "./pages/admin/AdminInsights";
+import AdminGallery from "./pages/admin/AdminGallery";
 import AdminUniversities from "./pages/admin/AdminUniversities";
 
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
@@ -397,6 +400,33 @@ const SEO_ROUTES = {
       {
         name: "Insights",
         path: "/insights",
+      },
+    ],
+  },
+
+
+  // ==========================================================
+  // GALLERY SEO
+  // ==========================================================
+
+  "/gallery": {
+    title:
+      "Gallery | Continental Founders",
+
+    description:
+      "Explore moments from Continental Founders events, founder programs, partnerships, university engagements, community activities, and global collaborations.",
+
+    canonical:
+      "/gallery",
+
+    breadcrumb: [
+      {
+        name: "Insights",
+        path: "/insights",
+      },
+      {
+        name: "Gallery",
+        path: "/gallery",
       },
     ],
   },
@@ -795,7 +825,6 @@ function setBreadcrumbData(
     ...items,
   ];
 
-
   const data = {
     "@context":
       "https://schema.org",
@@ -825,7 +854,6 @@ function setBreadcrumbData(
         })
       ),
   };
-
 
   setStructuredData(
     "cf-breadcrumb-schema",
@@ -893,7 +921,6 @@ function setOrganizationData() {
     ],
   };
 
-
   setStructuredData(
     "cf-organization-schema",
     data
@@ -933,7 +960,6 @@ function setWebsiteData() {
     inLanguage:
       "en-US",
   };
-
 
   setStructuredData(
     "cf-website-schema",
@@ -989,7 +1015,6 @@ function setWebPageData({
       "en-US",
   };
 
-
   setStructuredData(
     "cf-webpage-schema",
     data
@@ -1018,25 +1043,20 @@ function applyPublicSEO({
     description ||
     DEFAULT_DESCRIPTION;
 
-
   document.title =
     finalTitle;
-
 
   setDescription(
     finalDescription
   );
 
-
   setRobots(
     INDEX_ROBOTS
   );
 
-
   setCanonical(
     canonicalUrl
   );
-
 
   setOpenGraph({
     title:
@@ -1052,7 +1072,6 @@ function applyPublicSEO({
     image,
   });
 
-
   setTwitterMeta({
     title:
       finalTitle,
@@ -1063,11 +1082,9 @@ function applyPublicSEO({
     image,
   });
 
-
   setOrganizationData();
 
   setWebsiteData();
-
 
   setWebPageData({
     title:
@@ -1081,7 +1098,6 @@ function applyPublicSEO({
     type:
       schemaType,
   });
-
 
   setBreadcrumbData(
     breadcrumbs
@@ -1101,19 +1117,15 @@ function applyNoIndexSEO({
   document.title =
     title;
 
-
   setDescription(
     description
   );
-
 
   setRobots(
     robots
   );
 
-
   removeCanonical();
-
 
   removeMetaTag(
     'meta[property="og:url"]'
@@ -1147,7 +1159,6 @@ function applyNoIndexSEO({
     'meta[name="twitter:image"]'
   );
 
-
   removeStructuredData(
     "cf-breadcrumb-schema"
   );
@@ -1165,7 +1176,6 @@ function applyNoIndexSEO({
 function SEOManager() {
   const { pathname } =
     useLocation();
-
 
   useEffect(() => {
     const cleanPath =
@@ -1399,9 +1409,7 @@ function SEOManager() {
         seo.breadcrumb ||
         [],
     });
-
   }, [pathname]);
-
 
   return null;
 }
@@ -1415,7 +1423,6 @@ function ScrollToTop() {
   const { pathname } =
     useLocation();
 
-
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -1423,7 +1430,6 @@ function ScrollToTop() {
       behavior: "auto",
     });
   }, [pathname]);
-
 
   return null;
 }
@@ -1437,13 +1443,11 @@ export default function App() {
   const { pathname } =
     useLocation();
 
-
   const isAdminRoute =
     pathname === "/admin" ||
     pathname.startsWith(
       "/admin/"
     );
-
 
   return (
     <div
@@ -1453,7 +1457,6 @@ export default function App() {
           : "site-shell"
       }
     >
-
       <ScrollToTop />
 
       <SEOManager />
@@ -1480,7 +1483,6 @@ export default function App() {
             : "main-content"
         }
       >
-
         <PageTransition>
 
           <Routes>
@@ -1653,6 +1655,18 @@ export default function App() {
 
 
             {/* =================================================
+                GALLERY
+            ================================================= */}
+
+            <Route
+              path="/gallery"
+              element={
+                <Gallery />
+              }
+            />
+
+
+            {/* =================================================
                 CONTACT
             ================================================= */}
 
@@ -1699,7 +1713,6 @@ export default function App() {
                 <ProtectedAdminRoute />
               }
             >
-
               <Route
                 path="/admin"
                 element={
@@ -1734,6 +1747,19 @@ export default function App() {
                     <AdminInsights />
                   }
                 />
+
+
+                {/* =============================================
+                    ADMIN GALLERY
+                ============================================== */}
+
+                <Route
+                  path="gallery"
+                  element={
+                    <AdminGallery />
+                  }
+                />
+
 
                 <Route
                   path="universities"
@@ -1792,7 +1818,6 @@ export default function App() {
                 />
 
               </Route>
-
             </Route>
 
 
@@ -1810,7 +1835,6 @@ export default function App() {
           </Routes>
 
         </PageTransition>
-
       </main>
 
 
@@ -1825,11 +1849,6 @@ export default function App() {
 
       {/* =====================================================
           ETH TECH SOLUTIONS PROMOTIONAL POPUP
-
-          - Public website only
-          - Appears after delay configured inside EthTechPopup
-          - Never appears in the admin dashboard
-          - Clicking it opens Eth Tech Solutions
       ====================================================== */}
 
       {!isAdminRoute && (

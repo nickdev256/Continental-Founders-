@@ -49,6 +49,18 @@ export const navigation = [
   {
     label: "Insights",
     path: "/insights",
+
+    children: [
+      {
+        label: "All Insights",
+        path: "/insights",
+      },
+
+      {
+        label: "Gallery",
+        path: "/gallery",
+      },
+    ],
   },
 
   {

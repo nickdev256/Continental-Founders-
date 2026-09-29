@@ -2,32 +2,36 @@ const {
   supabaseAdmin,
 } = require("../config/supabase");
 
-// ============================================================
-// CONFIGURATION
-// ============================================================
+
+/* ============================================================
+   CONFIGURATION
+============================================================ */
 
 const RECENT_ACTIVITY_LIMIT = 8;
 
-// ============================================================
-// HELPER: SAFE COUNT QUERY
-// ============================================================
+
+/* ============================================================
+   HELPER: SAFE COUNT QUERY
+============================================================ */
 
 async function countRows(
   table,
   configureQuery = null
 ) {
-  let query = supabaseAdmin
-    .from(table)
-    .select("*", {
-      count: "exact",
-      head: true,
-    });
+  let query =
+    supabaseAdmin
+      .from(table)
+      .select("*", {
+        count: "exact",
+        head: true,
+      });
 
   if (
     typeof configureQuery ===
     "function"
   ) {
-    query = configureQuery(query);
+    query =
+      configureQuery(query);
   }
 
   const {
@@ -42,12 +46,13 @@ async function countRows(
   return count || 0;
 }
 
-// ============================================================
-// OPTIONAL COUNT
-//
-// Used for dashboard modules that should not cause the whole
-// dashboard to fail if the table/schema is unavailable.
-// ============================================================
+
+/* ============================================================
+   OPTIONAL COUNT
+
+   Used for dashboard modules that should not cause the entire
+   dashboard to fail if a table/schema is temporarily unavailable.
+============================================================ */
 
 async function optionalCount(
   label,
@@ -69,9 +74,10 @@ async function optionalCount(
   }
 }
 
-// ============================================================
-// HELPER: FETCH RECENT ROWS SAFELY
-// ============================================================
+
+/* ============================================================
+   HELPER: FETCH RECENT ROWS SAFELY
+============================================================ */
 
 async function fetchRecentRows({
   label,
@@ -83,13 +89,17 @@ async function fetchRecentRows({
     const {
       data,
       error,
-    } = await supabaseAdmin
-      .from(table)
-      .select(columns)
-      .order("created_at", {
-        ascending: false,
-      })
-      .limit(limit);
+    } =
+      await supabaseAdmin
+        .from(table)
+        .select(columns)
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        )
+        .limit(limit);
 
     if (error) {
       throw error;
@@ -108,9 +118,10 @@ async function fetchRecentRows({
   }
 }
 
-// ============================================================
-// HELPER: DATE VALUE
-// ============================================================
+
+/* ============================================================
+   HELPER: DATE VALUE
+============================================================ */
 
 function getTimestamp(item) {
   const value =
@@ -124,145 +135,182 @@ function getTimestamp(item) {
   }
 
   const timestamp =
-    new Date(value).getTime();
+    new Date(value)
+      .getTime();
 
-  return Number.isFinite(timestamp)
+  return Number.isFinite(
+    timestamp
+  )
     ? timestamp
     : 0;
 }
 
-// ============================================================
-// DASHBOARD STATS
-//
-// GET /api/admin/dashboard/stats
-// ============================================================
 
-async function stats(req, res) {
+/* ============================================================
+   DASHBOARD STATS
+
+   GET /api/admin/dashboard/stats
+============================================================ */
+
+async function stats(
+  req,
+  res
+) {
   try {
     const now =
-      new Date().toISOString();
+      new Date()
+        .toISOString();
 
-    // ========================================================
-    // CORE COUNTS
-    //
-    // These tables are already part of the CMS and should
-    // exist. If one fails, return a server error rather than
-    // silently presenting incorrect core statistics.
-    // ========================================================
+
+    /* ========================================================
+       CORE COUNTS
+    ======================================================== */
 
     const [
       totalContacts,
       newContacts,
       upcomingEvents,
       publishedInsights,
-    ] = await Promise.all([
-      // ------------------------------------------------------
-      // ALL CONTACTS
-      // ------------------------------------------------------
+    ] =
+      await Promise.all([
+        /* ----------------------------------------------------
+           ALL CONTACTS
+        ---------------------------------------------------- */
 
-      countRows(
-        "contact_messages"
-      ),
+        countRows(
+          "contact_messages"
+        ),
 
-      // ------------------------------------------------------
-      // NEW CONTACTS
-      // ------------------------------------------------------
 
-      countRows(
-        "contact_messages",
-        (query) =>
-          query.eq(
-            "status",
-            "new"
-          )
-      ),
+        /* ----------------------------------------------------
+           NEW CONTACTS
+        ---------------------------------------------------- */
 
-      // ------------------------------------------------------
-      // UPCOMING PUBLISHED EVENTS
-      // ------------------------------------------------------
+        countRows(
+          "contact_messages",
+          (query) =>
+            query.eq(
+              "status",
+              "new"
+            )
+        ),
 
-      countRows(
-        "events",
-        (query) =>
-          query
-            .eq(
+
+        /* ----------------------------------------------------
+           UPCOMING PUBLISHED EVENTS
+        ---------------------------------------------------- */
+
+        countRows(
+          "events",
+          (query) =>
+            query
+              .eq(
+                "status",
+                "published"
+              )
+              .gte(
+                "event_date",
+                now
+              )
+        ),
+
+
+        /* ----------------------------------------------------
+           PUBLISHED INSIGHTS
+        ---------------------------------------------------- */
+
+        countRows(
+          "insights",
+          (query) =>
+            query.eq(
               "status",
               "published"
             )
-            .gte(
-              "event_date",
-              now
-            )
-      ),
+        ),
+      ]);
 
-      // ------------------------------------------------------
-      // PUBLISHED INSIGHTS
-      // ------------------------------------------------------
 
-      countRows(
-        "insights",
-        (query) =>
-          query.eq(
-            "status",
-            "published"
-          )
-      ),
-    ]);
-
-    // ========================================================
-    // OPTIONAL COUNTS
-    // ========================================================
+    /* ========================================================
+       OPTIONAL COUNTS
+    ======================================================== */
 
     const [
       newsletterSubscribers,
       partnerships,
       newPartnerships,
-    ] = await Promise.all([
-      // ------------------------------------------------------
-      // ACTIVE NEWSLETTER SUBSCRIBERS
-      // ------------------------------------------------------
+      totalGalleryPhotos,
+      publishedGalleryPhotos,
+    ] =
+      await Promise.all([
+        /* ----------------------------------------------------
+           ACTIVE NEWSLETTER SUBSCRIBERS
+        ---------------------------------------------------- */
 
-      optionalCount(
-        "Newsletter subscriber count",
-        "newsletter_subscribers",
-        (query) =>
-          query.eq(
-            "active",
-            true
-          )
-      ),
+        optionalCount(
+          "Newsletter subscriber count",
+          "newsletter_subscribers",
+          (query) =>
+            query.eq(
+              "active",
+              true
+            )
+        ),
 
-      // ------------------------------------------------------
-      // TOTAL PARTNERSHIPS
-      // ------------------------------------------------------
 
-      optionalCount(
-        "Partnership count",
-        "partnerships"
-      ),
+        /* ----------------------------------------------------
+           TOTAL PARTNERSHIPS
+        ---------------------------------------------------- */
 
-      // ------------------------------------------------------
-      // NEW PARTNERSHIPS
-      //
-      // This assumes partnership records use status = "new".
-      // If your partnership table uses another status value,
-      // we can adjust this after checking the schema.
-      // ------------------------------------------------------
+        optionalCount(
+          "Partnership count",
+          "partnerships"
+        ),
 
-      optionalCount(
-        "New partnership count",
-        "partnerships",
-        (query) =>
-          query.eq(
-            "status",
-            "new"
-          )
-      ),
-    ]);
 
-    // ========================================================
-    // RECENT CONTACTS
-    // ========================================================
+        /* ----------------------------------------------------
+           NEW PARTNERSHIPS
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "New partnership count",
+          "partnerships",
+          (query) =>
+            query.eq(
+              "status",
+              "new"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           TOTAL GALLERY PHOTOS
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "Gallery photo count",
+          "gallery_items"
+        ),
+
+
+        /* ----------------------------------------------------
+           PUBLISHED GALLERY PHOTOS
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "Published gallery photo count",
+          "gallery_items",
+          (query) =>
+            query.eq(
+              "status",
+              "published"
+            )
+        ),
+      ]);
+
+
+    /* ========================================================
+       RECENT CONTACTS
+    ======================================================== */
 
     const recentContacts =
       await fetchRecentRows({
@@ -275,13 +323,13 @@ async function stats(req, res) {
         columns:
           "id, name, organization, status, created_at",
 
-        limit:
-          4,
+        limit: 4,
       });
 
-    // ========================================================
-    // RECENT EVENTS
-    // ========================================================
+
+    /* ========================================================
+       RECENT EVENTS
+    ======================================================== */
 
     const recentEvents =
       await fetchRecentRows({
@@ -294,13 +342,13 @@ async function stats(req, res) {
         columns:
           "id, title, status, event_date, created_at",
 
-        limit:
-          3,
+        limit: 3,
       });
 
-    // ========================================================
-    // RECENT INSIGHTS
-    // ========================================================
+
+    /* ========================================================
+       RECENT INSIGHTS
+    ======================================================== */
 
     const recentInsights =
       await fetchRecentRows({
@@ -313,13 +361,32 @@ async function stats(req, res) {
         columns:
           "id, title, status, created_at",
 
-        limit:
-          3,
+        limit: 3,
       });
 
-    // ========================================================
-    // NORMALIZE CONTACT ACTIVITY
-    // ========================================================
+
+    /* ========================================================
+       RECENT GALLERY PHOTOS
+    ======================================================== */
+
+    const recentGallery =
+      await fetchRecentRows({
+        label:
+          "Recent gallery photos",
+
+        table:
+          "gallery_items",
+
+        columns:
+          "id, title, category, status, image_url, created_at",
+
+        limit: 4,
+      });
+
+
+    /* ========================================================
+       NORMALIZE CONTACT ACTIVITY
+    ======================================================== */
 
     const contactActivity =
       recentContacts.map(
@@ -347,9 +414,10 @@ async function stats(req, res) {
         })
       );
 
-    // ========================================================
-    // NORMALIZE EVENT ACTIVITY
-    // ========================================================
+
+    /* ========================================================
+       NORMALIZE EVENT ACTIVITY
+    ======================================================== */
 
     const eventActivity =
       recentEvents.map(
@@ -380,9 +448,10 @@ async function stats(req, res) {
         })
       );
 
-    // ========================================================
-    // NORMALIZE INSIGHT ACTIVITY
-    // ========================================================
+
+    /* ========================================================
+       NORMALIZE INSIGHT ACTIVITY
+    ======================================================== */
 
     const insightActivity =
       recentInsights.map(
@@ -410,14 +479,52 @@ async function stats(req, res) {
         })
       );
 
-    // ========================================================
-    // COMBINE RECENT ACTIVITY
-    // ========================================================
+
+    /* ========================================================
+       NORMALIZE GALLERY ACTIVITY
+    ======================================================== */
+
+    const galleryActivity =
+      recentGallery.map(
+        (galleryItem) => ({
+          id:
+            `gallery-${galleryItem.id}`,
+
+          type:
+            "gallery",
+
+          title:
+            galleryItem.title ||
+            "Gallery photo",
+
+          description:
+            galleryItem.category
+              ? `${galleryItem.category} • ${galleryItem.status || "draft"}`
+              : galleryItem.status
+                ? `Gallery status: ${galleryItem.status}`
+                : "Continental Founders gallery",
+
+          status:
+            galleryItem.status,
+
+          image_url:
+            galleryItem.image_url,
+
+          created_at:
+            galleryItem.created_at,
+        })
+      );
+
+
+    /* ========================================================
+       COMBINE RECENT ACTIVITY
+    ======================================================== */
 
     const recentActivity = [
       ...contactActivity,
       ...eventActivity,
       ...insightActivity,
+      ...galleryActivity,
     ]
       .sort(
         (a, b) =>
@@ -429,9 +536,10 @@ async function stats(req, res) {
         RECENT_ACTIVITY_LIMIT
       );
 
-    // ========================================================
-    // RESPONSE
-    // ========================================================
+
+    /* ========================================================
+       RESPONSE
+    ======================================================== */
 
     return res
       .status(200)
@@ -452,13 +560,18 @@ async function stats(req, res) {
           partnerships,
 
           newPartnerships,
+
+          totalGalleryPhotos,
+
+          publishedGalleryPhotos,
         },
 
         recentActivity,
 
         meta: {
           generatedAt:
-            new Date().toISOString(),
+            new Date()
+              .toISOString(),
         },
       });
   } catch (error) {
@@ -484,9 +597,10 @@ async function stats(req, res) {
   }
 }
 
-// ============================================================
-// EXPORTS
-// ============================================================
+
+/* ============================================================
+   EXPORTS
+============================================================ */
 
 module.exports = {
   stats,

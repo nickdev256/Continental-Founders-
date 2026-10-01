@@ -11,7 +11,7 @@ import {
   CalendarDays,
   Download,
   Expand,
-  Image as ImageIcon,  
+  Image as ImageIcon,
   LoaderCircle,
   RefreshCw,
   Search,
@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 
 import "./Gallery.css";
-
 
 // ============================================================
 // API CONFIGURATION
@@ -30,13 +29,11 @@ const API_URL = (
   "http://localhost:5000"
 ).replace(/\/+$/, "");
 
-
 // ============================================================
 // CONSTANTS
 // ============================================================
 
 const ALL_CATEGORY = "All";
-
 
 // ============================================================
 // HELPERS
@@ -48,15 +45,11 @@ function cleanString(value) {
     : "";
 }
 
-
 function normalizeCategory(value) {
-  const category =
-    cleanString(value);
+  const category = cleanString(value);
 
-  return category ||
-    "General";
+  return category || "General";
 }
-
 
 function normalizeGalleryItem(item) {
   if (
@@ -66,14 +59,13 @@ function normalizeGalleryItem(item) {
     return null;
   }
 
-  const imageUrl =
-    cleanString(
-      item.imageUrl ||
+  const imageUrl = cleanString(
+    item.imageUrl ||
       item.image_url ||
       item.url ||
       item.publicUrl ||
       item.public_url
-    );
+  );
 
   if (!imageUrl) {
     return null;
@@ -85,15 +77,13 @@ function normalizeGalleryItem(item) {
       imageUrl,
 
     title:
-      cleanString(
-        item.title
-      ) ||
+      cleanString(item.title) ||
       "Continental Founders",
 
     caption:
       cleanString(
         item.caption ||
-        item.description
+          item.description
       ),
 
     category:
@@ -106,18 +96,15 @@ function normalizeGalleryItem(item) {
     downloadUrl:
       cleanString(
         item.downloadUrl ||
-        item.download_url
-      ) ||
-      imageUrl,
+          item.download_url
+      ) || imageUrl,
 
     altText:
       cleanString(
         item.altText ||
-        item.alt_text
+          item.alt_text
       ) ||
-      cleanString(
-        item.title
-      ) ||
+      cleanString(item.title) ||
       "Continental Founders gallery image",
 
     eventDate:
@@ -136,12 +123,11 @@ function normalizeGalleryItem(item) {
     sortOrder:
       Number(
         item.sortOrder ??
-        item.sort_order ??
-        0
+          item.sort_order ??
+          0
       ) || 0,
   };
 }
-
 
 function normalizeGalleryResponse(
   payload
@@ -151,57 +137,38 @@ function normalizeGalleryResponse(
   if (Array.isArray(payload)) {
     records = payload;
   } else if (
-    Array.isArray(
-      payload?.items
-    )
+    Array.isArray(payload?.items)
   ) {
-    records =
-      payload.items;
+    records = payload.items;
   } else if (
-    Array.isArray(
-      payload?.gallery
-    )
+    Array.isArray(payload?.gallery)
   ) {
-    records =
-      payload.gallery;
+    records = payload.gallery;
   } else if (
-    Array.isArray(
-      payload?.data
-    )
+    Array.isArray(payload?.data)
   ) {
-    records =
-      payload.data;
+    records = payload.data;
   } else if (
-    Array.isArray(
-      payload?.data?.items
-    )
+    Array.isArray(payload?.data?.items)
   ) {
-    records =
-      payload.data.items;
+    records = payload.data.items;
   } else if (
-    Array.isArray(
-      payload?.data?.gallery
-    )
+    Array.isArray(payload?.data?.gallery)
   ) {
-    records =
-      payload.data.gallery;
+    records = payload.data.gallery;
   }
 
   return records
-    .map(
-      normalizeGalleryItem
-    )
+    .map(normalizeGalleryItem)
     .filter(Boolean);
 }
-
 
 function formatDate(value) {
   if (!value) {
     return "";
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
   if (
     Number.isNaN(
@@ -220,7 +187,6 @@ function formatDate(value) {
     }
   ).format(date);
 }
-
 
 function createSafeFileName(
   title,
@@ -242,8 +208,7 @@ function createSafeFileName(
   let extension = "jpg";
 
   try {
-    const url =
-      new URL(imageUrl);
+    const url = new URL(imageUrl);
 
     const match =
       url.pathname.match(
@@ -252,8 +217,7 @@ function createSafeFileName(
 
     if (match?.[1]) {
       const candidate =
-        match[1]
-          .toLowerCase();
+        match[1].toLowerCase();
 
       if (
         [
@@ -261,12 +225,9 @@ function createSafeFileName(
           "jpeg",
           "png",
           "webp",
-        ].includes(
-          candidate
-        )
+        ].includes(candidate)
       ) {
-        extension =
-          candidate;
+        extension = candidate;
       }
     }
   } catch {
@@ -276,12 +237,15 @@ function createSafeFileName(
   return `${base}.${extension}`;
 }
 
-
 // ============================================================
 // GALLERY PAGE
 // ============================================================
 
 export default function Gallery() {
+  // ----------------------------------------------------------
+  // GALLERY DATA
+  // ----------------------------------------------------------
+
   const [
     gallery,
     setGallery,
@@ -297,6 +261,10 @@ export default function Gallery() {
     setError,
   ] = useState("");
 
+  // ----------------------------------------------------------
+  // FILTERS
+  // ----------------------------------------------------------
+
   const [
     activeCategory,
     setActiveCategory,
@@ -309,16 +277,42 @@ export default function Gallery() {
     setSearchQuery,
   ] = useState("");
 
+  // ----------------------------------------------------------
+  // LIGHTBOX
+  // ----------------------------------------------------------
+
   const [
     selectedIndex,
     setSelectedIndex,
   ] = useState(null);
+
+  // ----------------------------------------------------------
+  // DOWNLOAD
+  // ----------------------------------------------------------
 
   const [
     downloadingId,
     setDownloadingId,
   ] = useState(null);
 
+  // ----------------------------------------------------------
+  // CAROUSEL
+  // ----------------------------------------------------------
+
+  const [
+    carouselIndex,
+    setCarouselIndex,
+  ] = useState(0);
+
+  const carouselPointerRef =
+    useRef({
+      startX: 0,
+      currentX: 0,
+      dragging: false,
+    });
+
+  const carouselMovedRef =
+    useRef(false);
 
   // ==========================================================
   // LOAD PUBLISHED GALLERY
@@ -335,7 +329,6 @@ export default function Gallery() {
             `${API_URL}/api/gallery/published`,
             {
               method: "GET",
-
               headers: {
                 Accept:
                   "application/json",
@@ -355,8 +348,8 @@ export default function Gallery() {
         if (!response.ok) {
           throw new Error(
             payload?.message ||
-            payload?.error ||
-            "Unable to load the gallery."
+              payload?.error ||
+              "Unable to load the gallery."
           );
         }
 
@@ -365,9 +358,7 @@ export default function Gallery() {
             payload
           );
 
-        setGallery(
-          normalized
-        );
+        setGallery(normalized);
       } catch (requestError) {
         console.error(
           "Gallery loading error:",
@@ -378,18 +369,16 @@ export default function Gallery() {
 
         setError(
           requestError?.message ||
-          "Unable to load the gallery."
+            "Unable to load the gallery."
         );
       } finally {
         setLoading(false);
       }
     };
 
-
   useEffect(() => {
     loadGallery();
   }, []);
-
 
   // ==========================================================
   // CATEGORIES
@@ -397,14 +386,11 @@ export default function Gallery() {
 
   const categories =
     useMemo(() => {
-      const unique =
-        new Set();
+      const unique = new Set();
 
       gallery.forEach(
         (item) => {
-          if (
-            item.category
-          ) {
+          if (item.category) {
             unique.add(
               item.category
             );
@@ -414,15 +400,12 @@ export default function Gallery() {
 
       return [
         ALL_CATEGORY,
-        ...Array.from(
-          unique
-        ).sort(
+        ...Array.from(unique).sort(
           (a, b) =>
             a.localeCompare(b)
         ),
       ];
     }, [gallery]);
-
 
   // ==========================================================
   // FILTERED GALLERY
@@ -443,9 +426,7 @@ export default function Gallery() {
             item.category ===
               activeCategory;
 
-          if (
-            !matchesCategory
-          ) {
+          if (!matchesCategory) {
             return false;
           }
 
@@ -453,15 +434,14 @@ export default function Gallery() {
             return true;
           }
 
-          const searchable =
-            [
-              item.title,
-              item.caption,
-              item.category,
-            ]
-              .filter(Boolean)
-              .join(" ")
-              .toLowerCase();
+          const searchable = [
+            item.title,
+            item.caption,
+            item.category,
+          ]
+            .filter(Boolean)
+            .join(" ")
+            .toLowerCase();
 
           return searchable.includes(
             query
@@ -474,38 +454,181 @@ export default function Gallery() {
       searchQuery,
     ]);
 
-
-      // ==========================================================
-  // INITIAL CAROUSEL POSITION
+  // ==========================================================
+  // KEEP CAROUSEL INDEX VALID
   // ==========================================================
 
   useEffect(() => {
     if (
-      filteredGallery.length > 0 &&
-      selectedIndex === null
+      filteredGallery.length === 0
     ) {
-      setSelectedIndex(0);
+      setCarouselIndex(0);
+      return;
     }
-  }, [
-    filteredGallery,
-    selectedIndex,
-  ]);
 
+    setCarouselIndex(
+      (current) =>
+        Math.min(
+          current,
+          filteredGallery.length - 1
+        )
+    );
+  }, [filteredGallery.length]);
 
   // ==========================================================
-  // KEEP LIGHTBOX INDEX VALID
+  // CAROUSEL ITEM
+  // ==========================================================
+
+  const getCarouselItem =
+    (offset) => {
+      if (
+        filteredGallery.length === 0
+      ) {
+        return null;
+      }
+
+      const index =
+        (carouselIndex +
+          offset +
+          filteredGallery.length) %
+        filteredGallery.length;
+
+      return {
+        item:
+          filteredGallery[index],
+        index,
+      };
+    };
+
+  // ==========================================================
+  // MOVE CAROUSEL
+  // ==========================================================
+
+  const moveCarousel =
+    (direction) => {
+      if (
+        filteredGallery.length <= 1
+      ) {
+        return;
+      }
+
+      setCarouselIndex(
+        (current) =>
+          (
+            current +
+            direction +
+            filteredGallery.length
+          ) %
+          filteredGallery.length
+      );
+    };
+
+  // ==========================================================
+  // CAROUSEL POINTER CONTROLS
+  // ==========================================================
+
+  const handleCarouselPointerDown =
+    (event) => {
+      carouselPointerRef.current = {
+        startX: event.clientX,
+        currentX: event.clientX,
+        dragging: true,
+      };
+
+      carouselMovedRef.current =
+        false;
+
+      event.currentTarget.setPointerCapture?.(
+        event.pointerId
+      );
+    };
+
+  const handleCarouselPointerMove =
+    (event) => {
+      const pointer =
+        carouselPointerRef.current;
+
+      if (!pointer.dragging) {
+        return;
+      }
+
+      pointer.currentX =
+        event.clientX;
+
+      if (
+        Math.abs(
+          pointer.currentX -
+            pointer.startX
+        ) > 8
+      ) {
+        carouselMovedRef.current =
+          true;
+      }
+    };
+
+  const handleCarouselPointerUp =
+    () => {
+      const pointer =
+        carouselPointerRef.current;
+
+      if (!pointer.dragging) {
+        return;
+      }
+
+      const distance =
+        pointer.currentX -
+        pointer.startX;
+
+      pointer.dragging = false;
+
+      if (Math.abs(distance) < 55) {
+        return;
+      }
+
+      if (distance < 0) {
+        moveCarousel(1);
+      } else {
+        moveCarousel(-1);
+      }
+
+      window.setTimeout(() => {
+        carouselMovedRef.current =
+          false;
+      }, 100);
+    };
+
+  const handleCarouselPointerCancel =
+    () => {
+      carouselPointerRef.current.dragging =
+        false;
+    };
+
+  // ==========================================================
+  // OPEN LIGHTBOX FROM CAROUSEL
+  // ==========================================================
+
+  const openCarouselLightbox =
+    (index) => {
+      if (
+        carouselMovedRef.current
+      ) {
+        return;
+      }
+
+      setSelectedIndex(index);
+    };
+
+  // ==========================================================
+  // LIGHTBOX INDEX VALIDATION
   // ==========================================================
 
   useEffect(() => {
-    if (
-      selectedIndex === null
-    ) {
+    if (selectedIndex === null) {
       return;
     }
 
     if (
-      filteredGallery.length ===
-      0
+      filteredGallery.length === 0
     ) {
       setSelectedIndex(null);
       return;
@@ -522,7 +645,6 @@ export default function Gallery() {
     selectedIndex,
   ]);
 
-
   const selectedItem =
     selectedIndex === null
       ? null
@@ -530,222 +652,65 @@ export default function Gallery() {
           selectedIndex
         ];
 
-
   // ==========================================================
   // LIGHTBOX
   // ==========================================================
 
-  const openLightbox = (
-    index
-  ) => {
-    setSelectedIndex(
-      index
-    );
-  };
-
-
-  const closeLightbox = () => {
-    setSelectedIndex(null);
-  };
-
-
-  const showPrevious = () => {
-    if (
-      filteredGallery.length <=
-      1
-    ) {
-      return;
-    }
-
-    setSelectedIndex(
-      (current) => {
-        if (
-          current === null
-        ) {
-          return 0;
-        }
-
-        return (
-          current -
-          1 +
-          filteredGallery.length
-        ) %
-          filteredGallery.length;
-      }
-    );
-  };
-
-
-  const showNext = () => {
-    if (
-      filteredGallery.length <=
-      1
-    ) {
-      return;
-    }
-
-    setSelectedIndex(
-      (current) => {
-        if (
-          current === null
-        ) {
-          return 0;
-        }
-
-        return (
-          current + 1
-        ) %
-          filteredGallery.length;
-      }
-    );
-  };
-
-
-
-    // ==========================================================
-  // 3D CAROUSEL MOUSE / TOUCH CONTROLS
-  // ==========================================================
-
-  const carouselPointerRef = useRef({
-    startX: 0,
-    currentX: 0,
-    dragging: false,
-    moved: false,
-  });
-
-  const carouselSuppressClickRef =
-    useRef(false);
-
-  const handleCarouselPointerDown = (
-    event
-  ) => {
-    carouselPointerRef.current = {
-      startX: event.clientX,
-      currentX: event.clientX,
-      dragging: true,
-      moved: false,
+  const openLightbox =
+    (index) => {
+      setSelectedIndex(index);
     };
 
-    event.currentTarget.setPointerCapture?.(
-      event.pointerId
-    );
-  };
-
-
-  const handleCarouselPointerMove = (
-    event
-  ) => {
-    const pointer =
-      carouselPointerRef.current;
-
-    if (!pointer.dragging) {
-      return;
-    }
-
-    pointer.currentX =
-      event.clientX;
-
-    const distance =
-      pointer.currentX -
-      pointer.startX;
-
-    if (
-      Math.abs(distance) >
-      8
-    ) {
-      pointer.moved = true;
-    }
-  };
-
-
-  const handleCarouselPointerUp = (
-    event
-  ) => {
-    const pointer =
-      carouselPointerRef.current;
-
-    if (!pointer.dragging) {
-      return;
-    }
-
-    const distance =
-      pointer.currentX -
-      pointer.startX;
-
-    pointer.dragging = false;
-
-    if (
-      Math.abs(distance) <
-      55
-    ) {
-      return;
-    }
-
-    carouselSuppressClickRef.current =
-      true;
-
-    if (distance < 0) {
-      showNext();
-    } else {
-      showPrevious();
-    }
-
-    window.setTimeout(() => {
-      carouselSuppressClickRef.current =
-        false;
-    }, 100);
-  };
-
-
-  const handleCarouselPointerCancel =
+  const closeLightbox =
     () => {
-      carouselPointerRef.current.dragging =
-        false;
+      setSelectedIndex(null);
     };
 
+  const showPrevious =
+    () => {
+      if (
+        filteredGallery.length <= 1
+      ) {
+        return;
+      }
 
-  const getCarouselIndex = (
-    offset
-  ) => {
-    if (
-      filteredGallery.length ===
-        0 ||
-      selectedIndex === null
-    ) {
-      return null;
-    }
+      setSelectedIndex(
+        (current) => {
+          if (current === null) {
+            return 0;
+          }
 
-    return (
-      (
-        selectedIndex +
-        offset +
-        filteredGallery.length
-      ) %
-      filteredGallery.length
-    );
-  };
+          return (
+            current -
+            1 +
+            filteredGallery.length
+          ) %
+            filteredGallery.length;
+        }
+      );
+    };
 
+  const showNext =
+    () => {
+      if (
+        filteredGallery.length <= 1
+      ) {
+        return;
+      }
 
-  const handleCarouselCardClick = (
-    index,
-    position
-  ) => {
-    if (
-      carouselSuppressClickRef.current
-    ) {
-      return;
-    }
+      setSelectedIndex(
+        (current) => {
+          if (current === null) {
+            return 0;
+          }
 
-    if (
-      position === 0
-    ) {
-      openLightbox(index);
-      return;
-    }
-
-    setSelectedIndex(index);
-  };
-
+          return (
+            current + 1
+          ) %
+            filteredGallery.length;
+        }
+      );
+    };
 
   // ==========================================================
   // KEYBOARD LIGHTBOX CONTROLS
@@ -756,30 +721,29 @@ export default function Gallery() {
       return undefined;
     }
 
-    const handleKeyDown = (
-      event
-    ) => {
-      if (
-        event.key ===
-        "Escape"
-      ) {
-        closeLightbox();
-      }
+    const handleKeyDown =
+      (event) => {
+        if (
+          event.key ===
+          "Escape"
+        ) {
+          closeLightbox();
+        }
 
-      if (
-        event.key ===
-        "ArrowLeft"
-      ) {
-        showPrevious();
-      }
+        if (
+          event.key ===
+          "ArrowLeft"
+        ) {
+          showPrevious();
+        }
 
-      if (
-        event.key ===
-        "ArrowRight"
-      ) {
-        showNext();
-      }
-    };
+        if (
+          event.key ===
+          "ArrowRight"
+        ) {
+          showNext();
+        }
+      };
 
     document.body.style.overflow =
       "hidden";
@@ -803,7 +767,6 @@ export default function Gallery() {
     filteredGallery.length,
   ]);
 
-
   // ==========================================================
   // DOWNLOAD IMAGE
   // ==========================================================
@@ -819,9 +782,7 @@ export default function Gallery() {
         return;
       }
 
-      setDownloadingId(
-        item.id
-      );
+      setDownloadingId(item.id);
 
       try {
         const response =
@@ -868,21 +829,11 @@ export default function Gallery() {
         URL.revokeObjectURL(
           objectUrl
         );
-      } catch (
-        downloadError
-      ) {
+      } catch (downloadError) {
         console.error(
           "Gallery download error:",
           downloadError
         );
-
-        /*
-         * Some external/CDN image hosts
-         * may block fetch() because of CORS.
-         *
-         * Opening the original asset is a
-         * graceful fallback.
-         */
 
         window.open(
           item.downloadUrl,
@@ -890,12 +841,9 @@ export default function Gallery() {
           "noopener,noreferrer"
         );
       } finally {
-        setDownloadingId(
-          null
-        );
+        setDownloadingId(null);
       }
     };
-
 
   // ==========================================================
   // RENDER
@@ -910,16 +858,22 @@ export default function Gallery() {
 
       <section className="gallery-hero">
 
-  <div className="gallery-hero__slideshow" aria-hidden="true">
-    <div className="gallery-hero__slide gallery-hero__slide--1" />
-    <div className="gallery-hero__slide gallery-hero__slide--2" />
-    <div className="gallery-hero__slide gallery-hero__slide--3" />
-    <div className="gallery-hero__slide gallery-hero__slide--4" />
-  </div>
+        <div
+          className="gallery-hero__slideshow"
+          aria-hidden="true"
+        >
+          <div className="gallery-hero__slide gallery-hero__slide--1" />
+          <div className="gallery-hero__slide gallery-hero__slide--2" />
+          <div className="gallery-hero__slide gallery-hero__slide--3" />
+          <div className="gallery-hero__slide gallery-hero__slide--4" />
+        </div>
 
-  <div className="gallery-hero__overlay" />
+        <div
+          className="gallery-hero__overlay"
+        />
 
         <div className="gallery-hero__content">
+
           <div className="gallery-hero__eyebrow">
             <span />
 
@@ -929,14 +883,12 @@ export default function Gallery() {
           </div>
 
           <h1>
-            Stories 
+            Stories
             <br />
             Behind Our
             <br />
             Journey Together
           </h1>
-           <br />
-
 
           <p className="gallery-hero__description">
             Explore moments from
@@ -945,16 +897,15 @@ export default function Gallery() {
             engagements, partnerships,
             and community activities.
           </p>
+
         </div>
 
         <div
           className="gallery-hero__mark"
           aria-hidden="true"
-        >
-          
-        </div>
-      </section>
+        />
 
+      </section>
 
       {/* =====================================================
           GALLERY CONTENT
@@ -977,9 +928,7 @@ export default function Gallery() {
               {categories.map(
                 (category) => (
                   <button
-                    key={
-                      category
-                    }
+                    key={category}
                     type="button"
                     className={
                       activeCategory ===
@@ -999,8 +948,8 @@ export default function Gallery() {
               )}
             </div>
 
-
             <div className="gallery-search">
+
               <Search
                 size={19}
                 strokeWidth={1.8}
@@ -1009,12 +958,8 @@ export default function Gallery() {
 
               <input
                 type="search"
-                value={
-                  searchQuery
-                }
-                onChange={(
-                  event
-                ) =>
+                value={searchQuery}
+                onChange={(event) =>
                   setSearchQuery(
                     event.target.value
                   )
@@ -1028,9 +973,7 @@ export default function Gallery() {
                   type="button"
                   className="gallery-search__clear"
                   onClick={() =>
-                    setSearchQuery(
-                      ""
-                    )
+                    setSearchQuery("")
                   }
                   aria-label="Clear gallery search"
                 >
@@ -1040,10 +983,10 @@ export default function Gallery() {
                   />
                 </button>
               )}
+
             </div>
 
           </div>
-
 
           {/* =================================================
               LOADING
@@ -1051,6 +994,7 @@ export default function Gallery() {
 
           {loading && (
             <div className="gallery-state">
+
               <LoaderCircle
                 className="gallery-state__spinner"
                 size={34}
@@ -1067,17 +1011,55 @@ export default function Gallery() {
                 Continental Founders
                 moments.
               </p>
+
             </div>
           )}
-
 
           {/* =================================================
               ERROR
           ================================================= */}
 
+          {!loading && error && (
+            <div className="gallery-state gallery-state--error">
+
+              <ImageIcon
+                size={36}
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+
+              <h2>
+                Gallery unavailable
+              </h2>
+
+              <p>
+                {error}
+              </p>
+
+              <button
+                type="button"
+                onClick={loadGallery}
+              >
+                <RefreshCw
+                  size={17}
+                  aria-hidden="true"
+                />
+
+                Try Again
+              </button>
+
+            </div>
+          )}
+
+          {/* =================================================
+              EMPTY
+          ================================================= */}
+
           {!loading &&
-            error && (
-              <div className="gallery-state gallery-state--error">
+            !error &&
+            filteredGallery.length === 0 && (
+              <div className="gallery-state">
+
                 <ImageIcon
                   size={36}
                   strokeWidth={1.5}
@@ -1085,571 +1067,492 @@ export default function Gallery() {
                 />
 
                 <h2>
-                  Gallery unavailable
+                  No gallery images
                 </h2>
 
                 <p>
-                  {error}
+                  No published images
+                  match your current
+                  search or category.
                 </p>
 
-                <button
-                  type="button"
-                  onClick={
-                    loadGallery
-                  }
-                >
-                  <RefreshCw
-                    size={17}
-                    aria-hidden="true"
-                  />
-
-                  Try Again
-                </button>
               </div>
             )}
 
-
-          
-
           {/* =================================================
-    3D PHOTO CAROUSEL
-================================================= */}
-
-{!loading &&
-  !error &&
-  filteredGallery.length > 0 &&
-  selectedIndex !== null && (
-
-  <div
-    className="gallery-carousel"
-    onPointerDown={
-      handleCarouselPointerDown
-    }
-    onPointerMove={
-      handleCarouselPointerMove
-    }
-    onPointerUp={
-      handleCarouselPointerUp
-    }
-    onPointerCancel={
-      handleCarouselPointerCancel
-    }
-    onPointerLeave={
-      handleCarouselPointerCancel
-    }
-  >
-
-    {/* BACKGROUND IMAGE */}
-    <div
-      className="gallery-carousel__background"
-      style={{
-        backgroundImage: `
-          url(
-            "${filteredGallery[selectedIndex].imageUrl}"
-          )
-        `,
-      }}
-      aria-hidden="true"
-    />
-
-    <div
-      className="gallery-carousel__background-overlay"
-      aria-hidden="true"
-    />
-
-
-    {/* CAROUSEL STAGE */}
-    <div className="gallery-carousel__stage">
-
-      {[-2, -1, 0, 1, 2].map(
-        (offset) => {
-
-          const index =
-            getCarouselIndex(
-              offset
-            );
-
-          if (
-            index === null
-          ) {
-            return null;
-          }
-
-          const item =
-            filteredGallery[index];
-
-          const position =
-            offset === 0
-              ? "is-center"
-              : offset < 0
-                ? `is-left-${Math.abs(offset)}`
-                : `is-right-${offset}`;
-
-          return (
-            <article
-              key={`${item.id}-${offset}`}
-              className={`gallery-carousel__item ${position}`}
-              onClick={() =>
-                handleCarouselCardClick(
-                  index,
-                  offset
-                )
-              }
-            >
-
-              <div className="gallery-carousel__image-wrap">
-
-                <img
-                  src={item.imageUrl}
-                  alt={
-                    item.altText
-                  }
-                  className="gallery-carousel__image"
-                  draggable="false"
-                />
-
-                <div className="gallery-carousel__shade" />
-
-                {offset === 0 && (
-                  <div className="gallery-carousel__info">
-
-                    {item.category && (
-                      <span className="gallery-carousel__category">
-                        {item.category}
-                      </span>
-                    )}
-
-                    <h2>
-                      {item.title}
-                    </h2>
-
-                    {item.caption && (
-                      <p>
-                        {item.caption}
-                      </p>
-                    )}
-
-                    <span className="gallery-carousel__line" />
-
-                    <span className="gallery-carousel__hint">
-                      Drag to explore
-                    </span>
-
-                  </div>
-                )}
-
-              </div>
-
-            </article>
-          );
-        }
-      )}
-
-    </div>
-
-
-    {/* LEFT ARROW */}
-    {filteredGallery.length > 1 && (
-      <button
-        type="button"
-        className="gallery-carousel__arrow gallery-carousel__arrow--left"
-        onClick={(event) => {
-          event.stopPropagation();
-          showPrevious();
-        }}
-        aria-label="Previous gallery photo"
-      >
-        <ArrowLeft
-          size={27}
-          strokeWidth={1.5}
-        />
-      </button>
-    )}
-
-
-    {/* RIGHT ARROW */}
-    {filteredGallery.length > 1 && (
-      <button
-        type="button"
-        className="gallery-carousel__arrow gallery-carousel__arrow--right"
-        onClick={(event) => {
-          event.stopPropagation();
-          showNext();
-        }}
-        aria-label="Next gallery photo"
-      >
-        <ArrowRight
-          size={27}
-          strokeWidth={1.5}
-        />
-      </button>
-    )}
-
-
-    {/* COUNTER */}
-    <div className="gallery-carousel__counter">
-      <span>
-        {selectedIndex + 1}
-      </span>
-
-      <span className="gallery-carousel__counter-divider">
-        /
-      </span>
-
-      <span>
-        {filteredGallery.length}
-      </span>
-    </div>
-
-  </div>
-)}
-
-
-          {/* =================================================
-              PHOTO GRID
+              THREE-IMAGE CAROUSEL
           ================================================= */}
 
           {!loading &&
             !error &&
-            filteredGallery.length >
-              0 && (
-              <div className="gallery-grid">
+            filteredGallery.length > 0 && (
+              <div className="cf-gallery-carousel">
 
-                {filteredGallery.map(
-                  (
-                    item,
-                    index
-                  ) => {
-                    const displayDate =
-                      formatDate(
-                        item.eventDate ||
-                        item.publishedAt
-                      );
+                <div
+                  className="cf-gallery-carousel__stage"
+                  onPointerDown={
+                    handleCarouselPointerDown
+                  }
+                  onPointerMove={
+                    handleCarouselPointerMove
+                  }
+                  onPointerUp={
+                    handleCarouselPointerUp
+                  }
+                  onPointerCancel={
+                    handleCarouselPointerCancel
+                  }
+                >
 
-                    return (
-                      <article
-                        className="gallery-card"
-                        key={
-                          item.id
-                        }
-                      >
+                  {/* LEFT IMAGE */}
 
+                  {filteredGallery.length > 1 &&
+                    (() => {
+                      const previous =
+                        getCarouselItem(-1);
+
+                      return (
                         <button
                           type="button"
-                          className="gallery-card__image-button"
+                          className="cf-gallery-carousel__card cf-gallery-carousel__card--left"
                           onClick={() =>
-                            openLightbox(
-                              index
-                            )
+                            moveCarousel(-1)
                           }
-                          aria-label={`Open ${item.title}`}
+                          aria-label="Previous gallery image"
                         >
                           <img
                             src={
-                              item.imageUrl
+                              previous.item.imageUrl
                             }
                             alt={
-                              item.altText
+                              previous.item.altText
                             }
-                            className="gallery-card__image"
-                            loading="lazy"
+                            draggable="false"
                           />
+                        </button>
+                      );
+                    })()}
 
-                          <div className="gallery-card__image-overlay">
-                            <Expand
-                              size={24}
-                              strokeWidth={1.6}
+                  {/* CENTER IMAGE */}
+
+                  {(() => {
+                    const current =
+                      getCarouselItem(0);
+
+                    if (!current) {
+                      return null;
+                    }
+
+                    return (
+                      <button
+                        type="button"
+                        className="cf-gallery-carousel__card cf-gallery-carousel__card--center"
+                        onClick={() =>
+                          openCarouselLightbox(
+                            current.index
+                          )
+                        }
+                        aria-label={`Open ${current.item.title}`}
+                      >
+
+                        <img
+                          src={
+                            current.item.imageUrl
+                          }
+                          alt={
+                            current.item.altText
+                          }
+                          draggable="false"
+                        />
+
+                        <span className="cf-gallery-carousel__expand">
+                          <Expand
+                            size={21}
+                            strokeWidth={1.7}
+                            aria-hidden="true"
+                          />
+                        </span>
+
+                      </button>
+                    );
+                  })()}
+
+                  {/* RIGHT IMAGE */}
+
+                  {filteredGallery.length > 1 &&
+                    (() => {
+                      const next =
+                        getCarouselItem(1);
+
+                      return (
+                        <button
+                          type="button"
+                          className="cf-gallery-carousel__card cf-gallery-carousel__card--right"
+                          onClick={() =>
+                            moveCarousel(1)
+                          }
+                          aria-label="Next gallery image"
+                        >
+                          <img
+                            src={
+                              next.item.imageUrl
+                            }
+                            alt={
+                              next.item.altText
+                            }
+                            draggable="false"
+                          />
+                        </button>
+                      );
+                    })()}
+
+                  {/* LEFT ARROW */}
+
+                  {filteredGallery.length > 1 && (
+                    <button
+                      type="button"
+                      className="cf-gallery-carousel__arrow cf-gallery-carousel__arrow--left"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        moveCarousel(-1);
+                      }}
+                      aria-label="Previous gallery image"
+                    >
+                      <ArrowLeft
+                        size={22}
+                        strokeWidth={1.7}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  )}
+
+                  {/* RIGHT ARROW */}
+
+                  {filteredGallery.length > 1 && (
+                    <button
+                      type="button"
+                      className="cf-gallery-carousel__arrow cf-gallery-carousel__arrow--right"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        moveCarousel(1);
+                      }}
+                      aria-label="Next gallery image"
+                    >
+                      <ArrowRight
+                        size={22}
+                        strokeWidth={1.7}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  )}
+
+                </div>
+
+                {/* =================================================
+                    IMAGE INFORMATION
+                ================================================= */}
+
+                {(() => {
+                  const current =
+                    getCarouselItem(0);
+
+                  if (!current) {
+                    return null;
+                  }
+
+                  const item =
+                    current.item;
+
+                  const displayDate =
+                    formatDate(
+                      item.eventDate ||
+                        item.publishedAt
+                    );
+
+                  return (
+                    <div className="cf-gallery-carousel__information">
+
+                      <div className="cf-gallery-carousel__meta">
+
+                        {item.category && (
+                          <span className="cf-gallery-carousel__category">
+                            {item.category}
+                          </span>
+                        )}
+
+                        {displayDate && (
+                          <span className="cf-gallery-carousel__date">
+
+                            <CalendarDays
+                              size={14}
+                              strokeWidth={1.7}
                               aria-hidden="true"
                             />
-                          </div>
 
-                          <span className="gallery-card__category">
-                            {
-                              item.category
-                            }
+                            {displayDate}
+
                           </span>
-                        </button>
+                        )}
 
+                      </div>
 
-                        <div className="gallery-card__body">
+                      <div className="cf-gallery-carousel__bottom">
 
-                          <div className="gallery-card__text">
-                            <h2>
-                              {
-                                item.title
-                              }
-                            </h2>
+                        <div className="cf-gallery-carousel__text">
 
-                            {displayDate && (
-                              <div className="gallery-card__date">
-                                <CalendarDays
-                                  size={14}
-                                  strokeWidth={1.7}
-                                  aria-hidden="true"
-                                />
+                          <h2>
+                            {item.title}
+                          </h2>
 
-                                <span>
-                                  {
-                                    displayDate
-                                  }
-                                </span>
-                              </div>
-                            )}
-
-                            {item.caption && (
-                              <p>
-                                {
-                                  item.caption
-                                }
-                              </p>
-                            )}
-                          </div>
-
-
-                          <button
-                            type="button"
-                            className="gallery-card__download"
-                            onClick={(
-                              event
-                            ) =>
-                              handleDownload(
-                                item,
-                                event
-                              )
-                            }
-                            disabled={
-                              downloadingId ===
-                              item.id
-                            }
-                            aria-label={`Download ${item.title}`}
-                            title="Download photo"
-                          >
-                            {downloadingId ===
-                            item.id ? (
-                              <LoaderCircle
-                                className="gallery-card__download-spinner"
-                                size={19}
-                                strokeWidth={1.8}
-                                aria-hidden="true"
-                              />
-                            ) : (
-                              <Download
-                                size={19}
-                                strokeWidth={1.8}
-                                aria-hidden="true"
-                              />
-                            )}
-                          </button>
+                          {item.caption && (
+                            <p>
+                              {item.caption}
+                            </p>
+                          )}
 
                         </div>
 
-                      </article>
-                    );
-                  }
-                )}
+                        <button
+                          type="button"
+                          className="cf-gallery-carousel__download"
+                          onClick={(event) =>
+                            handleDownload(
+                              item,
+                              event
+                            )
+                          }
+                          disabled={
+                            downloadingId ===
+                            item.id
+                          }
+                        >
+                          {downloadingId ===
+                          item.id ? (
+                            <LoaderCircle
+                              size={18}
+                              strokeWidth={1.8}
+                              aria-hidden="true"
+                            />
+                          ) : (
+                            <Download
+                              size={18}
+                              strokeWidth={1.8}
+                              aria-hidden="true"
+                            />
+                          )}
+
+                          <span>
+                            Download
+                          </span>
+                        </button>
+
+                      </div>
+
+                      <div className="cf-gallery-carousel__counter">
+                        {carouselIndex + 1}
+                        {" / "}
+                        {filteredGallery.length}
+                      </div>
+
+                    </div>
+                  );
+                })()}
 
               </div>
             )}
 
+          {/* =================================================
+              LIGHTBOX
+          ================================================= */}
+
+          {selectedItem && (
+            <div
+              className="gallery-lightbox"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Gallery image viewer"
+              onClick={closeLightbox}
+            >
+
+              {/* CLOSE */}
+
+              <button
+                type="button"
+                className="gallery-lightbox__close"
+                onClick={closeLightbox}
+                aria-label="Close image viewer"
+              >
+                <X
+                  size={25}
+                  strokeWidth={1.7}
+                  aria-hidden="true"
+                />
+              </button>
+
+              {/* PREVIOUS */}
+
+              {filteredGallery.length > 1 && (
+                <button
+                  type="button"
+                  className="gallery-lightbox__navigation gallery-lightbox__navigation--previous"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showPrevious();
+                  }}
+                  aria-label="Previous image"
+                >
+                  <ArrowLeft
+                    size={25}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+
+              {/* LIGHTBOX CONTENT */}
+
+              <div
+                className="gallery-lightbox__content"
+                onClick={(event) =>
+                  event.stopPropagation()
+                }
+              >
+
+                <div className="gallery-lightbox__image-wrapper">
+
+                  <img
+                    src={
+                      selectedItem.imageUrl
+                    }
+                    alt={
+                      selectedItem.altText
+                    }
+                  />
+
+                </div>
+
+                <div className="gallery-lightbox__information">
+
+                  <div className="gallery-lightbox__meta">
+
+                    <span className="gallery-lightbox__category">
+                      {
+                        selectedItem.category
+                      }
+                    </span>
+
+                    {(selectedItem.eventDate ||
+                      selectedItem.publishedAt) && (
+                      <span className="gallery-lightbox__date">
+
+                        <CalendarDays
+                          size={14}
+                          strokeWidth={1.7}
+                          aria-hidden="true"
+                        />
+
+                        {formatDate(
+                          selectedItem.eventDate ||
+                            selectedItem.publishedAt
+                        )}
+
+                      </span>
+                    )}
+
+                  </div>
+
+                  <div className="gallery-lightbox__title-row">
+
+                    <div>
+
+                      <h2>
+                        {
+                          selectedItem.title
+                        }
+                      </h2>
+
+                      {selectedItem.caption && (
+                        <p>
+                          {
+                            selectedItem.caption
+                          }
+                        </p>
+                      )}
+
+                    </div>
+
+                    <button
+                      type="button"
+                      className="gallery-lightbox__download"
+                      onClick={(event) =>
+                        handleDownload(
+                          selectedItem,
+                          event
+                        )
+                      }
+                      disabled={
+                        downloadingId ===
+                        selectedItem.id
+                      }
+                    >
+
+                      {downloadingId ===
+                      selectedItem.id ? (
+                        <LoaderCircle
+                          size={18}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Download
+                          size={18}
+                          aria-hidden="true"
+                        />
+                      )}
+
+                      <span>
+                        Download
+                      </span>
+
+                    </button>
+
+                  </div>
+
+                  <div className="gallery-lightbox__counter">
+                    {selectedIndex + 1}
+                    {" / "}
+                    {filteredGallery.length}
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* NEXT */}
+
+              {filteredGallery.length > 1 && (
+                <button
+                  type="button"
+                  className="gallery-lightbox__navigation gallery-lightbox__navigation--next"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showNext();
+                  }}
+                  aria-label="Next image"
+                >
+                  <ArrowRight
+                    size={25}
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                  />
+                </button>
+              )}
+
+            </div>
+          )}
+
         </div>
 
       </section>
-
-
-      {/* =====================================================
-          LIGHTBOX
-      ====================================================== */}
-
-      {selectedItem && (
-        <div
-          className="gallery-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Gallery image viewer"
-          onClick={
-            closeLightbox
-          }
-        >
-
-          <button
-            type="button"
-            className="gallery-lightbox__close"
-            onClick={
-              closeLightbox
-            }
-            aria-label="Close image viewer"
-          >
-            <X
-              size={25}
-              strokeWidth={1.7}
-              aria-hidden="true"
-            />
-          </button>
-
-
-          {filteredGallery.length >
-            1 && (
-            <button
-              type="button"
-              className="gallery-lightbox__navigation gallery-lightbox__navigation--previous"
-              onClick={(
-                event
-              ) => {
-                event.stopPropagation();
-                showPrevious();
-              }}
-              aria-label="Previous image"
-            >
-              <ArrowLeft
-                size={25}
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
-            </button>
-          )}
-
-
-          <div
-            className="gallery-lightbox__content"
-            onClick={(
-              event
-            ) =>
-              event.stopPropagation()
-            }
-          >
-
-            <div className="gallery-lightbox__image-wrapper">
-              <img
-                src={
-                  selectedItem.imageUrl
-                }
-                alt={
-                  selectedItem.altText
-                }
-              />
-            </div>
-
-
-            <div className="gallery-lightbox__information">
-
-              <div className="gallery-lightbox__meta">
-                <span className="gallery-lightbox__category">
-                  {
-                    selectedItem.category
-                  }
-                </span>
-
-                {(selectedItem.eventDate ||
-                  selectedItem.publishedAt) && (
-                  <span className="gallery-lightbox__date">
-                    <CalendarDays
-                      size={14}
-                      strokeWidth={1.7}
-                      aria-hidden="true"
-                    />
-
-                    {formatDate(
-                      selectedItem.eventDate ||
-                      selectedItem.publishedAt
-                    )}
-                  </span>
-                )}
-              </div>
-
-
-              <div className="gallery-lightbox__title-row">
-
-                <div>
-                  <h2>
-                    {
-                      selectedItem.title
-                    }
-                  </h2>
-
-                  {selectedItem.caption && (
-                    <p>
-                      {
-                        selectedItem.caption
-                      }
-                    </p>
-                  )}
-                </div>
-
-
-                <button
-                  type="button"
-                  className="gallery-lightbox__download"
-                  onClick={(
-                    event
-                  ) =>
-                    handleDownload(
-                      selectedItem,
-                      event
-                    )
-                  }
-                  disabled={
-                    downloadingId ===
-                    selectedItem.id
-                  }
-                >
-                  {downloadingId ===
-                  selectedItem.id ? (
-                    <LoaderCircle
-                      className="gallery-card__download-spinner"
-                      size={18}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Download
-                      size={18}
-                      aria-hidden="true"
-                    />
-                  )}
-
-                  <span>
-                    Download
-                  </span>
-                </button>
-
-              </div>
-
-
-              <div className="gallery-lightbox__counter">
-                {selectedIndex + 1}
-                {" / "}
-                {
-                  filteredGallery.length
-                }
-              </div>
-
-            </div>
-
-          </div>
-
-
-          {filteredGallery.length >
-            1 && (
-            <button
-              type="button"
-              className="gallery-lightbox__navigation gallery-lightbox__navigation--next"
-              onClick={(
-                event
-              ) => {
-                event.stopPropagation();
-                showNext();
-              }}
-              aria-label="Next image"
-            >
-              <ArrowRight
-                size={25}
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
-            </button>
-          )}
-
-        </div>
-      )}
 
     </div>
   );

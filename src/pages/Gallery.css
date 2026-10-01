@@ -361,25 +361,25 @@
 
 /* PHOTO 1 */
 .gallery-hero__slide--1 {
-  background-image: url("public/assets/gallery/DZ9A1318 (1).jpg");
+  background-image: url("/assets/gallery/DZ9A1318 (1).jpg");
   animation-delay: 0s;
 }
 
 /* PHOTO 2 */
 .gallery-hero__slide--2 {
-  background-image: url("/public/assets/gallery/DZ9A1311.jpg");
+  background-image: url("/assets/gallery/DZ9A1311.jpg");
   animation-delay: 5s;
 }
 
 /* PHOTO 3 */
 .gallery-hero__slide--3 {
-  background-image: url("public/assets/gallery/DZ9A0696.jpg");
+  background-image: url("/assets/gallery/DZ9A0696.jpg");
   animation-delay: 10s;
 }
 
 /* PHOTO 4 */
 .gallery-hero__slide--4 {
-  background-image: url("public/assets/gallery/DZ9A0973.jpg");
+  background-image: url("/assets/gallery/DZ9A0973.jpg");
   animation-delay: 15s;
 }
 

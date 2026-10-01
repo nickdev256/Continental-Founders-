@@ -9,134 +9,82 @@ const sendEmail = require("../utils/sendEmail");
 
 
 /* ============================================================
-   CFCV CONFIGURATION
+   NEWSLETTER CONFIGURATION
 ============================================================ */
 
-const CFCV_TABLE =
-  "cfcv_applications";
+const SUBSCRIBERS_TABLE =
+  "newsletter_subscribers";
 
-const CFCV_RESUMES_BUCKET =
+const CAMPAIGNS_TABLE =
+  "newsletter_campaigns";
+
+const DELIVERIES_TABLE =
+  "newsletter_deliveries";
+
+
+const NEWSLETTER_IMAGES_BUCKET =
   String(
-    process.env.CFCV_RESUMES_BUCKET ||
-      "cfcv-resumes"
+    process.env.NEWSLETTER_IMAGES_BUCKET ||
+      "newsletter-images"
   ).trim();
 
-const MAX_RESUME_SIZE =
+
+const MAX_NEWSLETTER_IMAGE_SIZE =
   5 * 1024 * 1024;
 
-const SIGNED_RESUME_URL_SECONDS =
-  300;
 
-
-/* ============================================================
-   ALLOWED RESUME TYPES
-============================================================ */
-
-const ALLOWED_RESUME_TYPES =
+const ALLOWED_NEWSLETTER_IMAGE_TYPES =
   new Set([
-    "application/pdf",
-
-    "application/msword",
-
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
   ]);
 
-const ALLOWED_RESUME_EXTENSIONS =
+
+const ALLOWED_NEWSLETTER_IMAGE_EXTENSIONS =
   new Set([
-    ".pdf",
-    ".doc",
-    ".docx",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
   ]);
 
 
 /* ============================================================
-   VALID CFCV VALUES
+   NEWSLETTER STATUS
 ============================================================ */
 
-const VALID_GEOGRAPHIES =
-  new Set([
-    "Africa",
-    "United States",
-    "Diaspora",
-  ]);
+const CAMPAIGN_STATUS = {
+  DRAFT: "draft",
+  SCHEDULED: "scheduled",
+  SENDING: "sending",
+  SENT: "sent",
+  FAILED: "failed",
+};
 
-const VALID_VENTURE_STAGES =
-  new Set([
-    "Idea / problem / early concept",
 
-    "MVP / prototype / pilot / early traction",
+/* ============================================================
+   FIXED AUDIENCE
 
-    "Operating business",
-  ]);
+   Continental Founders now uses one newsletter audience:
+   all active subscribers.
+============================================================ */
 
-const VALID_TEAM_STATUSES =
-  new Set([
-    "Individual founder",
-    "Existing team",
-  ]);
+const DEFAULT_AUDIENCE =
+  "all";
 
-const VALID_YES_NO =
-  new Set([
-    "Yes",
-    "No",
-  ]);
 
-const VALID_ADMISSIONS_STAGES =
-  new Set([
-    "applied",
-    "assessment",
-    "interview",
-    "track_placement",
-    "matching",
-    "compatibility",
-    "final_decision",
-    "enrollment",
-  ]);
+/* ============================================================
+   DEFAULT CONTENT TYPE
 
-const VALID_TRACKS =
-  new Set([
-    "Genesis",
-    "Ascend",
-    "Horizon",
-  ]);
+   The existing newsletter_campaigns database table requires
+   content_type to contain a non-null value.
 
-const VALID_MATCHING_STATUSES =
-  new Set([
-    "not_started",
-    "required",
-    "in_progress",
-    "matched",
-    "compatibility_sprint",
-    "completed",
-  ]);
+   The current Newsletter Studio uses the standard format.
+============================================================ */
 
-const VALID_FINAL_DECISIONS =
-  new Set([
-    "ADMIT",
-    "ADMIT WITH TRACK PLACEMENT",
-    "MATCH REQUIRED",
-    "WAITLIST",
-    "NOT SELECTED",
-  ]);
-
-const VALID_STATUSES =
-  new Set([
-    "submitted",
-    "under_review",
-    "in_progress",
-    "admitted",
-    "waitlisted",
-    "not_selected",
-    "withdrawn",
-  ]);
-
-const VALID_INTERVIEW_STATUSES =
-  new Set([
-    "not_scheduled",
-    "scheduled",
-    "completed",
-    "cancelled",
-  ]);
+const DEFAULT_CONTENT_TYPE =
+  "standard";
 
 
 /* ============================================================
@@ -173,7 +121,7 @@ function cleanNullableString(
 }
 
 
-function cleanEmail(
+function normalizeEmail(
   value
 ) {
   return cleanString(value)
@@ -185,7 +133,7 @@ function isValidEmail(
   value
 ) {
   const email =
-    cleanEmail(value);
+    normalizeEmail(value);
 
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
     email
@@ -193,47 +141,38 @@ function isValidEmail(
 }
 
 
-function escapeHtml(
+function isValidUrl(
   value
 ) {
-  return String(
-    value ?? ""
-  )
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+  const cleaned =
+    cleanString(value);
 
-
-function parseBoolean(
-  value,
-  fallback = false
-) {
-  if (
-    value === true ||
-    value === "true" ||
-    value === 1 ||
-    value === "1"
-  ) {
-    return true;
-  }
-
-  if (
-    value === false ||
-    value === "false" ||
-    value === 0 ||
-    value === "0"
-  ) {
+  if (!cleaned) {
     return false;
   }
 
-  return fallback;
+  try {
+    const parsed =
+      new URL(cleaned);
+
+    return (
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
+    );
+  } catch {
+    return false;
+  }
 }
 
 
-function normalizeNullableDate(
+function createToken() {
+  return crypto
+    .randomBytes(32)
+    .toString("hex");
+}
+
+
+function parseDateOrNull(
   value
 ) {
   if (!value) {
@@ -255,6 +194,51 @@ function normalizeNullableDate(
 }
 
 
+function sleep(ms) {
+  return new Promise(
+    (resolve) =>
+      setTimeout(resolve, ms)
+  );
+}
+
+
+/* ============================================================
+   HTML ESCAPING
+============================================================ */
+
+function escapeHtml(
+  value
+) {
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+}
+
+
+/* ============================================================
+   ADMIN ID
+============================================================ */
+
 function getCurrentAdminId(
   req
 ) {
@@ -267,7 +251,7 @@ function getCurrentAdminId(
 
 
 /* ============================================================
-   SERVER ERROR
+   SERVER ERROR HELPER
 ============================================================ */
 
 function sendServerError(
@@ -277,7 +261,7 @@ function sendServerError(
     "Something went wrong."
 ) {
   console.error(
-    "[CFCV]",
+    "[NEWSLETTER]",
     error
   );
 
@@ -294,59 +278,551 @@ function sendServerError(
 
 
 /* ============================================================
-   APPLICATION BODY PARSER
+   NORMALIZE IMAGE ARRAY
 
    Supports:
-   application=<JSON string>
+   [
+     "https://...",
+     "https://..."
+   ]
 
-   from multipart/form-data.
-
-   It also supports normal JSON requests for compatibility.
+   Also tolerates:
+   [
+     { url: "https://..." }
+   ]
 ============================================================ */
 
-function parseApplicationBody(
-  req
+function normalizeImages(
+  value
 ) {
-  const body =
-    req?.body || {};
+  let source = value;
 
   if (
-    typeof body.application ===
-    "string"
+    typeof source === "string"
   ) {
     try {
-      return JSON.parse(
-        body.application
-      );
+      source =
+        JSON.parse(source);
     } catch {
-      const error =
-        new Error(
-          "The application form data is invalid."
-        );
-
-      error.statusCode = 400;
-
-      throw error;
+      source = [];
     }
   }
 
   if (
-    body.application &&
-    typeof body.application ===
-      "object"
+    !Array.isArray(source)
   ) {
-    return body.application;
+    return [];
   }
 
-  return body;
+  const seen =
+    new Set();
+
+  const result = [];
+
+  for (
+    const item of source
+  ) {
+    let url = "";
+
+    if (
+      typeof item ===
+      "string"
+    ) {
+      url =
+        cleanString(item);
+    } else if (
+      item &&
+      typeof item ===
+        "object"
+    ) {
+      url =
+        cleanString(
+          item.url ||
+            item.publicUrl ||
+            item.imageUrl
+        );
+    }
+
+    if (!url) {
+      continue;
+    }
+
+    if (
+      !isValidUrl(url)
+    ) {
+      continue;
+    }
+
+    if (
+      seen.has(url)
+    ) {
+      continue;
+    }
+
+    seen.add(url);
+
+    result.push(url);
+  }
+
+  return result;
 }
 
 
 /* ============================================================
-   RESUME HELPERS
+   NORMALIZE SUBSCRIBER
 ============================================================ */
 
-function getResumeExtension(
+function normalizeSubscriber(
+  subscriber
+) {
+  if (!subscriber) {
+    return null;
+  }
+
+  return {
+    id:
+      subscriber.id,
+
+    email:
+      subscriber.email || "",
+
+    name:
+      subscriber.name || "",
+
+    status:
+      subscriber.status ||
+      "subscribed",
+
+    token:
+      subscriber.token || "",
+
+    source:
+      subscriber.source || "",
+
+    subscribedAt:
+      subscriber.subscribed_at ||
+      null,
+
+    unsubscribedAt:
+      subscriber.unsubscribed_at ||
+      null,
+
+    createdAt:
+      subscriber.created_at ||
+      null,
+
+    updatedAt:
+      subscriber.updated_at ||
+      null,
+  };
+}
+
+
+/* ============================================================
+   NORMALIZE CAMPAIGN
+============================================================ */
+
+function normalizeCampaign(
+  campaign
+) {
+  if (!campaign) {
+    return null;
+  }
+
+  const images =
+    normalizeImages(
+      campaign.images
+    );
+
+  return {
+    id:
+      campaign.id,
+
+    title:
+      campaign.title || "",
+
+    subject:
+      campaign.subject || "",
+
+    previewText:
+      campaign.preview_text ||
+      "",
+
+    featuredImage:
+      campaign.featured_image ||
+      "",
+
+    images,
+
+    content:
+      campaign.content || "",
+
+    /*
+     * IMPORTANT:
+     * Existing database schema requires content_type.
+     */
+    contentType:
+      campaign.content_type ||
+      DEFAULT_CONTENT_TYPE,
+
+    ctaText:
+      campaign.cta_text || "",
+
+    ctaLink:
+      campaign.cta_link || "",
+
+    audience:
+      DEFAULT_AUDIENCE,
+
+    status:
+      campaign.status ||
+      CAMPAIGN_STATUS.DRAFT,
+
+    scheduledAt:
+      campaign.scheduled_at ||
+      null,
+
+    sentAt:
+      campaign.sent_at ||
+      null,
+
+    recipientCount:
+      Number(
+        campaign.recipient_count ||
+          0
+      ),
+
+    deliveredCount:
+      Number(
+        campaign.delivered_count ||
+          0
+      ),
+
+    acceptedCount:
+      Number(
+        campaign.delivered_count ||
+          0
+      ),
+
+    failedCount:
+      Number(
+        campaign.failed_count ||
+          0
+      ),
+
+    openedCount:
+      Number(
+        campaign.opened_count ||
+          0
+      ),
+
+    clickedCount:
+      Number(
+        campaign.clicked_count ||
+          0
+      ),
+
+    createdBy:
+      campaign.created_by ||
+      null,
+
+    createdAt:
+      campaign.created_at ||
+      null,
+
+    updatedAt:
+      campaign.updated_at ||
+      null,
+  };
+}
+
+
+/* ============================================================
+   NORMALIZE DELIVERY
+============================================================ */
+
+function normalizeDelivery(
+  delivery
+) {
+  if (!delivery) {
+    return null;
+  }
+
+  return {
+    id:
+      delivery.id,
+
+    campaignId:
+      delivery.campaign_id ||
+      null,
+
+    subscriberId:
+      delivery.subscriber_id ||
+      null,
+
+    email:
+      delivery.email || "",
+
+    status:
+      delivery.status || "",
+
+    providerMessageId:
+      delivery.provider_message_id ||
+      null,
+
+    sentAt:
+      delivery.sent_at ||
+      null,
+
+    deliveredAt:
+      delivery.delivered_at ||
+      null,
+
+    openedAt:
+      delivery.opened_at ||
+      null,
+
+    clickedAt:
+      delivery.clicked_at ||
+      null,
+
+    failedAt:
+      delivery.failed_at ||
+      null,
+
+    failureReason:
+      delivery.failure_reason ||
+      null,
+
+    createdAt:
+      delivery.created_at ||
+      null,
+
+    updatedAt:
+      delivery.updated_at ||
+      null,
+  };
+}
+
+
+/* ============================================================
+   NORMALIZE CAMPAIGN INPUT
+============================================================ */
+
+function normalizeCampaignInput(
+  body = {}
+) {
+  return {
+    title:
+      cleanString(
+        body.title
+      ),
+
+    subject:
+      cleanString(
+        body.subject
+      ),
+
+    previewText:
+      cleanString(
+        body.previewText ??
+          body.preview_text
+      ),
+
+    featuredImage:
+      cleanString(
+        body.featuredImage ??
+          body.featured_image
+      ),
+
+    images:
+      normalizeImages(
+        body.images
+      ),
+
+    content:
+      cleanString(
+        body.content
+      ),
+
+    /*
+     * This fixes the NOT NULL database error.
+     */
+    contentType:
+      cleanString(
+        body.contentType ??
+          body.content_type,
+        DEFAULT_CONTENT_TYPE
+      ) ||
+      DEFAULT_CONTENT_TYPE,
+
+    ctaText:
+      cleanString(
+        body.ctaText ??
+          body.cta_text
+      ),
+
+    ctaLink:
+      cleanString(
+        body.ctaLink ??
+          body.cta_link
+      ),
+
+    /*
+     * Audience sent by the browser is deliberately ignored.
+     */
+    audience:
+      DEFAULT_AUDIENCE,
+
+    scheduledAt:
+      body.scheduledAt ??
+      body.scheduled_at ??
+      null,
+  };
+}
+
+
+/* ============================================================
+   VALIDATE CAMPAIGN
+============================================================ */
+
+function validateCampaign(
+  campaign
+) {
+  const errors = [];
+
+  if (
+    !campaign.title
+  ) {
+    errors.push(
+      "Newsletter title is required."
+    );
+  }
+
+  if (
+    !campaign.subject
+  ) {
+    errors.push(
+      "Email subject is required."
+    );
+  }
+
+  if (
+    !campaign.content
+  ) {
+    errors.push(
+      "Newsletter content is required."
+    );
+  }
+
+  if (
+    !campaign.contentType
+  ) {
+    errors.push(
+      "Newsletter content type is required."
+    );
+  }
+
+  if (
+    campaign.featuredImage &&
+    !isValidUrl(
+      campaign.featuredImage
+    )
+  ) {
+    errors.push(
+      "Featured image must be a valid HTTP or HTTPS URL."
+    );
+  }
+
+  if (
+    !Array.isArray(
+      campaign.images
+    )
+  ) {
+    errors.push(
+      "Newsletter images must be an array."
+    );
+  } else {
+    for (
+      const imageUrl of
+      campaign.images
+    ) {
+      if (
+        !isValidUrl(
+          imageUrl
+        )
+      ) {
+        errors.push(
+          "Every newsletter image must be a valid HTTP or HTTPS URL."
+        );
+
+        break;
+      }
+    }
+  }
+
+  if (
+    campaign.ctaLink &&
+    !isValidUrl(
+      campaign.ctaLink
+    )
+  ) {
+    errors.push(
+      "Call-to-action link must be a valid HTTP or HTTPS URL."
+    );
+  }
+
+  return errors;
+}
+
+
+/* ============================================================
+   ACTIVE SUBSCRIBER COUNT
+============================================================ */
+
+async function getRecipientCount() {
+  const {
+    count,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select(
+        "id",
+        {
+          count: "exact",
+          head: true,
+        }
+      )
+      .eq(
+        "status",
+        "subscribed"
+      );
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    count:
+      Number(count || 0),
+
+    supported:
+      true,
+
+    audience:
+      DEFAULT_AUDIENCE,
+  };
+}
+
+
+/* ============================================================
+   IMAGE FILE HELPERS
+============================================================ */
+
+function getNewsletterImageExtension(
   file
 ) {
   const originalName =
@@ -362,7 +838,7 @@ function getResumeExtension(
       .toLowerCase();
 
   if (
-    ALLOWED_RESUME_EXTENSIONS.has(
+    ALLOWED_NEWSLETTER_IMAGE_EXTENSIONS.has(
       extension
     )
   ) {
@@ -376,38 +852,37 @@ function getResumeExtension(
 
   if (
     mimeType ===
-    "application/pdf"
+    "image/jpeg"
   ) {
-    return ".pdf";
+    return ".jpg";
   }
 
   if (
     mimeType ===
-    "application/msword"
+    "image/png"
   ) {
-    return ".doc";
+    return ".png";
   }
 
   if (
     mimeType ===
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    "image/webp"
   ) {
-    return ".docx";
+    return ".webp";
   }
 
   return "";
 }
 
 
-function validateResumeFile(
+function validateNewsletterImageFile(
   file
 ) {
   if (!file) {
     return {
       valid: false,
-
       message:
-        "Please upload your résumé or CV.",
+        "Please choose an image to upload.",
     };
   }
 
@@ -419,21 +894,8 @@ function validateResumeFile(
   ) {
     return {
       valid: false,
-
       message:
-        "The uploaded résumé or CV is empty.",
-    };
-  }
-
-  if (
-    file.buffer.length >
-    MAX_RESUME_SIZE
-  ) {
-    return {
-      valid: false,
-
-      message:
-        "Your résumé or CV must not exceed 5 MB.",
+        "The uploaded image is empty.",
     };
   }
 
@@ -443,34 +905,38 @@ function validateResumeFile(
     ).toLowerCase();
 
   if (
-    !ALLOWED_RESUME_TYPES.has(
+    !ALLOWED_NEWSLETTER_IMAGE_TYPES.has(
       mimeType
     )
   ) {
     return {
       valid: false,
-
       message:
-        "Only PDF, DOC and DOCX résumé files are allowed.",
+        "Only JPG, PNG and WEBP images are allowed.",
+    };
+  }
+
+  if (
+    file.buffer.length >
+    MAX_NEWSLETTER_IMAGE_SIZE
+  ) {
+    return {
+      valid: false,
+      message:
+        "The image is too large. Maximum size is 5 MB.",
     };
   }
 
   const extension =
-    getResumeExtension(
+    getNewsletterImageExtension(
       file
     );
 
-  if (
-    !extension ||
-    !ALLOWED_RESUME_EXTENSIONS.has(
-      extension
-    )
-  ) {
+  if (!extension) {
     return {
       valid: false,
-
       message:
-        "Unable to determine the résumé file format.",
+        "Unable to determine the image format.",
     };
   }
 
@@ -483,723 +949,345 @@ function validateResumeFile(
 
 
 /* ============================================================
-   CLEAN STORAGE FILE NAME
+   PUBLIC API URL
 ============================================================ */
 
-function sanitizeFileName(
-  value
-) {
-  const original =
-    cleanString(
-      value,
-      "resume"
-    );
-
-  return original
+function getPublicApiUrl() {
+  return String(
+    process.env.PUBLIC_API_URL ||
+      process.env.API_URL ||
+      process.env.SERVER_URL ||
+      "https://continental-founders-1.onrender.com"
+  )
+    .trim()
     .replace(
-      /[^a-zA-Z0-9._-]/g,
-      "-"
-    )
-    .replace(
-      /-+/g,
-      "-"
-    )
-    .slice(
-      0,
-      120
+      /\/+$/,
+      ""
     );
 }
 
 
 /* ============================================================
-   APPLICATION REFERENCE
+   UNSUBSCRIBE URL
 ============================================================ */
 
-async function generateApplicationReference() {
-  const year =
-    new Date().getFullYear();
-
-  for (
-    let attempt = 0;
-    attempt < 10;
-    attempt += 1
-  ) {
-    const token =
-      crypto
-        .randomBytes(4)
-        .toString("hex")
-        .toUpperCase();
-
-    const reference =
-      `CFCV-${year}-${token}`;
-
-    const {
-      data,
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          CFCV_TABLE
-        )
-        .select(
-          "id"
-        )
-        .eq(
-          "application_reference",
-          reference
-        )
-        .maybeSingle();
-
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
-      return reference;
-    }
-  }
-
-  throw new Error(
-    "Unable to generate a unique application reference."
-  );
-}
-
-
-/* ============================================================
-   NORMALIZE APPLICATION
-============================================================ */
-
-function normalizeApplication(
-  row
+function buildUnsubscribeUrl(
+  subscriber
 ) {
-  if (!row) {
-    return null;
-  }
-
-  return {
-    id:
-      row.id,
-
-    applicationReference:
-      row.application_reference,
-
-    firstName:
-      row.first_name || "",
-
-    lastName:
-      row.last_name || "",
-
-    email:
-      row.email || "",
-
-    phone:
-      row.phone || "",
-
-    country:
-      row.country || "",
-
-    city:
-      row.city || "",
-
-    geography:
-      row.geography || "",
-
-    professionalBackground:
-      row.professional_background ||
-      "",
-
-    relevantSkills:
-      row.relevant_skills || "",
-
-    entrepreneurshipReason:
-      row.entrepreneurship_reason ||
-      "",
-
-    ventureName:
-      row.venture_name || "",
-
-    sector:
-      row.sector || "",
-
-    ventureDescription:
-      row.venture_description ||
-      "",
-
-    problem:
-      row.problem || "",
-
-    solution:
-      row.solution || "",
-
-    ventureStage:
-      row.venture_stage || "",
-
-    currentProgress:
-      row.current_progress || "",
-
-    targetMarket:
-      row.target_market || "",
-
-    customerDescription:
-      row.customer_description ||
-      "",
-
-    teamStatus:
-      row.team_status || "",
-
-    teamDescription:
-      row.team_description || "",
-
-    existingCrossContinentalTeam:
-      row.existing_cross_continental_team ||
-      "",
-
-    collaboratorNeeds:
-      row.collaborator_needs || "",
-
-    marketKnowledge:
-      row.market_knowledge || "",
-
-    geographicConnections:
-      row.geographic_connections ||
-      "",
-
-    workingStyle:
-      row.working_style || "",
-
-    leadershipStrengths:
-      row.leadership_strengths ||
-      "",
-
-    longTermObjectives:
-      row.long_term_objectives ||
-      "",
-
-    timeCommitment:
-      row.time_commitment || "",
-
-    decisionMaking:
-      row.decision_making || "",
-
-    ownershipExpectations:
-      row.ownership_expectations ||
-      "",
-
-    sixMonthGoals:
-      row.six_month_goals || "",
-
-    resumeFileName:
-      row.resume_file_name || "",
-
-    resumeMimeType:
-      row.resume_mime_type || "",
-
-    hasResume:
-      Boolean(
-        row.resume_path
-      ),
-
-    admissionsStage:
-      row.admissions_stage ||
-      "applied",
-
-    assignedTrack:
-      row.assigned_track ||
-      null,
-
-    matchingRequired:
-      Boolean(
-        row.matching_required
-      ),
-
-    matchingStatus:
-      row.matching_status ||
-      "not_started",
-
-    finalDecision:
-      row.final_decision ||
-      null,
-
-    reviewerNotes:
-      row.reviewer_notes || "",
-
-    interviewNotes:
-      row.interview_notes || "",
-
-    matchingNotes:
-      row.matching_notes || "",
-
-    decisionNotes:
-      row.decision_notes || "",
-
-    interviewRequired:
-      Boolean(
-        row.interview_required
-      ),
-
-    interviewStatus:
-      row.interview_status ||
-      "not_scheduled",
-
-    interviewDate:
-      row.interview_date ||
-      null,
-
-    status:
-      row.status ||
-      "submitted",
-
-    reviewedBy:
-      row.reviewed_by ||
-      null,
-
-    reviewedAt:
-      row.reviewed_at ||
-      null,
-
-    submittedAt:
-      row.submitted_at ||
-      null,
-
-    createdAt:
-      row.created_at ||
-      null,
-
-    updatedAt:
-      row.updated_at ||
-      null,
-  };
-}
-
-
-/* ============================================================
-   VALIDATE PUBLIC APPLICATION
-============================================================ */
-
-function validatePublicApplication(
-  application
-) {
-  const errors = [];
-
-  const firstName =
-    cleanString(
-      application.firstName
-    );
-
-  const lastName =
-    cleanString(
-      application.lastName
-    );
-
-  const email =
-    cleanEmail(
-      application.email
-    );
-
-  const country =
-    cleanString(
-      application.country
-    );
-
-  const geography =
-    cleanString(
-      application.geography
-    );
-
-  const professionalBackground =
-    cleanString(
-      application.professionalBackground
-    );
-
-  const relevantSkills =
-    cleanString(
-      application.relevantSkills
-    );
-
-  const ventureDescription =
-    cleanString(
-      application.ventureDescription
-    );
-
-  const problem =
-    cleanString(
-      application.problem
-    );
-
-  const solution =
-    cleanString(
-      application.solution
-    );
-
-  const ventureStage =
-    cleanString(
-      application.ventureStage
-    );
-
-  const currentProgress =
-    cleanString(
-      application.currentProgress
-    );
-
-  const targetMarket =
-    cleanString(
-      application.targetMarket
-    );
-
-  const teamStatus =
-    cleanString(
-      application.teamStatus
-    );
-
-  const existingCrossContinentalTeam =
-    cleanString(
-      application.existingCrossContinentalTeam
-    );
-
-  const workingStyle =
-    cleanString(
-      application.workingStyle
-    );
-
-  const longTermObjectives =
-    cleanString(
-      application.longTermObjectives
-    );
-
-  const timeCommitment =
-    cleanString(
-      application.timeCommitment
-    );
-
-  const decisionMaking =
-    cleanString(
-      application.decisionMaking
-    );
-
-  const sixMonthGoals =
-    cleanString(
-      application.sixMonthGoals
-    );
-
-
-  if (!firstName) {
-    errors.push(
-      "First name is required."
-    );
-  }
-
-  if (!lastName) {
-    errors.push(
-      "Last name is required."
-    );
-  }
+  const baseUrl =
+    getPublicApiUrl();
 
   if (
-    !email ||
-    !isValidEmail(email)
+    subscriber?.token
   ) {
-    errors.push(
-      "A valid email address is required."
-    );
-  }
-
-  if (!country) {
-    errors.push(
-      "Country is required."
-    );
-  }
-
-  if (
-    !VALID_GEOGRAPHIES.has(
-      geography
-    )
-  ) {
-    errors.push(
-      "Please select a valid geographic location."
-    );
-  }
-
-  if (!professionalBackground) {
-    errors.push(
-      "Professional background is required."
-    );
-  }
-
-  if (!relevantSkills) {
-    errors.push(
-      "Relevant skills are required."
-    );
-  }
-
-  if (!ventureDescription) {
-    errors.push(
-      "Venture description is required."
-    );
-  }
-
-  if (!problem) {
-    errors.push(
-      "Please describe the problem your venture addresses."
-    );
-  }
-
-  if (!solution) {
-    errors.push(
-      "Please describe your proposed solution."
-    );
-  }
-
-  if (
-    !VALID_VENTURE_STAGES.has(
-      ventureStage
-    )
-  ) {
-    errors.push(
-      "Please select a valid venture stage."
-    );
-  }
-
-  if (!currentProgress) {
-    errors.push(
-      "Current venture progress is required."
-    );
-  }
-
-  if (!targetMarket) {
-    errors.push(
-      "Target market is required."
-    );
-  }
-
-  if (
-    !VALID_TEAM_STATUSES.has(
-      teamStatus
-    )
-  ) {
-    errors.push(
-      "Please select a valid team status."
-    );
-  }
-
-  if (
-    !VALID_YES_NO.has(
-      existingCrossContinentalTeam
-    )
-  ) {
-    errors.push(
-      "Please indicate whether you already have a cross-continental team."
-    );
-  }
-
-  if (!workingStyle) {
-    errors.push(
-      "Working style is required."
-    );
-  }
-
-  if (!longTermObjectives) {
-    errors.push(
-      "Long-term objectives are required."
-    );
-  }
-
-  if (!timeCommitment) {
-    errors.push(
-      "Time commitment is required."
-    );
-  }
-
-  if (!decisionMaking) {
-    errors.push(
-      "Decision-making approach is required."
-    );
-  }
-
-  if (!sixMonthGoals) {
-    errors.push(
-      "Six-month goals are required."
-    );
-  }
-
-  return errors;
-}
-
-
-/* ============================================================
-   CREATE RESUME STORAGE PATH
-============================================================ */
-
-function buildResumeStoragePath(
-  applicationReference,
-  file,
-  extension
-) {
-  const safeName =
-    sanitizeFileName(
-      path.basename(
-        cleanString(
-          file?.originalname,
-          `resume${extension}`
-        ),
-        path.extname(
-          cleanString(
-            file?.originalname
-          )
-        )
+    return (
+      `${baseUrl}` +
+      `/api/newsletter/unsubscribe?token=` +
+      encodeURIComponent(
+        subscriber.token
       )
     );
-
-  const randomId =
-    crypto.randomUUID();
-
-  return [
-    applicationReference,
-    `${randomId}-${safeName}${extension}`,
-  ].join("/");
-}
-
-
-/* ============================================================
-   REMOVE RESUME SAFELY
-============================================================ */
-
-async function safelyRemoveResume(
-  storagePath
-) {
-  if (!storagePath) {
-    return;
   }
 
-  try {
-    const {
-      error,
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          CFCV_RESUMES_BUCKET
-        )
-        .remove([
-          storagePath,
-        ]);
-
-    if (error) {
-      console.error(
-        "[CFCV] Unable to remove résumé:",
-        error
-      );
-    }
-  } catch (error) {
-    console.error(
-      "[CFCV] Résumé cleanup error:",
-      error
-    );
-  }
-}
-
-
-/* ============================================================
-   ADMIN NOTIFICATION EMAIL
-============================================================ */
-
-function getCfcvNotificationEmail() {
-  return cleanEmail(
-    process.env.CFCV_NOTIFICATION_EMAIL ||
-      process.env.ADMIN_NOTIFICATION_EMAIL ||
-      process.env.CONTACT_NOTIFICATION_EMAIL ||
-      process.env.CONTACT_EMAIL ||
-      ""
+  return (
+    `${baseUrl}` +
+    `/api/newsletter/unsubscribe?email=` +
+    encodeURIComponent(
+      subscriber?.email ||
+        ""
+    )
   );
 }
 
 
-function buildAdminNotificationHtml({
-  applicationReference,
-  application,
-  submittedAt,
-}) {
-  const fullName =
-    `${cleanString(
-      application.firstName
-    )} ${cleanString(
-      application.lastName
-    )}`.trim();
+/* ============================================================
+   NEWSLETTER IMAGE HTML
+============================================================ */
+
+function buildNewsletterImagesHtml(
+  campaign
+) {
+  const images = [];
+
+  if (
+    campaign.featured_image
+  ) {
+    images.push(
+      campaign.featured_image
+    );
+  }
+
+  for (
+    const url of
+    normalizeImages(
+      campaign.images
+    )
+  ) {
+    if (
+      !images.includes(url)
+    ) {
+      images.push(url);
+    }
+  }
+
+  if (
+    images.length === 0
+  ) {
+    return "";
+  }
+
+  return images
+    .map(
+      (url) => `
+        <tr>
+          <td
+            style="
+              padding:0 32px 24px 32px;
+            "
+          >
+            <img
+              src="${escapeHtml(url)}"
+              alt=""
+              style="
+                display:block;
+                width:100%;
+                max-width:636px;
+                height:auto;
+                border:0;
+                border-radius:12px;
+              "
+            />
+          </td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+
+/* ============================================================
+   NEWSLETTER EMAIL HTML
+============================================================ */
+
+function buildNewsletterHtml(
+  campaign,
+  subscriber = null
+) {
+  const title =
+    escapeHtml(
+      campaign.title ||
+        ""
+    );
+
+  const previewText =
+    escapeHtml(
+      campaign.preview_text ||
+        ""
+    );
+
+  const content =
+    escapeHtml(
+      campaign.content ||
+        ""
+    ).replace(
+      /\r?\n/g,
+      "<br />"
+    );
+
+  const ctaText =
+    escapeHtml(
+      campaign.cta_text ||
+        ""
+    );
+
+  const ctaLink =
+    campaign.cta_link &&
+    isValidUrl(
+      campaign.cta_link
+    )
+      ? escapeHtml(
+          campaign.cta_link
+        )
+      : "";
+
+  const unsubscribeUrl =
+    subscriber
+      ? buildUnsubscribeUrl(
+          subscriber
+        )
+      : "";
+
+  const imageHtml =
+    buildNewsletterImagesHtml(
+      campaign
+    );
+
+  const ctaHtml =
+    ctaText &&
+    ctaLink
+      ? `
+        <tr>
+          <td
+            align="center"
+            style="
+              padding:8px 32px 32px 32px;
+            "
+          >
+            <a
+              href="${ctaLink}"
+              style="
+                display:inline-block;
+                padding:14px 24px;
+                border-radius:8px;
+                background:#0d2238;
+                color:#ffffff;
+                font-family:Arial,sans-serif;
+                font-size:15px;
+                font-weight:700;
+                text-decoration:none;
+              "
+            >
+              ${ctaText}
+            </a>
+          </td>
+        </tr>
+      `
+      : "";
+
+  const unsubscribeHtml =
+    unsubscribeUrl
+      ? `
+        <p
+          style="
+            margin:12px 0 0 0;
+            font-size:12px;
+            line-height:18px;
+          "
+        >
+          <a
+            href="${escapeHtml(
+              unsubscribeUrl
+            )}"
+            style="
+              color:#64748b;
+              text-decoration:underline;
+            "
+          >
+            Unsubscribe
+          </a>
+        </p>
+      `
+      : "";
 
   return `
 <!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
+
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1"
     />
-    <title>New CFCV Application</title>
+
+    <title>${title}</title>
   </head>
 
   <body
     style="
       margin:0;
       padding:0;
-      background:#f4f6f8;
-      font-family:Arial,sans-serif;
-      color:#172033;
+      background:#f3f5f7;
     "
   >
+    <div
+      style="
+        display:none;
+        max-height:0;
+        overflow:hidden;
+        opacity:0;
+      "
+    >
+      ${previewText}
+    </div>
+
     <table
       role="presentation"
       width="100%"
       cellspacing="0"
       cellpadding="0"
       border="0"
+      style="
+        width:100%;
+        background:#f3f5f7;
+      "
     >
       <tr>
         <td
           align="center"
-          style="padding:32px 16px;"
+          style="
+            padding:32px 16px;
+          "
         >
+
           <table
             role="presentation"
-            width="680"
+            width="700"
             cellspacing="0"
             cellpadding="0"
             border="0"
             style="
               width:100%;
-              max-width:680px;
+              max-width:700px;
               background:#ffffff;
               border-radius:16px;
               overflow:hidden;
+              box-shadow:
+                0 8px 28px
+                rgba(15,23,42,.08);
             "
           >
+
             <tr>
               <td
                 style="
-                  padding:28px 32px;
-                  background:#0d2238;
-                  color:#ffffff;
+                  padding:30px 32px 18px 32px;
+                  font-family:Arial,sans-serif;
                 "
               >
                 <div
                   style="
+                    color:#0d2238;
                     font-size:13px;
                     font-weight:700;
-                    letter-spacing:1.2px;
+                    letter-spacing:1.4px;
                     text-transform:uppercase;
-                    color:#d6b45b;
                   "
                 >
                   Continental Founders
                 </div>
+              </td>
+            </tr>
 
+            ${imageHtml}
+
+            <tr>
+              <td
+                style="
+                  padding:8px 32px 18px 32px;
+                  font-family:Arial,sans-serif;
+                "
+              >
                 <h1
                   style="
-                    margin:10px 0 0;
-                    font-size:26px;
-                    line-height:34px;
+                    margin:0;
+                    color:#0f172a;
+                    font-size:30px;
+                    line-height:38px;
+                    font-weight:700;
                   "
                 >
-                  New CFCV Fellowship Application
+                  ${title}
                 </h1>
               </td>
             </tr>
@@ -1207,260 +1295,41 @@ function buildAdminNotificationHtml({
             <tr>
               <td
                 style="
-                  padding:30px 32px;
-                  font-size:15px;
-                  line-height:24px;
+                  padding:0 32px 28px 32px;
+                  color:#334155;
+                  font-family:Arial,sans-serif;
+                  font-size:16px;
+                  line-height:27px;
                 "
               >
-                <p
-                  style="
-                    margin:0 0 20px;
-                  "
-                >
-                  A new application has been submitted
-                  through the CFCV Fellowship application.
-                </p>
-
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellspacing="0"
-                  cellpadding="0"
-                  border="0"
-                  style="
-                    border-collapse:collapse;
-                  "
-                >
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                        width:190px;
-                      "
-                    >
-                      Application Reference
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        applicationReference
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Applicant
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        fullName
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Email
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.email
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Country
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.country
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Geography
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.geography
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Venture
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.ventureName ||
-                          "Not provided"
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Sector
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.sector ||
-                          "Not provided"
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Venture Stage
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.ventureStage
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Team Status
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        application.teamStatus
-                      )}
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td
-                      style="
-                        padding:9px 0;
-                        font-weight:700;
-                      "
-                    >
-                      Submitted
-                    </td>
-
-                    <td
-                      style="
-                        padding:9px 0;
-                      "
-                    >
-                      ${escapeHtml(
-                        submittedAt
-                      )}
-                    </td>
-                  </tr>
-                </table>
-
-                <p
-                  style="
-                    margin:24px 0 0;
-                    padding:16px;
-                    background:#f7f8fa;
-                    border-radius:10px;
-                  "
-                >
-                  The applicant's résumé/CV has been
-                  stored privately. Open the CFCV
-                  Admissions CMS to review the complete
-                  application and access the résumé.
-                </p>
+                ${content}
               </td>
             </tr>
+
+            ${ctaHtml}
+
+            <tr>
+              <td
+                style="
+                  padding:24px 32px 30px 32px;
+                  border-top:1px solid #e2e8f0;
+                  color:#64748b;
+                  font-family:Arial,sans-serif;
+                  font-size:12px;
+                  line-height:18px;
+                "
+              >
+                Continental Founders<br />
+
+                Building a global ecosystem
+                for founders.
+
+                ${unsubscribeHtml}
+              </td>
+            </tr>
+
           </table>
+
         </td>
       </tr>
     </table>
@@ -1470,151 +1339,1987 @@ function buildAdminNotificationHtml({
 }
 
 
-function buildAdminNotificationText({
-  applicationReference,
-  application,
-  submittedAt,
-}) {
-  const fullName =
-    `${cleanString(
-      application.firstName
-    )} ${cleanString(
-      application.lastName
-    )}`.trim();
+/* ============================================================
+   NEWSLETTER PLAIN TEXT
+============================================================ */
 
-  return [
-    "New CFCV Fellowship Application",
+function buildNewsletterText(
+  campaign,
+  subscriber = null
+) {
+  const lines = [
+    campaign.title || "",
     "",
-    `Application Reference: ${applicationReference}`,
-    `Applicant: ${fullName}`,
-    `Email: ${application.email}`,
-    `Country: ${application.country}`,
-    `Geography: ${application.geography}`,
-    `Venture: ${application.ventureName || "Not provided"}`,
-    `Sector: ${application.sector || "Not provided"}`,
-    `Venture Stage: ${application.ventureStage}`,
-    `Team Status: ${application.teamStatus}`,
-    `Submitted: ${submittedAt}`,
-    "",
-    "The applicant's résumé/CV is stored privately and can be accessed through the CFCV Admissions CMS.",
-  ].join("\n");
+    campaign.content || "",
+  ];
+
+  if (
+    campaign.cta_text &&
+    campaign.cta_link
+  ) {
+    lines.push(
+      "",
+      `${campaign.cta_text}: ${campaign.cta_link}`
+    );
+  }
+
+  if (subscriber) {
+    lines.push(
+      "",
+      `Unsubscribe: ${buildUnsubscribeUrl(
+        subscriber
+      )}`
+    );
+  }
+
+  return lines
+    .join("\n")
+    .trim();
 }
 
 
 /* ============================================================
-   SEND ADMIN NOTIFICATION SAFELY
-
-   Email failure must NOT delete or reject an application that
-   has already been stored successfully.
+   SUBSCRIBE
 ============================================================ */
 
-async function safelySendAdminNotification({
-  applicationReference,
-  application,
-  submittedAt,
-}) {
-  const notificationEmail =
-    getCfcvNotificationEmail();
-
-  if (!notificationEmail) {
-    console.warn(
-      "[CFCV] No CFCV notification email is configured. Application saved without email notification."
-    );
-
-    return {
-      sent: false,
-      reason:
-        "notification_email_not_configured",
-    };
-  }
-
-  try {
-    const result =
-      await sendEmail({
-        to:
-          notificationEmail,
-
-        subject:
-          `New CFCV Application — ${applicationReference}`,
-
-        html:
-          buildAdminNotificationHtml({
-            applicationReference,
-            application,
-            submittedAt,
-          }),
-
-        text:
-          buildAdminNotificationText({
-            applicationReference,
-            application,
-            submittedAt,
-          }),
-      });
-
-    if (
-      result &&
-      result.success === false
-    ) {
-      console.error(
-        "[CFCV] Application notification email was rejected:",
-        result
-      );
-
-      return {
-        sent: false,
-        reason:
-          result.message ||
-          result.error ||
-          "email_provider_rejected",
-      };
-    }
-
-    return {
-      sent: true,
-
-      providerMessageId:
-        result?.messageId ||
-        result?.id ||
-        result?.data?.id ||
-        null,
-    };
-  } catch (error) {
-    console.error(
-      "[CFCV] Unable to send application notification email:",
-      error
-    );
-
-    return {
-      sent: false,
-      reason:
-        error?.message ||
-        "email_send_failed",
-    };
-  }
-}
-
-
-/* ============================================================
-   CREATE PUBLIC APPLICATION
-============================================================ */
-
-async function createApplication(
+async function subscribe(
   req,
   res
 ) {
-  let uploadedResumePath =
-    null;
-
   try {
-    const application =
-      parseApplicationBody(
+    const email =
+      normalizeEmail(
+        req.body?.email
+      );
+
+    const name =
+      cleanString(
+        req.body?.name
+      );
+
+    if (
+      !isValidEmail(email)
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Please enter a valid email address.",
+        });
+    }
+
+    const {
+      data: existing,
+      error: existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .select("*")
+        .eq(
+          "email",
+          email
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (existing) {
+      const {
+        data,
+        error,
+      } =
+        await supabaseAdmin
+          .from(
+            SUBSCRIBERS_TABLE
+          )
+          .update({
+            name:
+              name ||
+              existing.name ||
+              "",
+
+            status:
+              "subscribed",
+
+            unsubscribed_at:
+              null,
+
+            subscribed_at:
+              existing.subscribed_at ||
+              nowIso(),
+
+            token:
+              existing.token ||
+              createToken(),
+
+            updated_at:
+              nowIso(),
+          })
+          .eq(
+            "id",
+            existing.id
+          )
+          .select("*")
+          .single();
+
+      if (error) {
+        throw error;
+      }
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            "You are subscribed to Continental Founders updates.",
+
+          subscriber:
+            normalizeSubscriber(
+              data
+            ),
+        });
+    }
+
+    const timestamp =
+      nowIso();
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .insert({
+          email,
+
+          name,
+
+          status:
+            "subscribed",
+
+          token:
+            createToken(),
+
+          source:
+            cleanString(
+              req.body?.source,
+              "website"
+            ),
+
+          subscribed_at:
+            timestamp,
+
+          unsubscribed_at:
+            null,
+
+          created_at:
+            timestamp,
+
+          updated_at:
+            timestamp,
+        })
+        .select("*")
+        .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "You are subscribed to Continental Founders updates.",
+
+        subscriber:
+          normalizeSubscriber(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to subscribe right now."
+    );
+  }
+}
+
+
+/* ============================================================
+   UNSUBSCRIBE
+============================================================ */
+
+async function unsubscribe(
+  req,
+  res
+) {
+  try {
+    const email =
+      normalizeEmail(
+        req.body?.email ||
+          req.query?.email
+      );
+
+    const token =
+      cleanString(
+        req.body?.token ||
+          req.query?.token
+      );
+
+    if (
+      !email &&
+      !token
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "An email address or unsubscribe token is required.",
+        });
+    }
+
+    let query =
+      supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .select("*");
+
+    if (token) {
+      query =
+        query.eq(
+          "token",
+          token
+        );
+    } else {
+      query =
+        query.eq(
+          "email",
+          email
+        );
+    }
+
+    const {
+      data: subscriber,
+      error,
+    } =
+      await query
+        .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!subscriber) {
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            "Your unsubscribe request has been processed.",
+        });
+    }
+
+    const timestamp =
+      nowIso();
+
+    const {
+      error:
+        updateError,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .update({
+          status:
+            "unsubscribed",
+
+          unsubscribed_at:
+            timestamp,
+
+          updated_at:
+            timestamp,
+        })
+        .eq(
+          "id",
+          subscriber.id
+        );
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          "You have been unsubscribed from Continental Founders updates.",
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to process the unsubscribe request."
+    );
+  }
+}
+
+
+/* ============================================================
+   GET SUBSCRIBERS
+============================================================ */
+
+async function getSubscribers(
+  req,
+  res
+) {
+  try {
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending:
+              false,
+          }
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    const subscribers =
+      (data || []).map(
+        normalizeSubscriber
+      );
+
+    const activeCount =
+      subscribers.filter(
+        (subscriber) =>
+          subscriber.status ===
+          "subscribed"
+      ).length;
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        subscribers,
+
+        count:
+          subscribers.length,
+
+        activeCount,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter subscribers."
+    );
+  }
+}
+
+
+/* ============================================================
+   UPDATE SUBSCRIBER
+============================================================ */
+
+async function updateSubscriber(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Subscriber ID is required.",
+        });
+    }
+
+    const updates = {
+      updated_at:
+        nowIso(),
+    };
+
+    if (
+      req.body?.name !==
+      undefined
+    ) {
+      updates.name =
+        cleanString(
+          req.body.name
+        );
+    }
+
+    if (
+      req.body?.email !==
+      undefined
+    ) {
+      const email =
+        normalizeEmail(
+          req.body.email
+        );
+
+      if (
+        !isValidEmail(
+          email
+        )
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Please enter a valid email address.",
+          });
+      }
+
+      updates.email =
+        email;
+    }
+
+    if (
+      req.body?.status !==
+      undefined
+    ) {
+      const status =
+        cleanString(
+          req.body.status
+        ).toLowerCase();
+
+      if (
+        ![
+          "subscribed",
+          "unsubscribed",
+        ].includes(
+          status
+        )
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "Subscriber status must be subscribed or unsubscribed.",
+          });
+      }
+
+      updates.status =
+        status;
+
+      if (
+        status ===
+        "subscribed"
+      ) {
+        updates.unsubscribed_at =
+          null;
+
+        updates.subscribed_at =
+          nowIso();
+      } else {
+        updates.unsubscribed_at =
+          nowIso();
+      }
+    }
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .update(
+          updates
+        )
+        .eq(
+          "id",
+          id
+        )
+        .select("*")
+        .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          "Subscriber updated successfully.",
+
+        subscriber:
+          normalizeSubscriber(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to update subscriber."
+    );
+  }
+}
+
+
+/* ============================================================
+   DELETE SUBSCRIBER
+============================================================ */
+
+async function deleteSubscriber(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message:
+            "Subscriber ID is required.",
+        });
+    }
+
+    const {
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .delete()
+        .eq(
+          "id",
+          id
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          "Subscriber deleted successfully.",
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to delete subscriber."
+    );
+  }
+}
+
+
+/* ============================================================
+   UPLOAD NEWSLETTER IMAGE
+
+   One image is uploaded per request. The frontend can call this
+   endpoint repeatedly and save the returned URLs in `images`.
+============================================================ */
+
+async function uploadNewsletterImage(
+  req,
+  res
+) {
+  try {
+    const file =
+      req.file;
+
+    const validation =
+      validateNewsletterImageFile(
+        file
+      );
+
+    if (
+      !validation.valid
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validation.message,
+        });
+    }
+
+    const adminId =
+      getCurrentAdminId(
         req
       );
 
+    if (!adminId) {
+      return res
+        .status(401)
+        .json({
+          success: false,
+
+          message:
+            "Administrator authentication is required.",
+        });
+    }
+
+    const extension =
+      validation.extension;
+
+    const storagePath =
+      [
+        "newsletters",
+        String(adminId),
+        new Date()
+          .toISOString()
+          .slice(
+            0,
+            10
+          ),
+        `${Date.now()}-${crypto
+          .randomBytes(10)
+          .toString("hex")}${extension}`,
+      ].join("/");
+
+    const {
+      data: uploadData,
+      error: uploadError,
+    } =
+      await supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .upload(
+          storagePath,
+          file.buffer,
+          {
+            contentType:
+              validation.mimeType,
+
+            cacheControl:
+              "3600",
+
+            upsert:
+              false,
+          }
+        );
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const {
+      data: publicUrlData,
+    } =
+      supabaseAdmin
+        .storage
+        .from(
+          NEWSLETTER_IMAGES_BUCKET
+        )
+        .getPublicUrl(
+          uploadData?.path ||
+            storagePath
+        );
+
+    const publicUrl =
+      cleanString(
+        publicUrlData?.publicUrl
+      );
+
+    if (
+      !publicUrl ||
+      !isValidUrl(
+        publicUrl
+      )
+    ) {
+      try {
+        await supabaseAdmin
+          .storage
+          .from(
+            NEWSLETTER_IMAGES_BUCKET
+          )
+          .remove([
+            uploadData?.path ||
+              storagePath,
+          ]);
+      } catch (
+        cleanupError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to clean up image after public URL failure:",
+          cleanupError
+        );
+      }
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+
+          message:
+            "The image uploaded, but its public URL could not be created.",
+        });
+    }
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter image uploaded successfully.",
+
+        url:
+          publicUrl,
+
+        publicUrl:
+          publicUrl,
+
+        imageUrl:
+          publicUrl,
+
+        image: {
+          url:
+            publicUrl,
+
+          publicUrl:
+            publicUrl,
+
+          path:
+            uploadData?.path ||
+            storagePath,
+
+          bucket:
+            NEWSLETTER_IMAGES_BUCKET,
+
+          mimeType:
+            validation.mimeType,
+
+          size:
+            file.buffer.length,
+
+          originalName:
+            cleanString(
+              file.originalname
+            ),
+        },
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to upload newsletter image."
+    );
+  }
+}/* ============================================================
+   GET CAMPAIGNS
+============================================================ */
+
+async function getCampaigns(
+  req,
+  res
+) {
+  try {
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    const campaigns =
+      (data || []).map(
+        normalizeCampaign
+      );
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        campaigns,
+
+        count:
+          campaigns.length,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter campaigns."
+    );
+  }
+}
+
+
+/* ============================================================
+   GET SINGLE CAMPAIGN
+============================================================ */
+
+async function getCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   CREATE CAMPAIGN
+
+   Drafts can be created before the newsletter is complete.
+
+   IMPORTANT:
+   content_type is explicitly written because the existing
+   newsletter_campaigns table requires a non-null value.
+============================================================ */
+
+async function createCampaign(
+  req,
+  res
+) {
+  try {
+    const input =
+      normalizeCampaignInput(
+        req.body || {}
+      );
+
+    if (!input.title) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter title is required.",
+        });
+    }
+
+    if (!input.subject) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Email subject is required.",
+        });
+    }
+
+    const adminId =
+      getCurrentAdminId(
+        req
+      );
+
+    const timestamp =
+      nowIso();
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .insert({
+          title:
+            input.title,
+
+          subject:
+            input.subject,
+
+          preview_text:
+            input.previewText,
+
+          featured_image:
+            input.featuredImage ||
+            null,
+
+          images:
+            input.images,
+
+          content:
+            input.content,
+
+          /*
+           * Required database field.
+           */
+          content_type:
+            input.contentType ||
+            DEFAULT_CONTENT_TYPE,
+
+          cta_text:
+            input.ctaText,
+
+          cta_link:
+            input.ctaLink ||
+            null,
+
+          /*
+           * Audience is fixed by the server.
+           */
+          audience:
+            DEFAULT_AUDIENCE,
+
+          status:
+            CAMPAIGN_STATUS.DRAFT,
+
+          scheduled_at:
+            null,
+
+          sent_at:
+            null,
+
+          recipient_count:
+            0,
+
+          delivered_count:
+            0,
+
+          failed_count:
+            0,
+
+          opened_count:
+            0,
+
+          clicked_count:
+            0,
+
+          created_by:
+            adminId,
+
+          created_at:
+            timestamp,
+
+          updated_at:
+            timestamp,
+        })
+        .select("*")
+        .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter draft created successfully.",
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to create newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   UPDATE CAMPAIGN
+============================================================ */
+
+async function updateCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data: existing,
+      error: existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    /*
+     * A campaign currently being delivered must not be edited.
+     */
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent and cannot be edited.",
+        });
+    }
+
+    /*
+     * Historical sent newsletters should remain unchanged.
+     * Duplicate them if they need to be reused.
+     */
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "A sent newsletter cannot be edited. Duplicate it to create a new draft.",
+        });
+    }
+
+    /*
+     * Merge the existing campaign with only the fields supplied
+     * by the frontend.
+     */
+    const mergedInput = {
+      title:
+        req.body?.title !==
+        undefined
+          ? req.body.title
+          : existing.title,
+
+      subject:
+        req.body?.subject !==
+        undefined
+          ? req.body.subject
+          : existing.subject,
+
+      previewText:
+        req.body?.previewText !==
+          undefined ||
+        req.body?.preview_text !==
+          undefined
+          ? (
+              req.body
+                ?.previewText ??
+              req.body
+                ?.preview_text
+            )
+          : existing.preview_text,
+
+      featuredImage:
+        req.body?.featuredImage !==
+          undefined ||
+        req.body?.featured_image !==
+          undefined
+          ? (
+              req.body
+                ?.featuredImage ??
+              req.body
+                ?.featured_image
+            )
+          : existing.featured_image,
+
+      images:
+        req.body?.images !==
+        undefined
+          ? req.body.images
+          : existing.images,
+
+      content:
+        req.body?.content !==
+        undefined
+          ? req.body.content
+          : existing.content,
+
+      /*
+       * Preserve existing content type unless explicitly changed.
+       */
+      contentType:
+        req.body?.contentType !==
+          undefined ||
+        req.body?.content_type !==
+          undefined
+          ? (
+              req.body
+                ?.contentType ??
+              req.body
+                ?.content_type
+            )
+          : (
+              existing.content_type ||
+              DEFAULT_CONTENT_TYPE
+            ),
+
+      ctaText:
+        req.body?.ctaText !==
+          undefined ||
+        req.body?.cta_text !==
+          undefined
+          ? (
+              req.body
+                ?.ctaText ??
+              req.body
+                ?.cta_text
+            )
+          : existing.cta_text,
+
+      ctaLink:
+        req.body?.ctaLink !==
+          undefined ||
+        req.body?.cta_link !==
+          undefined
+          ? (
+              req.body
+                ?.ctaLink ??
+              req.body
+                ?.cta_link
+            )
+          : existing.cta_link,
+
+      audience:
+        DEFAULT_AUDIENCE,
+    };
+
+    const input =
+      normalizeCampaignInput(
+        mergedInput
+      );
+
+    if (!input.title) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter title is required.",
+        });
+    }
+
+    if (!input.subject) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Email subject is required.",
+        });
+    }
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .update({
+          title:
+            input.title,
+
+          subject:
+            input.subject,
+
+          preview_text:
+            input.previewText,
+
+          featured_image:
+            input.featuredImage ||
+            null,
+
+          images:
+            input.images,
+
+          content:
+            input.content,
+
+          /*
+           * Required database field.
+           */
+          content_type:
+            input.contentType ||
+            DEFAULT_CONTENT_TYPE,
+
+          cta_text:
+            input.ctaText,
+
+          cta_link:
+            input.ctaLink ||
+            null,
+
+          audience:
+            DEFAULT_AUDIENCE,
+
+          updated_at:
+            nowIso(),
+        })
+        .eq(
+          "id",
+          id
+        )
+        .select("*")
+        .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter campaign updated successfully.",
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to update newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   DELETE CAMPAIGN
+
+   Sent campaigns may be removed from the CMS.
+
+   Deleting a sent campaign DOES NOT recall emails that have
+   already reached recipients.
+============================================================ */
+
+async function deleteCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data: existing,
+      error: existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,title,status"
+        )
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    if (
+      existing.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "A newsletter that is currently being sent cannot be deleted.",
+        });
+    }
+
+    /*
+     * Remove delivery records first.
+     */
+    const {
+      error:
+        deliveryDeleteError,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .delete()
+        .eq(
+          "campaign_id",
+          id
+        );
+
+    if (
+      deliveryDeleteError
+    ) {
+      throw deliveryDeleteError;
+    }
+
+    const {
+      error:
+        campaignDeleteError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .delete()
+        .eq(
+          "id",
+          id
+        );
+
+    if (
+      campaignDeleteError
+    ) {
+      throw campaignDeleteError;
+    }
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          existing.status ===
+          CAMPAIGN_STATUS.SENT
+            ? "Sent newsletter record deleted successfully. Emails already sent to subscribers are unaffected."
+            : "Newsletter campaign deleted successfully.",
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to delete newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   DUPLICATE CAMPAIGN
+============================================================ */
+
+async function duplicateCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data: existing,
+      error: existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    const timestamp =
+      nowIso();
+
+    const adminId =
+      getCurrentAdminId(
+        req
+      );
+
+    const {
+      data,
+      error,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .insert({
+          title:
+            `${cleanString(
+              existing.title,
+              "Newsletter"
+            )} Copy`,
+
+          subject:
+            existing.subject ||
+            "",
+
+          preview_text:
+            existing.preview_text ||
+            "",
+
+          featured_image:
+            existing.featured_image ||
+            null,
+
+          images:
+            normalizeImages(
+              existing.images
+            ),
+
+          content:
+            existing.content ||
+            "",
+
+          /*
+           * Preserve the required content type.
+           */
+          content_type:
+            existing.content_type ||
+            DEFAULT_CONTENT_TYPE,
+
+          cta_text:
+            existing.cta_text ||
+            "",
+
+          cta_link:
+            existing.cta_link ||
+            null,
+
+          audience:
+            DEFAULT_AUDIENCE,
+
+          status:
+            CAMPAIGN_STATUS.DRAFT,
+
+          scheduled_at:
+            null,
+
+          sent_at:
+            null,
+
+          recipient_count:
+            0,
+
+          delivered_count:
+            0,
+
+          failed_count:
+            0,
+
+          opened_count:
+            0,
+
+          clicked_count:
+            0,
+
+          created_by:
+            adminId,
+
+          created_at:
+            timestamp,
+
+          updated_at:
+            timestamp,
+        })
+        .select("*")
+        .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return res
+      .status(201)
+      .json({
+        success: true,
+
+        message:
+          "Newsletter duplicated successfully.",
+
+        campaign:
+          normalizeCampaign(
+            data
+          ),
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to duplicate newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   GET CAMPAIGN RECIPIENT COUNT
+============================================================ */
+
+async function getCampaignRecipientCount(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data: campaign,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,status"
+        )
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (
+      campaignError
+    ) {
+      throw campaignError;
+    }
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    const result =
+      await getRecipientCount();
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        campaignId:
+          id,
+
+        audience:
+          DEFAULT_AUDIENCE,
+
+        audienceLabel:
+          "All Active Subscribers",
+
+        recipientCount:
+          result.count,
+
+        count:
+          result.count,
+
+        supported:
+          true,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to calculate newsletter recipients."
+    );
+  }
+}
+
+
+/* ============================================================
+   SCHEDULE CAMPAIGN
+============================================================ */
+
+async function scheduleCampaign(
+  req,
+  res
+) {
+  try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const scheduledAt =
+      parseDateOrNull(
+        req.body
+          ?.scheduledAt ??
+          req.body
+            ?.scheduled_at
+      );
+
+    if (!scheduledAt) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Please provide a valid schedule date and time.",
+        });
+    }
+
+    if (
+      new Date(
+        scheduledAt
+      ).getTime() <=
+      Date.now()
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "The scheduled send time must be in the future.",
+        });
+    }
+
+    const {
+      data: existing,
+      error: existingError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select("*")
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    if (!existing) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    if (
+      existing.status ===
+        CAMPAIGN_STATUS.SENDING ||
+      existing.status ===
+        CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            existing.status ===
+            CAMPAIGN_STATUS.SENT
+              ? "A sent newsletter cannot be scheduled again. Duplicate it first."
+              : "This newsletter is currently being sent.",
+        });
+    }
+
+    /*
+     * Normalize the complete existing record before validation.
+     */
+    const normalized =
+      normalizeCampaignInput({
+        title:
+          existing.title,
+
+        subject:
+          existing.subject,
+
+        previewText:
+          existing.preview_text,
+
+        featuredImage:
+          existing.featured_image,
+
+        images:
+          existing.images,
+
+        content:
+          existing.content,
+
+        contentType:
+          existing.content_type ||
+          DEFAULT_CONTENT_TYPE,
+
+        ctaText:
+          existing.cta_text,
+
+        ctaLink:
+          existing.cta_link,
+
+        audience:
+          DEFAULT_AUDIENCE,
+
+        scheduledAt,
+      });
+
     const validationErrors =
-      validatePublicApplication(
-        application
+      validateCampaign(
+        normalized
       );
 
     if (
@@ -1634,21 +3339,14 @@ async function createApplication(
         });
     }
 
-
-    /* --------------------------------------------------------
-       RESUME VALIDATION
-    --------------------------------------------------------- */
-
-    const resumeFile =
-      req.file;
-
-    const resumeValidation =
-      validateResumeFile(
-        resumeFile
-      );
+    const {
+      count:
+        recipientCount,
+    } =
+      await getRecipientCount();
 
     if (
-      !resumeValidation.valid
+      recipientCount <= 0
     ) {
       return res
         .status(400)
@@ -1656,331 +3354,9 @@ async function createApplication(
           success: false,
 
           message:
-            resumeValidation.message,
+            "There are no active newsletter subscribers to receive this campaign.",
         });
     }
-
-
-    /* --------------------------------------------------------
-       APPLICATION REFERENCE
-    --------------------------------------------------------- */
-
-    const applicationReference =
-      await generateApplicationReference();
-
-
-    /* --------------------------------------------------------
-       UPLOAD PRIVATE RESUME
-    --------------------------------------------------------- */
-
-    const resumeStoragePath =
-      buildResumeStoragePath(
-        applicationReference,
-        resumeFile,
-        resumeValidation.extension
-      );
-
-    const {
-      data: uploadData,
-      error: uploadError,
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          CFCV_RESUMES_BUCKET
-        )
-        .upload(
-          resumeStoragePath,
-          resumeFile.buffer,
-          {
-            contentType:
-              resumeValidation.mimeType,
-
-            cacheControl:
-              "3600",
-
-            upsert:
-              false,
-          }
-        );
-
-    if (uploadError) {
-      console.error(
-        "[CFCV] Résumé upload error:",
-        uploadError
-      );
-
-      return res
-        .status(500)
-        .json({
-          success: false,
-
-          message:
-            "We could not securely upload your résumé or CV. Please try again.",
-        });
-    }
-
-    uploadedResumePath =
-      uploadData?.path ||
-      resumeStoragePath;
-
-
-    /* --------------------------------------------------------
-       DATABASE PAYLOAD
-
-       Admissions decisions are intentionally controlled by
-       the backend and cannot be supplied by the applicant.
-    --------------------------------------------------------- */
-
-    const submittedAt =
-      nowIso();
-
-    const payload = {
-      application_reference:
-        applicationReference,
-
-      first_name:
-        cleanString(
-          application.firstName
-        ),
-
-      last_name:
-        cleanString(
-          application.lastName
-        ),
-
-      email:
-        cleanEmail(
-          application.email
-        ),
-
-      phone:
-        cleanString(
-          application.phone
-        ),
-
-      country:
-        cleanString(
-          application.country
-        ),
-
-      city:
-        cleanString(
-          application.city
-        ),
-
-      geography:
-        cleanString(
-          application.geography
-        ),
-
-      professional_background:
-        cleanString(
-          application.professionalBackground
-        ),
-
-      relevant_skills:
-        cleanString(
-          application.relevantSkills
-        ),
-
-      entrepreneurship_reason:
-        cleanString(
-          application.entrepreneurshipReason
-        ),
-
-      venture_name:
-        cleanString(
-          application.ventureName
-        ),
-
-      sector:
-        cleanString(
-          application.sector
-        ),
-
-      venture_description:
-        cleanString(
-          application.ventureDescription
-        ),
-
-      problem:
-        cleanString(
-          application.problem
-        ),
-
-      solution:
-        cleanString(
-          application.solution
-        ),
-
-      venture_stage:
-        cleanString(
-          application.ventureStage
-        ),
-
-      current_progress:
-        cleanString(
-          application.currentProgress
-        ),
-
-      target_market:
-        cleanString(
-          application.targetMarket
-        ),
-
-      customer_description:
-        cleanString(
-          application.customerDescription
-        ),
-
-      team_status:
-        cleanString(
-          application.teamStatus
-        ),
-
-      team_description:
-        cleanString(
-          application.teamDescription
-        ),
-
-      existing_cross_continental_team:
-        cleanString(
-          application.existingCrossContinentalTeam
-        ),
-
-      collaborator_needs:
-        cleanString(
-          application.collaboratorNeeds
-        ),
-
-      market_knowledge:
-        cleanString(
-          application.marketKnowledge
-        ),
-
-      geographic_connections:
-        cleanString(
-          application.geographicConnections
-        ),
-
-      working_style:
-        cleanString(
-          application.workingStyle
-        ),
-
-      leadership_strengths:
-        cleanString(
-          application.leadershipStrengths
-        ),
-
-      long_term_objectives:
-        cleanString(
-          application.longTermObjectives
-        ),
-
-      time_commitment:
-        cleanString(
-          application.timeCommitment
-        ),
-
-      decision_making:
-        cleanString(
-          application.decisionMaking
-        ),
-
-      ownership_expectations:
-        cleanString(
-          application.ownershipExpectations
-        ),
-
-      six_month_goals:
-        cleanString(
-          application.sixMonthGoals
-        ),
-
-
-      /* ------------------------------------------------------
-         PRIVATE RESUME METADATA
-
-         No public URL is stored.
-      ------------------------------------------------------- */
-
-      resume_path:
-        uploadedResumePath,
-
-      resume_file_name:
-        cleanString(
-          resumeFile.originalname
-        ),
-
-      resume_mime_type:
-        resumeValidation.mimeType,
-
-
-      /* ------------------------------------------------------
-         SERVER-CONTROLLED ADMISSIONS FIELDS
-      ------------------------------------------------------- */
-
-      admissions_stage:
-        "applied",
-
-      assigned_track:
-        null,
-
-      matching_required:
-        false,
-
-      matching_status:
-        "not_started",
-
-      final_decision:
-        null,
-
-      reviewer_notes:
-        "",
-
-      interview_notes:
-        "",
-
-      matching_notes:
-        "",
-
-      decision_notes:
-        "",
-
-      interview_required:
-        false,
-
-      interview_status:
-        "not_scheduled",
-
-      interview_date:
-        null,
-
-      status:
-        "submitted",
-
-      reviewed_by:
-        null,
-
-      reviewed_at:
-        null,
-
-      submitted_at:
-        submittedAt,
-
-      created_at:
-        submittedAt,
-
-      updated_at:
-        submittedAt,
-    };
-
-
-    /* --------------------------------------------------------
-       SAVE APPLICATION
-    --------------------------------------------------------- */
 
     const {
       data,
@@ -1988,367 +3364,57 @@ async function createApplication(
     } =
       await supabaseAdmin
         .from(
-          CFCV_TABLE
+          CAMPAIGNS_TABLE
         )
-        .insert(
-          payload
+        .update({
+          status:
+            CAMPAIGN_STATUS.SCHEDULED,
+
+          audience:
+            DEFAULT_AUDIENCE,
+
+          /*
+           * Ensure legacy rows also receive the required value.
+           */
+          content_type:
+            existing.content_type ||
+            DEFAULT_CONTENT_TYPE,
+
+          scheduled_at:
+            scheduledAt,
+
+          recipient_count:
+            recipientCount,
+
+          updated_at:
+            nowIso(),
+        })
+        .eq(
+          "id",
+          id
         )
         .select("*")
         .single();
 
     if (error) {
-      await safelyRemoveResume(
-        uploadedResumePath
-      );
-
-      uploadedResumePath =
-        null;
-
       throw error;
     }
 
-
-    /* --------------------------------------------------------
-       EMAIL CLIENT / ADMIN
-
-       Application is already safely stored. Email failure
-       therefore does not reject the application.
-    --------------------------------------------------------- */
-
-    const notification =
-      await safelySendAdminNotification({
-        applicationReference,
-        application,
-        submittedAt,
-      });
-
-
-    /* --------------------------------------------------------
-       RESPONSE
-    --------------------------------------------------------- */
-
     return res
-      .status(201)
+      .status(200)
       .json({
         success: true,
 
         message:
-          "Your CFCV application has been submitted successfully.",
+          "Newsletter scheduled successfully.",
 
-        applicationReference,
+        recipientCount,
 
-        submittedAt,
+        audience:
+          DEFAULT_AUDIENCE,
 
-        application:
-          normalizeApplication(
-            data
-          ),
-
-        notificationSent:
-          notification.sent,
-      });
-  } catch (error) {
-    if (uploadedResumePath) {
-      await safelyRemoveResume(
-        uploadedResumePath
-      );
-    }
-
-    if (
-      error?.statusCode ===
-      400
-    ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            error.message,
-        });
-    }
-
-    return sendServerError(
-      res,
-      error,
-      "Unable to submit your CFCV application."
-    );
-  }
-}
-
-
-/* ============================================================
-   GET APPLICATIONS - ADMIN
-============================================================ */
-
-async function getApplications(
-  req,
-  res
-) {
-  try {
-    const status =
-      cleanString(
-        req.query?.status
-      );
-
-    const admissionsStage =
-      cleanString(
-        req.query?.admissionsStage ||
-        req.query?.admissions_stage
-      );
-
-    const track =
-      cleanString(
-        req.query?.track
-      );
-
-    const geography =
-      cleanString(
-        req.query?.geography
-      );
-
-    const search =
-      cleanString(
-        req.query?.search
-      );
-
-
-    let query =
-      supabaseAdmin
-        .from(
-          CFCV_TABLE
-        )
-        .select("*");
-
-
-    if (status) {
-      if (
-        !VALID_STATUSES.has(
-          status
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid application status.",
-          });
-      }
-
-      query =
-        query.eq(
-          "status",
-          status
-        );
-    }
-
-
-    if (admissionsStage) {
-      if (
-        !VALID_ADMISSIONS_STAGES.has(
-          admissionsStage
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid admissions stage.",
-          });
-      }
-
-      query =
-        query.eq(
-          "admissions_stage",
-          admissionsStage
-        );
-    }
-
-
-    if (track) {
-      if (
-        !VALID_TRACKS.has(
-          track
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid CFCV track.",
-          });
-      }
-
-      query =
-        query.eq(
-          "assigned_track",
-          track
-        );
-    }
-
-
-    if (geography) {
-      if (
-        !VALID_GEOGRAPHIES.has(
-          geography
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid geography.",
-          });
-      }
-
-      query =
-        query.eq(
-          "geography",
-          geography
-        );
-    }
-
-
-    if (search) {
-      const safeSearch =
-        search
-          .replace(/[%(),]/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-
-      if (safeSearch) {
-        query =
-          query.or(
-            [
-              `first_name.ilike.%${safeSearch}%`,
-              `last_name.ilike.%${safeSearch}%`,
-              `email.ilike.%${safeSearch}%`,
-              `venture_name.ilike.%${safeSearch}%`,
-              `application_reference.ilike.%${safeSearch}%`,
-            ].join(",")
-          );
-      }
-    }
-
-
-    const {
-      data,
-      error,
-    } =
-      await query
-        .order(
-          "submitted_at",
-          {
-            ascending:
-              false,
-          }
-        );
-
-    if (error) {
-      throw error;
-    }
-
-
-    const applications =
-      (data || []).map(
-        normalizeApplication
-      );
-
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        applications,
-
-        count:
-          applications.length,
-      });
-  } catch (error) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to load CFCV applications."
-    );
-  }
-}
-
-
-/* ============================================================
-   GET SINGLE APPLICATION - ADMIN
-============================================================ */
-
-async function getApplicationById(
-  req,
-  res
-) {
-  try {
-    const id =
-      cleanString(
-        req.params?.id
-      );
-
-    if (!id) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Application ID is required.",
-        });
-    }
-
-
-    const {
-      data,
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          CFCV_TABLE
-        )
-        .select("*")
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    if (!data) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "CFCV application not found.",
-        });
-    }
-
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        application:
-          normalizeApplication(
+        campaign:
+          normalizeCampaign(
             data
           ),
       });
@@ -2356,20 +3422,17 @@ async function getApplicationById(
     return sendServerError(
       res,
       error,
-      "Unable to load the CFCV application."
+      "Unable to schedule newsletter campaign."
     );
   }
 }
 
 
 /* ============================================================
-   GET PRIVATE RESUME SIGNED URL - ADMIN
-
-   IMPORTANT:
-   This endpoint must be behind requireAdmin in cfcvRoutes.js.
+   CANCEL SCHEDULED CAMPAIGN
 ============================================================ */
 
-async function getApplicationResume(
+async function cancelScheduledCampaign(
   req,
   res
 ) {
@@ -2386,154 +3449,9 @@ async function getApplicationResume(
           success: false,
 
           message:
-            "Application ID is required.",
+            "Campaign ID is required.",
         });
     }
-
-
-    const {
-      data: application,
-      error,
-    } =
-      await supabaseAdmin
-        .from(
-          CFCV_TABLE
-        )
-        .select(
-          "id,application_reference,resume_path,resume_file_name,resume_mime_type"
-        )
-        .eq(
-          "id",
-          id
-        )
-        .maybeSingle();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    if (!application) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "CFCV application not found.",
-        });
-    }
-
-
-    if (
-      !application.resume_path
-    ) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-
-          message:
-            "No résumé or CV is attached to this application.",
-        });
-    }
-
-
-    const {
-      data: signedData,
-      error: signedError,
-    } =
-      await supabaseAdmin
-        .storage
-        .from(
-          CFCV_RESUMES_BUCKET
-        )
-        .createSignedUrl(
-          application.resume_path,
-          SIGNED_RESUME_URL_SECONDS,
-          {
-            download:
-              application.resume_file_name ||
-              "resume",
-          }
-        );
-
-
-    if (signedError) {
-      throw signedError;
-    }
-
-
-    if (
-      !signedData?.signedUrl
-    ) {
-      throw new Error(
-        "Unable to create a secure résumé download link."
-      );
-    }
-
-
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        applicationReference:
-          application.application_reference,
-
-        fileName:
-          application.resume_file_name ||
-          "resume",
-
-        mimeType:
-          application.resume_mime_type ||
-          "",
-
-        url:
-          signedData.signedUrl,
-
-        signedUrl:
-          signedData.signedUrl,
-
-        expiresIn:
-          SIGNED_RESUME_URL_SECONDS,
-      });
-  } catch (error) {
-    return sendServerError(
-      res,
-      error,
-      "Unable to access the applicant résumé."
-    );
-  }
-}
-
-
-/* ============================================================
-   UPDATE APPLICATION - ADMIN
-============================================================ */
-
-async function updateApplication(
-  req,
-  res
-) {
-  try {
-    const id =
-      cleanString(
-        req.params?.id
-      );
-
-    if (!id) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-
-          message:
-            "Application ID is required.",
-        });
-    }
-
 
     const {
       data: existing,
@@ -2541,7 +3459,7 @@ async function updateApplication(
     } =
       await supabaseAdmin
         .from(
-          CFCV_TABLE
+          CAMPAIGNS_TABLE
         )
         .select("*")
         .eq(
@@ -2550,11 +3468,9 @@ async function updateApplication(
         )
         .maybeSingle();
 
-
     if (existingError) {
       throw existingError;
     }
-
 
     if (!existing) {
       return res
@@ -2563,420 +3479,23 @@ async function updateApplication(
           success: false,
 
           message:
-            "CFCV application not found.",
+            "Newsletter campaign not found.",
         });
     }
 
-
-    const updates = {
-      updated_at:
-        nowIso(),
-
-      reviewed_at:
-        nowIso(),
-
-      reviewed_by:
-        getCurrentAdminId(
-          req
-        ),
-    };
-
-
-    /* --------------------------------------------------------
-       ADMISSIONS STAGE
-    --------------------------------------------------------- */
-
     if (
-      req.body?.admissionsStage !==
-        undefined ||
-      req.body?.admissions_stage !==
-        undefined
+      existing.status !==
+      CAMPAIGN_STATUS.SCHEDULED
     ) {
-      const value =
-        cleanString(
-          req.body
-            ?.admissionsStage ??
-          req.body
-            ?.admissions_stage
-        );
+      return res
+        .status(409)
+        .json({
+          success: false,
 
-      if (
-        !VALID_ADMISSIONS_STAGES.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid admissions stage.",
-          });
-      }
-
-      updates.admissions_stage =
-        value;
+          message:
+            "Only a scheduled newsletter can have its schedule cancelled.",
+        });
     }
-
-
-    /* --------------------------------------------------------
-       TRACK PLACEMENT
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.assignedTrack !==
-        undefined ||
-      req.body?.assigned_track !==
-        undefined
-    ) {
-      const value =
-        cleanNullableString(
-          req.body
-            ?.assignedTrack ??
-          req.body
-            ?.assigned_track
-        );
-
-      if (
-        value &&
-        !VALID_TRACKS.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid CFCV track.",
-          });
-      }
-
-      updates.assigned_track =
-        value;
-    }
-
-
-    /* --------------------------------------------------------
-       MATCHING REQUIRED
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.matchingRequired !==
-        undefined ||
-      req.body?.matching_required !==
-        undefined
-    ) {
-      updates.matching_required =
-        parseBoolean(
-          req.body
-            ?.matchingRequired ??
-          req.body
-            ?.matching_required,
-          false
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       MATCHING STATUS
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.matchingStatus !==
-        undefined ||
-      req.body?.matching_status !==
-        undefined
-    ) {
-      const value =
-        cleanString(
-          req.body
-            ?.matchingStatus ??
-          req.body
-            ?.matching_status
-        );
-
-      if (
-        !VALID_MATCHING_STATUSES.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid matching status.",
-          });
-      }
-
-      updates.matching_status =
-        value;
-    }
-
-
-    /* --------------------------------------------------------
-       FINAL DECISION
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.finalDecision !==
-        undefined ||
-      req.body?.final_decision !==
-        undefined
-    ) {
-      const value =
-        cleanNullableString(
-          req.body
-            ?.finalDecision ??
-          req.body
-            ?.final_decision
-        );
-
-      if (
-        value &&
-        !VALID_FINAL_DECISIONS.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid final admissions decision.",
-          });
-      }
-
-      updates.final_decision =
-        value;
-    }
-
-
-    /* --------------------------------------------------------
-       APPLICATION STATUS
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.status !==
-      undefined
-    ) {
-      const value =
-        cleanString(
-          req.body.status
-        );
-
-      if (
-        !VALID_STATUSES.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid application status.",
-          });
-      }
-
-      updates.status =
-        value;
-    }
-
-
-    /* --------------------------------------------------------
-       INTERVIEW REQUIRED
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.interviewRequired !==
-        undefined ||
-      req.body?.interview_required !==
-        undefined
-    ) {
-      updates.interview_required =
-        parseBoolean(
-          req.body
-            ?.interviewRequired ??
-          req.body
-            ?.interview_required,
-          false
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       INTERVIEW STATUS
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.interviewStatus !==
-        undefined ||
-      req.body?.interview_status !==
-        undefined
-    ) {
-      const value =
-        cleanString(
-          req.body
-            ?.interviewStatus ??
-          req.body
-            ?.interview_status
-        );
-
-      if (
-        !VALID_INTERVIEW_STATUSES.has(
-          value
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              "Invalid interview status.",
-          });
-      }
-
-      updates.interview_status =
-        value;
-    }
-
-
-    /* --------------------------------------------------------
-       INTERVIEW DATE
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.interviewDate !==
-        undefined ||
-      req.body?.interview_date !==
-        undefined
-    ) {
-      const rawValue =
-        req.body
-          ?.interviewDate ??
-        req.body
-          ?.interview_date;
-
-      if (
-        rawValue === null ||
-        rawValue === ""
-      ) {
-        updates.interview_date =
-          null;
-      } else {
-        const normalizedDate =
-          normalizeNullableDate(
-            rawValue
-          );
-
-        if (!normalizedDate) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-
-              message:
-                "Invalid interview date.",
-            });
-        }
-
-        updates.interview_date =
-          normalizedDate;
-      }
-    }
-
-
-    /* --------------------------------------------------------
-       REVIEWER NOTES
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.reviewerNotes !==
-        undefined ||
-      req.body?.reviewer_notes !==
-        undefined
-    ) {
-      updates.reviewer_notes =
-        cleanString(
-          req.body
-            ?.reviewerNotes ??
-          req.body
-            ?.reviewer_notes
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       INTERVIEW NOTES
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.interviewNotes !==
-        undefined ||
-      req.body?.interview_notes !==
-        undefined
-    ) {
-      updates.interview_notes =
-        cleanString(
-          req.body
-            ?.interviewNotes ??
-          req.body
-            ?.interview_notes
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       MATCHING NOTES
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.matchingNotes !==
-        undefined ||
-      req.body?.matching_notes !==
-        undefined
-    ) {
-      updates.matching_notes =
-        cleanString(
-          req.body
-            ?.matchingNotes ??
-          req.body
-            ?.matching_notes
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       DECISION NOTES
-    --------------------------------------------------------- */
-
-    if (
-      req.body?.decisionNotes !==
-        undefined ||
-      req.body?.decision_notes !==
-        undefined
-    ) {
-      updates.decision_notes =
-        cleanString(
-          req.body
-            ?.decisionNotes ??
-          req.body
-            ?.decision_notes
-        );
-    }
-
-
-    /* --------------------------------------------------------
-       UPDATE DATABASE
-    --------------------------------------------------------- */
 
     const {
       data,
@@ -2984,11 +3503,21 @@ async function updateApplication(
     } =
       await supabaseAdmin
         .from(
-          CFCV_TABLE
+          CAMPAIGNS_TABLE
         )
-        .update(
-          updates
-        )
+        .update({
+          status:
+            CAMPAIGN_STATUS.DRAFT,
+
+          scheduled_at:
+            null,
+
+          recipient_count:
+            0,
+
+          updated_at:
+            nowIso(),
+        })
         .eq(
           "id",
           id
@@ -2996,11 +3525,9 @@ async function updateApplication(
         .select("*")
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     return res
       .status(200)
@@ -3008,10 +3535,10 @@ async function updateApplication(
         success: true,
 
         message:
-          "CFCV application updated successfully.",
+          "Newsletter schedule cancelled.",
 
-        application:
-          normalizeApplication(
+        campaign:
+          normalizeCampaign(
             data
           ),
       });
@@ -3019,206 +3546,1540 @@ async function updateApplication(
     return sendServerError(
       res,
       error,
-      "Unable to update the CFCV application."
+      "Unable to cancel newsletter schedule."
     );
   }
 }
 
 
 /* ============================================================
-   APPLICATION STATS - ADMIN
+   GET CAMPAIGN DELIVERIES
 ============================================================ */
 
-async function getApplicationStats(
+async function getCampaignDeliveries(
   req,
   res
 ) {
   try {
+    const id =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const {
+      data: campaign,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,title,subject,status"
+        )
+        .eq(
+          "id",
+          id
+        )
+        .maybeSingle();
+
+    if (
+      campaignError
+    ) {
+      throw campaignError;
+    }
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
     const {
       data,
       error,
     } =
       await supabaseAdmin
         .from(
-          CFCV_TABLE
+          DELIVERIES_TABLE
         )
-        .select(
-          "id,status,admissions_stage,assigned_track,matching_required,final_decision,interview_required,interview_status"
+        .select("*")
+        .eq(
+          "campaign_id",
+          id
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false,
+          }
         );
-
 
     if (error) {
       throw error;
     }
 
+    const deliveries =
+      (data || []).map(
+        normalizeDelivery
+      );
 
-    const applications =
-      data || [];
-
-
-    const totalApplications =
-      applications.length;
-
-
-    const submitted =
-      applications.filter(
-        (item) =>
-          item.status ===
-          "submitted"
-      ).length;
-
-
-    const underReview =
-      applications.filter(
-        (item) =>
-          item.status ===
-          "under_review"
-      ).length;
-
-
-    const interviews =
-      applications.filter(
-        (item) =>
-          item.interview_required ===
-            true ||
+    const acceptedCount =
+      deliveries.filter(
+        (delivery) =>
           [
-            "scheduled",
-            "completed",
+            "sent",
+            "accepted",
+            "delivered",
           ].includes(
-            item.interview_status
+            cleanString(
+              delivery.status
+            ).toLowerCase()
           )
       ).length;
 
-
-    const matchingRequired =
-      applications.filter(
-        (item) =>
-          item.matching_required ===
-            true ||
-          item.final_decision ===
-            "MATCH REQUIRED"
+    const failedCount =
+      deliveries.filter(
+        (delivery) =>
+          cleanString(
+            delivery.status
+          ).toLowerCase() ===
+          "failed"
       ).length;
-
-
-    const admitted =
-      applications.filter(
-        (item) =>
-          item.final_decision ===
-            "ADMIT" ||
-          item.final_decision ===
-            "ADMIT WITH TRACK PLACEMENT"
-      ).length;
-
-
-    const waitlisted =
-      applications.filter(
-        (item) =>
-          item.final_decision ===
-          "WAITLIST"
-      ).length;
-
-
-    const genesis =
-      applications.filter(
-        (item) =>
-          item.assigned_track ===
-          "Genesis"
-      ).length;
-
-
-    const ascend =
-      applications.filter(
-        (item) =>
-          item.assigned_track ===
-          "Ascend"
-      ).length;
-
-
-    const horizon =
-      applications.filter(
-        (item) =>
-          item.assigned_track ===
-          "Horizon"
-      ).length;
-
-
-    const cohortCapacity =
-      30;
-
-
-    const remainingCapacity =
-      Math.max(
-        cohortCapacity -
-          admitted,
-        0
-      );
-
 
     return res
       .status(200)
       .json({
         success: true,
 
-        stats: {
-          totalApplications,
+        campaign: {
+          id:
+            campaign.id,
 
-          submitted,
+          title:
+            campaign.title ||
+            "",
 
-          underReview,
+          subject:
+            campaign.subject ||
+            "",
 
-          interviews,
-
-          matchingRequired,
-
-          admitted,
-
-          waitlisted,
-
-          genesis,
-
-          ascend,
-
-          horizon,
-
-          cohortCapacity,
-
-          remainingCapacity,
+          status:
+            campaign.status ||
+            CAMPAIGN_STATUS.DRAFT,
         },
 
+        deliveries,
 
-        /* ----------------------------------------------------
-           Compatibility fields for simpler admin dashboards
-        ----------------------------------------------------- */
+        count:
+          deliveries.length,
 
-        totalApplications,
+        acceptedCount,
 
-        submitted,
-
-        underReview,
-
-        interviews,
-
-        matchingRequired,
-
-        admitted,
-
-        waitlisted,
-
-        genesis,
-
-        ascend,
-
-        horizon,
-
-        cohortCapacity,
-
-        remainingCapacity,
+        failedCount,
       });
   } catch (error) {
     return sendServerError(
       res,
       error,
-      "Unable to load CFCV application statistics."
+      "Unable to load newsletter deliveries."
+    );
+  }
+}/* ============================================================
+   LOAD CAMPAIGN FOR DELIVERY
+============================================================ */
+
+async function loadCampaignForDelivery(
+  campaignId
+) {
+  const id =
+    cleanString(
+      campaignId
+    );
+
+  if (!id) {
+    return null;
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        CAMPAIGNS_TABLE
+      )
+      .select("*")
+      .eq(
+        "id",
+        id
+      )
+      .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data || null;
+}
+
+
+/* ============================================================
+   VALIDATE CAMPAIGN FOR DELIVERY
+============================================================ */
+
+function validateCampaignForDelivery(
+  campaign
+) {
+  if (!campaign) {
+    return [
+      "Newsletter campaign not found.",
+    ];
+  }
+
+  const normalized =
+    normalizeCampaignInput({
+      title:
+        campaign.title,
+
+      subject:
+        campaign.subject,
+
+      previewText:
+        campaign.preview_text,
+
+      featuredImage:
+        campaign.featured_image,
+
+      images:
+        campaign.images,
+
+      content:
+        campaign.content,
+
+      /*
+       * Required by the current database schema.
+       */
+      contentType:
+        campaign.content_type ||
+        DEFAULT_CONTENT_TYPE,
+
+      ctaText:
+        campaign.cta_text,
+
+      ctaLink:
+        campaign.cta_link,
+
+      audience:
+        DEFAULT_AUDIENCE,
+    });
+
+  return validateCampaign(
+    normalized
+  );
+}
+
+
+/* ============================================================
+   SEND TEST CAMPAIGN
+
+   Sends the newsletter to one email address only.
+
+   It does NOT:
+   - mark the campaign as sent
+   - change recipient counts
+   - send to subscribers
+============================================================ */
+
+async function sendTestCampaign(
+  req,
+  res
+) {
+  try {
+    const campaignId =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!campaignId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    /*
+     * Support both email and testEmail from the frontend.
+     */
+    const email =
+      normalizeEmail(
+        req.body?.email ||
+          req.body?.testEmail
+      );
+
+    if (
+      !isValidEmail(email)
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Please provide a valid test email address.",
+        });
+    }
+
+    const campaign =
+      await loadCampaignForDelivery(
+        campaignId
+      );
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is currently being sent.",
+        });
+    }
+
+    const validationErrors =
+      validateCampaignForDelivery(
+        campaign
+      );
+
+    if (
+      validationErrors.length >
+      0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validationErrors[0],
+
+          errors:
+            validationErrors,
+        });
+    }
+
+    const html =
+      buildNewsletterHtml(
+        campaign,
+        null
+      );
+
+    const text =
+      buildNewsletterText(
+        campaign,
+        null
+      );
+
+    const result =
+      await sendEmail({
+        to:
+          email,
+
+        subject:
+          campaign.subject,
+
+        html,
+
+        text,
+      });
+
+    /*
+     * Support sendEmail utilities that explicitly return
+     * { success: false } instead of throwing.
+     */
+    if (
+      result &&
+      result.success === false
+    ) {
+      return res
+        .status(502)
+        .json({
+          success: false,
+
+          message:
+            result.message ||
+            result.error ||
+            "The email provider did not accept the test email.",
+        });
+    }
+
+    const providerMessageId =
+      result?.messageId ||
+      result?.id ||
+      result?.data?.id ||
+      null;
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        message:
+          `Test newsletter sent to ${email}.`,
+
+        email,
+
+        providerMessageId,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to send the test newsletter."
+    );
+  }
+}
+
+
+/* ============================================================
+   GET ACTIVE SUBSCRIBERS FOR DELIVERY
+
+   Fixed audience:
+   ALL ACTIVE SUBSCRIBERS
+============================================================ */
+
+async function getActiveSubscribersForDelivery() {
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        SUBSCRIBERS_TABLE
+      )
+      .select("*")
+      .eq(
+        "status",
+        "subscribed"
+      )
+      .order(
+        "created_at",
+        {
+          ascending: true,
+        }
+      );
+
+  if (error) {
+    throw error;
+  }
+
+  return (
+    data || []
+  ).filter(
+    (subscriber) =>
+      isValidEmail(
+        subscriber.email
+      )
+  );
+}
+
+
+/* ============================================================
+   CREATE DELIVERY RECORD
+============================================================ */
+
+async function createDeliveryRecord({
+  campaignId,
+  subscriberId,
+  email,
+  status,
+  providerMessageId = null,
+  failureReason = null,
+  sentAt = null,
+  failedAt = null,
+}) {
+  const timestamp =
+    nowIso();
+
+  const payload = {
+    campaign_id:
+      campaignId,
+
+    subscriber_id:
+      subscriberId ||
+      null,
+
+    email:
+      normalizeEmail(
+        email
+      ),
+
+    status,
+
+    provider_message_id:
+      providerMessageId ||
+      null,
+
+    failure_reason:
+      failureReason ||
+      null,
+
+    sent_at:
+      sentAt ||
+      null,
+
+    /*
+     * Provider acceptance is not the same as confirmed delivery.
+     * Leave delivered_at empty until webhook support is added.
+     */
+    delivered_at:
+      null,
+
+    opened_at:
+      null,
+
+    clicked_at:
+      null,
+
+    failed_at:
+      failedAt ||
+      null,
+
+    created_at:
+      timestamp,
+
+    updated_at:
+      timestamp,
+  };
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        DELIVERIES_TABLE
+      )
+      .insert(
+        payload
+      )
+      .select("*")
+      .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+
+/* ============================================================
+   SAFE DELIVERY RECORD
+
+   A tracking-row failure should be logged separately from the
+   provider send result.
+============================================================ */
+
+async function safelyCreateDeliveryRecord(
+  payload
+) {
+  try {
+    return await createDeliveryRecord(
+      payload
+    );
+  } catch (error) {
+    console.error(
+      "[NEWSLETTER] Unable to create delivery record:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+/* ============================================================
+   UPDATE CAMPAIGN DELIVERY PROGRESS
+============================================================ */
+
+async function updateCampaignDeliveryProgress(
+  campaignId,
+  {
+    status,
+    recipientCount,
+    acceptedCount,
+    failedCount,
+    sentAt,
+  }
+) {
+  const updates = {
+    audience:
+      DEFAULT_AUDIENCE,
+
+    content_type:
+      DEFAULT_CONTENT_TYPE,
+
+    recipient_count:
+      Number(
+        recipientCount ||
+          0
+      ),
+
+    /*
+     * Existing schema uses delivered_count.
+     *
+     * Until provider webhooks are implemented, this field is
+     * being used as the provider-accepted count for backwards
+     * compatibility with the existing database.
+     */
+    delivered_count:
+      Number(
+        acceptedCount ||
+          0
+      ),
+
+    failed_count:
+      Number(
+        failedCount ||
+          0
+      ),
+
+    updated_at:
+      nowIso(),
+  };
+
+  if (status) {
+    updates.status =
+      status;
+  }
+
+  if (
+    sentAt !==
+    undefined
+  ) {
+    updates.sent_at =
+      sentAt;
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from(
+        CAMPAIGNS_TABLE
+      )
+      .update(
+        updates
+      )
+      .eq(
+        "id",
+        campaignId
+      )
+      .select("*")
+      .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+
+/* ============================================================
+   SEND CAMPAIGN TO ALL ACTIVE SUBSCRIBERS
+============================================================ */
+
+async function sendCampaign(
+  req,
+  res
+) {
+  let campaignId = "";
+
+  try {
+    campaignId =
+      cleanString(
+        req.params?.id
+      );
+
+    if (!campaignId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "Campaign ID is required.",
+        });
+    }
+
+    const campaign =
+      await loadCampaignForDelivery(
+        campaignId
+      );
+
+    if (!campaign) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+
+          message:
+            "Newsletter campaign not found.",
+        });
+    }
+
+    /*
+     * Prevent duplicate sends.
+     */
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENT
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter has already been sent. Duplicate it if you want to send it again.",
+        });
+    }
+
+    if (
+      campaign.status ===
+      CAMPAIGN_STATUS.SENDING
+    ) {
+      return res
+        .status(409)
+        .json({
+          success: false,
+
+          message:
+            "This newsletter is already being sent.",
+        });
+    }
+
+    const validationErrors =
+      validateCampaignForDelivery(
+        campaign
+      );
+
+    if (
+      validationErrors.length >
+      0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            validationErrors[0],
+
+          errors:
+            validationErrors,
+        });
+    }
+
+    const subscribers =
+      await getActiveSubscribersForDelivery();
+
+    const recipientCount =
+      subscribers.length;
+
+    if (
+      recipientCount === 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+
+          message:
+            "There are no active newsletter subscribers to receive this campaign.",
+        });
+    }
+
+    /*
+     * Mark the campaign as sending before processing recipients.
+     */
+    await updateCampaignDeliveryProgress(
+      campaignId,
+      {
+        status:
+          CAMPAIGN_STATUS.SENDING,
+
+        recipientCount,
+
+        acceptedCount:
+          0,
+
+        failedCount:
+          0,
+
+        sentAt:
+          null,
+      }
+    );
+
+    let acceptedCount = 0;
+    let failedCount = 0;
+
+    const results = [];
+
+    /*
+     * Send sequentially.
+     *
+     * This is intentionally conservative for the current small
+     * mailing list and helps avoid provider rate-limit bursts.
+     */
+    for (
+      let index = 0;
+      index <
+      subscribers.length;
+      index += 1
+    ) {
+      const subscriber =
+        subscribers[index];
+
+      const email =
+        normalizeEmail(
+          subscriber.email
+        );
+
+      try {
+        const html =
+          buildNewsletterHtml(
+            campaign,
+            subscriber
+          );
+
+        const text =
+          buildNewsletterText(
+            campaign,
+            subscriber
+          );
+
+        const result =
+          await sendEmail({
+            to:
+              email,
+
+            subject:
+              campaign.subject,
+
+            html,
+
+            text,
+          });
+
+        if (
+          result &&
+          result.success === false
+        ) {
+          throw new Error(
+            result.message ||
+              result.error ||
+              "The email provider rejected the message."
+          );
+        }
+
+        const providerMessageId =
+          result?.messageId ||
+          result?.id ||
+          result?.data?.id ||
+          null;
+
+        acceptedCount += 1;
+
+        const sentAt =
+          nowIso();
+
+        await safelyCreateDeliveryRecord({
+          campaignId,
+
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          /*
+           * "sent" means the provider accepted our send request.
+           * It does not prove inbox delivery.
+           */
+          status:
+            "sent",
+
+          providerMessageId,
+
+          sentAt,
+
+          failedAt:
+            null,
+
+          failureReason:
+            null,
+        });
+
+        results.push({
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          status:
+            "sent",
+
+          providerMessageId,
+        });
+      } catch (
+        recipientError
+      ) {
+        failedCount += 1;
+
+        const failureReason =
+          cleanString(
+            recipientError?.message,
+            "Unable to send newsletter."
+          );
+
+        await safelyCreateDeliveryRecord({
+          campaignId,
+
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          status:
+            "failed",
+
+          providerMessageId:
+            null,
+
+          sentAt:
+            null,
+
+          failedAt:
+            nowIso(),
+
+          failureReason,
+        });
+
+        results.push({
+          subscriberId:
+            subscriber.id,
+
+          email,
+
+          status:
+            "failed",
+
+          error:
+            failureReason,
+        });
+
+        console.error(
+          `[NEWSLETTER] Failed to send campaign ${campaignId} to ${email}:`,
+          recipientError
+        );
+      }
+
+      /*
+       * Update progress after each recipient.
+       */
+      try {
+        await updateCampaignDeliveryProgress(
+          campaignId,
+          {
+            status:
+              CAMPAIGN_STATUS.SENDING,
+
+            recipientCount,
+
+            acceptedCount,
+
+            failedCount,
+
+            sentAt:
+              null,
+          }
+        );
+      } catch (
+        progressError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to update campaign send progress:",
+          progressError
+        );
+      }
+
+      /*
+       * Avoid unnecessary delay after the final recipient.
+       */
+      if (
+        index <
+        subscribers.length -
+          1
+      ) {
+        await sleep(550);
+      }
+    }
+
+    /*
+     * If at least one email was accepted by the provider,
+     * consider the campaign send operation completed.
+     *
+     * If every send failed, mark the campaign failed.
+     */
+    const finalStatus =
+      acceptedCount > 0
+        ? CAMPAIGN_STATUS.SENT
+        : CAMPAIGN_STATUS.FAILED;
+
+    const sentAt =
+      acceptedCount > 0
+        ? nowIso()
+        : null;
+
+    const finalCampaign =
+      await updateCampaignDeliveryProgress(
+        campaignId,
+        {
+          status:
+            finalStatus,
+
+          recipientCount,
+
+          acceptedCount,
+
+          failedCount,
+
+          sentAt,
+        }
+      );
+
+    return res
+      .status(200)
+      .json({
+        success:
+          acceptedCount > 0,
+
+        message:
+          acceptedCount > 0
+            ? failedCount > 0
+              ? `Newsletter send completed. ${acceptedCount} accepted and ${failedCount} failed.`
+              : `Newsletter accepted for all ${acceptedCount} active subscribers.`
+            : "The newsletter could not be sent to any active subscriber.",
+
+        audience:
+          DEFAULT_AUDIENCE,
+
+        audienceLabel:
+          "All Active Subscribers",
+
+        recipientCount,
+
+        acceptedCount,
+
+        failedCount,
+
+        campaign:
+          normalizeCampaign(
+            finalCampaign
+          ),
+
+        results,
+      });
+  } catch (error) {
+    /*
+     * If the operation crashes after the campaign has been
+     * identified, make a best effort to mark it failed.
+     */
+    if (campaignId) {
+      try {
+        const current =
+          await loadCampaignForDelivery(
+            campaignId
+          );
+
+        if (
+          current &&
+          current.status ===
+            CAMPAIGN_STATUS.SENDING
+        ) {
+          await supabaseAdmin
+            .from(
+              CAMPAIGNS_TABLE
+            )
+            .update({
+              status:
+                CAMPAIGN_STATUS.FAILED,
+
+              updated_at:
+                nowIso(),
+            })
+            .eq(
+              "id",
+              campaignId
+            );
+        }
+      } catch (
+        recoveryError
+      ) {
+        console.error(
+          "[NEWSLETTER] Unable to recover failed campaign state:",
+          recoveryError
+        );
+      }
+    }
+
+    return sendServerError(
+      res,
+      error,
+      "Unable to send newsletter campaign."
+    );
+  }
+}
+
+
+/* ============================================================
+   NEWSLETTER ANALYTICS
+============================================================ */
+
+async function getNewsletterAnalytics(
+  req,
+  res
+) {
+  try {
+    /*
+     * Load subscriber totals.
+     */
+    const {
+      data:
+        subscriberRows,
+      error:
+        subscriberError,
+    } =
+      await supabaseAdmin
+        .from(
+          SUBSCRIBERS_TABLE
+        )
+        .select(
+          "id,status,created_at"
+        );
+
+    if (
+      subscriberError
+    ) {
+      throw subscriberError;
+    }
+
+    /*
+     * Load campaign totals.
+     */
+    const {
+      data:
+        campaignRows,
+      error:
+        campaignError,
+    } =
+      await supabaseAdmin
+        .from(
+          CAMPAIGNS_TABLE
+        )
+        .select(
+          "id,status,recipient_count,delivered_count,failed_count,opened_count,clicked_count,created_at,sent_at"
+        );
+
+    if (
+      campaignError
+    ) {
+      throw campaignError;
+    }
+
+    /*
+     * Load delivery totals.
+     */
+    const {
+      data:
+        deliveryRows,
+      error:
+        deliveryError,
+    } =
+      await supabaseAdmin
+        .from(
+          DELIVERIES_TABLE
+        )
+        .select(
+          "id,status,sent_at,delivered_at,opened_at,clicked_at,failed_at"
+        );
+
+    if (
+      deliveryError
+    ) {
+      throw deliveryError;
+    }
+
+    const subscribers =
+      subscriberRows || [];
+
+    const campaigns =
+      campaignRows || [];
+
+    const deliveries =
+      deliveryRows || [];
+
+
+    /* --------------------------------------------------------
+       SUBSCRIBERS
+    --------------------------------------------------------- */
+
+    const totalSubscribers =
+      subscribers.length;
+
+    const activeSubscribers =
+      subscribers.filter(
+        (subscriber) =>
+          cleanString(
+            subscriber.status
+          ).toLowerCase() ===
+          "subscribed"
+      ).length;
+
+    const unsubscribedSubscribers =
+      subscribers.filter(
+        (subscriber) =>
+          cleanString(
+            subscriber.status
+          ).toLowerCase() ===
+          "unsubscribed"
+      ).length;
+
+
+    /* --------------------------------------------------------
+       CAMPAIGNS
+    --------------------------------------------------------- */
+
+    const totalCampaigns =
+      campaigns.length;
+
+    const draftCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.DRAFT
+      ).length;
+
+    const scheduledCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SCHEDULED
+      ).length;
+
+    const sendingCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SENDING
+      ).length;
+
+    const sentCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.SENT
+      ).length;
+
+    const failedCampaigns =
+      campaigns.filter(
+        (campaign) =>
+          campaign.status ===
+          CAMPAIGN_STATUS.FAILED
+      ).length;
+
+
+    /* --------------------------------------------------------
+       DELIVERY
+
+       "sent" currently means provider accepted the send request.
+       Confirmed delivered/opened/clicked data requires webhooks.
+    --------------------------------------------------------- */
+
+    const recipients =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.recipient_count ||
+              0
+          ),
+        0
+      );
+
+    const acceptedFromCampaigns =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.delivered_count ||
+              0
+          ),
+        0
+      );
+
+    const failedFromCampaigns =
+      campaigns.reduce(
+        (
+          total,
+          campaign
+        ) =>
+          total +
+          Number(
+            campaign.failed_count ||
+              0
+          ),
+        0
+      );
+
+    const acceptedDeliveryRows =
+      deliveries.filter(
+        (delivery) =>
+          [
+            "sent",
+            "accepted",
+            "delivered",
+          ].includes(
+            cleanString(
+              delivery.status
+            ).toLowerCase()
+          )
+      ).length;
+
+    const failedDeliveryRows =
+      deliveries.filter(
+        (delivery) =>
+          cleanString(
+            delivery.status
+          ).toLowerCase() ===
+          "failed"
+      ).length;
+
+    const confirmedDelivered =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.delivered_at
+          )
+      ).length;
+
+    const opened =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.opened_at
+          )
+      ).length;
+
+    const clicked =
+      deliveries.filter(
+        (delivery) =>
+          Boolean(
+            delivery.clicked_at
+          )
+      ).length;
+
+    /*
+     * Prefer actual delivery rows when available.
+     * Otherwise use campaign aggregate fields.
+     */
+    const accepted =
+      deliveries.length > 0
+        ? acceptedDeliveryRows
+        : acceptedFromCampaigns;
+
+    const failed =
+      deliveries.length > 0
+        ? failedDeliveryRows
+        : failedFromCampaigns;
+
+    const acceptanceRate =
+      recipients > 0
+        ? Number(
+            (
+              (
+                accepted /
+                recipients
+              ) *
+              100
+            ).toFixed(2)
+          )
+        : 0;
+
+    const failureRate =
+      recipients > 0
+        ? Number(
+            (
+              (
+                failed /
+                recipients
+              ) *
+              100
+            ).toFixed(2)
+          )
+        : 0;
+
+
+    /* --------------------------------------------------------
+       RESPONSE
+    --------------------------------------------------------- */
+
+    return res
+      .status(200)
+      .json({
+        success: true,
+
+        subscribers: {
+          total:
+            totalSubscribers,
+
+          active:
+            activeSubscribers,
+
+          unsubscribed:
+            unsubscribedSubscribers,
+        },
+
+        campaigns: {
+          total:
+            totalCampaigns,
+
+          draft:
+            draftCampaigns,
+
+          scheduled:
+            scheduledCampaigns,
+
+          sending:
+            sendingCampaigns,
+
+          sent:
+            sentCampaigns,
+
+          failed:
+            failedCampaigns,
+        },
+
+        delivery: {
+          recipients,
+
+          /*
+           * Provider accepted.
+           */
+          accepted,
+
+          failed,
+
+          /*
+           * These remain zero unless delivery/webhook events
+           * populate the relevant timestamps.
+           */
+          confirmedDelivered,
+
+          opened,
+
+          clicked,
+
+          acceptanceRate,
+
+          failureRate,
+        },
+
+        /*
+         * Compatibility values for older admin UI code.
+         */
+        totalSubscribers,
+
+        activeSubscribers,
+
+        totalCampaigns,
+
+        draftCampaigns,
+
+        scheduledCampaigns,
+
+        sentCampaigns,
+
+        failedCampaigns,
+
+        totalRecipients:
+          recipients,
+
+        totalAccepted:
+          accepted,
+
+        totalDelivered:
+          accepted,
+
+        totalFailed:
+          failed,
+
+        totalOpened:
+          opened,
+
+        totalClicked:
+          clicked,
+      });
+  } catch (error) {
+    return sendServerError(
+      res,
+      error,
+      "Unable to load newsletter analytics."
     );
   }
 }
@@ -3230,16 +5091,57 @@ async function getApplicationStats(
 
 module.exports = {
   /*
-   * Public
+   * Public subscriber endpoints
    */
-  createApplication,
+  subscribe,
+  unsubscribe,
 
   /*
-   * Admin
+   * Admin subscriber management
    */
-  getApplications,
-  getApplicationById,
-  getApplicationResume,
-  updateApplication,
-  getApplicationStats,
+  getSubscribers,
+  updateSubscriber,
+  deleteSubscriber,
+
+  /*
+   * Newsletter images
+   */
+  uploadNewsletterImage,
+
+  /*
+   * Campaign management
+   */
+  getCampaigns,
+  getCampaign,
+  createCampaign,
+  updateCampaign,
+  deleteCampaign,
+  duplicateCampaign,
+
+  /*
+   * Audience / recipients
+   */
+  getCampaignRecipientCount,
+
+  /*
+   * Scheduling
+   */
+  scheduleCampaign,
+  cancelScheduledCampaign,
+
+  /*
+   * Sending
+   */
+  sendTestCampaign,
+  sendCampaign,
+
+  /*
+   * Delivery records
+   */
+  getCampaignDeliveries,
+
+  /*
+   * Analytics
+   */
+  getNewsletterAnalytics,
 };

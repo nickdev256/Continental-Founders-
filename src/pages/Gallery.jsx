@@ -878,7 +878,7 @@ const handleCarouselPointerDown =
             </p>
           </div>
           <br />
-          <br />
+         
 
           <h1>
             Stories
@@ -887,6 +887,7 @@ const handleCarouselPointerDown =
             <br />
             Journey Together
           </h1>
+          <br />
 
           <p className="gallery-hero__description">
             Explore moments from

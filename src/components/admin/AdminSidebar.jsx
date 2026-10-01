@@ -1,13 +1,13 @@
 import React, {
   useState,
+  useEffect,
+  useRef,
 } from "react";
-
 import {
   NavLink,
   Link,
   useNavigate,
 } from "react-router-dom";
-
 import {
   LayoutDashboard,
   CalendarDays,
@@ -29,24 +29,17 @@ import {
   ClipboardCheck,
   Images,
 } from "lucide-react";
-
 import "./AdminSidebar.css";
-
-
 /* ============================================================
    API
-============================================================ */
-
+= =========================================================== */
 const API_URL = (
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000"
 ).replace(/\/+$/, "");
-
-
 /* ============================================================
    OVERVIEW NAVIGATION
-============================================================ */
-
+= =========================================================== */
 const overviewNavigation = [
   {
     label: "Dashboard",
@@ -57,12 +50,9 @@ const overviewNavigation = [
     end: true,
   },
 ];
-
-
 /* ============================================================
    VENTURE & FELLOWSHIP
-============================================================ */
-
+= =========================================================== */
 const ventureNavigation = [
   {
     label: "Ventures",
@@ -71,7 +61,6 @@ const ventureNavigation = [
     path: "/admin/ventures",
     icon: BriefcaseBusiness,
   },
-
   {
     label: "CFCV Admissions",
     description:
@@ -80,12 +69,9 @@ const ventureNavigation = [
     icon: ClipboardCheck,
   },
 ];
-
-
 /* ============================================================
    CONTENT & COMMUNICATIONS
-============================================================ */
-
+= =========================================================== */
 const contentNavigation = [
   {
     label: "Events",
@@ -94,7 +80,6 @@ const contentNavigation = [
     path: "/admin/events",
     icon: CalendarDays,
   },
-
   {
     label: "Insights",
     description:
@@ -102,7 +87,6 @@ const contentNavigation = [
     path: "/admin/insights",
     icon: Newspaper,
   },
-
   {
     label: "Gallery",
     description:
@@ -110,7 +94,6 @@ const contentNavigation = [
     path: "/admin/gallery",
     icon: Images,
   },
-
   {
     label: "Newsletter",
     description:
@@ -119,12 +102,9 @@ const contentNavigation = [
     icon: Mail,
   },
 ];
-
-
 /* ============================================================
    RELATIONSHIPS
-============================================================ */
-
+= =========================================================== */
 const relationshipNavigation = [
   {
     label: "Contacts",
@@ -133,7 +113,6 @@ const relationshipNavigation = [
     path: "/admin/contacts",
     icon: MessageSquareText,
   },
-
   {
     label: "Universities",
     description:
@@ -142,12 +121,9 @@ const relationshipNavigation = [
     icon: GraduationCap,
   },
 ];
-
-
 /* ============================================================
    PARTNERSHIPS
-============================================================ */
-
+= =========================================================== */
 const partnerNavigation = [
   {
     label:
@@ -156,7 +132,6 @@ const partnerNavigation = [
       "/admin/partners/us-africa-trade-network",
     icon: Globe2,
   },
-
   {
     label:
       "Corporate Partners",
@@ -164,7 +139,6 @@ const partnerNavigation = [
       "/admin/partners/corporate",
     icon: Building2,
   },
-
   {
     label:
       "Government & Development",
@@ -173,12 +147,9 @@ const partnerNavigation = [
     icon: Landmark,
   },
 ];
-
-
 /* ============================================================
    ORGANIZATION
-============================================================ */
-
+= =========================================================== */
 const organizationNavigation = [
   {
     label: "About",
@@ -187,7 +158,6 @@ const organizationNavigation = [
     path: "/admin/about",
     icon: FileText,
   },
-
   {
     label: "Leadership",
     description:
@@ -196,104 +166,119 @@ const organizationNavigation = [
     icon: Users,
   },
 ];
-
-
 /* ============================================================
    SIDEBAR
-============================================================ */
-
+= =========================================================== */
 export default function AdminSidebar({
   open = false,
   onClose,
 }) {
   const navigate =
     useNavigate();
+  const sidebarRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(max-width: 850px)").matches
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 850px)");
+    const update = () => setIsMobile(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (sidebar) sidebar.inert = isMobile && !open;
+  }, [isMobile, open]);
+
+  useEffect(() => {
+    if (!isMobile || !open) return;
+    const previousFocus = document.activeElement;
+    closeButtonRef.current?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose?.();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+        previousFocus.focus();
+      }
+    };
+  }, [isMobile, open, onClose]);
 
   const [
     loggingOut,
     setLoggingOut,
   ] = useState(false);
-
   const [
     logoutError,
     setLogoutError,
   ] = useState("");
-
-
   /* ==========================================================
      CLEAR LOCAL AUTH
   ========================================================== */
-
   function clearLocalAuthState() {
     localStorage.removeItem(
       "cf_admin_user"
     );
-
     localStorage.removeItem(
       "cf_admin_token"
     );
-
     sessionStorage.removeItem(
       "cf_pending_admin_email"
     );
-
     sessionStorage.removeItem(
       "cf_otp_purpose"
     );
   }
-
-
   /* ==========================================================
      LOGOUT
   ========================================================== */
-
   async function handleLogout() {
     if (loggingOut) {
       return;
     }
-
     setLoggingOut(true);
     setLogoutError("");
-
     try {
       const response =
         await fetch(
           `${API_URL}/api/auth/logout`,
           {
             method: "POST",
-
             credentials:
               "include",
-
             headers: {
               Accept:
                 "application/json",
             },
           }
         );
-
       let result = null;
-
       try {
         result =
           await response.json();
       } catch {
         result = null;
       }
-
       if (!response.ok) {
         throw new Error(
           result?.message ||
             "Unable to sign out securely."
         );
       }
-
       clearLocalAuthState();
-
       if (onClose) {
         onClose();
       }
-
       navigate(
         "/admin/login",
         {
@@ -305,14 +290,11 @@ export default function AdminSidebar({
         "Admin logout error:",
         error
       );
-
       clearLocalAuthState();
-
       setLogoutError(
         error?.message ||
           "Unable to sign out. Please try again."
       );
-
       navigate(
         "/admin/login",
         {
@@ -323,30 +305,23 @@ export default function AdminSidebar({
       setLoggingOut(false);
     }
   }
-
-
   /* ==========================================================
      CLOSE AFTER NAVIGATION
   ========================================================== */
-
   function handleNavigation() {
     if (onClose) {
       onClose();
     }
   }
-
-
   /* ==========================================================
      NAVIGATION ITEM
   ========================================================== */
-
   function renderNavItem(
     item,
     compact = false
   ) {
     const Icon =
       item.icon;
-
     return (
       <NavLink
         key={item.path}
@@ -358,11 +333,9 @@ export default function AdminSidebar({
         }) =>
           [
             "admin-sidebar__link",
-
             compact
               ? "admin-sidebar__link--compact"
               : "",
-
             isActive
               ? "admin-sidebar__link--active"
               : "",
@@ -380,12 +353,10 @@ export default function AdminSidebar({
             strokeWidth={1.8}
           />
         </span>
-
         <span className="admin-sidebar__link-content">
           <span className="admin-sidebar__link-title">
             {item.label}
           </span>
-
           {item.description &&
             !compact && (
               <span className="admin-sidebar__link-description">
@@ -395,7 +366,6 @@ export default function AdminSidebar({
               </span>
             )}
         </span>
-
         <ChevronRight
           className="admin-sidebar__link-chevron"
           size={14}
@@ -405,12 +375,9 @@ export default function AdminSidebar({
       </NavLink>
     );
   }
-
-
   /* ==========================================================
      NAVIGATION SECTION
   ========================================================== */
-
   function renderSection({
     title,
     items,
@@ -422,13 +389,11 @@ export default function AdminSidebar({
           <span>
             {title}
           </span>
-
           <span
             className="admin-sidebar__section-line"
             aria-hidden="true"
           />
         </div>
-
         <div className="admin-sidebar__section-links">
           {items.map(
             (item) =>
@@ -441,14 +406,14 @@ export default function AdminSidebar({
       </div>
     );
   }
-
-
   /* ==========================================================
      RENDER
   ========================================================== */
-
   return (
     <aside
+      ref={sidebarRef}
+      id="admin-sidebar"
+      aria-hidden={isMobile && !open ? true : undefined}
       className={
         open
           ? "admin-sidebar admin-sidebar--open"
@@ -456,11 +421,9 @@ export default function AdminSidebar({
       }
       aria-label="Continental Founders administration"
     >
-
       {/* ======================================================
           BRAND
       ====================================================== */}
-
       <header className="admin-sidebar__header">
         <Link
           to="/"
@@ -474,9 +437,9 @@ export default function AdminSidebar({
             className="admin-sidebar__logo"
           />
         </Link>
-
         <button
           type="button"
+          ref={closeButtonRef}
           className="admin-sidebar__close"
           onClick={onClose}
           aria-label="Close administration menu"
@@ -487,12 +450,9 @@ export default function AdminSidebar({
           />
         </button>
       </header>
-
-
       {/* ======================================================
           ADMIN IDENTITY
       ====================================================== */}
-
       <div className="admin-sidebar__identity">
         <div className="admin-sidebar__identity-top">
           <ShieldCheck
@@ -500,16 +460,13 @@ export default function AdminSidebar({
             size={17}
             strokeWidth={1.8}
           />
-
           <span className="admin-sidebar__eyebrow">
             ADMINISTRATION
           </span>
         </div>
-
         <h1>
           Content Management
         </h1>
-
         <p>
           Manage ventures, CFCV
           admissions, institutional
@@ -519,12 +476,9 @@ export default function AdminSidebar({
           information.
         </p>
       </div>
-
-
       {/* ======================================================
           NAVIGATION
       ====================================================== */}
-
       <nav
         className="admin-sidebar__nav"
         aria-label="CMS navigation"
@@ -534,28 +488,24 @@ export default function AdminSidebar({
           items:
             overviewNavigation,
         })}
-
         {renderSection({
           title:
             "VENTURE & FELLOWSHIP",
           items:
             ventureNavigation,
         })}
-
         {renderSection({
           title:
             "CONTENT & COMMUNICATIONS",
           items:
             contentNavigation,
         })}
-
         {renderSection({
           title:
             "RELATIONSHIPS",
           items:
             relationshipNavigation,
         })}
-
         {renderSection({
           title:
             "PARTNERSHIPS",
@@ -563,7 +513,6 @@ export default function AdminSidebar({
             partnerNavigation,
           compact: true,
         })}
-
         {renderSection({
           title:
             "ORGANIZATION",
@@ -571,18 +520,13 @@ export default function AdminSidebar({
             organizationNavigation,
         })}
       </nav>
-
-
       {/* ======================================================
           BOTTOM AREA
       ====================================================== */}
-
       <footer className="admin-sidebar__bottom">
-
         {/* ====================================================
             PUBLIC QUICK ACCESS
         ==================================================== */}
-
         <div className="admin-sidebar__quick-actions">
           <Link
             to="/cfcv"
@@ -593,12 +537,10 @@ export default function AdminSidebar({
               size={16}
               strokeWidth={1.8}
             />
-
             <span>
               View CFCV
             </span>
           </Link>
-
           <Link
             to="/gallery"
             className="admin-sidebar__utility-link"
@@ -608,12 +550,10 @@ export default function AdminSidebar({
               size={16}
               strokeWidth={1.8}
             />
-
             <span>
               View Gallery
             </span>
           </Link>
-
           <Link
             to="/ventures"
             className="admin-sidebar__utility-link"
@@ -623,12 +563,10 @@ export default function AdminSidebar({
               size={16}
               strokeWidth={1.8}
             />
-
             <span>
               View Ventures
             </span>
           </Link>
-
           <Link
             to="/strategic-partners"
             className="admin-sidebar__utility-link"
@@ -638,12 +576,10 @@ export default function AdminSidebar({
               size={16}
               strokeWidth={1.8}
             />
-
             <span>
               View Partners
             </span>
           </Link>
-
           <Link
             to="/"
             className="admin-sidebar__utility-link"
@@ -653,18 +589,14 @@ export default function AdminSidebar({
               size={16}
               strokeWidth={1.8}
             />
-
             <span>
               View Public Website
             </span>
           </Link>
         </div>
-
-
         {/* ====================================================
             LOGOUT
         ==================================================== */}
-
         <div className="admin-sidebar__logout-wrap">
           <button
             type="button"
@@ -680,14 +612,12 @@ export default function AdminSidebar({
               size={17}
               strokeWidth={1.8}
             />
-
             <span>
               {loggingOut
                 ? "Signing out..."
                 : "Sign out"}
             </span>
           </button>
-
           {logoutError && (
             <p
               className="admin-sidebar__logout-error"
@@ -697,17 +627,13 @@ export default function AdminSidebar({
             </p>
           )}
         </div>
-
-
         {/* ====================================================
             FOOTER COPY
         ==================================================== */}
-
         <div className="admin-sidebar__footer-copy">
           <strong>
             Continental Founders™
           </strong>
-
           <span>
             Secure CMS Administration
           </span>

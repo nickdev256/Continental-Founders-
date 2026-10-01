@@ -216,17 +216,26 @@
 
 }
 
-.gallery-hero__eyebrow span {
 
-  display: block;
+.gallery-hero {
+  position: relative;
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  padding:
+    110px
+    clamp(24px, 6vw, 100px)
+    70px;
 
-  width: 42px;
+  overflow: hidden;
 
-  height: 2px;
-
-  background: var(--gallery-gold);
-
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
+
+
 
 .gallery-hero__eyebrow p {
 
@@ -241,6 +250,7 @@
   letter-spacing: 0.13em;
 
   text-transform: uppercase;
+  color: #c69605;
 
 }
 
@@ -322,6 +332,115 @@
 
 }
 
+
+
+/* ============================================================
+   HERO PHOTO SLIDESHOW
+============================================================ */
+
+.gallery-hero__slideshow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.gallery-hero__slide {
+  position: absolute;
+  inset: 0;
+
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  opacity: 0;
+  transform: scale(1.12);
+
+  animation: galleryHeroZoomOut 20s infinite;
+}
+
+/* PHOTO 1 */
+.gallery-hero__slide--1 {
+  background-image: url("/assets/q.jpg");
+  animation-delay: 0s;
+}
+
+/* PHOTO 2 */
+.gallery-hero__slide--2 {
+  background-image: url("/public/assets/gallery/DZ9A1311.jpg");
+  animation-delay: 5s;
+}
+
+/* PHOTO 3 */
+.gallery-hero__slide--3 {
+  background-image: url("public/assets/gallery/DZ9A0696.jpg");
+  animation-delay: 10s;
+}
+
+/* PHOTO 4 */
+.gallery-hero__slide--4 {
+  background-image: url("public/assets/gallery/DZ9A0973.jpg");
+  animation-delay: 15s;
+}
+
+
+/* ============================================================
+   SMOOTH FADE + ZOOM OUT
+============================================================ */
+
+@keyframes galleryHeroZoomOut {
+
+  /* Start zoomed in */
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+
+  /* Smoothly appear */
+  5% {
+    opacity: 1;
+    transform: scale(1.10);
+  }
+
+  /* Continue slowly zooming out */
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Fade away */
+  30% {
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+
+.gallery-hero__overlay {
+  position: absolute;
+  inset: 0;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4, 17, 16, 0.88) 0%,
+      rgba(4, 17, 16, 0.68) 45%,
+      rgba(4, 17, 16, 0.38) 100%
+    );
+}
+
+
+
+
 /* ============================================================
 
    HERO SIDE MARK
@@ -375,6 +494,24 @@
     rgba(201, 149, 46, 0.55);
 
 }
+
+
+
+.gallery-hero__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(4, 17, 16, 0.88) 0%,
+      rgba(4, 17, 16, 0.68) 45%,
+      rgba(4, 17, 16, 0.38) 100%
+    );
+}
+
 
 .gallery-hero__mark span {
 
@@ -3405,4 +3542,809 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   3D CMS GALLERY CAROUSEL
+============================================================ */
+
+.gallery-carousel {
+  --carousel-height: 610px;
+  --center-width: 330px;
+  --center-height: 500px;
+
+  position: relative;
+
+  width: 100%;
+  height: var(--carousel-height);
+
+  margin-top: 42px;
+
+  overflow: hidden;
+
+  border-radius: 2px;
+
+  background: #071816;
+
+  touch-action: pan-y;
+
+  user-select: none;
+
+  cursor: grab;
+}
+
+.gallery-carousel:active {
+  cursor: grabbing;
+}
+
+
+/* ============================================================
+   BLURRED BACKGROUND
+============================================================ */
+
+.gallery-carousel__background {
+  position: absolute;
+
+  inset: -70px;
+
+  z-index: 0;
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  filter: blur(25px);
+
+  transform: scale(1.08);
+
+  opacity: 0.62;
+
+  transition:
+    background-image 0.45s ease,
+    opacity 0.45s ease;
+}
+
+.gallery-carousel__background-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 17, 16, 0.86) 0%,
+      rgba(3, 17, 16, 0.55) 32%,
+      rgba(3, 17, 16, 0.30) 50%,
+      rgba(3, 17, 16, 0.55) 68%,
+      rgba(3, 17, 16, 0.86) 100%
+    );
+}
+
+
+/* ============================================================
+   CAROUSEL STAGE
+============================================================ */
+
+.gallery-carousel__stage {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 3;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  perspective: 1400px;
+
+  perspective-origin: center center;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   INDIVIDUAL CARDS
+============================================================ */
+
+.gallery-carousel__item {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  width: var(--center-width);
+  height: var(--center-height);
+
+  margin: 0;
+
+  transform-style: preserve-3d;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.65s
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      ),
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    z-index 0s;
+
+  will-change:
+    transform,
+    opacity;
+}
+
+
+/* ============================================================
+   CENTER IMAGE
+============================================================ */
+
+.gallery-carousel__item.is-center {
+  z-index: 10;
+
+  transform:
+    translate3d(
+      -50%,
+      -50%,
+      80px
+    )
+    rotateY(0deg)
+    rotateZ(0deg)
+    scale(1);
+
+  opacity: 1;
+
+  filter: none;
+}
+
+
+/* ============================================================
+   LEFT IMAGE #1
+============================================================ */
+
+.gallery-carousel__item.is-left-1 {
+  z-index: 8;
+
+  transform:
+    translate3d(
+      calc(-50% - 205px),
+      -50%,
+      0
+    )
+    rotateY(14deg)
+    rotateZ(-1deg)
+    scale(0.87);
+
+  opacity: 0.96;
+
+  filter: brightness(0.82);
+}
+
+
+/* ============================================================
+   RIGHT IMAGE #1
+============================================================ */
+
+.gallery-carousel__item.is-right-1 {
+  z-index: 8;
+
+  transform:
+    translate3d(
+      calc(-50% + 205px),
+      -50%,
+      0
+    )
+    rotateY(-14deg)
+    rotateZ(1deg)
+    scale(0.87);
+
+  opacity: 0.96;
+
+  filter: brightness(0.82);
+}
+
+
+/* ============================================================
+   LEFT IMAGE #2
+============================================================ */
+
+.gallery-carousel__item.is-left-2 {
+  z-index: 6;
+
+  transform:
+    translate3d(
+      calc(-50% - 395px),
+      -50%,
+      -40px
+    )
+    rotateY(21deg)
+    rotateZ(-2deg)
+    scale(0.72);
+
+  opacity: 0.68;
+
+  filter: brightness(0.58);
+}
+
+
+/* ============================================================
+   RIGHT IMAGE #2
+============================================================ */
+
+.gallery-carousel__item.is-right-2 {
+  z-index: 6;
+
+  transform:
+    translate3d(
+      calc(-50% + 395px),
+      -50%,
+      -40px
+    )
+    rotateY(-21deg)
+    rotateZ(2deg)
+    scale(0.72);
+
+  opacity: 0.68;
+
+  filter: brightness(0.58);
+}
+
+
+/* ============================================================
+   IMAGE FRAME
+============================================================ */
+
+.gallery-carousel__image-wrap {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  border-radius: 2px;
+
+  background: #101817;
+
+  box-shadow:
+    0 28px 55px
+      rgba(0, 0, 0, 0.34);
+
+  transition:
+    box-shadow 0.45s ease;
+}
+
+.gallery-carousel__item.is-center
+.gallery-carousel__image-wrap {
+  box-shadow:
+    0 32px 75px
+      rgba(0, 0, 0, 0.48);
+}
+
+
+/* ============================================================
+   IMAGE
+============================================================ */
+
+.gallery-carousel__image {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  pointer-events: none;
+
+  -webkit-user-drag: none;
+
+  user-select: none;
+
+  transition:
+    transform 0.8s
+      cubic-bezier(
+        0.22,
+        1,
+        0.36,
+        1
+      );
+}
+
+.gallery-carousel__item.is-center
+.gallery-carousel__image {
+  transform: scale(1.015);
+}
+
+.gallery-carousel__item.is-center:hover
+.gallery-carousel__image {
+  transform: scale(1.045);
+}
+
+
+/* ============================================================
+   IMAGE DARK SHADE
+============================================================ */
+
+.gallery-carousel__shade {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.04) 30%,
+      rgba(0, 0, 0, 0.70) 100%
+    );
+}
+
+
+/* ============================================================
+   CENTER IMAGE INFORMATION
+============================================================ */
+
+.gallery-carousel__info {
+  position: absolute;
+
+  left: 28px;
+  right: 28px;
+  bottom: 30px;
+
+  z-index: 5;
+
+  color: #ffffff;
+
+  text-align: left;
+
+  pointer-events: none;
+}
+
+.gallery-carousel__category {
+  display: inline-block;
+
+  margin-bottom: 11px;
+
+  font-size: 0.68rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+
+  color: #ffffff;
+
+  opacity: 0.85;
+}
+
+.gallery-carousel__info h2 {
+  margin: 0;
+
+  max-width: 280px;
+
+  font-size: clamp(
+    1.65rem,
+    3vw,
+    2.5rem
+  );
+
+  line-height: 1.05;
+
+  letter-spacing: -0.025em;
+
+  font-weight: 700;
+
+  color: #ffffff;
+
+  text-shadow:
+    0 2px 16px
+      rgba(0, 0, 0, 0.35);
+}
+
+.gallery-carousel__info p {
+  margin: 12px 0 0;
+
+  max-width: 270px;
+
+  font-size: 0.85rem;
+
+  line-height: 1.55;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.88
+  );
+}
+
+.gallery-carousel__line {
+  display: block;
+
+  width: 40px;
+  height: 2px;
+
+  margin-top: 17px;
+
+  background: #c9952e;
+}
+
+.gallery-carousel__hint {
+  display: block;
+
+  margin-top: 9px;
+
+  font-size: 0.65rem;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+
+  color: rgba(
+    255,
+    255,
+    255,
+    0.62
+  );
+}
+
+
+/* ============================================================
+   ARROWS
+============================================================ */
+
+.gallery-carousel__arrow {
+  position: absolute;
+
+  top: 50%;
+
+  z-index: 20;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 52px;
+  height: 52px;
+
+  padding: 0;
+
+  border: 1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.32
+    );
+
+  border-radius: 50%;
+
+  background:
+    rgba(
+      8,
+      22,
+      20,
+      0.42
+    );
+
+  color: #ffffff;
+
+  backdrop-filter: blur(8px);
+
+  -webkit-backdrop-filter: blur(8px);
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%);
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.gallery-carousel__arrow:hover {
+  background:
+    rgba(
+      8,
+      22,
+      20,
+      0.78
+    );
+
+  border-color:
+    rgba(
+      255,
+      255,
+      255,
+      0.7
+    );
+
+  transform:
+    translateY(-50%)
+    scale(1.05);
+}
+
+.gallery-carousel__arrow--left {
+  left: 24px;
+}
+
+.gallery-carousel__arrow--right {
+  right: 24px;
+}
+
+
+/* ============================================================
+   COUNTER
+============================================================ */
+
+.gallery-carousel__counter {
+  position: absolute;
+
+  left: 50%;
+  bottom: 22px;
+
+  z-index: 20;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transform:
+    translateX(-50%);
+
+  font-size: 0.78rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+}
+
+.gallery-carousel__counter span:first-child {
+  color: #ffffff;
+}
+
+.gallery-carousel__counter-divider {
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.4
+    );
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .gallery-carousel {
+    --carousel-height: 550px;
+    --center-width: 290px;
+    --center-height: 440px;
+  }
+
+  .gallery-carousel__item.is-left-1 {
+    transform:
+      translate3d(
+        calc(-50% - 175px),
+        -50%,
+        0
+      )
+      rotateY(13deg)
+      scale(0.82);
+  }
+
+  .gallery-carousel__item.is-right-1 {
+    transform:
+      translate3d(
+        calc(-50% + 175px),
+        -50%,
+        0
+      )
+      rotateY(-13deg)
+      scale(0.82);
+  }
+
+  .gallery-carousel__item.is-left-2 {
+    transform:
+      translate3d(
+        calc(-50% - 320px),
+        -50%,
+        -40px
+      )
+      rotateY(18deg)
+      scale(0.66);
+  }
+
+  .gallery-carousel__item.is-right-2 {
+    transform:
+      translate3d(
+        calc(-50% + 320px),
+        -50%,
+        -40px
+      )
+      rotateY(-18deg)
+      scale(0.66);
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .gallery-carousel {
+    --carousel-height: 500px;
+    --center-width: min(
+      72vw,
+      280px
+    );
+    --center-height: 400px;
+
+    margin-top: 28px;
+
+    border-radius: 0;
+  }
+
+  .gallery-carousel__item.is-left-1 {
+    transform:
+      translate3d(
+        calc(-50% - 135px),
+        -50%,
+        0
+      )
+      rotateY(14deg)
+      rotateZ(-2deg)
+      scale(0.72);
+
+    opacity: 0.7;
+  }
+
+  .gallery-carousel__item.is-right-1 {
+    transform:
+      translate3d(
+        calc(-50% + 135px),
+        -50%,
+        0
+      )
+      rotateY(-14deg)
+      rotateZ(2deg)
+      scale(0.72);
+
+    opacity: 0.7;
+  }
+
+  .gallery-carousel__item.is-left-2,
+  .gallery-carousel__item.is-right-2 {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gallery-carousel__arrow {
+    width: 44px;
+    height: 44px;
+  }
+
+  .gallery-carousel__arrow--left {
+    left: 12px;
+  }
+
+  .gallery-carousel__arrow--right {
+    right: 12px;
+  }
+
+  .gallery-carousel__info {
+    left: 21px;
+    right: 21px;
+    bottom: 25px;
+  }
+
+  .gallery-carousel__info h2 {
+    font-size: 1.65rem;
+  }
+
+  .gallery-carousel__info p {
+    font-size: 0.78rem;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL PHONES
+============================================================ */
+
+@media (max-width: 430px) {
+
+  .gallery-carousel {
+    --carousel-height: 470px;
+    --center-width: 250px;
+    --center-height: 370px;
+  }
+
+  .gallery-carousel__item.is-left-1 {
+    transform:
+      translate3d(
+        calc(-50% - 118px),
+        -50%,
+        0
+      )
+      rotateY(14deg)
+      scale(0.68);
+  }
+
+  .gallery-carousel__item.is-right-1 {
+    transform:
+      translate3d(
+        calc(-50% + 118px),
+        -50%,
+        0
+      )
+      rotateY(-14deg)
+      scale(0.68);
+  }
+
+  .gallery-carousel__arrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .gallery-carousel__arrow--left {
+    left: 8px;
+  }
+
+  .gallery-carousel__arrow--right {
+    right: 8px;
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (
+  prefers-reduced-motion: reduce
+) {
+
+  .gallery-carousel__item,
+  .gallery-carousel__image,
+  .gallery-carousel__background {
+    transition: none;
+  }
+
 }

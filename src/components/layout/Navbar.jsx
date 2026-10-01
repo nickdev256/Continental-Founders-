@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   ChevronDown,
   Search,
+  Rocket,
 } from "lucide-react";
 
 import {
@@ -25,135 +26,134 @@ import {
 import "./Navbar.css";
 
 
-// ============================================================
-// SEARCHABLE SITE CONTENT
-// ============================================================
+/* ============================================================
+   SEARCHABLE SITE CONTENT
+============================================================ */
 
 const searchItems = [
   {
     title: "About Continental Founders",
-
     description:
       "Learn about Continental Founders, our mission, vision, leadership, purpose, and global ecosystem.",
-
     url: "/about",
   },
 
   {
     title: "Ventures",
-
     description:
       "Discover founders and ventures building practical and scalable solutions across Africa and global markets.",
-
     url: "/ventures",
   },
 
   {
     title: "Our Model",
-
     description:
       "Explore how Continental Founders supports founders through Potential, Preparation, Execution, Evidence, and Opportunity.",
-
     url: "/our-model",
   },
 
   {
-    title: "Strategic Partners",
+    title: "CFCV Fellowship",
+    description:
+      "Explore the Continental Founders Catalytic Ventures six-month cross-continental venture-development fellowship.",
+    url: "/cfcv",
+    cfcv: true,
+  },
 
+  {
+    title: "Apply to CFCV",
+    description:
+      "Start your application to the Continental Founders Catalytic Ventures fellowship.",
+    url: "/cfcv/apply",
+    cfcv: true,
+  },
+
+  {
+    title: "Strategic Partners",
     description:
       "Explore the Continental Founders partnership ecosystem and opportunities for institutional and commercial collaboration.",
-
     url: "/strategic-partners",
   },
 
   {
-    title: "U.S.–Africa Trade & Business Network",
-
+    title:
+      "U.S.–Africa Trade & Business Network",
     description:
       "Explore business relationships, market access, commercial engagement, and connections between Africa and the United States.",
-
-    url: "/partners/us-africa-trade-network",
+    url:
+      "/partners/us-africa-trade-network",
   },
 
   {
     title: "University Partnerships",
-
     description:
       "Explore university partnerships, faculty expertise, research collaboration, student engagement, and global learning opportunities.",
-
     url: "/universities",
   },
 
   {
     title: "Corporate Partners",
-
     description:
       "Explore corporate collaboration, industry expertise, mentorship, sponsorship, markets, and commercial opportunities.",
-
     url: "/partners/corporate",
   },
 
   {
     title:
       "Government & Development Institutions",
-
     description:
       "Explore collaboration with government and development institutions around entrepreneurship, programs, markets, and economic opportunity.",
-
     url:
       "/partners/government-development",
   },
 
   {
     title: "Programs",
-
     description:
       "Explore Continental Founders programs connecting entrepreneurs with universities, mentors, expertise, markets, and opportunity.",
-
     url: "/programs",
   },
 
   {
     title: "Impact",
-
     description:
       "Explore the impact of Continental Founders across entrepreneurship, partnerships, innovation, and founder development.",
-
     url: "/impact",
   },
 
   {
     title: "Events",
-
     description:
       "Discover Continental Founders events, gatherings, conferences, and founder activities.",
-
     url: "/events",
   },
 
   {
     title: "Insights",
-
     description:
       "Read Continental Founders insights on entrepreneurship, innovation, markets, partnerships, leadership, and opportunity.",
-
     url: "/insights",
   },
 
   {
-    title: "Contact Continental Founders",
+    title: "Gallery",
+    description:
+      "Explore moments from Continental Founders events, programs, partnerships, and activities.",
+    url: "/gallery",
+  },
 
+  {
+    title: "Contact Continental Founders",
     description:
       "Contact Continental Founders about partnerships, founder opportunities, university collaboration, and participation.",
-
     url: "/contact",
   },
 ];
 
 
-// ============================================================
-// NAVBAR
-// ============================================================
+/* ============================================================
+   NAVBAR
+============================================================ */
 
 export default function Navbar() {
   const [
@@ -188,9 +188,9 @@ export default function Navbar() {
     useNavigate();
 
 
-  // ==========================================================
-  // SEARCH RESULTS
-  // ==========================================================
+  /* ==========================================================
+     SEARCH RESULTS
+  ========================================================== */
 
   const filteredResults =
     searchItems.filter((item) => {
@@ -214,25 +214,28 @@ export default function Navbar() {
     });
 
 
-  // ==========================================================
-  // MENU HELPERS
-  // ==========================================================
+  /* ==========================================================
+     MENU HELPERS
+  ========================================================== */
 
   const closeMenu = () => {
     setOpen(false);
     setMobileDropdown(null);
   };
 
+
   const closeSearch = () => {
     setSearchOpen(false);
     setSearchQuery("");
   };
+
 
   const openSearch = () => {
     setOpen(false);
     setMobileDropdown(null);
     setSearchOpen(true);
   };
+
 
   const toggleMobileDropdown = (
     label
@@ -246,9 +249,36 @@ export default function Navbar() {
   };
 
 
-  // ==========================================================
-  // ADMIN ACCESS
-  // ==========================================================
+  /* ==========================================================
+     CFCV HELPERS
+  ========================================================== */
+
+  const isCFCVPath = (
+    path
+  ) => {
+    if (!path) {
+      return false;
+    }
+
+    return (
+      path === "/cfcv" ||
+      path.startsWith("/cfcv/")
+    );
+  };
+
+
+  const isCFCVItem = (
+    item
+  ) => {
+    return isCFCVPath(
+      item?.path
+    );
+  };
+
+
+  /* ==========================================================
+     ADMIN ACCESS
+  ========================================================== */
 
   const handleLogoClick = (
     event
@@ -277,9 +307,9 @@ export default function Navbar() {
   };
 
 
-  // ==========================================================
-  // RESET LOGO CLICK COUNTER
-  // ==========================================================
+  /* ==========================================================
+     RESET LOGO CLICK COUNTER
+  ========================================================== */
 
   useEffect(() => {
     if (logoClicks === 0) {
@@ -302,9 +332,9 @@ export default function Navbar() {
   }, [logoClicks]);
 
 
-  // ==========================================================
-  // ROUTE CHANGE
-  // ==========================================================
+  /* ==========================================================
+     ROUTE CHANGE
+  ========================================================== */
 
   useEffect(() => {
     setOpen(false);
@@ -315,9 +345,9 @@ export default function Navbar() {
   }, [location.pathname]);
 
 
-  // ==========================================================
-  // BODY SCROLL
-  // ==========================================================
+  /* ==========================================================
+     BODY SCROLL
+  ========================================================== */
 
   useEffect(() => {
     if (
@@ -344,9 +374,9 @@ export default function Navbar() {
   ]);
 
 
-  // ==========================================================
-  // DROPDOWN ACTIVE STATE
-  // ==========================================================
+  /* ==========================================================
+     DROPDOWN ACTIVE STATE
+  ========================================================== */
 
   const isDropdownActive = (
     item
@@ -369,9 +399,9 @@ export default function Navbar() {
   };
 
 
-  // ==========================================================
-  // KEYBOARD SUPPORT
-  // ==========================================================
+  /* ==========================================================
+     KEYBOARD SUPPORT
+  ========================================================== */
 
   useEffect(() => {
     const handleKeyDown = (
@@ -408,9 +438,38 @@ export default function Navbar() {
   ]);
 
 
-  // ==========================================================
-  // RENDER
-  // ==========================================================
+  /* ==========================================================
+     NAVIGATION LABEL
+  ========================================================== */
+
+  const renderNavLabel = (
+    item
+  ) => {
+    const cfcvItem =
+      isCFCVItem(item);
+
+    return (
+      <>
+        {cfcvItem && (
+          <Rocket
+            className="navbar__cfcv-icon"
+            size={16}
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+        )}
+
+        <span>
+          {item.label}
+        </span>
+      </>
+    );
+  };
+
+
+  /* ==========================================================
+     RENDER
+  ========================================================== */
 
   return (
     <header className="navbar">
@@ -477,7 +536,9 @@ export default function Navbar() {
 
         <div className="navbar__inner">
 
-          {/* BRAND */}
+          {/* =================================================
+              BRAND
+          ================================================= */}
 
           <Link
             to="/"
@@ -498,7 +559,9 @@ export default function Navbar() {
           </Link>
 
 
-          {/* NAVIGATION */}
+          {/* =================================================
+              NAVIGATION
+          ================================================= */}
 
           <nav
             id="primary-navigation"
@@ -515,6 +578,10 @@ export default function Navbar() {
               {navigation.map(
                 (item) => {
 
+                  /* ==========================================
+                     DROPDOWN NAVIGATION
+                  ========================================== */
+
                   if (
                     item.children?.length
                   ) {
@@ -524,6 +591,11 @@ export default function Navbar() {
 
                     const dropdownActive =
                       isDropdownActive(
+                        item
+                      );
+
+                    const cfcvItem =
+                      isCFCVItem(
                         item
                       );
 
@@ -554,6 +626,10 @@ export default function Navbar() {
                                 dropdownActive
                                   ? "is-active"
                                   : ""
+                              } ${
+                                cfcvItem
+                                  ? "navbar__link--cfcv"
+                                  : ""
                               }`
                             }
                             onClick={() => {
@@ -566,9 +642,9 @@ export default function Navbar() {
                             }}
                           >
 
-                            <span>
-                              {item.label}
-                            </span>
+                            {renderNavLabel(
+                              item
+                            )}
 
                             <ChevronDown
                               className="navbar__dropdown-arrow"
@@ -608,40 +684,67 @@ export default function Navbar() {
                         <div className="navbar__dropdown-menu">
 
                           {item.children.map(
-                            (child) => (
-                              <NavLink
-                                key={
-                                  child.path
-                                }
-                                to={
-                                  child.path
-                                }
-                                className={({
-                                  isActive,
-                                }) =>
-                                  `navbar__dropdown-link ${
-                                    isActive
-                                      ? "is-active"
-                                      : ""
-                                  }`
-                                }
-                                onClick={
-                                  closeMenu
-                                }
-                              >
+                            (child) => {
 
-                                <span>
-                                  {child.label}
-                                </span>
+                              const childIsCFCV =
+                                isCFCVItem(
+                                  child
+                                );
 
-                                <ArrowUpRight
-                                  size={14}
-                                  strokeWidth={1.6}
-                                  aria-hidden="true"
-                                />
+                              return (
+                                <NavLink
+                                  key={
+                                    child.path
+                                  }
+                                  to={
+                                    child.path
+                                  }
+                                  className={({
+                                    isActive,
+                                  }) =>
+                                    `navbar__dropdown-link ${
+                                      isActive
+                                        ? "is-active"
+                                        : ""
+                                    } ${
+                                      childIsCFCV
+                                        ? "navbar__dropdown-link--cfcv"
+                                        : ""
+                                    }`
+                                  }
+                                  onClick={
+                                    closeMenu
+                                  }
+                                >
 
-                              </NavLink>
-                            )
+                                  <span className="navbar__dropdown-link-content">
+
+                                    {childIsCFCV && (
+                                      <Rocket
+                                        className="navbar__cfcv-icon"
+                                        size={15}
+                                        strokeWidth={1.8}
+                                        aria-hidden="true"
+                                      />
+                                    )}
+
+                                    <span>
+                                      {
+                                        child.label
+                                      }
+                                    </span>
+
+                                  </span>
+
+                                  <ArrowUpRight
+                                    size={14}
+                                    strokeWidth={1.6}
+                                    aria-hidden="true"
+                                  />
+
+                                </NavLink>
+                              );
+                            }
                           )}
 
                         </div>
@@ -650,6 +753,15 @@ export default function Navbar() {
                     );
                   }
 
+
+                  /* ==========================================
+                     STANDARD NAVIGATION ITEM
+                  ========================================== */
+
+                  const cfcvItem =
+                    isCFCVItem(
+                      item
+                    );
 
                   return (
                     <NavLink
@@ -670,6 +782,10 @@ export default function Navbar() {
                           isActive
                             ? "is-active"
                             : ""
+                        } ${
+                          cfcvItem
+                            ? "navbar__link--cfcv"
+                            : ""
                         }`
                       }
                       onClick={
@@ -677,9 +793,9 @@ export default function Navbar() {
                       }
                     >
 
-                      <span>
-                        {item.label}
-                      </span>
+                      {renderNavLabel(
+                        item
+                      )}
 
                     </NavLink>
                   );
@@ -689,7 +805,9 @@ export default function Navbar() {
             </div>
 
 
-            {/* ACTIONS */}
+            {/* =================================================
+                NAVBAR ACTIONS
+            ================================================= */}
 
             <div className="navbar__actions">
 
@@ -711,16 +829,27 @@ export default function Navbar() {
               </button>
 
 
+              {/* ===============================================
+                  CFCV APPLICATION CTA
+              ================================================ */}
+
               <Link
-                to="/contact"
-                className="navbar__cta"
+                to="/cfcv/apply"
+                className="navbar__cta navbar__cta--cfcv"
                 onClick={
                   closeMenu
                 }
               >
 
+                <Rocket
+                  className="navbar__cta-icon"
+                  size={16}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
+
                 <span>
-                  Schedule a Meeting
+                  Apply to CFCV
                 </span>
 
                 <ArrowUpRight
@@ -736,7 +865,9 @@ export default function Navbar() {
           </nav>
 
 
-          {/* MOBILE MENU BUTTON */}
+          {/* =================================================
+              MOBILE MENU BUTTON
+          ================================================= */}
 
           <button
             type="button"
@@ -808,6 +939,10 @@ export default function Navbar() {
             aria-label="Search Continental Founders"
           >
 
+            {/* =================================================
+                SEARCH HEADER
+            ================================================= */}
+
             <div className="search-header">
 
               <div className="search-input-wrapper">
@@ -858,7 +993,16 @@ export default function Navbar() {
             </div>
 
 
+            {/* =================================================
+                SEARCH RESULTS
+            ================================================= */}
+
             <div className="search-results">
+
+
+              {/* ===============================================
+                  INITIAL SEARCH STATE
+              ================================================ */}
 
               {!searchQuery.trim() && (
                 <div className="search-empty">
@@ -875,19 +1019,36 @@ export default function Navbar() {
 
                   <p>
                     Search our ventures,
-                    partnerships, programs,
-                    events, insights, model,
-                    universities, and more.
+                    CFCV fellowship,
+                    partnerships,
+                    programs,
+                    events,
+                    insights,
+                    model,
+                    universities,
+                    gallery,
+                    and more.
                   </p>
 
                 </div>
               )}
 
 
+              {/* ===============================================
+                  NO RESULTS
+              ================================================ */}
+
               {searchQuery.trim() &&
                 filteredResults.length ===
                   0 && (
+
                   <div className="search-empty">
+
+                    <Search
+                      size={34}
+                      strokeWidth={1.4}
+                      aria-hidden="true"
+                    />
 
                     <h3>
                       No results found
@@ -902,50 +1063,88 @@ export default function Navbar() {
                 )}
 
 
+              {/* ===============================================
+                  RESULT LIST
+              ================================================ */}
+
               {filteredResults.length >
                 0 && (
+
                 <div className="search-result-list">
 
                   {filteredResults.map(
-                    (item) => (
-                      <Link
-                        key={
-                          item.url
-                        }
-                        to={
-                          item.url
-                        }
-                        className="search-result"
-                        onClick={
-                          closeSearch
-                        }
-                      >
+                    (item) => {
 
-                        <div className="search-result-icon">
+                      const cfcvResult =
+                        item.cfcv ||
+                        isCFCVPath(
+                          item.url
+                        );
 
-                          <Search
-                            size={17}
+                      return (
+                        <Link
+                          key={
+                            item.url
+                          }
+                          to={
+                            item.url
+                          }
+                          className={`search-result ${
+                            cfcvResult
+                              ? "search-result--cfcv"
+                              : ""
+                          }`}
+                          onClick={
+                            closeSearch
+                          }
+                        >
+
+                          <div className="search-result-icon">
+
+                            {cfcvResult ? (
+                              <Rocket
+                                size={17}
+                                strokeWidth={1.7}
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <Search
+                                size={17}
+                                strokeWidth={1.6}
+                                aria-hidden="true"
+                              />
+                            )}
+
+                          </div>
+
+
+                          <div className="search-result-content">
+
+                            <h4>
+                              {
+                                item.title
+                              }
+                            </h4>
+
+                            <p>
+                              {
+                                item.description
+                              }
+                            </p>
+
+                          </div>
+
+
+                          <ArrowUpRight
+                            className="search-result-arrow"
+                            size={16}
                             strokeWidth={1.6}
                             aria-hidden="true"
                           />
 
-                        </div>
-
-
-                        <div>
-
-                          <h4>
-                            {item.title}
-                          </h4>
-
-                          <p>
-                            {item.description}
-                          </p>
-
-                        </div>
-
-                      </Link>
-                    )
+                        </Link>
+                      );
+                    }
                   )}
 
                 </div>

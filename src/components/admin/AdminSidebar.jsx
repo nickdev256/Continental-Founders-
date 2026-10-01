@@ -26,6 +26,8 @@ import {
   ShieldCheck,
   ChevronRight,
   BriefcaseBusiness,
+  ClipboardCheck,
+  Images,
 } from "lucide-react";
 
 import "./AdminSidebar.css";
@@ -35,110 +37,163 @@ import "./AdminSidebar.css";
    API
 ============================================================ */
 
-const API_URL =
+const API_URL = (
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  "http://localhost:5000"
+).replace(/\/+$/, "");
 
 
 /* ============================================================
-   MANAGEMENT NAVIGATION
+   OVERVIEW NAVIGATION
 ============================================================ */
 
-const managementNavigation = [
+const overviewNavigation = [
   {
     label: "Dashboard",
-    description: "Overview & activity",
+    description:
+      "Overview & activity",
     path: "/admin",
     icon: LayoutDashboard,
     end: true,
   },
+];
 
+
+/* ============================================================
+   VENTURE & FELLOWSHIP
+============================================================ */
+
+const ventureNavigation = [
   {
     label: "Ventures",
-    description: "Founders & venture profiles",
+    description:
+      "Founders & venture profiles",
     path: "/admin/ventures",
     icon: BriefcaseBusiness,
   },
 
   {
+    label: "CFCV Admissions",
+    description:
+      "Applications & fellowship admissions",
+    path: "/admin/cfcv",
+    icon: ClipboardCheck,
+  },
+];
+
+
+/* ============================================================
+   CONTENT & COMMUNICATIONS
+============================================================ */
+
+const contentNavigation = [
+  {
     label: "Events",
-    description: "Programs & conferences",
+    description:
+      "Programs & conferences",
     path: "/admin/events",
     icon: CalendarDays,
   },
 
   {
     label: "Insights",
-    description: "Articles & publications",
+    description:
+      "Articles & publications",
     path: "/admin/insights",
     icon: Newspaper,
   },
 
   {
-    label: "Universities",
-    description: "Academic directory",
-    path: "/admin/universities",
-    icon: GraduationCap,
+    label: "Gallery",
+    description:
+      "Photos & media",
+    path: "/admin/gallery",
+    icon: Images,
   },
 
   {
     label: "Newsletter",
-    description: "Subscribers & campaigns",
+    description:
+      "Subscribers & campaigns",
     path: "/admin/newsletter",
     icon: Mail,
-  },
-
-  {
-    label: "Contacts",
-    description: "Messages & inquiries",
-    path: "/admin/contacts",
-    icon: MessageSquareText,
   },
 ];
 
 
 /* ============================================================
-   CONTENT NAVIGATION
+   RELATIONSHIPS
 ============================================================ */
 
-const contentNavigation = [
+const relationshipNavigation = [
+  {
+    label: "Contacts",
+    description:
+      "Messages & inquiries",
+    path: "/admin/contacts",
+    icon: MessageSquareText,
+  },
+
+  {
+    label: "Universities",
+    description:
+      "Academic directory",
+    path: "/admin/universities",
+    icon: GraduationCap,
+  },
+];
+
+
+/* ============================================================
+   PARTNERSHIPS
+============================================================ */
+
+const partnerNavigation = [
+  {
+    label:
+      "U.S.–Africa Trade Network",
+    path:
+      "/admin/partners/us-africa-trade-network",
+    icon: Globe2,
+  },
+
+  {
+    label:
+      "Corporate Partners",
+    path:
+      "/admin/partners/corporate",
+    icon: Building2,
+  },
+
+  {
+    label:
+      "Government & Development",
+    path:
+      "/admin/partners/government-development",
+    icon: Landmark,
+  },
+];
+
+
+/* ============================================================
+   ORGANIZATION
+============================================================ */
+
+const organizationNavigation = [
   {
     label: "About",
-    description: "Institutional content",
+    description:
+      "Institutional content",
     path: "/admin/about",
     icon: FileText,
   },
 
   {
     label: "Leadership",
-    description: "Team & governance",
+    description:
+      "Team & governance",
     path: "/admin/leadership",
     icon: Users,
-  },
-];
-
-
-/* ============================================================
-   PARTNERSHIPS NAVIGATION
-============================================================ */
-
-const partnerNavigation = [
-  {
-    label: "U.S.–Africa Trade Network",
-    path: "/admin/partners/us-africa-trade-network",
-    icon: Globe2,
-  },
-
-  {
-    label: "Corporate Partners",
-    path: "/admin/partners/corporate",
-    icon: Building2,
-  },
-
-  {
-    label: "Government & Development",
-    path: "/admin/partners/government-development",
-    icon: Landmark,
   },
 ];
 
@@ -157,14 +212,12 @@ export default function AdminSidebar({
   const [
     loggingOut,
     setLoggingOut,
-  ] =
-    useState(false);
+  ] = useState(false);
 
   const [
     logoutError,
     setLogoutError,
-  ] =
-    useState("");
+  ] = useState("");
 
 
   /* ==========================================================
@@ -219,7 +272,6 @@ export default function AdminSidebar({
           }
         );
 
-
       let result = null;
 
       try {
@@ -229,22 +281,18 @@ export default function AdminSidebar({
         result = null;
       }
 
-
       if (!response.ok) {
         throw new Error(
           result?.message ||
-          "Unable to sign out securely."
+            "Unable to sign out securely."
         );
       }
 
-
       clearLocalAuthState();
-
 
       if (onClose) {
         onClose();
       }
-
 
       navigate(
         "/admin/login",
@@ -258,15 +306,12 @@ export default function AdminSidebar({
         error
       );
 
-
       clearLocalAuthState();
-
 
       setLogoutError(
         error?.message ||
-        "Unable to sign out. Please try again."
+          "Unable to sign out. Please try again."
       );
-
 
       navigate(
         "/admin/login",
@@ -302,7 +347,6 @@ export default function AdminSidebar({
     const Icon =
       item.icon;
 
-
     return (
       <NavLink
         key={item.path}
@@ -327,7 +371,6 @@ export default function AdminSidebar({
             .join(" ")
         }
       >
-
         <span
           className="admin-sidebar__link-icon"
           aria-hidden="true"
@@ -338,25 +381,20 @@ export default function AdminSidebar({
           />
         </span>
 
-
         <span className="admin-sidebar__link-content">
-
           <span className="admin-sidebar__link-title">
             {item.label}
           </span>
 
-
           {item.description &&
             !compact && (
-
-            <span className="admin-sidebar__link-description">
-              {item.description}
-            </span>
-
-          )}
-
+              <span className="admin-sidebar__link-description">
+                {
+                  item.description
+                }
+              </span>
+            )}
         </span>
-
 
         <ChevronRight
           className="admin-sidebar__link-chevron"
@@ -364,7 +402,6 @@ export default function AdminSidebar({
           strokeWidth={1.8}
           aria-hidden="true"
         />
-
       </NavLink>
     );
   }
@@ -381,9 +418,7 @@ export default function AdminSidebar({
   }) {
     return (
       <div className="admin-sidebar__section">
-
         <div className="admin-sidebar__section-header">
-
           <span>
             {title}
           </span>
@@ -392,12 +427,9 @@ export default function AdminSidebar({
             className="admin-sidebar__section-line"
             aria-hidden="true"
           />
-
         </div>
 
-
         <div className="admin-sidebar__section-links">
-
           {items.map(
             (item) =>
               renderNavItem(
@@ -405,9 +437,7 @@ export default function AdminSidebar({
                 compact
               )
           )}
-
         </div>
-
       </div>
     );
   }
@@ -428,11 +458,10 @@ export default function AdminSidebar({
     >
 
       {/* ======================================================
-          LOGO
+          BRAND
       ====================================================== */}
 
       <header className="admin-sidebar__header">
-
         <Link
           to="/"
           className="admin-sidebar__brand"
@@ -446,7 +475,6 @@ export default function AdminSidebar({
           />
         </Link>
 
-
         <button
           type="button"
           className="admin-sidebar__close"
@@ -458,7 +486,6 @@ export default function AdminSidebar({
             strokeWidth={1.8}
           />
         </button>
-
       </header>
 
 
@@ -467,9 +494,7 @@ export default function AdminSidebar({
       ====================================================== */}
 
       <div className="admin-sidebar__identity">
-
         <div className="admin-sidebar__identity-top">
-
           <ShieldCheck
             className="admin-sidebar__identity-icon"
             size={17}
@@ -479,21 +504,20 @@ export default function AdminSidebar({
           <span className="admin-sidebar__eyebrow">
             ADMINISTRATION
           </span>
-
         </div>
-
 
         <h1>
           Content Management
         </h1>
 
-
         <p>
-          Manage ventures, institutional content,
-          partnerships, events, communications,
-          universities, and public-facing information.
+          Manage ventures, CFCV
+          admissions, institutional
+          content, partnerships, events,
+          communications, universities,
+          gallery and public-facing
+          information.
         </p>
-
       </div>
 
 
@@ -505,36 +529,47 @@ export default function AdminSidebar({
         className="admin-sidebar__nav"
         aria-label="CMS navigation"
       >
-
         {renderSection({
-          title:
-            "MANAGEMENT",
-
+          title: "OVERVIEW",
           items:
-            managementNavigation,
+            overviewNavigation,
         })}
 
+        {renderSection({
+          title:
+            "VENTURE & FELLOWSHIP",
+          items:
+            ventureNavigation,
+        })}
 
         {renderSection({
           title:
-            "CONTENT",
-
+            "CONTENT & COMMUNICATIONS",
           items:
             contentNavigation,
         })}
 
+        {renderSection({
+          title:
+            "RELATIONSHIPS",
+          items:
+            relationshipNavigation,
+        })}
 
         {renderSection({
           title:
             "PARTNERSHIPS",
-
           items:
             partnerNavigation,
-
-          compact:
-            true,
+          compact: true,
         })}
 
+        {renderSection({
+          title:
+            "ORGANIZATION",
+          items:
+            organizationNavigation,
+        })}
       </nav>
 
 
@@ -544,23 +579,40 @@ export default function AdminSidebar({
 
       <footer className="admin-sidebar__bottom">
 
-        <div className="admin-sidebar__quick-actions">
+        {/* ====================================================
+            PUBLIC QUICK ACCESS
+        ==================================================== */}
 
+        <div className="admin-sidebar__quick-actions">
           <Link
-            to="/strategic-partners"
+            to="/cfcv"
             className="admin-sidebar__utility-link"
             onClick={handleNavigation}
           >
-            <ExternalLink
+            <ClipboardCheck
               size={16}
               strokeWidth={1.8}
             />
 
             <span>
-              View Partners Page
+              View CFCV
             </span>
           </Link>
 
+          <Link
+            to="/gallery"
+            className="admin-sidebar__utility-link"
+            onClick={handleNavigation}
+          >
+            <Images
+              size={16}
+              strokeWidth={1.8}
+            />
+
+            <span>
+              View Gallery
+            </span>
+          </Link>
 
           <Link
             to="/ventures"
@@ -573,10 +625,24 @@ export default function AdminSidebar({
             />
 
             <span>
-              View Ventures Page
+              View Ventures
             </span>
           </Link>
 
+          <Link
+            to="/strategic-partners"
+            className="admin-sidebar__utility-link"
+            onClick={handleNavigation}
+          >
+            <ExternalLink
+              size={16}
+              strokeWidth={1.8}
+            />
+
+            <span>
+              View Partners
+            </span>
+          </Link>
 
           <Link
             to="/"
@@ -592,17 +658,23 @@ export default function AdminSidebar({
               View Public Website
             </span>
           </Link>
-
         </div>
 
 
-        <div className="admin-sidebar__logout-wrap">
+        {/* ====================================================
+            LOGOUT
+        ==================================================== */}
 
+        <div className="admin-sidebar__logout-wrap">
           <button
             type="button"
             className="admin-sidebar__logout"
-            onClick={handleLogout}
-            disabled={loggingOut}
+            onClick={
+              handleLogout
+            }
+            disabled={
+              loggingOut
+            }
           >
             <LogOut
               size={17}
@@ -616,23 +688,22 @@ export default function AdminSidebar({
             </span>
           </button>
 
-
           {logoutError && (
-
             <p
               className="admin-sidebar__logout-error"
               role="alert"
             >
               {logoutError}
             </p>
-
           )}
-
         </div>
 
 
-        <div className="admin-sidebar__footer-copy">
+        {/* ====================================================
+            FOOTER COPY
+        ==================================================== */}
 
+        <div className="admin-sidebar__footer-copy">
           <strong>
             Continental Founders™
           </strong>
@@ -640,11 +711,8 @@ export default function AdminSidebar({
           <span>
             Secure CMS Administration
           </span>
-
         </div>
-
       </footer>
-
     </aside>
   );
 }

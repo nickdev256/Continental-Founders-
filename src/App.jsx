@@ -7,25 +7,25 @@ import {
 } from "react-router-dom";
 
 
-// ============================================================
-// PUBLIC LAYOUT
-// ============================================================
+/* ============================================================
+   PUBLIC LAYOUT
+============================================================ */
 
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import PageTransition from "./components/layout/PageTransition";
 
 
-// ============================================================
-// GLOBAL PUBLIC COMPONENTS
-// ============================================================
+/* ============================================================
+   GLOBAL PUBLIC COMPONENTS
+============================================================ */
 
 import EthTechPopup from "./components/common/EthTechPopup";
 
 
-// ============================================================
-// PUBLIC PAGES
-// ============================================================
+/* ============================================================
+   PUBLIC PAGES
+============================================================ */
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -38,18 +38,27 @@ import StrategicPartners from "./pages/StrategicPartners";
 import Universities from "./pages/Universities";
 
 
-// ============================================================
-// PARTNER SUBPAGES
-// ============================================================
+/* ============================================================
+   CFCV FELLOWSHIP
+============================================================ */
+
+import CFCV from "./pages/CFCV";
+import CFCVApply from "./pages/CFCVApply";
+import CFCVApplicationSuccess from "./pages/CFCVApplicationSuccess";
+
+
+/* ============================================================
+   PARTNER SUBPAGES
+============================================================ */
 
 import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
 import CorporatePartners from "./pages/CorporatePartners";
 import GovernmentDevelopment from "./pages/GovernmentDevelopment";
 
 
-// ============================================================
-// OTHER PUBLIC PAGES
-// ============================================================
+/* ============================================================
+   OTHER PUBLIC PAGES
+============================================================ */
 
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
@@ -66,21 +75,22 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 
-// ============================================================
-// ADMIN AUTH
-// ============================================================
+/* ============================================================
+   ADMIN AUTH
+============================================================ */
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRegister from "./pages/admin/AdminRegister";
 import AdminOtp from "./pages/admin/AdminOtp";
 
 
-// ============================================================
-// ADMIN / CMS
-// ============================================================
+/* ============================================================
+   ADMIN / CMS
+============================================================ */
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCFCV from "./pages/admin/AdminCFCV";
 
 import AdminVentures from "./pages/admin/AdminVentures";
 import AdminEvents from "./pages/admin/AdminEvents";
@@ -95,28 +105,27 @@ import AdminAbout from "./pages/admin/AdminAbout";
 import AdminLeadership from "./pages/admin/AdminLeadership";
 
 
-// ============================================================
-// ADMIN PARTNER CMS
-// ============================================================
+/* ============================================================
+   ADMIN PARTNER CMS
+============================================================ */
 
 import AdminUSAfricaTradeNetwork from "./pages/admin/AdminUSAfricaTradeNetwork";
 import AdminCorporatePartners from "./pages/admin/AdminCorporatePartners";
 import AdminGovernmentDevelopment from "./pages/admin/AdminGovernmentDevelopment";
 
 
-// ============================================================
-// ADMIN PROTECTION
-// ============================================================
+/* ============================================================
+   ADMIN PROTECTION
+============================================================ */
 
 import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 
 
-// ============================================================
-// GLOBAL SITE CONFIGURATION
-// ============================================================
+/* ============================================================
+   GLOBAL SITE CONFIGURATION
+============================================================ */
 
-const SITE_NAME =
-  "Continental Founders";
+const SITE_NAME = "Continental Founders";
 
 const SITE_URL =
   "https://www.continentalfounders.org";
@@ -137,9 +146,9 @@ const NOINDEX_ROBOTS =
   "noindex, nofollow, noarchive";
 
 
-// ============================================================
-// STATIC SEO CONFIGURATION
-// ============================================================
+/* ============================================================
+   STATIC SEO CONFIGURATION
+============================================================ */
 
 const SEO_ROUTES = {
   "/": {
@@ -212,6 +221,92 @@ const SEO_ROUTES = {
   },
 
 
+  /* ==========================================================
+     CFCV FELLOWSHIP SEO
+  ========================================================== */
+
+  "/cfcv": {
+    title:
+      "CFCV Fellowship | Continental Founders",
+
+    description:
+      "Explore Continental Founders Catalytic Ventures, a six-month cross-continental venture-development fellowship connecting founders in Africa and the U.S./diaspora.",
+
+    canonical:
+      "/cfcv",
+
+    breadcrumb: [
+      {
+        name:
+          "CFCV Fellowship",
+
+        path:
+          "/cfcv",
+      },
+    ],
+  },
+
+
+  "/cfcv/apply": {
+    title:
+      "Apply to CFCV | Continental Founders",
+
+    description:
+      "Apply to the Continental Founders Catalytic Ventures fellowship and begin the CFCV admissions process.",
+
+    canonical:
+      "/cfcv/apply",
+
+    breadcrumb: [
+      {
+        name:
+          "CFCV Fellowship",
+
+        path:
+          "/cfcv",
+      },
+
+      {
+        name:
+          "Apply",
+
+        path:
+          "/cfcv/apply",
+      },
+    ],
+  },
+
+
+  "/cfcv/application-success": {
+    title:
+      "CFCV Application Submitted | Continental Founders",
+
+    description:
+      "Confirmation of a Continental Founders Catalytic Ventures fellowship application submission.",
+
+    canonical:
+      "/cfcv/application-success",
+
+    breadcrumb: [
+      {
+        name:
+          "CFCV Fellowship",
+
+        path:
+          "/cfcv",
+      },
+
+      {
+        name:
+          "Application Submitted",
+
+        path:
+          "/cfcv/application-success",
+      },
+    ],
+  },
+
+
   "/strategic-partners": {
     title:
       "Strategic Partnerships | Continental Founders",
@@ -224,8 +319,11 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Strategic Partners",
-        path: "/strategic-partners",
+        name:
+          "Strategic Partners",
+
+        path:
+          "/strategic-partners",
       },
     ],
   },
@@ -243,12 +341,19 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Strategic Partners",
-        path: "/strategic-partners",
+        name:
+          "Strategic Partners",
+
+        path:
+          "/strategic-partners",
       },
+
       {
-        name: "Universities",
-        path: "/universities",
+        name:
+          "Universities",
+
+        path:
+          "/universities",
       },
     ],
   },
@@ -266,9 +371,13 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Strategic Partners",
-        path: "/strategic-partners",
+        name:
+          "Strategic Partners",
+
+        path:
+          "/strategic-partners",
       },
+
       {
         name:
           "U.S.–Africa Trade & Business Network",
@@ -292,12 +401,19 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Strategic Partners",
-        path: "/strategic-partners",
+        name:
+          "Strategic Partners",
+
+        path:
+          "/strategic-partners",
       },
+
       {
-        name: "Corporate Partners",
-        path: "/partners/corporate",
+        name:
+          "Corporate Partners",
+
+        path:
+          "/partners/corporate",
       },
     ],
   },
@@ -315,9 +431,13 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Strategic Partners",
-        path: "/strategic-partners",
+        name:
+          "Strategic Partners",
+
+        path:
+          "/strategic-partners",
       },
+
       {
         name:
           "Government & Development Institutions",
@@ -341,8 +461,11 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Programs",
-        path: "/programs",
+        name:
+          "Programs",
+
+        path:
+          "/programs",
       },
     ],
   },
@@ -360,8 +483,11 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Impact",
-        path: "/impact",
+        name:
+          "Impact",
+
+        path:
+          "/impact",
       },
     ],
   },
@@ -379,8 +505,11 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Events",
-        path: "/events",
+        name:
+          "Events",
+
+        path:
+          "/events",
       },
     ],
   },
@@ -398,16 +527,15 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Insights",
-        path: "/insights",
+        name:
+          "Insights",
+
+        path:
+          "/insights",
       },
     ],
   },
 
-
-  // ==========================================================
-  // GALLERY SEO
-  // ==========================================================
 
   "/gallery": {
     title:
@@ -421,12 +549,19 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Insights",
-        path: "/insights",
+        name:
+          "Insights",
+
+        path:
+          "/insights",
       },
+
       {
-        name: "Gallery",
-        path: "/gallery",
+        name:
+          "Gallery",
+
+        path:
+          "/gallery",
       },
     ],
   },
@@ -444,17 +579,20 @@ const SEO_ROUTES = {
 
     breadcrumb: [
       {
-        name: "Contact",
-        path: "/contact",
+        name:
+          "Contact",
+
+        path:
+          "/contact",
       },
     ],
   },
 };
 
 
-// ============================================================
-// PATH HELPERS
-// ============================================================
+/* ============================================================
+   PATH HELPERS
+============================================================ */
 
 function normalizePath(pathname) {
   if (
@@ -488,9 +626,9 @@ function buildCanonicalUrl(path) {
 }
 
 
-// ============================================================
-// META HELPERS
-// ============================================================
+/* ============================================================
+   META HELPERS
+============================================================ */
 
 function setMetaTag(
   selector,
@@ -540,9 +678,9 @@ function removeMetaTag(
 }
 
 
-// ============================================================
-// CANONICAL
-// ============================================================
+/* ============================================================
+   CANONICAL
+============================================================ */
 
 function setCanonical(url) {
   let canonical =
@@ -585,9 +723,9 @@ function removeCanonical() {
 }
 
 
-// ============================================================
-// DESCRIPTION
-// ============================================================
+/* ============================================================
+   DESCRIPTION
+============================================================ */
 
 function setDescription(
   description
@@ -601,9 +739,9 @@ function setDescription(
 }
 
 
-// ============================================================
-// ROBOTS
-// ============================================================
+/* ============================================================
+   ROBOTS
+============================================================ */
 
 function setRobots(value) {
   setMetaTag(
@@ -622,9 +760,9 @@ function setRobots(value) {
 }
 
 
-// ============================================================
-// OPEN GRAPH
-// ============================================================
+/* ============================================================
+   OPEN GRAPH
+============================================================ */
 
 function setOpenGraph({
   title,
@@ -705,9 +843,9 @@ function setOpenGraph({
 }
 
 
-// ============================================================
-// X / TWITTER
-// ============================================================
+/* ============================================================
+   X / TWITTER
+============================================================ */
 
 function setTwitterMeta({
   title,
@@ -751,9 +889,9 @@ function setTwitterMeta({
 }
 
 
-// ============================================================
-// STRUCTURED DATA HELPERS
-// ============================================================
+/* ============================================================
+   STRUCTURED DATA HELPERS
+============================================================ */
 
 function setStructuredData(
   id,
@@ -795,9 +933,9 @@ function removeStructuredData(
 }
 
 
-// ============================================================
-// BREADCRUMB STRUCTURED DATA
-// ============================================================
+/* ============================================================
+   BREADCRUMB STRUCTURED DATA
+============================================================ */
 
 function setBreadcrumbData(
   items = []
@@ -862,9 +1000,9 @@ function setBreadcrumbData(
 }
 
 
-// ============================================================
-// ORGANIZATION STRUCTURED DATA
-// ============================================================
+/* ============================================================
+   ORGANIZATION STRUCTURED DATA
+============================================================ */
 
 function setOrganizationData() {
   const data = {
@@ -928,9 +1066,9 @@ function setOrganizationData() {
 }
 
 
-// ============================================================
-// WEBSITE STRUCTURED DATA
-// ============================================================
+/* ============================================================
+   WEBSITE STRUCTURED DATA
+============================================================ */
 
 function setWebsiteData() {
   const data = {
@@ -968,9 +1106,9 @@ function setWebsiteData() {
 }
 
 
-// ============================================================
-// WEB PAGE STRUCTURED DATA
-// ============================================================
+/* ============================================================
+   WEB PAGE STRUCTURED DATA
+============================================================ */
 
 function setWebPageData({
   title,
@@ -1022,9 +1160,9 @@ function setWebPageData({
 }
 
 
-// ============================================================
-// APPLY PUBLIC SEO
-// ============================================================
+/* ============================================================
+   APPLY PUBLIC SEO
+============================================================ */
 
 function applyPublicSEO({
   title,
@@ -1105,9 +1243,9 @@ function applyPublicSEO({
 }
 
 
-// ============================================================
-// APPLY NOINDEX SEO
-// ============================================================
+/* ============================================================
+   APPLY NOINDEX SEO
+============================================================ */
 
 function applyNoIndexSEO({
   title,
@@ -1169,9 +1307,9 @@ function applyNoIndexSEO({
 }
 
 
-// ============================================================
-// GLOBAL SEO MANAGER
-// ============================================================
+/* ============================================================
+   GLOBAL SEO MANAGER
+============================================================ */
 
 function SEOManager() {
   const { pathname } =
@@ -1184,9 +1322,9 @@ function SEOManager() {
       );
 
 
-    // ========================================================
-    // ADMIN
-    // ========================================================
+    /* ========================================================
+       ADMIN
+    ======================================================== */
 
     if (
       cleanPath === "/admin" ||
@@ -1209,9 +1347,9 @@ function SEOManager() {
     }
 
 
-    // ========================================================
-    // DYNAMIC VENTURE
-    // ========================================================
+    /* ========================================================
+       DYNAMIC VENTURE
+    ======================================================== */
 
     if (
       cleanPath.startsWith(
@@ -1259,9 +1397,9 @@ function SEOManager() {
     }
 
 
-    // ========================================================
-    // DYNAMIC EVENT
-    // ========================================================
+    /* ========================================================
+       DYNAMIC EVENT
+    ======================================================== */
 
     if (
       cleanPath.startsWith(
@@ -1309,9 +1447,9 @@ function SEOManager() {
     }
 
 
-    // ========================================================
-    // DYNAMIC INSIGHT
-    // ========================================================
+    /* ========================================================
+       DYNAMIC INSIGHT
+    ======================================================== */
 
     if (
       cleanPath.startsWith(
@@ -1359,9 +1497,9 @@ function SEOManager() {
     }
 
 
-    // ========================================================
-    // STATIC PAGE
-    // ========================================================
+    /* ========================================================
+       STATIC PAGE
+    ======================================================== */
 
     const seo =
       SEO_ROUTES[
@@ -1369,9 +1507,9 @@ function SEOManager() {
       ];
 
 
-    // ========================================================
-    // 404
-    // ========================================================
+    /* ========================================================
+       404
+    ======================================================== */
 
     if (!seo) {
       applyNoIndexSEO({
@@ -1389,9 +1527,9 @@ function SEOManager() {
     }
 
 
-    // ========================================================
-    // APPLY STATIC SEO
-    // ========================================================
+    /* ========================================================
+       APPLY STATIC SEO
+    ======================================================== */
 
     applyPublicSEO({
       title:
@@ -1415,9 +1553,9 @@ function SEOManager() {
 }
 
 
-// ============================================================
-// SCROLL TO TOP
-// ============================================================
+/* ============================================================
+   SCROLL TO TOP
+============================================================ */
 
 function ScrollToTop() {
   const { pathname } =
@@ -1435,9 +1573,9 @@ function ScrollToTop() {
 }
 
 
-// ============================================================
-// APP
-// ============================================================
+/* ============================================================
+   APP
+============================================================ */
 
 export default function App() {
   const { pathname } =
@@ -1484,7 +1622,6 @@ export default function App() {
         }
       >
         <PageTransition>
-
           <Routes>
 
             {/* =================================================
@@ -1538,6 +1675,32 @@ export default function App() {
               path="/our-model"
               element={
                 <OurModel />
+              }
+            />
+
+
+            {/* =================================================
+                CFCV FELLOWSHIP
+            ================================================= */}
+
+            <Route
+              path="/cfcv"
+              element={
+                <CFCV />
+              }
+            />
+
+            <Route
+              path="/cfcv/apply"
+              element={
+                <CFCVApply />
+              }
+            />
+
+            <Route
+              path="/cfcv/application-success"
+              element={
+                <CFCVApplicationSuccess />
               }
             />
 
@@ -1720,12 +1883,33 @@ export default function App() {
                 }
               >
 
+                {/* =============================================
+                    DASHBOARD
+                ============================================= */}
+
                 <Route
                   index
                   element={
                     <AdminDashboard />
                   }
                 />
+
+
+                {/* =============================================
+                    CFCV ADMISSIONS
+                ============================================= */}
+
+                <Route
+                  path="cfcv"
+                  element={
+                    <AdminCFCV />
+                  }
+                />
+
+
+                {/* =============================================
+                    VENTURES
+                ============================================= */}
 
                 <Route
                   path="ventures"
@@ -1734,12 +1918,22 @@ export default function App() {
                   }
                 />
 
+
+                {/* =============================================
+                    EVENTS
+                ============================================= */}
+
                 <Route
                   path="events"
                   element={
                     <AdminEvents />
                   }
                 />
+
+
+                {/* =============================================
+                    INSIGHTS
+                ============================================= */}
 
                 <Route
                   path="insights"
@@ -1750,8 +1944,8 @@ export default function App() {
 
 
                 {/* =============================================
-                    ADMIN GALLERY
-                ============================================== */}
+                    GALLERY
+                ============================================= */}
 
                 <Route
                   path="gallery"
@@ -1761,12 +1955,21 @@ export default function App() {
                 />
 
 
+                {/* =============================================
+                    UNIVERSITIES
+                ============================================= */}
+
                 <Route
                   path="universities"
                   element={
                     <AdminUniversities />
                   }
                 />
+
+
+                {/* =============================================
+                    PARTNERS
+                ============================================= */}
 
                 <Route
                   path="partners/us-africa-trade-network"
@@ -1789,6 +1992,11 @@ export default function App() {
                   }
                 />
 
+
+                {/* =============================================
+                    NEWSLETTER
+                ============================================= */}
+
                 <Route
                   path="newsletter"
                   element={
@@ -1796,12 +2004,22 @@ export default function App() {
                   }
                 />
 
+
+                {/* =============================================
+                    CONTACTS
+                ============================================= */}
+
                 <Route
                   path="contacts"
                   element={
                     <AdminContacts />
                   }
                 />
+
+
+                {/* =============================================
+                    ORGANIZATION
+                ============================================= */}
 
                 <Route
                   path="about"
@@ -1833,7 +2051,6 @@ export default function App() {
             />
 
           </Routes>
-
         </PageTransition>
       </main>
 

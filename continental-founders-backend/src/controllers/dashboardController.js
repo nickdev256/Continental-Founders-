@@ -9,6 +9,8 @@ const {
 
 const RECENT_ACTIVITY_LIMIT = 8;
 
+const CFCV_COHORT_CAPACITY = 30;
+
 
 /* ============================================================
    HELPER: SAFE COUNT QUERY
@@ -173,6 +175,7 @@ async function stats(
       publishedInsights,
     ] =
       await Promise.all([
+
         /* ----------------------------------------------------
            ALL CONTACTS
         ---------------------------------------------------- */
@@ -231,7 +234,7 @@ async function stats(
 
 
     /* ========================================================
-       OPTIONAL COUNTS
+       OPTIONAL CMS COUNTS
     ======================================================== */
 
     const [
@@ -242,6 +245,7 @@ async function stats(
       publishedGalleryPhotos,
     ] =
       await Promise.all([
+
         /* ----------------------------------------------------
            ACTIVE NEWSLETTER SUBSCRIBERS
         ---------------------------------------------------- */
@@ -306,6 +310,188 @@ async function stats(
             )
         ),
       ]);
+
+
+    /* ========================================================
+       CFCV ADMISSIONS COUNTS
+
+       These are optional so the main CMS dashboard remains
+       available if the CFCV table is temporarily unavailable.
+    ======================================================== */
+
+    const [
+      cfcvApplications,
+      cfcvSubmitted,
+      cfcvUnderReview,
+      cfcvInterviews,
+      cfcvMatchRequired,
+      cfcvAdmitted,
+      cfcvWaitlisted,
+      cfcvGenesis,
+      cfcvAscend,
+      cfcvHorizon,
+    ] =
+      await Promise.all([
+
+        /* ----------------------------------------------------
+           TOTAL APPLICATIONS
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV application count",
+          "cfcv_applications"
+        ),
+
+
+        /* ----------------------------------------------------
+           SUBMITTED
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV submitted applications",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "status",
+              "submitted"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           UNDER REVIEW
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV applications under review",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "status",
+              "under_review"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           INTERVIEWS
+
+           Uses the admissions workflow stage rather than
+           guessing from applicant information.
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV interview applications",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "stage",
+              "interview"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           MATCH REQUIRED
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV matching required",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "matching_status",
+              "required"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           ADMITTED
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV admitted applications",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "final_decision",
+              "admit"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           WAITLIST
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV waitlisted applications",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "final_decision",
+              "waitlist"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           GENESIS TRACK
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV Genesis track",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "track",
+              "Genesis"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           ASCEND TRACK
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV Ascend track",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "track",
+              "Ascend"
+            )
+        ),
+
+
+        /* ----------------------------------------------------
+           HORIZON TRACK
+        ---------------------------------------------------- */
+
+        optionalCount(
+          "CFCV Horizon track",
+          "cfcv_applications",
+          (query) =>
+            query.eq(
+              "track",
+              "Horizon"
+            )
+        ),
+      ]);
+
+
+    /* ========================================================
+       CFCV CAPACITY
+    ======================================================== */
+
+    const cfcvRemainingCapacity =
+      Math.max(
+        CFCV_COHORT_CAPACITY -
+          cfcvAdmitted,
+        0
+      );
 
 
     /* ========================================================
@@ -379,6 +565,25 @@ async function stats(
 
         columns:
           "id, title, category, status, image_url, created_at",
+
+        limit: 4,
+      });
+
+
+    /* ========================================================
+       RECENT CFCV APPLICATIONS
+    ======================================================== */
+
+    const recentCfcvApplications =
+      await fetchRecentRows({
+        label:
+          "Recent CFCV applications",
+
+        table:
+          "cfcv_applications",
+
+        columns:
+          "id, application_reference, founder_name, venture_name, status, stage, final_decision, created_at",
 
         limit: 4,
       });
@@ -517,10 +722,66 @@ async function stats(
 
 
     /* ========================================================
+       NORMALIZE CFCV ACTIVITY
+    ======================================================== */
+
+    const cfcvActivity =
+      recentCfcvApplications.map(
+        (application) => {
+          const displayName =
+            application.venture_name ||
+            application.founder_name ||
+            application.application_reference ||
+            "CFCV application";
+
+          let description =
+            "CFCV fellowship application";
+
+          if (
+            application.final_decision
+          ) {
+            description =
+              `Decision: ${application.final_decision}`;
+          } else if (
+            application.stage
+          ) {
+            description =
+              `Admissions stage: ${application.stage}`;
+          } else if (
+            application.status
+          ) {
+            description =
+              `Application status: ${application.status}`;
+          }
+
+          return {
+            id:
+              `cfcv-${application.id}`,
+
+            type:
+              "cfcv_application",
+
+            title:
+              displayName,
+
+            description,
+
+            status:
+              application.status,
+
+            created_at:
+              application.created_at,
+          };
+        }
+      );
+
+
+    /* ========================================================
        COMBINE RECENT ACTIVITY
     ======================================================== */
 
     const recentActivity = [
+      ...cfcvActivity,
       ...contactActivity,
       ...eventActivity,
       ...insightActivity,
@@ -547,6 +808,8 @@ async function stats(
         success: true,
 
         stats: {
+          /* CMS */
+
           upcomingEvents,
 
           publishedInsights,
@@ -564,6 +827,34 @@ async function stats(
           totalGalleryPhotos,
 
           publishedGalleryPhotos,
+
+
+          /* CFCV */
+
+          cfcvApplications,
+
+          cfcvSubmitted,
+
+          cfcvUnderReview,
+
+          cfcvInterviews,
+
+          cfcvMatchRequired,
+
+          cfcvAdmitted,
+
+          cfcvWaitlisted,
+
+          cfcvGenesis,
+
+          cfcvAscend,
+
+          cfcvHorizon,
+
+          cfcvCohortCapacity:
+            CFCV_COHORT_CAPACITY,
+
+          cfcvRemainingCapacity,
         },
 
         recentActivity,

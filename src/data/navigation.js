@@ -15,28 +15,45 @@ export const navigation = [
   },
 
   {
+    label: "CFCV",
+    path: "/cfcv",
+  },
+
+  {
     label: "Partners",
     path: "/strategic-partners",
 
     children: [
       {
-        label: "U.S.–Africa Trade & Business Network",
-        path: "/partners/us-africa-trade-network",
+        label:
+          "U.S.–Africa Trade & Business Network",
+
+        path:
+          "/partners/us-africa-trade-network",
       },
 
       {
-        label: "Universities",
-        path: "/universities",
+        label:
+          "Universities",
+
+        path:
+          "/universities",
       },
 
       {
-        label: "Corporate Partners",
-        path: "/partners/corporate",
+        label:
+          "Corporate Partners",
+
+        path:
+          "/partners/corporate",
       },
 
       {
-        label: "Government & Development Institutions",
-        path: "/partners/government-development",
+        label:
+          "Government & Development Institutions",
+
+        path:
+          "/partners/government-development",
       },
     ],
   },
@@ -52,13 +69,19 @@ export const navigation = [
 
     children: [
       {
-        label: "All Insights",
-        path: "/insights",
+        label:
+          "All Insights",
+
+        path:
+          "/insights",
       },
 
       {
-        label: "Gallery",
-        path: "/gallery",
+        label:
+          "Gallery",
+
+        path:
+          "/gallery",
       },
     ],
   },

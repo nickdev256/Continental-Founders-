@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
+
 /* ============================================================
    ROUTES
 ============================================================ */
@@ -24,6 +25,9 @@ const pagesRoutes = require("./routes/pagesRoutes");
 
 // Gallery
 const galleryRoutes = require("./routes/galleryRoutes");
+
+// CFCV Fellowship Admissions
+const cfcvRoutes = require("./routes/cfcvRoutes");
 
 const {
   notFound,
@@ -375,6 +379,41 @@ const newsletterLimiter =
 
 
 /* ============================================================
+   CFCV APPLICATION RATE LIMIT
+============================================================ */
+
+/*
+ * Separate limiter for fellowship applications.
+ *
+ * This protects the public application endpoint
+ * from automated spam without affecting the
+ * protected admin admissions endpoints.
+ */
+
+const cfcvApplicationLimiter =
+  rateLimit({
+    windowMs:
+      30 *
+      60 *
+      1000,
+
+    limit: 10,
+
+    standardHeaders: true,
+
+    legacyHeaders: false,
+
+
+    message: {
+      success: false,
+
+      message:
+        "Too many application submissions. Please wait and try again later.",
+    },
+  });
+
+
+/* ============================================================
    NO-CACHE ADMIN / AUTH
 ============================================================ */
 
@@ -383,6 +422,7 @@ app.use(
     "/api/auth",
     "/api/admin",
     "/api/gallery/admin",
+    "/api/cfcv/admin",
   ],
 
   (
@@ -512,6 +552,35 @@ app.use(
 
 
 /* ============================================================
+   CFCV FELLOWSHIP ADMISSIONS API
+============================================================ */
+
+/*
+ * Public:
+ *
+ * POST /api/cfcv/applications
+ *
+ *
+ * Protected admin:
+ *
+ * GET   /api/cfcv/admin/stats
+ * GET   /api/cfcv/admin/applications
+ * GET   /api/cfcv/admin/applications/:id
+ * PATCH /api/cfcv/admin/applications/:id
+ */
+
+app.use(
+  "/api/cfcv/applications",
+  cfcvApplicationLimiter
+);
+
+app.use(
+  "/api/cfcv",
+  cfcvRoutes
+);
+
+
+/* ============================================================
    ADMIN DASHBOARD
 ============================================================ */
 
@@ -569,5 +638,4 @@ app.use(
    EXPORT APP
 ============================================================ */
 
-module.exports =
-  app;
+module.exports = app;

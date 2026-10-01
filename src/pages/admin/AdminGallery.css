@@ -1,98 +1,137 @@
 /* ============================================================
+
    CONTINENTAL FOUNDERS
+
    ADMIN GALLERY
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery {
+
   --ag-primary: #0b3d37;
+
   --ag-primary-dark: #072d29;
+
   --ag-primary-light: #e8f1ef;
 
   --ag-gold: #c8942f;
+
   --ag-gold-dark: #a9781d;
+
   --ag-gold-light: #fbf4e5;
 
   --ag-background: #f5f7f6;
+
   --ag-surface: #ffffff;
+
   --ag-surface-soft: #fafbfa;
 
   --ag-text: #17211f;
+
   --ag-muted: #687370;
+
   --ag-muted-light: #8d9694;
 
   --ag-border: #e2e7e5;
+
   --ag-border-dark: #d3dad7;
 
   --ag-success: #18835c;
+
   --ag-success-bg: #eaf7f1;
 
   --ag-danger: #c44444;
+
   --ag-danger-dark: #a63333;
+
   --ag-danger-bg: #fff0f0;
 
   --ag-warning: #bd7c13;
 
   width: 100%;
+
   min-height: 100vh;
 
   padding: 34px;
 
   color: var(--ag-text);
+
   background: var(--ag-background);
 
   box-sizing: border-box;
+
 }
 
 .admin-gallery *,
+
 .admin-gallery *::before,
+
 .admin-gallery *::after {
+
   box-sizing: border-box;
+
 }
 
-
 /* ============================================================
+
    HEADER
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__header {
+
   display: flex;
+
   align-items: flex-start;
+
   justify-content: space-between;
 
   gap: 30px;
 
   margin-bottom: 30px;
+
 }
 
 .admin-gallery__header > div:first-child {
+
   min-width: 0;
+
 }
 
 .admin-gallery__eyebrow {
+
   margin: 0 0 8px;
 
   color: var(--ag-gold-dark);
 
   font-size: 0.72rem;
+
   font-weight: 800;
 
   letter-spacing: 0.12em;
+
   text-transform: uppercase;
+
 }
 
 .admin-gallery__header h1 {
+
   margin: 0;
 
   color: var(--ag-text);
 
   font-size: clamp(1.8rem, 3vw, 2.5rem);
+
   font-weight: 750;
 
   line-height: 1.12;
+
   letter-spacing: -0.035em;
+
 }
 
 .admin-gallery__subtitle {
+
   max-width: 700px;
 
   margin: 10px 0 0;
@@ -100,21 +139,27 @@
   color: var(--ag-muted);
 
   font-size: 0.9rem;
+
   line-height: 1.65;
+
 }
 
-
 /* ============================================================
+
    PRIMARY ADD BUTTON
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__add-button {
+
   flex-shrink: 0;
 
   min-height: 45px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 8px;
@@ -122,83 +167,113 @@
   padding: 11px 18px;
 
   border: 0;
+
   border-radius: 10px;
 
   color: #ffffff;
+
   background: var(--ag-primary);
 
   font: inherit;
+
   font-size: 0.84rem;
+
   font-weight: 700;
 
   cursor: pointer;
 
   box-shadow:
+
     0 8px 20px
+
     rgba(11, 61, 55, 0.16);
 
   transition:
+
     transform 0.2s ease,
+
     background 0.2s ease,
+
     box-shadow 0.2s ease;
+
 }
 
 .admin-gallery__add-button:hover {
+
   transform: translateY(-1px);
 
   background: var(--ag-primary-dark);
 
   box-shadow:
+
     0 12px 26px
+
     rgba(11, 61, 55, 0.22);
+
 }
 
-
 /* ============================================================
+
    ALERTS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__alert {
+
   position: relative;
 
   display: flex;
+
   align-items: center;
 
   gap: 10px;
 
   margin-bottom: 20px;
+
   padding: 13px 48px 13px 15px;
 
   border: 1px solid transparent;
+
   border-radius: 10px;
 
   font-size: 0.83rem;
+
   line-height: 1.45;
+
 }
 
 .admin-gallery__alert > svg {
+
   flex-shrink: 0;
+
 }
 
 .admin-gallery__alert > span {
+
   flex: 1;
+
 }
 
 .admin-gallery__alert > button {
+
   position: absolute;
 
   top: 50%;
+
   right: 11px;
 
   width: 29px;
+
   height: 29px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 0;
+
   border-radius: 50%;
 
   background: transparent;
@@ -208,47 +283,63 @@
   cursor: pointer;
 
   transform: translateY(-50%);
+
 }
 
 .admin-gallery__alert > button:hover {
+
   background: rgba(0, 0, 0, 0.05);
+
 }
 
 .admin-gallery__alert--error {
+
   color: #a23535;
 
   border-color: #f0cccc;
+
   background: var(--ag-danger-bg);
+
 }
 
 .admin-gallery__alert--success {
+
   color: #126b4b;
 
   border-color: #c8e7d9;
+
   background: var(--ag-success-bg);
+
 }
 
-
 /* ============================================================
+
    STATISTICS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__stats {
+
   display: grid;
 
   grid-template-columns:
+
     repeat(6, minmax(0, 1fr));
 
   gap: 14px;
 
   margin-bottom: 24px;
+
 }
 
 .admin-gallery__stat {
+
   min-width: 0;
+
   min-height: 105px;
 
   display: flex;
+
   align-items: center;
 
   gap: 14px;
@@ -256,65 +347,97 @@
   padding: 18px;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 14px;
 
   background: var(--ag-surface);
 
   box-shadow:
+
     0 3px 12px
+
     rgba(16, 39, 35, 0.035);
+
 }
 
 .admin-gallery__stat-icon {
+
   width: 43px;
+
   height: 43px;
 
   flex: 0 0 43px;
 
   display: grid;
+
   place-items: center;
 
   border-radius: 11px;
 
   color: var(--ag-primary);
+
   background: var(--ag-primary-light);
+
 }
 
 .admin-gallery__stat:nth-child(2)
+
 .admin-gallery__stat-icon {
+
   color: var(--ag-success);
+
   background: var(--ag-success-bg);
+
 }
 
 .admin-gallery__stat:nth-child(3)
+
 .admin-gallery__stat-icon {
+
   color: #8d641a;
+
   background: var(--ag-gold-light);
+
 }
 
 .admin-gallery__stat:nth-child(4)
+
 .admin-gallery__stat-icon {
+
   color: #4f6392;
+
   background: #eef1f8;
+
 }
 
 .admin-gallery__stat:nth-child(5)
+
 .admin-gallery__stat-icon {
+
   color: #936d1e;
+
   background: #faf2df;
+
 }
 
 .admin-gallery__stat:nth-child(6)
+
 .admin-gallery__stat-icon {
+
   color: #6651a1;
+
   background: #f1eef9;
+
 }
 
 .admin-gallery__stat > div:last-child {
+
   min-width: 0;
+
 }
 
 .admin-gallery__stat strong {
+
   display: block;
 
   overflow: hidden;
@@ -322,14 +445,17 @@
   color: var(--ag-text);
 
   font-size: 1.4rem;
+
   font-weight: 750;
 
   line-height: 1.1;
 
   text-overflow: ellipsis;
+
 }
 
 .admin-gallery__stat span:not(.admin-gallery__stat-icon) {
+
   display: block;
 
   margin-top: 6px;
@@ -337,215 +463,289 @@
   color: var(--ag-muted);
 
   font-size: 0.72rem;
+
   font-weight: 600;
 
   white-space: nowrap;
+
 }
 
-
 /* ============================================================
+
    TOOLBAR
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__toolbar {
+
   display: flex;
+
   align-items: center;
 
   gap: 10px;
 
   margin-bottom: 24px;
+
   padding: 12px;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 13px;
 
   background: var(--ag-surface);
 
   box-shadow:
+
     0 3px 12px
+
     rgba(16, 39, 35, 0.03);
+
 }
 
-
 /* ============================================================
+
    SEARCH
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__search {
+
   position: relative;
 
   min-width: 250px;
+
   flex: 1;
 
   display: flex;
+
   align-items: center;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 9px;
 
   background: #ffffff;
 
   transition:
+
     border-color 0.2s ease,
+
     box-shadow 0.2s ease;
+
 }
 
 .admin-gallery__search:focus-within {
+
   border-color: var(--ag-gold);
 
   box-shadow:
+
     0 0 0 3px
+
     rgba(200, 148, 47, 0.1);
+
 }
 
 .admin-gallery__search > svg {
+
   flex-shrink: 0;
 
   margin-left: 13px;
 
   color: #87908e;
+
 }
 
 .admin-gallery__search input {
+
   width: 100%;
+
   height: 42px;
 
   padding: 0 38px 0 10px;
 
   border: 0;
+
   outline: 0;
 
   color: var(--ag-text);
+
   background: transparent;
 
   font: inherit;
+
   font-size: 0.8rem;
+
 }
 
 .admin-gallery__search input::placeholder {
+
   color: #9ba3a1;
+
 }
 
 .admin-gallery__search button {
+
   position: absolute;
 
   top: 50%;
+
   right: 7px;
 
   width: 28px;
+
   height: 28px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 0;
+
   border-radius: 50%;
 
   color: #78817f;
+
   background: transparent;
 
   cursor: pointer;
 
   transform: translateY(-50%);
+
 }
 
 .admin-gallery__search button:hover {
+
   background: #f0f2f1;
+
 }
 
-
 /* ============================================================
+
    TOOLBAR SELECTS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__toolbar > select {
+
   min-width: 145px;
+
   height: 42px;
 
   padding: 0 34px 0 12px;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 9px;
+
   outline: 0;
 
   color: #3c4745;
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.78rem;
 
   cursor: pointer;
 
   transition:
+
     border-color 0.2s ease,
+
     box-shadow 0.2s ease;
+
 }
 
 .admin-gallery__toolbar > select:focus {
+
   border-color: var(--ag-gold);
 
   box-shadow:
+
     0 0 0 3px
+
     rgba(200, 148, 47, 0.09);
+
 }
 
-
 /* ============================================================
+
    REFRESH
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__refresh {
+
   width: 42px;
+
   height: 42px;
 
   flex: 0 0 42px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 9px;
 
   color: var(--ag-primary);
+
   background: #ffffff;
 
   cursor: pointer;
 
   transition:
+
     background 0.2s ease,
+
     border-color 0.2s ease,
+
     transform 0.2s ease;
+
 }
 
 .admin-gallery__refresh:hover:not(:disabled) {
+
   transform: translateY(-1px);
 
   border-color: #bac6c2;
+
   background: #f8faf9;
+
 }
 
 .admin-gallery__refresh:disabled {
+
   opacity: 0.55;
 
   cursor: wait;
+
 }
 
-
 /* ============================================================
+
    LOADING / EMPTY STATE
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__state {
+
   min-height: 390px;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   padding: 50px 24px;
@@ -553,24 +753,31 @@
   text-align: center;
 
   border: 1px dashed var(--ag-border-dark);
+
   border-radius: 15px;
 
   background: var(--ag-surface);
+
 }
 
 .admin-gallery__state > svg {
+
   color: var(--ag-gold);
+
 }
 
 .admin-gallery__state h2 {
+
   margin: 17px 0 7px;
 
   color: var(--ag-text);
 
   font-size: 1.2rem;
+
 }
 
 .admin-gallery__state p {
+
   max-width: 480px;
 
   margin: 0 0 20px;
@@ -578,74 +785,101 @@
   color: var(--ag-muted);
 
   font-size: 0.83rem;
+
   line-height: 1.6;
+
 }
 
-
 /* ============================================================
+
    GALLERY GRID
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__grid {
+
   display: grid;
 
   grid-template-columns:
+
     repeat(4, minmax(0, 1fr));
 
   gap: 17px;
+
 }
 
-
 /* ============================================================
+
    CARD
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card {
+
   min-width: 0;
 
   overflow: hidden;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 14px;
 
   background: var(--ag-surface);
 
   box-shadow:
+
     0 3px 12px
+
     rgba(16, 39, 35, 0.04);
 
   transition:
+
     transform 0.2s ease,
+
     border-color 0.2s ease,
+
     box-shadow 0.2s ease;
+
 }
 
 .admin-gallery-card:hover {
+
   transform: translateY(-2px);
 
   border-color: #cbd4d1;
 
   box-shadow:
+
     0 13px 28px
+
     rgba(14, 43, 38, 0.09);
+
 }
 
 .admin-gallery-card.is-selected {
+
   border-color: var(--ag-gold);
 
   box-shadow:
+
     0 0 0 2px
+
     rgba(200, 148, 47, 0.12),
+
     0 12px 28px
+
     rgba(14, 43, 38, 0.08);
+
 }
 
-
 /* ============================================================
+
    CARD MEDIA
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__media {
+
   position: relative;
 
   height: 205px;
@@ -653,10 +887,13 @@
   overflow: hidden;
 
   background: #edf0ee;
+
 }
 
 .admin-gallery-card__media > img {
+
   width: 100%;
+
   height: 100%;
 
   display: block;
@@ -664,85 +901,117 @@
   object-fit: cover;
 
   transition: transform 0.35s ease;
+
 }
 
 .admin-gallery-card:hover
+
 .admin-gallery-card__media > img {
+
   transform: scale(1.025);
+
 }
 
 .admin-gallery-card__missing {
+
   width: 100%;
+
   height: 100%;
 
   display: grid;
+
   place-items: center;
 
   color: #a2aaa7;
+
   background: #edf0ee;
+
 }
 
-
 /* ============================================================
+
    CARD CHECKBOX
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__check {
+
   position: absolute;
 
   top: 12px;
+
   left: 12px;
 
   width: 28px;
+
   height: 28px;
 
   cursor: pointer;
+
 }
 
 .admin-gallery-card__check input {
+
   position: absolute;
 
   opacity: 0;
+
   pointer-events: none;
+
 }
 
 .admin-gallery-card__check span {
+
   width: 28px;
+
   height: 28px;
 
   display: grid;
+
   place-items: center;
 
   border: 1px solid rgba(255, 255, 255, 0.7);
+
   border-radius: 7px;
 
   color: transparent;
+
   background: rgba(10, 29, 26, 0.58);
 
   backdrop-filter: blur(8px);
 
   transition:
+
     color 0.2s ease,
+
     background 0.2s ease,
+
     border-color 0.2s ease;
+
 }
 
 .admin-gallery-card__check input:checked + span {
+
   color: #ffffff;
 
   border-color: var(--ag-gold);
+
   background: var(--ag-gold);
+
 }
 
-
 /* ============================================================
+
    STATUS BADGE
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__status {
+
   position: absolute;
 
   top: 12px;
+
   right: 12px;
 
   padding: 6px 10px;
@@ -750,34 +1019,47 @@
   border-radius: 999px;
 
   font-size: 0.64rem;
+
   font-weight: 800;
 
   letter-spacing: 0.03em;
+
   text-transform: uppercase;
 
   backdrop-filter: blur(8px);
+
 }
 
 .admin-gallery-card__status.is-published {
+
   color: #ffffff;
+
   background: rgba(19, 126, 87, 0.92);
+
 }
 
 .admin-gallery-card__status.is-draft {
+
   color: #443817;
+
   background: rgba(242, 214, 151, 0.94);
+
 }
 
-
 /* ============================================================
+
    CARD CONTENT
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__content {
+
   padding: 16px;
+
 }
 
 .admin-gallery-card__content h3 {
+
   margin: 0 0 9px;
 
   overflow: hidden;
@@ -785,15 +1067,19 @@
   color: var(--ag-text);
 
   font-size: 0.94rem;
+
   font-weight: 700;
 
   line-height: 1.35;
 
   text-overflow: ellipsis;
+
   white-space: nowrap;
+
 }
 
 .admin-gallery-card__category {
+
   display: inline-flex;
 
   max-width: 100%;
@@ -805,17 +1091,23 @@
   border-radius: 999px;
 
   color: var(--ag-gold-dark);
+
   background: var(--ag-gold-light);
 
   font-size: 0.64rem;
+
   font-weight: 700;
 
   text-overflow: ellipsis;
+
   white-space: nowrap;
+
 }
 
 .admin-gallery-card__date {
+
   display: flex;
+
   align-items: center;
 
   gap: 6px;
@@ -825,13 +1117,17 @@
   color: var(--ag-muted);
 
   font-size: 0.7rem;
+
 }
 
 .admin-gallery-card__date svg {
+
   color: var(--ag-gold-dark);
+
 }
 
 .admin-gallery-card__caption {
+
   display: -webkit-box;
 
   min-height: 39px;
@@ -843,31 +1139,41 @@
   color: var(--ag-muted);
 
   font-size: 0.75rem;
+
   line-height: 1.5;
 
   -webkit-box-orient: vertical;
+
   -webkit-line-clamp: 2;
+
 }
 
-
 /* ============================================================
+
    CARD METRICS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__metrics {
+
   display: flex;
+
   align-items: center;
 
   gap: 14px;
 
   margin-top: 14px;
+
   padding-top: 12px;
 
   border-top: 1px solid #eef0ef;
+
 }
 
 .admin-gallery-card__metrics span {
+
   display: inline-flex;
+
   align-items: center;
 
   gap: 5px;
@@ -875,103 +1181,137 @@
   color: #7b8582;
 
   font-size: 0.68rem;
+
 }
 
-
 /* ============================================================
+
    CARD ACTIONS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-card__actions {
+
   display: flex;
+
   align-items: center;
 
   gap: 7px;
 
   margin-top: 13px;
+
 }
 
 .admin-gallery-card__actions button {
+
   height: 34px;
 
   flex: 1;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 8px;
 
   color: #53605d;
+
   background: #ffffff;
 
   cursor: pointer;
 
   transition:
+
     color 0.2s ease,
+
     background 0.2s ease,
+
     border-color 0.2s ease;
+
 }
 
 .admin-gallery-card__actions button:hover:not(:disabled) {
+
   color: var(--ag-primary);
 
   border-color: #bdcbc7;
+
   background: #f5f9f8;
+
 }
 
 .admin-gallery-card__actions button.is-danger:hover:not(:disabled) {
+
   color: var(--ag-danger);
 
   border-color: #e7bcbc;
+
   background: var(--ag-danger-bg);
+
 }
 
 .admin-gallery-card__actions button:disabled {
+
   opacity: 0.5;
 
   cursor: wait;
+
 }
 
-
 /* ============================================================
+
    FOOTER
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__footer {
+
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 20px;
 
   margin-top: 24px;
+
   padding: 14px 16px;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 12px;
 
   background: var(--ag-surface);
+
 }
 
-
 /* ============================================================
+
    BULK ACTIONS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__bulk {
+
   display: flex;
+
   align-items: center;
 
   gap: 8px;
 
   flex-wrap: wrap;
+
 }
 
 .admin-gallery__bulk label {
+
   display: flex;
+
   align-items: center;
 
   gap: 8px;
@@ -981,71 +1321,97 @@
   color: var(--ag-muted);
 
   font-size: 0.75rem;
+
   font-weight: 600;
 
   cursor: pointer;
+
 }
 
 .admin-gallery__bulk input {
+
   width: 16px;
+
   height: 16px;
 
   accent-color: var(--ag-primary);
+
 }
 
 .admin-gallery__bulk button {
+
   min-height: 34px;
 
   padding: 7px 11px;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 7px;
 
   color: #4e5957;
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.7rem;
+
   font-weight: 700;
 
   cursor: pointer;
+
 }
 
 .admin-gallery__bulk button:hover:not(:disabled) {
+
   color: var(--ag-primary);
 
   background: #f4f8f7;
+
 }
 
 .admin-gallery__bulk button.is-danger {
+
   color: var(--ag-danger);
+
 }
 
 .admin-gallery__bulk button.is-danger:hover:not(:disabled) {
+
   border-color: #e6b8b8;
+
   background: var(--ag-danger-bg);
+
 }
 
 .admin-gallery__bulk button:disabled {
+
   opacity: 0.5;
 
   cursor: wait;
+
 }
 
-
 /* ============================================================
+
    PAGINATION
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery__pagination {
+
   display: flex;
+
   align-items: center;
 
   gap: 6px;
+
 }
 
 .admin-gallery__page-size {
+
   display: flex;
+
   align-items: center;
 
   gap: 7px;
@@ -1055,25 +1421,33 @@
   color: var(--ag-muted);
 
   font-size: 0.72rem;
+
 }
 
 .admin-gallery__page-size select {
+
   height: 33px;
 
   padding: 0 7px;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 7px;
+
   outline: 0;
 
   color: var(--ag-text);
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.72rem;
+
 }
 
 .admin-gallery__range {
+
   margin-right: 8px;
 
   color: var(--ag-muted);
@@ -1081,55 +1455,73 @@
   font-size: 0.7rem;
 
   white-space: nowrap;
+
 }
 
 .admin-gallery__pagination > button {
+
   min-width: 33px;
+
   height: 33px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0 8px;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 7px;
 
   color: #53605d;
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.72rem;
 
   cursor: pointer;
+
 }
 
 .admin-gallery__pagination > button:hover:not(:disabled) {
+
   color: var(--ag-primary);
 
   border-color: #becbc7;
+
   background: #f4f8f7;
+
 }
 
 .admin-gallery__pagination > button.is-active {
+
   color: #ffffff;
 
   border-color: var(--ag-primary);
+
   background: var(--ag-primary);
+
 }
 
 .admin-gallery__pagination > button:disabled {
+
   opacity: 0.4;
 
   cursor: default;
+
 }
 
-
 /* ============================================================
+
    MODAL
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-modal {
+
   position: fixed;
 
   z-index: 10000;
@@ -1137,61 +1529,83 @@
   inset: 0;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   padding: 30px;
+
 }
 
 .admin-gallery-modal__backdrop {
+
   position: absolute;
 
   inset: 0;
 
   background:
+
     rgba(6, 21, 19, 0.68);
 
   backdrop-filter: blur(5px);
+
 }
 
 .admin-gallery-modal__panel {
+
   position: relative;
+
   z-index: 2;
 
   width: min(720px, 100%);
+
   max-height: calc(100vh - 60px);
 
   display: flex;
+
   flex-direction: column;
 
   overflow: hidden;
 
   border: 1px solid rgba(255, 255, 255, 0.2);
+
   border-radius: 17px;
 
   background: #ffffff;
 
   box-shadow:
+
     0 35px 90px
+
     rgba(0, 0, 0, 0.28);
 
   animation:
+
     adminGalleryModalIn
+
     0.2s ease;
+
 }
 
 .admin-gallery-modal__panel--edit {
+
   width: min(660px, 100%);
+
 }
 
-
 /* ============================================================
+
    MODAL HEADER
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-modal__header {
+
   display: flex;
+
   align-items: flex-start;
+
   justify-content: space-between;
 
   gap: 20px;
@@ -1199,74 +1613,95 @@
   padding: 21px 23px;
 
   border-bottom: 1px solid var(--ag-border);
+
 }
 
 .admin-gallery-modal__header h2 {
+
   margin: 0;
 
   color: var(--ag-text);
 
   font-size: 1.2rem;
+
 }
 
 .admin-gallery-modal__header p {
+
   margin: 6px 0 0;
 
   color: var(--ag-muted);
 
   font-size: 0.76rem;
+
 }
 
 .admin-gallery-modal__header > button {
+
   width: 35px;
+
   height: 35px;
 
   flex: 0 0 35px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 0;
+
   border-radius: 50%;
 
   color: #66716e;
+
   background: #f2f4f3;
 
   cursor: pointer;
+
 }
 
 .admin-gallery-modal__header > button:hover:not(:disabled) {
+
   color: var(--ag-text);
+
   background: #e8ebea;
+
 }
 
-
 /* ============================================================
+
    MODAL BODY
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-modal__body {
+
   flex: 1;
 
   overflow-y: auto;
 
   padding: 22px 23px 26px;
+
 }
 
-
 /* ============================================================
+
    UPLOAD DROPZONE
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-upload {
+
   min-height: 190px;
 
   display: flex;
+
   flex-direction: column;
 
   align-items: center;
+
   justify-content: center;
 
   padding: 30px;
@@ -1274,80 +1709,107 @@
   text-align: center;
 
   border:
+
     1.5px dashed
+
     #bdc8c5;
 
   border-radius: 13px;
 
   background:
+
     linear-gradient(
+
       145deg,
+
       #fbfcfb,
+
       #f4f7f6
+
     );
 
   cursor: pointer;
 
   transition:
+
     border-color 0.2s ease,
+
     background 0.2s ease,
+
     transform 0.2s ease;
+
 }
 
 .admin-gallery-upload:hover {
+
   transform: translateY(-1px);
 
   border-color: var(--ag-gold);
 
   background: #fcfaf4;
+
 }
 
 .admin-gallery-upload > svg {
+
   margin-bottom: 12px;
 
   color: var(--ag-gold);
+
 }
 
 .admin-gallery-upload strong {
+
   color: var(--ag-text);
 
   font-size: 0.9rem;
+
 }
 
 .admin-gallery-upload p {
+
   margin: 7px 0 0;
 
   color: var(--ag-muted);
 
   font-size: 0.76rem;
+
 }
 
 .admin-gallery-upload small {
+
   margin-top: 7px;
 
   color: #909996;
 
   font-size: 0.68rem;
+
 }
 
-
 /* ============================================================
+
    UPLOAD PREVIEWS
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-upload__previews {
+
   display: grid;
 
   grid-template-columns:
+
     repeat(5, minmax(0, 1fr));
 
   gap: 9px;
 
   margin-top: 13px;
+
 }
 
 .admin-gallery-upload__preview,
+
 .admin-gallery-upload__more {
+
   position: relative;
 
   aspect-ratio: 1 / 1;
@@ -1355,51 +1817,67 @@
   overflow: hidden;
 
   border: 1px solid var(--ag-border);
+
   border-radius: 9px;
 
   background: #eef1ef;
+
 }
 
 .admin-gallery-upload__preview img {
+
   width: 100%;
+
   height: 100%;
 
   display: block;
 
   object-fit: cover;
+
 }
 
 .admin-gallery-upload__preview > button {
+
   position: absolute;
 
   top: 5px;
+
   right: 5px;
 
   width: 23px;
+
   height: 23px;
 
   display: grid;
+
   place-items: center;
 
   padding: 0;
 
   border: 0;
+
   border-radius: 50%;
 
   color: #ffffff;
+
   background: rgba(18, 27, 25, 0.75);
 
   cursor: pointer;
 
   backdrop-filter: blur(5px);
+
 }
 
 .admin-gallery-upload__preview > button:hover {
+
   background: var(--ag-danger);
+
 }
 
 .admin-gallery-upload__more {
+
   display: grid;
+
   place-items: center;
 
   color: var(--ag-primary);
@@ -1407,74 +1885,103 @@
   border-style: dashed;
 
   cursor: pointer;
+
 }
 
 .admin-gallery-upload__more:hover {
+
   border-color: var(--ag-gold);
 
   color: var(--ag-gold-dark);
+
   background: var(--ag-gold-light);
+
 }
 
-
 /* ============================================================
+
    FORM
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-form {
+
   display: flex;
+
   flex-direction: column;
 
   gap: 17px;
 
   margin-top: 22px;
+
 }
 
 .admin-gallery-form > label,
+
 .admin-gallery-form__row > label {
+
   min-width: 0;
 
   display: flex;
+
   flex-direction: column;
 
   gap: 7px;
+
 }
 
 .admin-gallery-form label > span {
+
   color: #3c4745;
 
   font-size: 0.73rem;
+
   font-weight: 700;
+
 }
 
 .admin-gallery-form input,
+
 .admin-gallery-form textarea,
+
 .admin-gallery-form select {
+
   width: 100%;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 9px;
+
   outline: 0;
 
   color: var(--ag-text);
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.8rem;
 
   transition:
+
     border-color 0.2s ease,
+
     box-shadow 0.2s ease;
+
 }
 
 .admin-gallery-form input,
+
 .admin-gallery-form select {
+
   height: 43px;
 
   padding: 0 12px;
+
 }
 
 .admin-gallery-form textarea {
+
   min-height: 100px;
 
   padding: 11px 12px;
@@ -1482,38 +1989,53 @@
   line-height: 1.5;
 
   resize: vertical;
+
 }
 
 .admin-gallery-form input:focus,
+
 .admin-gallery-form textarea:focus,
+
 .admin-gallery-form select:focus {
+
   border-color: var(--ag-gold);
 
   box-shadow:
+
     0 0 0 3px
+
     rgba(200, 148, 47, 0.09);
+
 }
 
 .admin-gallery-form input::placeholder,
+
 .admin-gallery-form textarea::placeholder {
+
   color: #a0a8a6;
+
 }
 
 .admin-gallery-form__row {
+
   display: grid;
 
   grid-template-columns:
+
     repeat(2, minmax(0, 1fr));
 
   gap: 14px;
+
 }
 
-
 /* ============================================================
+
    EDIT IMAGE
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-edit__image {
+
   height: 260px;
 
   overflow: hidden;
@@ -1521,25 +2043,33 @@
   border-radius: 12px;
 
   background: #e9edeb;
+
 }
 
 .admin-gallery-edit__image img {
+
   width: 100%;
+
   height: 100%;
 
   display: block;
 
   object-fit: cover;
+
 }
 
-
 /* ============================================================
+
    MODAL FOOTER
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-modal__footer {
+
   display: flex;
+
   align-items: center;
+
   justify-content: flex-end;
 
   gap: 9px;
@@ -1549,13 +2079,17 @@
   border-top: 1px solid var(--ag-border);
 
   background: #fafbfa;
+
 }
 
 .admin-gallery-modal__footer button {
+
   min-height: 40px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 7px;
@@ -1565,48 +2099,67 @@
   border-radius: 8px;
 
   font: inherit;
+
   font-size: 0.76rem;
+
   font-weight: 700;
 
   cursor: pointer;
+
 }
 
 .admin-gallery-modal__footer button.is-secondary {
+
   border: 1px solid var(--ag-border-dark);
 
   color: #4f5a57;
+
   background: #ffffff;
+
 }
 
 .admin-gallery-modal__footer button.is-secondary:hover:not(:disabled) {
+
   background: #f3f5f4;
+
 }
 
 .admin-gallery-modal__footer button.is-primary {
+
   border: 1px solid var(--ag-primary);
 
   color: #ffffff;
+
   background: var(--ag-primary);
+
 }
 
 .admin-gallery-modal__footer button.is-primary:hover:not(:disabled) {
+
   border-color: var(--ag-primary-dark);
+
   background: var(--ag-primary-dark);
+
 }
 
 .admin-gallery-modal__footer button:disabled {
+
   opacity: 0.55;
 
   cursor: wait;
+
 }
 
-
 /* ============================================================
+
    DELETE CONFIRMATION
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery-delete {
+
   position: relative;
+
   z-index: 2;
 
   width: min(430px, 100%);
@@ -1620,19 +2173,27 @@
   background: #ffffff;
 
   box-shadow:
+
     0 35px 90px
+
     rgba(0, 0, 0, 0.28);
 
   animation:
+
     adminGalleryModalIn
+
     0.2s ease;
+
 }
 
 .admin-gallery-delete__icon {
+
   width: 54px;
+
   height: 54px;
 
   display: grid;
+
   place-items: center;
 
   margin: 0 auto 17px;
@@ -1640,46 +2201,61 @@
   border-radius: 50%;
 
   color: var(--ag-danger);
+
   background: var(--ag-danger-bg);
+
 }
 
 .admin-gallery-delete h2 {
+
   margin: 0;
 
   color: var(--ag-text);
 
   font-size: 1.2rem;
+
 }
 
 .admin-gallery-delete p {
+
   margin: 11px 0 0;
 
   color: var(--ag-muted);
 
   font-size: 0.8rem;
+
   line-height: 1.6;
+
 }
 
 .admin-gallery-delete p strong {
+
   color: var(--ag-text);
+
 }
 
 .admin-gallery-delete__actions {
+
   display: grid;
 
   grid-template-columns:
+
     repeat(2, minmax(0, 1fr));
 
   gap: 9px;
 
   margin-top: 24px;
+
 }
 
 .admin-gallery-delete__actions button {
+
   min-height: 41px;
 
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 7px;
@@ -1687,423 +2263,582 @@
   padding: 9px 13px;
 
   border: 1px solid var(--ag-border-dark);
+
   border-radius: 8px;
 
   color: #4c5754;
+
   background: #ffffff;
 
   font: inherit;
+
   font-size: 0.76rem;
+
   font-weight: 700;
 
   cursor: pointer;
+
 }
 
 .admin-gallery-delete__actions button:hover:not(:disabled) {
+
   background: #f4f6f5;
+
 }
 
 .admin-gallery-delete__actions button.is-danger {
+
   color: #ffffff;
 
   border-color: var(--ag-danger);
+
   background: var(--ag-danger);
+
 }
 
 .admin-gallery-delete__actions button.is-danger:hover:not(:disabled) {
+
   border-color: var(--ag-danger-dark);
+
   background: var(--ag-danger-dark);
+
 }
 
 .admin-gallery-delete__actions button:disabled {
+
   opacity: 0.55;
 
   cursor: wait;
+
 }
 
-
 /* ============================================================
+
    SPINNER
-============================================================ */
+
+\============================================================ */
 
 .is-spinning {
+
   animation:
+
     adminGallerySpin
+
     0.75s linear infinite;
+
 }
 
 @keyframes adminGallerySpin {
+
   to {
+
     transform: rotate(360deg);
+
   }
+
 }
 
 @keyframes adminGalleryModalIn {
+
   from {
+
     opacity: 0;
+
     transform:
+
       translateY(12px)
+
       scale(0.985);
+
   }
 
   to {
+
     opacity: 1;
+
     transform:
+
       translateY(0)
+
       scale(1);
+
   }
+
 }
 
-
 /* ============================================================
+
    FOCUS STATES
-============================================================ */
+
+\============================================================ */
 
 .admin-gallery button:focus-visible,
+
 .admin-gallery input:focus-visible,
+
 .admin-gallery textarea:focus-visible,
+
 .admin-gallery select:focus-visible,
+
 .admin-gallery-card__check input:focus-visible + span {
+
   outline:
+
     3px solid
+
     rgba(200, 148, 47, 0.25);
 
   outline-offset: 2px;
+
 }
 
-
 /* ============================================================
+
    1400px
-============================================================ */
+
+\============================================================ */
 
 @media (max-width: 1400px) {
+
   .admin-gallery__stats {
+
     grid-template-columns:
+
       repeat(3, minmax(0, 1fr));
+
   }
 
   .admin-gallery__grid {
+
     grid-template-columns:
+
       repeat(3, minmax(0, 1fr));
+
   }
+
 }
 
-
 /* ============================================================
+
    1100px
-============================================================ */
+
+\============================================================ */
 
 @media (max-width: 1100px) {
+
   .admin-gallery {
+
     padding: 26px;
+
   }
 
   .admin-gallery__toolbar {
+
     flex-wrap: wrap;
+
   }
 
   .admin-gallery__search {
+
     width: 100%;
+
     min-width: 100%;
+
   }
 
   .admin-gallery__toolbar > select {
+
     flex: 1;
+
   }
 
   .admin-gallery__grid {
+
     grid-template-columns:
+
       repeat(2, minmax(0, 1fr));
+
   }
 
   .admin-gallery__footer {
+
     align-items: flex-start;
+
     flex-direction: column;
+
   }
 
   .admin-gallery__pagination {
+
     width: 100%;
 
     justify-content: flex-end;
+
   }
+
 }
 
-
 /* ============================================================
+
    760px
-============================================================ */
+
+\============================================================ */
 
 @media (max-width: 760px) {
+
   .admin-gallery {
+
     padding: 20px;
+
   }
 
   .admin-gallery__header {
+
     align-items: stretch;
+
     flex-direction: column;
 
     gap: 18px;
+
   }
 
   .admin-gallery__add-button {
+
     width: 100%;
+
   }
 
   .admin-gallery__stats {
+
     grid-template-columns:
+
       repeat(2, minmax(0, 1fr));
+
   }
 
   .admin-gallery__stat {
+
     min-height: 94px;
+
   }
 
   .admin-gallery__toolbar {
+
     align-items: stretch;
+
     flex-direction: column;
+
   }
 
   .admin-gallery__toolbar > select {
+
     width: 100%;
+
   }
 
   .admin-gallery__refresh {
+
     width: 100%;
+
   }
 
   .admin-gallery__grid {
+
     grid-template-columns:
+
       minmax(0, 1fr);
+
   }
 
   .admin-gallery-card__media {
+
     height: clamp(
+
       220px,
+
       55vw,
+
       340px
+
     );
+
   }
 
   .admin-gallery__footer {
+
     padding: 13px;
+
   }
 
   .admin-gallery__bulk {
+
     width: 100%;
+
   }
 
   .admin-gallery__pagination {
+
     justify-content: flex-start;
 
     overflow-x: auto;
 
     padding-bottom: 2px;
+
   }
 
   .admin-gallery-modal {
+
     align-items: flex-end;
 
     padding: 0;
+
   }
 
   .admin-gallery-modal__panel {
+
     width: 100%;
+
     max-height: 92vh;
 
     border-radius:
+
       18px 18px 0 0;
+
   }
 
   .admin-gallery-upload__previews {
+
     grid-template-columns:
+
       repeat(4, minmax(0, 1fr));
+
   }
 
   .admin-gallery-form__row {
+
     grid-template-columns:
+
       minmax(0, 1fr);
+
   }
 
   .admin-gallery-delete {
+
     width: calc(100% - 28px);
 
     margin-bottom: 14px;
+
   }
+
 }
 
-
 /* ============================================================
+
    500px
-============================================================ */
+
+\============================================================ */
 
 @media (max-width: 500px) {
+
   .admin-gallery {
+
     padding: 16px;
+
   }
 
   .admin-gallery__header h1 {
+
     font-size: 1.7rem;
+
   }
 
   .admin-gallery__stats {
+
     grid-template-columns:
+
       minmax(0, 1fr);
+
   }
 
   .admin-gallery__stat {
+
     min-height: 82px;
 
     padding: 14px;
+
   }
 
   .admin-gallery__stat-icon {
+
     width: 40px;
+
     height: 40px;
 
     flex-basis: 40px;
+
   }
 
   .admin-gallery__toolbar {
+
     padding: 10px;
+
   }
 
   .admin-gallery-card__media {
+
     height: 230px;
+
   }
 
   .admin-gallery__pagination {
+
     flex-wrap: wrap;
+
   }
 
   .admin-gallery__page-size {
+
     width: 100%;
 
     margin-bottom: 4px;
+
   }
 
   .admin-gallery__range {
+
     width: 100%;
 
     margin-bottom: 4px;
+
   }
 
   .admin-gallery-modal__header {
+
     padding: 18px;
+
   }
 
   .admin-gallery-modal__body {
+
     padding: 18px;
+
   }
 
   .admin-gallery-modal__footer {
+
     padding: 13px 18px;
+
   }
 
   .admin-gallery-modal__footer button {
+
     flex: 1;
+
   }
 
   .admin-gallery-upload {
+
     min-height: 165px;
 
     padding: 22px 15px;
+
   }
 
   .admin-gallery-upload__previews {
+
     grid-template-columns:
+
       repeat(3, minmax(0, 1fr));
+
   }
 
   .admin-gallery-edit__image {
+
     height: 210px;
+
   }
 
   .admin-gallery-delete {
+
     padding: 25px 20px;
+
   }
 
   .admin-gallery-delete__actions {
+
     grid-template-columns:
+
       minmax(0, 1fr);
+
   }
+
 }
 
-
 /* ============================================================
+
    REDUCED MOTION
-============================================================ */
+
+\============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
+
   .admin-gallery *,
+
   .admin-gallery *::before,
+
   .admin-gallery *::after {
+
     scroll-behavior: auto !important;
+
     transition: none !important;
+
   }
 
   .admin-gallery-card:hover,
+
   .admin-gallery__add-button:hover,
+
   .admin-gallery-upload:hover {
+
     transform: none;
+
   }
+
 }
 
 /* ============================================================
    SCROLL + MULTI-UPLOAD HARDENING
 ============================================================ */
 
-html,
-body,
-#root {
-  min-height: 100%;
-}
-
-body {
-  overflow-y: auto;
-}
-
+/* AdminLayout remains responsible for the page's vertical scroll. */
 .admin-gallery {
   width: 100%;
   min-width: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow-x: hidden;
-  overflow-y: visible;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
+/* Keep upload/edit modals inside the viewport. */
 .admin-gallery-modal {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 10000;
   overflow: hidden;
   overscroll-behavior: contain;
 }
 
-.admin-gallery-modal__panel {
+.admin-gallery-modal__panel,
+.admin-gallery-modal__panel--edit {
   display: flex;
   flex-direction: column;
-  width: min(760px, calc(100vw - 32px));
-  max-height: min(92vh, 900px);
-  max-height: min(92dvh, 900px);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
   overflow: hidden;
 }
 
 .admin-gallery-modal__header,
 .admin-gallery-modal__footer {
-  position: relative;
-  z-index: 3;
   flex: 0 0 auto;
-  background: #fff;
-}
-
-.admin-gallery-modal__header {
-  top: 0;
-}
-
-.admin-gallery-modal__footer {
-  bottom: 0;
-  box-shadow: 0 -10px 24px rgba(17, 45, 38, 0.05);
 }
 
 .admin-gallery-modal__body {
@@ -2113,7 +2848,15 @@ body {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
+}
+
+/* Multiple-image selection remains usable without making the modal too tall. */
+.admin-gallery-upload__previews {
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .admin-gallery-upload.is-disabled,
@@ -2121,14 +2864,6 @@ body {
   cursor: progress;
   opacity: 0.72;
   pointer-events: none;
-}
-
-.admin-gallery-upload__previews {
-  max-height: 330px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 2px 4px 4px 2px;
-  scrollbar-width: thin;
 }
 
 .admin-gallery-upload__preview button:disabled,
@@ -2201,14 +2936,8 @@ body {
 }
 
 @media (max-width: 768px) {
-  .admin-gallery {
-    min-height: 100dvh;
-    overflow-x: hidden;
-  }
-
   .admin-gallery-modal {
     align-items: flex-end;
-    overflow: hidden;
     padding: 0;
   }
 
@@ -2216,16 +2945,13 @@ body {
   .admin-gallery-modal__panel--edit {
     width: 100%;
     max-width: none;
+    max-height: 94vh;
     max-height: 94dvh;
     border-radius: 18px 18px 0 0;
   }
 
-  .admin-gallery-modal__body {
-    padding-bottom: 24px;
-  }
-
   .admin-gallery-upload__previews {
-    max-height: 280px;
+    max-height: 260px;
   }
 }
 
@@ -2237,10 +2963,6 @@ body {
   }
 
   .admin-gallery-upload__previews {
-    max-height: 250px;
-  }
-
-  .admin-gallery-modal__body {
-    padding-bottom: 18px;
+    max-height: 230px;
   }
 }

@@ -1,0 +1,2395 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   CFCV FELLOWSHIP PAGE
+   File: src/pages/CFCV.css
+============================================================ */
+
+
+/* ============================================================
+   01 — PAGE VARIABLES
+============================================================ */
+
+.cfcv-page {
+  --cfcv-navy: #031b34;
+  --cfcv-navy-deep: #021426;
+  --cfcv-navy-soft: #0a2947;
+
+  --cfcv-gold: #c69a3a;
+  --cfcv-gold-dark: #a97c22;
+  --cfcv-gold-light: #e3c77b;
+
+  --cfcv-white: #ffffff;
+  --cfcv-soft: #f6f4ef;
+  --cfcv-soft-2: #faf9f6;
+
+  --cfcv-text: #17202a;
+  --cfcv-muted: #66717d;
+  --cfcv-border: rgba(3, 27, 52, 0.12);
+
+  --cfcv-shadow:
+    0 18px 55px rgba(3, 27, 52, 0.08);
+
+  --cfcv-shadow-lg:
+    0 30px 80px rgba(3, 27, 52, 0.14);
+
+  width: 100%;
+  min-width: 0;
+
+  overflow-x: hidden;
+
+  background: var(--cfcv-white);
+  color: var(--cfcv-text);
+
+  font-family:
+    "Montserrat",
+    Arial,
+    sans-serif;
+}
+
+
+/* ============================================================
+   02 — GLOBAL PAGE RESET
+============================================================ */
+
+.cfcv-page *,
+.cfcv-page *::before,
+.cfcv-page *::after {
+  box-sizing: border-box;
+}
+
+
+.cfcv-page h1,
+.cfcv-page h2,
+.cfcv-page h3,
+.cfcv-page p {
+  margin-top: 0;
+}
+
+
+.cfcv-page a {
+  text-decoration: none;
+}
+
+
+.cfcv-page button,
+.cfcv-page a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+.cfcv-page img {
+  display: block;
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   03 — CONTAINER
+============================================================ */
+
+.cfcv-container {
+  width: min(1180px, calc(100% - 48px));
+
+  margin-inline: auto;
+}
+
+
+/* ============================================================
+   04 — SECTION LABEL
+============================================================ */
+
+.cfcv-section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 24px;
+
+  color: var(--cfcv-gold-dark);
+}
+
+
+.cfcv-section-label > span {
+  width: 42px;
+  height: 2px;
+
+  flex: 0 0 auto;
+
+  background: var(--cfcv-gold);
+}
+
+
+.cfcv-section-label strong {
+  font-size: 0.73rem;
+  font-weight: 800;
+
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+
+  text-transform: uppercase;
+}
+
+
+.cfcv-section-label--light {
+  color: var(--cfcv-gold-light);
+}
+
+
+.cfcv-section-label--light > span {
+  background: var(--cfcv-gold);
+}
+
+
+/* ============================================================
+   05 — SHARED HEADINGS
+============================================================ */
+
+.cfcv-heading {
+  margin-bottom: 0;
+
+  color: var(--cfcv-navy);
+
+  font-family:
+    "Trajan Pro",
+    "Times New Roman",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    2rem,
+    4vw,
+    3.7rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+
+.cfcv-heading em {
+  color: var(--cfcv-gold);
+
+  font-family: Georgia, serif;
+
+  font-weight: 400;
+}
+
+
+.cfcv-heading__connector {
+  display: inline-block;
+
+  margin-inline: 18px;
+
+  color: var(--cfcv-gold);
+}
+
+
+/* ============================================================
+   06 — BUTTONS
+============================================================ */
+
+.cfcv-button {
+  min-height: 52px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 14px 22px;
+
+  border: 1px solid transparent;
+
+  font-size: 0.82rem;
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+.cfcv-button:hover {
+  transform: translateY(-2px);
+}
+
+
+.cfcv-button:focus-visible {
+  outline: 3px solid rgba(198, 154, 58, 0.35);
+  outline-offset: 4px;
+}
+
+
+.cfcv-button--gold {
+  background: var(--cfcv-gold);
+
+  color: var(--cfcv-navy-deep);
+
+  box-shadow:
+    0 13px 30px rgba(198, 154, 58, 0.2);
+}
+
+
+.cfcv-button--gold:hover {
+  background: var(--cfcv-gold-light);
+
+  box-shadow:
+    0 17px 38px rgba(198, 154, 58, 0.28);
+}
+
+
+.cfcv-button--outline {
+  border-color:
+    rgba(255, 255, 255, 0.38);
+
+  background:
+    rgba(255, 255, 255, 0.04);
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-button--outline:hover {
+  border-color: var(--cfcv-white);
+
+  background:
+    rgba(255, 255, 255, 0.09);
+}
+
+
+/* ============================================================
+   07 — HERO
+============================================================ */
+
+.cfcv-hero {
+  position: relative;
+
+  isolation: isolate;
+
+  min-height: 720px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      115deg,
+      var(--cfcv-navy-deep) 0%,
+      var(--cfcv-navy) 54%,
+      #0a3155 100%
+    );
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-hero::before {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  top: -190px;
+  right: -160px;
+
+  width: 600px;
+  height: 600px;
+
+  border: 1px solid
+    rgba(198, 154, 58, 0.15);
+
+  border-radius: 50%;
+}
+
+
+.cfcv-hero::after {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  right: 8%;
+  bottom: -280px;
+
+  width: 650px;
+  height: 650px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(198, 154, 58, 0.1),
+      transparent 67%
+    );
+}
+
+
+.cfcv-hero__pattern {
+  position: absolute;
+
+  z-index: -1;
+
+  inset: 0;
+
+  opacity: 0.13;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px
+    );
+
+  background-size: 68px 68px;
+
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent,
+      black 45%,
+      black
+    );
+}
+
+
+.cfcv-hero__inner {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.3fr)
+    minmax(300px, 0.7fr);
+
+  align-items: center;
+
+  gap: 80px;
+
+  padding-top: 110px;
+  padding-bottom: 100px;
+}
+
+
+.cfcv-hero__content {
+  max-width: 760px;
+}
+
+
+.cfcv-hero__kicker {
+  margin-bottom: 13px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 0.78rem;
+  font-weight: 700;
+
+  letter-spacing: 0.23em;
+
+  text-transform: uppercase;
+}
+
+
+.cfcv-hero h1 {
+  max-width: 790px;
+
+  margin-bottom: 30px;
+
+  color: var(--cfcv-white);
+
+  font-family:
+    "Trajan Pro",
+    "Times New Roman",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    3rem,
+    6.7vw,
+    6.2rem
+  );
+
+  font-weight: 500;
+
+  line-height: 0.98;
+
+  letter-spacing: -0.055em;
+}
+
+
+.cfcv-hero h1 em {
+  color: var(--cfcv-gold);
+
+  font-family: Georgia, serif;
+
+  font-weight: 400;
+}
+
+
+.cfcv-hero__lead {
+  max-width: 700px;
+
+  margin-bottom: 34px;
+
+  color:
+    rgba(255, 255, 255, 0.76);
+
+  font-size: 1.02rem;
+
+  line-height: 1.85;
+}
+
+
+.cfcv-hero__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+}
+
+
+/* ============================================================
+   08 — HERO SUMMARY
+============================================================ */
+
+.cfcv-hero__summary {
+  display: grid;
+
+  gap: 14px;
+}
+
+
+.cfcv-summary-card {
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 25px 26px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+
+  background:
+    rgba(255, 255, 255, 0.055);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+
+.cfcv-summary-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 3px;
+  height: 100%;
+
+  background: var(--cfcv-gold);
+}
+
+
+.cfcv-summary-card__label {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: var(--cfcv-gold-light);
+
+  font-size: 0.64rem;
+  font-weight: 800;
+
+  letter-spacing: 0.17em;
+}
+
+
+.cfcv-summary-card > strong {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--cfcv-white);
+
+  font-family: Georgia, serif;
+
+  font-size: 1.25rem;
+
+  font-weight: 500;
+}
+
+
+.cfcv-summary-card p {
+  margin-bottom: 0;
+
+  color:
+    rgba(255, 255, 255, 0.66);
+
+  font-size: 0.82rem;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   09 — SHARED SECTIONS
+============================================================ */
+
+.cfcv-section {
+  position: relative;
+
+  padding: 110px 0;
+}
+
+
+.cfcv-section--white {
+  background: var(--cfcv-white);
+}
+
+
+.cfcv-section--soft {
+  background: var(--cfcv-soft);
+}
+
+
+.cfcv-section-heading {
+  max-width: 820px;
+
+  margin-bottom: 58px;
+}
+
+
+.cfcv-section-heading > p {
+  max-width: 700px;
+
+  margin-top: 25px;
+  margin-bottom: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.98rem;
+
+  line-height: 1.8;
+}
+
+
+/* ============================================================
+   10 — PROGRAM OVERVIEW
+============================================================ */
+
+.cfcv-overview {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
+  gap: 100px;
+
+  align-items: start;
+}
+
+
+.cfcv-overview__copy {
+  padding-top: 46px;
+}
+
+
+.cfcv-overview__copy p {
+  margin-bottom: 22px;
+
+  color: var(--cfcv-muted);
+
+  font-size: 1rem;
+
+  line-height: 1.9;
+}
+
+
+.cfcv-overview__copy p:first-child {
+  color: var(--cfcv-navy);
+
+  font-size: 1.18rem;
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   11 — ADMISSIONS WORKFLOW
+============================================================ */
+
+.cfcv-workflow {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  border-top:
+    1px solid
+    rgba(3, 27, 52, 0.16);
+}
+
+
+.cfcv-workflow__item {
+  position: relative;
+
+  min-width: 0;
+
+  padding:
+    36px 24px
+    25px 0;
+}
+
+
+.cfcv-workflow__item:not(:last-child) {
+  padding-right: 30px;
+}
+
+
+.cfcv-workflow__number {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: -61px;
+  margin-bottom: 27px;
+
+  border: 1px solid var(--cfcv-gold);
+
+  background: var(--cfcv-soft);
+
+  color: var(--cfcv-gold-dark);
+
+  font-family: Georgia, serif;
+
+  font-size: 0.84rem;
+}
+
+
+.cfcv-workflow__body h3 {
+  margin-bottom: 13px;
+
+  color: var(--cfcv-navy);
+
+  font-size: 0.86rem;
+  font-weight: 900;
+
+  letter-spacing: 0.11em;
+}
+
+
+.cfcv-workflow__body p {
+  margin-bottom: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.84rem;
+
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   12 — TRACK CARDS
+============================================================ */
+
+.cfcv-tracks {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 22px;
+}
+
+
+.cfcv-track-card {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 100%;
+
+  padding: 34px;
+
+  border:
+    1px solid
+    var(--cfcv-border);
+
+  background: var(--cfcv-white);
+
+  box-shadow: var(--cfcv-shadow);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+
+.cfcv-track-card:hover {
+  transform: translateY(-5px);
+
+  border-color:
+    rgba(198, 154, 58, 0.48);
+
+  box-shadow: var(--cfcv-shadow-lg);
+}
+
+
+.cfcv-track-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 32px;
+}
+
+
+.cfcv-track-card__number {
+  color:
+    rgba(3, 27, 52, 0.34);
+
+  font-family: Georgia, serif;
+
+  font-size: 0.85rem;
+}
+
+
+.cfcv-track-card__icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(198, 154, 58, 0.11);
+
+  color: var(--cfcv-gold-dark);
+}
+
+
+.cfcv-track-card__title {
+  padding-bottom: 24px;
+
+  border-bottom:
+    1px solid
+    var(--cfcv-border);
+}
+
+
+.cfcv-track-card__title span {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--cfcv-gold-dark);
+
+  font-size: 0.73rem;
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+}
+
+
+.cfcv-track-card__title h3 {
+  margin-bottom: 0;
+
+  color: var(--cfcv-navy);
+
+  font-family: Georgia, serif;
+
+  font-size: 1.75rem;
+
+  font-weight: 500;
+}
+
+
+.cfcv-track-card__section {
+  padding-top: 24px;
+}
+
+
+.cfcv-track-card__section small,
+.cfcv-track-card__outcome small {
+  display: block;
+
+  margin-bottom: 10px;
+
+  color: var(--cfcv-gold-dark);
+
+  font-size: 0.65rem;
+  font-weight: 900;
+
+  letter-spacing: 0.14em;
+}
+
+
+.cfcv-track-card__section p,
+.cfcv-track-card__outcome p {
+  margin-bottom: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.88rem;
+
+  line-height: 1.7;
+}
+
+
+.cfcv-track-card__section ul {
+  margin: 0;
+
+  padding-left: 19px;
+
+  color: var(--cfcv-muted);
+}
+
+
+.cfcv-track-card__section li {
+  margin-bottom: 7px;
+
+  font-size: 0.85rem;
+
+  line-height: 1.55;
+}
+
+
+.cfcv-track-card__section li::marker {
+  color: var(--cfcv-gold);
+}
+
+
+.cfcv-track-card__outcome {
+  margin-top: auto;
+
+  padding: 24px 20px;
+
+  background: var(--cfcv-soft-2);
+}
+
+
+/* ============================================================
+   13 — FOUNDER ASSESSMENT
+============================================================ */
+
+.cfcv-assessment {
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      120deg,
+      var(--cfcv-navy-deep),
+      var(--cfcv-navy)
+    );
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-assessment::after {
+  content: "";
+
+  position: absolute;
+
+  top: -180px;
+  right: -160px;
+
+  width: 500px;
+  height: 500px;
+
+  border:
+    1px solid
+    rgba(198, 154, 58, 0.15);
+
+  border-radius: 50%;
+}
+
+
+.cfcv-two-column {
+  position: relative;
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.85fr)
+    minmax(0, 1.15fr);
+
+  align-items: start;
+
+  gap: 100px;
+}
+
+
+.cfcv-two-column__content h2 {
+  margin-bottom: 25px;
+
+  color: var(--cfcv-white);
+
+  font-family:
+    "Trajan Pro",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    2.2rem,
+    4vw,
+    3.8rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.08;
+}
+
+
+.cfcv-two-column__content h2 em {
+  color: var(--cfcv-gold);
+
+  font-family: Georgia, serif;
+}
+
+
+.cfcv-two-column__content > p {
+  max-width: 500px;
+
+  color:
+    rgba(255, 255, 255, 0.68);
+
+  line-height: 1.8;
+}
+
+
+.cfcv-two-column__panel {
+  padding: 36px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+
+  background:
+    rgba(255, 255, 255, 0.05);
+}
+
+
+/* ============================================================
+   14 — CHECKLIST
+============================================================ */
+
+.cfcv-checklist {
+  display: grid;
+
+  gap: 0;
+}
+
+
+.cfcv-checklist__item {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  padding: 17px 0;
+
+  border-bottom:
+    1px solid
+    rgba(3, 27, 52, 0.1);
+}
+
+
+.cfcv-checklist__item:last-child {
+  border-bottom: 0;
+}
+
+
+.cfcv-checklist__icon {
+  width: 29px;
+  height: 29px;
+
+  flex: 0 0 29px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 1px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(198, 154, 58, 0.12);
+
+  color: var(--cfcv-gold);
+}
+
+
+.cfcv-checklist__item p {
+  margin: 0;
+
+  color: var(--cfcv-text);
+
+  font-size: 0.9rem;
+
+  line-height: 1.65;
+}
+
+
+.cfcv-two-column__panel
+.cfcv-checklist__item {
+  border-color:
+    rgba(255, 255, 255, 0.1);
+}
+
+
+.cfcv-two-column__panel
+.cfcv-checklist__item p {
+  color:
+    rgba(255, 255, 255, 0.82);
+}
+
+
+/* ============================================================
+   15 — FOUNDER INTERVIEW
+============================================================ */
+
+.cfcv-interview {
+  display: grid;
+
+  grid-template-columns:
+    minmax(280px, 0.7fr)
+    minmax(0, 1.3fr);
+
+  gap: 100px;
+}
+
+
+.cfcv-interview__duration {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 11px;
+
+  margin-top: 30px;
+
+  padding: 15px 17px;
+
+  background: var(--cfcv-soft);
+
+  color: var(--cfcv-navy);
+
+  font-size: 0.82rem;
+}
+
+
+.cfcv-interview__duration svg {
+  color: var(--cfcv-gold-dark);
+}
+
+
+.cfcv-interview__questions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  border-top:
+    1px solid
+    var(--cfcv-border);
+}
+
+
+.cfcv-interview__questions > div {
+  display: grid;
+
+  grid-template-columns: 40px 1fr;
+
+  gap: 14px;
+
+  padding: 21px 15px 21px 0;
+
+  border-bottom:
+    1px solid
+    var(--cfcv-border);
+}
+
+
+.cfcv-interview__questions > div:nth-child(odd) {
+  margin-right: 22px;
+}
+
+
+.cfcv-interview__questions span {
+  color: var(--cfcv-gold-dark);
+
+  font-family: Georgia, serif;
+
+  font-size: 0.75rem;
+}
+
+
+.cfcv-interview__questions p {
+  margin: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.87rem;
+
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   16 — CROSS-CONTINENTAL MATCHING
+============================================================ */
+
+.cfcv-matching {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 1.1fr);
+
+  align-items: start;
+
+  gap: 100px;
+}
+
+
+.cfcv-matching__intro > p {
+  max-width: 570px;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.95rem;
+
+  line-height: 1.8;
+}
+
+
+.cfcv-matching__intro
+.cfcv-heading {
+  margin-bottom: 28px;
+}
+
+
+.cfcv-matching__criteria {
+  padding: 36px 40px;
+
+  border-top:
+    4px solid
+    var(--cfcv-gold);
+
+  background: var(--cfcv-white);
+
+  box-shadow: var(--cfcv-shadow);
+}
+
+
+.cfcv-matching__criteria h3 {
+  margin-bottom: 17px;
+
+  color: var(--cfcv-navy);
+
+  font-family: Georgia, serif;
+
+  font-size: 1.45rem;
+
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   17 — COMPATIBILITY SPRINT
+============================================================ */
+
+.cfcv-compatibility {
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      115deg,
+      #071d32,
+      var(--cfcv-navy)
+    );
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-compatibility__header {
+  max-width: 820px;
+
+  margin-bottom: 58px;
+}
+
+
+.cfcv-compatibility__header h2 {
+  margin-bottom: 24px;
+
+  font-family:
+    "Trajan Pro",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    2.1rem,
+    4vw,
+    3.8rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.1;
+}
+
+
+.cfcv-compatibility__header h2 em {
+  color: var(--cfcv-gold);
+}
+
+
+.cfcv-compatibility__header p {
+  max-width: 690px;
+
+  margin-bottom: 0;
+
+  color:
+    rgba(255, 255, 255, 0.68);
+
+  line-height: 1.8;
+}
+
+
+.cfcv-compatibility__grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  border-top:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+
+  border-left:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+}
+
+
+.cfcv-compatibility__item {
+  min-height: 180px;
+
+  padding: 27px;
+
+  border-right:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+
+  border-bottom:
+    1px solid
+    rgba(255, 255, 255, 0.13);
+}
+
+
+.cfcv-compatibility__item > span {
+  display: block;
+
+  margin-bottom: 32px;
+
+  color: var(--cfcv-gold);
+
+  font-family: Georgia, serif;
+
+  font-size: 0.77rem;
+}
+
+
+.cfcv-compatibility__item p {
+  margin-bottom: 0;
+
+  color:
+    rgba(255, 255, 255, 0.83);
+
+  font-size: 0.89rem;
+
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   18 — DECISIONS
+============================================================ */
+
+.cfcv-decisions {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 15px;
+}
+
+
+.cfcv-decision {
+  display: grid;
+
+  grid-template-columns: 52px 1fr;
+
+  align-items: start;
+
+  gap: 19px;
+
+  padding: 27px;
+
+  border:
+    1px solid
+    var(--cfcv-border);
+
+  background: var(--cfcv-white);
+
+  transition:
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+.cfcv-decision:hover {
+  transform: translateY(-3px);
+
+  border-color:
+    rgba(198, 154, 58, 0.45);
+
+  box-shadow: var(--cfcv-shadow);
+}
+
+
+.cfcv-decision__icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(198, 154, 58, 0.12);
+
+  color: var(--cfcv-gold-dark);
+}
+
+
+.cfcv-decision h3 {
+  margin-bottom: 8px;
+
+  color: var(--cfcv-navy);
+
+  font-size: 0.83rem;
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+
+.cfcv-decision p {
+  margin-bottom: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.87rem;
+
+  line-height: 1.65;
+}
+
+
+.cfcv-cohort-note {
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-top: 28px;
+
+  padding: 21px 24px;
+
+  border-left:
+    4px solid
+    var(--cfcv-gold);
+
+  background: var(--cfcv-soft);
+}
+
+
+.cfcv-cohort-note svg {
+  flex: 0 0 auto;
+
+  color: var(--cfcv-gold-dark);
+}
+
+
+.cfcv-cohort-note p {
+  margin: 0;
+
+  color: var(--cfcv-navy);
+
+  font-size: 0.91rem;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   19 — TIMELINE
+============================================================ */
+
+.cfcv-timeline {
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 16px;
+}
+
+
+.cfcv-timeline__item {
+  display: grid;
+
+  grid-template-columns: 50px 1fr;
+
+  gap: 18px;
+
+  min-height: 160px;
+
+  padding: 25px;
+
+  border:
+    1px solid
+    var(--cfcv-border);
+
+  background: var(--cfcv-white);
+}
+
+
+.cfcv-timeline__marker span {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(198, 154, 58, 0.5);
+
+  color: var(--cfcv-gold-dark);
+
+  font-family: Georgia, serif;
+
+  font-size: 0.72rem;
+}
+
+
+.cfcv-timeline__content small {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: var(--cfcv-gold-dark);
+
+  font-size: 0.64rem;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+
+.cfcv-timeline__content h3 {
+  margin-bottom: 8px;
+
+  color: var(--cfcv-navy);
+
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+
+.cfcv-timeline__content p {
+  margin: 0;
+
+  color: var(--cfcv-muted);
+
+  font-size: 0.82rem;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   20 — ADMISSIONS FUNNEL
+============================================================ */
+
+.cfcv-funnel {
+  overflow: hidden;
+
+  background: var(--cfcv-navy-deep);
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-funnel__header {
+  max-width: 750px;
+
+  margin-bottom: 55px;
+}
+
+
+.cfcv-funnel__header h2 {
+  margin-bottom: 0;
+
+  font-family:
+    "Trajan Pro",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    2.3rem,
+    4vw,
+    4rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.06;
+}
+
+
+.cfcv-funnel__header h2 em {
+  color: var(--cfcv-gold);
+}
+
+
+.cfcv-funnel__flow {
+  max-width: 730px;
+
+  margin-inline: auto;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: stretch;
+
+  text-align: center;
+}
+
+
+.cfcv-funnel__flow > span {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  min-height: 68px;
+
+  padding: 15px 20px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.15);
+
+  background:
+    rgba(255, 255, 255, 0.045);
+
+  color: var(--cfcv-white);
+
+  font-size: 0.77rem;
+  font-weight: 900;
+
+  letter-spacing: 0.11em;
+}
+
+
+.cfcv-funnel__flow > span small {
+  color:
+    rgba(255, 255, 255, 0.58);
+
+  font-size: 0.68rem;
+  font-weight: 500;
+
+  letter-spacing: 0.03em;
+}
+
+
+.cfcv-funnel__flow > i {
+  display: block;
+
+  padding: 7px 0;
+
+  color: var(--cfcv-gold);
+
+  font-style: normal;
+}
+
+
+/* ============================================================
+   21 — POSITIONING
+============================================================ */
+
+.cfcv-positioning {
+  background: var(--cfcv-white);
+}
+
+
+.cfcv-positioning__inner {
+  display: grid;
+
+  grid-template-columns: 90px 1fr;
+
+  gap: 42px;
+
+  max-width: 1000px;
+}
+
+
+.cfcv-positioning__icon {
+  width: 74px;
+  height: 74px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--cfcv-navy);
+
+  color: var(--cfcv-gold);
+}
+
+
+.cfcv-positioning__inner
+.cfcv-heading {
+  margin-bottom: 28px;
+}
+
+
+.cfcv-positioning__inner p {
+  max-width: 760px;
+
+  margin-bottom: 17px;
+
+  color: var(--cfcv-muted);
+
+  line-height: 1.85;
+}
+
+
+/* ============================================================
+   22 — FINAL CTA
+============================================================ */
+
+.cfcv-final {
+  position: relative;
+
+  isolation: isolate;
+
+  overflow: hidden;
+
+  padding: 115px 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      var(--cfcv-navy-deep),
+      var(--cfcv-navy)
+    );
+
+  color: var(--cfcv-white);
+}
+
+
+.cfcv-final__pattern {
+  position: absolute;
+
+  z-index: -1;
+
+  inset: 0;
+
+  opacity: 0.12;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.08) 1px,
+      transparent 1px
+    );
+
+  background-size: 72px 72px;
+}
+
+
+.cfcv-final::after {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  width: 520px;
+  height: 520px;
+
+  right: -180px;
+  top: -170px;
+
+  border-radius: 50%;
+
+  border:
+    1px solid
+    rgba(198, 154, 58, 0.17);
+}
+
+
+.cfcv-final__inner {
+  max-width: 900px;
+}
+
+
+.cfcv-final h2 {
+  margin-bottom: 25px;
+
+  color: var(--cfcv-white);
+
+  font-family:
+    "Trajan Pro",
+    Georgia,
+    serif;
+
+  font-size: clamp(
+    2.6rem,
+    5vw,
+    5rem
+  );
+
+  font-weight: 500;
+
+  line-height: 1.02;
+
+  letter-spacing: -0.04em;
+}
+
+
+.cfcv-final h2 em {
+  color: var(--cfcv-gold);
+
+  font-family: Georgia, serif;
+}
+
+
+.cfcv-final__inner > p {
+  max-width: 650px;
+
+  margin-bottom: 32px;
+
+  color:
+    rgba(255, 255, 255, 0.7);
+
+  font-size: 1rem;
+
+  line-height: 1.8;
+}
+
+
+.cfcv-final__actions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+}
+
+
+/* ============================================================
+   23 — TABLET
+============================================================ */
+
+@media (max-width: 1050px) {
+
+  .cfcv-hero__inner {
+    grid-template-columns:
+      minmax(0, 1.15fr)
+      minmax(260px, 0.85fr);
+
+    gap: 45px;
+  }
+
+
+  .cfcv-overview,
+  .cfcv-two-column,
+  .cfcv-interview,
+  .cfcv-matching {
+    gap: 60px;
+  }
+
+
+  .cfcv-workflow {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+
+    gap: 30px 20px;
+
+    border-top: 0;
+  }
+
+
+  .cfcv-workflow__item {
+    padding:
+      25px 20px;
+
+    border-top:
+      1px solid
+      var(--cfcv-border);
+  }
+
+
+  .cfcv-workflow__number {
+    margin-top: -50px;
+  }
+
+
+  .cfcv-compatibility__grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+
+  .cfcv-timeline {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ============================================================
+   24 — TABLET / MOBILE
+============================================================ */
+
+@media (max-width: 820px) {
+
+  .cfcv-container {
+    width:
+      min(
+        100% - 34px,
+        1180px
+      );
+  }
+
+
+  .cfcv-section {
+    padding: 82px 0;
+  }
+
+
+  .cfcv-hero {
+    min-height: auto;
+  }
+
+
+  .cfcv-hero__inner {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    padding-top: 95px;
+    padding-bottom: 75px;
+  }
+
+
+  .cfcv-hero__summary {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+
+  .cfcv-summary-card {
+    padding: 20px;
+  }
+
+
+  .cfcv-overview,
+  .cfcv-two-column,
+  .cfcv-interview,
+  .cfcv-matching {
+    grid-template-columns: 1fr;
+
+    gap: 45px;
+  }
+
+
+  .cfcv-overview__copy {
+    padding-top: 0;
+  }
+
+
+  .cfcv-tracks {
+    grid-template-columns: 1fr;
+  }
+
+
+  .cfcv-track-card {
+    max-width: 650px;
+  }
+
+
+  .cfcv-interview__questions {
+    grid-template-columns: 1fr;
+  }
+
+
+  .cfcv-interview__questions
+  > div:nth-child(odd) {
+    margin-right: 0;
+  }
+
+
+  .cfcv-decisions {
+    grid-template-columns: 1fr;
+  }
+
+
+  .cfcv-positioning__inner {
+    grid-template-columns: 1fr;
+
+    gap: 27px;
+  }
+
+}
+
+
+/* ============================================================
+   25 — MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .cfcv-container {
+    width:
+      calc(100% - 28px);
+  }
+
+
+  .cfcv-section {
+    padding: 68px 0;
+  }
+
+
+  .cfcv-section-label {
+    gap: 9px;
+
+    margin-bottom: 19px;
+  }
+
+
+  .cfcv-section-label > span {
+    width: 28px;
+  }
+
+
+  .cfcv-section-label strong {
+    font-size: 0.64rem;
+
+    letter-spacing: 0.12em;
+  }
+
+
+  .cfcv-heading {
+    font-size:
+      clamp(
+        1.9rem,
+        9vw,
+        2.8rem
+      );
+  }
+
+
+  /* HERO */
+
+  .cfcv-hero__inner {
+    padding-top: 80px;
+    padding-bottom: 65px;
+  }
+
+
+  .cfcv-hero h1 {
+    font-size:
+      clamp(
+        2.65rem,
+        13vw,
+        4rem
+      );
+
+    line-height: 1;
+  }
+
+
+  .cfcv-hero__lead {
+    font-size: 0.92rem;
+
+    line-height: 1.75;
+  }
+
+
+  .cfcv-hero__actions {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .cfcv-button {
+    width: 100%;
+  }
+
+
+  .cfcv-hero__summary {
+    grid-template-columns: 1fr;
+  }
+
+
+  /* SECTION HEADINGS */
+
+  .cfcv-section-heading {
+    margin-bottom: 45px;
+  }
+
+
+  /* WORKFLOW */
+
+  .cfcv-workflow {
+    grid-template-columns: 1fr;
+
+    gap: 17px;
+  }
+
+
+  .cfcv-workflow__item {
+    display: grid;
+
+    grid-template-columns: 50px 1fr;
+
+    gap: 17px;
+
+    padding: 22px 0;
+
+    border-top: 0;
+
+    border-bottom:
+      1px solid
+      var(--cfcv-border);
+  }
+
+
+  .cfcv-workflow__number {
+    margin: 0;
+
+    width: 44px;
+    height: 44px;
+  }
+
+
+  /* TRACKS */
+
+  .cfcv-track-card {
+    padding: 27px 23px;
+  }
+
+
+  /* ASSESSMENT */
+
+  .cfcv-two-column__panel {
+    padding: 22px;
+  }
+
+
+  /* INTERVIEW */
+
+  .cfcv-interview__questions > div {
+    padding:
+      18px 0;
+
+    grid-template-columns:
+      35px 1fr;
+  }
+
+
+  /* MATCHING */
+
+  .cfcv-matching__criteria {
+    padding: 27px 22px;
+  }
+
+
+  .cfcv-heading__connector {
+    margin-inline: 7px;
+  }
+
+
+  /* COMPATIBILITY */
+
+  .cfcv-compatibility__grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .cfcv-compatibility__item {
+    min-height: auto;
+
+    padding: 23px;
+  }
+
+
+  .cfcv-compatibility__item > span {
+    margin-bottom: 17px;
+  }
+
+
+  /* DECISIONS */
+
+  .cfcv-decision {
+    grid-template-columns:
+      44px 1fr;
+
+    padding: 22px 18px;
+  }
+
+
+  .cfcv-decision__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+
+  .cfcv-cohort-note {
+    align-items: flex-start;
+
+    padding: 18px;
+  }
+
+
+  /* TIMELINE */
+
+  .cfcv-timeline {
+    grid-template-columns: 1fr;
+  }
+
+
+  .cfcv-timeline__item {
+    min-height: auto;
+
+    padding: 21px;
+
+    grid-template-columns:
+      44px 1fr;
+  }
+
+
+  /* FUNNEL */
+
+  .cfcv-funnel__flow > span {
+    font-size: 0.7rem;
+  }
+
+
+  /* POSITIONING */
+
+  .cfcv-positioning__icon {
+    width: 62px;
+    height: 62px;
+  }
+
+
+  /* FINAL CTA */
+
+  .cfcv-final {
+    padding: 80px 0;
+  }
+
+
+  .cfcv-final h2 {
+    font-size:
+      clamp(
+        2.25rem,
+        11vw,
+        3.5rem
+      );
+  }
+
+
+  .cfcv-final__actions {
+    flex-direction: column;
+  }
+
+}
+
+
+/* ============================================================
+   26 — VERY SMALL MOBILE
+============================================================ */
+
+@media (max-width: 380px) {
+
+  .cfcv-container {
+    width:
+      calc(100% - 22px);
+  }
+
+
+  .cfcv-track-card {
+    padding:
+      24px 18px;
+  }
+
+
+  .cfcv-two-column__panel,
+  .cfcv-matching__criteria {
+    padding:
+      21px 17px;
+  }
+
+
+  .cfcv-decision {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ============================================================
+   27 — ACCESSIBILITY / REDUCED MOTION
+============================================================ */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .cfcv-page *,
+  .cfcv-page *::before,
+  .cfcv-page *::after {
+    scroll-behavior: auto !important;
+
+    transition-duration:
+      0.01ms !important;
+
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+  }
+
+}
+
+
+/* ============================================================
+   28 — PRINT
+============================================================ */
+
+@media print {
+
+  .cfcv-page {
+    background: #ffffff;
+
+    color: #000000;
+  }
+
+
+  .cfcv-hero,
+  .cfcv-assessment,
+  .cfcv-compatibility,
+  .cfcv-funnel,
+  .cfcv-final {
+    background: #ffffff !important;
+
+    color: #000000 !important;
+  }
+
+
+  .cfcv-hero *,
+  .cfcv-assessment *,
+  .cfcv-compatibility *,
+  .cfcv-funnel *,
+  .cfcv-final * {
+    color: #000000 !important;
+  }
+
+
+  .cfcv-hero__pattern,
+  .cfcv-final__pattern {
+    display: none;
+  }
+
+
+  .cfcv-button {
+    display: none;
+  }
+
+
+  .cfcv-section {
+    padding:
+      35px 0;
+  }
+
+
+  .cfcv-track-card,
+  .cfcv-decision,
+  .cfcv-timeline__item {
+    box-shadow: none;
+
+    break-inside: avoid;
+  }
+
+}

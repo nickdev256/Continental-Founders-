@@ -10,6 +10,7 @@ import {
   ArrowUpRight,
   CalendarDays,
   CheckCircle2,
+  ClipboardCheck,
   ExternalLink,
   GraduationCap,
   Handshake,
@@ -19,10 +20,13 @@ import {
   MessageSquareText,
   Newspaper,
   RefreshCw,
+  UserCheck,
   Users,
 } from "lucide-react";
 
-import { Link } from "react-router-dom";
+import {
+  Link,
+} from "react-router-dom";
 
 import "./AdminDashboard.css";
 
@@ -38,29 +42,56 @@ const API_URL = (
 
 
 /* ============================================================
-   DEFAULT DASHBOARD STATE
+   DEFAULT GENERAL DASHBOARD
 ============================================================ */
 
 const DEFAULT_DASHBOARD = {
   upcomingEvents: 0,
-
   publishedInsights: 0,
 
   newsletterSubscribers: 0,
 
   newContacts: 0,
-
   totalContacts: 0,
 
   partnerships: 0,
-
   newPartnerships: 0,
 
   totalGalleryPhotos: 0,
-
   publishedGalleryPhotos: 0,
 
   recentActivity: [],
+};
+
+
+/* ============================================================
+   DEFAULT CFCV STATS
+============================================================ */
+
+const DEFAULT_CFCV_STATS = {
+  totalApplications: 0,
+
+  submitted: 0,
+
+  underReview: 0,
+
+  interviews: 0,
+
+  matchingRequired: 0,
+
+  admitted: 0,
+
+  waitlisted: 0,
+
+  genesis: 0,
+
+  ascend: 0,
+
+  horizon: 0,
+
+  cohortCapacity: 30,
+
+  remainingCapacity: 30,
 };
 
 
@@ -69,6 +100,17 @@ const DEFAULT_DASHBOARD = {
 ============================================================ */
 
 const quickAccess = [
+  {
+    title: "CFCV Admissions",
+
+    description:
+      "Review applications, interviews, matching, track placement and admissions decisions.",
+
+    icon: ClipboardCheck,
+
+    to: "/admin/cfcv",
+  },
+
   {
     title: "Events",
 
@@ -152,8 +194,12 @@ const quickAccess = [
    NUMBER HELPERS
 ============================================================ */
 
-function getNumber(...values) {
-  for (const value of values) {
+function getNumber(
+  ...values
+) {
+  for (
+    const value of values
+  ) {
     if (
       value === null ||
       value === undefined ||
@@ -166,7 +212,9 @@ function getNumber(...values) {
       Number(value);
 
     if (
-      Number.isFinite(parsed)
+      Number.isFinite(
+        parsed
+      )
     ) {
       return parsed;
     }
@@ -176,7 +224,9 @@ function getNumber(...values) {
 }
 
 
-function formatNumber(value) {
+function formatNumber(
+  value
+) {
   return new Intl.NumberFormat(
     "en-US"
   ).format(
@@ -186,7 +236,34 @@ function formatNumber(value) {
 
 
 /* ============================================================
-   NORMALIZE BACKEND RESPONSE
+   SAFE JSON RESPONSE
+============================================================ */
+
+async function readJsonResponse(
+  response,
+  serviceName
+) {
+  const contentType =
+    response.headers.get(
+      "content-type"
+    ) || "";
+
+  if (
+    !contentType.includes(
+      "application/json"
+    )
+  ) {
+    throw new Error(
+      `${serviceName} returned an invalid response (${response.status}).`
+    );
+  }
+
+  return response.json();
+}
+
+
+/* ============================================================
+   NORMALIZE GENERAL DASHBOARD
 ============================================================ */
 
 function normalizeDashboardData(
@@ -229,14 +306,11 @@ function normalizeDashboardData(
       source.activity;
   }
 
-
   return {
     upcomingEvents:
       getNumber(
         stats.upcomingEvents,
         stats.upcoming_events,
-        stats.upcomingEventCount,
-        stats.upcoming_event_count,
         source.upcomingEvents,
         source.upcoming_events
       ),
@@ -245,8 +319,6 @@ function normalizeDashboardData(
       getNumber(
         stats.publishedInsights,
         stats.published_insights,
-        stats.publishedInsightCount,
-        stats.published_insight_count,
         source.publishedInsights,
         source.published_insights
       ),
@@ -257,8 +329,6 @@ function normalizeDashboardData(
         stats.newsletter_subscribers,
         stats.activeSubscribers,
         stats.active_subscribers,
-        stats.subscribers,
-        stats.totalSubscribers,
         source.newsletterSubscribers,
         source.newsletter_subscribers
       ),
@@ -273,7 +343,6 @@ function normalizeDashboardData(
 
     totalContacts:
       getNumber(
-        stats.contacts,
         stats.totalContacts,
         stats.total_contacts,
         source.totalContacts,
@@ -285,17 +354,14 @@ function normalizeDashboardData(
         stats.partnerships,
         stats.totalPartnerships,
         stats.total_partnerships,
-        source.partnerships,
-        source.totalPartnerships,
-        source.total_partnerships
+        source.partnerships
       ),
 
     newPartnerships:
       getNumber(
         stats.newPartnerships,
         stats.new_partnerships,
-        source.newPartnerships,
-        source.new_partnerships
+        source.newPartnerships
       ),
 
     totalGalleryPhotos:
@@ -303,17 +369,13 @@ function normalizeDashboardData(
         stats.totalGalleryPhotos,
         stats.total_gallery_photos,
         stats.galleryPhotos,
-        stats.gallery_photos,
-        source.totalGalleryPhotos,
-        source.total_gallery_photos
+        stats.gallery_photos
       ),
 
     publishedGalleryPhotos:
       getNumber(
         stats.publishedGalleryPhotos,
-        stats.published_gallery_photos,
-        source.publishedGalleryPhotos,
-        source.published_gallery_photos
+        stats.published_gallery_photos
       ),
 
     recentActivity,
@@ -322,27 +384,123 @@ function normalizeDashboardData(
 
 
 /* ============================================================
+   NORMALIZE CFCV STATS
+============================================================ */
+
+function normalizeCfcvStats(
+  payload
+) {
+  const source =
+    payload?.data ||
+    payload ||
+    {};
+
+  const stats =
+    source?.stats ||
+    source?.statistics ||
+    {};
+
+  return {
+    totalApplications:
+      getNumber(
+        stats.totalApplications,
+        stats.total_applications
+      ),
+
+    submitted:
+      getNumber(
+        stats.submitted
+      ),
+
+    underReview:
+      getNumber(
+        stats.underReview,
+        stats.under_review
+      ),
+
+    interviews:
+      getNumber(
+        stats.interviews
+      ),
+
+    matchingRequired:
+      getNumber(
+        stats.matchingRequired,
+        stats.matching_required
+      ),
+
+    admitted:
+      getNumber(
+        stats.admitted
+      ),
+
+    waitlisted:
+      getNumber(
+        stats.waitlisted
+      ),
+
+    genesis:
+      getNumber(
+        stats.genesis
+      ),
+
+    ascend:
+      getNumber(
+        stats.ascend
+      ),
+
+    horizon:
+      getNumber(
+        stats.horizon
+      ),
+
+    cohortCapacity:
+      getNumber(
+        stats.cohortCapacity,
+        stats.cohort_capacity,
+        30
+      ),
+
+    remainingCapacity:
+      getNumber(
+        stats.remainingCapacity,
+        stats.remaining_capacity
+      ),
+  };
+}
+
+
+/* ============================================================
    ACTIVITY HELPERS
 ============================================================ */
 
-function getActivityIcon(item) {
+function getActivityIcon(
+  item
+) {
   const type =
     String(
       item?.type ||
-        item?.category ||
-        item?.entity ||
-        ""
+      item?.category ||
+      item?.entity ||
+      ""
     )
       .trim()
       .toLowerCase();
 
+  if (
+    type.includes("cfcv") ||
+    type.includes(
+      "application"
+    )
+  ) {
+    return ClipboardCheck;
+  }
 
   if (
     type.includes("event")
   ) {
     return CalendarDays;
   }
-
 
   if (
     type.includes("insight") ||
@@ -352,7 +510,6 @@ function getActivityIcon(item) {
     return Newspaper;
   }
 
-
   if (
     type.includes("gallery") ||
     type.includes("photo") ||
@@ -361,14 +518,16 @@ function getActivityIcon(item) {
     return Images;
   }
 
-
   if (
-    type.includes("newsletter") ||
-    type.includes("subscriber")
+    type.includes(
+      "newsletter"
+    ) ||
+    type.includes(
+      "subscriber"
+    )
   ) {
     return Mail;
   }
-
 
   if (
     type.includes("contact") ||
@@ -378,27 +537,30 @@ function getActivityIcon(item) {
     return MessageSquareText;
   }
 
-
   if (
     type.includes("partner") ||
-    type.includes("partnership")
+    type.includes(
+      "partnership"
+    )
   ) {
     return Handshake;
   }
 
-
   if (
-    type.includes("university")
+    type.includes(
+      "university"
+    )
   ) {
     return GraduationCap;
   }
-
 
   return Activity;
 }
 
 
-function getActivityTitle(item) {
+function getActivityTitle(
+  item
+) {
   return (
     item?.title ||
     item?.name ||
@@ -421,7 +583,9 @@ function getActivityDescription(
 }
 
 
-function getActivityTime(item) {
+function getActivityTime(
+  item
+) {
   const value =
     item?.time ||
     item?.relativeTime ||
@@ -434,10 +598,8 @@ function getActivityTime(item) {
     return "";
   }
 
-
   const parsedDate =
     new Date(value);
-
 
   if (
     Number.isNaN(
@@ -446,7 +608,6 @@ function getActivityTime(item) {
   ) {
     return String(value);
   }
-
 
   return new Intl.DateTimeFormat(
     "en-US",
@@ -468,6 +629,7 @@ function StatCard({
   label,
   value,
   helper,
+  unavailable = false,
 }) {
   return (
     <article className="admin-dashboard__stat-card">
@@ -484,7 +646,11 @@ function StatCard({
         </span>
 
         <strong className="admin-dashboard__stat-value">
-          {formatNumber(value)}
+          {unavailable
+            ? "—"
+            : formatNumber(
+                value
+              )}
         </strong>
 
         {helper && (
@@ -553,6 +719,18 @@ function AdminDashboard() {
   );
 
   const [
+    cfcvStats,
+    setCfcvStats,
+  ] = useState(
+    DEFAULT_CFCV_STATS
+  );
+
+  const [
+    cfcvAvailable,
+    setCfcvAvailable,
+  ] = useState(false);
+
+  const [
     loading,
     setLoading,
   ] = useState(true);
@@ -565,6 +743,11 @@ function AdminDashboard() {
   const [
     error,
     setError,
+  ] = useState("");
+
+  const [
+    cfcvError,
+    setCfcvError,
   ] = useState("");
 
   const [
@@ -590,51 +773,75 @@ function AdminDashboard() {
           }
 
           setError("");
+          setCfcvError("");
 
-          const response =
-            await fetch(
-              `${API_URL}/api/admin/dashboard/stats`,
-              {
-                method:
-                  "GET",
+          const [
+            dashboardResult,
+            cfcvResult,
+          ] =
+            await Promise.allSettled([
+              fetch(
+                `${API_URL}/api/admin/dashboard/stats`,
+                {
+                  method: "GET",
 
-                headers: {
-                  Accept:
-                    "application/json",
-                },
+                  headers: {
+                    Accept:
+                      "application/json",
+                  },
 
-                credentials:
-                  "include",
+                  credentials:
+                    "include",
 
-                cache:
-                  "no-store",
-              }
-            );
+                  cache:
+                    "no-store",
+                }
+              ),
+
+              fetch(
+                `${API_URL}/api/cfcv/admin/stats`,
+                {
+                  method: "GET",
+
+                  headers: {
+                    Accept:
+                      "application/json",
+                  },
+
+                  credentials:
+                    "include",
+
+                  cache:
+                    "no-store",
+                }
+              ),
+            ]);
 
 
-          const contentType =
-            response.headers.get(
-              "content-type"
-            ) || "";
-
+          /* ================================================
+             GENERAL DASHBOARD RESPONSE
+          ================================================ */
 
           if (
-            !contentType.includes(
-              "application/json"
-            )
+            dashboardResult.status !==
+            "fulfilled"
           ) {
             throw new Error(
-              `Dashboard service returned an invalid response (${response.status}).`
+              "Unable to connect to the dashboard service."
             );
           }
 
+          const dashboardResponse =
+            dashboardResult.value;
 
-          const result =
-            await response.json();
-
+          const dashboardData =
+            await readJsonResponse(
+              dashboardResponse,
+              "Dashboard service"
+            );
 
           if (
-            response.status ===
+            dashboardResponse.status ===
             401
           ) {
             throw new Error(
@@ -642,34 +849,109 @@ function AdminDashboard() {
             );
           }
 
-
           if (
-            response.status ===
+            dashboardResponse.status ===
             403
           ) {
             throw new Error(
-              result?.message ||
-                "Your account does not have permission to access the dashboard."
+              dashboardData?.message ||
+              "Your account does not have permission to access the dashboard."
             );
           }
-
 
           if (
-            !response.ok
+            !dashboardResponse.ok
           ) {
             throw new Error(
-              result?.message ||
-                result?.error ||
-                `Unable to load dashboard (${response.status}).`
+              dashboardData?.message ||
+              dashboardData?.error ||
+              `Unable to load dashboard (${dashboardResponse.status}).`
             );
           }
-
 
           setDashboard(
             normalizeDashboardData(
-              result
+              dashboardData
             )
           );
+
+
+          /* ================================================
+             CFCV RESPONSE
+
+             CFCV failure must not take down the rest of CMS.
+          ================================================ */
+
+          if (
+            cfcvResult.status ===
+            "fulfilled"
+          ) {
+            const cfcvResponse =
+              cfcvResult.value;
+
+            try {
+              const cfcvData =
+                await readJsonResponse(
+                  cfcvResponse,
+                  "CFCV admissions service"
+                );
+
+              if (
+                cfcvResponse.ok
+              ) {
+                setCfcvStats(
+                  normalizeCfcvStats(
+                    cfcvData
+                  )
+                );
+
+                setCfcvAvailable(
+                  true
+                );
+
+                setCfcvError("");
+              } else {
+                setCfcvAvailable(
+                  false
+                );
+
+                setCfcvError(
+                  cfcvData?.message ||
+                  "CFCV admissions statistics are temporarily unavailable."
+                );
+              }
+            } catch (
+              cfcvRequestError
+            ) {
+              console.warn(
+                "CFCV dashboard loading error:",
+                cfcvRequestError
+              );
+
+              setCfcvAvailable(
+                false
+              );
+
+              setCfcvError(
+                cfcvRequestError
+                  ?.message ||
+                "CFCV admissions statistics are temporarily unavailable."
+              );
+            }
+          } else {
+            console.warn(
+              "CFCV dashboard request failed:",
+              cfcvResult.reason
+            );
+
+            setCfcvAvailable(
+              false
+            );
+
+            setCfcvError(
+              "CFCV admissions statistics are temporarily unavailable."
+            );
+          }
 
 
           setLastUpdated(
@@ -683,10 +965,10 @@ function AdminDashboard() {
             requestError
           );
 
-
           setError(
-            requestError?.message ||
-              "Unable to load dashboard information."
+            requestError
+              ?.message ||
+            "Unable to load dashboard information."
           );
         } finally {
           setLoading(false);
@@ -708,7 +990,7 @@ function AdminDashboard() {
 
 
   /* ==========================================================
-     DASHBOARD STATS
+     MAIN CMS STATS
   ========================================================== */
 
   const stats =
@@ -716,10 +998,54 @@ function AdminDashboard() {
       () => [
         {
           label:
+            "CFCV Applications",
+
+          value:
+            cfcvStats
+              .totalApplications,
+
+          icon:
+            ClipboardCheck,
+
+          helper:
+            cfcvAvailable
+              ? `${formatNumber(
+                  cfcvStats.submitted
+                )} submitted`
+              : "CFCV unavailable",
+
+          unavailable:
+            !cfcvAvailable,
+        },
+
+        {
+          label:
+            "CFCV Admitted",
+
+          value:
+            cfcvStats.admitted,
+
+          icon:
+            UserCheck,
+
+          helper:
+            cfcvAvailable
+              ? `${formatNumber(
+                  cfcvStats.remainingCapacity
+                )} cohort spaces remaining`
+              : "CFCV unavailable",
+
+          unavailable:
+            !cfcvAvailable,
+        },
+
+        {
+          label:
             "Upcoming Events",
 
           value:
-            dashboard.upcomingEvents,
+            dashboard
+              .upcomingEvents,
 
           icon:
             CalendarDays,
@@ -733,7 +1059,8 @@ function AdminDashboard() {
             "Published Insights",
 
           value:
-            dashboard.publishedInsights,
+            dashboard
+              .publishedInsights,
 
           icon:
             Newspaper,
@@ -747,14 +1074,16 @@ function AdminDashboard() {
             "Gallery Photos",
 
           value:
-            dashboard.publishedGalleryPhotos,
+            dashboard
+              .publishedGalleryPhotos,
 
           icon:
             Images,
 
           helper:
             `${formatNumber(
-              dashboard.totalGalleryPhotos
+              dashboard
+                .totalGalleryPhotos
             )} total photos`,
         },
 
@@ -763,7 +1092,8 @@ function AdminDashboard() {
             "Newsletter Subscribers",
 
           value:
-            dashboard.newsletterSubscribers,
+            dashboard
+              .newsletterSubscribers,
 
           icon:
             Mail,
@@ -800,21 +1130,94 @@ function AdminDashboard() {
 
           helper:
             `${formatNumber(
-              dashboard.newPartnerships
+              dashboard
+                .newPartnerships
             )} new`,
         },
       ],
       [
-        dashboard.upcomingEvents,
-        dashboard.publishedInsights,
-        dashboard.publishedGalleryPhotos,
-        dashboard.totalGalleryPhotos,
-        dashboard.newsletterSubscribers,
-        dashboard.newContacts,
-        dashboard.totalContacts,
-        dashboard.partnerships,
-        dashboard.newPartnerships,
+        cfcvStats,
+        cfcvAvailable,
+        dashboard,
       ]
+    );
+
+
+  /* ==========================================================
+     CFCV ADMISSIONS CARDS
+  ========================================================== */
+
+  const cfcvCards =
+    useMemo(
+      () => [
+        {
+          label:
+            "Submitted",
+
+          value:
+            cfcvStats.submitted,
+
+          icon:
+            ClipboardCheck,
+        },
+
+        {
+          label:
+            "Under Review",
+
+          value:
+            cfcvStats.underReview,
+
+          icon:
+            Activity,
+        },
+
+        {
+          label:
+            "Interviews",
+
+          value:
+            cfcvStats.interviews,
+
+          icon:
+            Users,
+        },
+
+        {
+          label:
+            "Match Required",
+
+          value:
+            cfcvStats
+              .matchingRequired,
+
+          icon:
+            Handshake,
+        },
+
+        {
+          label:
+            "Admitted",
+
+          value:
+            cfcvStats.admitted,
+
+          icon:
+            UserCheck,
+        },
+
+        {
+          label:
+            "Waitlisted",
+
+          value:
+            cfcvStats.waitlisted,
+
+          icon:
+            ClipboardCheck,
+        },
+      ],
+      [cfcvStats]
     );
 
 
@@ -826,12 +1229,12 @@ function AdminDashboard() {
     useMemo(() => {
       if (
         !Array.isArray(
-          dashboard.recentActivity
+          dashboard
+            .recentActivity
         )
       ) {
         return [];
       }
-
 
       return dashboard
         .recentActivity
@@ -865,12 +1268,12 @@ function AdminDashboard() {
           </h1>
 
           <p>
-            Manage institutional
-            content, events, insights,
-            gallery, partnerships,
-            subscribers and your
-            digital presence from one
-            workspace.
+            Manage CFCV admissions,
+            institutional content,
+            events, insights, gallery,
+            partnerships, subscribers
+            and your digital presence
+            from one workspace.
           </p>
         </div>
 
@@ -886,7 +1289,6 @@ function AdminDashboard() {
               CMS Workspace
             </span>
           </div>
-
 
           <button
             type="button"
@@ -935,7 +1337,7 @@ function AdminDashboard() {
 
 
       {/* ======================================================
-          ERROR
+          GENERAL ERROR
       ====================================================== */}
 
       {error && (
@@ -973,7 +1375,7 @@ function AdminDashboard() {
 
 
       {/* ======================================================
-          STATS
+          MAIN STATS
       ====================================================== */}
 
       <section
@@ -998,9 +1400,124 @@ function AdminDashboard() {
               helper={
                 stat.helper
               }
+              unavailable={
+                stat.unavailable
+              }
             />
           )
         )}
+      </section>
+
+
+      {/* ======================================================
+          CFCV ADMISSIONS
+      ====================================================== */}
+
+      <section className="admin-dashboard__block">
+        <header className="admin-dashboard__block-header">
+          <div>
+            <span className="admin-dashboard__section-eyebrow">
+              Fellowship Admissions
+            </span>
+
+            <h2>
+              CFCV Admissions
+            </h2>
+          </div>
+
+          <Link
+            to="/admin/cfcv"
+            className="admin-dashboard__block-helper"
+          >
+            Open CFCV Admissions
+          </Link>
+        </header>
+
+
+        {cfcvError && (
+          <div
+            className="admin-dashboard__error"
+            role="status"
+          >
+            <div>
+              <strong>
+                CFCV statistics unavailable
+              </strong>
+
+              <span>
+                {cfcvError}
+              </span>
+            </div>
+          </div>
+        )}
+
+
+        <div
+          className="admin-dashboard__stats"
+          aria-label="CFCV admissions statistics"
+        >
+          {cfcvCards.map(
+            (stat) => (
+              <StatCard
+                key={
+                  stat.label
+                }
+                icon={
+                  stat.icon
+                }
+                label={
+                  stat.label
+                }
+                value={
+                  stat.value
+                }
+                helper={
+                  cfcvAvailable
+                    ? "CFCV admissions"
+                    : "Unavailable"
+                }
+                unavailable={
+                  !cfcvAvailable
+                }
+              />
+            )
+          )}
+        </div>
+
+
+        <div className="admin-dashboard__capacity">
+          <div>
+            <span>
+              Cohort capacity
+            </span>
+
+            <strong>
+              {cfcvAvailable
+                ? `${formatNumber(
+                    cfcvStats.admitted
+                  )} / ${formatNumber(
+                    cfcvStats
+                      .cohortCapacity
+                  )}`
+                : "Unavailable"}
+            </strong>
+          </div>
+
+          {cfcvAvailable && (
+            <p>
+              {formatNumber(
+                cfcvStats
+                  .remainingCapacity
+              )}{" "}
+              {cfcvStats
+                .remainingCapacity ===
+              1
+                ? "space"
+                : "spaces"}{" "}
+              remaining
+            </p>
+          )}
+        </div>
       </section>
 
 
@@ -1112,7 +1629,6 @@ function AdminDashboard() {
                       item
                     );
 
-
                   return (
                     <div
                       key={
@@ -1131,7 +1647,6 @@ function AdminDashboard() {
                         />
                       </div>
 
-
                       <div className="admin-dashboard__activity-copy">
                         <strong>
                           {title}
@@ -1145,7 +1660,6 @@ function AdminDashboard() {
                           </span>
                         )}
                       </div>
-
 
                       {time && (
                         <time>
@@ -1217,7 +1731,6 @@ function AdminDashboard() {
               )}
             </div>
 
-
             <div>
               <strong>
                 {error
@@ -1228,14 +1741,15 @@ function AdminDashboard() {
               <p>
                 {error
                   ? "The CMS could not load dashboard data from the backend."
-                  : "The CMS is connected to the Continental Founders backend."}
+                  : cfcvAvailable
+                    ? "The CMS and CFCV admissions services are connected."
+                    : "The CMS is connected. CFCV admissions statistics are currently unavailable."}
               </p>
 
               {!error &&
                 lastUpdated && (
                   <small>
                     Last updated{" "}
-
                     {lastUpdated.toLocaleTimeString(
                       [],
                       {
@@ -1254,6 +1768,19 @@ function AdminDashboard() {
 
           <div className="admin-dashboard__system-links">
             <Link
+              to="/cfcv"
+              className="admin-dashboard__system-link"
+            >
+              <span>
+                View CFCV
+              </span>
+
+              <ExternalLink
+                size={12}
+              />
+            </Link>
+
+            <Link
               to="/gallery"
               className="admin-dashboard__system-link"
             >
@@ -1265,7 +1792,6 @@ function AdminDashboard() {
                 size={12}
               />
             </Link>
-
 
             <Link
               to="/strategic-partners"
@@ -1279,7 +1805,6 @@ function AdminDashboard() {
                 size={12}
               />
             </Link>
-
 
             <Link
               to="/"

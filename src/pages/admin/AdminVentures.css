@@ -3282,4 +3282,52 @@ div.admin-ventures__opportunity-editor:last-child {
     animation: none;
   }
 
+}/* Scroll the main Ventures page */
+.admin-ventures {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+
+  height: calc(100vh - var(--admin-header-height, 0px));
+  height: calc(100dvh - var(--admin-header-height, 0px));
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+/* Keep detail and editing drawers within the visible screen */
+.admin-ventures__overlay {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.admin-ventures__drawer,
+.admin-ventures__form-drawer {
+  box-sizing: border-box;
+
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media print {
+  .admin-ventures {
+    height: auto;
+    overflow: visible;
+  }
 }

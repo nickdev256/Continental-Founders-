@@ -3135,4 +3135,36 @@
     box-shadow:
       none;
   }
+}/* Scroll to all lower admissions information */
+@media screen {
+  .admin-cfcv {
+    box-sizing: border-box;
+    min-height: 0;
+
+    height: calc(100vh - var(--admin-header-height, 0px));
+    height: calc(100dvh - var(--admin-header-height, 0px));
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+
+  /* Applicant details expand inside the page */
+  .admin-cfcv .admin-cfcv-detail {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+
+  /* Keep all review fields reachable */
+  .admin-cfcv .admin-cfcv-review-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
 }

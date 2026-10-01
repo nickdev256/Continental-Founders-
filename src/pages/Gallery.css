@@ -361,7 +361,7 @@
 
 /* PHOTO 1 */
 .gallery-hero__slide--1 {
-  background-image: url("/assets/q.jpg");
+  background-image: url("public/assets/gallery/DZ9A1311.jpg");
   animation-delay: 0s;
 }
 

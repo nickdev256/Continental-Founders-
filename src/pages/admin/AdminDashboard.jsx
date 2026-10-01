@@ -28,18 +28,10 @@ import { Link } from "react-router-dom";
 
 import "./AdminDashboard.css";
 
-/* ============================================================
-   API CONFIGURATION
-============================================================ */
-
 const API_URL = (
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000"
 ).replace(/\/+$/, "");
-
-/* ============================================================
-   DEFAULT DATA
-============================================================ */
 
 const DEFAULT_DASHBOARD = {
   upcomingEvents: 0,
@@ -68,10 +60,6 @@ const DEFAULT_CFCV_STATS = {
   cohortCapacity: 30,
   remainingCapacity: 30,
 };
-
-/* ============================================================
-   MANAGEMENT LINKS
-============================================================ */
 
 const quickAccess = [
   {
@@ -132,10 +120,6 @@ const quickAccess = [
   },
 ];
 
-/* ============================================================
-   NUMBER HELPERS
-============================================================ */
-
 function getNumber(...values) {
   for (const value of values) {
     if (
@@ -162,10 +146,6 @@ function formatNumber(value) {
   );
 }
 
-/* ============================================================
-   RESPONSE VALIDATION
-============================================================ */
-
 async function readJsonResponse(response, serviceName) {
   const contentType =
     response.headers.get("content-type") || "";
@@ -178,10 +158,6 @@ async function readJsonResponse(response, serviceName) {
 
   return response.json();
 }
-
-/* ============================================================
-   NORMALIZE ORGANISATION DATA
-============================================================ */
 
 function normalizeDashboardData(payload) {
   const source =
@@ -273,10 +249,6 @@ function normalizeDashboardData(payload) {
   };
 }
 
-/* ============================================================
-   NORMALIZE ADMISSIONS DATA
-============================================================ */
-
 function normalizeCfcvStats(payload) {
   const source = payload?.data || payload || {};
 
@@ -317,11 +289,8 @@ function normalizeCfcvStats(payload) {
     admitted,
 
     waitlisted: getNumber(stats.waitlisted),
-
     genesis: getNumber(stats.genesis),
-
     ascend: getNumber(stats.ascend),
-
     horizon: getNumber(stats.horizon),
 
     cohortCapacity,
@@ -334,16 +303,12 @@ function normalizeCfcvStats(payload) {
   };
 }
 
-/* ============================================================
-   ACTIVITY HELPERS
-============================================================ */
-
 function getActivityIcon(item) {
   const type = String(
     item?.type ||
-      item?.category ||
-      item?.entity ||
-      ""
+    item?.category ||
+    item?.entity ||
+    ""
   )
     .trim()
     .toLowerCase();
@@ -449,10 +414,6 @@ function getActivityTime(item) {
   }).format(parsedDate);
 }
 
-/* ============================================================
-   STATISTIC CARD
-============================================================ */
-
 function StatCard({
   icon: Icon,
   label,
@@ -490,10 +451,6 @@ function StatCard({
   );
 }
 
-/* ============================================================
-   MANAGEMENT CARD
-============================================================ */
-
 function QuickAccessCard({ item }) {
   const Icon = item.icon;
 
@@ -520,11 +477,7 @@ function QuickAccessCard({ item }) {
   );
 }
 
-/* ============================================================
-   DASHBOARD
-============================================================ */
-
-function AdminDashboard() {
+export default function AdminDashboard() {
   const [dashboard, setDashboard] = useState(
     DEFAULT_DASHBOARD
   );
@@ -533,10 +486,8 @@ function AdminDashboard() {
     DEFAULT_CFCV_STATS
   );
 
-  const [
-    dashboardAvailable,
-    setDashboardAvailable,
-  ] = useState(false);
+  const [dashboardAvailable, setDashboardAvailable] =
+    useState(false);
 
   const [cfcvAvailable, setCfcvAvailable] =
     useState(false);
@@ -547,12 +498,7 @@ function AdminDashboard() {
   const [error, setError] = useState("");
   const [cfcvError, setCfcvError] = useState("");
 
-  const [lastUpdated, setLastUpdated] =
-    useState(null);
-
-  /* ----------------------------------------------------------
-     LOAD BOTH SERVICES INDEPENDENTLY
-  ---------------------------------------------------------- */
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const loadDashboard = useCallback(
     async ({ silent = false } = {}) => {
@@ -568,7 +514,6 @@ function AdminDashboard() {
           {
             credentials: "include",
             cache: "no-store",
-
             headers: {
               Accept: "application/json",
             },
@@ -585,8 +530,8 @@ function AdminDashboard() {
             response.status === 401
               ? "Your session has expired. Please sign in again."
               : data?.message ||
-                  data?.error ||
-                  `${name} is unavailable (${response.status}).`
+                data?.error ||
+                `${name} is unavailable (${response.status}).`
           );
         }
 
@@ -600,7 +545,6 @@ function AdminDashboard() {
               "/api/admin/dashboard/stats",
               "Dashboard"
             ),
-
             readService(
               "/api/cfcv/admin/stats",
               "CFCV admissions"
@@ -611,15 +555,13 @@ function AdminDashboard() {
           setDashboard(
             normalizeDashboardData(general.value)
           );
-
           setDashboardAvailable(true);
           setError("");
         } else {
           setDashboardAvailable(false);
-
           setError(
             general.reason?.message ||
-              "Unable to load organisational data."
+            "Unable to load organisational data."
           );
         }
 
@@ -627,15 +569,13 @@ function AdminDashboard() {
           setCfcvStats(
             normalizeCfcvStats(admissions.value)
           );
-
           setCfcvAvailable(true);
           setCfcvError("");
         } else {
           setCfcvAvailable(false);
-
           setCfcvError(
             admissions.reason?.message ||
-              "Unable to load admissions data."
+            "Unable to load admissions data."
           );
         }
 
@@ -656,10 +596,6 @@ function AdminDashboard() {
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
-
-  /* ----------------------------------------------------------
-     OVERVIEW METRICS
-  ---------------------------------------------------------- */
 
   const stats = [
     {
@@ -694,13 +630,11 @@ function AdminDashboard() {
       label: "Published photos",
       value: dashboard.publishedGalleryPhotos,
       icon: Images,
-
       helper: dashboardAvailable
         ? `${formatNumber(
             dashboard.totalGalleryPhotos
           )} in the library`
         : "Gallery library",
-
       unavailable: !dashboardAvailable,
     },
     {
@@ -714,33 +648,25 @@ function AdminDashboard() {
       label: "New enquiries",
       value: dashboard.newContacts,
       icon: MessageSquareText,
-
       helper: dashboardAvailable
         ? `${formatNumber(
             dashboard.totalContacts
           )} total contacts`
         : "Contact enquiries",
-
       unavailable: !dashboardAvailable,
     },
     {
       label: "Partnerships",
       value: dashboard.partnerships,
       icon: Handshake,
-
       helper: dashboardAvailable
         ? `${formatNumber(
             dashboard.newPartnerships
           )} new requests`
         : "Partnership network",
-
       unavailable: !dashboardAvailable,
     },
   ];
-
-  /* ----------------------------------------------------------
-     ADMISSIONS STAGES
-  ---------------------------------------------------------- */
 
   const stages = [
     {
@@ -768,10 +694,6 @@ function AdminDashboard() {
       value: cfcvStats.waitlisted,
     },
   ];
-
-  /* ----------------------------------------------------------
-     FOLLOW-UP ITEMS
-  ---------------------------------------------------------- */
 
   const priorities = [
     {
@@ -837,22 +759,15 @@ function AdminDashboard() {
     }
   ).format(new Date());
 
-  /* ----------------------------------------------------------
-     RENDER
-  ---------------------------------------------------------- */
-
   return (
     <main
       className="admin-dashboard"
       aria-busy={loading || refreshing}
     >
-      {/* HEADER */}
-
       <header className="admin-dashboard__hero">
         <div className="admin-dashboard__hero-copy">
           <span className="admin-dashboard__hero-eyebrow">
             <LayoutDashboard size={14} />
-
             Continental Founders · Administration
           </span>
 
@@ -903,8 +818,6 @@ function AdminDashboard() {
         </div>
       </header>
 
-      {/* OVERVIEW HEADING */}
-
       <div className="admin-dashboard__overview-label">
         <h2>At a glance</h2>
 
@@ -927,8 +840,6 @@ function AdminDashboard() {
         </span>
       </div>
 
-      {/* SERVICE ERRORS */}
-
       {(error || cfcvError) && (
         <section
           className="admin-dashboard__error"
@@ -940,7 +851,6 @@ function AdminDashboard() {
             </strong>
 
             {error && <span>{error}</span>}
-
             {cfcvError && <span>{cfcvError}</span>}
           </div>
 
@@ -957,8 +867,6 @@ function AdminDashboard() {
         </section>
       )}
 
-      {/* MAIN METRICS */}
-
       <section
         className="admin-dashboard__stats"
         aria-label="Organisation statistics"
@@ -972,21 +880,16 @@ function AdminDashboard() {
         ))}
       </section>
 
-      {/* OPERATIONAL OVERVIEW */}
-
       <section
         className="admin-dashboard__operations-grid"
         aria-label="Operational overview"
       >
-        {/* ADMISSIONS */}
-
         <article className="admin-dashboard__panel admin-dashboard__admissions">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
                 Fellowship programme
               </span>
-
               <h2>CFCV admissions</h2>
             </div>
 
@@ -1074,14 +977,11 @@ function AdminDashboard() {
                 (track) => (
                   <span key={track}>
                     <i aria-hidden="true" />
-
                     {track}
 
                     <strong>
                       {displayValue(
-                        cfcvStats[
-                          track.toLowerCase()
-                        ],
+                        cfcvStats[track.toLowerCase()],
                         cfcvAvailable
                       )}
                     </strong>
@@ -1092,15 +992,12 @@ function AdminDashboard() {
           </div>
         </article>
 
-        {/* ATTENTION LIST */}
-
         <article className="admin-dashboard__panel admin-dashboard__priorities">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
                 Follow-up
               </span>
-
               <h2>Needs attention</h2>
             </div>
 
@@ -1121,10 +1018,7 @@ function AdminDashboard() {
 
                   <div>
                     <strong>{item.title}</strong>
-
-                    <span>
-                      {item.description}
-                    </span>
+                    <span>{item.description}</span>
                   </div>
 
                   <b>
@@ -1147,8 +1041,6 @@ function AdminDashboard() {
         </article>
       </section>
 
-      {/* MANAGEMENT LINKS */}
-
       <section
         className="admin-dashboard__block"
         aria-label="Management sections"
@@ -1158,7 +1050,6 @@ function AdminDashboard() {
             <span className="admin-dashboard__section-eyebrow">
               Workspace
             </span>
-
             <h2>Manage your organisation</h2>
           </div>
 
@@ -1177,18 +1068,13 @@ function AdminDashboard() {
         </div>
       </section>
 
-      {/* ACTIVITY AND STATUS */}
-
       <section className="admin-dashboard__lower-grid">
-        {/* RECENT ACTIVITY */}
-
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
                 Activity log
               </span>
-
               <h2>Recent updates</h2>
             </div>
 
@@ -1219,20 +1105,14 @@ function AdminDashboard() {
             <div className="admin-dashboard__activity-list">
               {recentActivity.map((item, index) => {
                 const Icon = getActivityIcon(item);
-
                 const description =
                   getActivityDescription(item);
-
                 const time = getActivityTime(item);
 
                 return (
                   <div
                     className="admin-dashboard__activity-item"
-                    key={
-                      item?.id ||
-                      item?._id ||
-                      index
-                    }
+                    key={item?.id || item?._id || index}
                   >
                     <div className="admin-dashboard__activity-icon">
                       <Icon size={16} />
@@ -1256,15 +1136,12 @@ function AdminDashboard() {
           )}
         </article>
 
-        {/* SERVICE STATUS */}
-
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
                 Service connections
               </span>
-
               <h2>Workspace status</h2>
             </div>
 
@@ -1326,8 +1203,7 @@ function AdminDashboard() {
               },
               {
                 to: "/",
-                label:
-                  "Continental Founders website",
+                label: "Continental Founders website",
               },
             ].map((item) => (
               <Link
@@ -1336,15 +1212,12 @@ function AdminDashboard() {
                 className="admin-dashboard__system-link"
               >
                 {item.label}
-
                 <ExternalLink size={14} />
               </Link>
             ))}
           </div>
         </article>
       </section>
-
-      {/* FOOTER */}
 
       <footer className="admin-dashboard__footer">
         <span>Continental Founders</span>
@@ -1353,5 +1226,3 @@ function AdminDashboard() {
     </main>
   );
 }
-
-export default AdminDashboard;

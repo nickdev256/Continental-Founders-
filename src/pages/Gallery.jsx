@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -10,7 +11,7 @@ import {
   CalendarDays,
   Download,
   Expand,
-  Image as ImageIcon,
+  Image as ImageIcon,  
   LoaderCircle,
   RefreshCw,
   Search,
@@ -474,6 +475,23 @@ export default function Gallery() {
     ]);
 
 
+      // ==========================================================
+  // INITIAL CAROUSEL POSITION
+  // ==========================================================
+
+  useEffect(() => {
+    if (
+      filteredGallery.length > 0 &&
+      selectedIndex === null
+    ) {
+      setSelectedIndex(0);
+    }
+  }, [
+    filteredGallery,
+    selectedIndex,
+  ]);
+
+
   // ==========================================================
   // KEEP LIGHTBOX INDEX VALID
   // ==========================================================
@@ -580,6 +598,152 @@ export default function Gallery() {
           filteredGallery.length;
       }
     );
+  };
+
+
+
+    // ==========================================================
+  // 3D CAROUSEL MOUSE / TOUCH CONTROLS
+  // ==========================================================
+
+  const carouselPointerRef = useRef({
+    startX: 0,
+    currentX: 0,
+    dragging: false,
+    moved: false,
+  });
+
+  const carouselSuppressClickRef =
+    useRef(false);
+
+  const handleCarouselPointerDown = (
+    event
+  ) => {
+    carouselPointerRef.current = {
+      startX: event.clientX,
+      currentX: event.clientX,
+      dragging: true,
+      moved: false,
+    };
+
+    event.currentTarget.setPointerCapture?.(
+      event.pointerId
+    );
+  };
+
+
+  const handleCarouselPointerMove = (
+    event
+  ) => {
+    const pointer =
+      carouselPointerRef.current;
+
+    if (!pointer.dragging) {
+      return;
+    }
+
+    pointer.currentX =
+      event.clientX;
+
+    const distance =
+      pointer.currentX -
+      pointer.startX;
+
+    if (
+      Math.abs(distance) >
+      8
+    ) {
+      pointer.moved = true;
+    }
+  };
+
+
+  const handleCarouselPointerUp = (
+    event
+  ) => {
+    const pointer =
+      carouselPointerRef.current;
+
+    if (!pointer.dragging) {
+      return;
+    }
+
+    const distance =
+      pointer.currentX -
+      pointer.startX;
+
+    pointer.dragging = false;
+
+    if (
+      Math.abs(distance) <
+      55
+    ) {
+      return;
+    }
+
+    carouselSuppressClickRef.current =
+      true;
+
+    if (distance < 0) {
+      showNext();
+    } else {
+      showPrevious();
+    }
+
+    window.setTimeout(() => {
+      carouselSuppressClickRef.current =
+        false;
+    }, 100);
+  };
+
+
+  const handleCarouselPointerCancel =
+    () => {
+      carouselPointerRef.current.dragging =
+        false;
+    };
+
+
+  const getCarouselIndex = (
+    offset
+  ) => {
+    if (
+      filteredGallery.length ===
+        0 ||
+      selectedIndex === null
+    ) {
+      return null;
+    }
+
+    return (
+      (
+        selectedIndex +
+        offset +
+        filteredGallery.length
+      ) %
+      filteredGallery.length
+    );
+  };
+
+
+  const handleCarouselCardClick = (
+    index,
+    position
+  ) => {
+    if (
+      carouselSuppressClickRef.current
+    ) {
+      return;
+    }
+
+    if (
+      position === 0
+    ) {
+      openLightbox(index);
+      return;
+    }
+
+    setSelectedIndex(index);
   };
 
 
@@ -745,7 +909,15 @@ export default function Gallery() {
       ====================================================== */}
 
       <section className="gallery-hero">
-        <div className="gallery-hero__overlay" />
+
+  <div className="gallery-hero__slideshow" aria-hidden="true">
+    <div className="gallery-hero__slide gallery-hero__slide--1" />
+    <div className="gallery-hero__slide gallery-hero__slide--2" />
+    <div className="gallery-hero__slide gallery-hero__slide--3" />
+    <div className="gallery-hero__slide gallery-hero__slide--4" />
+  </div>
+
+  <div className="gallery-hero__overlay" />
 
         <div className="gallery-hero__content">
           <div className="gallery-hero__eyebrow">
@@ -757,10 +929,14 @@ export default function Gallery() {
           </div>
 
           <h1>
-            Moments That Move
+            Stories 
             <br />
-            Opportunity Forward
+            Behind Our
+            <br />
+            Journey Together
           </h1>
+           <br />
+
 
           <p className="gallery-hero__description">
             Explore moments from
@@ -775,21 +951,7 @@ export default function Gallery() {
           className="gallery-hero__mark"
           aria-hidden="true"
         >
-          <span>
-            People
-          </span>
-
-          <span>
-            Partnerships
-          </span>
-
-          <span>
-            Ideas
-          </span>
-
-          <span>
-            Opportunity
-          </span>
+          
         </div>
       </section>
 
@@ -947,33 +1109,200 @@ export default function Gallery() {
             )}
 
 
-          {/* =================================================
-              EMPTY
-          ================================================= */}
+          
 
-          {!loading &&
-            !error &&
-            filteredGallery.length ===
-              0 && (
-              <div className="gallery-state">
-                <ImageIcon
-                  size={38}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
+          {/* =================================================
+    3D PHOTO CAROUSEL
+================================================= */}
+
+{!loading &&
+  !error &&
+  filteredGallery.length > 0 &&
+  selectedIndex !== null && (
+
+  <div
+    className="gallery-carousel"
+    onPointerDown={
+      handleCarouselPointerDown
+    }
+    onPointerMove={
+      handleCarouselPointerMove
+    }
+    onPointerUp={
+      handleCarouselPointerUp
+    }
+    onPointerCancel={
+      handleCarouselPointerCancel
+    }
+    onPointerLeave={
+      handleCarouselPointerCancel
+    }
+  >
+
+    {/* BACKGROUND IMAGE */}
+    <div
+      className="gallery-carousel__background"
+      style={{
+        backgroundImage: `
+          url(
+            "${filteredGallery[selectedIndex].imageUrl}"
+          )
+        `,
+      }}
+      aria-hidden="true"
+    />
+
+    <div
+      className="gallery-carousel__background-overlay"
+      aria-hidden="true"
+    />
+
+
+    {/* CAROUSEL STAGE */}
+    <div className="gallery-carousel__stage">
+
+      {[-2, -1, 0, 1, 2].map(
+        (offset) => {
+
+          const index =
+            getCarouselIndex(
+              offset
+            );
+
+          if (
+            index === null
+          ) {
+            return null;
+          }
+
+          const item =
+            filteredGallery[index];
+
+          const position =
+            offset === 0
+              ? "is-center"
+              : offset < 0
+                ? `is-left-${Math.abs(offset)}`
+                : `is-right-${offset}`;
+
+          return (
+            <article
+              key={`${item.id}-${offset}`}
+              className={`gallery-carousel__item ${position}`}
+              onClick={() =>
+                handleCarouselCardClick(
+                  index,
+                  offset
+                )
+              }
+            >
+
+              <div className="gallery-carousel__image-wrap">
+
+                <img
+                  src={item.imageUrl}
+                  alt={
+                    item.altText
+                  }
+                  className="gallery-carousel__image"
+                  draggable="false"
                 />
 
-                <h2>
-                  No photos found
-                </h2>
+                <div className="gallery-carousel__shade" />
 
-                <p>
-                  {gallery.length ===
-                  0
-                    ? "Published gallery photos will appear here."
-                    : "Try another category or search term."}
-                </p>
+                {offset === 0 && (
+                  <div className="gallery-carousel__info">
+
+                    {item.category && (
+                      <span className="gallery-carousel__category">
+                        {item.category}
+                      </span>
+                    )}
+
+                    <h2>
+                      {item.title}
+                    </h2>
+
+                    {item.caption && (
+                      <p>
+                        {item.caption}
+                      </p>
+                    )}
+
+                    <span className="gallery-carousel__line" />
+
+                    <span className="gallery-carousel__hint">
+                      Drag to explore
+                    </span>
+
+                  </div>
+                )}
+
               </div>
-            )}
+
+            </article>
+          );
+        }
+      )}
+
+    </div>
+
+
+    {/* LEFT ARROW */}
+    {filteredGallery.length > 1 && (
+      <button
+        type="button"
+        className="gallery-carousel__arrow gallery-carousel__arrow--left"
+        onClick={(event) => {
+          event.stopPropagation();
+          showPrevious();
+        }}
+        aria-label="Previous gallery photo"
+      >
+        <ArrowLeft
+          size={27}
+          strokeWidth={1.5}
+        />
+      </button>
+    )}
+
+
+    {/* RIGHT ARROW */}
+    {filteredGallery.length > 1 && (
+      <button
+        type="button"
+        className="gallery-carousel__arrow gallery-carousel__arrow--right"
+        onClick={(event) => {
+          event.stopPropagation();
+          showNext();
+        }}
+        aria-label="Next gallery photo"
+      >
+        <ArrowRight
+          size={27}
+          strokeWidth={1.5}
+        />
+      </button>
+    )}
+
+
+    {/* COUNTER */}
+    <div className="gallery-carousel__counter">
+      <span>
+        {selectedIndex + 1}
+      </span>
+
+      <span className="gallery-carousel__counter-divider">
+        /
+      </span>
+
+      <span>
+        {filteredGallery.length}
+      </span>
+    </div>
+
+  </div>
+)}
 
 
           {/* =================================================

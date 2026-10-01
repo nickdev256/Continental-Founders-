@@ -4385,3 +4385,63 @@
   }
 
 }
+
+
+
+
+
+/* ============================================================
+   CAROUSEL INTERACTION FIX
+   ============================================================ */
+
+/* The carousel itself must accept mouse/touch interaction */
+.cf-gallery-carousel {
+  pointer-events: auto;
+}
+
+
+/* The stage accepts dragging */
+.cf-gallery-carousel__stage {
+  pointer-events: auto;
+  cursor: grab;
+}
+
+
+/* Show a grabbing cursor while dragging */
+.cf-gallery-carousel__stage:active {
+  cursor: grabbing;
+}
+
+
+/* Make every image card explicitly interactive */
+.cf-gallery-carousel__card {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+
+/* Make the navigation buttons sit above everything */
+.cf-gallery-carousel__arrow {
+  pointer-events: auto !important;
+  z-index: 50 !important;
+  cursor: pointer;
+}
+
+
+/* Keep the expand icon from blocking the center image click */
+.cf-gallery-carousel__expand {
+  pointer-events: none;
+}
+
+
+/* Make sure images themselves don't capture the pointer */
+.cf-gallery-carousel__card img {
+  pointer-events: none;
+}
+
+
+/* Keep the information section below the images */
+.cf-gallery-carousel__information {
+  position: relative;
+  z-index: 2;
+}

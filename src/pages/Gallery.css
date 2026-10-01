@@ -46,7 +46,7 @@
 
 ============================================================ */
 
-.gallery-hero {
+/* .gallery-hero {
 
   position: relative;
 
@@ -90,7 +90,7 @@
 
     );
 
-}
+} */
 
 /* ============================================================
 
@@ -361,7 +361,7 @@
 
 /* PHOTO 1 */
 .gallery-hero__slide--1 {
-  background-image: url("public/assets/gallery/DZ9A1311.jpg");
+  background-image: url("public/assets/gallery/DZ9A1318 (1).jpg");
   animation-delay: 0s;
 }
 
@@ -3868,6 +3868,7 @@
   );
 
   margin: 0 auto;
+  margin-top: 50px;
 
   padding: 24px 26px 20px;
 

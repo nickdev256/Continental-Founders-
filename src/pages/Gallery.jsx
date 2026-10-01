@@ -877,6 +877,8 @@ const handleCarouselPointerDown =
               Gallery
             </p>
           </div>
+          <br />
+          <br />
 
           <h1>
             Stories

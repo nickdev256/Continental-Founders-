@@ -1358,4 +1358,45 @@
 .admin-dashboard .admin-dashboard__activity-list {
   max-height: none;
   overflow: visible;
+}/* Scroll the entire dashboard to reach lower information */
+.admin-dashboard {
+  height: calc(100vh - var(--admin-header-height, 0px));
+  height: calc(100dvh - var(--admin-header-height, 0px));
+
+  min-height: 0;
+  max-height: none;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: thin;
+  scrollbar-color: #9aa9b8 #edf1f5;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Recent activity uses the same dashboard scroll */
+.admin-dashboard .admin-dashboard__activity-list {
+  max-height: none;
+  overflow: visible;
+}
+
+.admin-dashboard::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-dashboard::-webkit-scrollbar-track {
+  background: #edf1f5;
+}
+
+.admin-dashboard::-webkit-scrollbar-thumb {
+  background: #9aa9b8;
+  border-radius: 8px;
+}
+
+@media print {
+  .admin-dashboard {
+    height: auto;
+    overflow: visible;
+  }
 }

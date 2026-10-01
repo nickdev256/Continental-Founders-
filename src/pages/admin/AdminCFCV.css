@@ -2,7 +2,6 @@
    CONTINENTAL FOUNDERS
    CFCV ADMISSIONS CMS
    AdminCFCV.css
-
    Responsive targets:
    - Very small phones
    - Phones
@@ -17,50 +16,39 @@
    - Reduced motion
    - High contrast
    - Print
-
    IMPORTANT:
    Everything is scoped under .admin-cfcv.
 ============================================================ */
-
-
 /* ============================================================
    DESIGN TOKENS
 ============================================================ */
-
 .admin-cfcv {
   --cfcv-navy-950: #071726;
   --cfcv-navy-900: #0d2238;
   --cfcv-navy-850: #102942;
   --cfcv-navy-800: #14324f;
   --cfcv-navy-700: #1d466b;
-
   --cfcv-gold-700: #98762a;
   --cfcv-gold-600: #b38c35;
   --cfcv-gold-500: #d1aa52;
   --cfcv-gold-400: #dfbf72;
   --cfcv-gold-100: #f8efd9;
   --cfcv-gold-50: #fcf8ed;
-
   --cfcv-green-700: #1e684e;
   --cfcv-green-600: #277b5e;
   --cfcv-green-100: #dff2e9;
   --cfcv-green-50: #f0faf5;
-
   --cfcv-blue-700: #245f9d;
   --cfcv-blue-100: #e2effc;
   --cfcv-blue-50: #f2f8fe;
-
   --cfcv-red-700: #a43c3c;
   --cfcv-red-600: #c14b4b;
   --cfcv-red-100: #f9dddd;
   --cfcv-red-50: #fff3f3;
-
   --cfcv-orange-700: #9b5c1d;
   --cfcv-orange-100: #fbe8ce;
-
   --cfcv-purple-700: #674aa0;
   --cfcv-purple-100: #eee7fb;
-
   --cfcv-gray-950: #121820;
   --cfcv-gray-900: #1d2630;
   --cfcv-gray-800: #303b47;
@@ -74,95 +62,67 @@
   --cfcv-gray-100: #f2f4f6;
   --cfcv-gray-75: #f7f8f9;
   --cfcv-gray-50: #fafbfc;
-
   --cfcv-white: #ffffff;
-
   --cfcv-page-bg: #f5f7f9;
   --cfcv-card-bg: #ffffff;
-
   --cfcv-border: rgba(13, 34, 56, 0.1);
   --cfcv-border-strong: rgba(13, 34, 56, 0.18);
-
   --cfcv-shadow-xs:
     0 1px 2px rgba(7, 23, 38, 0.04);
-
   --cfcv-shadow-sm:
     0 4px 14px rgba(7, 23, 38, 0.06);
-
   --cfcv-shadow-md:
     0 12px 32px rgba(7, 23, 38, 0.08);
-
   --cfcv-shadow-lg:
     0 22px 54px rgba(7, 23, 38, 0.11);
-
   --cfcv-radius-sm: 8px;
   --cfcv-radius-md: 12px;
   --cfcv-radius-lg: 16px;
   --cfcv-radius-xl: 22px;
-
   --cfcv-transition:
     180ms ease;
-
   --cfcv-page-padding:
     clamp(14px, 2vw, 32px);
-
   --cfcv-content-max:
     1800px;
-
   width: 100%;
   min-width: 0;
   max-width: 100%;
-
   min-height: 100%;
-
   padding:
     var(--cfcv-page-padding);
-
   padding-left:
     max(
       var(--cfcv-page-padding),
       env(safe-area-inset-left)
     );
-
   padding-right:
     max(
       var(--cfcv-page-padding),
       env(safe-area-inset-right)
     );
-
   padding-bottom:
     max(
       var(--cfcv-page-padding),
       env(safe-area-inset-bottom)
     );
-
   margin: 0 auto;
-
   color:
     var(--cfcv-gray-900);
-
   background:
     var(--cfcv-page-bg);
-
   font-family:
     inherit;
-
   line-height: 1.5;
-
   overflow-x: clip;
-
   -webkit-font-smoothing:
     antialiased;
-
   text-rendering:
     optimizeLegibility;
 }
-
-
 /* ============================================================
    BOX SIZING
 ============================================================ */
-
 .admin-cfcv,
 .admin-cfcv *,
 .admin-cfcv *::before,
@@ -170,65 +130,51 @@
   box-sizing:
     border-box;
 }
-
-
 /* ============================================================
    GLOBAL ELEMENT SAFETY
 ============================================================ */
-
 .admin-cfcv img,
 .admin-cfcv svg {
   max-width: 100%;
 }
-
 .admin-cfcv button,
 .admin-cfcv input,
 .admin-cfcv select,
 .admin-cfcv textarea {
   font: inherit;
 }
-
 .admin-cfcv button,
 .admin-cfcv select {
   cursor: pointer;
 }
-
 .admin-cfcv button:disabled,
 .admin-cfcv input:disabled,
 .admin-cfcv select:disabled,
 .admin-cfcv textarea:disabled {
   cursor:
     not-allowed;
-
   opacity:
     0.62;
 }
-
 .admin-cfcv a {
   color:
     inherit;
-
   text-decoration:
     none;
 }
-
 .admin-cfcv button {
   -webkit-tap-highlight-color:
     transparent;
 }
-
 .admin-cfcv input,
 .admin-cfcv select,
 .admin-cfcv textarea {
   min-width: 0;
   max-width: 100%;
 }
-
-
 /* ============================================================
    ACCESSIBLE FOCUS
 ============================================================ */
-
 .admin-cfcv button:focus-visible,
 .admin-cfcv a:focus-visible,
 .admin-cfcv input:focus-visible,
@@ -237,158 +183,115 @@
   outline:
     3px solid
     rgba(209, 170, 82, 0.35);
-
   outline-offset:
     2px;
 }
-
-
 /* ============================================================
    HEADER
 ============================================================ */
-
 .admin-cfcv__header {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   margin:
     0 auto
     clamp(18px, 2vw, 28px);
-
   display: flex;
   align-items:
     flex-start;
   justify-content:
     space-between;
-
   gap:
     clamp(16px, 2vw, 30px);
 }
-
 .admin-cfcv__header-copy {
   min-width: 0;
   max-width: 800px;
 }
-
 .admin-cfcv__eyebrow {
   display:
     inline-flex;
-
   align-items:
     center;
-
   gap: 7px;
-
   margin-bottom:
     8px;
-
   color:
     var(--cfcv-gold-700);
-
   font-size:
     0.76rem;
-
   font-weight:
     800;
-
   letter-spacing:
     0.1em;
-
   text-transform:
     uppercase;
 }
-
 .admin-cfcv__eyebrow svg {
   flex:
     0 0 auto;
 }
-
 .admin-cfcv__header h1 {
   margin:
     0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     clamp(
       1.55rem,
       2.5vw,
       2.45rem
     );
-
   line-height:
     1.08;
-
   letter-spacing:
     -0.035em;
 }
-
 .admin-cfcv__header p {
   max-width:
     720px;
-
   margin:
     10px 0 0;
-
   color:
     var(--cfcv-gray-600);
-
   font-size:
     clamp(
       0.88rem,
       1vw,
       0.98rem
     );
-
   line-height:
     1.7;
 }
-
 .admin-cfcv__refresh {
   flex:
     0 0 auto;
-
   min-height:
     44px;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap: 8px;
-
   padding:
     10px 16px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     10px;
-
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-white);
-
   box-shadow:
     var(--cfcv-shadow-xs);
-
   font-size:
     0.84rem;
-
   font-weight:
     700;
-
   transition:
     border-color
       var(--cfcv-transition),
@@ -397,176 +300,124 @@
     transform
       var(--cfcv-transition);
 }
-
 .admin-cfcv__refresh:hover:not(:disabled) {
   border-color:
     var(--cfcv-gold-500);
-
   background:
     var(--cfcv-gold-50);
-
   transform:
     translateY(-1px);
 }
-
-
 /* ============================================================
    ALERTS
 ============================================================ */
-
 .admin-cfcv-alert {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   min-width: 0;
-
   margin:
     0 auto
     18px;
-
   padding:
     12px 14px;
-
   display: grid;
-
   grid-template-columns:
     auto minmax(0, 1fr) auto;
-
   align-items:
     center;
-
   gap:
     10px;
-
   border:
     1px solid transparent;
-
   border-radius:
     12px;
-
   font-size:
     0.86rem;
-
   font-weight:
     600;
-
   overflow-wrap:
     anywhere;
 }
-
 .admin-cfcv-alert--error {
   color:
     var(--cfcv-red-700);
-
   background:
     var(--cfcv-red-50);
-
   border-color:
     var(--cfcv-red-100);
 }
-
 .admin-cfcv-alert--success {
   color:
     var(--cfcv-green-700);
-
   background:
     var(--cfcv-green-50);
-
   border-color:
     var(--cfcv-green-100);
 }
-
 .admin-cfcv-alert > svg {
   flex:
     0 0 auto;
 }
-
 .admin-cfcv-alert button {
   width: 34px;
   height: 34px;
-
   display:
     inline-grid;
-
   place-items:
     center;
-
   padding: 0;
-
   border: 0;
-
   border-radius:
     8px;
-
   color:
     currentColor;
-
   background:
     transparent;
 }
-
 .admin-cfcv-alert button:hover {
   background:
     rgba(0, 0, 0, 0.05);
 }
-
-
 /* ============================================================
    STATISTICS
 ============================================================ */
-
 .admin-cfcv-stats {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   margin:
     0 auto
     clamp(16px, 2vw, 24px);
-
   display: grid;
-
   grid-template-columns:
     repeat(
       6,
       minmax(0, 1fr)
     );
-
   gap:
     clamp(10px, 1vw, 16px);
 }
-
 .admin-cfcv-stat {
   min-width: 0;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     12px;
-
   min-height:
     96px;
-
   padding:
     clamp(13px, 1.3vw, 18px);
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     var(--cfcv-radius-lg);
-
   background:
     var(--cfcv-card-bg);
-
   box-shadow:
     var(--cfcv-shadow-xs);
-
   transition:
     border-color
       var(--cfcv-transition),
@@ -575,7 +426,6 @@
     transform
       var(--cfcv-transition);
 }
-
 .admin-cfcv-stat:hover {
   border-color:
     rgba(
@@ -584,338 +434,242 @@
       82,
       0.4
     );
-
   box-shadow:
     var(--cfcv-shadow-sm);
-
   transform:
     translateY(-2px);
 }
-
 .admin-cfcv-stat__icon {
   width: 42px;
   height: 42px;
-
   flex:
     0 0 42px;
-
   display:
     grid;
-
   place-items:
     center;
-
   border-radius:
     12px;
-
   color:
     var(--cfcv-gold-700);
-
   background:
     var(--cfcv-gold-50);
 }
-
 .admin-cfcv-stat > div:last-child {
   min-width: 0;
 }
-
 .admin-cfcv-stat strong {
   display:
     block;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     clamp(
       1.25rem,
       1.6vw,
       1.65rem
     );
-
   line-height: 1;
-
   font-weight:
     800;
-
   font-variant-numeric:
     tabular-nums;
 }
-
 .admin-cfcv-stat span {
   display:
     block;
-
   margin-top:
     6px;
-
   color:
     var(--cfcv-gray-600);
-
   font-size:
     0.72rem;
-
   font-weight:
     700;
-
   line-height:
     1.3;
 }
-
-
 /* ============================================================
    COHORT SUMMARY
 ============================================================ */
-
 .admin-cfcv-cohort {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   margin:
     0 auto
     clamp(16px, 2vw, 24px);
-
   padding:
     clamp(15px, 1.8vw, 22px);
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     var(--cfcv-radius-lg);
-
   background:
     var(--cfcv-card-bg);
-
   box-shadow:
     var(--cfcv-shadow-xs);
 }
-
 .admin-cfcv-cohort__heading {
   display: flex;
-
   align-items:
     center;
-
   justify-content:
     space-between;
-
   gap:
     16px;
 }
-
 .admin-cfcv-cohort__heading > div {
   min-width: 0;
 }
-
 .admin-cfcv-cohort__heading span {
   display:
     block;
-
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.72rem;
-
   font-weight:
     800;
-
   letter-spacing:
     0.07em;
-
   text-transform:
     uppercase;
 }
-
 .admin-cfcv-cohort__heading strong {
   display:
     block;
-
   margin-top:
     4px;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     clamp(
       0.95rem,
       1.4vw,
       1.15rem
     );
-
   overflow-wrap:
     anywhere;
 }
-
 .admin-cfcv-cohort__heading
   .admin-cfcv-cohort__remaining {
   flex:
     0 0 auto;
-
   padding:
     7px 10px;
-
   border-radius:
     999px;
-
   color:
     var(--cfcv-green-700);
-
   background:
     var(--cfcv-green-50);
-
   font-size:
     0.7rem;
-
   letter-spacing: 0;
-
   text-transform:
     none;
 }
-
 .admin-cfcv-cohort__bar {
   width: 100%;
   height: 8px;
-
   margin:
     16px 0 13px;
-
   border-radius:
     999px;
-
   background:
     var(--cfcv-gray-100);
-
   overflow:
     hidden;
 }
-
 .admin-cfcv-cohort__bar span {
   display:
     block;
-
   width: 0;
   height: 100%;
-
   border-radius:
     inherit;
-
   background:
     linear-gradient(
       90deg,
       var(--cfcv-gold-600),
       var(--cfcv-gold-400)
     );
-
   transition:
     width 350ms ease;
 }
-
 .admin-cfcv-track-summary {
   display: flex;
-
   align-items:
     center;
-
   flex-wrap:
     wrap;
-
   gap:
     8px 18px;
-
   color:
     var(--cfcv-gray-600);
-
   font-size:
     0.78rem;
 }
-
 .admin-cfcv-track-summary span {
   display:
     inline-flex;
-
   align-items:
     center;
-
   gap: 5px;
 }
-
 .admin-cfcv-track-summary strong {
   color:
     var(--cfcv-navy-900);
 }
-
-
 /* ============================================================
    TOOLBAR
 ============================================================ */
-
 .admin-cfcv-toolbar {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   margin:
     0 auto
     16px;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     12px;
-
   min-width: 0;
 }
-
 .admin-cfcv-search {
   flex:
     1 1 320px;
-
   min-width:
     220px;
-
   height:
     44px;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     9px;
-
   padding:
     0 12px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     11px;
-
   background:
     var(--cfcv-white);
-
   transition:
     border-color
       var(--cfcv-transition),
     box-shadow
       var(--cfcv-transition);
 }
-
 .admin-cfcv-search:focus-within {
   border-color:
     var(--cfcv-gold-500);
-
   box-shadow:
     0 0 0 3px
     rgba(
@@ -925,231 +679,160 @@
       0.12
     );
 }
-
 .admin-cfcv-search > svg {
   flex:
     0 0 auto;
-
   color:
     var(--cfcv-gray-500);
 }
-
 .admin-cfcv-search input {
   flex: 1;
-
   width: 100%;
-
   min-width: 0;
-
   border: 0;
   outline: 0;
-
   color:
     var(--cfcv-gray-900);
-
   background:
     transparent;
-
   font-size:
     max(
       16px,
       0.84rem
     );
 }
-
 .admin-cfcv-search input::placeholder {
   color:
     var(--cfcv-gray-400);
 }
-
 .admin-cfcv-search button {
   width: 30px;
   height: 30px;
-
   flex:
     0 0 30px;
-
   display:
     grid;
-
   place-items:
     center;
-
   padding: 0;
-
   border: 0;
-
   border-radius:
     7px;
-
   color:
     var(--cfcv-gray-500);
-
   background:
     transparent;
 }
-
 .admin-cfcv-search button:hover {
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-gray-100);
 }
-
-
 /* ============================================================
    FILTERS
 ============================================================ */
-
 .admin-cfcv-filters {
   flex:
     0 1 auto;
-
   min-width: 0;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     8px;
 }
-
 .admin-cfcv-filters select {
   width: auto;
-
   min-width:
     120px;
-
   max-width:
     190px;
-
   min-height:
     44px;
-
   padding:
     8px 32px 8px 10px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     10px;
-
   color:
     var(--cfcv-gray-800);
-
   background:
     var(--cfcv-white);
-
   font-size:
     max(
       16px,
       0.76rem
     );
-
   font-weight:
     600;
 }
-
 .admin-cfcv-filter-toggle {
   display:
     none;
-
   min-height:
     44px;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap: 7px;
-
   padding:
     9px 13px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     10px;
-
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-white);
-
   font-size:
     0.8rem;
-
   font-weight:
     700;
 }
-
 .admin-cfcv-clear {
   min-height:
     40px;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap: 5px;
-
   padding:
     8px 10px;
-
   border:
     0;
-
   border-radius:
     8px;
-
   color:
     var(--cfcv-red-700);
-
   background:
     var(--cfcv-red-50);
-
   font-size:
     0.74rem;
-
   font-weight:
     700;
 }
-
-
 /* ============================================================
    MAIN WORKSPACE
-
    Desktop:
    applicant list | application details
 ============================================================ */
-
 .admin-cfcv-workspace {
   width: 100%;
   max-width:
     var(--cfcv-content-max);
-
   min-width: 0;
-
   margin:
     0 auto;
-
   display: grid;
-
   grid-template-columns:
     minmax(
       280px,
@@ -1159,239 +842,169 @@
       0,
       1fr
     );
-
   align-items:
     start;
-
   gap:
     clamp(14px, 1.5vw, 22px);
 }
-
-
 /* ============================================================
    APPLICATION LIST
 ============================================================ */
-
 .admin-cfcv-list {
   min-width: 0;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     var(--cfcv-radius-lg);
-
   background:
     var(--cfcv-white);
-
   box-shadow:
     var(--cfcv-shadow-xs);
-
   overflow:
     hidden;
 }
-
 .admin-cfcv-list__header {
   min-height:
     69px;
-
   display: flex;
-
   align-items:
     center;
-
   justify-content:
     space-between;
-
   gap:
     10px;
-
   padding:
     14px 16px;
-
   border-bottom:
     1px solid
     var(--cfcv-border);
-
   background:
     var(--cfcv-gray-50);
 }
-
 .admin-cfcv-list__header h2 {
   margin:
     0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.95rem;
 }
-
 .admin-cfcv-list__header span {
   display:
     block;
-
   margin-top:
     3px;
-
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.7rem;
 }
-
 .admin-cfcv-list__items {
   width: 100%;
-
   max-height:
     min(
       74vh,
       880px
     );
-
   overflow-y:
     auto;
-
   overscroll-behavior:
     contain;
-
   scrollbar-width:
     thin;
-
   scrollbar-color:
     var(--cfcv-gray-300)
     transparent;
 }
-
 .admin-cfcv-list__items::-webkit-scrollbar {
   width: 7px;
 }
-
 .admin-cfcv-list__items::-webkit-scrollbar-thumb {
   border-radius:
     999px;
-
   background:
     var(--cfcv-gray-300);
 }
-
-
 /* ============================================================
    APPLICATION CARD
 ============================================================ */
-
 .admin-cfcv-application-card {
   position:
     relative;
-
   width: 100%;
-
   min-width: 0;
-
   display:
     block;
-
   padding:
     15px;
-
   border: 0;
-
   border-bottom:
     1px solid
     var(--cfcv-border);
-
   border-radius: 0;
-
   color:
     var(--cfcv-gray-900);
-
   background:
     var(--cfcv-white);
-
   text-align:
     left;
-
   transition:
     background
       var(--cfcv-transition),
     box-shadow
       var(--cfcv-transition);
 }
-
 .admin-cfcv-application-card:last-child {
   border-bottom:
     0;
 }
-
 .admin-cfcv-application-card:hover {
   background:
     var(--cfcv-gray-50);
 }
-
 .admin-cfcv-application-card.is-selected {
   background:
     var(--cfcv-gold-50);
-
   box-shadow:
     inset 3px 0 0
     var(--cfcv-gold-500);
 }
-
 .admin-cfcv-application-card__top {
   display: grid;
-
   grid-template-columns:
     auto minmax(0, 1fr) auto;
-
   align-items:
     center;
-
   gap:
     10px;
-
   min-width: 0;
 }
-
-
 /* ============================================================
    AVATAR
 ============================================================ */
-
 .admin-cfcv-avatar {
   width: 38px;
   height: 38px;
-
   flex:
     0 0 38px;
-
   display:
     grid;
-
   place-items:
     center;
-
   border-radius:
     50%;
-
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-gold-100);
-
   font-size:
     0.7rem;
-
   font-weight:
     800;
-
   letter-spacing:
     0.02em;
 }
-
 .admin-cfcv-avatar--large {
   width:
     clamp(
@@ -1399,14 +1012,12 @@
       5vw,
       62px
     );
-
   height:
     clamp(
       50px,
       5vw,
       62px
     );
-
   flex:
     0 0
     clamp(
@@ -1414,280 +1025,198 @@
       5vw,
       62px
     );
-
   font-size:
     0.95rem;
 }
-
-
 /* ============================================================
    CARD IDENTITY
 ============================================================ */
-
 .admin-cfcv-application-card__identity {
   min-width: 0;
 }
-
 .admin-cfcv-application-card__identity strong {
   display:
     block;
-
   overflow:
     hidden;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.82rem;
-
   font-weight:
     800;
-
   line-height:
     1.3;
-
   text-overflow:
     ellipsis;
-
   white-space:
     nowrap;
 }
-
 .admin-cfcv-application-card__identity span {
   display:
     block;
-
   margin-top:
     2px;
-
   overflow:
     hidden;
-
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.66rem;
-
   font-weight:
     600;
-
   text-overflow:
     ellipsis;
-
   white-space:
     nowrap;
 }
-
 .admin-cfcv-application-card__arrow {
   flex:
     0 0 auto;
-
   color:
     var(--cfcv-gray-400);
 }
-
 .admin-cfcv-application-card__venture {
   min-width: 0;
-
   margin-top:
     12px;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     7px;
-
   color:
     var(--cfcv-gray-700);
-
   font-size:
     0.73rem;
-
   font-weight:
     700;
 }
-
 .admin-cfcv-application-card__venture svg {
   flex:
     0 0 auto;
-
   color:
     var(--cfcv-gold-700);
 }
-
 .admin-cfcv-application-card__venture span {
   min-width: 0;
-
   overflow:
     hidden;
-
   text-overflow:
     ellipsis;
-
   white-space:
     nowrap;
 }
-
 .admin-cfcv-application-card__meta {
   margin-top:
     9px;
-
   display: flex;
-
   flex-wrap:
     wrap;
-
   align-items:
     center;
-
   gap:
     7px 12px;
-
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.66rem;
 }
-
 .admin-cfcv-application-card__meta span {
   min-width: 0;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   gap: 5px;
 }
-
 .admin-cfcv-application-card__meta svg {
   flex:
     0 0 auto;
 }
-
 .admin-cfcv-application-card__badges {
   margin-top:
     11px;
-
   display: flex;
-
   flex-wrap:
     wrap;
-
   gap:
     6px;
 }
-
-
 /* ============================================================
    BADGES
 ============================================================ */
-
 .cfcv-badge {
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   max-width:
     100%;
-
   min-height:
     24px;
-
   padding:
     4px 8px;
-
   border-radius:
     999px;
-
   color:
     var(--cfcv-gray-700);
-
   background:
     var(--cfcv-gray-100);
-
   font-size:
     0.62rem;
-
   font-weight:
     800;
-
   line-height:
     1.2;
-
   text-align:
     center;
-
   overflow-wrap:
     anywhere;
 }
-
 .cfcv-badge--applied {
   color:
     var(--cfcv-blue-700);
-
   background:
     var(--cfcv-blue-100);
 }
-
 .cfcv-badge--assessment {
   color:
     var(--cfcv-orange-700);
-
   background:
     var(--cfcv-orange-100);
 }
-
 .cfcv-badge--interview {
   color:
     var(--cfcv-purple-700);
-
   background:
     var(--cfcv-purple-100);
 }
-
 .cfcv-badge--track-placement {
   color:
     var(--cfcv-gold-700);
-
   background:
     var(--cfcv-gold-100);
 }
-
 .cfcv-badge--matching,
 .cfcv-badge--compatibility {
   color:
     #176475;
-
   background:
     #dff3f5;
 }
-
 .cfcv-badge--final-decision,
 .cfcv-badge--enrollment {
   color:
     var(--cfcv-green-700);
-
   background:
     var(--cfcv-green-100);
 }
-
 .cfcv-badge--track {
   color:
     var(--cfcv-navy-900);
-
   background:
     rgba(
       13,
@@ -1696,153 +1225,108 @@
       0.08
     );
 }
-
-
 /* ============================================================
    LOADING / EMPTY STATES
 ============================================================ */
-
 .admin-cfcv-state,
 .admin-cfcv-detail-empty {
   min-height:
     240px;
-
   display: flex;
-
   flex-direction:
     column;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap:
     8px;
-
   padding:
     30px 18px;
-
   color:
     var(--cfcv-gray-500);
-
   text-align:
     center;
 }
-
 .admin-cfcv-state h3,
 .admin-cfcv-detail-empty h2 {
   margin:
     5px 0 0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     1rem;
 }
-
 .admin-cfcv-state p,
 .admin-cfcv-detail-empty p {
   max-width:
     360px;
-
   margin:
     0;
-
   font-size:
     0.78rem;
-
   line-height:
     1.6;
 }
-
 .admin-cfcv-state button {
   margin-top:
     7px;
-
   min-height:
     40px;
-
   padding:
     8px 13px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     9px;
-
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-white);
-
   font-size:
     0.75rem;
-
   font-weight:
     700;
 }
-
-
 /* ============================================================
    DETAIL PANEL
 ============================================================ */
-
 .admin-cfcv-detail {
   min-width: 0;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     var(--cfcv-radius-lg);
-
   background:
     var(--cfcv-white);
-
   box-shadow:
     var(--cfcv-shadow-xs);
-
   overflow:
     hidden;
 }
-
-
 /* ============================================================
    DETAIL HERO
 ============================================================ */
-
 .admin-cfcv-detail__hero {
   min-width: 0;
-
   display: flex;
-
   align-items:
     center;
-
   justify-content:
     space-between;
-
   gap:
     20px;
-
   padding:
     clamp(
       17px,
       2vw,
       24px
     );
-
   border-bottom:
     1px solid
     var(--cfcv-border);
-
   background:
     linear-gradient(
       135deg,
@@ -1850,174 +1334,124 @@
       var(--cfcv-gold-50)
     );
 }
-
 .admin-cfcv-detail__identity {
   min-width: 0;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     13px;
 }
-
 .admin-cfcv-detail__identity > div:last-child {
   min-width: 0;
 }
-
 .admin-cfcv-detail__reference {
   display:
     block;
-
   margin-bottom:
     3px;
-
   color:
     var(--cfcv-gold-700);
-
   font-size:
     0.67rem;
-
   font-weight:
     800;
-
   letter-spacing:
     0.06em;
-
   overflow-wrap:
     anywhere;
 }
-
 .admin-cfcv-detail__identity h2 {
   margin:
     0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     clamp(
       1.1rem,
       2vw,
       1.5rem
     );
-
   line-height:
     1.2;
-
   overflow-wrap:
     anywhere;
 }
-
 .admin-cfcv-detail__identity p {
   margin:
     4px 0 0;
-
   color:
     var(--cfcv-gray-600);
-
   font-size:
     0.78rem;
-
   overflow-wrap:
     anywhere;
 }
-
 .admin-cfcv-detail__hero-actions {
   flex:
     0 0 auto;
-
   display: flex;
-
   align-items:
     center;
-
   justify-content:
     flex-end;
-
   flex-wrap:
     wrap;
-
   gap:
     8px;
 }
-
 .admin-cfcv-resume-button {
   min-height:
     40px;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap:
     7px;
-
   padding:
     8px 12px;
-
   border:
     1px solid
     var(--cfcv-navy-900);
-
   border-radius:
     9px;
-
   color:
     var(--cfcv-white);
-
   background:
     var(--cfcv-navy-900);
-
   font-size:
     0.73rem;
-
   font-weight:
     800;
-
   transition:
     background
       var(--cfcv-transition),
     transform
       var(--cfcv-transition);
 }
-
 .admin-cfcv-resume-button:hover:not(:disabled) {
   background:
     var(--cfcv-navy-800);
-
   transform:
     translateY(-1px);
 }
-
-
 /* ============================================================
    ADMISSIONS WORKFLOW
 ============================================================ */
-
 .admin-cfcv-workflow {
   width: 100%;
-
   min-width: 0;
-
   display: grid;
-
   grid-template-columns:
     repeat(
       8,
       minmax(70px, 1fr)
     );
-
   gap:
     0;
-
   padding:
     17px
     clamp(
@@ -2025,151 +1459,107 @@
       2vw,
       24px
     );
-
   border-bottom:
     1px solid
     var(--cfcv-border);
-
   background:
     var(--cfcv-gray-50);
-
   overflow-x:
     auto;
-
   overscroll-behavior-x:
     contain;
-
   scrollbar-width:
     thin;
 }
-
 .admin-cfcv-workflow__step {
   position:
     relative;
-
   min-width:
     70px;
-
   display: flex;
-
   flex-direction:
     column;
-
   align-items:
     center;
-
   gap:
     7px;
-
   padding:
     0 5px;
-
   text-align:
     center;
 }
-
 .admin-cfcv-workflow__step::after {
   content: "";
-
   position:
     absolute;
-
   top:
     14px;
-
   left:
     calc(50% + 18px);
-
   width:
     calc(100% - 36px);
-
   height:
     2px;
-
   background:
     var(--cfcv-gray-200);
 }
-
 .admin-cfcv-workflow__step:last-child::after {
   display:
     none;
 }
-
 .admin-cfcv-workflow__step > span {
   position:
     relative;
-
   z-index: 1;
-
   width: 29px;
   height: 29px;
-
   display:
     grid;
-
   place-items:
     center;
-
   border:
     2px solid
     var(--cfcv-gray-300);
-
   border-radius:
     50%;
-
   color:
     var(--cfcv-gray-500);
-
   background:
     var(--cfcv-white);
-
   font-size:
     0.66rem;
-
   font-weight:
     800;
 }
-
 .admin-cfcv-workflow__step small {
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.59rem;
-
   font-weight:
     700;
-
   line-height:
     1.3;
 }
-
 .admin-cfcv-workflow__step.is-complete > span {
   border-color:
     var(--cfcv-green-600);
-
   color:
     var(--cfcv-white);
-
   background:
     var(--cfcv-green-600);
 }
-
 .admin-cfcv-workflow__step.is-complete::after {
   background:
     var(--cfcv-green-600);
 }
-
 .admin-cfcv-workflow__step.is-active > span {
   border-color:
     var(--cfcv-gold-500);
-
   color:
     var(--cfcv-navy-900);
-
   background:
     var(--cfcv-gold-100);
-
   box-shadow:
     0 0 0 4px
     rgba(
@@ -2179,61 +1569,45 @@
       0.12
     );
 }
-
 .admin-cfcv-workflow__step.is-active small {
   color:
     var(--cfcv-navy-900);
-
   font-weight:
     800;
 }
-
-
 /* ============================================================
    DETAIL CONTENT GRID
-
    Main application content | review controls
 ============================================================ */
-
 .admin-cfcv-detail-grid {
   min-width: 0;
-
   display: grid;
-
   grid-template-columns:
     minmax(0, 1fr)
     minmax(
       280px,
       350px
     );
-
   align-items:
     start;
 }
-
 .admin-cfcv-detail-main {
   min-width: 0;
-
   padding:
     clamp(
       16px,
       2vw,
       25px
     );
-
   border-right:
     1px solid
     var(--cfcv-border);
 }
-
-
 /* ============================================================
    DETAIL SECTIONS
 ============================================================ */
-
 .cfcv-detail-section {
   min-width: 0;
-
   margin:
     0 0
     clamp(
@@ -2241,91 +1615,66 @@
       2vw,
       22px
     );
-
   padding:
     clamp(
       15px,
       1.5vw,
       19px
     );
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     var(--cfcv-radius-md);
-
   background:
     var(--cfcv-white);
 }
-
 .cfcv-detail-section:last-child {
   margin-bottom: 0;
 }
-
 .cfcv-detail-section > h3 {
   margin:
     0 0 11px;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.87rem;
-
   font-weight:
     800;
 }
-
 .cfcv-detail-section__heading {
   display: flex;
-
   align-items:
     center;
-
   gap:
     8px;
-
   margin-bottom:
     14px;
 }
-
 .cfcv-detail-section__heading svg {
   flex:
     0 0 auto;
-
   color:
     var(--cfcv-gold-700);
 }
-
 .cfcv-detail-section__heading h3 {
   margin: 0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.88rem;
-
   font-weight:
     800;
 }
-
-
 /* ============================================================
    DEFINITION LIST
 ============================================================ */
-
 .cfcv-detail-list {
   margin: 0;
 }
-
 .cfcv-detail-row {
   min-width: 0;
-
   display: grid;
-
   grid-template-columns:
     minmax(
       120px,
@@ -2335,339 +1684,241 @@
       0,
       1fr
     );
-
   gap:
     12px;
-
   padding:
     10px 0;
-
   border-bottom:
     1px solid
     var(--cfcv-gray-100);
 }
-
 .cfcv-detail-row:first-child {
   padding-top: 0;
 }
-
 .cfcv-detail-row:last-child {
   padding-bottom: 0;
-
   border-bottom: 0;
 }
-
 .cfcv-detail-row dt {
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.71rem;
-
   font-weight:
     700;
 }
-
 .cfcv-detail-row dd {
   min-width: 0;
-
   margin: 0;
-
   color:
     var(--cfcv-gray-800);
-
   font-size:
     0.76rem;
-
   font-weight:
     600;
-
   line-height:
     1.55;
-
   overflow-wrap:
     anywhere;
-
   word-break:
     break-word;
 }
-
 .cfcv-detail-row a {
   display:
     inline-flex;
-
   align-items:
     center;
-
   gap:
     6px;
-
   max-width:
     100%;
-
   color:
     var(--cfcv-blue-700);
-
   overflow-wrap:
     anywhere;
 }
-
 .cfcv-detail-row a:hover {
   text-decoration:
     underline;
 }
-
 .cfcv-inline-icon {
   display:
     inline-flex;
-
   align-items:
     center;
-
   gap:
     5px;
 }
-
 .cfcv-detail-copy {
   color:
     var(--cfcv-gray-700);
-
   font-size:
     0.78rem;
-
   line-height:
     1.75;
-
   white-space:
     pre-wrap;
-
   overflow-wrap:
     anywhere;
-
   word-break:
     break-word;
 }
-
-
 /* ============================================================
    INLINE RESUME
 ============================================================ */
-
 .cfcv-inline-download {
   max-width:
     100%;
-
   min-height:
     36px;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     flex-start;
-
   gap:
     7px;
-
   padding:
     6px 9px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     8px;
-
   color:
     var(--cfcv-blue-700);
-
   background:
     var(--cfcv-blue-50);
-
   font-size:
     0.72rem;
-
   font-weight:
     700;
-
   overflow-wrap:
     anywhere;
 }
-
-
 /* ============================================================
    REVIEW PANEL
 ============================================================ */
-
 .admin-cfcv-review-panel {
   position:
     sticky;
-
   top:
     16px;
-
   min-width: 0;
-
   max-height:
     calc(
       100vh - 32px
     );
-
   padding:
     clamp(
       15px,
       1.5vw,
       20px
     );
-
   background:
     var(--cfcv-gray-50);
-
   overflow-y:
     auto;
-
   overscroll-behavior:
     contain;
-
   scrollbar-width:
     thin;
 }
-
 .admin-cfcv-review-panel__heading {
   display: flex;
-
   align-items:
     flex-start;
-
   gap:
     9px;
-
   margin-bottom:
     18px;
-
   padding-bottom:
     14px;
-
   border-bottom:
     1px solid
     var(--cfcv-border);
 }
-
 .admin-cfcv-review-panel__heading > svg {
   flex:
     0 0 auto;
-
   margin-top:
     2px;
-
   color:
     var(--cfcv-gold-700);
 }
-
 .admin-cfcv-review-panel__heading h3 {
   margin: 0;
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.9rem;
 }
-
 .admin-cfcv-review-panel__heading p {
   margin:
     3px 0 0;
-
   color:
     var(--cfcv-gray-500);
-
   font-size:
     0.67rem;
 }
-
-
 /* ============================================================
    REVIEW FORM
 ============================================================ */
-
 .admin-cfcv-review-field {
   min-width: 0;
-
   margin-bottom:
     14px;
 }
-
 .admin-cfcv-review-field label {
   display:
     block;
-
   margin-bottom:
     6px;
-
   color:
     var(--cfcv-gray-700);
-
   font-size:
     0.69rem;
-
   font-weight:
     800;
 }
-
 .admin-cfcv-review-field input,
 .admin-cfcv-review-field select,
 .admin-cfcv-review-field textarea {
   width: 100%;
-
   min-width: 0;
-
   border:
     1px solid
     var(--cfcv-border-strong);
-
   border-radius:
     9px;
-
   color:
     var(--cfcv-gray-900);
-
   background:
     var(--cfcv-white);
-
   transition:
     border-color
       var(--cfcv-transition),
     box-shadow
       var(--cfcv-transition);
 }
-
 .admin-cfcv-review-field input,
 .admin-cfcv-review-field select {
   min-height:
     42px;
-
   padding:
     8px 10px;
 }
-
 .admin-cfcv-review-field textarea {
   min-height:
     92px;
-
   padding:
     10px;
-
   resize:
     vertical;
-
   line-height:
     1.55;
 }
-
 .admin-cfcv-review-field input,
 .admin-cfcv-review-field select,
 .admin-cfcv-review-field textarea {
@@ -2681,15 +1932,12 @@
       0.76rem
     );
 }
-
 .admin-cfcv-review-field input:focus,
 .admin-cfcv-review-field select:focus,
 .admin-cfcv-review-field textarea:focus {
   outline: 0;
-
   border-color:
     var(--cfcv-gold-500);
-
   box-shadow:
     0 0 0 3px
     rgba(
@@ -2699,182 +1947,126 @@
       0.12
     );
 }
-
 .admin-cfcv-review-field textarea::placeholder {
   color:
     var(--cfcv-gray-400);
 }
-
-
 /* ============================================================
    REVIEW DIVIDER
 ============================================================ */
-
 .admin-cfcv-review-divider {
   margin:
     22px 0 13px;
-
   padding-top:
     16px;
-
   border-top:
     1px solid
     var(--cfcv-border);
-
   color:
     var(--cfcv-navy-900);
-
   font-size:
     0.71rem;
-
   font-weight:
     800;
-
   letter-spacing:
     0.04em;
-
   text-transform:
     uppercase;
 }
-
-
 /* ============================================================
    CHECKBOX
 ============================================================ */
-
 .admin-cfcv-check {
   min-height:
     42px;
-
   margin-bottom:
     14px;
-
   display: flex;
-
   align-items:
     center;
-
   gap:
     9px;
-
   padding:
     9px 10px;
-
   border:
     1px solid
     var(--cfcv-border);
-
   border-radius:
     9px;
-
   color:
     var(--cfcv-gray-700);
-
   background:
     var(--cfcv-white);
-
   font-size:
     0.73rem;
-
   font-weight:
     700;
-
   cursor:
     pointer;
 }
-
 .admin-cfcv-check input {
   width: 17px;
   height: 17px;
-
   flex:
     0 0 17px;
-
   margin: 0;
-
   accent-color:
     var(--cfcv-green-600);
 }
-
-
 /* ============================================================
    SAVE BUTTON
 ============================================================ */
-
 .admin-cfcv-save {
   position:
     sticky;
-
   bottom: 0;
-
   z-index: 2;
-
   width: 100%;
-
   min-height:
     46px;
-
   margin-top:
     18px;
-
   display:
     inline-flex;
-
   align-items:
     center;
-
   justify-content:
     center;
-
   gap:
     8px;
-
   padding:
     10px 14px;
-
   border:
     1px solid
     var(--cfcv-navy-900);
-
   border-radius:
     10px;
-
   color:
     var(--cfcv-white);
-
   background:
     var(--cfcv-navy-900);
-
   box-shadow:
     0 -8px 20px
     var(--cfcv-gray-50);
-
   font-size:
     0.78rem;
-
   font-weight:
     800;
-
   transition:
     background
       var(--cfcv-transition),
     transform
       var(--cfcv-transition);
 }
-
 .admin-cfcv-save:hover:not(:disabled) {
   background:
     var(--cfcv-navy-800);
-
   transform:
     translateY(-1px);
 }
-
-
 /* ============================================================
    SPINNER
 ============================================================ */
-
 .is-spinning {
   animation:
     cfcv-spin
@@ -2882,20 +2074,16 @@
     linear
     infinite;
 }
-
 @keyframes cfcv-spin {
   to {
     transform:
       rotate(360deg);
   }
 }
-
-
 /* ============================================================
    LARGE DESKTOP
    1440px+
 ============================================================ */
-
 @media (
   min-width: 1440px
 ) {
@@ -2910,7 +2098,6 @@
         1fr
       );
   }
-
   .admin-cfcv-detail-grid {
     grid-template-columns:
       minmax(
@@ -2922,7 +2109,6 @@
         380px
       );
   }
-
   .admin-cfcv-list__items {
     max-height:
       min(
@@ -2931,24 +2117,19 @@
       );
   }
 }
-
-
 /* ============================================================
    ULTRAWIDE
    1920px+
 ============================================================ */
-
 @media (
   min-width: 1920px
 ) {
   .admin-cfcv {
     --cfcv-content-max:
       1920px;
-
     --cfcv-page-padding:
       34px;
   }
-
   .admin-cfcv-workspace {
     grid-template-columns:
       390px
@@ -2957,7 +2138,6 @@
         1fr
       );
   }
-
   .admin-cfcv-detail-grid {
     grid-template-columns:
       minmax(
@@ -2966,20 +2146,15 @@
       )
       390px;
   }
-
   .admin-cfcv-stat {
     min-height:
       104px;
   }
 }
-
-
 /* ============================================================
    EXTREME ULTRAWIDE
-
    Prevent content from becoming excessively stretched.
 ============================================================ */
-
 @media (
   min-width: 2560px
 ) {
@@ -2988,13 +2163,10 @@
       2100px;
   }
 }
-
-
 /* ============================================================
    MEDIUM DESKTOP / SMALL LAPTOP
    <= 1280px
 ============================================================ */
-
 @media (
   max-width: 1280px
 ) {
@@ -3005,7 +2177,6 @@
         minmax(0, 1fr)
       );
   }
-
   .admin-cfcv-workspace {
     grid-template-columns:
       minmax(
@@ -3017,7 +2188,6 @@
         1fr
       );
   }
-
   .admin-cfcv-detail-grid {
     grid-template-columns:
       minmax(
@@ -3029,42 +2199,32 @@
         310px
       );
   }
-
   .admin-cfcv-toolbar {
     align-items:
       flex-start;
-
     flex-wrap:
       wrap;
   }
-
   .admin-cfcv-search {
     flex:
       1 1 100%;
   }
-
   .admin-cfcv-filters {
     width: 100%;
-
     flex-wrap:
       wrap;
   }
-
   .admin-cfcv-filters select {
     flex:
       1 1 150px;
-
     max-width:
       none;
   }
 }
-
-
 /* ============================================================
    TABLET LANDSCAPE / NARROW LAPTOP
    <= 1100px
 ============================================================ */
-
 @media (
   max-width: 1100px
 ) {
@@ -3076,67 +2236,52 @@
         1fr
       );
   }
-
   .admin-cfcv-detail-grid {
     display:
       block;
   }
-
   .admin-cfcv-detail-main {
     border-right:
       0;
-
     border-bottom:
       1px solid
       var(--cfcv-border);
   }
-
   .admin-cfcv-review-panel {
     position:
       static;
-
     max-height:
       none;
-
     overflow:
       visible;
   }
-
   .admin-cfcv-review-panel {
     display: grid;
-
     grid-template-columns:
       repeat(
         2,
         minmax(0, 1fr)
       );
-
     gap:
       0 16px;
   }
-
   .admin-cfcv-review-panel__heading,
   .admin-cfcv-review-divider,
   .admin-cfcv-save {
     grid-column:
       1 / -1;
   }
-
   .admin-cfcv-save {
     position:
       static;
   }
 }
-
-
 /* ============================================================
    TABLETS
    <= 900px
-
    Workspace stacks so admin sidebar layouts don't crush
    the applicant detail content.
 ============================================================ */
-
 @media (
   max-width: 900px
 ) {
@@ -3148,31 +2293,25 @@
         20px
       );
   }
-
   .admin-cfcv__header {
     align-items:
       center;
   }
-
   .admin-cfcv-workspace {
     display:
       block;
   }
-
   .admin-cfcv-list {
     margin-bottom:
       15px;
   }
-
   .admin-cfcv-list__items {
     max-height:
       430px;
   }
-
   .admin-cfcv-detail {
     width: 100%;
   }
-
   .admin-cfcv-workflow {
     grid-template-columns:
       repeat(
@@ -3184,13 +2323,10 @@
       );
   }
 }
-
-
 /* ============================================================
    MOBILE / SMALL TABLET
    <= 768px
 ============================================================ */
-
 @media (
   max-width: 768px
 ) {
@@ -3198,145 +2334,110 @@
     --cfcv-page-padding:
       14px;
   }
-
   .admin-cfcv__header {
     display:
       block;
   }
-
   .admin-cfcv__refresh {
     width: 100%;
-
     margin-top:
       15px;
   }
-
   .admin-cfcv-stats {
     grid-template-columns:
       repeat(
         2,
         minmax(0, 1fr)
       );
-
     gap:
       9px;
   }
-
   .admin-cfcv-stat {
     min-height:
       86px;
-
     padding:
       12px;
   }
-
   .admin-cfcv-stat__icon {
     width: 37px;
     height: 37px;
-
     flex-basis:
       37px;
   }
-
   .admin-cfcv-cohort__heading {
     align-items:
       flex-start;
-
     flex-direction:
       column;
-
     gap:
       10px;
   }
-
   .admin-cfcv-toolbar {
     display:
       grid;
-
     grid-template-columns:
       minmax(0, 1fr)
       auto;
-
     align-items:
       center;
-
     gap:
       9px;
   }
-
   .admin-cfcv-search {
     min-width: 0;
   }
-
   .admin-cfcv-filter-toggle {
     display:
       inline-flex;
   }
-
   .admin-cfcv-filters {
     grid-column:
       1 / -1;
-
     display:
       none;
-
     width: 100%;
-
     padding:
       12px;
-
     border:
       1px solid
       var(--cfcv-border);
-
     border-radius:
       12px;
-
     background:
       var(--cfcv-white);
   }
-
   .admin-cfcv-filters.is-open {
     display:
       grid;
-
     grid-template-columns:
       repeat(
         2,
         minmax(0, 1fr)
       );
-
     gap:
       9px;
   }
-
   .admin-cfcv-filters select {
     width: 100%;
     max-width: none;
   }
-
   .admin-cfcv-clear {
     width: 100%;
   }
-
   .admin-cfcv-detail__hero {
     align-items:
       flex-start;
   }
-
   .admin-cfcv-detail__hero-actions {
     align-items:
       flex-end;
-
     flex-direction:
       column;
   }
-
   .admin-cfcv-review-panel {
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-review-panel__heading,
   .admin-cfcv-review-divider,
   .admin-cfcv-save {
@@ -3344,13 +2445,10 @@
       auto;
   }
 }
-
-
 /* ============================================================
    PHONE
    <= 600px
 ============================================================ */
-
 @media (
   max-width: 600px
 ) {
@@ -3358,7 +2456,6 @@
     --cfcv-page-padding:
       12px;
   }
-
   .admin-cfcv__header h1 {
     font-size:
       clamp(
@@ -3367,7 +2464,6 @@
         1.85rem
       );
   }
-
   .admin-cfcv-stats {
     grid-template-columns:
       repeat(
@@ -3375,156 +2471,119 @@
         minmax(0, 1fr)
       );
   }
-
   .admin-cfcv-stat {
     align-items:
       flex-start;
-
     flex-direction:
       column;
-
     gap:
       9px;
   }
-
   .admin-cfcv-track-summary {
     display: grid;
-
     grid-template-columns:
       repeat(
         3,
         minmax(0, 1fr)
       );
-
     gap:
       7px;
   }
-
   .admin-cfcv-track-summary span {
     justify-content:
       center;
-
     padding:
       7px 5px;
-
     border-radius:
       8px;
-
     background:
       var(--cfcv-gray-50);
-
     font-size:
       0.68rem;
   }
-
   .admin-cfcv-toolbar {
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-filter-toggle {
     width: 100%;
   }
-
   .admin-cfcv-filters {
     grid-column:
       auto;
   }
-
   .admin-cfcv-filters.is-open {
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-list__items {
     max-height:
       380px;
   }
-
   .admin-cfcv-detail__hero {
     display:
       block;
   }
-
   .admin-cfcv-detail__identity {
     align-items:
       flex-start;
   }
-
   .admin-cfcv-detail__hero-actions {
     width: 100%;
-
     margin-top:
       15px;
-
     align-items:
       stretch;
-
     flex-direction:
       row;
-
     justify-content:
       flex-start;
   }
-
   .admin-cfcv-resume-button {
     flex:
       1 1 auto;
   }
-
   .admin-cfcv-workflow {
     padding:
       15px 10px;
-
     grid-template-columns:
       repeat(
         8,
         88px
       );
   }
-
   .admin-cfcv-detail-main,
   .admin-cfcv-review-panel {
     padding:
       13px;
   }
-
   .cfcv-detail-row {
     grid-template-columns:
       1fr;
-
     gap:
       4px;
-
     padding:
       11px 0;
   }
-
   .cfcv-detail-row dt {
     color:
       var(--cfcv-gray-500);
-
     font-size:
       0.66rem;
   }
-
   .cfcv-detail-row dd {
     font-size:
       0.76rem;
   }
-
   .admin-cfcv-save {
     min-height:
       48px;
   }
 }
-
-
 /* ============================================================
    SMALL PHONE
    <= 420px
 ============================================================ */
-
 @media (
   max-width: 420px
 ) {
@@ -3532,119 +2591,92 @@
     --cfcv-page-padding:
       10px;
   }
-
   .admin-cfcv__eyebrow {
     font-size:
       0.67rem;
   }
-
   .admin-cfcv__header p {
     font-size:
       0.84rem;
   }
-
   .admin-cfcv-stats {
     gap:
       7px;
   }
-
   .admin-cfcv-stat {
     min-height:
       104px;
-
     padding:
       11px;
   }
-
   .admin-cfcv-stat strong {
     font-size:
       1.3rem;
   }
-
   .admin-cfcv-stat span {
     font-size:
       0.67rem;
   }
-
   .admin-cfcv-cohort {
     padding:
       13px;
   }
-
   .admin-cfcv-cohort__heading
     .admin-cfcv-cohort__remaining {
     width: 100%;
-
     text-align:
       center;
   }
-
   .admin-cfcv-track-summary {
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-application-card {
     padding:
       13px 11px;
   }
-
   .admin-cfcv-detail__hero {
     padding:
       14px 12px;
   }
-
   .admin-cfcv-detail__identity {
     gap:
       9px;
   }
-
   .admin-cfcv-avatar--large {
     width: 46px;
     height: 46px;
-
     flex-basis:
       46px;
   }
-
   .admin-cfcv-detail__hero-actions {
     flex-direction:
       column;
-
     align-items:
       stretch;
   }
-
   .admin-cfcv-detail__hero-actions
     .cfcv-badge {
     width: 100%;
-
     min-height:
       34px;
   }
-
   .cfcv-detail-section {
     padding:
       13px 11px;
-
     border-radius:
       10px;
   }
-
   .admin-cfcv-review-panel {
     padding:
       13px 11px;
   }
 }
-
-
 /* ============================================================
    VERY SMALL PHONE
    <= 350px
-
    Supports narrow legacy / compact mobile widths.
 ============================================================ */
-
 @media (
   max-width: 350px
 ) {
@@ -3652,80 +2684,61 @@
     --cfcv-page-padding:
       8px;
   }
-
   .admin-cfcv-stats {
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-stat {
     min-height:
       76px;
-
     flex-direction:
       row;
-
     align-items:
       center;
   }
-
   .admin-cfcv-search {
     padding:
       0 9px;
   }
-
   .admin-cfcv-application-card__top {
     grid-template-columns:
       34px
       minmax(0, 1fr);
   }
-
   .admin-cfcv-application-card__arrow {
     display:
       none;
   }
-
   .admin-cfcv-avatar {
     width: 34px;
     height: 34px;
-
     flex-basis:
       34px;
   }
-
   .admin-cfcv-application-card__meta {
     display:
       grid;
-
     grid-template-columns:
       1fr;
   }
-
   .admin-cfcv-detail__identity {
     display:
       grid;
-
     grid-template-columns:
       42px
       minmax(0, 1fr);
   }
-
   .admin-cfcv-avatar--large {
     width: 42px;
     height: 42px;
-
     flex-basis:
       42px;
   }
 }
-
-
 /* ============================================================
    LANDSCAPE MOBILE
-
    Avoid giant vertically constrained internal panels.
 ============================================================ */
-
 @media (
   max-height: 520px
 ) and (
@@ -3734,29 +2747,22 @@
   .admin-cfcv-review-panel {
     position:
       static;
-
     max-height:
       none;
   }
-
   .admin-cfcv-list__items {
     max-height:
       300px;
   }
-
   .admin-cfcv-save {
     position:
       static;
   }
 }
-
-
 /* ============================================================
    TOUCH DEVICES
-
    Larger interaction targets.
 ============================================================ */
-
 @media (
   hover: none
 ) and (
@@ -3767,25 +2773,20 @@
     min-height:
       44px;
   }
-
   .admin-cfcv-application-card {
     min-height:
       112px;
   }
-
   .admin-cfcv-check {
     min-height:
       46px;
   }
-
   .admin-cfcv-check input {
     width: 19px;
     height: 19px;
-
     flex-basis:
       19px;
   }
-
   .admin-cfcv-stat:hover,
   .admin-cfcv__refresh:hover,
   .admin-cfcv-resume-button:hover,
@@ -3794,23 +2795,17 @@
       none;
   }
 }
-
-
 /* ============================================================
    BROWSER ZOOM / NARROW CONTAINER SAFETY
-
    container queries allow the page to adapt when the CMS
    sidebar leaves less usable width than the viewport suggests.
 ============================================================ */
-
 .admin-cfcv {
   container-type:
     inline-size;
-
   container-name:
     cfcv-admin;
 }
-
 @container cfcv-admin (
   max-width: 1050px
 ) {
@@ -3822,7 +2817,6 @@
       );
   }
 }
-
 @container cfcv-admin (
   max-width: 820px
 ) {
@@ -3830,35 +2824,28 @@
     display:
       block;
   }
-
   .admin-cfcv-list {
     margin-bottom:
       15px;
   }
-
   .admin-cfcv-detail-grid {
     display:
       block;
   }
-
   .admin-cfcv-detail-main {
     border-right:
       0;
-
     border-bottom:
       1px solid
       var(--cfcv-border);
   }
-
   .admin-cfcv-review-panel {
     position:
       static;
-
     max-height:
       none;
   }
 }
-
 @container cfcv-admin (
   max-width: 560px
 ) {
@@ -3869,34 +2856,26 @@
         minmax(0, 1fr)
       );
   }
-
   .admin-cfcv-detail__hero {
     display:
       block;
   }
-
   .admin-cfcv-detail__hero-actions {
     margin-top:
       14px;
-
     justify-content:
       flex-start;
   }
-
   .cfcv-detail-row {
     grid-template-columns:
       1fr;
-
     gap:
       4px;
   }
 }
-
-
 /* ============================================================
    REDUCED MOTION
 ============================================================ */
-
 @media (
   prefers-reduced-motion:
     reduce
@@ -3906,23 +2885,17 @@
   .admin-cfcv *::after {
     scroll-behavior:
       auto !important;
-
     animation-duration:
       0.01ms !important;
-
     animation-iteration-count:
       1 !important;
-
     transition-duration:
       0.01ms !important;
   }
 }
-
-
 /* ============================================================
    HIGH CONTRAST
 ============================================================ */
-
 @media (
   prefers-contrast:
     more
@@ -3935,7 +2908,6 @@
         56,
         0.32
       );
-
     --cfcv-border-strong:
       rgba(
         13,
@@ -3944,7 +2916,6 @@
         0.5
       );
   }
-
   .admin-cfcv button,
   .admin-cfcv input,
   .admin-cfcv select,
@@ -3953,27 +2924,174 @@
       2px;
   }
 }
+/* Visibility and scrolling: preserve the existing visual design. */
+@media screen {
+  .admin-cfcv .admin-cfcv-application-card__identity strong,
+  .admin-cfcv .admin-cfcv-application-card__identity span,
+  .admin-cfcv .admin-cfcv-application-card__venture span {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 
+  .admin-cfcv .admin-cfcv-detail__identity,
+  .admin-cfcv .admin-cfcv-detail__hero-actions,
+  .admin-cfcv .cfcv-detail-row dt,
+  .admin-cfcv .cfcv-detail-row dd {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-cfcv .admin-cfcv-detail__hero {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .admin-cfcv .admin-cfcv-detail-main,
+  .admin-cfcv .admin-cfcv-review-panel {
+    padding: clamp(12px, 1.4vw, 18px);
+  }
+
+  .admin-cfcv .cfcv-detail-section {
+    margin-bottom: 12px;
+    padding: 14px;
+  }
+
+  .admin-cfcv .cfcv-detail-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .admin-cfcv .cfcv-detail-section__heading {
+    margin-bottom: 10px;
+  }
+
+  .admin-cfcv .cfcv-detail-row {
+    padding-block: 8px;
+    gap: 8px;
+  }
+
+  .admin-cfcv .cfcv-detail-row:first-child {
+    padding-top: 0;
+  }
+
+  .admin-cfcv .cfcv-detail-row:last-child {
+    padding-bottom: 0;
+  }
+
+  /* One scroll area for the complete application and review form. */
+  .admin-cfcv .admin-cfcv-detail {
+    max-height: 76vh;
+    max-height: 76dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--cfcv-gray-300) transparent;
+  }
+
+  .admin-cfcv .admin-cfcv-review-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .admin-cfcv .admin-cfcv-save {
+    position: static;
+  }
+
+  .admin-cfcv .admin-cfcv-list__items {
+    max-height: 66vh;
+    max-height: 66dvh;
+    scrollbar-gutter: stable;
+  }
+
+  .admin-cfcv .admin-cfcv-detail::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  .admin-cfcv .admin-cfcv-detail::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: var(--cfcv-gray-300);
+  }
+}
+
+/* Use the width left after the CMS sidebar, rather than screen width. */
+@container cfcv-admin (min-width: 1051px) {
+  .admin-cfcv .admin-cfcv-detail-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+  }
+}
+
+@container cfcv-admin (max-width: 1050px) {
+  .admin-cfcv .admin-cfcv-detail-grid {
+    display: block;
+  }
+
+  .admin-cfcv .admin-cfcv-detail-main {
+    border-right: 0;
+    border-bottom: 1px solid var(--cfcv-border);
+  }
+
+  .admin-cfcv .admin-cfcv-review-panel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+
+  .admin-cfcv .admin-cfcv-review-panel__heading,
+  .admin-cfcv .admin-cfcv-review-divider,
+  .admin-cfcv .admin-cfcv-save {
+    grid-column: 1 / -1;
+  }
+}
+
+@container cfcv-admin (max-width: 820px) {
+  .admin-cfcv .admin-cfcv-list__items {
+    max-height: 32vh;
+    max-height: 32dvh;
+  }
+
+  .admin-cfcv .admin-cfcv-detail {
+    max-height: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+}
+
+@container cfcv-admin (max-width: 560px) {
+  .admin-cfcv .admin-cfcv-review-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-cfcv .cfcv-detail-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+}
+
+@media screen and (max-width: 900px), screen and (max-height: 520px) {
+  .admin-cfcv .admin-cfcv-detail {
+    max-height: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
+  }
+}
 
 /* ============================================================
    PRINT
-
    Useful if the admin prints an application for an internal
    review meeting. Controls are hidden.
 ============================================================ */
-
 @media print {
   .admin-cfcv {
     padding: 0;
-
     color: #000;
-
     background: #fff;
-
     overflow:
       visible;
   }
-
   .admin-cfcv__refresh,
   .admin-cfcv-toolbar,
   .admin-cfcv-stats,
@@ -3985,46 +3103,35 @@
     display:
       none !important;
   }
-
   .admin-cfcv-workspace,
   .admin-cfcv-detail-grid {
     display:
       block;
   }
-
   .admin-cfcv-detail {
     border: 0;
-
     box-shadow:
       none;
-
     overflow:
       visible;
   }
-
   .admin-cfcv-detail-main {
     padding: 0;
-
     border: 0;
   }
-
   .admin-cfcv-detail__hero {
     padding:
       0 0 18px;
-
     background:
       #fff;
   }
-
   .admin-cfcv-workflow {
     overflow:
       visible;
   }
-
   .cfcv-detail-section {
     break-inside:
       avoid;
-
     box-shadow:
       none;
   }

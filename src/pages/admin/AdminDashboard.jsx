@@ -24,12 +24,9 @@ import {
   Users,
 } from "lucide-react";
 
-import {
-  Link,
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import "./AdminDashboard.css";
-
 
 /* ============================================================
    API CONFIGURATION
@@ -40,166 +37,107 @@ const API_URL = (
   "http://localhost:5000"
 ).replace(/\/+$/, "");
 
-
 /* ============================================================
-   DEFAULT GENERAL DASHBOARD
+   DEFAULT DATA
 ============================================================ */
 
 const DEFAULT_DASHBOARD = {
   upcomingEvents: 0,
   publishedInsights: 0,
-
   newsletterSubscribers: 0,
-
   newContacts: 0,
   totalContacts: 0,
-
   partnerships: 0,
   newPartnerships: 0,
-
   totalGalleryPhotos: 0,
   publishedGalleryPhotos: 0,
-
   recentActivity: [],
 };
 
-
-/* ============================================================
-   DEFAULT CFCV STATS
-============================================================ */
-
 const DEFAULT_CFCV_STATS = {
   totalApplications: 0,
-
   submitted: 0,
-
   underReview: 0,
-
   interviews: 0,
-
   matchingRequired: 0,
-
   admitted: 0,
-
   waitlisted: 0,
-
   genesis: 0,
-
   ascend: 0,
-
   horizon: 0,
-
   cohortCapacity: 30,
-
   remainingCapacity: 30,
 };
 
-
 /* ============================================================
-   QUICK ACCESS
+   MANAGEMENT LINKS
 ============================================================ */
 
 const quickAccess = [
   {
     title: "CFCV Admissions",
-
     description:
       "Review applications, interviews, matching, track placement and admissions decisions.",
-
     icon: ClipboardCheck,
-
     to: "/admin/cfcv",
   },
-
   {
     title: "Events",
-
     description:
       "Create, publish and manage Continental Founders events.",
-
     icon: CalendarDays,
-
     to: "/admin/events",
   },
-
   {
     title: "Insights",
-
     description:
       "Publish articles, research and founder insights.",
-
     icon: Newspaper,
-
     to: "/admin/insights",
   },
-
   {
     title: "Gallery",
-
     description:
       "Upload, publish and manage photos from events, programs and partnerships.",
-
     icon: Images,
-
     to: "/admin/gallery",
   },
-
   {
     title: "Newsletter",
-
     description:
       "Manage subscribers and newsletter outreach.",
-
     icon: Mail,
-
     to: "/admin/newsletter",
   },
-
   {
     title: "Contacts",
-
     description:
       "Review contact enquiries and website messages.",
-
     icon: MessageSquareText,
-
     to: "/admin/contacts",
   },
-
   {
     title: "Universities",
-
     description:
       "Manage university partners and institutions.",
-
     icon: GraduationCap,
-
     to: "/admin/universities",
   },
-
   {
     title: "Leadership",
-
     description:
       "Manage leadership and organizational profiles.",
-
     icon: Users,
-
     to: "/admin/leadership",
   },
 ];
-
 
 /* ============================================================
    NUMBER HELPERS
 ============================================================ */
 
-function getNumber(
-  ...values
-) {
-  for (
-    const value of values
-  ) {
+function getNumber(...values) {
+  for (const value of values) {
     if (
       value === null ||
       value === undefined ||
@@ -208,14 +146,9 @@ function getNumber(
       continue;
     }
 
-    const parsed =
-      Number(value);
+    const parsed = Number(value);
 
-    if (
-      Number.isFinite(
-        parsed
-      )
-    ) {
+    if (Number.isFinite(parsed)) {
       return parsed;
     }
   }
@@ -223,36 +156,21 @@ function getNumber(
   return 0;
 }
 
-
-function formatNumber(
-  value
-) {
-  return new Intl.NumberFormat(
-    "en-US"
-  ).format(
+function formatNumber(value) {
+  return new Intl.NumberFormat("en-US").format(
     getNumber(value)
   );
 }
 
-
 /* ============================================================
-   SAFE JSON RESPONSE
+   RESPONSE VALIDATION
 ============================================================ */
 
-async function readJsonResponse(
-  response,
-  serviceName
-) {
+async function readJsonResponse(response, serviceName) {
   const contentType =
-    response.headers.get(
-      "content-type"
-    ) || "";
+    response.headers.get("content-type") || "";
 
-  if (
-    !contentType.includes(
-      "application/json"
-    )
-  ) {
+  if (!contentType.includes("application/json")) {
     throw new Error(
       `${serviceName} returned an invalid response (${response.status}).`
     );
@@ -261,14 +179,11 @@ async function readJsonResponse(
   return response.json();
 }
 
-
 /* ============================================================
-   NORMALIZE GENERAL DASHBOARD
+   NORMALIZE ORGANISATION DATA
 ============================================================ */
 
-function normalizeDashboardData(
-  payload
-) {
+function normalizeDashboardData(payload) {
   const source =
     payload?.data ||
     payload?.dashboard ||
@@ -283,222 +198,164 @@ function normalizeDashboardData(
 
   let recentActivity = [];
 
-  if (
-    Array.isArray(
-      source.recentActivity
-    )
-  ) {
-    recentActivity =
-      source.recentActivity;
-  } else if (
-    Array.isArray(
-      source.recent_activity
-    )
-  ) {
-    recentActivity =
-      source.recent_activity;
-  } else if (
-    Array.isArray(
-      source.activity
-    )
-  ) {
-    recentActivity =
-      source.activity;
+  if (Array.isArray(source.recentActivity)) {
+    recentActivity = source.recentActivity;
+  } else if (Array.isArray(source.recent_activity)) {
+    recentActivity = source.recent_activity;
+  } else if (Array.isArray(source.activity)) {
+    recentActivity = source.activity;
   }
 
   return {
-    upcomingEvents:
-      getNumber(
-        stats.upcomingEvents,
-        stats.upcoming_events,
-        source.upcomingEvents,
-        source.upcoming_events
-      ),
+    upcomingEvents: getNumber(
+      stats.upcomingEvents,
+      stats.upcoming_events,
+      source.upcomingEvents,
+      source.upcoming_events
+    ),
 
-    publishedInsights:
-      getNumber(
-        stats.publishedInsights,
-        stats.published_insights,
-        source.publishedInsights,
-        source.published_insights
-      ),
+    publishedInsights: getNumber(
+      stats.publishedInsights,
+      stats.published_insights,
+      source.publishedInsights,
+      source.published_insights
+    ),
 
-    newsletterSubscribers:
-      getNumber(
-        stats.newsletterSubscribers,
-        stats.newsletter_subscribers,
-        stats.activeSubscribers,
-        stats.active_subscribers,
-        source.newsletterSubscribers,
-        source.newsletter_subscribers
-      ),
+    newsletterSubscribers: getNumber(
+      stats.newsletterSubscribers,
+      stats.newsletter_subscribers,
+      stats.activeSubscribers,
+      stats.active_subscribers,
+      source.newsletterSubscribers,
+      source.newsletter_subscribers
+    ),
 
-    newContacts:
-      getNumber(
-        stats.newContacts,
-        stats.new_contacts,
-        source.newContacts,
-        source.new_contacts
-      ),
+    newContacts: getNumber(
+      stats.newContacts,
+      stats.new_contacts,
+      source.newContacts,
+      source.new_contacts
+    ),
 
-    totalContacts:
-      getNumber(
-        stats.totalContacts,
-        stats.total_contacts,
-        source.totalContacts,
-        source.total_contacts
-      ),
+    totalContacts: getNumber(
+      stats.totalContacts,
+      stats.total_contacts,
+      source.totalContacts,
+      source.total_contacts
+    ),
 
-    partnerships:
-      getNumber(
-        stats.partnerships,
-        stats.totalPartnerships,
-        stats.total_partnerships,
-        source.partnerships
-      ),
+    partnerships: getNumber(
+      stats.partnerships,
+      stats.totalPartnerships,
+      stats.total_partnerships,
+      source.partnerships
+    ),
 
-    newPartnerships:
-      getNumber(
-        stats.newPartnerships,
-        stats.new_partnerships,
-        source.newPartnerships
-      ),
+    newPartnerships: getNumber(
+      stats.newPartnerships,
+      stats.new_partnerships,
+      source.newPartnerships
+    ),
 
-    totalGalleryPhotos:
-      getNumber(
-        stats.totalGalleryPhotos,
-        stats.total_gallery_photos,
-        stats.galleryPhotos,
-        stats.gallery_photos
-      ),
+    totalGalleryPhotos: getNumber(
+      stats.totalGalleryPhotos,
+      stats.total_gallery_photos,
+      stats.galleryPhotos,
+      stats.gallery_photos
+    ),
 
-    publishedGalleryPhotos:
-      getNumber(
-        stats.publishedGalleryPhotos,
-        stats.published_gallery_photos
-      ),
+    publishedGalleryPhotos: getNumber(
+      stats.publishedGalleryPhotos,
+      stats.published_gallery_photos
+    ),
 
     recentActivity,
   };
 }
 
-
 /* ============================================================
-   NORMALIZE CFCV STATS
+   NORMALIZE ADMISSIONS DATA
 ============================================================ */
 
-function normalizeCfcvStats(
-  payload
-) {
-  const source =
-    payload?.data ||
-    payload ||
-    {};
+function normalizeCfcvStats(payload) {
+  const source = payload?.data || payload || {};
 
   const stats =
     source?.stats ||
     source?.statistics ||
+    source ||
     {};
 
+  const cohortCapacity = getNumber(
+    stats.cohortCapacity,
+    stats.cohort_capacity,
+    30
+  );
+
+  const admitted = getNumber(stats.admitted);
+
   return {
-    totalApplications:
-      getNumber(
-        stats.totalApplications,
-        stats.total_applications
-      ),
+    totalApplications: getNumber(
+      stats.totalApplications,
+      stats.total_applications
+    ),
 
-    submitted:
-      getNumber(
-        stats.submitted
-      ),
+    submitted: getNumber(stats.submitted),
 
-    underReview:
-      getNumber(
-        stats.underReview,
-        stats.under_review
-      ),
+    underReview: getNumber(
+      stats.underReview,
+      stats.under_review
+    ),
 
-    interviews:
-      getNumber(
-        stats.interviews
-      ),
+    interviews: getNumber(stats.interviews),
 
-    matchingRequired:
-      getNumber(
-        stats.matchingRequired,
-        stats.matching_required
-      ),
+    matchingRequired: getNumber(
+      stats.matchingRequired,
+      stats.matching_required
+    ),
 
-    admitted:
-      getNumber(
-        stats.admitted
-      ),
+    admitted,
 
-    waitlisted:
-      getNumber(
-        stats.waitlisted
-      ),
+    waitlisted: getNumber(stats.waitlisted),
 
-    genesis:
-      getNumber(
-        stats.genesis
-      ),
+    genesis: getNumber(stats.genesis),
 
-    ascend:
-      getNumber(
-        stats.ascend
-      ),
+    ascend: getNumber(stats.ascend),
 
-    horizon:
-      getNumber(
-        stats.horizon
-      ),
+    horizon: getNumber(stats.horizon),
 
-    cohortCapacity:
-      getNumber(
-        stats.cohortCapacity,
-        stats.cohort_capacity,
-        30
-      ),
+    cohortCapacity,
 
-    remainingCapacity:
-      getNumber(
-        stats.remainingCapacity,
-        stats.remaining_capacity
-      ),
+    remainingCapacity: getNumber(
+      stats.remainingCapacity,
+      stats.remaining_capacity,
+      Math.max(0, cohortCapacity - admitted)
+    ),
   };
 }
-
 
 /* ============================================================
    ACTIVITY HELPERS
 ============================================================ */
 
-function getActivityIcon(
-  item
-) {
-  const type =
-    String(
-      item?.type ||
+function getActivityIcon(item) {
+  const type = String(
+    item?.type ||
       item?.category ||
       item?.entity ||
       ""
-    )
-      .trim()
-      .toLowerCase();
+  )
+    .trim()
+    .toLowerCase();
 
   if (
     type.includes("cfcv") ||
-    type.includes(
-      "application"
-    )
+    type.includes("application")
   ) {
     return ClipboardCheck;
   }
 
-  if (
-    type.includes("event")
-  ) {
+  if (type.includes("event")) {
     return CalendarDays;
   }
 
@@ -519,12 +376,8 @@ function getActivityIcon(
   }
 
   if (
-    type.includes(
-      "newsletter"
-    ) ||
-    type.includes(
-      "subscriber"
-    )
+    type.includes("newsletter") ||
+    type.includes("subscriber")
   ) {
     return Mail;
   }
@@ -539,28 +392,19 @@ function getActivityIcon(
 
   if (
     type.includes("partner") ||
-    type.includes(
-      "partnership"
-    )
+    type.includes("partnership")
   ) {
     return Handshake;
   }
 
-  if (
-    type.includes(
-      "university"
-    )
-  ) {
+  if (type.includes("university")) {
     return GraduationCap;
   }
 
   return Activity;
 }
 
-
-function getActivityTitle(
-  item
-) {
+function getActivityTitle(item) {
   return (
     item?.title ||
     item?.name ||
@@ -570,10 +414,7 @@ function getActivityTitle(
   );
 }
 
-
-function getActivityDescription(
-  item
-) {
+function getActivityDescription(item) {
   return (
     item?.description ||
     item?.details ||
@@ -582,10 +423,7 @@ function getActivityDescription(
   );
 }
 
-
-function getActivityTime(
-  item
-) {
+function getActivityTime(item) {
   const value =
     item?.time ||
     item?.relativeTime ||
@@ -598,30 +436,21 @@ function getActivityTime(
     return "";
   }
 
-  const parsedDate =
-    new Date(value);
+  const parsedDate = new Date(value);
 
-  if (
-    Number.isNaN(
-      parsedDate.getTime()
-    )
-  ) {
+  if (Number.isNaN(parsedDate.getTime())) {
     return String(value);
   }
 
-  return new Intl.DateTimeFormat(
-    "en-US",
-    {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }
-  ).format(parsedDate);
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(parsedDate);
 }
 
-
 /* ============================================================
-   STAT CARD
+   STATISTIC CARD
 ============================================================ */
 
 function StatCard({
@@ -630,14 +459,12 @@ function StatCard({
   value,
   helper,
   unavailable = false,
+  loading = false,
 }) {
   return (
     <article className="admin-dashboard__stat-card">
       <div className="admin-dashboard__stat-icon">
-        <Icon
-          size={18}
-          strokeWidth={1.8}
-        />
+        <Icon size={18} strokeWidth={1.8} />
       </div>
 
       <div className="admin-dashboard__stat-content">
@@ -646,11 +473,11 @@ function StatCard({
         </span>
 
         <strong className="admin-dashboard__stat-value">
-          {unavailable
-            ? "—"
-            : formatNumber(
-                value
-              )}
+          {loading
+            ? "…"
+            : unavailable
+              ? "—"
+              : formatNumber(value)}
         </strong>
 
         {helper && (
@@ -663,16 +490,12 @@ function StatCard({
   );
 }
 
-
 /* ============================================================
-   QUICK ACCESS CARD
+   MANAGEMENT CARD
 ============================================================ */
 
-function QuickAccessCard({
-  item,
-}) {
-  const Icon =
-    item.icon;
+function QuickAccessCard({ item }) {
+  const Icon = item.icon;
 
   return (
     <Link
@@ -680,20 +503,12 @@ function QuickAccessCard({
       className="admin-dashboard__quick-card"
     >
       <div className="admin-dashboard__quick-icon">
-        <Icon
-          size={16}
-          strokeWidth={1.8}
-        />
+        <Icon size={16} strokeWidth={1.8} />
       </div>
 
       <div className="admin-dashboard__quick-copy">
-        <h3>
-          {item.title}
-        </h3>
-
-        <p>
-          {item.description}
-        </p>
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
       </div>
 
       <ArrowUpRight
@@ -705,1125 +520,838 @@ function QuickAccessCard({
   );
 }
 
-
 /* ============================================================
-   ADMIN DASHBOARD
+   DASHBOARD
 ============================================================ */
 
 function AdminDashboard() {
-  const [
-    dashboard,
-    setDashboard,
-  ] = useState(
+  const [dashboard, setDashboard] = useState(
     DEFAULT_DASHBOARD
   );
 
-  const [
-    cfcvStats,
-    setCfcvStats,
-  ] = useState(
+  const [cfcvStats, setCfcvStats] = useState(
     DEFAULT_CFCV_STATS
   );
 
   const [
-    cfcvAvailable,
-    setCfcvAvailable,
+    dashboardAvailable,
+    setDashboardAvailable,
   ] = useState(false);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [cfcvAvailable, setCfcvAvailable] =
+    useState(false);
 
-  const [
-    refreshing,
-    setRefreshing,
-  ] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] = useState("");
+  const [cfcvError, setCfcvError] = useState("");
 
-  const [
-    cfcvError,
-    setCfcvError,
-  ] = useState("");
+  const [lastUpdated, setLastUpdated] =
+    useState(null);
 
-  const [
-    lastUpdated,
-    setLastUpdated,
-  ] = useState(null);
+  /* ----------------------------------------------------------
+     LOAD BOTH SERVICES INDEPENDENTLY
+  ---------------------------------------------------------- */
 
+  const loadDashboard = useCallback(
+    async ({ silent = false } = {}) => {
+      if (silent) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
 
-  /* ==========================================================
-     LOAD DASHBOARD
-  ========================================================== */
+      const readService = async (endpoint, name) => {
+        const response = await fetch(
+          `${API_URL}${endpoint}`,
+          {
+            credentials: "include",
+            cache: "no-store",
 
-  const loadDashboard =
-    useCallback(
-      async ({
-        silent = false,
-      } = {}) => {
-        try {
-          if (silent) {
-            setRefreshing(true);
-          } else {
-            setLoading(true);
+            headers: {
+              Accept: "application/json",
+            },
           }
+        );
 
-          setError("");
-          setCfcvError("");
+        const data = await readJsonResponse(
+          response,
+          name
+        );
 
-          const [
-            dashboardResult,
-            cfcvResult,
-          ] =
-            await Promise.allSettled([
-              fetch(
-                `${API_URL}/api/admin/dashboard/stats`,
-                {
-                  method: "GET",
+        if (!response.ok) {
+          throw new Error(
+            response.status === 401
+              ? "Your session has expired. Please sign in again."
+              : data?.message ||
+                  data?.error ||
+                  `${name} is unavailable (${response.status}).`
+          );
+        }
 
-                  headers: {
-                    Accept:
-                      "application/json",
-                  },
+        return data;
+      };
 
-                  credentials:
-                    "include",
+      try {
+        const [general, admissions] =
+          await Promise.allSettled([
+            readService(
+              "/api/admin/dashboard/stats",
+              "Dashboard"
+            ),
 
-                  cache:
-                    "no-store",
-                }
-              ),
+            readService(
+              "/api/cfcv/admin/stats",
+              "CFCV admissions"
+            ),
+          ]);
 
-              fetch(
-                `${API_URL}/api/cfcv/admin/stats`,
-                {
-                  method: "GET",
-
-                  headers: {
-                    Accept:
-                      "application/json",
-                  },
-
-                  credentials:
-                    "include",
-
-                  cache:
-                    "no-store",
-                }
-              ),
-            ]);
-
-
-          /* ================================================
-             GENERAL DASHBOARD RESPONSE
-          ================================================ */
-
-          if (
-            dashboardResult.status !==
-            "fulfilled"
-          ) {
-            throw new Error(
-              "Unable to connect to the dashboard service."
-            );
-          }
-
-          const dashboardResponse =
-            dashboardResult.value;
-
-          const dashboardData =
-            await readJsonResponse(
-              dashboardResponse,
-              "Dashboard service"
-            );
-
-          if (
-            dashboardResponse.status ===
-            401
-          ) {
-            throw new Error(
-              "Your CMS session is not authenticated. Please sign in again."
-            );
-          }
-
-          if (
-            dashboardResponse.status ===
-            403
-          ) {
-            throw new Error(
-              dashboardData?.message ||
-              "Your account does not have permission to access the dashboard."
-            );
-          }
-
-          if (
-            !dashboardResponse.ok
-          ) {
-            throw new Error(
-              dashboardData?.message ||
-              dashboardData?.error ||
-              `Unable to load dashboard (${dashboardResponse.status}).`
-            );
-          }
-
+        if (general.status === "fulfilled") {
           setDashboard(
-            normalizeDashboardData(
-              dashboardData
-            )
+            normalizeDashboardData(general.value)
           );
 
-
-          /* ================================================
-             CFCV RESPONSE
-
-             CFCV failure must not take down the rest of CMS.
-          ================================================ */
-
-          if (
-            cfcvResult.status ===
-            "fulfilled"
-          ) {
-            const cfcvResponse =
-              cfcvResult.value;
-
-            try {
-              const cfcvData =
-                await readJsonResponse(
-                  cfcvResponse,
-                  "CFCV admissions service"
-                );
-
-              if (
-                cfcvResponse.ok
-              ) {
-                setCfcvStats(
-                  normalizeCfcvStats(
-                    cfcvData
-                  )
-                );
-
-                setCfcvAvailable(
-                  true
-                );
-
-                setCfcvError("");
-              } else {
-                setCfcvAvailable(
-                  false
-                );
-
-                setCfcvError(
-                  cfcvData?.message ||
-                  "CFCV admissions statistics are temporarily unavailable."
-                );
-              }
-            } catch (
-              cfcvRequestError
-            ) {
-              console.warn(
-                "CFCV dashboard loading error:",
-                cfcvRequestError
-              );
-
-              setCfcvAvailable(
-                false
-              );
-
-              setCfcvError(
-                cfcvRequestError
-                  ?.message ||
-                "CFCV admissions statistics are temporarily unavailable."
-              );
-            }
-          } else {
-            console.warn(
-              "CFCV dashboard request failed:",
-              cfcvResult.reason
-            );
-
-            setCfcvAvailable(
-              false
-            );
-
-            setCfcvError(
-              "CFCV admissions statistics are temporarily unavailable."
-            );
-          }
-
-
-          setLastUpdated(
-            new Date()
-          );
-        } catch (
-          requestError
-        ) {
-          console.error(
-            "Dashboard loading error:",
-            requestError
-          );
+          setDashboardAvailable(true);
+          setError("");
+        } else {
+          setDashboardAvailable(false);
 
           setError(
-            requestError
-              ?.message ||
-            "Unable to load dashboard information."
+            general.reason?.message ||
+              "Unable to load organisational data."
           );
-        } finally {
-          setLoading(false);
-
-          setRefreshing(false);
         }
-      },
-      []
-    );
 
+        if (admissions.status === "fulfilled") {
+          setCfcvStats(
+            normalizeCfcvStats(admissions.value)
+          );
 
-  /* ==========================================================
-     INITIAL LOAD
-  ========================================================== */
+          setCfcvAvailable(true);
+          setCfcvError("");
+        } else {
+          setCfcvAvailable(false);
+
+          setCfcvError(
+            admissions.reason?.message ||
+              "Unable to load admissions data."
+          );
+        }
+
+        if (
+          general.status === "fulfilled" ||
+          admissions.status === "fulfilled"
+        ) {
+          setLastUpdated(new Date());
+        }
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
 
+  /* ----------------------------------------------------------
+     OVERVIEW METRICS
+  ---------------------------------------------------------- */
 
-  /* ==========================================================
-     MAIN CMS STATS
-  ========================================================== */
+  const stats = [
+    {
+      label: "Applications",
+      value: cfcvStats.totalApplications,
+      icon: ClipboardCheck,
+      helper: "CFCV fellowship",
+      unavailable: !cfcvAvailable,
+    },
+    {
+      label: "Admitted founders",
+      value: cfcvStats.admitted,
+      icon: UserCheck,
+      helper: "Current cohort",
+      unavailable: !cfcvAvailable,
+    },
+    {
+      label: "Upcoming events",
+      value: dashboard.upcomingEvents,
+      icon: CalendarDays,
+      helper: "Scheduled programmes",
+      unavailable: !dashboardAvailable,
+    },
+    {
+      label: "Published insights",
+      value: dashboard.publishedInsights,
+      icon: Newspaper,
+      helper: "Research & publications",
+      unavailable: !dashboardAvailable,
+    },
+    {
+      label: "Published photos",
+      value: dashboard.publishedGalleryPhotos,
+      icon: Images,
 
-  const stats =
-    useMemo(
-      () => [
-        {
-          label:
-            "CFCV Applications",
+      helper: dashboardAvailable
+        ? `${formatNumber(
+            dashboard.totalGalleryPhotos
+          )} in the library`
+        : "Gallery library",
 
-          value:
-            cfcvStats
-              .totalApplications,
+      unavailable: !dashboardAvailable,
+    },
+    {
+      label: "Subscribers",
+      value: dashboard.newsletterSubscribers,
+      icon: Mail,
+      helper: "Newsletter audience",
+      unavailable: !dashboardAvailable,
+    },
+    {
+      label: "New enquiries",
+      value: dashboard.newContacts,
+      icon: MessageSquareText,
 
-          icon:
-            ClipboardCheck,
+      helper: dashboardAvailable
+        ? `${formatNumber(
+            dashboard.totalContacts
+          )} total contacts`
+        : "Contact enquiries",
 
-          helper:
-            cfcvAvailable
-              ? `${formatNumber(
-                  cfcvStats.submitted
-                )} submitted`
-              : "CFCV unavailable",
+      unavailable: !dashboardAvailable,
+    },
+    {
+      label: "Partnerships",
+      value: dashboard.partnerships,
+      icon: Handshake,
 
-          unavailable:
-            !cfcvAvailable,
-        },
+      helper: dashboardAvailable
+        ? `${formatNumber(
+            dashboard.newPartnerships
+          )} new requests`
+        : "Partnership network",
 
-        {
-          label:
-            "CFCV Admitted",
+      unavailable: !dashboardAvailable,
+    },
+  ];
 
-          value:
-            cfcvStats.admitted,
+  /* ----------------------------------------------------------
+     ADMISSIONS STAGES
+  ---------------------------------------------------------- */
 
-          icon:
-            UserCheck,
+  const stages = [
+    {
+      label: "Submitted",
+      value: cfcvStats.submitted,
+    },
+    {
+      label: "Under review",
+      value: cfcvStats.underReview,
+    },
+    {
+      label: "Interviews",
+      value: cfcvStats.interviews,
+    },
+    {
+      label: "Matching required",
+      value: cfcvStats.matchingRequired,
+    },
+    {
+      label: "Admitted",
+      value: cfcvStats.admitted,
+    },
+    {
+      label: "Waitlisted",
+      value: cfcvStats.waitlisted,
+    },
+  ];
 
-          helper:
-            cfcvAvailable
-              ? `${formatNumber(
-                  cfcvStats.remainingCapacity
-                )} cohort spaces remaining`
-              : "CFCV unavailable",
+  /* ----------------------------------------------------------
+     FOLLOW-UP ITEMS
+  ---------------------------------------------------------- */
 
-          unavailable:
-            !cfcvAvailable,
-        },
+  const priorities = [
+    {
+      title: "Application review",
+      description: "Open the admissions workspace",
+      value: cfcvStats.submitted,
+      available: cfcvAvailable,
+      icon: ClipboardCheck,
+      to: "/admin/cfcv",
+    },
+    {
+      title: "Founder matching",
+      description: "Review matching requirements",
+      value: cfcvStats.matchingRequired,
+      available: cfcvAvailable,
+      icon: Users,
+      to: "/admin/cfcv",
+    },
+    {
+      title: "Contact enquiries",
+      description: "Review new website messages",
+      value: dashboard.newContacts,
+      available: dashboardAvailable,
+      icon: MessageSquareText,
+      to: "/admin/contacts",
+    },
+  ];
 
-        {
-          label:
-            "Upcoming Events",
+  const recentActivity = useMemo(
+    () => dashboard.recentActivity.slice(0, 8),
+    [dashboard.recentActivity]
+  );
 
-          value:
-            dashboard
-              .upcomingEvents,
+  const capacity = Math.max(
+    0,
+    cfcvStats.cohortCapacity
+  );
 
-          icon:
-            CalendarDays,
+  const occupied = Math.max(
+    0,
+    cfcvStats.admitted
+  );
 
-          helper:
-            "Scheduled events",
-        },
+  const capacityPercent =
+    capacity > 0
+      ? Math.min(100, (occupied / capacity) * 100)
+      : 0;
 
-        {
-          label:
-            "Published Insights",
+  const displayValue = (value, available) =>
+    loading
+      ? "…"
+      : available
+        ? formatNumber(value)
+        : "—";
 
-          value:
-            dashboard
-              .publishedInsights,
+  const dateLabel = new Intl.DateTimeFormat(
+    "en-GB",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }
+  ).format(new Date());
 
-          icon:
-            Newspaper,
-
-          helper:
-            "Live publications",
-        },
-
-        {
-          label:
-            "Gallery Photos",
-
-          value:
-            dashboard
-              .publishedGalleryPhotos,
-
-          icon:
-            Images,
-
-          helper:
-            `${formatNumber(
-              dashboard
-                .totalGalleryPhotos
-            )} total photos`,
-        },
-
-        {
-          label:
-            "Newsletter Subscribers",
-
-          value:
-            dashboard
-              .newsletterSubscribers,
-
-          icon:
-            Mail,
-
-          helper:
-            "Active audience",
-        },
-
-        {
-          label:
-            "New Contacts",
-
-          value:
-            dashboard.newContacts,
-
-          icon:
-            MessageSquareText,
-
-          helper:
-            `${formatNumber(
-              dashboard.totalContacts
-            )} total enquiries`,
-        },
-
-        {
-          label:
-            "Partnerships",
-
-          value:
-            dashboard.partnerships,
-
-          icon:
-            Handshake,
-
-          helper:
-            `${formatNumber(
-              dashboard
-                .newPartnerships
-            )} new`,
-        },
-      ],
-      [
-        cfcvStats,
-        cfcvAvailable,
-        dashboard,
-      ]
-    );
-
-
-  /* ==========================================================
-     CFCV ADMISSIONS CARDS
-  ========================================================== */
-
-  const cfcvCards =
-    useMemo(
-      () => [
-        {
-          label:
-            "Submitted",
-
-          value:
-            cfcvStats.submitted,
-
-          icon:
-            ClipboardCheck,
-        },
-
-        {
-          label:
-            "Under Review",
-
-          value:
-            cfcvStats.underReview,
-
-          icon:
-            Activity,
-        },
-
-        {
-          label:
-            "Interviews",
-
-          value:
-            cfcvStats.interviews,
-
-          icon:
-            Users,
-        },
-
-        {
-          label:
-            "Match Required",
-
-          value:
-            cfcvStats
-              .matchingRequired,
-
-          icon:
-            Handshake,
-        },
-
-        {
-          label:
-            "Admitted",
-
-          value:
-            cfcvStats.admitted,
-
-          icon:
-            UserCheck,
-        },
-
-        {
-          label:
-            "Waitlisted",
-
-          value:
-            cfcvStats.waitlisted,
-
-          icon:
-            ClipboardCheck,
-        },
-      ],
-      [cfcvStats]
-    );
-
-
-  /* ==========================================================
-     RECENT ACTIVITY
-  ========================================================== */
-
-  const recentActivity =
-    useMemo(() => {
-      if (
-        !Array.isArray(
-          dashboard
-            .recentActivity
-        )
-      ) {
-        return [];
-      }
-
-      return dashboard
-        .recentActivity
-        .slice(0, 8);
-    }, [
-      dashboard.recentActivity,
-    ]);
-
-
-  /* ==========================================================
+  /* ----------------------------------------------------------
      RENDER
-  ========================================================== */
+  ---------------------------------------------------------- */
 
   return (
-    <main className="admin-dashboard">
+    <main
+      className="admin-dashboard"
+      aria-busy={loading || refreshing}
+    >
+      {/* HEADER */}
 
-      {/* ======================================================
-          HERO
-      ====================================================== */}
-
-      <section className="admin-dashboard__hero">
+      <header className="admin-dashboard__hero">
         <div className="admin-dashboard__hero-copy">
           <span className="admin-dashboard__hero-eyebrow">
-            Continental Founders
-            Administration
+            <LayoutDashboard size={14} />
+
+            Continental Founders · Administration
           </span>
 
-          <h1>
-            Welcome to Continental
-            Founders CMS
-          </h1>
+          <h1>Organisation overview</h1>
 
           <p>
-            Manage CFCV admissions,
-            institutional content,
-            events, insights, gallery,
-            partnerships, subscribers
-            and your digital presence
-            from one workspace.
+            Your programmes, people, and institutional
+            activity in one view.
           </p>
         </div>
 
-
         <div className="admin-dashboard__hero-actions">
-          <div className="admin-dashboard__workspace-badge">
-            <LayoutDashboard
-              size={15}
-              strokeWidth={1.8}
-            />
+          <span className="admin-dashboard__date">
+            {dateLabel}
+          </span>
 
-            <span>
-              CMS Workspace
-            </span>
-          </div>
+          <div className="admin-dashboard__header-buttons">
+            <Link
+              to="/"
+              className="admin-dashboard__website-button"
+            >
+              View website
+              <ExternalLink size={14} />
+            </Link>
 
-          <button
-            type="button"
-            className="admin-dashboard__refresh-button"
-            onClick={() =>
-              loadDashboard({
-                silent: true,
-              })
-            }
-            disabled={
-              loading ||
-              refreshing
-            }
-          >
-            <RefreshCw
-              size={14}
-              className={
-                refreshing
-                  ? "admin-dashboard__refresh-icon admin-dashboard__refresh-icon--active"
-                  : "admin-dashboard__refresh-icon"
+            <button
+              type="button"
+              className="admin-dashboard__refresh-button"
+              onClick={() =>
+                loadDashboard({ silent: true })
               }
-            />
+              disabled={loading || refreshing}
+            >
+              <RefreshCw
+                size={15}
+                className={
+                  loading || refreshing
+                    ? "admin-dashboard__refresh-icon--active"
+                    : ""
+                }
+              />
 
-            <span>
               {refreshing
-                ? "Refreshing..."
+                ? "Refreshing…"
                 : "Refresh data"}
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
+      </header>
 
+      {/* OVERVIEW HEADING */}
 
-        <div
-          className="admin-dashboard__hero-decoration"
-          aria-hidden="true"
-        >
-          <span className="admin-dashboard__hero-circle admin-dashboard__hero-circle--one" />
+      <div className="admin-dashboard__overview-label">
+        <h2>At a glance</h2>
 
-          <span className="admin-dashboard__hero-circle admin-dashboard__hero-circle--two" />
+        <span role="status">
+          {loading
+            ? "Loading current data…"
+            : refreshing
+              ? "Updating data…"
+              : error || cfcvError
+                ? "Some data is unavailable"
+                : lastUpdated
+                  ? `Updated ${lastUpdated.toLocaleTimeString(
+                      [],
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}`
+                  : "Awaiting data"}
+        </span>
+      </div>
 
-          <span className="admin-dashboard__hero-line admin-dashboard__hero-line--one" />
+      {/* SERVICE ERRORS */}
 
-          <span className="admin-dashboard__hero-line admin-dashboard__hero-line--two" />
-        </div>
-      </section>
-
-
-      {/* ======================================================
-          GENERAL ERROR
-      ====================================================== */}
-
-      {error && (
+      {(error || cfcvError) && (
         <section
           className="admin-dashboard__error"
           role="alert"
         >
           <div>
             <strong>
-              Dashboard unavailable
+              Some services could not be refreshed
             </strong>
 
-            <span>
-              {error}
-            </span>
+            {error && <span>{error}</span>}
+
+            {cfcvError && <span>{cfcvError}</span>}
           </div>
 
           <button
             type="button"
+            disabled={loading || refreshing}
             onClick={() =>
-              loadDashboard()
+              loadDashboard({ silent: true })
             }
-            disabled={loading}
           >
-            <RefreshCw
-              size={13}
-            />
-
-            {loading
-              ? "Retrying..."
-              : "Retry"}
+            Retry
+            <RefreshCw size={14} />
           </button>
         </section>
       )}
 
-
-      {/* ======================================================
-          MAIN STATS
-      ====================================================== */}
+      {/* MAIN METRICS */}
 
       <section
         className="admin-dashboard__stats"
-        aria-label="Dashboard statistics"
+        aria-label="Organisation statistics"
       >
-        {stats.map(
-          (stat) => (
-            <StatCard
-              key={
-                stat.label
-              }
-              icon={
-                stat.icon
-              }
-              label={
-                stat.label
-              }
-              value={
-                stat.value
-              }
-              helper={
-                stat.helper
-              }
-              unavailable={
-                stat.unavailable
-              }
-            />
-          )
-        )}
+        {stats.map((stat) => (
+          <StatCard
+            key={stat.label}
+            {...stat}
+            loading={loading}
+          />
+        ))}
       </section>
 
+      {/* OPERATIONAL OVERVIEW */}
 
-      {/* ======================================================
-          CFCV ADMISSIONS
-      ====================================================== */}
+      <section
+        className="admin-dashboard__operations-grid"
+        aria-label="Operational overview"
+      >
+        {/* ADMISSIONS */}
 
-      <section className="admin-dashboard__block">
-        <header className="admin-dashboard__block-header">
-          <div>
-            <span className="admin-dashboard__section-eyebrow">
-              Fellowship Admissions
-            </span>
+        <article className="admin-dashboard__panel admin-dashboard__admissions">
+          <header className="admin-dashboard__panel-header">
+            <div>
+              <span className="admin-dashboard__section-eyebrow">
+                Fellowship programme
+              </span>
 
-            <h2>
-              CFCV Admissions
-            </h2>
+              <h2>CFCV admissions</h2>
+            </div>
+
+            <Link
+              to="/admin/cfcv"
+              className="admin-dashboard__text-link"
+            >
+              Manage admissions
+              <ArrowUpRight size={15} />
+            </Link>
+          </header>
+
+          <div className="admin-dashboard__stage-grid">
+            {stages.map((stage) => (
+              <div
+                className="admin-dashboard__stage"
+                key={stage.label}
+              >
+                <strong>
+                  {displayValue(
+                    stage.value,
+                    cfcvAvailable
+                  )}
+                </strong>
+
+                <span>{stage.label}</span>
+              </div>
+            ))}
           </div>
 
-          <Link
-            to="/admin/cfcv"
-            className="admin-dashboard__block-helper"
-          >
-            Open CFCV Admissions
-          </Link>
-        </header>
+          <div className="admin-dashboard__cohort">
+            <div className="admin-dashboard__cohort-heading">
+              <div>
+                <span>Cohort capacity</span>
 
+                <strong>
+                  {loading
+                    ? "Loading…"
+                    : cfcvAvailable
+                      ? `${formatNumber(
+                          occupied
+                        )} of ${formatNumber(
+                          capacity
+                        )} places filled`
+                      : "Unavailable"}
+                </strong>
+              </div>
 
-        {cfcvError && (
-          <div
-            className="admin-dashboard__error"
-            role="status"
-          >
-            <div>
-              <strong>
-                CFCV statistics unavailable
-              </strong>
-
-              <span>
-                {cfcvError}
+              <span className="admin-dashboard__capacity-badge">
+                {displayValue(
+                  cfcvStats.remainingCapacity,
+                  cfcvAvailable
+                )}{" "}
+                places remaining
               </span>
             </div>
+
+            {cfcvAvailable && !loading && (
+              <div
+                className="admin-dashboard__capacity-track"
+                role="progressbar"
+                aria-label="Cohort places filled"
+                aria-valuemin={0}
+                aria-valuemax={capacity || 1}
+                aria-valuenow={Math.min(
+                  occupied,
+                  capacity || 1
+                )}
+                aria-valuetext={`${formatNumber(
+                  occupied
+                )} of ${formatNumber(
+                  capacity
+                )} places filled`}
+              >
+                <span
+                  style={{
+                    width: `${capacityPercent}%`,
+                  }}
+                />
+              </div>
+            )}
+
+            <div className="admin-dashboard__tracks">
+              {["Genesis", "Ascend", "Horizon"].map(
+                (track) => (
+                  <span key={track}>
+                    <i aria-hidden="true" />
+
+                    {track}
+
+                    <strong>
+                      {displayValue(
+                        cfcvStats[
+                          track.toLowerCase()
+                        ],
+                        cfcvAvailable
+                      )}
+                    </strong>
+                  </span>
+                )
+              )}
+            </div>
           </div>
-        )}
+        </article>
 
+        {/* ATTENTION LIST */}
 
-        <div
-          className="admin-dashboard__stats"
-          aria-label="CFCV admissions statistics"
-        >
-          {cfcvCards.map(
-            (stat) => (
-              <StatCard
-                key={
-                  stat.label
-                }
-                icon={
-                  stat.icon
-                }
-                label={
-                  stat.label
-                }
-                value={
-                  stat.value
-                }
-                helper={
-                  cfcvAvailable
-                    ? "CFCV admissions"
-                    : "Unavailable"
-                }
-                unavailable={
-                  !cfcvAvailable
-                }
-              />
-            )
-          )}
-        </div>
+        <article className="admin-dashboard__panel admin-dashboard__priorities">
+          <header className="admin-dashboard__panel-header">
+            <div>
+              <span className="admin-dashboard__section-eyebrow">
+                Follow-up
+              </span>
 
+              <h2>Needs attention</h2>
+            </div>
 
-        <div className="admin-dashboard__capacity">
-          <div>
-            <span>
-              Cohort capacity
-            </span>
+            <Activity size={18} />
+          </header>
 
-            <strong>
-              {cfcvAvailable
-                ? `${formatNumber(
-                    cfcvStats.admitted
-                  )} / ${formatNumber(
-                    cfcvStats
-                      .cohortCapacity
-                  )}`
-                : "Unavailable"}
-            </strong>
+          <div className="admin-dashboard__priority-list">
+            {priorities.map(
+              ({ icon: Icon, ...item }) => (
+                <Link
+                  className="admin-dashboard__priority"
+                  to={item.to}
+                  key={item.title}
+                >
+                  <span className="admin-dashboard__priority-icon">
+                    <Icon size={18} />
+                  </span>
+
+                  <div>
+                    <strong>{item.title}</strong>
+
+                    <span>
+                      {item.description}
+                    </span>
+                  </div>
+
+                  <b>
+                    {displayValue(
+                      item.value,
+                      item.available
+                    )}
+                  </b>
+
+                  <ArrowUpRight size={14} />
+                </Link>
+              )
+            )}
           </div>
 
-          {cfcvAvailable && (
-            <p>
-              {formatNumber(
-                cfcvStats
-                  .remainingCapacity
-              )}{" "}
-              {cfcvStats
-                .remainingCapacity ===
-              1
-                ? "space"
-                : "spaces"}{" "}
-              remaining
-            </p>
-          )}
-        </div>
+          <p className="admin-dashboard__priority-note">
+            Counts reflect the latest available
+            service data.
+          </p>
+        </article>
       </section>
 
+      {/* MANAGEMENT LINKS */}
 
-      {/* ======================================================
-          QUICK ACCESS
-      ====================================================== */}
-
-      <section className="admin-dashboard__block">
+      <section
+        className="admin-dashboard__block"
+        aria-label="Management sections"
+      >
         <header className="admin-dashboard__block-header">
           <div>
             <span className="admin-dashboard__section-eyebrow">
-              Management
+              Workspace
             </span>
 
-            <h2>
-              Quick Access
-            </h2>
+            <h2>Manage your organisation</h2>
           </div>
 
           <span className="admin-dashboard__block-helper">
-            Open frequently used
-            CMS sections
+            Content, programmes & relationships
           </span>
         </header>
 
-
         <div className="admin-dashboard__quick-grid">
-          {quickAccess.map(
-            (item) => (
-              <QuickAccessCard
-                key={
-                  item.title
-                }
-                item={
-                  item
-                }
-              />
-            )
-          )}
+          {quickAccess.map((item) => (
+            <QuickAccessCard
+              key={item.title}
+              item={item}
+            />
+          ))}
         </div>
       </section>
 
-
-      {/* ======================================================
-          LOWER DASHBOARD
-      ====================================================== */}
+      {/* ACTIVITY AND STATUS */}
 
       <section className="admin-dashboard__lower-grid">
-
-        {/* ====================================================
-            RECENT ACTIVITY
-        ==================================================== */}
+        {/* RECENT ACTIVITY */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
-                Updates
+                Activity log
               </span>
 
-              <h2>
-                Recent Activity
-              </h2>
+              <h2>Recent updates</h2>
             </div>
 
-            <Activity
-              size={16}
-              strokeWidth={1.8}
-            />
+            <Activity size={18} />
           </header>
 
-
-          {loading ? (
+          {loading ||
+          !dashboardAvailable ||
+          !recentActivity.length ? (
             <div className="admin-dashboard__activity-empty">
-              <RefreshCw
-                size={15}
-              />
+              <Activity size={22} />
+
+              <strong>
+                {loading
+                  ? "Loading activity…"
+                  : !dashboardAvailable
+                    ? "Activity unavailable"
+                    : "No recent activity"}
+              </strong>
 
               <span>
-                Loading dashboard
-                activity...
+                {!loading && dashboardAvailable
+                  ? "Updates will appear here as your team works in the CMS."
+                  : "Activity will appear when dashboard data is available."}
               </span>
-            </div>
-          ) : recentActivity.length >
-            0 ? (
-            <div className="admin-dashboard__activity-list">
-              {recentActivity.map(
-                (
-                  item,
-                  index
-                ) => {
-                  const Icon =
-                    getActivityIcon(
-                      item
-                    );
-
-                  const title =
-                    getActivityTitle(
-                      item
-                    );
-
-                  const description =
-                    getActivityDescription(
-                      item
-                    );
-
-                  const time =
-                    getActivityTime(
-                      item
-                    );
-
-                  return (
-                    <div
-                      key={
-                        item?.id ||
-                        item?._id ||
-                        `${title}-${index}`
-                      }
-                      className="admin-dashboard__activity-item"
-                    >
-                      <div className="admin-dashboard__activity-icon">
-                        <Icon
-                          size={13}
-                          strokeWidth={
-                            1.8
-                          }
-                        />
-                      </div>
-
-                      <div className="admin-dashboard__activity-copy">
-                        <strong>
-                          {title}
-                        </strong>
-
-                        {description && (
-                          <span>
-                            {
-                              description
-                            }
-                          </span>
-                        )}
-                      </div>
-
-                      {time && (
-                        <time>
-                          {time}
-                        </time>
-                      )}
-                    </div>
-                  );
-                }
-              )}
             </div>
           ) : (
-            <div className="admin-dashboard__activity-empty">
-              <Activity
-                size={15}
-              />
+            <div className="admin-dashboard__activity-list">
+              {recentActivity.map((item, index) => {
+                const Icon = getActivityIcon(item);
 
-              <span>
-                No recent CMS
-                activity has been
-                recorded yet.
-              </span>
+                const description =
+                  getActivityDescription(item);
+
+                const time = getActivityTime(item);
+
+                return (
+                  <div
+                    className="admin-dashboard__activity-item"
+                    key={
+                      item?.id ||
+                      item?._id ||
+                      index
+                    }
+                  >
+                    <div className="admin-dashboard__activity-icon">
+                      <Icon size={16} />
+                    </div>
+
+                    <div className="admin-dashboard__activity-copy">
+                      <strong>
+                        {getActivityTitle(item)}
+                      </strong>
+
+                      {description && (
+                        <span>{description}</span>
+                      )}
+                    </div>
+
+                    {time && <time>{time}</time>}
+                  </div>
+                );
+              })}
             </div>
           )}
         </article>
 
-
-        {/* ====================================================
-            SYSTEM STATUS
-        ==================================================== */}
+        {/* SERVICE STATUS */}
 
         <article className="admin-dashboard__panel">
           <header className="admin-dashboard__panel-header">
             <div>
               <span className="admin-dashboard__section-eyebrow">
-                Workspace
+                Service connections
               </span>
 
-              <h2>
-                System Status
-              </h2>
+              <h2>Workspace status</h2>
             </div>
 
-            <CheckCircle2
-              size={16}
-              strokeWidth={1.8}
-            />
+            <CheckCircle2 size={18} />
           </header>
 
+          <div className="admin-dashboard__service-list">
+            {[
+              {
+                label: "Organisation data",
+                available: dashboardAvailable,
+              },
+              {
+                label: "CFCV admissions",
+                available: cfcvAvailable,
+              },
+            ].map((service) => (
+              <div
+                className="admin-dashboard__service"
+                key={service.label}
+              >
+                <span>{service.label}</span>
 
-          <div
-            className={
-              error
-                ? "admin-dashboard__system-status admin-dashboard__system-status--warning"
-                : "admin-dashboard__system-status"
-            }
-          >
-            <div className="admin-dashboard__system-status-icon">
-              {error ? (
-                <Activity
-                  size={14}
-                  strokeWidth={2}
-                />
-              ) : (
-                <CheckCircle2
-                  size={14}
-                  strokeWidth={2}
-                />
-              )}
-            </div>
+                <b
+                  className={
+                    loading
+                      ? "is-pending"
+                      : service.available
+                        ? "is-connected"
+                        : "is-unavailable"
+                  }
+                >
+                  <i aria-hidden="true" />
 
-            <div>
-              <strong>
-                {error
-                  ? "Dashboard Connection Issue"
-                  : "Dashboard Connected"}
-              </strong>
-
-              <p>
-                {error
-                  ? "The CMS could not load dashboard data from the backend."
-                  : cfcvAvailable
-                    ? "The CMS and CFCV admissions services are connected."
-                    : "The CMS is connected. CFCV admissions statistics are currently unavailable."}
-              </p>
-
-              {!error &&
-                lastUpdated && (
-                  <small>
-                    Last updated{" "}
-                    {lastUpdated.toLocaleTimeString(
-                      [],
-                      {
-                        hour:
-                          "2-digit",
-
-                        minute:
-                          "2-digit",
-                      }
-                    )}
-                  </small>
-                )}
-            </div>
+                  {loading
+                    ? "Checking"
+                    : service.available
+                      ? "Connected"
+                      : "Unavailable"}
+                </b>
+              </div>
+            ))}
           </div>
 
+          <p className="admin-dashboard__status-note">
+            Status reflects the latest dashboard
+            requests.
+          </p>
 
           <div className="admin-dashboard__system-links">
-            <Link
-              to="/cfcv"
-              className="admin-dashboard__system-link"
-            >
-              <span>
-                View CFCV
-              </span>
+            {[
+              {
+                to: "/cfcv",
+                label: "Public fellowship page",
+              },
+              {
+                to: "/gallery",
+                label: "Public gallery",
+              },
+              {
+                to: "/",
+                label:
+                  "Continental Founders website",
+              },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="admin-dashboard__system-link"
+              >
+                {item.label}
 
-              <ExternalLink
-                size={12}
-              />
-            </Link>
-
-            <Link
-              to="/gallery"
-              className="admin-dashboard__system-link"
-            >
-              <span>
-                View Public Gallery
-              </span>
-
-              <ExternalLink
-                size={12}
-              />
-            </Link>
-
-            <Link
-              to="/strategic-partners"
-              className="admin-dashboard__system-link"
-            >
-              <span>
-                View Partners Page
-              </span>
-
-              <ExternalLink
-                size={12}
-              />
-            </Link>
-
-            <Link
-              to="/"
-              className="admin-dashboard__system-link"
-            >
-              <span>
-                View Public Website
-              </span>
-
-              <ExternalLink
-                size={12}
-              />
-            </Link>
+                <ExternalLink size={14} />
+              </Link>
+            ))}
           </div>
         </article>
       </section>
+
+      {/* FOOTER */}
+
+      <footer className="admin-dashboard__footer">
+        <span>Continental Founders</span>
+        <span>Administration workspace</span>
+      </footer>
     </main>
   );
 }
-
 
 export default AdminDashboard;

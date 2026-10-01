@@ -3558,485 +3558,830 @@
 }
 
 
-/* ------------------------------------------------------------
-   CAROUSEL STAGE
------------------------------------------------------------- */
+/* ============================================================
+   CONTINENTAL FOUNDERS
+   GALLERY — 3 IMAGE CAROUSEL
+   ============================================================ */
 
-.gallery-carousel__stage {
+.cf-gallery-carousel {
   position: relative;
   width: 100%;
-  height: 540px;
+  margin: 0;
+  padding: 50px 0 40px;
+}
+
+
+/* ============================================================
+   CAROUSEL STAGE
+   ============================================================ */
+
+.cf-gallery-carousel__stage {
+  position: relative;
+  width: 100%;
+  height: 560px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  perspective: 1500px;
+
   overflow: visible;
-  perspective: 1400px;
+
   touch-action: pan-y;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 
-/* ------------------------------------------------------------
-   THREE IMAGE CARDS
------------------------------------------------------------- */
+/* ============================================================
+   ALL THREE IMAGE CARDS
+   ============================================================ */
 
-.gallery-carousel__card {
+.cf-gallery-carousel__card {
   position: absolute;
+
   top: 50%;
-  display: block;
+  left: 50%;
+
   padding: 0;
   margin: 0;
+
   border: 0;
+  outline: none;
+
   overflow: hidden;
+
+  background: #071c19;
+
+  border-radius: 16px;
+
   cursor: pointer;
-  background: #071b19;
-  border-radius: 18px;
-  box-shadow:
-    0 28px 70px rgba(0, 0, 0, 0.28);
+
   transform-origin: center center;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.28);
+
   transition:
-    transform 0.55s cubic-bezier(
-      0.22,
-      0.61,
-      0.36,
-      1
-    ),
-    opacity 0.45s ease,
+    transform 0.55s
+      cubic-bezier(
+        0.22,
+        0.61,
+        0.36,
+        1
+      ),
     filter 0.45s ease,
+    opacity 0.45s ease,
     box-shadow 0.45s ease;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
-.gallery-carousel__card img {
+
+/* ============================================================
+   IMAGE
+   ============================================================ */
+
+.cf-gallery-carousel__card img {
   display: block;
+
   width: 100%;
   height: 100%;
+
   object-fit: cover;
+
   pointer-events: none;
+
+  user-select: none;
+  -webkit-user-select: none;
   -webkit-user-drag: none;
 }
 
 
-/* ------------------------------------------------------------
-   CENTER
------------------------------------------------------------- */
+/* ============================================================
+   CENTER IMAGE
+   ============================================================ */
 
-.gallery-carousel__card--center {
+.cf-gallery-carousel__card--center {
   z-index: 5;
-  width: 360px;
-  height: 510px;
-  left: 50%;
+
+  width: 370px;
+  height: 520px;
+
   transform:
     translate(-50%, -50%)
     translateZ(80px);
+
   opacity: 1;
+
   filter: none;
+
+  box-shadow:
+    0 35px 80px rgba(0, 0, 0, 0.38);
 }
 
 
-/* ------------------------------------------------------------
-   LEFT
------------------------------------------------------------- */
+/* ============================================================
+   LEFT IMAGE
+   ============================================================ */
 
-.gallery-carousel__card--left {
+.cf-gallery-carousel__card--left {
   z-index: 3;
-  width: 300px;
-  height: 430px;
-  left: 50%;
+
+  width: 315px;
+  height: 445px;
+
   transform:
     translate(-50%, -50%)
-    translateX(-310px)
+    translateX(-350px)
     rotateY(18deg)
-    scale(0.91);
-  opacity: 0.78;
-  filter: brightness(0.68);
+    scale(0.9);
+
+  opacity: 0.85;
+
+  filter: brightness(0.72);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.3);
 }
 
 
-/* ------------------------------------------------------------
-   RIGHT
------------------------------------------------------------- */
+/* ============================================================
+   RIGHT IMAGE
+   ============================================================ */
 
-.gallery-carousel__card--right {
+.cf-gallery-carousel__card--right {
   z-index: 3;
-  width: 300px;
-  height: 430px;
-  left: 50%;
+
+  width: 315px;
+  height: 445px;
+
   transform:
     translate(-50%, -50%)
-    translateX(310px)
+    translateX(350px)
     rotateY(-18deg)
-    scale(0.91);
-  opacity: 0.78;
-  filter: brightness(0.68);
+    scale(0.9);
+
+  opacity: 0.85;
+
+  filter: brightness(0.72);
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.3);
 }
 
 
-/* ------------------------------------------------------------
-   HOVER
------------------------------------------------------------- */
+/* ============================================================
+   SIDE IMAGE HOVER
+   ============================================================ */
 
-.gallery-carousel__card--left:hover,
-.gallery-carousel__card--right:hover {
-  opacity: 0.92;
-  filter: brightness(0.82);
+.cf-gallery-carousel__card--left:hover,
+.cf-gallery-carousel__card--right:hover {
+  opacity: 1;
+
+  filter: brightness(0.9);
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.4);
 }
 
 
-/* ------------------------------------------------------------
-   CENTER EXPAND ICON
------------------------------------------------------------- */
+/* ============================================================
+   CENTER IMAGE HOVER
+   ============================================================ */
 
-.gallery-carousel__expand {
+.cf-gallery-carousel__card--center:hover {
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ============================================================
+   EXPAND BUTTON ON CENTER IMAGE
+   ============================================================ */
+
+.cf-gallery-carousel__expand {
   position: absolute;
+
   right: 16px;
   bottom: 16px;
+
   width: 44px;
   height: 44px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+
   color: #ffffff;
-  background: rgba(7, 27, 25, 0.78);
-  border: 1px solid
-    rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(8px);
+
+  background:
+    rgba(5, 25, 22, 0.82);
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.25);
+
+  border-radius: 50%;
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  pointer-events: none;
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    NAVIGATION ARROWS
------------------------------------------------------------- */
+   ============================================================ */
 
-.gallery-carousel__arrow {
+.cf-gallery-carousel__arrow {
   position: absolute;
+
   top: 50%;
+
   z-index: 10;
-  width: 50px;
-  height: 50px;
+
+  width: 52px;
+  height: 52px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
-  border: 1px solid
-    rgba(201, 149, 46, 0.42);
+
+  border:
+    1px solid
+    rgba(201, 149, 46, 0.55);
+
   border-radius: 50%;
+
   color: #ffffff;
-  background: rgba(7, 27, 25, 0.84);
+
+  background:
+    rgba(6, 29, 25, 0.9);
+
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
   cursor: pointer;
-  transform: translateY(-50%);
+
+  transform:
+    translateY(-50%);
+
   transition:
     background 0.25s ease,
     border-color 0.25s ease,
     transform 0.25s ease;
 }
 
-.gallery-carousel__arrow:hover {
+
+.cf-gallery-carousel__arrow:hover {
   background: #c9952e;
+
   border-color: #c9952e;
+
   transform:
     translateY(-50%)
-    scale(1.05);
-}
-
-.gallery-carousel__arrow--left {
-  left: 22px;
-}
-
-.gallery-carousel__arrow--right {
-  right: 22px;
+    scale(1.08);
 }
 
 
-/* ------------------------------------------------------------
-   INFORMATION
------------------------------------------------------------- */
+.cf-gallery-carousel__arrow--left {
+  left: 24px;
+}
 
-.gallery-carousel__information {
+
+.cf-gallery-carousel__arrow--right {
+  right: 24px;
+}
+
+
+/* ============================================================
+   INFORMATION PANEL
+   ============================================================ */
+
+.cf-gallery-carousel__information {
   width: min(
     760px,
     calc(100% - 40px)
   );
-  margin: -2px auto 0;
+
+  margin: 0 auto;
+
   padding: 24px 26px 20px;
-  background: #082f2b;
+
   color: #ffffff;
-  border-radius: 0 0 18px 18px;
+
+  background: #082f2b;
+
+  border-radius:
+    0 0 16px 16px;
+
   box-shadow:
-    0 22px 55px rgba(0, 0, 0, 0.2);
+    0 25px 55px
+    rgba(0, 0, 0, 0.2);
 }
 
 
-/* ------------------------------------------------------------
-   META
------------------------------------------------------------- */
+/* ============================================================
+   META INFORMATION
+   ============================================================ */
 
-.gallery-carousel__meta {
+.cf-gallery-carousel__meta {
   display: flex;
   align-items: center;
+
   gap: 14px;
+
   margin-bottom: 14px;
 }
 
-.gallery-carousel__category {
+
+.cf-gallery-carousel__category {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  padding: 6px 13px;
-  border: 1px solid
-    rgba(201, 149, 46, 0.65);
-  border-radius: 999px;
+
+  min-height: 32px;
+
+  padding:
+    5px 13px;
+
   color: #f4e5bf;
+
+  border:
+    1px solid
+    rgba(201, 149, 46, 0.65);
+
+  border-radius: 999px;
+
   font-size: 0.72rem;
+
   font-weight: 700;
+
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
 }
 
-.gallery-carousel__date {
+
+.cf-gallery-carousel__date {
   display: inline-flex;
   align-items: center;
+
   gap: 6px;
-  color: rgba(255, 255, 255, 0.68);
+
+  color:
+    rgba(255, 255, 255, 0.65);
+
   font-size: 0.82rem;
 }
 
 
-/* ------------------------------------------------------------
-   TITLE / DOWNLOAD
------------------------------------------------------------- */
+/* ============================================================
+   TITLE + DOWNLOAD
+   ============================================================ */
 
-.gallery-carousel__bottom {
+.cf-gallery-carousel__bottom {
   display: flex;
+
   align-items: flex-end;
+
   justify-content: space-between;
+
   gap: 24px;
 }
 
-.gallery-carousel__text {
+
+.cf-gallery-carousel__text {
   min-width: 0;
 }
 
-.gallery-carousel__text h2 {
+
+.cf-gallery-carousel__text h2 {
   margin: 0;
+
   color: #ffffff;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(
-    1.45rem,
-    2.5vw,
-    2rem
-  );
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      1.5rem,
+      2.4vw,
+      2rem
+    );
+
   font-weight: 500;
+
   line-height: 1.15;
 }
 
-.gallery-carousel__text p {
-  margin: 8px 0 0;
-  color: rgba(255, 255, 255, 0.68);
+
+.cf-gallery-carousel__text p {
+  margin:
+    8px 0 0;
+
+  color:
+    rgba(255, 255, 255, 0.65);
+
   font-size: 0.88rem;
+
   line-height: 1.55;
 }
 
 
-.gallery-carousel__download {
-  flex: 0 0 auto;
+/* ============================================================
+   DOWNLOAD BUTTON
+   ============================================================ */
+
+.cf-gallery-carousel__download {
+  flex:
+    0 0 auto;
+
   min-height: 46px;
+
   display: inline-flex;
+
   align-items: center;
+
   justify-content: center;
+
   gap: 8px;
-  padding: 10px 17px;
+
+  padding:
+    10px 18px;
+
   border: 0;
+
   border-radius: 8px;
+
   color: #ffffff;
+
   background: #c9952e;
+
   font-weight: 700;
+
   cursor: pointer;
+
   transition:
-    transform 0.25s ease,
-    background 0.25s ease;
+    background 0.25s ease,
+    transform 0.25s ease;
 }
 
-.gallery-carousel__download:hover:not(:disabled) {
+
+.cf-gallery-carousel__download:hover:not(:disabled) {
   background: #a97818;
-  transform: translateY(-2px);
+
+  transform:
+    translateY(-2px);
 }
 
-.gallery-carousel__download:disabled {
+
+.cf-gallery-carousel__download:disabled {
   opacity: 0.65;
+
   cursor: not-allowed;
 }
 
 
-/* ------------------------------------------------------------
+/* ============================================================
    COUNTER
------------------------------------------------------------- */
+   ============================================================ */
 
-.gallery-carousel__counter {
+.cf-gallery-carousel__counter {
   margin-top: 17px;
-  color: rgba(255, 255, 255, 0.48);
+
+  color:
+    rgba(255, 255, 255, 0.45);
+
   font-size: 0.75rem;
+
   letter-spacing: 0.08em;
 }
 
 
 /* ============================================================
-   LARGE SCREENS
-============================================================ */
+   LARGE DESKTOP
+   ============================================================ */
 
 @media (min-width: 1400px) {
-  .gallery-carousel__stage {
-    height: 570px;
+
+  .cf-gallery-carousel__stage {
+    height: 590px;
   }
 
-  .gallery-carousel__card--center {
-    width: 390px;
-    height: 540px;
+
+  .cf-gallery-carousel__card--center {
+    width: 400px;
+    height: 555px;
   }
 
-  .gallery-carousel__card--left,
-  .gallery-carousel__card--right {
-    width: 325px;
-    height: 455px;
+
+  .cf-gallery-carousel__card--left,
+  .cf-gallery-carousel__card--right {
+    width: 340px;
+    height: 475px;
   }
 
-  .gallery-carousel__card--left {
+
+  .cf-gallery-carousel__card--left {
     transform:
       translate(-50%, -50%)
-      translateX(-350px)
+      translateX(-380px)
       rotateY(18deg)
-      scale(0.91);
+      scale(0.9);
   }
 
-  .gallery-carousel__card--right {
+
+  .cf-gallery-carousel__card--right {
     transform:
       translate(-50%, -50%)
-      translateX(350px)
+      translateX(380px)
       rotateY(-18deg)
-      scale(0.91);
+      scale(0.9);
   }
+
 }
 
 
 /* ============================================================
    TABLET
-============================================================ */
+   ============================================================ */
 
-@media (max-width: 900px) {
-  .gallery-carousel {
-    padding-top: 20px;
+@media (max-width: 1100px) {
+
+  .cf-gallery-carousel__stage {
+    height: 500px;
   }
 
-  .gallery-carousel__stage {
-    height: 470px;
+
+  .cf-gallery-carousel__card--center {
+    width: 320px;
+    height: 455px;
   }
 
-  .gallery-carousel__card--center {
-    width: 300px;
-    height: 425px;
+
+  .cf-gallery-carousel__card--left,
+  .cf-gallery-carousel__card--right {
+    width: 270px;
+    height: 380px;
   }
 
-  .gallery-carousel__card--left,
-  .gallery-carousel__card--right {
-    width: 245px;
-    height: 350px;
-  }
 
-  .gallery-carousel__card--left {
+  .cf-gallery-carousel__card--left {
     transform:
       translate(-50%, -50%)
-      translateX(-245px)
-      rotateY(15deg)
+      translateX(-285px)
+      rotateY(16deg)
       scale(0.88);
   }
 
-  .gallery-carousel__card--right {
+
+  .cf-gallery-carousel__card--right {
     transform:
       translate(-50%, -50%)
-      translateX(245px)
-      rotateY(-15deg)
+      translateX(285px)
+      rotateY(-16deg)
       scale(0.88);
   }
 
-  .gallery-carousel__arrow--left {
-    left: 8px;
+
+  .cf-gallery-carousel__arrow--left {
+    left: 10px;
   }
 
-  .gallery-carousel__arrow--right {
-    right: 8px;
+
+  .cf-gallery-carousel__arrow--right {
+    right: 10px;
   }
+
+}
+
+
+/* ============================================================
+   SMALL TABLET
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+  .cf-gallery-carousel {
+    padding-top: 30px;
+  }
+
+
+  .cf-gallery-carousel__stage {
+    height: 450px;
+  }
+
+
+  .cf-gallery-carousel__card--center {
+    width: 285px;
+    height: 405px;
+  }
+
+
+  .cf-gallery-carousel__card--left,
+  .cf-gallery-carousel__card--right {
+    width: 235px;
+    height: 335px;
+  }
+
+
+  .cf-gallery-carousel__card--left {
+    transform:
+      translate(-50%, -50%)
+      translateX(-225px)
+      rotateY(14deg)
+      scale(0.85);
+  }
+
+
+  .cf-gallery-carousel__card--right {
+    transform:
+      translate(-50%, -50%)
+      translateX(225px)
+      rotateY(-14deg)
+      scale(0.85);
+  }
+
+
+  .cf-gallery-carousel__arrow {
+    width: 46px;
+    height: 46px;
+  }
+
+
+  .cf-gallery-carousel__arrow--left {
+    left: 6px;
+  }
+
+
+  .cf-gallery-carousel__arrow--right {
+    right: 6px;
+  }
+
 }
 
 
 /* ============================================================
    MOBILE
-============================================================ */
+   ============================================================ */
 
-@media (max-width: 640px) {
-  .gallery-carousel {
-    padding-top: 8px;
+@media (max-width: 600px) {
+
+  .cf-gallery-carousel {
+    padding:
+      20px 0 30px;
   }
 
-  .gallery-carousel__stage {
+
+  .cf-gallery-carousel__stage {
     height: 390px;
+
     overflow: hidden;
   }
 
-  .gallery-carousel__card--center {
-    width: 235px;
-    height: 335px;
-  }
 
-  .gallery-carousel__card--left,
-  .gallery-carousel__card--right {
-    width: 190px;
-    height: 275px;
-  }
+  .cf-gallery-carousel__card--center {
+    width: 230px;
+    height: 330px;
 
-  .gallery-carousel__card--left {
     transform:
       translate(-50%, -50%)
-      translateX(-150px)
-      rotateY(13deg)
+      translateZ(40px);
+  }
+
+
+  .cf-gallery-carousel__card--left,
+  .cf-gallery-carousel__card--right {
+    width: 185px;
+    height: 270px;
+  }
+
+
+  .cf-gallery-carousel__card--left {
+    transform:
+      translate(-50%, -50%)
+      translateX(-145px)
+      rotateY(12deg)
       scale(0.82);
   }
 
-  .gallery-carousel__card--right {
+
+  .cf-gallery-carousel__card--right {
     transform:
       translate(-50%, -50%)
-      translateX(150px)
-      rotateY(-13deg)
+      translateX(145px)
+      rotateY(-12deg)
       scale(0.82);
   }
 
-  .gallery-carousel__arrow {
-    width: 43px;
-    height: 43px;
+
+  .cf-gallery-carousel__arrow {
+    width: 42px;
+    height: 42px;
   }
 
-  .gallery-carousel__arrow--left {
+
+  .cf-gallery-carousel__arrow--left {
     left: 4px;
   }
 
-  .gallery-carousel__arrow--right {
+
+  .cf-gallery-carousel__arrow--right {
     right: 4px;
   }
 
-  .gallery-carousel__information {
-    width: calc(100% - 24px);
-    padding: 18px;
+
+  .cf-gallery-carousel__expand {
+    right: 10px;
+    bottom: 10px;
+
+    width: 38px;
+    height: 38px;
   }
 
-  .gallery-carousel__bottom {
-    align-items: stretch;
+
+  .cf-gallery-carousel__information {
+    width:
+      calc(100% - 24px);
+
+    padding:
+      18px;
+  }
+
+
+  .cf-gallery-carousel__meta {
+    flex-wrap: wrap;
+
+    gap: 9px;
+  }
+
+
+  .cf-gallery-carousel__bottom {
     flex-direction: column;
+
+    align-items: stretch;
+
     gap: 16px;
   }
 
-  .gallery-carousel__download {
+
+  .cf-gallery-carousel__download {
     width: 100%;
   }
+
+
+  .cf-gallery-carousel__text h2 {
+    font-size: 1.45rem;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL PHONES
+   ============================================================ */
+
+@media (max-width: 400px) {
+
+  .cf-gallery-carousel__stage {
+    height: 350px;
+  }
+
+
+  .cf-gallery-carousel__card--center {
+    width: 205px;
+    height: 295px;
+  }
+
+
+  .cf-gallery-carousel__card--left,
+  .cf-gallery-carousel__card--right {
+    width: 165px;
+    height: 240px;
+  }
+
+
+  .cf-gallery-carousel__card--left {
+    transform:
+      translate(-50%, -50%)
+      translateX(-125px)
+      rotateY(11deg)
+      scale(0.8);
+  }
+
+
+  .cf-gallery-carousel__card--right {
+    transform:
+      translate(-50%, -50%)
+      translateX(125px)
+      rotateY(-11deg)
+      scale(0.8);
+  }
+
 }

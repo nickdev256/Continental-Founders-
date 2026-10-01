@@ -527,21 +527,17 @@ export default function Gallery() {
   // CAROUSEL POINTER CONTROLS
   // ==========================================================
 
-  const handleCarouselPointerDown =
-    (event) => {
-      carouselPointerRef.current = {
-        startX: event.clientX,
-        currentX: event.clientX,
-        dragging: true,
-      };
-
-      carouselMovedRef.current =
-        false;
-
-      event.currentTarget.setPointerCapture?.(
-        event.pointerId
-      );
+const handleCarouselPointerDown =
+  (event) => {
+    carouselPointerRef.current = {
+      startX: event.clientX,
+      currentX: event.clientX,
+      dragging: true,
     };
+
+    carouselMovedRef.current =
+      false;
+  };
 
   const handleCarouselPointerMove =
     (event) => {
@@ -566,36 +562,36 @@ export default function Gallery() {
       }
     };
 
-  const handleCarouselPointerUp =
-    () => {
-      const pointer =
-        carouselPointerRef.current;
+ const handleCarouselPointerUp =
+  () => {
+    const pointer =
+      carouselPointerRef.current;
 
-      if (!pointer.dragging) {
-        return;
-      }
+    if (!pointer.dragging) {
+      return;
+    }
 
-      const distance =
-        pointer.currentX -
-        pointer.startX;
+    const distance =
+      pointer.currentX -
+      pointer.startX;
 
-      pointer.dragging = false;
+    pointer.dragging = false;
 
-      if (Math.abs(distance) < 55) {
-        return;
-      }
+    if (Math.abs(distance) < 55) {
+      return;
+    }
 
-      if (distance < 0) {
-        moveCarousel(1);
-      } else {
-        moveCarousel(-1);
-      }
+    if (distance < 0) {
+      moveCarousel(1);
+    } else {
+      moveCarousel(-1);
+    }
 
-      window.setTimeout(() => {
-        carouselMovedRef.current =
-          false;
-      }, 100);
-    };
+    window.setTimeout(() => {
+      carouselMovedRef.current =
+        false;
+    }, 150);
+  };
 
   const handleCarouselPointerCancel =
     () => {

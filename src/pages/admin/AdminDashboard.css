@@ -1345,4 +1345,17 @@
   .admin-dashboard__header-buttons > * {
     flex: 1 1 150px;
   }
+}/* Full dashboard scrolling */
+.admin-dashboard {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Keep recent activity within the main page scroll */
+.admin-dashboard .admin-dashboard__activity-list {
+  max-height: none;
+  overflow: visible;
 }

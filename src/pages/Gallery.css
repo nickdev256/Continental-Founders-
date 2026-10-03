@@ -4490,3 +4490,26 @@
   position: relative;
   z-index: 2;
 }
+
+
+@media (max-width: 640px) {
+  .gallery-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .gallery-search {
+    width: 220px;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: 0;
+    flex-shrink: 1;
+  }
+
+  .gallery-search input {
+    height: 46px;
+  }
+}

@@ -1,13 +1,11 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 import {
   NavLink,
   Link,
   useNavigate,
 } from "react-router-dom";
+
 import {
   LayoutDashboard,
   CalendarDays,
@@ -29,616 +27,528 @@ import {
   ClipboardCheck,
   Images,
 } from "lucide-react";
+
 import "./AdminSidebar.css";
-/* ============================================================
-   API
-= =========================================================== */
+
 const API_URL = (
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000"
+  import.meta.env.VITE_API_URL || "http://localhost:5000"
 ).replace(/\/+$/, "");
-/* ============================================================
-   OVERVIEW NAVIGATION
-= =========================================================== */
-const overviewNavigation = [
+
+const ETH_TECH_ADMIN_URL =
+  "https://app.pacetas.com/v2/location/y0gKe8UoL5xmijbdA9j0/dashboard";
+
+const navigationSections = [
   {
-    label: "Dashboard",
-    description:
-      "Overview & activity",
-    path: "/admin",
-    icon: LayoutDashboard,
-    end: true,
+    title: "Overview",
+    items: [
+      {
+        label: "Dashboard",
+        path: "/admin",
+        icon: LayoutDashboard,
+        end: true,
+      },
+    ],
+  },
+  {
+    title: "Venture & Fellowship",
+    items: [
+      {
+        label: "Ventures",
+        path: "/admin/ventures",
+        icon: BriefcaseBusiness,
+      },
+      {
+        label: "CFCV Admissions",
+        path: "/admin/cfcv",
+        icon: ClipboardCheck,
+      },
+    ],
+  },
+  {
+    title: "Content & Communications",
+    items: [
+      {
+        label: "Events",
+        path: "/admin/events",
+        icon: CalendarDays,
+      },
+      {
+        label: "Insights",
+        path: "/admin/insights",
+        icon: Newspaper,
+      },
+      {
+        label: "Gallery",
+        path: "/admin/gallery",
+        icon: Images,
+      },
+      {
+        label: "Newsletter",
+        path: "/admin/newsletter",
+        icon: Mail,
+      },
+    ],
+  },
+  {
+    title: "Relationships",
+    items: [
+      {
+        label: "Contacts",
+        path: "/admin/contacts",
+        icon: MessageSquareText,
+      },
+      {
+        label: "Universities",
+        path: "/admin/universities",
+        icon: GraduationCap,
+      },
+    ],
+  },
+  {
+    title: "Partnerships",
+    items: [
+      {
+        label: "U.S.–Africa Trade Network",
+        path: "/admin/partners/us-africa-trade-network",
+        icon: Globe2,
+      },
+      {
+        label: "Corporate Partners",
+        path: "/admin/partners/corporate",
+        icon: Building2,
+      },
+      {
+        label: "Government & Development",
+        path: "/admin/partners/government-development",
+        icon: Landmark,
+      },
+    ],
+  },
+  {
+    title: "Organization",
+    items: [
+      {
+        label: "About",
+        path: "/admin/about",
+        icon: FileText,
+      },
+      {
+        label: "Leadership",
+        path: "/admin/leadership",
+        icon: Users,
+      },
+    ],
   },
 ];
-/* ============================================================
-   VENTURE & FELLOWSHIP
-= =========================================================== */
-const ventureNavigation = [
+
+const publicShortcuts = [
   {
-    label: "Ventures",
-    description:
-      "Founders & venture profiles",
-    path: "/admin/ventures",
-    icon: BriefcaseBusiness,
-  },
-  {
-    label: "CFCV Admissions",
-    description:
-      "Applications & fellowship admissions",
-    path: "/admin/cfcv",
+    label: "CFCV",
+    path: "/cfcv",
     icon: ClipboardCheck,
-  },
-];
-/* ============================================================
-   CONTENT & COMMUNICATIONS
-= =========================================================== */
-const contentNavigation = [
-  {
-    label: "Events",
-    description:
-      "Programs & conferences",
-    path: "/admin/events",
-    icon: CalendarDays,
-  },
-  {
-    label: "Insights",
-    description:
-      "Articles & publications",
-    path: "/admin/insights",
-    icon: Newspaper,
   },
   {
     label: "Gallery",
-    description:
-      "Photos & media",
-    path: "/admin/gallery",
+    path: "/gallery",
     icon: Images,
   },
   {
-    label: "Newsletter",
-    description:
-      "Subscribers & campaigns",
-    path: "/admin/newsletter",
-    icon: Mail,
-  },
-];
-/* ============================================================
-   RELATIONSHIPS
-= =========================================================== */
-const relationshipNavigation = [
-  {
-    label: "Contacts",
-    description:
-      "Messages & inquiries",
-    path: "/admin/contacts",
-    icon: MessageSquareText,
+    label: "Ventures",
+    path: "/ventures",
+    icon: BriefcaseBusiness,
   },
   {
-    label: "Universities",
-    description:
-      "Academic directory",
-    path: "/admin/universities",
-    icon: GraduationCap,
-  },
-];
-/* ============================================================
-   PARTNERSHIPS
-= =========================================================== */
-const partnerNavigation = [
-  {
-    label:
-      "U.S.–Africa Trade Network",
-    path:
-      "/admin/partners/us-africa-trade-network",
-    icon: Globe2,
-  },
-  {
-    label:
-      "Corporate Partners",
-    path:
-      "/admin/partners/corporate",
-    icon: Building2,
-  },
-  {
-    label:
-      "Government & Development",
-    path:
-      "/admin/partners/government-development",
-    icon: Landmark,
-  },
-];
-/* ============================================================
-   ORGANIZATION
-= =========================================================== */
-const organizationNavigation = [
-  {
-    label: "About",
-    description:
-      "Institutional content",
-    path: "/admin/about",
-    icon: FileText,
-  },
-  {
-    label: "Leadership",
-    description:
-      "Team & governance",
-    path: "/admin/leadership",
+    label: "Partners",
+    path: "/strategic-partners",
     icon: Users,
   },
 ];
-/* ============================================================
-   SIDEBAR
-= =========================================================== */
+
 export default function AdminSidebar({
   open = false,
   onClose,
 }) {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
+
   const sidebarRef = useRef(null);
   const closeButtonRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(max-width: 850px)").matches
-  );
+  const onCloseRef = useRef(onClose);
+
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(() => {
+    return (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 850px)").matches
+    );
+  });
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     const query = window.matchMedia("(max-width: 850px)");
-    const update = () => setIsMobile(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
+
+    function updateViewport() {
+      setIsMobile(query.matches);
+    }
+
+    updateViewport();
+
+    query.addEventListener("change", updateViewport);
+
+    return () => {
+      query.removeEventListener("change", updateViewport);
+    };
   }, []);
 
   useEffect(() => {
-    const sidebar = sidebarRef.current;
-    if (sidebar) sidebar.inert = isMobile && !open;
+    if (sidebarRef.current) {
+      sidebarRef.current.inert = isMobile && !open;
+    }
   }, [isMobile, open]);
 
   useEffect(() => {
-    if (!isMobile || !open) return;
+    if (!isMobile || !open) {
+      return;
+    }
+
     const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
-    const handleKeyDown = (event) => {
+
+    function handleKeyDown(event) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose?.();
+        onCloseRef.current?.();
+        return;
       }
-    };
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const elements = Array.from(
+        sidebarRef.current?.querySelectorAll(
+          'a[href], button:not([disabled]), [tabindex="0"]'
+        ) || []
+      ).filter((element) => element.getClientRects().length > 0);
+
+      if (!elements.length) {
+        return;
+      }
+
+      const firstElement = elements[0];
+      const lastElement = elements[elements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (!sidebarRef.current?.contains(activeElement)) {
+        event.preventDefault();
+        firstElement.focus();
+      } else if (event.shiftKey && activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
+
     document.addEventListener("keydown", handleKeyDown);
+
     return () => {
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
-      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+
+      if (
+        previousFocus instanceof HTMLElement &&
+        previousFocus.isConnected
+      ) {
         previousFocus.focus();
       }
     };
-  }, [isMobile, open, onClose]);
+  }, [isMobile, open]);
 
-  const [
-    loggingOut,
-    setLoggingOut,
-  ] = useState(false);
-  const [
-    logoutError,
-    setLogoutError,
-  ] = useState("");
-  /* ==========================================================
-     CLEAR LOCAL AUTH
-  ========================================================== */
-  function clearLocalAuthState() {
-    localStorage.removeItem(
-      "cf_admin_user"
-    );
-    localStorage.removeItem(
-      "cf_admin_token"
-    );
-    sessionStorage.removeItem(
-      "cf_pending_admin_email"
-    );
-    sessionStorage.removeItem(
-      "cf_otp_purpose"
-    );
+  function handleNavigation() {
+    onCloseRef.current?.();
   }
-  /* ==========================================================
-     LOGOUT
-  ========================================================== */
+
+  function clearLocalAuthState() {
+    localStorage.removeItem("cf_admin_user");
+    localStorage.removeItem("cf_admin_token");
+
+    sessionStorage.removeItem("cf_pending_admin_email");
+    sessionStorage.removeItem("cf_otp_purpose");
+  }
+
   async function handleLogout() {
     if (loggingOut) {
       return;
     }
+
     setLoggingOut(true);
     setLogoutError("");
+
     try {
-      const response =
-        await fetch(
-          `${API_URL}/api/auth/logout`,
-          {
-            method: "POST",
-            credentials:
-              "include",
-            headers: {
-              Accept:
-                "application/json",
-            },
-          }
-        );
-      let result = null;
-      try {
-        result =
-          await response.json();
-      } catch {
-        result = null;
-      }
+      const response = await fetch(`${API_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
       if (!response.ok) {
+        let result = {};
+
+        try {
+          result = await response.json();
+        } catch {
+          result = {};
+        }
+
         throw new Error(
-          result?.message ||
-            "Unable to sign out securely."
+          result?.message || "Unable to sign out. Please try again."
         );
       }
+
       clearLocalAuthState();
-      if (onClose) {
-        onClose();
-      }
-      navigate(
-        "/admin/login",
-        {
-          replace: true,
-        }
-      );
+      handleNavigation();
+
+      navigate("/admin/login", {
+        replace: true,
+      });
     } catch (error) {
-      console.error(
-        "Admin logout error:",
-        error
-      );
-      clearLocalAuthState();
+      console.error("Admin logout error:", error);
+
       setLogoutError(
-        error?.message ||
-          "Unable to sign out. Please try again."
-      );
-      navigate(
-        "/admin/login",
-        {
-          replace: true,
-        }
+        error?.message || "Unable to sign out. Please try again."
       );
     } finally {
       setLoggingOut(false);
     }
   }
-  /* ==========================================================
-     CLOSE AFTER NAVIGATION
-  ========================================================== */
-  function handleNavigation() {
-    if (onClose) {
-      onClose();
-    }
-  }
-  /* ==========================================================
-     NAVIGATION ITEM
-  ========================================================== */
-  function renderNavItem(
-    item,
-    compact = false
-  ) {
-    const Icon =
-      item.icon;
-    return (
-      <NavLink
-        key={item.path}
-        to={item.path}
-        end={item.end}
-        onClick={handleNavigation}
-        className={({
-          isActive,
-        }) =>
-          [
-            "admin-sidebar__link",
-            compact
-              ? "admin-sidebar__link--compact"
-              : "",
-            isActive
-              ? "admin-sidebar__link--active"
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" ")
-        }
-      >
-        <span
-          className="admin-sidebar__link-icon"
-          aria-hidden="true"
-        >
-          <Icon
-            size={17}
-            strokeWidth={1.8}
-          />
-        </span>
-        <span className="admin-sidebar__link-content">
-          <span className="admin-sidebar__link-title">
-            {item.label}
-          </span>
-          {item.description &&
-            !compact && (
-              <span className="admin-sidebar__link-description">
-                {
-                  item.description
-                }
-              </span>
-            )}
-        </span>
-        <ChevronRight
-          className="admin-sidebar__link-chevron"
-          size={14}
-          strokeWidth={1.8}
+
+  return (
+    <>
+      {isMobile && open && (
+        <div
+          className="admin-sidebar__overlay"
+          onClick={handleNavigation}
           aria-hidden="true"
         />
-      </NavLink>
-    );
-  }
-  /* ==========================================================
-     NAVIGATION SECTION
-  ========================================================== */
-  function renderSection({
-    title,
-    items,
-    compact = false,
-  }) {
-    return (
-      <div className="admin-sidebar__section">
-        <div className="admin-sidebar__section-header">
-          <span>
-            {title}
-          </span>
-          <span
-            className="admin-sidebar__section-line"
-            aria-hidden="true"
-          />
-        </div>
-        <div className="admin-sidebar__section-links">
-          {items.map(
-            (item) =>
-              renderNavItem(
-                item,
-                compact
-              )
-          )}
-        </div>
-      </div>
-    );
-  }
-  /* ==========================================================
-     RENDER
-  ========================================================== */
-  return (
-    <aside
-      ref={sidebarRef}
-      id="admin-sidebar"
-      aria-hidden={isMobile && !open ? true : undefined}
-      className={
-        open
-          ? "admin-sidebar admin-sidebar--open"
-          : "admin-sidebar"
-      }
-      aria-label="Continental Founders administration"
-    >
-      {/* ======================================================
-          BRAND
-      ====================================================== */}
-      <header className="admin-sidebar__header">
-        <Link
-          to="/"
-          className="admin-sidebar__brand"
-          onClick={handleNavigation}
-          aria-label="Continental Founders home"
-        >
-          <img
-            src="/assets/continental-founders-logo.webp"
-            alt="Continental Founders"
-            className="admin-sidebar__logo"
-          />
-        </Link>
-        <button
-          type="button"
-          ref={closeButtonRef}
-          className="admin-sidebar__close"
-          onClick={onClose}
-          aria-label="Close administration menu"
-        >
-          <X
-            size={20}
-            strokeWidth={1.8}
-          />
-        </button>
-      </header>
-      {/* ======================================================
-          ADMIN IDENTITY
-      ====================================================== */}
-      <div className="admin-sidebar__identity">
-        <div className="admin-sidebar__identity-top">
-          <ShieldCheck
-            className="admin-sidebar__identity-icon"
-            size={17}
-            strokeWidth={1.8}
-          />
-          <span className="admin-sidebar__eyebrow">
-            ADMINISTRATION
-          </span>
-        </div>
-        <h1>
-          Content Management
-        </h1>
-        <p>
-          Manage ventures, CFCV
-          admissions, institutional
-          content, partnerships, events,
-          communications, universities,
-          gallery and public-facing
-          information.
-        </p>
-      </div>
-      {/* ======================================================
-          NAVIGATION
-      ====================================================== */}
-      <nav
-        className="admin-sidebar__nav"
-        aria-label="CMS navigation"
+      )}
+
+      <aside
+        ref={sidebarRef}
+        id="admin-sidebar"
+        className={[
+          "admin-sidebar",
+          open ? "admin-sidebar--open" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        aria-label="Continental Founders administration"
+        aria-hidden={isMobile && !open ? true : undefined}
       >
-        {renderSection({
-          title: "OVERVIEW",
-          items:
-            overviewNavigation,
-        })}
-        {renderSection({
-          title:
-            "VENTURE & FELLOWSHIP",
-          items:
-            ventureNavigation,
-        })}
-        {renderSection({
-          title:
-            "CONTENT & COMMUNICATIONS",
-          items:
-            contentNavigation,
-        })}
-        {renderSection({
-          title:
-            "RELATIONSHIPS",
-          items:
-            relationshipNavigation,
-        })}
-        {renderSection({
-          title:
-            "PARTNERSHIPS",
-          items:
-            partnerNavigation,
-          compact: true,
-        })}
-        {renderSection({
-          title:
-            "ORGANIZATION",
-          items:
-            organizationNavigation,
-        })}
-      </nav>
-      {/* ======================================================
-          BOTTOM AREA
-      ====================================================== */}
-      <footer className="admin-sidebar__bottom">
-        {/* ====================================================
-            PUBLIC QUICK ACCESS
-        ==================================================== */}
-        <div className="admin-sidebar__quick-actions">
-          <Link
-            to="/cfcv"
-            className="admin-sidebar__utility-link"
-            onClick={handleNavigation}
-          >
-            <ClipboardCheck
-              size={16}
-              strokeWidth={1.8}
-            />
-            <span>
-              View CFCV
-            </span>
-          </Link>
-          <Link
-            to="/gallery"
-            className="admin-sidebar__utility-link"
-            onClick={handleNavigation}
-          >
-            <Images
-              size={16}
-              strokeWidth={1.8}
-            />
-            <span>
-              View Gallery
-            </span>
-          </Link>
-          <Link
-            to="/ventures"
-            className="admin-sidebar__utility-link"
-            onClick={handleNavigation}
-          >
-            <BriefcaseBusiness
-              size={16}
-              strokeWidth={1.8}
-            />
-            <span>
-              View Ventures
-            </span>
-          </Link>
-          <Link
-            to="/strategic-partners"
-            className="admin-sidebar__utility-link"
-            onClick={handleNavigation}
-          >
-            <ExternalLink
-              size={16}
-              strokeWidth={1.8}
-            />
-            <span>
-              View Partners
-            </span>
-          </Link>
+        <header className="admin-sidebar__header">
           <Link
             to="/"
-            className="admin-sidebar__utility-link"
+            className="admin-sidebar__brand"
+            onClick={handleNavigation}
+            aria-label="Continental Founders home"
+          >
+            {logoFailed ? (
+              <span className="admin-sidebar__wordmark">
+                CONTINENTAL <span>FOUNDERS</span>
+              </span>
+            ) : (
+              <img
+                src="/assets/continental-founders-logo.webp"
+                alt="Continental Founders"
+                className="admin-sidebar__logo"
+                onError={() => setLogoFailed(true)}
+              />
+            )}
+          </Link>
+
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="admin-sidebar__close"
+            onClick={handleNavigation}
+            aria-label="Close administration menu"
+          >
+            <X size={20} />
+          </button>
+
+          <div className="admin-sidebar__workspace">
+            <ShieldCheck size={12} aria-hidden="true" />
+            <span>Admin Workspace</span>
+          </div>
+        </header>
+
+        <nav
+          className="admin-sidebar__nav"
+          aria-label="CMS navigation"
+        >
+          {navigationSections.map((section, sectionIndex) => (
+            <section
+              key={section.title}
+              className="admin-sidebar__section"
+              aria-labelledby={`admin-nav-section-${sectionIndex}`}
+            >
+              <h2
+                id={`admin-nav-section-${sectionIndex}`}
+                className="admin-sidebar__section-title"
+              >
+                {section.title}
+              </h2>
+
+              <div className="admin-sidebar__section-links">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      end={item.end}
+                      onClick={handleNavigation}
+                      className={({ isActive }) =>
+                        [
+                          "admin-sidebar__link",
+                          isActive
+                            ? "admin-sidebar__link--active"
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")
+                      }
+                    >
+                      <Icon
+                        className="admin-sidebar__link-icon"
+                        size={18}
+                        strokeWidth={1.7}
+                        aria-hidden="true"
+                      />
+
+                      <span className="admin-sidebar__link-title">
+                        {item.label}
+                      </span>
+
+                      <ChevronRight
+                        className="admin-sidebar__link-chevron"
+                        size={14}
+                        strokeWidth={1.7}
+                        aria-hidden="true"
+                      />
+                    </NavLink>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </nav>
+
+        <footer className="admin-sidebar__bottom">
+          <div className="admin-sidebar__quick-actions">
+            {publicShortcuts.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="admin-sidebar__shortcut"
+                  onClick={handleNavigation}
+                  aria-label={`View ${item.label}`}
+                >
+                  <Icon
+                    size={17}
+                    strokeWidth={1.7}
+                    aria-hidden="true"
+                  />
+
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <Link
+            to="/"
+            className="admin-sidebar__website"
             onClick={handleNavigation}
           >
-            <ExternalLink
-              size={16}
-              strokeWidth={1.8}
-            />
-            <span>
-              View Public Website
-            </span>
+            <Globe2 size={17} aria-hidden="true" />
+            <span>View Public Website</span>
+            <ExternalLink size={15} aria-hidden="true" />
           </Link>
-        </div>
-        {/* ====================================================
-            LOGOUT
-        ==================================================== */}
-        <div className="admin-sidebar__logout-wrap">
-          <button
-            type="button"
-            className="admin-sidebar__logout"
-            onClick={
-              handleLogout
-            }
-            disabled={
-              loggingOut
-            }
+
+          <a
+            href={ETH_TECH_ADMIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="admin-sidebar__eth-admin"
+            onClick={handleNavigation}
+            aria-label="Open Eth Tech Admin in a new tab"
           >
-            <LogOut
-              size={17}
-              strokeWidth={1.8}
-            />
-            <span>
-              {loggingOut
-                ? "Signing out..."
-                : "Sign out"}
-            </span>
-          </button>
+            <ShieldCheck size={19} aria-hidden="true" />
+            <span>Eth Tech Admin</span>
+            <ExternalLink size={15} aria-hidden="true" />
+          </a>
+
+          <div className="admin-sidebar__account">
+            <div
+              className="admin-sidebar__avatar"
+              aria-hidden="true"
+            >
+              <Users size={19} strokeWidth={1.7} />
+            </div>
+
+            <div className="admin-sidebar__account-info">
+              <span className="admin-sidebar__account-name">
+                Administrator
+              </span>
+
+              <span className="admin-sidebar__account-status">
+                <span aria-hidden="true" />
+                Secure session
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className="admin-sidebar__logout"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              aria-label={loggingOut ? "Signing out" : "Sign out"}
+              title={loggingOut ? "Signing out…" : "Sign out"}
+            >
+              <LogOut
+                size={18}
+                strokeWidth={1.7}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+
           {logoutError && (
             <p
-              className="admin-sidebar__logout-error"
+              className="admin-sidebar__error"
               role="alert"
             >
               {logoutError}
             </p>
           )}
-        </div>
-        {/* ====================================================
-            FOOTER COPY
-        ==================================================== */}
-        <div className="admin-sidebar__footer-copy">
-          <strong>
-            Continental Founders™
-          </strong>
-          <span>
-            Secure CMS Administration
-          </span>
-        </div>
-      </footer>
-    </aside>
+        </footer>
+      </aside>
+    </>
   );
 }

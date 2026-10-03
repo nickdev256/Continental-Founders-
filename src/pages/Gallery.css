@@ -4120,42 +4120,36 @@
    ============================================================ */
 
 @media (min-width: 1400px) {
-
   .cf-gallery-carousel__stage {
-    height: 590px;
+    height: 720px;
   }
-
 
   .cf-gallery-carousel__card--center {
-    width: 400px;
-    height: 555px;
+    width: 470px;
+    height: 650px;
   }
-
 
   .cf-gallery-carousel__card--left,
   .cf-gallery-carousel__card--right {
-    width: 340px;
-    height: 475px;
+    width: 390px;
+    height: 550px;
   }
-
 
   .cf-gallery-carousel__card--left {
     transform:
       translate(-50%, -50%)
-      translateX(-380px)
+      translateX(-455px)
       rotateY(18deg)
-      scale(0.9);
+      scale(0.92);
   }
-
 
   .cf-gallery-carousel__card--right {
     transform:
       translate(-50%, -50%)
-      translateX(380px)
+      translateX(455px)
       rotateY(-18deg)
-      scale(0.9);
+      scale(0.92);
   }
-
 }
 
 

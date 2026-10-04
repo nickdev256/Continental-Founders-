@@ -116,6 +116,12 @@
   margin: 0 auto;
 }
 
+@media (min-width: 1251px) {
+  .navbar__actions {
+    transform: translateX(180px);
+  }
+}
+
 .navbar__brand {
   display: inline-flex;
   align-items: center;
@@ -913,7 +919,7 @@
   height: 38px;
 
   color: #12355b;
-  background: #eef3f7;
+  background: #eef3f7;  
 
   border-radius: 6px;
 }
@@ -980,3 +986,7 @@
     transition: none !important;
   }
 }
+
+
+
+

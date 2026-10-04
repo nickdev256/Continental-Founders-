@@ -17,7 +17,7 @@ export default function ProcessGrid() {
         <article className="process-item" key={number}>
           <div className="process-item__top">
             <span>{number}</span>
-            <ArrowUpRight size={18} />
+            
           </div>
           <h3>{title}</h3>
           <p>{text}</p>

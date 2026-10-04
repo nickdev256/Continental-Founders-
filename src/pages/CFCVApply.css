@@ -131,9 +131,7 @@
 
 .cfcv-apply-hero {
   position: relative;
-
   isolation: isolate;
-
   overflow: hidden;
 
   padding:
@@ -141,17 +139,53 @@
     0
     clamp(55px, 7vw, 80px);
 
-  background:
+  background-image:
     linear-gradient(
-      120deg,
-      var(--cfcv-navy-deep) 0%,
-      var(--cfcv-navy) 55%,
-      #0a3155 100%
-    );
+      90deg,
+      rgba(2, 20, 38, 0.96) 0%,
+      rgba(2, 20, 38, 0.88) 35%,
+      rgba(3, 27, 52, 0.68) 65%,
+      rgba(3, 27, 52, 0.52) 100%
+    ),
+    url("/assets/zz.png");
+
+  background-repeat: no-repeat;
+  background-size: 115% 115%;
+  background-position: 55% center;
+
+  animation: cfcvHeroZoomOut 2.5s ease-out forwards;
 
   color: var(--cfcv-white);
 }
 
+
+.cfcv-apply-hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.cfcv-apply-back {
+  position: relative;
+  z-index: 2;
+}
+
+.cfcv-apply-hero__summary {
+  position: relative;
+  z-index: 2;
+  background: rgba(3, 27, 52, 0.48);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@keyframes cfcvHeroZoomOut {
+  from {
+    background-size: 120% 120%;
+  }
+
+  to {
+    background-size: 100% 100%;
+  }
+}
 
 .cfcv-apply-hero::before {
   content: "";
@@ -298,17 +332,14 @@
     serif;
 
   font-size: clamp(
-    2.8rem,
-    6vw,
-    5.7rem
+    2.2rem,
+    4.5vw,
+    4.2rem
   );
 
   font-weight: 500;
-
   line-height: 0.99;
-
-  letter-spacing: -0.05em;
-
+  letter-spacing: -0.04em;
   overflow-wrap: anywhere;
 }
 
@@ -371,20 +402,70 @@
 }
 
 
-/* ============================================================
-   05 — APPLICATION MAIN
-============================================================ */
+/* =========================================
+   CFCV APPLICATION SECTION — NAVY FADES
+   ========================================= */
 
 .cfcv-apply-main {
   position: relative;
+  overflow: hidden;
 
-  padding:
-    clamp(50px, 7vw, 90px)
-    0
-    clamp(75px, 9vw, 120px);
+  /* padding:
+    180px 0
+    clamp(110px, 12vw, 160px);
 
-  background:
-    var(--cfcv-soft-2);
+  background: var(--cfcv-soft-2); */
+}
+
+/* TOP NAVY BLUE FADE */
+.cfcv-apply-main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 180px;
+
+  background: linear-gradient(
+    to bottom,
+    #031b34 0%,
+    /* rgba(3, 27, 52, 0.85) 25%, */
+    /* rgba(3, 27, 52, 0.55) 50%,
+    rgba(3, 27, 52, 0.20) 75%, */
+    /* rgba(3, 27, 52, 0) 100% */
+  );
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* BOTTOM NAVY BLUE FADE */
+.cfcv-apply-main::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 220px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(3, 27, 52, 0) 0%,
+    /* rgba(3, 27, 52, 0.35) 45%, */
+    /* rgba(3, 27, 52, 0.75) 75%, */
+    #031b34 100%
+  );
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* KEEP THE APPLICATION CONTENT ABOVE THE FADES */
+.cfcv-apply-main > .cfcv-apply-container {
+  position: relative;
+  z-index: 2;
 }
 
 

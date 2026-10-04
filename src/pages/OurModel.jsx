@@ -360,14 +360,14 @@ export default function OurModel() {
 
 
               <div
-                className="model-companies-cta__line"
-                aria-hidden="true"
+               
               />
+              <br />
 
 
               <p>
                 Continental Founders is building an ecosystem around
-                founders and their ventures — connecting talent with
+                founders and their ventures connecting talent with
                 the people, institutions, markets, knowledge, and
                 opportunities needed to grow.
               </p>
@@ -386,7 +386,7 @@ export default function OurModel() {
     FINAL CTA
 ======================================================== */}
 
-<section className="model-final-cta"> 
+<section className="model-final-cta">    
 
   <div className="container">
 

@@ -2393,3 +2393,98 @@
   }
 
 }
+
+
+/* ============================================================
+   CFCV — FINAL HEADING CLEANUP
+   Remove gold heading lines + reduce heading sizes
+============================================================ */
+
+/* REMOVE GOLD LINES BESIDE SECTION HEADINGS */
+.cfcv-page .cfcv-section-label > span,
+.cfcv-page .cfcv-section-label--light > span {
+  display: none !important;
+}
+
+/* REMOVE GOLD TOP ACCENT FROM MATCHING CRITERIA */
+.cfcv-page .cfcv-matching__criteria {
+  border-top: none !important;
+}
+
+/* REDUCE ALL MAIN H1 HEADINGS */
+.cfcv-page h1 {
+  font-size: clamp(
+    2.4rem,
+    5.5vw,
+    5.2rem
+  ) !important;
+}
+
+/* REDUCE ALL H2 HEADINGS */
+.cfcv-page h2 {
+  font-size: clamp(
+    1.9rem,
+    3.5vw,
+    3.3rem
+  ) !important;
+}
+
+/* KEEP HERO H1 SLIGHTLY LARGER THAN OTHER HEADINGS */
+.cfcv-page .cfcv-hero h1 {
+  font-size: clamp(
+    2.6rem,
+    5.5vw,
+    5.2rem
+  ) !important;
+}
+
+/* FINAL CTA HEADING */
+.cfcv-page .cfcv-final h2 {
+  font-size: clamp(
+    2.2rem,
+    4.5vw,
+    4.3rem
+  ) !important;
+}
+
+/* ASSESSMENT HEADING */
+.cfcv-page .cfcv-two-column__content h2 {
+  font-size: clamp(
+    2rem,
+    3.5vw,
+    3.3rem
+  ) !important;
+}
+
+/* COMPATIBILITY HEADING */
+.cfcv-page .cfcv-compatibility__header h2 {
+  font-size: clamp(
+    2rem,
+    3.5vw,
+    3.3rem
+  ) !important;
+}
+
+/* MOBILE — KEEP EVERYTHING COMPACT */
+@media (max-width: 600px) {
+  .cfcv-page h1 {
+    font-size: 2.5rem !important;
+  }
+
+  .cfcv-page h2 {
+    font-size: 2rem !important;
+  }
+
+  .cfcv-page .cfcv-hero h1 {
+    font-size: 2.7rem !important;
+  }
+
+  .cfcv-page .cfcv-final h2 {
+    font-size: 2.35rem !important;
+  }
+
+  .cfcv-page .cfcv-two-column__content h2,
+  .cfcv-page .cfcv-compatibility__header h2 {
+    font-size: 2.1rem !important;
+  }
+}

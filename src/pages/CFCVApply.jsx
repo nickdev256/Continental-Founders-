@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   ChevronLeft,
   FileText,
-  Globe2,
+  Globe2,  
   Loader2,
   Send,
   UploadCloud,
@@ -1302,6 +1302,10 @@ function CFCVApply() {
 
         <div className="cfcv-apply-container">
 
+           <br />
+            <br />
+             <br />
+
 
           {/* ==================================================
               PROGRESS
@@ -1408,6 +1412,7 @@ function CFCVApply() {
             </div>
 
           </div>
+         
 
 
           {/* ==================================================
@@ -1421,6 +1426,8 @@ function CFCVApply() {
             }
             noValidate
           >
+
+            
 
 
             {/* ==================================================

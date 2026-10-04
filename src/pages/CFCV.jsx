@@ -38,7 +38,7 @@ const tracks = [
     icon: Lightbulb,
 
     bestFit:
-      "Idea, problem, or early concept",
+      "Idea, problem, or early concept", 
 
     focus: [
       "Customer discovery",

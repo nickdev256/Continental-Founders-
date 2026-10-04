@@ -255,7 +255,7 @@ export default function Navbar() {
     setActiveDropdown(null);
     setSearchOpen(false);
     setSearchQuery("");
-  }, [location.pathname, location.search]);
+  }, [location.pathname, location.search]);  
 
   useEffect(() => {
     if (navRef.current) {
@@ -593,22 +593,9 @@ export default function Navbar() {
                             }
                             onClick={closeMenu}
                           >
-                            <span className="navbar__dropdown-link-content">
-                              {isCFCVPath(child.path) && (
-                                <Rocket
-                                  size={15}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-                              )}
-
-                              <span>{child.label}</span>
-                            </span>
-
-                            <ArrowUpRight
-                              size={14}
-                              aria-hidden="true"
-                            />
+                          <span className="navbar__dropdown-link-content">
+  <span>{child.label}</span>
+</span>
                           </NavLink>
                         ))}
                       </div>
@@ -644,7 +631,7 @@ export default function Navbar() {
                   title="View subscription plans on Eth Tech Solutions"
                 >
                   <span>Subscribe</span>
-                  <ArrowUpRight size={16} aria-hidden="true" />
+                  
                 </a>
 
                 <Link
@@ -652,9 +639,9 @@ export default function Navbar() {
                   className="navbar__cta navbar__cta--cfcv"
                   onClick={closeMenu}
                 >
-                  <Rocket size={16} aria-hidden="true" />
+                  
                   <span>Apply to CFCV</span>
-                  <ArrowUpRight size={16} aria-hidden="true" />
+                  
                 </Link>
               </div>
             </nav>

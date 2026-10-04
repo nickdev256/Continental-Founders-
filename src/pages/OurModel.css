@@ -2729,3 +2729,51 @@
     line-height: 1.05 !important;
   }
 }
+
+
+
+
+/* ============================================================
+   REDUCE NON-HERO HEADINGS
+============================================================ */
+
+.our-model-page h2 {
+  font-size: clamp(2.2rem, 3.5vw, 3.6rem) !important;
+}
+
+/* Keep the hero heading unchanged */
+.model-hero h1 {
+  font-size: clamp(3.6rem, 5.5vw, 6.4rem);
+}
+
+
+/* TABLET */
+@media (max-width: 900px) {
+  .our-model-page h2 {
+    font-size: clamp(2rem, 4.5vw, 3.2rem) !important;
+  }
+}
+
+
+/* MOBILE */
+@media (max-width: 700px) {
+  .our-model-page h2 {
+    font-size: clamp(1.9rem, 7vw, 2.7rem) !important;
+  }
+}
+
+
+/* SMALL PHONES */
+@media (max-width: 420px) {
+  .our-model-page h2 {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* Remove gold lines from Our Model hero */
+
+.model-hero__eyebrow-line,
+.model-hero__theme-line {
+  display: none !important;
+}
+

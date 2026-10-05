@@ -1,1844 +1,2664 @@
 import {
-  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
 import {
-  AlertCircle,
-  Building2,
-  ChartNoAxesColumnIncreasing,
-  Check,
-  CheckCircle2,
-  ChevronDown,
-  ChevronRight,
-  ClipboardCheck,
-  Download,
-  FileText,
-  Filter,
-  Hourglass,
-  Loader2,
-  Mail,
-  MapPin,
-  Menu,
-  MessageCircle,
-  Mountain,
-  Network,
-  RefreshCw,
-  Search,
-  Sprout,
-  Users,
-  X,
-} from "lucide-react";
+  getCfcvStats,
+  getCfcvApplications,
+  getCfcvApplication,
+  getCfcvResume,
+  getCfcvHistory,
+  getCfcvEmails,
+  previewCfcvEmail,
+  saveCfcvReview,
+} from "../../services/cfcvApi";
 
 import "./AdminCFCV.css";
 
-/* API */
+// ============================================================
+// OPTIONS
+// ============================================================
 
-const API_URL = (
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000"
-).replace(/\/+$/, "");
+const STAGES = [
+  "applied",
+  "assessment",
+  "interview",
+  "track_placement",
+  "matching",
+  "compatibility",
+  "final_decision",
+  "enrollment",
+];
 
-/* Configuration */
-
-const ADMISSIONS_STAGES = [
-  { value: "applied", label: "Applied" },
-  { value: "assessment", label: "Assessment" },
-  { value: "interview", label: "Interview" },
-  { value: "track_placement", label: "Track Placement" },
-  { value: "matching", label: "Matching" },
-  { value: "compatibility", label: "Compatibility" },
-  { value: "final_decision", label: "Final Decision" },
-  { value: "enrollment", label: "Enrollment" },
+const STATUSES = [
+  "submitted",
+  "under_review",
+  "in_progress",
+  "admitted",
+  "waitlisted",
+  "not_selected",
+  "withdrawn",
 ];
 
 const TRACKS = [
-  { value: "", label: "Not assigned" },
-  { value: "Genesis", label: "Genesis — Build It" },
-  { value: "Ascend", label: "Ascend — Prove It" },
-  { value: "Horizon", label: "Horizon — Scale It" },
+  "Genesis",
+  "Ascend",
+  "Horizon",
 ];
 
-const MATCHING_STATUSES = [
-  { value: "not_started", label: "Not Started" },
-  { value: "required", label: "Required" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "matched", label: "Matched" },
-  {
-    value: "compatibility_sprint",
-    label: "Compatibility Sprint",
-  },
-  { value: "completed", label: "Completed" },
+const DECISIONS = [
+  "ADMIT",
+  "ADMIT WITH TRACK PLACEMENT",
+  "MATCH REQUIRED",
+  "WAITLIST",
+  "NOT SELECTED",
 ];
 
-const FINAL_DECISIONS = [
-  { value: "", label: "No decision yet" },
-  { value: "ADMIT", label: "Admit" },
-  {
-    value: "ADMIT WITH TRACK PLACEMENT",
-    label: "Admit With Track Placement",
-  },
-  {
-    value: "MATCH REQUIRED",
-    label: "Match Required",
-  },
-  { value: "WAITLIST", label: "Waitlist" },
-  { value: "NOT SELECTED", label: "Not Selected" },
+const REVIEW_KEYS = [
+  "admissionsStage",
+  "status",
+  "assignedTrack",
+  "matchingRequired",
+  "matchingStatus",
+  "matchedApplicationId",
+  "finalDecision",
+  "reviewerNotes",
+  "interviewNotes",
+  "matchingNotes",
+  "decisionNotes",
+  "interviewRequired",
+  "interviewStatus",
+  "interviewDate",
+  "interviewLink",
+  "interviewTimezone",
+  "enrollmentConfirmed",
 ];
 
-const APPLICATION_STATUSES = [
-  { value: "submitted", label: "Submitted" },
-  { value: "under_review", label: "Under Review" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "admitted", label: "Admitted" },
-  { value: "waitlisted", label: "Waitlisted" },
-  { value: "not_selected", label: "Not Selected" },
-  { value: "withdrawn", label: "Withdrawn" },
+const GROUPS = [
+  [
+    "Applicant",
+    [
+      "fullName",
+      "email",
+      "phone",
+      "country",
+      "city",
+      "geography",
+    ],
+  ],
+  [
+    "Experience",
+    [
+      "professionalBackground",
+      "relevantSkills",
+      "entrepreneurshipReason",
+    ],
+  ],
+  [
+    "Venture",
+    [
+      "ventureName",
+      "sector",
+      "ventureDescription",
+      "problem",
+      "solution",
+      "ventureStage",
+      "currentProgress",
+      "targetMarket",
+      "customerDescription",
+    ],
+  ],
+  [
+    "Team and collaboration",
+    [
+      "teamStatus",
+      "teamDescription",
+      "existingCrossContinentalTeam",
+      "collaboratorNeeds",
+      "marketKnowledge",
+      "geographicConnections",
+    ],
+  ],
+  [
+    "Working together",
+    [
+      "workingStyle",
+      "leadershipStrengths",
+      "longTermObjectives",
+      "timeCommitment",
+      "decisionMaking",
+      "ownershipExpectations",
+      "sixMonthGoals",
+    ],
+  ],
 ];
 
-const INTERVIEW_STATUSES = [
-  { value: "not_scheduled", label: "Not Scheduled" },
-  { value: "scheduled", label: "Scheduled" },
-  { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
+const LABELS = {
+  fullName: "Name",
 
-const GEOGRAPHIES = [
-  "Africa",
-  "United States",
-  "Diaspora",
-];
+  existingCrossContinentalTeam:
+    "Existing cross-continental team",
 
-/* Helpers */
+  sixMonthGoals:
+    "Six-month goals",
+};
 
-function formatDateTime(value, fallback = "—") {
-  if (!value) return fallback;
+const EMAIL_LABELS = {
+  pending: "Queued",
+  sending: "Sending",
 
-  const date = new Date(value);
+  accepted:
+    "Accepted by email provider",
 
-  if (Number.isNaN(date.getTime())) {
-    return fallback;
-  }
+  needs_review:
+    "Needs administrator review",
+};
 
-  return new Intl.DateTimeFormat(undefined, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
+const browserTimezone =
+  Intl.DateTimeFormat()
+    .resolvedOptions()
+    .timeZone || "UTC";
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function human(value = "") {
+  return String(value)
+    .replace(/_/g, " ")
+    .replace(
+      /([a-z])([A-Z])/g,
+      "$1 $2"
+    )
+    .replace(
+      /^./,
+      (letter) => letter.toUpperCase()
+    );
 }
 
-function toDateTimeLocal(value) {
-  if (!value) return "";
+function display(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return "Not provided";
+  }
 
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+
+  return String(value);
+}
+
+function formatDate(value) {
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
+  return value &&
+    Number.isFinite(date.getTime())
+    ? date.toLocaleString()
+    : "Not set";
+}
+
+function localDateInput(value) {
+  if (!value) {
     return "";
   }
 
-  const localDate = new Date(
+  const date = new Date(value);
+
+  if (
+    !Number.isFinite(date.getTime())
+  ) {
+    return "";
+  }
+
+  return new Date(
     date.getTime() -
-      date.getTimezoneOffset() * 60 * 1000
-  );
-
-  return localDate.toISOString().slice(0, 16);
-}
-
-function getFullName(application) {
-  return (
-    [
-      application?.firstName,
-      application?.lastName,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || "Unnamed applicant"
-  );
-}
-
-function getInitials(application) {
-  const first = String(
-    application?.firstName || ""
+      date.getTimezoneOffset() * 60000
   )
-    .trim()
-    .charAt(0);
-
-  const last = String(
-    application?.lastName || ""
-  )
-    .trim()
-    .charAt(0);
-
-  return `${first}${last}`.toUpperCase() || "CF";
+    .toISOString()
+    .slice(0, 16);
 }
 
-function getLabel(options, value) {
-  return (
-    options.find(
-      (option) => option.value === value
-    )?.label ||
-    value ||
-    "—"
+function reviewDraft(application) {
+  return Object.fromEntries(
+    REVIEW_KEYS.map((key) => {
+      let value;
+
+      if (key === "interviewDate") {
+        value = localDateInput(
+          application[key]
+        );
+      } else if (
+        [
+          "matchingRequired",
+          "interviewRequired",
+          "enrollmentConfirmed",
+        ].includes(key)
+      ) {
+        value = Boolean(
+          application[key]
+        );
+      } else {
+        value =
+          application[key] ?? "";
+      }
+
+      return [key, value];
+    })
   );
 }
 
-function stageClass(value) {
-  return String(value || "unknown")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-");
-}
-
-function normalizeStats(payload) {
-  const source = payload?.stats || payload || {};
-
-  return {
-    totalApplications: Number(
-      source.totalApplications || 0
-    ),
-    submitted: Number(source.submitted || 0),
-    underReview: Number(source.underReview || 0),
-    interviews: Number(source.interviews || 0),
-    matchingRequired: Number(
-      source.matchingRequired || 0
-    ),
-    admitted: Number(source.admitted || 0),
-    waitlisted: Number(source.waitlisted || 0),
-    genesis: Number(source.genesis || 0),
-    ascend: Number(source.ascend || 0),
-    horizon: Number(source.horizon || 0),
-    cohortCapacity: Number(
-      source.cohortCapacity || 30
-    ),
-    remainingCapacity: Number(
-      source.remainingCapacity ?? 30
-    ),
+function serializeReview(draft) {
+  const result = {
+    ...draft,
   };
-}
 
-async function request(endpoint, options = {}) {
-  const hasBody =
-    options.body !== undefined &&
-    options.body !== null;
-
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    {
-      ...options,
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        ...(hasBody
-          ? { "Content-Type": "application/json" }
-          : {}),
-        ...options.headers,
-      },
-    }
-  );
-
-  let data = {};
-
-  try {
-    data = await response.json();
-  } catch {
-    data = {};
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      data?.message ||
-        data?.error ||
-        "Something went wrong."
-    );
-  }
-
-  return data;
-}
-
-function DetailRow({ label, children }) {
-  return (
-    <div className="cfcv-detail-row">
-      <dt>{label}</dt>
-      <dd>{children || "—"}</dd>
-    </div>
-  );
-}
-
-function TextSection({ title, children }) {
-  return (
-    <section className="cfcv-detail-section">
-      <h3>{title}</h3>
-      <div className="cfcv-detail-copy">
-        {children || "—"}
-      </div>
-    </section>
-  );
-}
-
-/* Page */
-
-export default function AdminCFCV() {
-  const [applications, setApplications] =
-    useState([]);
-
-  const [stats, setStats] = useState(
-    normalizeStats({})
-  );
-
-  const [selectedId, setSelectedId] =
-    useState(null);
-
-  const [
-    selectedApplication,
-    setSelectedApplication,
-  ] = useState(null);
-
-  const [loading, setLoading] = useState(true);
-  const [detailLoading, setDetailLoading] =
-    useState(false);
-
-  const [saving, setSaving] = useState(false);
-  const [resumeLoading, setResumeLoading] =
-    useState(false);
-
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("");
-
-  const [stageFilter, setStageFilter] =
-    useState("");
-
-  const [trackFilter, setTrackFilter] =
-    useState("");
-
-  const [geographyFilter, setGeographyFilter] =
-    useState("");
-
-  const [
-    mobileFiltersOpen,
-    setMobileFiltersOpen,
-  ] = useState(false);
-
-  const [detailTab, setDetailTab] =
-    useState("Founder");
-
-  const [mobileTab, setMobileTab] =
-    useState("Details");
-
-  const [mobileListOpen, setMobileListOpen] =
-    useState(false);
-
-  const [editData, setEditData] = useState({
-    admissionsStage: "applied",
-    assignedTrack: "",
-    matchingRequired: false,
-    matchingStatus: "not_started",
-    finalDecision: "",
-    status: "submitted",
-    interviewRequired: false,
-    interviewStatus: "not_scheduled",
-    interviewDate: "",
-    reviewerNotes: "",
-    interviewNotes: "",
-    matchingNotes: "",
-    decisionNotes: "",
-  });
-
-  const queryString = useMemo(() => {
-    const params = new URLSearchParams();
-
-    if (statusFilter) {
-      params.set("status", statusFilter);
-    }
-
-    if (stageFilter) {
-      params.set("admissionsStage", stageFilter);
-    }
-
-    if (trackFilter) {
-      params.set("track", trackFilter);
-    }
-
-    if (geographyFilter) {
-      params.set("geography", geographyFilter);
-    }
-
-    if (search.trim()) {
-      params.set("search", search.trim());
-    }
-
-    const query = params.toString();
-
-    return query ? `?${query}` : "";
-  }, [
-    statusFilter,
-    stageFilter,
-    trackFilter,
-    geographyFilter,
-    search,
-  ]);
-
-  const loadStats = useCallback(async () => {
-    const data = await request(
-      "/api/cfcv/admin/stats"
+  if (
+    Object.hasOwn(
+      result,
+      "interviewDate"
+    ) &&
+    result.interviewDate
+  ) {
+    const date = new Date(
+      result.interviewDate
     );
 
-    setStats(normalizeStats(data));
-  }, []);
-
-  const loadApplications = useCallback(
-    async ({ showLoader = true } = {}) => {
-      if (showLoader) {
-        setLoading(true);
-      }
-
-      setError("");
-
-      try {
-        const data = await request(
-          `/api/cfcv/admin/applications${queryString}`
-        );
-
-        const rows = Array.isArray(
-          data?.applications
-        )
-          ? data.applications
-          : [];
-
-        setApplications(rows);
-
-        setSelectedId((current) => {
-          if (
-            current &&
-            rows.some(
-              (item) => item.id === current
-            )
-          ) {
-            return current;
-          }
-
-          return rows[0]?.id || null;
-        });
-      } catch (requestError) {
-        setError(
-          requestError.message ||
-            "Unable to load CFCV applications."
-        );
-
-        setApplications([]);
-        setSelectedId(null);
-      } finally {
-        if (showLoader) {
-          setLoading(false);
-        }
-      }
-    },
-    [queryString]
-  );
-
-  useEffect(() => {
-    const timer = window.setTimeout(
-      () => {
-        loadApplications();
-      },
-      search.trim() ? 350 : 0
-    );
-
-    return () => window.clearTimeout(timer);
-  }, [loadApplications, search]);
-
-  useEffect(() => {
-    loadStats().catch((statsError) => {
-      console.error(
-        "[CFCV ADMIN] Unable to load stats:",
-        statsError
-      );
-    });
-  }, [loadStats]);
-
-  const loadApplication = useCallback(
-    async (id, { showLoader = true } = {}) => {
-      if (!id) {
-        setSelectedApplication(null);
-        return;
-      }
-
-      if (showLoader) {
-        setDetailLoading(true);
-      }
-
-      try {
-        const data = await request(
-          `/api/cfcv/admin/applications/${id}`
-        );
-
-        const application =
-          data?.application || null;
-
-        setSelectedApplication(application);
-
-        if (application) {
-          setEditData({
-            admissionsStage:
-              application.admissionsStage ||
-              "applied",
-
-            assignedTrack:
-              application.assignedTrack || "",
-
-            matchingRequired: Boolean(
-              application.matchingRequired
-            ),
-
-            matchingStatus:
-              application.matchingStatus ||
-              "not_started",
-
-            finalDecision:
-              application.finalDecision || "",
-
-            status:
-              application.status || "submitted",
-
-            interviewRequired: Boolean(
-              application.interviewRequired
-            ),
-
-            interviewStatus:
-              application.interviewStatus ||
-              "not_scheduled",
-
-            interviewDate: toDateTimeLocal(
-              application.interviewDate
-            ),
-
-            reviewerNotes:
-              application.reviewerNotes || "",
-
-            interviewNotes:
-              application.interviewNotes || "",
-
-            matchingNotes:
-              application.matchingNotes || "",
-
-            decisionNotes:
-              application.decisionNotes || "",
-          });
-        }
-      } catch (requestError) {
-        setError(
-          requestError.message ||
-            "Unable to load the application."
-        );
-
-        setSelectedApplication(null);
-      } finally {
-        if (showLoader) {
-          setDetailLoading(false);
-        }
-      }
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (!selectedId) {
-      setSelectedApplication(null);
-      return;
-    }
-
-    loadApplication(selectedId);
-  }, [selectedId, loadApplication]);
-
-  function handleEditChange(event) {
-    const { name, value, type, checked } =
-      event.target;
-
-    setEditData((current) => ({
-      ...current,
-      [name]:
-        type === "checkbox" ? checked : value,
-    }));
-  }
-
-  async function handleSave() {
-    if (!selectedApplication?.id) {
-      return;
-    }
-
-    setSaving(true);
-    setError("");
-    setSuccess("");
-
-    try {
-      const payload = {
-        admissionsStage:
-          editData.admissionsStage,
-
-        assignedTrack:
-          editData.assignedTrack || null,
-
-        matchingRequired:
-          editData.matchingRequired,
-
-        matchingStatus:
-          editData.matchingStatus,
-
-        finalDecision:
-          editData.finalDecision || null,
-
-        status: editData.status,
-
-        interviewRequired:
-          editData.interviewRequired,
-
-        interviewStatus:
-          editData.interviewStatus,
-
-        interviewDate: editData.interviewDate
-          ? new Date(
-              editData.interviewDate
-            ).toISOString()
-          : null,
-
-        reviewerNotes: editData.reviewerNotes,
-        interviewNotes: editData.interviewNotes,
-        matchingNotes: editData.matchingNotes,
-        decisionNotes: editData.decisionNotes,
-      };
-
-      const data = await request(
-        `/api/cfcv/admin/applications/${selectedApplication.id}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (data?.application) {
-        setSelectedApplication(data.application);
-      }
-
-      setSuccess(
-        "Application updated successfully."
-      );
-
-      await Promise.all([
-        loadApplications({ showLoader: false }),
-        loadStats(),
-      ]);
-
-      await loadApplication(
-        selectedApplication.id,
-        { showLoader: false }
-      );
-    } catch (saveError) {
-      setError(
-        saveError.message ||
-          "Unable to update the application."
-      );
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function handleResume() {
-    if (!selectedApplication?.id) {
-      return;
-    }
-
-    setResumeLoading(true);
-    setError("");
-
-    try {
-      const data = await request(
-        `/api/cfcv/admin/applications/${selectedApplication.id}/resume`
-      );
-
-      const signedUrl =
-        data?.signedUrl || data?.url;
-
-      if (!signedUrl) {
-        throw new Error(
-          "The résumé download link could not be created."
-        );
-      }
-
-      window.open(
-        signedUrl,
-        "_blank",
-        "noopener,noreferrer"
-      );
-    } catch (resumeError) {
-      setError(
-        resumeError.message ||
-          "Unable to open the applicant résumé."
-      );
-    } finally {
-      setResumeLoading(false);
-    }
-  }
-
-  async function handleRefresh() {
-    setError("");
-    setSuccess("");
-
-    try {
-      await Promise.all([
-        loadApplications(),
-        loadStats(),
-      ]);
-
-      if (selectedId) {
-        await loadApplication(selectedId, {
-          showLoader: false,
-        });
-      }
-    } catch (refreshError) {
-      setError(
-        refreshError.message ||
-          "Unable to refresh CFCV admissions."
-      );
-    }
-  }
-
-  function clearFilters() {
-    setSearch("");
-    setStatusFilter("");
-    setStageFilter("");
-    setTrackFilter("");
-    setGeographyFilter("");
-  }
-
-  const hasFilters = Boolean(
-    search ||
-      statusFilter ||
-      stageFilter ||
-      trackFilter ||
-      geographyFilter
-  );
-
-  const applicant = selectedApplication;
-
-  const statusText = (application) =>
-    getLabel(
-      APPLICATION_STATUSES,
-      application.status
-    );
-
-  const workflow = [
-    {
-      label: "Applied",
-      stages: ["applied"],
-    },
-    {
-      label: "Assessment",
-      stages: ["assessment", "track_placement"],
-    },
-    {
-      label: "Interview",
-      stages: ["interview"],
-    },
-    {
-      label: "Matching",
-      stages: ["matching", "compatibility"],
-    },
-    {
-      label: "Decision",
-      stages: ["final_decision", "enrollment"],
-    },
-  ];
-
-  const activeStep = Math.max(
-    0,
-    workflow.findIndex((step) =>
-      step.stages.includes(
-        applicant?.admissionsStage
+    if (
+      !Number.isFinite(
+        date.getTime()
       )
+    ) {
+      throw new Error(
+        "Enter a valid interview date."
+      );
+    }
+
+    result.interviewDate =
+      date.toISOString();
+  }
+
+  return result;
+}
+
+function changedReview(
+  application,
+  draft
+) {
+  const original =
+    reviewDraft(application);
+
+  const changed = Object.fromEntries(
+    Object.entries(draft).filter(
+      ([key, value]) =>
+        value !== original[key]
     )
   );
 
-  const statCards = [
-    [
-      Users,
-      stats.totalApplications,
-      "Total applications",
-      "gold",
-    ],
-    [
-      FileText,
-      stats.underReview,
-      "Under review",
-      "gold",
-    ],
-    [
-      MessageCircle,
-      stats.interviews,
-      "Interviews",
-      "blue",
-    ],
-    [
-      Network,
-      stats.matchingRequired,
-      "Matching",
-      "gold",
-    ],
-    [
-      CheckCircle2,
-      stats.admitted,
-      "Admitted",
-      "green",
-    ],
-    [
-      Hourglass,
-      stats.waitlisted,
-      "Waitlisted",
-      "gold",
-    ],
-  ];
+  // Notification-only saves still need a valid review update.
+  return serializeReview(
+    Object.keys(changed).length
+      ? changed
+      : {
+          admissionsStage:
+            draft.admissionsStage,
+        }
+  );
+}
 
-  const trackCards = [
-    [Sprout, "Genesis", stats.genesis],
-    [
-      ChartNoAxesColumnIncreasing,
-      "Ascend",
-      stats.ascend,
-    ],
-    [Mountain, "Horizon", stats.horizon],
-  ];
+function useDebounced(
+  value,
+  delay = 350
+) {
+  const [
+    debounced,
+    setDebounced,
+  ] = useState(value);
 
-  const selectField = (
-    label,
-    name,
-    options
-  ) => (
-    <label
-      className="cfcv-form-row"
-      key={name}
-    >
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setDebounced(value),
+      delay
+    );
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debounced;
+}
+
+// ============================================================
+// REUSABLE FORM COMPONENTS
+// ============================================================
+
+function SelectField({
+  label,
+  value,
+  options,
+  onChange,
+  emptyLabel,
+}) {
+  return (
+    <label className="cfcv-admin-field">
       <span>{label}</span>
 
       <select
-        name={name}
-        value={editData[name]}
-        onChange={handleEditChange}
+        value={value ?? ""}
+        onChange={(event) =>
+          onChange(
+            event.target.value
+          )
+        }
       >
+        {emptyLabel && (
+          <option value="">
+            {emptyLabel}
+          </option>
+        )}
+
         {options.map((option) => (
           <option
-            key={option.value}
-            value={option.value}
+            key={option}
+            value={option}
           >
-            {option.label}
+            {human(option)}
           </option>
         ))}
       </select>
     </label>
   );
+}
 
-  const notesField = (label, name) => (
-    <label className="cfcv-notes" key={name}>
+function NoteField({
+  label,
+  value,
+  onChange,
+}) {
+  return (
+    <label className="cfcv-admin-field">
       <span>{label}</span>
 
       <textarea
-        name={name}
-        value={editData[name]}
-        onChange={handleEditChange}
-        rows={5}
+        rows={4}
+        maxLength={10000}
+        value={value || ""}
+        onChange={(event) =>
+          onChange(
+            event.target.value
+          )
+        }
       />
     </label>
   );
+}
 
-  const saveButton = (
-    <button
-      type="button"
-      className="cfcv-save"
-      disabled={
-        saving ||
-        detailLoading ||
-        !applicant
+function CheckField({
+  label,
+  value,
+  onChange,
+}) {
+  return (
+    <label className="cfcv-admin-check">
+      <input
+        type="checkbox"
+        checked={Boolean(value)}
+        onChange={(event) =>
+          onChange(
+            event.target.checked
+          )
+        }
+      />
+
+      <span>{label}</span>
+    </label>
+  );
+}
+
+// ============================================================
+// PAGE
+// ============================================================
+
+export default function AdminCFCV() {
+  const [stats, setStats] =
+    useState(null);
+
+  const [
+    statsError,
+    setStatsError,
+  ] = useState("");
+
+  const [
+    filters,
+    setFilters,
+  ] = useState({
+    search: "",
+    status: "",
+    admissionsStage: "",
+    track: "",
+    geography: "",
+    page: 1,
+  });
+
+  const search = useDebounced(
+    filters.search
+  );
+
+  const [
+    applications,
+    setApplications,
+  ] = useState([]);
+
+  const [
+    pagination,
+    setPagination,
+  ] = useState({
+    total: 0,
+    totalPages: 0,
+  });
+
+  const [
+    listLoading,
+    setListLoading,
+  ] = useState(true);
+
+  const [
+    listError,
+    setListError,
+  ] = useState("");
+
+  const [
+    refresh,
+    setRefresh,
+  ] = useState(0);
+
+  const [
+    selectedId,
+    setSelectedId,
+  ] = useState("");
+
+  const selectedIdRef =
+    useRef("");
+
+  selectedIdRef.current =
+    selectedId;
+
+  const [
+    application,
+    setApplication,
+  ] = useState(null);
+
+  const [
+    draft,
+    setDraft,
+  ] = useState(null);
+
+  const [
+    detailLoading,
+    setDetailLoading,
+  ] = useState(false);
+
+  const [
+    detailError,
+    setDetailError,
+  ] = useState("");
+
+  const [
+    detailRefresh,
+    setDetailRefresh,
+  ] = useState(0);
+
+  const [tab, setTab] =
+    useState("application");
+
+  const [
+    history,
+    setHistory,
+  ] = useState([]);
+
+  const [
+    emails,
+    setEmails,
+  ] = useState([]);
+
+  const [
+    historyError,
+    setHistoryError,
+  ] = useState("");
+
+  const [
+    emailError,
+    setEmailError,
+  ] = useState("");
+
+  const [
+    activityRefresh,
+    setActivityRefresh,
+  ] = useState(0);
+
+  const [
+    resumeUrl,
+    setResumeUrl,
+  ] = useState("");
+
+  const [
+    message,
+    setMessage,
+  ] = useState("");
+
+  const [
+    preview,
+    setPreview,
+  ] = useState(null);
+
+  const [busy, setBusy] =
+    useState("");
+
+  const actionLock =
+    useRef(false);
+
+  const [
+    notice,
+    setNotice,
+  ] = useState("");
+
+  const [
+    actionError,
+    setActionError,
+  ] = useState("");
+
+  const [
+    needsReload,
+    setNeedsReload,
+  ] = useState(false);
+
+  const [
+    candidateSearch,
+    setCandidateSearch,
+  ] = useState("");
+
+  const candidateQuery =
+    useDebounced(candidateSearch);
+
+  const [
+    candidates,
+    setCandidates,
+  ] = useState([]);
+
+  const [
+    candidateError,
+    setCandidateError,
+  ] = useState("");
+
+  const [
+    candidatesLoading,
+    setCandidatesLoading,
+  ] = useState(false);
+
+  const dirty = useMemo(
+    () =>
+      Boolean(
+        application &&
+          draft &&
+          JSON.stringify(draft) !==
+            JSON.stringify(
+              reviewDraft(application)
+            )
+      ),
+    [application, draft]
+  );
+
+  const hasUnsavedWork =
+    dirty ||
+    Boolean(message.trim());
+
+  const matchingActive = Boolean(
+    draft &&
+      (
+        draft.matchingRequired ||
+        [
+          "matching",
+          "compatibility",
+        ].includes(
+          draft.admissionsStage
+        )
+      )
+  );
+
+  // ==========================================================
+  // STATISTICS
+  // ==========================================================
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    let active = true;
+
+    setStatsError("");
+
+    getCfcvStats({
+      signal: controller.signal,
+    })
+      .then((data) => {
+        if (active) {
+          setStats(data.stats);
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setStatsError(
+            error.message
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [refresh]);
+
+  // ==========================================================
+  // APPLICATION LIST
+  // ==========================================================
+
+  useEffect(() => {
+    const controller =
+      new AbortController();
+
+    let active = true;
+
+    setListLoading(true);
+    setListError("");
+
+    getCfcvApplications(
+      {
+        ...filters,
+        search,
+        pageSize: 25,
+      },
+      {
+        signal:
+          controller.signal,
       }
-      onClick={handleSave}
-    >
-      {saving && (
-        <Loader2
-          size={16}
-          className="is-spinning"
-        />
-      )}
+    )
+      .then((data) => {
+        if (active) {
+          setApplications(
+            data.applications
+          );
 
-      {saving ? "Saving…" : "Save changes"}
-    </button>
-  );
+          setPagination(
+            data.pagination
+          );
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setListError(
+            error.message
+          );
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setListLoading(false);
+        }
+      });
 
-  const summaryRows = (rows) => (
-    <div className="cfcv-summary-rows">
-      {rows.map(([Icon, value], index) => (
-        <span key={index}>
-          <Icon size={15} />
-          {value || "—"}
-        </span>
-      ))}
-    </div>
-  );
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    search,
+    filters.status,
+    filters.admissionsStage,
+    filters.track,
+    filters.geography,
+    filters.page,
+    refresh,
+  ]);
 
-  const detailSection = (
-    title,
-    children
-  ) => (
-    <section className="cfcv-info">
-      <h3>{title}</h3>
-      {children}
-    </section>
-  );
+  // ==========================================================
+  // SELECTED APPLICATION
+  // ==========================================================
 
-  const textSections = (rows) =>
-    rows.map(([title, value]) =>
-      value ? (
-        <TextSection key={title} title={title}>
-          {value}
-        </TextSection>
-      ) : null
+  useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const controller =
+      new AbortController();
+
+    let active = true;
+
+    setDetailLoading(true);
+    setDetailError("");
+
+    setApplication(null);
+    setDraft(null);
+
+    setMessage("");
+    setPreview(null);
+    setResumeUrl("");
+
+    setNotice("");
+    setActionError("");
+    setNeedsReload(false);
+
+    getCfcvApplication(
+      selectedId,
+      {
+        signal:
+          controller.signal,
+      }
+    )
+      .then((data) => {
+        if (active) {
+          setApplication(
+            data.application
+          );
+
+          setDraft(
+            reviewDraft(
+              data.application
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setDetailError(
+            error.message
+          );
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setDetailLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    selectedId,
+    detailRefresh,
+  ]);
+
+  // ==========================================================
+  // REVIEW HISTORY AND EMAILS
+  // ==========================================================
+
+  useEffect(() => {
+    if (!selectedId) {
+      return;
+    }
+
+    const controller =
+      new AbortController();
+
+    let active = true;
+
+    setHistory([]);
+    setEmails([]);
+
+    setHistoryError("");
+    setEmailError("");
+
+    getCfcvHistory(
+      selectedId,
+      {
+        signal:
+          controller.signal,
+      }
+    )
+      .then((data) => {
+        if (active) {
+          setHistory(
+            data.history
+          );
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setHistoryError(
+            error.message
+          );
+        }
+      });
+
+    getCfcvEmails(
+      selectedId,
+      {
+        signal:
+          controller.signal,
+      }
+    )
+      .then((data) => {
+        if (active) {
+          setEmails(
+            data.emails
+          );
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setEmailError(
+            error.message
+          );
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    selectedId,
+    activityRefresh,
+    detailRefresh,
+  ]);
+
+  // ==========================================================
+  // EMAIL STATUS POLLING
+  // ==========================================================
+
+  useEffect(() => {
+    if (
+      !selectedId ||
+      tab !== "emails"
+    ) {
+      return;
+    }
+
+    const controller =
+      new AbortController();
+
+    let active = true;
+    let fetching = false;
+
+    const timer = setInterval(
+      async () => {
+        if (
+          document.hidden ||
+          fetching
+        ) {
+          return;
+        }
+
+        fetching = true;
+
+        try {
+          const data =
+            await getCfcvEmails(
+              selectedId,
+              {
+                signal:
+                  controller.signal,
+              }
+            );
+
+          if (active) {
+            setEmails(
+              data.emails
+            );
+
+            setEmailError("");
+          }
+        } catch (error) {
+          if (
+            active &&
+            error.code !== "ABORTED"
+          ) {
+            setEmailError(
+              error.message
+            );
+          }
+        } finally {
+          fetching = false;
+        }
+      },
+      15000
     );
 
-  return (
-    <main
-      className={`admin-cfcv mobile-tab-${mobileTab.toLowerCase()}`}
-    >
-      {/* Mobile header */}
+    return () => {
+      active = false;
 
-      <header className="cfcv-mobile-header">
+      clearInterval(timer);
+
+      controller.abort();
+    };
+  }, [selectedId, tab]);
+
+  // ==========================================================
+  // WARN BEFORE CLOSING WITH UNSAVED WORK
+  // ==========================================================
+
+  useEffect(() => {
+    if (!hasUnsavedWork) {
+      return;
+    }
+
+    const handler = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener(
+      "beforeunload",
+      handler
+    );
+
+    return () => {
+      window.removeEventListener(
+        "beforeunload",
+        handler
+      );
+    };
+  }, [hasUnsavedWork]);
+
+  // ==========================================================
+  // MATCHING CANDIDATE SEARCH
+  // ==========================================================
+
+  useEffect(() => {
+    setCandidates([]);
+    setCandidateError("");
+
+    if (
+      !selectedId ||
+      !matchingActive
+    ) {
+      setCandidatesLoading(false);
+      return;
+    }
+
+    const controller =
+      new AbortController();
+
+    let active = true;
+
+    setCandidatesLoading(true);
+
+    getCfcvApplications(
+      {
+        search:
+          candidateQuery,
+
+        pageSize: 20,
+      },
+      {
+        signal:
+          controller.signal,
+      }
+    )
+      .then((data) => {
+        if (active) {
+          setCandidates(
+            data.applications.filter(
+              (item) =>
+                item.id !== selectedId &&
+                item.status !== "withdrawn"
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        if (
+          active &&
+          error.code !== "ABORTED"
+        ) {
+          setCandidateError(
+            error.message
+          );
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setCandidatesLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [
+    selectedId,
+    matchingActive,
+    candidateQuery,
+  ]);
+
+  // ==========================================================
+  // USER ACTIONS
+  // ==========================================================
+
+  function changeFilter(
+    key,
+    value
+  ) {
+    setFilters((current) => ({
+      ...current,
+      [key]: value,
+      page: 1,
+    }));
+  }
+
+  function selectApplication(id) {
+    if (
+      actionLock.current ||
+      id === selectedId
+    ) {
+      return;
+    }
+
+    if (
+      hasUnsavedWork &&
+      !window.confirm(
+        "Discard your unsaved review and email draft?"
+      )
+    ) {
+      return;
+    }
+
+    setTab("application");
+
+    setCandidateSearch("");
+
+    setSelectedId(id);
+  }
+
+  function updateField(
+    key,
+    value
+  ) {
+    setDraft((current) => ({
+      ...current,
+      [key]: value,
+    }));
+
+    // A preview must be regenerated after review changes.
+    setPreview(null);
+
+    setNotice("");
+    setActionError("");
+  }
+
+  function reloadApplication() {
+    if (actionLock.current) {
+      return;
+    }
+
+    if (
+      hasUnsavedWork &&
+      !window.confirm(
+        "Reload this application and discard your unsaved review and email draft?"
+      )
+    ) {
+      return;
+    }
+
+    setDetailRefresh(
+      (value) => value + 1
+    );
+  }
+
+  async function runAction(
+    name,
+    operation
+  ) {
+    if (actionLock.current) {
+      return;
+    }
+
+    actionLock.current = true;
+
+    setBusy(name);
+    setActionError("");
+    setNotice("");
+
+    const id = selectedId;
+
+    try {
+      await operation(id);
+    } catch (error) {
+      if (
+        selectedIdRef.current === id
+      ) {
+        setActionError(
+          error.message
+        );
+
+        if (
+          name === "save" &&
+          [
+            "CONFLICT",
+            "TIMEOUT",
+            "NETWORK_ERROR",
+            "INVALID_RESPONSE",
+          ].includes(error.code)
+        ) {
+          setNeedsReload(true);
+        }
+      }
+    } finally {
+      actionLock.current = false;
+      setBusy("");
+    }
+  }
+
+  function prepareResume() {
+    void runAction(
+      "resume",
+      async (id) => {
+        const data =
+          await getCfcvResume(id);
+
+        if (
+          selectedIdRef.current === id
+        ) {
+          setResumeUrl(
+            data.signedUrl ||
+              data.url
+          );
+        }
+      }
+    );
+  }
+
+  function prepareEmail(
+    generate = false
+  ) {
+    void runAction(
+      "preview",
+      async (id) => {
+        const data =
+          await previewCfcvEmail(
+            id,
+            {
+              ...serializeReview(
+                draft
+              ),
+
+              applicantMessage:
+                generate
+                  ? ""
+                  : message,
+            }
+          );
+
+        if (
+          selectedIdRef.current === id
+        ) {
+          setMessage(
+            data.applicantMessage
+          );
+
+          setPreview(
+            generate
+              ? null
+              : data
+          );
+        }
+      }
+    );
+  }
+
+  function saveReview(
+    notifyApplicant
+  ) {
+    if (
+      needsReload ||
+      (
+        notifyApplicant &&
+        !preview
+      )
+    ) {
+      return;
+    }
+
+    void runAction(
+      "save",
+      async (id) => {
+        const data =
+          await saveCfcvReview(
+            id,
+            {
+              ...changedReview(
+                application,
+                draft
+              ),
+
+              expectedVersion:
+                application.version,
+
+              notifyApplicant,
+
+              applicantMessage:
+                notifyApplicant
+                  ? message
+                  : "",
+            }
+          );
+
+        if (
+          selectedIdRef.current !== id
+        ) {
+          return;
+        }
+
+        setApplication(
+          data.application
+        );
+
+        setDraft(
+          reviewDraft(
+            data.application
+          )
+        );
+
+        setPreview(null);
+
+        if (notifyApplicant) {
+          setMessage("");
+        }
+
+        setNotice(
+          data.message
+        );
+
+        setNeedsReload(false);
+
+        setRefresh(
+          (value) => value + 1
+        );
+
+        setActivityRefresh(
+          (value) => value + 1
+        );
+      }
+    );
+  }
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
+  return (
+    <main className="cfcv-admin-page">
+      <header className="cfcv-admin-header">
+        <div>
+          <span className="cfcv-admin-eyebrow">
+            CONTINENTAL FOUNDERS
+          </span>
+
+          <h1>CFCV Admissions</h1>
+
+          <p>
+            Review applications, manage fellowship
+            placement, and keep applicants informed.
+          </p>
+        </div>
+
         <button
           type="button"
-          aria-label="Show application list"
-          aria-expanded={mobileListOpen}
+          className="cfcv-admin-button"
+          disabled={Boolean(busy)}
           onClick={() =>
-            setMobileListOpen(
-              (current) => !current
+            setRefresh(
+              (value) => value + 1
             )
           }
         >
-          <Menu size={24} />
-        </button>
-
-        <strong>CFCV Admissions</strong>
-
-        <button
-          type="button"
-          aria-label="Refresh admissions"
-          disabled={loading}
-          onClick={handleRefresh}
-        >
-          <RefreshCw
-            size={22}
-            className={
-              loading ? "is-spinning" : ""
-            }
-          />
+          Refresh overview
         </button>
       </header>
 
-      {/* Desktop header */}
-
-      <header className="cfcv-header">
-        <div>
-          <h1>Fellowship Admissions</h1>
-          <p>
-            Review founders. Build the next cohort.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="cfcv-refresh"
-          onClick={handleRefresh}
-          disabled={loading}
-        >
-          <RefreshCw
-            size={16}
-            className={
-              loading ? "is-spinning" : ""
-            }
-          />
-          Refresh
-        </button>
-      </header>
-
-      {/* Notifications */}
-
-      {error && (
-        <div
-          className="cfcv-alert error"
+      {statsError && (
+        <p
+          className="cfcv-admin-alert"
           role="alert"
         >
-          <AlertCircle size={18} />
-          <span>{error}</span>
-
-          <button
-            type="button"
-            onClick={() => setError("")}
-            aria-label="Dismiss error"
-          >
-            <X size={16} />
-          </button>
-        </div>
+          Statistics: {statsError}
+        </p>
       )}
-
-      {success && (
-        <div
-          className="cfcv-alert success"
-          role="status"
-        >
-          <CheckCircle2 size={18} />
-          <span>{success}</span>
-
-          <button
-            type="button"
-            onClick={() => setSuccess("")}
-            aria-label="Dismiss message"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
-
-      {/* Statistics */}
 
       <section
-        className="cfcv-stats"
+        className="cfcv-admin-stats"
         aria-label="Admissions statistics"
       >
-        {statCards.map(
-          ([Icon, value, label, color]) => (
-            <article
-              className={`cfcv-stat ${color}`}
-              key={label}
-            >
-              <Icon size={28} />
+        {[
+          [
+            "Applications",
+            "totalApplications",
+          ],
+          [
+            "Under review",
+            "underReview",
+          ],
+          [
+            "Admitted",
+            "admitted",
+          ],
+          [
+            "Enrolled",
+            "enrolled",
+          ],
+          [
+            "Available places",
+            "remainingCapacity",
+          ],
+        ].map(([label, key]) => (
+          <div
+            className="cfcv-admin-stat"
+            key={key}
+          >
+            <span>{label}</span>
 
-              <div>
-                <strong>{value}</strong>
-                <span>{label}</span>
-              </div>
-            </article>
-          )
-        )}
+            <strong>
+              {stats?.[key] ?? "—"}
+            </strong>
+          </div>
+        ))}
       </section>
-
-      {/* Cohort capacity */}
 
       <section
-        className="cfcv-capacity"
-        aria-label="Cohort capacity"
+        className="cfcv-admin-filters"
+        aria-label="Filter applications"
       >
-        <div>
-          <h3>Cohort capacity</h3>
-
-          <p>
-            <strong>
-              {stats.admitted} of{" "}
-              {stats.cohortCapacity}
-            </strong>{" "}
-            places filled
-          </p>
-        </div>
-
-        <div
-          className="cfcv-capacity-bar"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={stats.cohortCapacity}
-          aria-valuenow={stats.admitted}
-        >
-          <span
-            style={{
-              width: `${Math.min(
-                100,
-                stats.cohortCapacity
-                  ? (stats.admitted /
-                      stats.cohortCapacity) *
-                      100
-                  : 0
-              )}%`,
-            }}
-          />
-        </div>
-
-        <div className="cfcv-tracks">
-          {trackCards.map(
-            ([Icon, label, count]) => (
-              <div key={label}>
-                <Icon size={29} />
-
-                <span>
-                  <strong>{label}</strong>
-                  <b>{count} assigned</b>
-                </span>
-              </div>
-            )
-          )}
-        </div>
-      </section>
-
-      {/* Search and filters */}
-
-      <section className="cfcv-toolbar">
-        <label className="cfcv-search">
-          <Search size={18} />
+        <label className="cfcv-admin-field">
+          <span>
+            Search applicants
+          </span>
 
           <input
             type="search"
-            value={search}
+            maxLength={120}
+            placeholder="Name, email or reference"
+            value={filters.search}
             onChange={(event) =>
-              setSearch(event.target.value)
-            }
-            placeholder="Search applicants by name, venture or location…"
-            aria-label="Search applicants"
-          />
-        </label>
-
-        <button
-          type="button"
-          className="cfcv-filter-toggle"
-          onClick={() =>
-            setMobileFiltersOpen(
-              (current) => !current
-            )
-          }
-          aria-expanded={mobileFiltersOpen}
-        >
-          <Filter size={16} />
-          Filters
-        </button>
-
-        <div
-          className={`cfcv-filters ${
-            mobileFiltersOpen ? "is-open" : ""
-          }`}
-        >
-          <select
-            value={stageFilter}
-            onChange={(event) =>
-              setStageFilter(event.target.value)
-            }
-            aria-label="Filter stages"
-          >
-            <option value="">All stages</option>
-
-            {ADMISSIONS_STAGES.map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={trackFilter}
-            onChange={(event) =>
-              setTrackFilter(event.target.value)
-            }
-            aria-label="Filter tracks"
-          >
-            <option value="">All tracks</option>
-
-            {TRACKS.filter(
-              (option) => option.value
-            ).map((option) => (
-              <option
-                key={option.value}
-                value={option.value}
-              >
-                {option.value}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={geographyFilter}
-            onChange={(event) =>
-              setGeographyFilter(
+              changeFilter(
+                "search",
                 event.target.value
               )
             }
-            aria-label="Filter geographies"
-          >
-            <option value="">
-              All geographies
-            </option>
+          />
+        </label>
 
-            {GEOGRAPHIES.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
+        <SelectField
+          label="Status"
+          value={filters.status}
+          options={STATUSES}
+          emptyLabel="All statuses"
+          onChange={(value) =>
+            changeFilter(
+              "status",
+              value
+            )
+          }
+        />
 
-          {hasFilters && (
-            <button
-              type="button"
-              className="cfcv-clear"
-              onClick={clearFilters}
-            >
-              Clear
-            </button>
-          )}
-        </div>
+        <SelectField
+          label="Admissions stage"
+          value={filters.admissionsStage}
+          options={STAGES}
+          emptyLabel="All stages"
+          onChange={(value) =>
+            changeFilter(
+              "admissionsStage",
+              value
+            )
+          }
+        />
+
+        <SelectField
+          label="Track"
+          value={filters.track}
+          options={TRACKS}
+          emptyLabel="All tracks"
+          onChange={(value) =>
+            changeFilter(
+              "track",
+              value
+            )
+          }
+        />
+
+        <SelectField
+          label="Geography"
+          value={filters.geography}
+          options={[
+            "Africa",
+            "United States",
+            "Diaspora",
+          ]}
+          emptyLabel="All regions"
+          onChange={(value) =>
+            changeFilter(
+              "geography",
+              value
+            )
+          }
+        />
       </section>
 
-      {/* Workspace */}
+      <div className="cfcv-admin-workspace">
+        {/* APPLICATION LIST */}
 
-      <section className="cfcv-workspace">
-        {/* Application list */}
-
-        <aside
-          className={`cfcv-list ${
-            mobileListOpen ? "is-open" : ""
-          }`}
+        <section
+          className="cfcv-admin-list"
+          aria-label="Applications"
+          aria-busy={listLoading}
         >
-          <header>
+          <div className="cfcv-admin-section-heading">
             <h2>Applications</h2>
+
             <span>
-              {applications.length} applicants
+              {listLoading
+                ? "Loading…"
+                : `${pagination.total} results`}
             </span>
-          </header>
-
-          <div className="cfcv-list-scroll">
-            {loading ? (
-              <div className="cfcv-state">
-                <Loader2 className="is-spinning" />
-                <p>Loading applications…</p>
-              </div>
-            ) : !applications.length ? (
-              <div className="cfcv-state">
-                <FileText />
-                <p>
-                  No applications match these
-                  filters.
-                </p>
-              </div>
-            ) : (
-              applications.map((application) => (
-                <button
-                  type="button"
-                  key={application.id}
-                  className={`cfcv-app ${
-                    selectedId === application.id
-                      ? "is-selected"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedId(application.id);
-                    setMobileListOpen(false);
-                    setMobileTab("Details");
-                    setDetailTab("Founder");
-                  }}
-                  aria-pressed={
-                    selectedId === application.id
-                  }
-                >
-                  <span className="cfcv-avatar">
-                    {getInitials(application)}
-                  </span>
-
-                  <span className="cfcv-app-identity">
-                    <strong>
-                      {getFullName(application)}
-                    </strong>
-
-                    <small>
-                      {application.country ||
-                        application.geography ||
-                        "—"}{" "}
-                      ·{" "}
-                      {application.ventureName ||
-                        "Unnamed venture"}
-                    </small>
-                  </span>
-
-                  <span className="cfcv-app-tags">
-                    <span
-                      className={`cfcv-badge status-${stageClass(
-                        application.status
-                      )}`}
-                    >
-                      {statusText(application)}
-                    </span>
-
-                    <small>
-                      {application.assignedTrack ||
-                        "Unassigned"}
-                    </small>
-                  </span>
-                </button>
-              ))
-            )}
           </div>
-        </aside>
 
-        {/* Mobile applicant card */}
+          {listError && (
+            <p
+              className="cfcv-admin-alert"
+              role="alert"
+            >
+              {listError}
+            </p>
+          )}
 
-        <div className="cfcv-selected-mobile">
-          {applicant && (
-            <>
-              <span className="cfcv-avatar">
-                {getInitials(applicant)}
-              </span>
+          {!listLoading &&
+            !listError &&
+            applications.length === 0 && (
+              <p className="cfcv-admin-empty">
+                No applications match these filters.
+              </p>
+            )}
 
-              <div>
-                <strong>
-                  {getFullName(applicant)}
-                </strong>
-
-                <span>{applicant.ventureName}</span>
-
-                <small>
-                  {applicant.applicationReference}
-                </small>
-              </div>
-
+          <div className="cfcv-admin-applicants">
+            {applications.map((item) => (
               <button
                 type="button"
-                aria-label="Choose another applicant"
+                key={item.id}
+                className={
+                  "cfcv-admin-applicant " +
+                  (
+                    selectedId === item.id
+                      ? "is-selected"
+                      : ""
+                  )
+                }
+                aria-pressed={
+                  selectedId === item.id
+                }
+                disabled={Boolean(busy)}
                 onClick={() =>
-                  setMobileListOpen(
-                    (current) => !current
+                  selectApplication(
+                    item.id
                   )
                 }
               >
-                <ChevronRight size={20} />
+                <strong>
+                  {item.fullName}
+                </strong>
+
+                <span>
+                  {item.applicationReference}
+                </span>
+
+                <span>
+                  {item.country}
+                  {" · "}
+                  {item.assignedTrack ||
+                    "Track pending"}
+                </span>
+
+                <div className="cfcv-admin-badges">
+                  <span className="cfcv-admin-badge">
+                    {human(
+                      item.admissionsStage
+                    )}
+                  </span>
+
+                  <span className="cfcv-admin-badge">
+                    {human(
+                      item.status
+                    )}
+                  </span>
+                </div>
               </button>
+            ))}
+          </div>
 
-              <div className="cfcv-mobile-badges">
-                <span
-                  className={`cfcv-badge status-${stageClass(
-                    applicant.status
-                  )}`}
-                >
-                  {statusText(applicant)}
-                </span>
-
-                <span className="cfcv-badge track">
-                  {applicant.assignedTrack ||
-                    "Unassigned"}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Mobile navigation */}
-
-        <nav
-          className="cfcv-mobile-tabs"
-          aria-label="Application view"
-        >
-          {["Details", "Review"].map((tab) => (
+          <nav
+            className="cfcv-admin-pagination"
+            aria-label="Application pages"
+          >
             <button
               type="button"
-              key={tab}
-              aria-pressed={mobileTab === tab}
-              onClick={() => setMobileTab(tab)}
+              disabled={
+                listLoading ||
+                filters.page <= 1
+              }
+              onClick={() =>
+                setFilters(
+                  (current) => ({
+                    ...current,
+
+                    page:
+                      current.page - 1,
+                  })
+                )
+              }
             >
-              {tab}
+              Previous
             </button>
-          ))}
-        </nav>
 
-        {/* Application details */}
+            <span>
+              Page {filters.page} of{" "}
+              {Math.max(
+                1,
+                pagination.totalPages
+              )}
+            </span>
 
-        <section className="cfcv-detail">
-          {detailLoading ? (
-            <div className="cfcv-state">
-              <Loader2 className="is-spinning" />
-              <p>Loading application…</p>
-            </div>
-          ) : !applicant ? (
-            <div className="cfcv-state">
-              <ClipboardCheck size={36} />
+            <button
+              type="button"
+              disabled={
+                listLoading ||
+                filters.page >=
+                  pagination.totalPages
+              }
+              onClick={() =>
+                setFilters(
+                  (current) => ({
+                    ...current,
+
+                    page:
+                      current.page + 1,
+                  })
+                )
+              }
+            >
+              Next
+            </button>
+          </nav>
+        </section>
+
+        {/* SELECTED APPLICATION */}
+
+        <section
+          className="cfcv-admin-detail"
+          aria-label="Selected application"
+          aria-busy={detailLoading}
+        >
+          {!selectedId && (
+            <div className="cfcv-admin-empty">
+              <h2>
+                Select an application
+              </h2>
 
               <p>
-                {selectedId
-                  ? "Application unavailable"
-                  : "Select an application to review"}
+                Choose an applicant to view their
+                information and manage their
+                admissions review.
               </p>
             </div>
-          ) : (
-            <>
-              <header className="cfcv-identity">
-                <span className="cfcv-avatar large">
-                  {getInitials(applicant)}
-                </span>
+          )}
 
+          {detailLoading && (
+            <p
+              className="cfcv-admin-empty"
+              role="status"
+            >
+              Loading application…
+            </p>
+          )}
+
+          {detailError && (
+            <div
+              className="cfcv-admin-alert"
+              role="alert"
+            >
+              <p>{detailError}</p>
+
+              <button
+                type="button"
+                onClick={
+                  reloadApplication
+                }
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {application && draft && (
+            <>
+              <header className="cfcv-admin-detail-header">
                 <div>
                   <h2>
-                    {getFullName(applicant)}
+                    {application.fullName}
                   </h2>
 
                   <p>
-                    {applicant.ventureName ||
-                      "Fellowship applicant"}
+                    {application.applicationReference}
+                    {" · "}
+                    Submitted{" "}
+                    {formatDate(
+                      application.submittedAt
+                    )}
                   </p>
-
-                  <small>
-                    {
-                      applicant.applicationReference
-                    }
-                  </small>
                 </div>
 
-                {applicant.hasResume && (
-                  <button
-                    type="button"
-                    className="cfcv-resume"
-                    onClick={handleResume}
-                    disabled={resumeLoading}
-                  >
-                    <FileText size={17} />
-
-                    {resumeLoading
-                      ? "Opening…"
-                      : "View résumé"}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="cfcv-admin-button"
+                  disabled={Boolean(busy)}
+                  onClick={
+                    reloadApplication
+                  }
+                >
+                  Reload application
+                </button>
               </header>
 
-              <div
-                className="cfcv-workflow"
-                aria-label="Application progress"
-              >
-                {workflow.map((step, index) => (
-                  <div
-                    key={step.label}
-                    className={`${
-                      index < activeStep
-                        ? "complete"
-                        : ""
-                    } ${
-                      index === activeStep
-                        ? "active"
-                        : ""
-                    }`}
-                  >
-                    <span>
-                      {index < activeStep && (
-                        <Check size={13} />
-                      )}
-                    </span>
-
-                    <small>{step.label}</small>
-                  </div>
-                ))}
-              </div>
-
               <nav
-                className="cfcv-detail-tabs"
-                aria-label="Applicant details"
+                className="cfcv-admin-tabs"
+                aria-label="Application sections"
               >
                 {[
-                  "Founder",
-                  "Venture",
-                  "Documents",
-                ].map((tab) => (
+                  "application",
+                  "review",
+                  "history",
+                  "emails",
+                ].map((name) => (
                   <button
                     type="button"
-                    key={tab}
-                    aria-pressed={
-                      detailTab === tab
+                    key={name}
+                    className={
+                      tab === name
+                        ? "is-active"
+                        : ""
+                    }
+                    aria-current={
+                      tab === name
+                        ? "page"
+                        : undefined
                     }
                     onClick={() =>
-                      setDetailTab(tab)
+                      setTab(name)
                     }
                   >
-                    {tab}
+                    {human(name)}
                   </button>
                 ))}
               </nav>
 
-              <div className="cfcv-detail-scroll">
-                {detailTab === "Founder" && (
-                  <>
-                    {detailSection(
-                      "Founder profile",
-                      summaryRows([
-                        [
-                          MapPin,
-                          [
-                            applicant.country,
-                            applicant.city,
-                          ]
-                            .filter(Boolean)
-                            .join(", "),
-                        ],
-                        [Mail, applicant.email],
-                        [Sprout, applicant.sector],
-                      ])
-                    )}
+              {notice && (
+                <p
+                  className="cfcv-admin-notice"
+                  role="status"
+                >
+                  {notice}
+                </p>
+              )}
 
-                    {detailSection(
-                      "Venture",
-                      summaryRows([
-                        [
-                          Building2,
-                          applicant.ventureName,
-                        ],
-                        [
-                          FileText,
-                          applicant.ventureDescription,
-                        ],
-                        [
-                          ChartNoAxesColumnIncreasing,
-                          applicant.ventureStage,
-                        ],
-                      ])
-                    )}
+              {actionError && (
+                <p
+                  className="cfcv-admin-alert"
+                  role="alert"
+                >
+                  {actionError}
+                </p>
+              )}
 
-                    {textSections([
-                      [
-                        "Application motivation",
-                        applicant.entrepreneurshipReason,
-                      ],
-                      [
-                        "Professional background",
-                        applicant.professionalBackground,
-                      ],
-                      [
-                        "Relevant skills & experience",
-                        applicant.relevantSkills,
-                      ],
-                      [
-                        "Long-term objectives",
-                        applicant.longTermObjectives,
-                      ],
-                      [
-                        "Six-month goals",
-                        applicant.sixMonthGoals,
-                      ],
-                    ])}
+              {needsReload && (
+                <p className="cfcv-admin-alert">
+                  Reload the application to check the
+                  saved result before making another
+                  save. Your draft remains visible
+                  until you reload.
+                </p>
+              )}
 
-                    {detailSection(
-                      "Contact & commitment",
-                      <dl>
-                        <DetailRow label="Phone">
-                          {applicant.phone}
-                        </DetailRow>
+              {/* APPLICATION INFORMATION */}
 
-                        <DetailRow label="Geography">
-                          {applicant.geography}
-                        </DetailRow>
+              {tab === "application" && (
+                <div className="cfcv-admin-content">
+                  <div className="cfcv-admin-resume">
+                    <strong>
+                      Résumé / CV
+                    </strong>
 
-                        <DetailRow label="Submitted">
-                          {formatDateTime(
-                            applicant.submittedAt
-                          )}
-                        </DetailRow>
+                    <span>
+                      {application.resumeFileName ||
+                        "No file uploaded"}
+                    </span>
 
-                        <DetailRow label="Time commitment">
-                          {applicant.timeCommitment}
-                        </DetailRow>
-
-                        <DetailRow label="Decision making">
-                          {applicant.decisionMaking}
-                        </DetailRow>
-
-                        <DetailRow label="Ownership expectations">
-                          {
-                            applicant.ownershipExpectations
-                          }
-                        </DetailRow>
-                      </dl>
-                    )}
-                  </>
-                )}
-
-                {detailTab === "Venture" && (
-                  <>
-                    {detailSection(
-                      "Venture",
-                      <dl>
-                        {[
-                          [
-                            "Name",
-                            applicant.ventureName,
-                          ],
-                          [
-                            "Sector",
-                            applicant.sector,
-                          ],
-                          [
-                            "Stage",
-                            applicant.ventureStage,
-                          ],
-                          [
-                            "Team",
-                            applicant.teamStatus,
-                          ],
-                          [
-                            "Target market",
-                            applicant.targetMarket,
-                          ],
-                          [
-                            "Customer",
-                            applicant.customerDescription,
-                          ],
-                          [
-                            "Team description",
-                            applicant.teamDescription,
-                          ],
-                        ].map(([label, value]) => (
-                          <DetailRow
-                            key={label}
-                            label={label}
-                          >
-                            {value}
-                          </DetailRow>
-                        ))}
-                      </dl>
-                    )}
-
-                    {textSections([
-                      [
-                        "Venture description",
-                        applicant.ventureDescription,
-                      ],
-                      ["Problem", applicant.problem],
-                      ["Solution", applicant.solution],
-                      [
-                        "Current progress",
-                        applicant.currentProgress,
-                      ],
-                    ])}
-
-                    {detailSection(
-                      "Cross-continental collaboration",
-                      <dl>
-                        {[
-                          [
-                            "Existing team",
-                            applicant.existingCrossContinentalTeam,
-                          ],
-                          [
-                            "Collaborator needs",
-                            applicant.collaboratorNeeds,
-                          ],
-                          [
-                            "Market knowledge",
-                            applicant.marketKnowledge,
-                          ],
-                          [
-                            "Geographic connections",
-                            applicant.geographicConnections,
-                          ],
-                          [
-                            "Working style",
-                            applicant.workingStyle,
-                          ],
-                          [
-                            "Leadership strengths",
-                            applicant.leadershipStrengths,
-                          ],
-                        ].map(([label, value]) => (
-                          <DetailRow
-                            key={label}
-                            label={label}
-                          >
-                            {value}
-                          </DetailRow>
-                        ))}
-                      </dl>
-                    )}
-                  </>
-                )}
-
-                {detailTab === "Documents" &&
-                  detailSection(
-                    "Résumé / CV",
-                    applicant.hasResume ? (
+                    {application.resumeAvailable && (
                       <button
                         type="button"
-                        className="cfcv-resume"
-                        onClick={handleResume}
-                        disabled={resumeLoading}
+                        className="cfcv-admin-button"
+                        disabled={Boolean(busy)}
+                        onClick={
+                          prepareResume
+                        }
                       >
-                        <Download size={16} />
-
-                        {applicant.resumeFileName ||
-                          "Open résumé"}
+                        {busy === "resume"
+                          ? "Preparing…"
+                          : "Prepare download"}
                       </button>
-                    ) : (
-                      <p>No résumé attached.</p>
+                    )}
+
+                    {resumeUrl && (
+                      <a
+                        className="cfcv-admin-button"
+                        href={resumeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Download résumé
+                      </a>
+                    )}
+
+                    {resumeUrl && (
+                      <small>
+                        The download link expires after
+                        five minutes. Prepare another
+                        link if needed.
+                      </small>
+                    )}
+                  </div>
+
+                  {GROUPS.map(
+                    ([title, keys]) => (
+                      <section
+                        className="cfcv-admin-card"
+                        key={title}
+                      >
+                        <h3>{title}</h3>
+
+                        <dl className="cfcv-admin-read-grid">
+                          {keys.map((key) => (
+                            <div key={key}>
+                              <dt>
+                                {LABELS[key] ||
+                                  human(key)}
+                              </dt>
+
+                              <dd>
+                                {display(
+                                  application[key]
+                                )}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </section>
                     )
                   )}
-              </div>
+                </div>
+              )}
+
+              {/* REVIEW */}
+
+              {tab === "review" && (
+                <div className="cfcv-admin-content">
+                  <p className="cfcv-admin-muted">
+                    Review version{" "}
+                    {application.version}.
+                    Internal notes stay within the
+                    admin system.
+                  </p>
+
+                  <fieldset
+                    className="cfcv-admin-review-fields"
+                    disabled={
+                      Boolean(busy) ||
+                      needsReload
+                    }
+                  >
+                    <legend className="cfcv-admin-sr-only">
+                      Admissions review
+                    </legend>
+
+                    <ol className="cfcv-admin-stages">
+                      {STAGES.map(
+                        (stage, index) => (
+                          <li key={stage}>
+                            <button
+                              type="button"
+                              aria-pressed={
+                                draft.admissionsStage ===
+                                stage
+                              }
+                              className={
+                                draft.admissionsStage ===
+                                stage
+                                  ? "is-active"
+                                  : ""
+                              }
+                              onClick={() =>
+                                updateField(
+                                  "admissionsStage",
+                                  stage
+                                )
+                              }
+                            >
+                              <span>
+                                {index + 1}
+                              </span>
+
+                              {human(stage)}
+                            </button>
+                          </li>
+                        )
+                      )}
+                    </ol>
+
+                    <section className="cfcv-admin-card">
+                      <h3>
+                        Current review
+                      </h3>
+
+                      <div className="cfcv-admin-form-grid">
+                        <SelectField
+                          label="Admissions stage"
+                          value={
+                            draft.admissionsStage
+                          }
+                          options={STAGES}
+                          onChange={(value) =>
+                            updateField(
+                              "admissionsStage",
+                              value
+                            )
+                          }
+                        />
+
+                        <SelectField
+                          label="Application status"
+                          value={
+                            draft.status
+                          }
+                          options={STATUSES}
+                          onChange={(value) =>
+                            updateField(
+                              "status",
+                              value
+                            )
+                          }
+                        />
+
+                        <SelectField
+                          label="Fellowship track"
+                          value={
+                            draft.assignedTrack
+                          }
+                          options={TRACKS}
+                          emptyLabel="Not assigned"
+                          onChange={(value) =>
+                            updateField(
+                              "assignedTrack",
+                              value
+                            )
+                          }
+                        />
+                      </div>
+
+                      <NoteField
+                        label="Internal assessment notes"
+                        value={
+                          draft.reviewerNotes
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "reviewerNotes",
+                            value
+                          )
+                        }
+                      />
+                    </section>
+
+                    {/* INTERVIEW */}
+
+                    <details
+                      className="cfcv-admin-card"
+                      open={
+                        draft.admissionsStage ===
+                        "interview"
+                      }
+                    >
+                      <summary>
+                        Interview
+                      </summary>
+
+                      <CheckField
+                        label="Interview required"
+                        value={
+                          draft.interviewRequired
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "interviewRequired",
+                            value
+                          )
+                        }
+                      />
+
+                      <div className="cfcv-admin-form-grid">
+                        <SelectField
+                          label="Interview status"
+                          value={
+                            draft.interviewStatus
+                          }
+                          options={[
+                            "not_scheduled",
+                            "scheduled",
+                            "completed",
+                            "cancelled",
+                          ]}
+                          onChange={(value) =>
+                            updateField(
+                              "interviewStatus",
+                              value
+                            )
+                          }
+                        />
+
+                        <label className="cfcv-admin-field">
+                          <span>
+                            Interview date — your local
+                            time ({browserTimezone})
+                          </span>
+
+                          <input
+                            type="datetime-local"
+                            value={
+                              draft.interviewDate
+                            }
+                            onChange={(event) =>
+                              updateField(
+                                "interviewDate",
+                                event.target.value
+                              )
+                            }
+                          />
+                        </label>
+
+                        <label className="cfcv-admin-field">
+                          <span>
+                            Timezone shown in applicant
+                            email
+                          </span>
+
+                          <input
+                            list="cfcv-timezones"
+                            maxLength={120}
+                            value={
+                              draft.interviewTimezone
+                            }
+                            onChange={(event) =>
+                              updateField(
+                                "interviewTimezone",
+                                event.target.value
+                              )
+                            }
+                          />
+
+                          <datalist id="cfcv-timezones">
+                            {[
+                              "UTC",
+                              "Africa/Kampala",
+                              "Africa/Nairobi",
+                              "America/New_York",
+                              "America/Chicago",
+                              "America/Los_Angeles",
+                              "Europe/London",
+                            ].map((zone) => (
+                              <option
+                                key={zone}
+                                value={zone}
+                              />
+                            ))}
+                          </datalist>
+                        </label>
+
+                        <label className="cfcv-admin-field">
+                          <span>
+                            Interview meeting link
+                          </span>
+
+                          <input
+                            type="url"
+                            maxLength={2000}
+                            placeholder="https://…"
+                            value={
+                              draft.interviewLink
+                            }
+                            onChange={(event) =>
+                              updateField(
+                                "interviewLink",
+                                event.target.value
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
+
+                      <NoteField
+                        label="Internal interview notes"
+                        value={
+                          draft.interviewNotes
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "interviewNotes",
+                            value
+                          )
+                        }
+                      />
+                    </details>
+
+                    {/* MATCHING AND COMPATIBILITY */}
+
+                    <details
+                      className="cfcv-admin-card"
+                      open={
+                        [
+                          "matching",
+                          "compatibility",
+                        ].includes(
+                          draft.admissionsStage
+                        )
+                      }
+                    >
+                      <summary>
+                        Founder matching and
+                        compatibility
+                      </summary>
+
+                      <CheckField
+                        label="Founder matching required"
+                        value={
+                          draft.matchingRequired
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "matchingRequired",
+                            value
+                          )
+                        }
+                      />
+
+                      <SelectField
+                        label="Matching status"
+                        value={
+                          draft.matchingStatus
+                        }
+                        options={[
+                          "not_started",
+                          "required",
+                          "in_progress",
+                          "matched",
+                          "compatibility_sprint",
+                          "completed",
+                        ]}
+                        onChange={(value) =>
+                          updateField(
+                            "matchingStatus",
+                            value
+                          )
+                        }
+                      />
+
+                      {matchingActive && (
+                        <>
+                          <label className="cfcv-admin-field">
+                            <span>
+                              Find an applicant to link
+                            </span>
+
+                            <input
+                              type="search"
+                              maxLength={120}
+                              placeholder="Search name, email or reference"
+                              value={
+                                candidateSearch
+                              }
+                              onChange={(event) =>
+                                setCandidateSearch(
+                                  event.target.value
+                                )
+                              }
+                            />
+                          </label>
+
+                          {candidateError && (
+                            <p
+                              className="cfcv-admin-alert"
+                              role="alert"
+                            >
+                              {candidateError}
+                            </p>
+                          )}
+
+                          <label className="cfcv-admin-field">
+                            <span>
+                              Linked founder application
+                              {candidatesLoading
+                                ? " — loading…"
+                                : ""}
+                            </span>
+
+                            <select
+                              value={
+                                draft.matchedApplicationId
+                              }
+                              onChange={(event) =>
+                                updateField(
+                                  "matchedApplicationId",
+                                  event.target.value
+                                )
+                              }
+                            >
+                              <option value="">
+                                No linked applicant
+                              </option>
+
+                              {draft.matchedApplicationId &&
+                                !candidates.some(
+                                  (item) =>
+                                    item.id ===
+                                    draft.matchedApplicationId
+                                ) && (
+                                  <option
+                                    value={
+                                      draft.matchedApplicationId
+                                    }
+                                  >
+                                    Current link:{" "}
+                                    {draft.matchedApplicationId}
+                                  </option>
+                                )}
+
+                              {candidates.map(
+                                (item) => (
+                                  <option
+                                    key={item.id}
+                                    value={item.id}
+                                  >
+                                    {item.fullName}
+                                    {" · "}
+                                    {item.geography}
+                                    {" · "}
+                                    {item.applicationReference}
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </label>
+
+                          <p className="cfcv-admin-muted">
+                            Shows up to 20 search
+                            results. This link records
+                            the match on this
+                            application; it does not
+                            automatically update or
+                            email the other applicant.
+                          </p>
+                        </>
+                      )}
+
+                      <NoteField
+                        label="Internal matching and compatibility notes"
+                        value={
+                          draft.matchingNotes
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "matchingNotes",
+                            value
+                          )
+                        }
+                      />
+                    </details>
+
+                    {/* DECISION AND ENROLLMENT */}
+
+                    <details
+                      className="cfcv-admin-card"
+                      open={
+                        [
+                          "final_decision",
+                          "enrollment",
+                        ].includes(
+                          draft.admissionsStage
+                        )
+                      }
+                    >
+                      <summary>
+                        Final decision and enrollment
+                      </summary>
+
+                      <SelectField
+                        label="Final admissions decision"
+                        value={
+                          draft.finalDecision
+                        }
+                        options={DECISIONS}
+                        emptyLabel="Decision pending"
+                        onChange={(value) =>
+                          updateField(
+                            "finalDecision",
+                            value
+                          )
+                        }
+                      />
+
+                      <CheckField
+                        label="Enrollment confirmed"
+                        value={
+                          draft.enrollmentConfirmed
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "enrollmentConfirmed",
+                            value
+                          )
+                        }
+                      />
+
+                      <p className="cfcv-admin-muted">
+                        Admission requires any
+                        required interview and
+                        matching process to be
+                        completed. Enrollment
+                        confirmation also requires
+                        an assigned track.
+                      </p>
+
+                      <NoteField
+                        label="Internal decision notes"
+                        value={
+                          draft.decisionNotes
+                        }
+                        onChange={(value) =>
+                          updateField(
+                            "decisionNotes",
+                            value
+                          )
+                        }
+                      />
+                    </details>
+
+                    {/* APPLICANT EMAIL */}
+
+                    <section className="cfcv-admin-card">
+                      <h3>
+                        Applicant email
+                      </h3>
+
+                      <p className="cfcv-admin-muted">
+                        Recipient:{" "}
+                        {application.email}.
+                        Review the message before
+                        choosing Save &amp; notify.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="cfcv-admin-button"
+                        onClick={() =>
+                          prepareEmail(true)
+                        }
+                      >
+                        Generate message for this stage
+                      </button>
+
+                      <NoteField
+                        label="Message the applicant will receive"
+                        value={message}
+                        onChange={(value) => {
+                          setMessage(value);
+                          setPreview(null);
+                        }}
+                      />
+
+                      <button
+                        type="button"
+                        className="cfcv-admin-button"
+                        disabled={
+                          !message.trim()
+                        }
+                        onClick={() =>
+                          prepareEmail(false)
+                        }
+                      >
+                        Preview email
+                      </button>
+
+                      {preview && (
+                        <div className="cfcv-admin-email-preview">
+                          <strong>
+                            {preview.subject}
+                          </strong>
+
+                          <p>
+                            To:{" "}
+                            {preview.recipient}
+                          </p>
+
+                          <pre>
+                            {preview.text}
+                          </pre>
+                        </div>
+                      )}
+                    </section>
+                  </fieldset>
+
+                  <div className="cfcv-admin-savebar">
+                    <span>
+                      {busy
+                        ? "Working…"
+                        : dirty
+                          ? "Unsaved review changes"
+                          : "Review is saved"}
+                    </span>
+
+                    <button
+                      type="button"
+                      className="cfcv-admin-button"
+                      disabled={
+                        Boolean(busy) ||
+                        needsReload ||
+                        !dirty
+                      }
+                      onClick={() =>
+                        saveReview(false)
+                      }
+                    >
+                      Save review
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cfcv-admin-button cfcv-admin-button--primary"
+                      disabled={
+                        Boolean(busy) ||
+                        needsReload ||
+                        !preview ||
+                        !message.trim()
+                      }
+                      onClick={() =>
+                        saveReview(true)
+                      }
+                    >
+                      Save &amp; notify
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* REVIEW HISTORY */}
+
+              {tab === "history" && (
+                <div className="cfcv-admin-content">
+                  <div className="cfcv-admin-section-heading">
+                    <h3>
+                      Recent review history
+                    </h3>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActivityRefresh(
+                          (value) => value + 1
+                        )
+                      }
+                    >
+                      Refresh
+                    </button>
+                  </div>
+
+                  {historyError && (
+                    <p
+                      className="cfcv-admin-alert"
+                      role="alert"
+                    >
+                      {historyError}
+                    </p>
+                  )}
+
+                  {!historyError &&
+                    history.length === 0 && (
+                      <p className="cfcv-admin-empty">
+                        No review history recorded yet.
+                      </p>
+                    )}
+
+                  {history.map((entry) => (
+                    <details
+                      className="cfcv-admin-card"
+                      key={entry.id}
+                    >
+                      <summary>
+                        Version{" "}
+                        {entry.application_version}
+                        {" · "}
+                        {formatDate(
+                          entry.created_at
+                        )}
+                      </summary>
+
+                      <p className="cfcv-admin-muted">
+                        Reviewer ID:{" "}
+                        {entry.actor_id ||
+                          "Not recorded"}
+                      </p>
+
+                      <dl className="cfcv-admin-read-grid">
+                        {Object.entries(
+                          entry.new_state || {}
+                        )
+                          .filter(
+                            ([key, value]) =>
+                              JSON.stringify(value) !==
+                              JSON.stringify(
+                                entry.previous_state?.[key]
+                              )
+                          )
+                          .map(([key, value]) => (
+                            <div key={key}>
+                              <dt>
+                                {human(key)}
+                              </dt>
+
+                              <dd>
+                                <span className="cfcv-admin-muted">
+                                  Before:{" "}
+                                  {display(
+                                    entry.previous_state?.[key]
+                                  )}
+                                </span>
+
+                                <br />
+
+                                After:{" "}
+                                {display(value)}
+                              </dd>
+                            </div>
+                          ))}
+                      </dl>
+                    </details>
+                  ))}
+                </div>
+              )}
+
+              {/* EMAIL STATUS */}
+
+              {tab === "emails" && (
+                <div className="cfcv-admin-content">
+                  <div className="cfcv-admin-section-heading">
+                    <h3>
+                      Recent applicant emails
+                    </h3>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActivityRefresh(
+                          (value) => value + 1
+                        )
+                      }
+                    >
+                      Refresh
+                    </button>
+                  </div>
+
+                  <p className="cfcv-admin-muted">
+                    Updates every 15 seconds while
+                    this section is visible.
+                    Provider acceptance does not
+                    confirm inbox delivery.
+                  </p>
+
+                  {emailError && (
+                    <p
+                      className="cfcv-admin-alert"
+                      role="alert"
+                    >
+                      {emailError}
+                    </p>
+                  )}
+
+                  {!emailError &&
+                    emails.length === 0 && (
+                      <p className="cfcv-admin-empty">
+                        No emails recorded for this
+                        application.
+                      </p>
+                    )}
+
+                  {emails.map((email) => (
+                    <details
+                      className="cfcv-admin-card"
+                      key={email.id}
+                    >
+                      <summary>
+                        {email.subject}
+                      </summary>
+
+                      <span
+                        className={
+                          "cfcv-admin-badge " +
+                          `cfcv-admin-badge--${email.status}`
+                        }
+                      >
+                        {EMAIL_LABELS[
+                          email.status
+                        ] ||
+                          human(
+                            email.status
+                          )}
+                      </span>
+
+                      <p>
+                        To: {email.recipient}
+                      </p>
+
+                      <p>
+                        Created:{" "}
+                        {formatDate(
+                          email.created_at
+                        )}
+                        {" · "}
+                        Attempts:{" "}
+                        {email.attempts}
+                      </p>
+
+                      {email.accepted_at && (
+                        <p>
+                          Accepted:{" "}
+                          {formatDate(
+                            email.accepted_at
+                          )}
+                        </p>
+                      )}
+
+                      {email.status === "pending" && (
+                        <p>
+                          Next attempt:{" "}
+                          {formatDate(
+                            email.next_attempt_at
+                          )}
+                        </p>
+                      )}
+
+                      {email.last_error && (
+                        <p className="cfcv-admin-alert">
+                          {email.last_error}
+                        </p>
+                      )}
+
+                      {email.status === "needs_review" && (
+                        <p>
+                          Check the Resend logs and the
+                          job’s provider message ID
+                          before deciding whether
+                          another email is needed.
+                        </p>
+                      )}
+
+                      {email.provider_message_id && (
+                        <p>
+                          Provider message ID:{" "}
+                          {email.provider_message_id}
+                        </p>
+                      )}
+
+                      <pre className="cfcv-admin-email-body">
+                        {email.body_text}
+                      </pre>
+                    </details>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </section>
-
-        {/* Admissions review */}
-
-        <aside className="cfcv-review">
-          <div className="cfcv-review-scroll">
-            <h2>Admissions review</h2>
-
-            <fieldset
-              disabled={
-                !applicant ||
-                detailLoading ||
-                saving
-              }
-            >
-              {selectField(
-                "Stage",
-                "admissionsStage",
-                ADMISSIONS_STAGES
-              )}
-
-              {selectField(
-                "Status",
-                "status",
-                APPLICATION_STATUSES
-              )}
-
-              {selectField(
-                "Track",
-                "assignedTrack",
-                TRACKS
-              )}
-
-              <div className="cfcv-accordions">
-                <details>
-                  <summary>
-                    <MessageCircle size={17} />
-                    Interview
-                    <ChevronDown size={15} />
-                  </summary>
-
-                  <div>
-                    <label className="cfcv-check">
-                      <input
-                        type="checkbox"
-                        name="interviewRequired"
-                        checked={
-                          editData.interviewRequired
-                        }
-                        onChange={handleEditChange}
-                      />
-                      Interview required
-                    </label>
-
-                    {selectField(
-                      "Status",
-                      "interviewStatus",
-                      INTERVIEW_STATUSES
-                    )}
-
-                    <label className="cfcv-notes">
-                      <span>Date & time</span>
-
-                      <input
-                        type="datetime-local"
-                        name="interviewDate"
-                        value={
-                          editData.interviewDate
-                        }
-                        onChange={handleEditChange}
-                      />
-                    </label>
-
-                    {notesField(
-                      "Interview notes",
-                      "interviewNotes"
-                    )}
-                  </div>
-                </details>
-
-                <details>
-                  <summary>
-                    <Users size={17} />
-                    Matching
-                    <ChevronDown size={15} />
-                  </summary>
-
-                  <div>
-                    <label className="cfcv-check">
-                      <input
-                        type="checkbox"
-                        name="matchingRequired"
-                        checked={
-                          editData.matchingRequired
-                        }
-                        onChange={handleEditChange}
-                      />
-                      Matching required
-                    </label>
-
-                    {selectField(
-                      "Status",
-                      "matchingStatus",
-                      MATCHING_STATUSES
-                    )}
-
-                    {notesField(
-                      "Matching notes",
-                      "matchingNotes"
-                    )}
-                  </div>
-                </details>
-
-                <details>
-                  <summary>
-                    <FileText size={17} />
-                    Final decision
-                    <ChevronDown size={15} />
-                  </summary>
-
-                  <div>
-                    {selectField(
-                      "Decision",
-                      "finalDecision",
-                      FINAL_DECISIONS
-                    )}
-
-                    {notesField(
-                      "Decision notes",
-                      "decisionNotes"
-                    )}
-                  </div>
-                </details>
-              </div>
-
-              {notesField(
-                "Reviewer notes",
-                "reviewerNotes"
-              )}
-            </fieldset>
-
-            {applicant?.updatedAt && (
-              <p className="cfcv-updated">
-                Last updated{" "}
-                {formatDateTime(
-                  applicant.updatedAt
-                )}
-              </p>
-            )}
-          </div>
-
-          <footer>{saveButton}</footer>
-        </aside>
-      </section>
-
-      {/* Mobile save button */}
-
-      <footer className="cfcv-mobile-save">
-        {saveButton}
-      </footer>
+      </div>
     </main>
   );
 }

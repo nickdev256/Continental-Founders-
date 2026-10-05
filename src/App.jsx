@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 import {
   Route,
@@ -6,22 +6,15 @@ import {
   useLocation,
 } from "react-router-dom";
 
-
 /* ============================================================
-   PUBLIC LAYOUT
+   LAYOUT
 ============================================================ */
 
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import PageTransition from "./components/layout/PageTransition";
 
-
-/* ============================================================
-   GLOBAL PUBLIC COMPONENTS
-============================================================ */
-
 import EthTechPopup from "./components/common/EthTechPopup";
-
 
 /* ============================================================
    PUBLIC PAGES
@@ -37,28 +30,13 @@ import OurModel from "./pages/OurModel";
 import StrategicPartners from "./pages/StrategicPartners";
 import Universities from "./pages/Universities";
 
-
-/* ============================================================
-   CFCV FELLOWSHIP
-============================================================ */
-
 import CFCV from "./pages/CFCV";
 import CFCVApply from "./pages/CFCVApply";
 import CFCVApplicationSuccess from "./pages/CFCVApplicationSuccess";
 
-
-/* ============================================================
-   PARTNER SUBPAGES
-============================================================ */
-
 import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
 import CorporatePartners from "./pages/CorporatePartners";
 import GovernmentDevelopment from "./pages/GovernmentDevelopment";
-
-
-/* ============================================================
-   OTHER PUBLIC PAGES
-============================================================ */
 
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
@@ -70,23 +48,16 @@ import Insights from "./pages/Insights";
 import InsightDetails from "./pages/InsightDetails";
 
 import Gallery from "./pages/Gallery";
-
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
-
 /* ============================================================
-   ADMIN AUTH
+   ADMIN
 ============================================================ */
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRegister from "./pages/admin/AdminRegister";
 import AdminOtp from "./pages/admin/AdminOtp";
-
-
-/* ============================================================
-   ADMIN / CMS
-============================================================ */
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -104,25 +75,14 @@ import AdminContacts from "./pages/admin/AdminContacts";
 import AdminAbout from "./pages/admin/AdminAbout";
 import AdminLeadership from "./pages/admin/AdminLeadership";
 
-
-/* ============================================================
-   ADMIN PARTNER CMS
-============================================================ */
-
 import AdminUSAfricaTradeNetwork from "./pages/admin/AdminUSAfricaTradeNetwork";
 import AdminCorporatePartners from "./pages/admin/AdminCorporatePartners";
 import AdminGovernmentDevelopment from "./pages/admin/AdminGovernmentDevelopment";
 
-
-/* ============================================================
-   ADMIN PROTECTION
-============================================================ */
-
 import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
 
-
 /* ============================================================
-   GLOBAL SITE CONFIGURATION
+   SITE CONFIGURATION
 ============================================================ */
 
 const SITE_NAME = "Continental Founders";
@@ -145,9 +105,8 @@ const INDEX_ROBOTS =
 const NOINDEX_ROBOTS =
   "noindex, nofollow, noarchive";
 
-
 /* ============================================================
-   STATIC SEO CONFIGURATION
+   STATIC SEO
 ============================================================ */
 
 const SEO_ROUTES = {
@@ -159,10 +118,8 @@ const SEO_ROUTES = {
       "Continental Founders connects African founders with universities, mentors, business leaders, investors, markets, and global opportunity networks.",
 
     canonical: "/",
-
     breadcrumb: [],
   },
-
 
   "/about": {
     title:
@@ -171,8 +128,7 @@ const SEO_ROUTES = {
     description:
       "Learn about Continental Founders, our mission, vision, leadership, principles, and commitment to connecting African founders with global knowledge, networks, markets, and opportunity.",
 
-    canonical:
-      "/about",
+    canonical: "/about",
 
     breadcrumb: [
       {
@@ -182,7 +138,6 @@ const SEO_ROUTES = {
     ],
   },
 
-
   "/ventures": {
     title:
       "African Ventures & Founders | Continental Founders",
@@ -190,8 +145,7 @@ const SEO_ROUTES = {
     description:
       "Discover founders and ventures in the Continental Founders network building practical, scalable solutions across Africa and global markets.",
 
-    canonical:
-      "/ventures",
+    canonical: "/ventures",
 
     breadcrumb: [
       {
@@ -201,7 +155,6 @@ const SEO_ROUTES = {
     ],
   },
 
-
   "/our-model": {
     title:
       "Venture Development Model | Continental Founders",
@@ -209,8 +162,7 @@ const SEO_ROUTES = {
     description:
       "Explore how Continental Founders supports founders through Potential, Preparation, Execution, Evidence, and Opportunity.",
 
-    canonical:
-      "/our-model",
+    canonical: "/our-model",
 
     breadcrumb: [
       {
@@ -220,11 +172,6 @@ const SEO_ROUTES = {
     ],
   },
 
-
-  /* ==========================================================
-     CFCV FELLOWSHIP SEO
-  ========================================================== */
-
   "/cfcv": {
     title:
       "CFCV Fellowship | Continental Founders",
@@ -232,20 +179,15 @@ const SEO_ROUTES = {
     description:
       "Explore Continental Founders Catalytic Ventures, a six-month cross-continental venture-development fellowship connecting founders in Africa and the U.S./diaspora.",
 
-    canonical:
-      "/cfcv",
+    canonical: "/cfcv",
 
     breadcrumb: [
       {
-        name:
-          "CFCV Fellowship",
-
-        path:
-          "/cfcv",
+        name: "CFCV Fellowship",
+        path: "/cfcv",
       },
     ],
   },
-
 
   "/cfcv/apply": {
     title:
@@ -254,58 +196,40 @@ const SEO_ROUTES = {
     description:
       "Apply to the Continental Founders Catalytic Ventures fellowship and begin the CFCV admissions process.",
 
-    canonical:
-      "/cfcv/apply",
+    canonical: "/cfcv/apply",
 
     breadcrumb: [
       {
-        name:
-          "CFCV Fellowship",
-
-        path:
-          "/cfcv",
+        name: "CFCV Fellowship",
+        path: "/cfcv",
       },
-
       {
-        name:
-          "Apply",
-
-        path:
-          "/cfcv/apply",
+        name: "Apply",
+        path: "/cfcv/apply",
       },
     ],
   },
 
-
   "/cfcv/application-success": {
     title:
-      "CFCV Application Submitted | Continental Founders",
+      "CFCV Application Confirmation | Continental Founders",
 
     description:
       "Confirmation of a Continental Founders Catalytic Ventures fellowship application submission.",
 
-    canonical:
-      "/cfcv/application-success",
+    canonical: "/cfcv/application-success",
 
     breadcrumb: [
       {
-        name:
-          "CFCV Fellowship",
-
-        path:
-          "/cfcv",
+        name: "CFCV Fellowship",
+        path: "/cfcv",
       },
-
       {
-        name:
-          "Application Submitted",
-
-        path:
-          "/cfcv/application-success",
+        name: "Application Confirmation",
+        path: "/cfcv/application-success",
       },
     ],
   },
-
 
   "/strategic-partners": {
     title:
@@ -314,20 +238,15 @@ const SEO_ROUTES = {
     description:
       "Explore the Continental Founders partnership ecosystem connecting universities, corporations, institutions, experts, mentors, markets, and global opportunity networks.",
 
-    canonical:
-      "/strategic-partners",
+    canonical: "/strategic-partners",
 
     breadcrumb: [
       {
-        name:
-          "Strategic Partners",
-
-        path:
-          "/strategic-partners",
+        name: "Strategic Partners",
+        path: "/strategic-partners",
       },
     ],
   },
-
 
   "/universities": {
     title:
@@ -336,28 +255,19 @@ const SEO_ROUTES = {
     description:
       "Explore how Continental Founders connects universities, faculty, students, research expertise, and African entrepreneurs through meaningful global partnerships.",
 
-    canonical:
-      "/universities",
+    canonical: "/universities",
 
     breadcrumb: [
       {
-        name:
-          "Strategic Partners",
-
-        path:
-          "/strategic-partners",
+        name: "Strategic Partners",
+        path: "/strategic-partners",
       },
-
       {
-        name:
-          "Universities",
-
-        path:
-          "/universities",
+        name: "Universities",
+        path: "/universities",
       },
     ],
   },
-
 
   "/partners/us-africa-trade-network": {
     title:
@@ -366,28 +276,19 @@ const SEO_ROUTES = {
     description:
       "Explore the Continental Founders U.S.–Africa Trade & Business Network connecting founders, business leaders, markets, expertise, and commercial opportunity.",
 
-    canonical:
-      "/partners/us-africa-trade-network",
+    canonical: "/partners/us-africa-trade-network",
 
     breadcrumb: [
       {
-        name:
-          "Strategic Partners",
-
-        path:
-          "/strategic-partners",
+        name: "Strategic Partners",
+        path: "/strategic-partners",
       },
-
       {
-        name:
-          "U.S.–Africa Trade & Business Network",
-
-        path:
-          "/partners/us-africa-trade-network",
+        name: "U.S.–Africa Trade & Business Network",
+        path: "/partners/us-africa-trade-network",
       },
     ],
   },
-
 
   "/partners/corporate": {
     title:
@@ -396,28 +297,19 @@ const SEO_ROUTES = {
     description:
       "Explore corporate partnerships with Continental Founders supporting entrepreneurs through expertise, mentorship, technology, markets, business networks, and commercial collaboration.",
 
-    canonical:
-      "/partners/corporate",
+    canonical: "/partners/corporate",
 
     breadcrumb: [
       {
-        name:
-          "Strategic Partners",
-
-        path:
-          "/strategic-partners",
+        name: "Strategic Partners",
+        path: "/strategic-partners",
       },
-
       {
-        name:
-          "Corporate Partners",
-
-        path:
-          "/partners/corporate",
+        name: "Corporate Partners",
+        path: "/partners/corporate",
       },
     ],
   },
-
 
   "/partners/government-development": {
     title:
@@ -426,28 +318,19 @@ const SEO_ROUTES = {
     description:
       "Explore how Continental Founders works with government and development institutions to strengthen entrepreneurship, innovation, market access, and economic opportunity.",
 
-    canonical:
-      "/partners/government-development",
+    canonical: "/partners/government-development",
 
     breadcrumb: [
       {
-        name:
-          "Strategic Partners",
-
-        path:
-          "/strategic-partners",
+        name: "Strategic Partners",
+        path: "/strategic-partners",
       },
-
       {
-        name:
-          "Government & Development Institutions",
-
-        path:
-          "/partners/government-development",
+        name: "Government & Development Institutions",
+        path: "/partners/government-development",
       },
     ],
   },
-
 
   "/programs": {
     title:
@@ -456,20 +339,15 @@ const SEO_ROUTES = {
     description:
       "Explore Continental Founders programs connecting entrepreneurs with mentorship, universities, industry expertise, markets, business networks, and global opportunity.",
 
-    canonical:
-      "/programs",
+    canonical: "/programs",
 
     breadcrumb: [
       {
-        name:
-          "Programs",
-
-        path:
-          "/programs",
+        name: "Programs",
+        path: "/programs",
       },
     ],
   },
-
 
   "/impact": {
     title:
@@ -478,20 +356,15 @@ const SEO_ROUTES = {
     description:
       "Explore the impact of Continental Founders across entrepreneurship, founder development, university partnerships, innovation, markets, and global opportunity networks.",
 
-    canonical:
-      "/impact",
+    canonical: "/impact",
 
     breadcrumb: [
       {
-        name:
-          "Impact",
-
-        path:
-          "/impact",
+        name: "Impact",
+        path: "/impact",
       },
     ],
   },
-
 
   "/events": {
     title:
@@ -500,20 +373,15 @@ const SEO_ROUTES = {
     description:
       "Discover Continental Founders events bringing together founders, universities, investors, business leaders, mentors, institutions, and strategic partners.",
 
-    canonical:
-      "/events",
+    canonical: "/events",
 
     breadcrumb: [
       {
-        name:
-          "Events",
-
-        path:
-          "/events",
+        name: "Events",
+        path: "/events",
       },
     ],
   },
-
 
   "/insights": {
     title:
@@ -522,20 +390,15 @@ const SEO_ROUTES = {
     description:
       "Read Continental Founders insights on entrepreneurship, venture development, innovation, university partnerships, markets, leadership, and global opportunity.",
 
-    canonical:
-      "/insights",
+    canonical: "/insights",
 
     breadcrumb: [
       {
-        name:
-          "Insights",
-
-        path:
-          "/insights",
+        name: "Insights",
+        path: "/insights",
       },
     ],
   },
-
 
   "/gallery": {
     title:
@@ -544,28 +407,19 @@ const SEO_ROUTES = {
     description:
       "Explore moments from Continental Founders events, founder programs, partnerships, university engagements, community activities, and global collaborations.",
 
-    canonical:
-      "/gallery",
+    canonical: "/gallery",
 
     breadcrumb: [
       {
-        name:
-          "Insights",
-
-        path:
-          "/insights",
+        name: "Insights",
+        path: "/insights",
       },
-
       {
-        name:
-          "Gallery",
-
-        path:
-          "/gallery",
+        name: "Gallery",
+        path: "/gallery",
       },
     ],
   },
-
 
   "/contact": {
     title:
@@ -574,60 +428,43 @@ const SEO_ROUTES = {
     description:
       "Contact Continental Founders about partnerships, founder opportunities, university collaboration, strategic engagement, and participation in our global network.",
 
-    canonical:
-      "/contact",
+    canonical: "/contact",
 
     breadcrumb: [
       {
-        name:
-          "Contact",
-
-        path:
-          "/contact",
+        name: "Contact",
+        path: "/contact",
       },
     ],
   },
 };
-
 
 /* ============================================================
    PATH HELPERS
 ============================================================ */
 
 function normalizePath(pathname) {
-  if (
-    !pathname ||
-    pathname === "/"
-  ) {
+  if (!pathname || pathname === "/") {
     return "/";
   }
 
-  return pathname.replace(
-    /\/+$/,
-    ""
-  );
+  return pathname.replace(/\/+$/, "") || "/";
 }
 
-
 function buildCanonicalUrl(path) {
-  if (
-    !path ||
-    path === "/"
-  ) {
+  if (!path || path === "/") {
     return `${SITE_URL}/`;
   }
 
-  const cleanPath =
-    path.startsWith("/")
-      ? path
-      : `/${path}`;
+  const cleanPath = path.startsWith("/")
+    ? path
+    : `/${path}`;
 
   return `${SITE_URL}${cleanPath}`;
 }
 
-
 /* ============================================================
-   META HELPERS
+   META TAG HELPERS
 ============================================================ */
 
 function setMetaTag(
@@ -637,99 +474,57 @@ function setMetaTag(
   content
 ) {
   let element =
-    document.head.querySelector(
-      selector
-    );
+    document.head.querySelector(selector);
 
   if (!element) {
-    element =
-      document.createElement(
-        "meta"
-      );
+    element = document.createElement("meta");
 
     element.setAttribute(
       attributeName,
       attributeValue
     );
 
-    document.head.appendChild(
-      element
-    );
+    document.head.appendChild(element);
   }
 
-  element.setAttribute(
-    "content",
-    content
-  );
+  element.setAttribute("content", content);
 }
 
-
-function removeMetaTag(
-  selector
-) {
+function removeMetaTag(selector) {
   const element =
-    document.head.querySelector(
-      selector
-    );
+    document.head.querySelector(selector);
 
   if (element) {
     element.remove();
   }
 }
 
-
-/* ============================================================
-   CANONICAL
-============================================================ */
-
 function setCanonical(url) {
-  let canonical =
-    document.head.querySelector(
-      'link[rel="canonical"]'
-    );
+  let canonical = document.head.querySelector(
+    'link[rel="canonical"]'
+  );
 
   if (!canonical) {
-    canonical =
-      document.createElement(
-        "link"
-      );
+    canonical = document.createElement("link");
+    canonical.setAttribute("rel", "canonical");
 
-    canonical.setAttribute(
-      "rel",
-      "canonical"
-    );
-
-    document.head.appendChild(
-      canonical
-    );
+    document.head.appendChild(canonical);
   }
 
-  canonical.setAttribute(
-    "href",
-    url
-  );
+  canonical.setAttribute("href", url);
 }
 
-
 function removeCanonical() {
-  const canonical =
-    document.head.querySelector(
-      'link[rel="canonical"]'
-    );
+  const canonical = document.head.querySelector(
+    'link[rel="canonical"]'
+  );
 
   if (canonical) {
     canonical.remove();
   }
 }
 
-
-/* ============================================================
-   DESCRIPTION
-============================================================ */
-
-function setDescription(
-  description
-) {
+function setDescription(description) {
   setMetaTag(
     'meta[name="description"]',
     "name",
@@ -737,11 +532,6 @@ function setDescription(
     description
   );
 }
-
-
-/* ============================================================
-   ROBOTS
-============================================================ */
 
 function setRobots(value) {
   setMetaTag(
@@ -758,7 +548,6 @@ function setRobots(value) {
     value
   );
 }
-
 
 /* ============================================================
    OPEN GRAPH
@@ -842,9 +631,8 @@ function setOpenGraph({
   );
 }
 
-
 /* ============================================================
-   X / TWITTER
+   TWITTER / X
 ============================================================ */
 
 function setTwitterMeta({
@@ -888,62 +676,35 @@ function setTwitterMeta({
   );
 }
 
-
 /* ============================================================
-   STRUCTURED DATA HELPERS
+   STRUCTURED DATA
 ============================================================ */
 
-function setStructuredData(
-  id,
-  data
-) {
-  let script =
-    document.getElementById(id);
+function setStructuredData(id, data) {
+  let script = document.getElementById(id);
 
   if (!script) {
-    script =
-      document.createElement(
-        "script"
-      );
+    script = document.createElement("script");
 
     script.id = id;
+    script.type = "application/ld+json";
 
-    script.type =
-      "application/ld+json";
-
-    document.head.appendChild(
-      script
-    );
+    document.head.appendChild(script);
   }
 
-  script.textContent =
-    JSON.stringify(data);
+  script.textContent = JSON.stringify(data);
 }
 
-
-function removeStructuredData(
-  id
-) {
-  const script =
-    document.getElementById(id);
+function removeStructuredData(id) {
+  const script = document.getElementById(id);
 
   if (script) {
     script.remove();
   }
 }
 
-
-/* ============================================================
-   BREADCRUMB STRUCTURED DATA
-============================================================ */
-
-function setBreadcrumbData(
-  items = []
-) {
-  if (
-    !items ||
-    items.length === 0
-  ) {
+function setBreadcrumbData(items = []) {
+  if (!items || items.length === 0) {
     removeStructuredData(
       "cf-breadcrumb-schema"
     );
@@ -953,162 +714,90 @@ function setBreadcrumbData(
 
   const breadcrumbItems = [
     {
-      name:
-        "Continental Founders",
-
-      path:
-        "/",
+      name: "Continental Founders",
+      path: "/",
     },
-
     ...items,
   ];
 
-  const data = {
-    "@context":
-      "https://schema.org",
-
-    "@type":
-      "BreadcrumbList",
-
-    itemListElement:
-      breadcrumbItems.map(
-        (
-          item,
-          index
-        ) => ({
-          "@type":
-            "ListItem",
-
-          position:
-            index + 1,
-
-          name:
-            item.name,
-
-          item:
-            buildCanonicalUrl(
-              item.path
-            ),
-        })
-      ),
-  };
-
   setStructuredData(
     "cf-breadcrumb-schema",
-    data
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+
+      itemListElement: breadcrumbItems.map(
+        (item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: buildCanonicalUrl(item.path),
+        })
+      ),
+    }
   );
 }
-
-
-/* ============================================================
-   ORGANIZATION STRUCTURED DATA
-============================================================ */
 
 function setOrganizationData() {
-  const data = {
-    "@context":
-      "https://schema.org",
-
-    "@type":
-      "Organization",
-
-    "@id":
-      `${SITE_URL}/#organization`,
-
-    name:
-      SITE_NAME,
-
-    url:
-      `${SITE_URL}/`,
-
-    logo:
-      SOCIAL_IMAGE,
-
-    description:
-      DEFAULT_DESCRIPTION,
-
-    areaServed: [
-      {
-        "@type":
-          "Continent",
-
-        name:
-          "Africa",
-      },
-
-      {
-        "@type":
-          "Country",
-
-        name:
-          "United States",
-      },
-    ],
-
-    knowsAbout: [
-      "Entrepreneurship",
-      "Venture Development",
-      "Innovation",
-      "University Partnerships",
-      "Founder Development",
-      "Mentorship",
-      "Business Partnerships",
-      "Market Access",
-      "Leadership Development",
-      "International Collaboration",
-    ],
-  };
-
   setStructuredData(
     "cf-organization-schema",
-    data
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: SOCIAL_IMAGE,
+      description: DEFAULT_DESCRIPTION,
+
+      areaServed: [
+        {
+          "@type": "Continent",
+          name: "Africa",
+        },
+        {
+          "@type": "Country",
+          name: "United States",
+        },
+      ],
+
+      knowsAbout: [
+        "Entrepreneurship",
+        "Venture Development",
+        "Innovation",
+        "University Partnerships",
+        "Founder Development",
+        "Mentorship",
+        "Business Partnerships",
+        "Market Access",
+        "Leadership Development",
+        "International Collaboration",
+      ],
+    }
   );
 }
-
-
-/* ============================================================
-   WEBSITE STRUCTURED DATA
-============================================================ */
 
 function setWebsiteData() {
-  const data = {
-    "@context":
-      "https://schema.org",
-
-    "@type":
-      "WebSite",
-
-    "@id":
-      `${SITE_URL}/#website`,
-
-    url:
-      `${SITE_URL}/`,
-
-    name:
-      SITE_NAME,
-
-    description:
-      DEFAULT_DESCRIPTION,
-
-    publisher: {
-      "@id":
-        `${SITE_URL}/#organization`,
-    },
-
-    inLanguage:
-      "en-US",
-  };
-
   setStructuredData(
     "cf-website-schema",
-    data
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      description: DEFAULT_DESCRIPTION,
+
+      publisher: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+
+      inLanguage: "en-US",
+    }
   );
 }
-
-
-/* ============================================================
-   WEB PAGE STRUCTURED DATA
-============================================================ */
 
 function setWebPageData({
   title,
@@ -1116,49 +805,33 @@ function setWebPageData({
   canonicalUrl,
   type = "WebPage",
 }) {
-  const data = {
-    "@context":
-      "https://schema.org",
-
-    "@type":
-      type,
-
-    "@id":
-      `${canonicalUrl}#webpage`,
-
-    url:
-      canonicalUrl,
-
-    name:
-      title,
-
-    description,
-
-    isPartOf: {
-      "@id":
-        `${SITE_URL}/#website`,
-    },
-
-    about: {
-      "@id":
-        `${SITE_URL}/#organization`,
-    },
-
-    publisher: {
-      "@id":
-        `${SITE_URL}/#organization`,
-    },
-
-    inLanguage:
-      "en-US",
-  };
-
   setStructuredData(
     "cf-webpage-schema",
-    data
+    {
+      "@context": "https://schema.org",
+      "@type": type,
+      "@id": `${canonicalUrl}#webpage`,
+
+      url: canonicalUrl,
+      name: title,
+      description,
+
+      isPartOf: {
+        "@id": `${SITE_URL}/#website`,
+      },
+
+      about: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+
+      publisher: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+
+      inLanguage: "en-US",
+    }
   );
 }
-
 
 /* ============================================================
    APPLY PUBLIC SEO
@@ -1174,74 +847,43 @@ function applyPublicSEO({
   breadcrumbs = [],
 }) {
   const finalTitle =
-    title ||
-    DEFAULT_TITLE;
+    title || DEFAULT_TITLE;
 
   const finalDescription =
-    description ||
-    DEFAULT_DESCRIPTION;
+    description || DEFAULT_DESCRIPTION;
 
-  document.title =
-    finalTitle;
+  document.title = finalTitle;
 
-  setDescription(
-    finalDescription
-  );
-
-  setRobots(
-    INDEX_ROBOTS
-  );
-
-  setCanonical(
-    canonicalUrl
-  );
+  setDescription(finalDescription);
+  setRobots(INDEX_ROBOTS);
+  setCanonical(canonicalUrl);
 
   setOpenGraph({
-    title:
-      finalTitle,
-
-    description:
-      finalDescription,
-
+    title: finalTitle,
+    description: finalDescription,
     canonicalUrl,
-
     type,
-
     image,
   });
 
   setTwitterMeta({
-    title:
-      finalTitle,
-
-    description:
-      finalDescription,
-
+    title: finalTitle,
+    description: finalDescription,
     image,
   });
 
   setOrganizationData();
-
   setWebsiteData();
 
   setWebPageData({
-    title:
-      finalTitle,
-
-    description:
-      finalDescription,
-
+    title: finalTitle,
+    description: finalDescription,
     canonicalUrl,
-
-    type:
-      schemaType,
+    type: schemaType,
   });
 
-  setBreadcrumbData(
-    breadcrumbs
-  );
+  setBreadcrumbData(breadcrumbs);
 }
-
 
 /* ============================================================
    APPLY NOINDEX SEO
@@ -1252,143 +894,91 @@ function applyNoIndexSEO({
   description,
   robots = NOINDEX_ROBOTS,
 }) {
-  document.title =
-    title;
+  document.title = title;
 
-  setDescription(
-    description
-  );
-
-  setRobots(
-    robots
-  );
+  setDescription(description);
+  setRobots(robots);
 
   removeCanonical();
 
-  removeMetaTag(
-    'meta[property="og:url"]'
-  );
+  document.head
+    .querySelectorAll(
+      'meta[property^="og:"], meta[name^="twitter:"]'
+    )
+    .forEach((element) => {
+      element.remove();
+    });
 
-  removeMetaTag(
-    'meta[property="og:title"]'
-  );
-
-  removeMetaTag(
-    'meta[property="og:description"]'
-  );
-
-  removeMetaTag(
-    'meta[property="og:image"]'
-  );
-
-  removeMetaTag(
-    'meta[property="og:image:secure_url"]'
-  );
-
-  removeMetaTag(
-    'meta[name="twitter:title"]'
-  );
-
-  removeMetaTag(
-    'meta[name="twitter:description"]'
-  );
-
-  removeMetaTag(
-    'meta[name="twitter:image"]'
-  );
-
-  removeStructuredData(
-    "cf-breadcrumb-schema"
-  );
-
-  removeStructuredData(
-    "cf-webpage-schema"
-  );
+  [
+    "cf-breadcrumb-schema",
+    "cf-webpage-schema",
+    "cf-organization-schema",
+    "cf-website-schema",
+  ].forEach(removeStructuredData);
 }
 
-
 /* ============================================================
-   GLOBAL SEO MANAGER
+   SEO MANAGER
 ============================================================ */
 
 function SEOManager() {
-  const { pathname } =
-    useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const cleanPath =
-      normalizePath(
-        pathname
-      );
+      normalizePath(pathname);
 
-
-    /* ========================================================
-       ADMIN
-    ======================================================== */
-
+    // Admin pages
     if (
       cleanPath === "/admin" ||
-      cleanPath.startsWith(
-        "/admin/"
-      )
+      cleanPath.startsWith("/admin/")
     ) {
       applyNoIndexSEO({
-        title:
-          `Admin | ${SITE_NAME}`,
-
+        title: `Admin | ${SITE_NAME}`,
         description:
           "Continental Founders administration.",
-
-        robots:
-          NOINDEX_ROBOTS,
       });
 
       return;
     }
 
-
-    /* ========================================================
-       DYNAMIC VENTURE
-    ======================================================== */
-
+    // Confirmation is a receipt page, not a search landing page.
     if (
-      cleanPath.startsWith(
-        "/ventures/"
-      )
+      cleanPath === "/cfcv/application-success"
     ) {
-      applyPublicSEO({
+      applyNoIndexSEO({
         title:
-          `Venture | ${SITE_NAME}`,
+          "CFCV Application Confirmation | Continental Founders",
+
+        description:
+          "View your CFCV application submission confirmation.",
+      });
+
+      return;
+    }
+
+    // Dynamic venture
+    if (cleanPath.startsWith("/ventures/")) {
+      applyPublicSEO({
+        title: `Venture | ${SITE_NAME}`,
 
         description:
           "Explore a venture in the Continental Founders network and discover the founders, solutions, markets, and opportunities behind the business.",
 
         canonicalUrl:
-          buildCanonicalUrl(
-            cleanPath
-          ),
+          buildCanonicalUrl(cleanPath),
 
-        type:
-          "website",
-
-        schemaType:
-          "WebPage",
+        type: "website",
+        schemaType: "WebPage",
 
         breadcrumbs: [
           {
-            name:
-              "Ventures",
-
-            path:
-              "/ventures",
+            name: "Ventures",
+            path: "/ventures",
           },
-
           {
-            name:
-              "Venture",
-
-            path:
-              cleanPath,
+            name: "Venture",
+            path: cleanPath,
           },
         ],
       });
@@ -1396,49 +986,28 @@ function SEOManager() {
       return;
     }
 
-
-    /* ========================================================
-       DYNAMIC EVENT
-    ======================================================== */
-
-    if (
-      cleanPath.startsWith(
-        "/events/"
-      )
-    ) {
+    // Dynamic event
+    if (cleanPath.startsWith("/events/")) {
       applyPublicSEO({
-        title:
-          `Event | ${SITE_NAME}`,
+        title: `Event | ${SITE_NAME}`,
 
         description:
           "Explore a Continental Founders event bringing together founders, universities, business leaders, mentors, institutions, and strategic partners.",
 
         canonicalUrl:
-          buildCanonicalUrl(
-            cleanPath
-          ),
+          buildCanonicalUrl(cleanPath),
 
-        type:
-          "website",
-
-        schemaType:
-          "WebPage",
+        type: "website",
+        schemaType: "WebPage",
 
         breadcrumbs: [
           {
-            name:
-              "Events",
-
-            path:
-              "/events",
+            name: "Events",
+            path: "/events",
           },
-
           {
-            name:
-              "Event",
-
-            path:
-              cleanPath,
+            name: "Event",
+            path: cleanPath,
           },
         ],
       });
@@ -1446,49 +1015,28 @@ function SEOManager() {
       return;
     }
 
-
-    /* ========================================================
-       DYNAMIC INSIGHT
-    ======================================================== */
-
-    if (
-      cleanPath.startsWith(
-        "/insights/"
-      )
-    ) {
+    // Dynamic insight
+    if (cleanPath.startsWith("/insights/")) {
       applyPublicSEO({
-        title:
-          `Insight | ${SITE_NAME}`,
+        title: `Insight | ${SITE_NAME}`,
 
         description:
           "Read insights from Continental Founders on entrepreneurship, innovation, venture development, markets, partnerships, leadership, and global opportunity.",
 
         canonicalUrl:
-          buildCanonicalUrl(
-            cleanPath
-          ),
+          buildCanonicalUrl(cleanPath),
 
-        type:
-          "article",
-
-        schemaType:
-          "Article",
+        type: "article",
+        schemaType: "Article",
 
         breadcrumbs: [
           {
-            name:
-              "Insights",
-
-            path:
-              "/insights",
+            name: "Insights",
+            path: "/insights",
           },
-
           {
-            name:
-              "Insight",
-
-            path:
-              cleanPath,
+            name: "Insight",
+            path: cleanPath,
           },
         ],
       });
@@ -1496,21 +1044,9 @@ function SEOManager() {
       return;
     }
 
+    const seo = SEO_ROUTES[cleanPath];
 
-    /* ========================================================
-       STATIC PAGE
-    ======================================================== */
-
-    const seo =
-      SEO_ROUTES[
-        cleanPath
-      ];
-
-
-    /* ========================================================
-       404
-    ======================================================== */
-
+    // Unknown route
     if (!seo) {
       applyNoIndexSEO({
         title:
@@ -1519,47 +1055,32 @@ function SEOManager() {
         description:
           "The requested page could not be found on the Continental Founders website.",
 
-        robots:
-          "noindex, follow",
+        robots: "noindex, follow",
       });
 
       return;
     }
 
-
-    /* ========================================================
-       APPLY STATIC SEO
-    ======================================================== */
-
     applyPublicSEO({
-      title:
-        seo.title,
-
-      description:
-        seo.description,
+      title: seo.title,
+      description: seo.description,
 
       canonicalUrl:
-        buildCanonicalUrl(
-          seo.canonical
-        ),
+        buildCanonicalUrl(seo.canonical),
 
-      breadcrumbs:
-        seo.breadcrumb ||
-        [],
+      breadcrumbs: seo.breadcrumb || [],
     });
   }, [pathname]);
 
   return null;
 }
 
-
 /* ============================================================
-   SCROLL TO TOP
+   SCROLL
 ============================================================ */
 
 function ScrollToTop() {
-  const { pathname } =
-    useLocation();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo({
@@ -1572,20 +1093,24 @@ function ScrollToTop() {
   return null;
 }
 
-
 /* ============================================================
    APP
 ============================================================ */
 
 export default function App() {
-  const { pathname } =
-    useLocation();
+  const { pathname } = useLocation();
+
+  const cleanPath =
+    normalizePath(pathname);
 
   const isAdminRoute =
-    pathname === "/admin" ||
-    pathname.startsWith(
-      "/admin/"
-    );
+    cleanPath === "/admin" ||
+    cleanPath.startsWith("/admin/");
+
+  const showPromotionalPopup =
+    !isAdminRoute &&
+    cleanPath !== "/cfcv/apply" &&
+    cleanPath !== "/cfcv/application-success";
 
   return (
     <div
@@ -1596,24 +1121,11 @@ export default function App() {
       }
     >
       <ScrollToTop />
-
       <SEOManager />
 
+      {!isAdminRoute && <Navbar />}
 
-      {/* =====================================================
-          PUBLIC NAVIGATION
-      ====================================================== */}
-
-      {!isAdminRoute && (
-        <Navbar />
-      )}
-
-
-      {/* =====================================================
-          MAIN APPLICATION
-      ====================================================== */}
-
-      <main
+      <div
         id="main-content"
         className={
           isAdminRoute
@@ -1623,455 +1135,232 @@ export default function App() {
       >
         <PageTransition>
           <Routes>
-
-            {/* =================================================
-                HOME
-            ================================================= */}
+            {/* PUBLIC */}
 
             <Route
               path="/"
-              element={
-                <Home />
-              }
+              element={<Home />}
             />
-
-
-            {/* =================================================
-                ABOUT
-            ================================================= */}
 
             <Route
               path="/about"
-              element={
-                <About />
-              }
+              element={<About />}
             />
-
-
-            {/* =================================================
-                VENTURES
-            ================================================= */}
 
             <Route
               path="/ventures"
-              element={
-                <Ventures />
-              }
+              element={<Ventures />}
             />
 
             <Route
               path="/ventures/:slug"
-              element={
-                <VentureDetails />
-              }
+              element={<VentureDetails />}
             />
-
-
-            {/* =================================================
-                OUR MODEL
-            ================================================= */}
 
             <Route
               path="/our-model"
-              element={
-                <OurModel />
-              }
+              element={<OurModel />}
             />
 
-
-            {/* =================================================
-                CFCV FELLOWSHIP
-            ================================================= */}
+            {/* CFCV */}
 
             <Route
               path="/cfcv"
-              element={
-                <CFCV />
-              }
+              element={<CFCV />}
             />
 
             <Route
               path="/cfcv/apply"
-              element={
-                <CFCVApply />
-              }
+              element={<CFCVApply />}
             />
 
             <Route
               path="/cfcv/application-success"
-              element={
-                <CFCVApplicationSuccess />
-              }
+              element={<CFCVApplicationSuccess />}
             />
 
-
-            {/* =================================================
-                UNIVERSITIES
-            ================================================= */}
+            {/* PARTNERS */}
 
             <Route
               path="/universities"
-              element={
-                <Universities />
-              }
+              element={<Universities />}
             />
-
-
-            {/* =================================================
-                STRATEGIC PARTNERS
-            ================================================= */}
 
             <Route
               path="/strategic-partners"
-              element={
-                <StrategicPartners />
-              }
+              element={<StrategicPartners />}
             />
-
-
-            {/* =================================================
-                PARTNER SUBPAGES
-            ================================================= */}
 
             <Route
               path="/partners/us-africa-trade-network"
-              element={
-                <USAfricaTradeNetwork />
-              }
+              element={<USAfricaTradeNetwork />}
             />
 
             <Route
               path="/partners/corporate"
-              element={
-                <CorporatePartners />
-              }
+              element={<CorporatePartners />}
             />
 
             <Route
               path="/partners/government-development"
-              element={
-                <GovernmentDevelopment />
-              }
+              element={<GovernmentDevelopment />}
             />
 
-
-            {/* =================================================
-                PROGRAMS
-            ================================================= */}
+            {/* OTHER PUBLIC PAGES */}
 
             <Route
               path="/programs"
-              element={
-                <Programs />
-              }
+              element={<Programs />}
             />
-
-
-            {/* =================================================
-                IMPACT
-            ================================================= */}
 
             <Route
               path="/impact"
-              element={
-                <Impact />
-              }
+              element={<Impact />}
             />
-
-
-            {/* =================================================
-                EVENTS
-            ================================================= */}
 
             <Route
               path="/events"
-              element={
-                <Events />
-              }
+              element={<Events />}
             />
 
             <Route
               path="/events/:slug"
-              element={
-                <EventDetails />
-              }
+              element={<EventDetails />}
             />
-
-
-            {/* =================================================
-                INSIGHTS
-            ================================================= */}
 
             <Route
               path="/insights"
-              element={
-                <Insights />
-              }
+              element={<Insights />}
             />
 
             <Route
               path="/insights/:slug"
-              element={
-                <InsightDetails />
-              }
+              element={<InsightDetails />}
             />
-
-
-            {/* =================================================
-                GALLERY
-            ================================================= */}
 
             <Route
               path="/gallery"
-              element={
-                <Gallery />
-              }
+              element={<Gallery />}
             />
-
-
-            {/* =================================================
-                CONTACT
-            ================================================= */}
 
             <Route
               path="/contact"
-              element={
-                <Contact />
-              }
+              element={<Contact />}
             />
 
-
-            {/* =================================================
-                ADMIN AUTH
-            ================================================= */}
+            {/* ADMIN AUTH */}
 
             <Route
               path="/admin/register"
-              element={
-                <AdminRegister />
-              }
+              element={<AdminRegister />}
             />
 
             <Route
               path="/admin/login"
-              element={
-                <AdminLogin />
-              }
+              element={<AdminLogin />}
             />
 
             <Route
               path="/admin/verify-otp"
-              element={
-                <AdminOtp />
-              }
+              element={<AdminOtp />}
             />
 
-
-            {/* =================================================
-                PROTECTED ADMIN
-            ================================================= */}
+            {/* PROTECTED ADMIN */}
 
             <Route
-              element={
-                <ProtectedAdminRoute />
-              }
+              element={<ProtectedAdminRoute />}
             >
               <Route
                 path="/admin"
-                element={
-                  <AdminLayout />
-                }
+                element={<AdminLayout />}
               >
-
-                {/* =============================================
-                    DASHBOARD
-                ============================================= */}
-
                 <Route
                   index
-                  element={
-                    <AdminDashboard />
-                  }
+                  element={<AdminDashboard />}
                 />
-
-
-                {/* =============================================
-                    CFCV ADMISSIONS
-                ============================================= */}
 
                 <Route
                   path="cfcv"
-                  element={
-                    <AdminCFCV />
-                  }
+                  element={<AdminCFCV />}
                 />
-
-
-                {/* =============================================
-                    VENTURES
-                ============================================= */}
 
                 <Route
                   path="ventures"
-                  element={
-                    <AdminVentures />
-                  }
+                  element={<AdminVentures />}
                 />
-
-
-                {/* =============================================
-                    EVENTS
-                ============================================= */}
 
                 <Route
                   path="events"
-                  element={
-                    <AdminEvents />
-                  }
+                  element={<AdminEvents />}
                 />
-
-
-                {/* =============================================
-                    INSIGHTS
-                ============================================= */}
 
                 <Route
                   path="insights"
-                  element={
-                    <AdminInsights />
-                  }
+                  element={<AdminInsights />}
                 />
-
-
-                {/* =============================================
-                    GALLERY
-                ============================================= */}
 
                 <Route
                   path="gallery"
-                  element={
-                    <AdminGallery />
-                  }
+                  element={<AdminGallery />}
                 />
-
-
-                {/* =============================================
-                    UNIVERSITIES
-                ============================================= */}
 
                 <Route
                   path="universities"
-                  element={
-                    <AdminUniversities />
-                  }
+                  element={<AdminUniversities />}
                 />
-
-
-                {/* =============================================
-                    PARTNERS
-                ============================================= */}
 
                 <Route
                   path="partners/us-africa-trade-network"
-                  element={
-                    <AdminUSAfricaTradeNetwork />
-                  }
+                  element={<AdminUSAfricaTradeNetwork />}
                 />
 
                 <Route
                   path="partners/corporate"
-                  element={
-                    <AdminCorporatePartners />
-                  }
+                  element={<AdminCorporatePartners />}
                 />
 
                 <Route
                   path="partners/government-development"
-                  element={
-                    <AdminGovernmentDevelopment />
-                  }
+                  element={<AdminGovernmentDevelopment />}
                 />
-
-
-                {/* =============================================
-                    NEWSLETTER
-                ============================================= */}
 
                 <Route
                   path="newsletter"
-                  element={
-                    <AdminNewsletter />
-                  }
+                  element={<AdminNewsletter />}
                 />
-
-
-                {/* =============================================
-                    CONTACTS
-                ============================================= */}
 
                 <Route
                   path="contacts"
-                  element={
-                    <AdminContacts />
-                  }
+                  element={<AdminContacts />}
                 />
-
-
-                {/* =============================================
-                    ORGANIZATION
-                ============================================= */}
 
                 <Route
                   path="about"
-                  element={
-                    <AdminAbout />
-                  }
+                  element={<AdminAbout />}
                 />
 
                 <Route
                   path="leadership"
-                  element={
-                    <AdminLeadership />
-                  }
+                  element={<AdminLeadership />}
                 />
-
               </Route>
             </Route>
 
-
-            {/* =================================================
-                404
-            ================================================= */}
+            {/* NOT FOUND */}
 
             <Route
               path="*"
-              element={
-                <NotFound />
-              }
+              element={<NotFound />}
             />
-
           </Routes>
         </PageTransition>
-      </main>
+      </div>
 
+      {!isAdminRoute && <Footer />}
 
-      {/* =====================================================
-          PUBLIC FOOTER
-      ====================================================== */}
-
-      {!isAdminRoute && (
-        <Footer />
-      )}
-
-
-      {/* =====================================================
-          ETH TECH SOLUTIONS PROMOTIONAL POPUP
-      ====================================================== */}
-
-      {!isAdminRoute && (
+      {showPromotionalPopup && (
         <EthTechPopup />
       )}
-
     </div>
   );
 }

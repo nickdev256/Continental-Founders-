@@ -1,26 +1,30 @@
-const crypto = require("crypto");
-const path = require("path");
+const crypto = require("node:crypto");
+const path = require("node:path");
 
 const {
-  supabaseAdmin,
+  supabaseAdmin: db,
 } = require("../config/supabase");
 
-/* ============================================================
-   CONFIGURATION
-============================================================ */
+// ============================================================
+// CONFIGURATION
+// ============================================================
 
 const CFCV_TABLE = "cfcv_applications";
+const HISTORY_TABLE = "cfcv_application_history";
+const EMAIL_TABLE = "cfcv_email_jobs";
 
-const CFCV_RESUMES_BUCKET = String(
+const RESUME_BUCKET = String(
   process.env.CFCV_RESUMES_BUCKET || "cfcv-resumes"
 ).trim();
 
 const MAX_RESUME_SIZE = 5 * 1024 * 1024;
-const RESUME_SIGNED_URL_SECONDS = 5 * 60;
 
-/* ============================================================
-   VALID VALUES
-============================================================ */
+const UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// ============================================================
+// VALID VALUES
+// ============================================================
 
 const VALID_GEOGRAPHIES = new Set([
   "Africa",
@@ -39,10 +43,7 @@ const VALID_TEAM_STATUSES = new Set([
   "Existing team",
 ]);
 
-const VALID_YES_NO = new Set([
-  "Yes",
-  "No",
-]);
+const VALID_YES_NO = new Set(["Yes", "No"]);
 
 const VALID_ADMISSIONS_STAGES = new Set([
   "applied",
@@ -101,356 +102,585 @@ const ALLOWED_RESUME_TYPES = new Set([
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 
-/* ============================================================
-   BASIC HELPERS
-============================================================ */
+// ============================================================
+// PUBLIC FORM FIELDS
+//
+// [database column, maximum text length]
+// ============================================================
 
-function cleanString(value, maxLength = 5000) {
+const PUBLIC_FIELDS = {
+  firstName: ["first_name", 120],
+  lastName: ["last_name", 120],
+  email: ["email", 320],
+  phone: ["phone", 50],
+  country: ["country", 120],
+  city: ["city", 120],
+  geography: ["geography", 50],
+
+  professionalBackground: [
+    "professional_background",
+    5000,
+  ],
+
+  relevantSkills: ["relevant_skills", 5000],
+
+  entrepreneurshipReason: [
+    "entrepreneurship_reason",
+    5000,
+  ],
+
+  ventureName: ["venture_name", 200],
+  sector: ["sector", 160],
+  ventureDescription: ["venture_description", 5000],
+  problem: ["problem", 5000],
+  solution: ["solution", 5000],
+  ventureStage: ["venture_stage", 120],
+  currentProgress: ["current_progress", 5000],
+  targetMarket: ["target_market", 5000],
+  customerDescription: ["customer_description", 5000],
+
+  teamStatus: ["team_status", 80],
+  teamDescription: ["team_description", 5000],
+
+  existingCrossContinentalTeam: [
+    "existing_cross_continental_team",
+    10,
+  ],
+
+  collaboratorNeeds: ["collaborator_needs", 5000],
+  marketKnowledge: ["market_knowledge", 5000],
+
+  geographicConnections: [
+    "geographic_connections",
+    5000,
+  ],
+
+  workingStyle: ["working_style", 5000],
+  leadershipStrengths: ["leadership_strengths", 5000],
+  longTermObjectives: ["long_term_objectives", 5000],
+  timeCommitment: ["time_commitment", 5000],
+  decisionMaking: ["decision_making", 5000],
+  ownershipExpectations: ["ownership_expectations", 5000],
+  sixMonthGoals: ["six_month_goals", 5000],
+};
+
+const REQUIRED_FIELDS = [
+  "firstName",
+  "lastName",
+  "email",
+  "country",
+  "geography",
+  "professionalBackground",
+  "relevantSkills",
+  "ventureDescription",
+  "problem",
+  "solution",
+  "ventureStage",
+  "currentProgress",
+  "targetMarket",
+  "teamStatus",
+  "existingCrossContinentalTeam",
+  "workingStyle",
+  "longTermObjectives",
+  "timeCommitment",
+  "decisionMaking",
+  "sixMonthGoals",
+];
+
+const REVIEW_ENUMS = {
+  admissionsStage: [
+    "admissions_stage",
+    VALID_ADMISSIONS_STAGES,
+  ],
+
+  assignedTrack: [
+    "assigned_track",
+    VALID_TRACKS,
+  ],
+
+  matchingStatus: [
+    "matching_status",
+    VALID_MATCHING_STATUSES,
+  ],
+
+  interviewStatus: [
+    "interview_status",
+    VALID_INTERVIEW_STATUSES,
+  ],
+
+  finalDecision: [
+    "final_decision",
+    VALID_FINAL_DECISIONS,
+  ],
+
+  status: ["status", VALID_STATUSES],
+};
+
+const DECISION_STATUSES = {
+  ADMIT: "admitted",
+  "ADMIT WITH TRACK PLACEMENT": "admitted",
+  "MATCH REQUIRED": "in_progress",
+  WAITLIST: "waitlisted",
+  "NOT SELECTED": "not_selected",
+};
+
+// ============================================================
+// ERROR AND VALIDATION HELPERS
+// ============================================================
+
+function fail(message, status = 400, fields = []) {
+  const error = new Error(message);
+
+  error.httpStatus = status;
+  error.fields = fields;
+
+  return error;
+}
+
+function respondError(res, error, fallback) {
+  const status = error.httpStatus || 500;
+
+  if (status >= 500) {
+    console.error("[CFCV]", fallback, error);
+  }
+
+  return res.status(status).json({
+    success: false,
+
+    message:
+      status < 500
+        ? error.message
+        : fallback,
+
+    ...(error.fields?.length
+      ? {
+          fields: error.fields,
+
+          ...(error.fields.length === 1
+            ? { field: error.fields[0] }
+            : {}),
+        }
+      : {}),
+  });
+}
+
+function text(value, maximum, field) {
   if (value === undefined || value === null) {
     return "";
   }
 
-  return String(value).trim().slice(0, maxLength);
-}
-
-function cleanEmail(value) {
-  return cleanString(value, 320).toLowerCase();
-}
-
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function parseBoolean(value) {
-  if (typeof value === "boolean") {
-    return value;
+  if (typeof value !== "string") {
+    throw fail(`Invalid ${field}.`, 400, [field]);
   }
 
-  if (value === "true") {
-    return true;
+  const result = value.trim();
+
+  if (result.length > maximum) {
+    throw fail(
+      `${field} must be ${maximum} characters or fewer.`,
+      400,
+      [field]
+    );
   }
 
-  if (value === "false") {
-    return false;
-  }
-
-  return null;
+  return result;
 }
 
-function normalizeNullableDate(value) {
-  if (!value) {
-    return null;
+function applicationId(req) {
+  const id = req.params?.id;
+
+  if (
+    typeof id !== "string" ||
+    !UUID.test(id)
+  ) {
+    throw fail("Invalid application ID.");
   }
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return date.toISOString();
+  return id.toLowerCase();
 }
 
-function getCurrentAdminId(req) {
-  return req?.admin?.id || null;
-}
+// ============================================================
+// PARSE AND VALIDATE PUBLIC APPLICATION
+// ============================================================
 
-/* ============================================================
-   APPLICATION BODY PARSER
+function parseApplication(req) {
+  let body;
 
-   multipart/form-data:
-   application = JSON string
-   resume      = uploaded file
-============================================================ */
-
-function parseApplicationBody(req) {
-  const rawBody = req.body || {};
-
-  if (typeof rawBody.application === "string") {
-    try {
-      const parsed = JSON.parse(rawBody.application);
-
-      if (
-        !parsed ||
-        typeof parsed !== "object" ||
-        Array.isArray(parsed)
-      ) {
-        throw new Error("Invalid application object.");
-      }
-
-      return parsed;
-    } catch (error) {
-      const parseError = new Error(
-        "The application form data is invalid."
-      );
-
-      parseError.code = "INVALID_APPLICATION_JSON";
-
-      throw parseError;
+  try {
+    if (
+      typeof req.body?.application !== "string"
+    ) {
+      throw new Error();
     }
+
+    body = JSON.parse(req.body.application);
+  } catch {
+    throw fail(
+      "The application form data is invalid.",
+      400,
+      ["application"]
+    );
   }
 
   if (
-    rawBody.application &&
-    typeof rawBody.application === "object" &&
-    !Array.isArray(rawBody.application)
+    !body ||
+    typeof body !== "object" ||
+    Array.isArray(body)
   ) {
-    return rawBody.application;
+    throw fail(
+      "The application form data is invalid.",
+      400,
+      ["application"]
+    );
   }
 
-  return rawBody;
+  const fields = {};
+  const payload = {};
+
+  for (
+    const [field, [column, maximum]]
+    of Object.entries(PUBLIC_FIELDS)
+  ) {
+    fields[field] = text(
+      body[field],
+      maximum,
+      field
+    );
+
+    payload[column] = fields[field];
+  }
+
+  payload.email = fields.email.toLowerCase();
+
+  const missing = REQUIRED_FIELDS.filter(
+    (field) => !fields[field]
+  );
+
+  if (missing.length) {
+    throw fail(
+      "Please complete all required application fields.",
+      400,
+      missing
+    );
+  }
+
+  if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      payload.email
+    )
+  ) {
+    throw fail(
+      "Please enter a valid email address.",
+      400,
+      ["email"]
+    );
+  }
+
+  for (const [field, values] of [
+    ["geography", VALID_GEOGRAPHIES],
+    ["ventureStage", VALID_VENTURE_STAGES],
+    ["teamStatus", VALID_TEAM_STATUSES],
+    [
+      "existingCrossContinentalTeam",
+      VALID_YES_NO,
+    ],
+  ]) {
+    if (!values.has(fields[field])) {
+      throw fail(
+        `Invalid ${field}.`,
+        400,
+        [field]
+      );
+    }
+  }
+
+  return { body, payload };
 }
 
-/* ============================================================
-   FILE HELPERS
-============================================================ */
+// ============================================================
+// RÉSUMÉ FILE HELPERS
+// ============================================================
 
-function sanitizeFileName(fileName) {
+function sanitizeFileName(value) {
   const original = path.basename(
-    cleanString(fileName, 255) || "resume"
+    String(value || "resume").replace(/\\/g, "/")
   );
 
   const extension = path
     .extname(original)
-    .toLowerCase()
-    .slice(0, 10);
+    .toLowerCase();
 
-  const baseName =
-    path
-      .basename(original, extension)
-      .replace(/[^a-zA-Z0-9_-]+/g, "-")
-      .replace(/^[-_]+|[-_]+$/g, "")
-      .slice(0, 80) || "resume";
+  const base = path
+    .basename(original, path.extname(original))
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/^[-_]+|[-_]+$/g, "")
+    .slice(0, 80);
 
-  return `${baseName}${extension}`;
+  return `${base || "resume"}${extension}`;
 }
 
-function getAllowedExtensionForMime(mimeType) {
-  switch (mimeType) {
-    case "application/pdf":
-      return ".pdf";
+// Check DOCX ZIP directory names without decompressing
+// user-controlled data.
+function hasDocxEntries(buffer) {
+  const minimum = Math.max(
+    0,
+    buffer.length - 65557
+  );
 
-    case "application/msword":
-      return ".doc";
+  for (
+    let end = buffer.length - 22;
+    end >= minimum;
+    end -= 1
+  ) {
+    if (
+      buffer.readUInt32LE(end) !== 0x06054b50
+    ) {
+      continue;
+    }
 
-    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-      return ".docx";
+    if (
+      end + 22 + buffer.readUInt16LE(end + 20)
+      !== buffer.length
+    ) {
+      continue;
+    }
 
-    default:
-      return "";
-  }
-}
+    if (
+      buffer.readUInt16LE(end + 4) ||
+      buffer.readUInt16LE(end + 6)
+    ) {
+      return false;
+    }
 
-function validateResumeFile(file) {
-  if (!file) {
-    const error = new Error(
-      "Please upload your résumé or CV."
+    const count = buffer.readUInt16LE(end + 10);
+    const size = buffer.readUInt32LE(end + 12);
+
+    let offset = buffer.readUInt32LE(end + 16);
+
+    const limit = offset + size;
+
+    if (
+      !count ||
+      count === 65535 ||
+      limit > end
+    ) {
+      return false;
+    }
+
+    const names = new Set();
+
+    for (
+      let index = 0;
+      index < count;
+      index += 1
+    ) {
+      if (
+        offset + 46 > limit ||
+        buffer.readUInt32LE(offset) !== 0x02014b50
+      ) {
+        return false;
+      }
+
+      if (
+        buffer.readUInt16LE(offset + 8) & 1
+      ) {
+        return false;
+      }
+
+      const length = buffer.readUInt16LE(
+        offset + 28
+      );
+
+      const extra = buffer.readUInt16LE(
+        offset + 30
+      );
+
+      const comment = buffer.readUInt16LE(
+        offset + 32
+      );
+
+      const next =
+        offset + 46 + length + extra + comment;
+
+      if (next > limit) {
+        return false;
+      }
+
+      const local = buffer.readUInt32LE(
+        offset + 42
+      );
+
+      if (
+        local + 30 > buffer.length ||
+        buffer.readUInt32LE(local) !== 0x04034b50
+      ) {
+        return false;
+      }
+
+      names.add(
+        buffer.toString(
+          "utf8",
+          offset + 46,
+          offset + 46 + length
+        )
+      );
+
+      offset = next;
+    }
+
+    return (
+      offset === limit &&
+      names.has("[Content_Types].xml") &&
+      names.has("word/document.xml")
     );
+  }
 
-    error.code = "RESUME_REQUIRED";
-    throw error;
+  return false;
+}
+
+function validateResume(file) {
+  if (
+    !file ||
+    !Buffer.isBuffer(file.buffer) ||
+    !file.buffer.length
+  ) {
+    throw fail(
+      "Choose a non-empty résumé file.",
+      400,
+      ["resume"]
+    );
   }
 
   if (
-    !Buffer.isBuffer(file.buffer) ||
-    file.buffer.length === 0
+    file.buffer.length > MAX_RESUME_SIZE ||
+    file.size > MAX_RESUME_SIZE
   ) {
-    const error = new Error(
-      "The uploaded résumé or CV is empty."
+    throw fail(
+      "Your résumé must be 5 MB or smaller.",
+      400,
+      ["resume"]
     );
-
-    error.code = "EMPTY_RESUME";
-    throw error;
   }
 
-  if (file.size > MAX_RESUME_SIZE) {
-    const error = new Error(
-      "Your résumé or CV must not exceed 5 MB."
-    );
+  const mimeType = String(
+    file.mimetype || ""
+  )
+    .trim()
+    .toLowerCase();
 
-    error.code = "RESUME_TOO_LARGE";
-    throw error;
-  }
+  const extensions = {
+    "application/pdf": ".pdf",
+    "application/msword": ".doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      ".docx",
+  };
 
-  const mimeType = cleanString(
-    file.mimetype,
-    200
-  ).toLowerCase();
-
-  if (!ALLOWED_RESUME_TYPES.has(mimeType)) {
-    const error = new Error(
-      "Only PDF, DOC and DOCX résumé files are allowed."
-    );
-
-    error.code = "INVALID_RESUME_TYPE";
-    throw error;
-  }
-
-  const expectedExtension =
-    getAllowedExtensionForMime(mimeType);
-
-  const actualExtension = path
-    .extname(cleanString(file.originalname, 255))
+  const extension = path
+    .extname(file.originalname || "")
     .toLowerCase();
 
   if (
-    !expectedExtension ||
-    actualExtension !== expectedExtension
+    !extensions[mimeType] ||
+    extensions[mimeType] !== extension
   ) {
-    const error = new Error(
-      "The résumé file extension does not match its file type."
+    throw fail(
+      "Only matching PDF, DOC or DOCX résumé files are allowed.",
+      400,
+      ["resume"]
     );
-
-    error.code = "INVALID_RESUME_EXTENSION";
-    throw error;
   }
 
-  return {
-    mimeType,
-    extension: expectedExtension,
+  const buffer = file.buffer;
+
+  const signatureValid =
+    extension === ".pdf"
+      ? buffer.subarray(0, 5).equals(
+          Buffer.from("%PDF-")
+        )
+      : extension === ".doc"
+        ? buffer.subarray(0, 8).equals(
+            Buffer.from(
+              "d0cf11e0a1b11ae1",
+              "hex"
+            )
+          )
+        : hasDocxEntries(buffer);
+
+  if (!signatureValid) {
+    throw fail(
+      "The résumé contents do not match its file type.",
+      400,
+      ["resume"]
+    );
+  }
+
+  return mimeType;
+}
+
+// ============================================================
+// STABLE SUBMISSION HASH
+// ============================================================
+
+function stableJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableJson).join(",")}]`;
+  }
+
+  if (
+    value &&
+    typeof value === "object"
+  ) {
+    return `{${Object.keys(value)
+      .sort()
+      .map(
+        (key) =>
+          `${JSON.stringify(key)}:${stableJson(value[key])}`
+      )
+      .join(",")}}`;
+  }
+
+  return JSON.stringify(value);
+}
+
+function submissionHash(body, file, mimeType) {
+  const metadata = {
+    application: body,
+    resumeName: file.originalname,
+    resumeType: mimeType,
+
+    resumeHash: crypto
+      .createHash("sha256")
+      .update(file.buffer)
+      .digest("hex"),
   };
+
+  return crypto
+    .createHash("sha256")
+    .update(stableJson(metadata))
+    .digest("hex");
 }
 
-function createResumeStoragePath({
-  applicationReference,
-  originalName,
-}) {
-  const safeReference = cleanString(
-    applicationReference,
-    120
-  )
-    .replace(/[^a-zA-Z0-9_-]+/g, "-")
-    .replace(/^[-_]+|[-_]+$/g, "");
-
-  const safeName = sanitizeFileName(originalName);
-
-  const uniqueId = crypto
-    .randomBytes(12)
-    .toString("hex");
-
-  return [
-    safeReference || "application",
-    `${Date.now()}-${uniqueId}-${safeName}`,
-  ].join("/");
-}
-
-/* ============================================================
-   PRIVATE STORAGE HELPERS
-============================================================ */
-
-async function uploadResume({
-  file,
-  applicationReference,
-}) {
-  validateResumeFile(file);
-
-  const storagePath = createResumeStoragePath({
-    applicationReference,
-    originalName: file.originalname,
-  });
-
-  const { error } = await supabaseAdmin.storage
-    .from(CFCV_RESUMES_BUCKET)
-    .upload(storagePath, file.buffer, {
-      contentType: file.mimetype,
-      upsert: false,
-      cacheControl: "3600",
-    });
-
-  if (error) {
-    console.error("CFCV resume upload error:", error);
-
-    const uploadError = new Error(
-      "Your résumé or CV could not be uploaded."
-    );
-
-    uploadError.code = "RESUME_UPLOAD_FAILED";
-
-    throw uploadError;
-  }
-
-  return storagePath;
-}
-
-async function removeResume(storagePath) {
-  if (!storagePath) {
-    return;
-  }
-
-  try {
-    const { error } = await supabaseAdmin.storage
-      .from(CFCV_RESUMES_BUCKET)
-      .remove([storagePath]);
-
-    if (error) {
-      console.error(
-        "CFCV resume cleanup error:",
-        error
-      );
-    }
-  } catch (error) {
-    console.error(
-      "CFCV resume cleanup error:",
-      error
-    );
-  }
-}
-
-/* ============================================================
-   APPLICATION REFERENCE
-============================================================ */
-
-async function generateApplicationReference() {
-  const year = new Date().getFullYear();
-
-  for (let attempt = 0; attempt < 10; attempt += 1) {
-    const random = crypto
-      .randomBytes(4)
-      .toString("hex")
-      .toUpperCase();
-
-    const reference = `CFCV-${year}-${random}`;
-
-    const { data, error } = await supabaseAdmin
-      .from(CFCV_TABLE)
-      .select("id")
-      .eq("application_reference", reference)
-      .maybeSingle();
-
-    if (error) {
-      throw error;
-    }
-
-    if (!data) {
-      return reference;
-    }
-  }
-
-  throw new Error(
-    "Unable to generate application reference."
-  );
-}
-
-/* ============================================================
-   NORMALIZE ADMIN RESPONSE
-
-   Never expose the private resume_path.
-============================================================ */
+// ============================================================
+// NORMALIZE ADMIN RESPONSE
+//
+// Do not expose storage paths or submission hashes.
+// ============================================================
 
 function normalizeApplication(row) {
-  if (!row) {
-    return null;
-  }
-
-  return {
+  const result = {
     id: row.id,
-
     applicationReference:
       row.application_reference,
+  };
 
-    firstName: row.first_name,
-    lastName: row.last_name,
+  for (
+    const [field, [column]]
+    of Object.entries(PUBLIC_FIELDS)
+  ) {
+    result[field] = row[column] ?? "";
+  }
 
+  Object.assign(result, {
     fullName: [
       row.first_name,
       row.last_name,
@@ -458,73 +688,9 @@ function normalizeApplication(row) {
       .filter(Boolean)
       .join(" "),
 
-    email: row.email,
-    phone: row.phone || "",
-    country: row.country,
-    city: row.city || "",
-    geography: row.geography,
-
-    professionalBackground:
-      row.professional_background,
-
-    relevantSkills: row.relevant_skills,
-
-    entrepreneurshipReason:
-      row.entrepreneurship_reason || "",
-
-    ventureName: row.venture_name || "",
-    sector: row.sector || "",
-
-    ventureDescription:
-      row.venture_description,
-
-    problem: row.problem,
-    solution: row.solution,
-    ventureStage: row.venture_stage,
-    currentProgress: row.current_progress,
-    targetMarket: row.target_market,
-
-    customerDescription:
-      row.customer_description || "",
-
-    teamStatus: row.team_status,
-    teamDescription: row.team_description || "",
-
-    existingCrossContinentalTeam:
-      row.existing_cross_continental_team,
-
-    collaboratorNeeds:
-      row.collaborator_needs || "",
-
-    marketKnowledge:
-      row.market_knowledge || "",
-
-    geographicConnections:
-      row.geographic_connections || "",
-
-    workingStyle: row.working_style,
-
-    leadershipStrengths:
-      row.leadership_strengths || "",
-
-    longTermObjectives:
-      row.long_term_objectives,
-
-    timeCommitment: row.time_commitment,
-    decisionMaking: row.decision_making,
-
-    ownershipExpectations:
-      row.ownership_expectations || "",
-
-    sixMonthGoals: row.six_month_goals,
-
     resumeAvailable: Boolean(row.resume_path),
-
-    resumeFileName:
-      row.resume_file_name || "",
-
-    resumeMimeType:
-      row.resume_mime_type || "",
+    resumeFileName: row.resume_file_name || "",
+    resumeMimeType: row.resume_mime_type || "",
 
     admissionsStage: row.admissions_stage,
     assignedTrack: row.assigned_track,
@@ -553,327 +719,169 @@ function normalizeApplication(row) {
     submittedAt: row.submitted_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
-  };
+
+    version: row.version,
+  });
+
+  return result;
 }
 
-/* ============================================================
-   PUBLIC: CREATE APPLICATION
-============================================================ */
+// ============================================================
+// SUBMISSION RETRY HELPERS
+// ============================================================
+
+async function findSubmission(key) {
+  const { data, error } = await db
+    .from(CFCV_TABLE)
+    .select(
+      "id,submission_hash,application_reference,submitted_at,resume_path"
+    )
+    .eq("submission_key", key)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+function receipt(
+  res,
+  row,
+  hash,
+  replayed
+) {
+  if (row.submission_hash !== hash) {
+    throw fail(
+      "This submission key was already used for different application details. Keep the original submission key when retrying the original application.",
+      409
+    );
+  }
+
+  return res
+    .status(replayed ? 200 : 201)
+    .json({
+      success: true,
+
+      message: replayed
+        ? "Your application was already submitted."
+        : "Your CFCV application has been submitted successfully.",
+
+      applicationReference:
+        row.application_reference,
+
+      submittedAt: row.submitted_at,
+      replayed,
+    });
+}
+
+async function removeUnusedResume(storagePath) {
+  try {
+    const { error } = await db.storage
+      .from(RESUME_BUCKET)
+      .remove([storagePath]);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    console.error(
+      "[CFCV] Unused résumé cleanup failed:",
+      error
+    );
+  }
+}
+
+// ============================================================
+// PUBLIC: CREATE APPLICATION
+// ============================================================
 
 async function createApplication(req, res) {
-  let uploadedResumePath = null;
-
   try {
-    let body;
-
-    try {
-      body = parseApplicationBody(req);
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message:
-          error.message ||
-          "The application form data is invalid.",
-      });
-    }
-
-    /* --------------------------------------------------------
-       CLEAN PUBLIC FIELDS
-    -------------------------------------------------------- */
-
-    const firstName = cleanString(body.firstName, 120);
-    const lastName = cleanString(body.lastName, 120);
-    const email = cleanEmail(body.email);
-    const phone = cleanString(body.phone, 50);
-    const country = cleanString(body.country, 120);
-    const city = cleanString(body.city, 120);
-    const geography = cleanString(body.geography, 50);
-
-    const professionalBackground = cleanString(
-      body.professionalBackground
-    );
-
-    const relevantSkills = cleanString(
-      body.relevantSkills
-    );
-
-    const entrepreneurshipReason = cleanString(
-      body.entrepreneurshipReason
-    );
-
-    const ventureName = cleanString(
-      body.ventureName,
-      200
-    );
-
-    const sector = cleanString(body.sector, 160);
-
-    const ventureDescription = cleanString(
-      body.ventureDescription
-    );
-
-    const problem = cleanString(body.problem);
-    const solution = cleanString(body.solution);
-
-    const ventureStage = cleanString(
-      body.ventureStage,
-      120
-    );
-
-    const currentProgress = cleanString(
-      body.currentProgress
-    );
-
-    const targetMarket = cleanString(
-      body.targetMarket
-    );
-
-    const customerDescription = cleanString(
-      body.customerDescription
-    );
-
-    const teamStatus = cleanString(
-      body.teamStatus,
-      80
-    );
-
-    const teamDescription = cleanString(
-      body.teamDescription
-    );
-
-    const existingCrossContinentalTeam = cleanString(
-      body.existingCrossContinentalTeam,
-      10
-    );
-
-    const collaboratorNeeds = cleanString(
-      body.collaboratorNeeds
-    );
-
-    const marketKnowledge = cleanString(
-      body.marketKnowledge
-    );
-
-    const geographicConnections = cleanString(
-      body.geographicConnections
-    );
-
-    const workingStyle = cleanString(
-      body.workingStyle
-    );
-
-    const leadershipStrengths = cleanString(
-      body.leadershipStrengths
-    );
-
-    const longTermObjectives = cleanString(
-      body.longTermObjectives
-    );
-
-    const timeCommitment = cleanString(
-      body.timeCommitment
-    );
-
-    const decisionMaking = cleanString(
-      body.decisionMaking
-    );
-
-    const ownershipExpectations = cleanString(
-      body.ownershipExpectations
-    );
-
-    const sixMonthGoals = cleanString(
-      body.sixMonthGoals
-    );
-
-    /* --------------------------------------------------------
-       REQUIRED FIELDS
-    -------------------------------------------------------- */
-
-    const requiredFields = {
-      firstName,
-      lastName,
-      email,
-      country,
-      geography,
-      professionalBackground,
-      relevantSkills,
-      ventureDescription,
-      problem,
-      solution,
-      ventureStage,
-      currentProgress,
-      targetMarket,
-      teamStatus,
-      existingCrossContinentalTeam,
-      workingStyle,
-      longTermObjectives,
-      timeCommitment,
-      decisionMaking,
-      sixMonthGoals,
-    };
-
-    const missingFields = Object.entries(
-      requiredFields
-    )
-      .filter(([, value]) => !value)
-      .map(([field]) => field);
-
-    if (missingFields.length) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Please complete all required application fields.",
-        fields: missingFields,
-      });
-    }
-
-    /* --------------------------------------------------------
-       FORMAT VALIDATION
-    -------------------------------------------------------- */
-
-    if (!isValidEmail(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter a valid email address.",
-        field: "email",
-      });
-    }
-
-    if (!VALID_GEOGRAPHIES.has(geography)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid applicant geography.",
-        field: "geography",
-      });
-    }
-
-    if (!VALID_VENTURE_STAGES.has(ventureStage)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid venture stage.",
-        field: "ventureStage",
-      });
-    }
-
-    if (!VALID_TEAM_STATUSES.has(teamStatus)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid team status.",
-        field: "teamStatus",
-      });
-    }
+    const key = req.body?.submissionKey;
 
     if (
-      !VALID_YES_NO.has(
-        existingCrossContinentalTeam
-      )
+      typeof key !== "string" ||
+      !UUID.test(key)
     ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid cross-continental team selection.",
-        field: "existingCrossContinentalTeam",
-      });
+      throw fail(
+        "A valid submission key is required.",
+        400,
+        ["submissionKey"]
+      );
     }
 
-    /* --------------------------------------------------------
-       RESUME VALIDATION
-    -------------------------------------------------------- */
+    const submissionKey = key.toLowerCase();
 
-    try {
-      validateResumeFile(req.file);
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message:
-          error.message ||
-          "Please upload a valid résumé or CV.",
-        field: "resume",
-      });
+    const { body, payload } =
+      parseApplication(req);
+
+    const mimeType = validateResume(req.file);
+
+    const hash = submissionHash(
+      body,
+      req.file,
+      mimeType
+    );
+
+    const existing = await findSubmission(
+      submissionKey
+    );
+
+    if (existing) {
+      return receipt(
+        res,
+        existing,
+        hash,
+        true
+      );
     }
 
-    const applicationReference =
-      await generateApplicationReference();
+    const reference =
+      `CFCV-${new Date().getUTCFullYear()}-${crypto
+        .randomBytes(8)
+        .toString("hex")
+        .toUpperCase()}`;
 
-    uploadedResumePath = await uploadResume({
-      file: req.file,
-      applicationReference,
-    });
+    const storagePath =
+      `${reference}/${crypto.randomUUID()}-${sanitizeFileName(
+        req.file.originalname
+      )}`;
 
-    /* --------------------------------------------------------
-       DATABASE PAYLOAD
-    -------------------------------------------------------- */
+    const { error: uploadError } =
+      await db.storage
+        .from(RESUME_BUCKET)
+        .upload(
+          storagePath,
+          req.file.buffer,
+          {
+            contentType: mimeType,
+            upsert: false,
+            cacheControl: "0",
+          }
+        );
 
-    const payload = {
-      application_reference: applicationReference,
+    if (uploadError) {
+      throw uploadError;
+    }
 
-      first_name: firstName,
-      last_name: lastName,
+    const record = {
+      ...payload,
 
-      email,
-      phone,
-      country,
-      city,
-      geography,
+      application_reference: reference,
 
-      professional_background:
-        professionalBackground,
+      submission_key: submissionKey,
+      submission_hash: hash,
 
-      relevant_skills: relevantSkills,
-
-      entrepreneurship_reason:
-        entrepreneurshipReason,
-
-      venture_name: ventureName,
-      sector,
-
-      venture_description: ventureDescription,
-
-      problem,
-      solution,
-
-      venture_stage: ventureStage,
-      current_progress: currentProgress,
-      target_market: targetMarket,
-
-      customer_description: customerDescription,
-
-      team_status: teamStatus,
-      team_description: teamDescription,
-
-      existing_cross_continental_team:
-        existingCrossContinentalTeam,
-
-      collaborator_needs: collaboratorNeeds,
-      market_knowledge: marketKnowledge,
-
-      geographic_connections:
-        geographicConnections,
-
-      working_style: workingStyle,
-      leadership_strengths: leadershipStrengths,
-
-      long_term_objectives: longTermObjectives,
-
-      time_commitment: timeCommitment,
-      decision_making: decisionMaking,
-
-      ownership_expectations:
-        ownershipExpectations,
-
-      six_month_goals: sixMonthGoals,
-
-      // Private résumé metadata.
-      resume_path: uploadedResumePath,
+      resume_path: storagePath,
 
       resume_file_name: sanitizeFileName(
         req.file.originalname
       ),
 
-      resume_mime_type: req.file.mimetype,
+      resume_mime_type: mimeType,
 
-      // Admissions state is controlled by the server.
       admissions_stage: "applied",
       assigned_track: null,
 
@@ -886,729 +894,914 @@ async function createApplication(req, res) {
       interview_status: "not_scheduled",
 
       status: "submitted",
+      version: 1,
     };
 
-    const { data, error } = await supabaseAdmin
-      .from(CFCV_TABLE)
-      .insert(payload)
-      .select("*")
-      .single();
+    // UNIQUE submission_key arbitrates concurrent retries.
+    //
+    // Resolve uncertain inserts by reading the same key.
+    // Never remove a résumé if its insert may have committed.
 
-    if (error) {
-      console.error("CFCV insert error:", error);
+    let data;
+    let insertError;
 
-      await removeResume(uploadedResumePath);
-      uploadedResumePath = null;
+    try {
+      const result = await db
+        .from(CFCV_TABLE)
+        .insert(record)
+        .select(
+          "id,submission_hash,application_reference,submitted_at,resume_path"
+        )
+        .single();
 
-      return res.status(500).json({
-        success: false,
-        message:
-          "Your application could not be submitted.",
-      });
+      data = result.data;
+      insertError = result.error;
+    } catch (error) {
+      insertError = error;
     }
 
-    // The résumé now belongs to the saved application.
-    uploadedResumePath = null;
+    if (insertError || !data) {
+      const saved = await findSubmission(
+        submissionKey
+      );
 
-    return res.status(201).json({
-      success: true,
-      message:
-        "Your CFCV application has been submitted successfully.",
-      applicationReference:
-        data.application_reference,
-      submittedAt: data.submitted_at,
-    });
-  } catch (error) {
-    console.error(
-      "CFCV create application error:",
-      error
+      if (saved) {
+        if (
+          saved.resume_path !== storagePath
+        ) {
+          await removeUnusedResume(
+            storagePath
+          );
+        }
+
+        return receipt(
+          res,
+          saved,
+          hash,
+          true
+        );
+      }
+
+      // A unique-constraint rejection is definitive.
+      if (
+        insertError?.code === "23505"
+      ) {
+        await removeUnusedResume(
+          storagePath
+        );
+      }
+
+      throw (
+        insertError ||
+        new Error(
+          "The database did not confirm submission."
+        )
+      );
+    }
+
+    return receipt(
+      res,
+      data,
+      hash,
+      false
     );
-
-    if (uploadedResumePath) {
-      await removeResume(uploadedResumePath);
-    }
-
-    const clientErrors = new Set([
-      "RESUME_REQUIRED",
-      "EMPTY_RESUME",
-      "RESUME_TOO_LARGE",
-      "INVALID_RESUME_TYPE",
-      "INVALID_RESUME_EXTENSION",
-      "INVALID_APPLICATION_JSON",
-    ]);
-
-    const statusCode = clientErrors.has(error?.code)
-      ? 400
-      : 500;
-
-    return res.status(statusCode).json({
-      success: false,
-      message:
-        statusCode === 400
-          ? error.message
-          : "Your application could not be submitted. Please try again.",
-    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Your application could not be confirmed. Retry with the same submission key and unchanged application."
+    );
   }
 }
 
-/* ============================================================
-   ADMIN: GET APPLICATIONS
-============================================================ */
+// ============================================================
+// READ APPLICATION
+// ============================================================
+
+async function readApplication(id) {
+  const { data, error } = await db
+    .from(CFCV_TABLE)
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw fail(
+      "Application not found.",
+      404
+    );
+  }
+
+  return data;
+}
+
+// ============================================================
+// ADMIN: APPLICATION LIST
+// ============================================================
 
 async function getApplications(req, res) {
   try {
-    const status = cleanString(
-      req.query.status,
-      50
+    const filters = req.query || {};
+
+    const page = Number(
+      filters.page ?? 1
     );
 
-    const admissionsStage = cleanString(
-      req.query.admissionsStage,
-      50
+    const pageSize = Number(
+      filters.pageSize ?? 25
     );
 
-    const track = cleanString(req.query.track, 50);
-
-    const geography = cleanString(
-      req.query.geography,
-      50
-    );
-
-    const search = cleanString(
-      req.query.search,
-      200
-    );
-
-    let query = supabaseAdmin
-      .from(CFCV_TABLE)
-      .select("*")
-      .order("submitted_at", {
-        ascending: false,
-      });
-
-    if (status) {
-      query = query.eq("status", status);
-    }
-
-    if (admissionsStage) {
-      query = query.eq(
-        "admissions_stage",
-        admissionsStage
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100 ||
+      !Number.isSafeInteger(page * pageSize)
+    ) {
+      throw fail(
+        "Use a valid page and a pageSize between 1 and 100."
       );
     }
 
-    if (track) {
-      query = query.eq("assigned_track", track);
-    }
+    let query = db
+      .from(CFCV_TABLE)
+      .select("*", {
+        count: "exact",
+      });
 
-    if (geography) {
-      query = query.eq("geography", geography);
-    }
+    for (
+      const [field, column, values]
+      of [
+        ["status", "status", VALID_STATUSES],
+        [
+          "admissionsStage",
+          "admissions_stage",
+          VALID_ADMISSIONS_STAGES,
+        ],
+        [
+          "track",
+          "assigned_track",
+          VALID_TRACKS,
+        ],
+        [
+          "geography",
+          "geography",
+          VALID_GEOGRAPHIES,
+        ],
+      ]
+    ) {
+      if (filters[field]) {
+        const value = text(
+          filters[field],
+          80,
+          field
+        );
 
-    if (search) {
-      const safeSearch = search
-        .replace(/[%_]/g, "")
-        .replace(/,/g, " ");
+        if (!values.has(value)) {
+          throw fail(
+            `Invalid ${field} filter.`
+          );
+        }
 
-      if (safeSearch) {
-        query = query.or(
-          [
-            `first_name.ilike.%${safeSearch}%`,
-            `last_name.ilike.%${safeSearch}%`,
-            `email.ilike.%${safeSearch}%`,
-            `venture_name.ilike.%${safeSearch}%`,
-            `application_reference.ilike.%${safeSearch}%`,
-          ].join(",")
+        query = query.eq(
+          column,
+          value
         );
       }
     }
 
-    const { data, error } = await query;
-
-    if (error) {
-      console.error(
-        "CFCV applications query error:",
-        error
-      );
-
-      return res.status(500).json({
-        success: false,
-        message: "Unable to load CFCV applications.",
-      });
-    }
-
-    return res.json({
-      success: true,
-      count: data?.length || 0,
-      applications: (data || []).map(
-        normalizeApplication
-      ),
-    });
-  } catch (error) {
-    console.error("CFCV applications error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to load CFCV applications.",
-    });
-  }
-}
-
-/* ============================================================
-   ADMIN: GET ONE APPLICATION
-============================================================ */
-
-async function getApplicationById(req, res) {
-  try {
-    const id = cleanString(req.params.id, 100);
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "Application ID is required.",
-      });
-    }
-
-    const { data, error } = await supabaseAdmin
-      .from(CFCV_TABLE)
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
-
-    if (error) {
-      console.error(
-        "CFCV application query error:",
-        error
-      );
-
-      return res.status(500).json({
-        success: false,
-        message: "Unable to load application.",
-      });
-    }
-
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Application not found.",
-      });
-    }
-
-    return res.json({
-      success: true,
-      application: normalizeApplication(data),
-    });
-  } catch (error) {
-    console.error("CFCV application error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to load application.",
-    });
-  }
-}
-
-/* ============================================================
-   ADMIN: GET PRIVATE RESUME
-
-   The Supabase Storage bucket must remain PRIVATE.
-============================================================ */
-
-async function getApplicationResume(req, res) {
-  try {
-    const id = cleanString(req.params.id, 100);
-
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "Application ID is required.",
-      });
-    }
-
-    const { data, error } = await supabaseAdmin
-      .from(CFCV_TABLE)
-      .select(
-        [
-          "id",
-          "application_reference",
-          "resume_path",
-          "resume_file_name",
-          "resume_mime_type",
-        ].join(",")
+    const search = text(
+      filters.search,
+      200,
+      "search"
+    )
+      .replace(
+        /[^\p{L}\p{N}\s@.+_-]/gu,
+        " "
       )
-      .eq("id", id)
-      .maybeSingle();
+      .replace(/[%_]/g, " ")
+      .trim();
 
-    if (error) {
-      console.error(
-        "CFCV resume application query error:",
-        error
+    if (search) {
+      query = query.or(
+        [
+          "first_name",
+          "last_name",
+          "email",
+          "venture_name",
+          "application_reference",
+        ]
+          .map(
+            (column) =>
+              `${column}.ilike.%${search}%`
+          )
+          .join(",")
       );
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Unable to access the applicant résumé.",
-      });
-    }
-
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Application not found.",
-      });
-    }
-
-    if (!data.resume_path) {
-      return res.status(404).json({
-        success: false,
-        message:
-          "No résumé or CV is attached to this application.",
-      });
     }
 
     const {
-      data: signedData,
-      error: signedError,
-    } = await supabaseAdmin.storage
-      .from(CFCV_RESUMES_BUCKET)
-      .createSignedUrl(
-        data.resume_path,
-        RESUME_SIGNED_URL_SECONDS,
-        {
-          download:
-            data.resume_file_name || "resume",
-        }
+      data,
+      count,
+      error,
+    } = await query
+      .order("submitted_at", {
+        ascending: false,
+      })
+      .order("id", {
+        ascending: false,
+      })
+      .range(
+        (page - 1) * pageSize,
+        page * pageSize - 1
       );
 
-    if (signedError || !signedData?.signedUrl) {
-      console.error(
-        "CFCV resume signed URL error:",
-        signedError
-      );
-
-      return res.status(500).json({
-        success: false,
-        message:
-          "Unable to generate a secure résumé link.",
-      });
+    if (error) {
+      throw error;
     }
-
-    res.set("Cache-Control", "no-store");
 
     return res.json({
       success: true,
-      fileName: data.resume_file_name || "resume",
-      mimeType: data.resume_mime_type || "",
-      expiresIn: RESUME_SIGNED_URL_SECONDS,
-      url: signedData.signedUrl,
+
+      count: count || 0,
+
+      applications: (data || []).map(
+        normalizeApplication
+      ),
+
+      pagination: {
+        page,
+        pageSize,
+        total: count || 0,
+
+        totalPages: Math.ceil(
+          (count || 0) / pageSize
+        ),
+      },
     });
   } catch (error) {
-    console.error("CFCV get resume error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message:
-        "Unable to access the applicant résumé.",
-    });
+    return respondError(
+      res,
+      error,
+      "Unable to load CFCV applications."
+    );
   }
 }
 
-/* ============================================================
-   ADMIN: UPDATE APPLICATION
-============================================================ */
+// ============================================================
+// ADMIN: APPLICATION DETAILS
+// ============================================================
+
+async function getApplicationById(req, res) {
+  try {
+    const row = await readApplication(
+      applicationId(req)
+    );
+
+    return res.json({
+      success: true,
+      application:
+        normalizeApplication(row),
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Unable to load application."
+    );
+  }
+}
+
+// ============================================================
+// ADMIN: PRIVATE RÉSUMÉ LINK
+// ============================================================
+
+async function getApplicationResume(req, res) {
+  try {
+    const row = await readApplication(
+      applicationId(req)
+    );
+
+    if (!row.resume_path) {
+      throw fail(
+        "No résumé is available for this application.",
+        404
+      );
+    }
+
+    const { data, error } =
+      await db.storage
+        .from(RESUME_BUCKET)
+        .createSignedUrl(
+          row.resume_path,
+          300,
+          {
+            download:
+              row.resume_file_name ||
+              "resume",
+          }
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data?.signedUrl) {
+      throw new Error(
+        "Missing signed URL."
+      );
+    }
+
+    return res.json({
+      success: true,
+
+      url: data.signedUrl,
+      signedUrl: data.signedUrl,
+
+      fileName:
+        row.resume_file_name || "resume",
+
+      mimeType:
+        row.resume_mime_type || "",
+
+      expiresIn: 300,
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Unable to access the résumé."
+    );
+  }
+}
+
+// ============================================================
+// VALIDATE PROPOSED ADMIN REVIEW
+// ============================================================
+
+function buildReview(body, current) {
+  if (
+    !body ||
+    typeof body !== "object" ||
+    Array.isArray(body)
+  ) {
+    throw fail(
+      "Invalid review data."
+    );
+  }
+
+  if (
+    !Number.isSafeInteger(
+      body.expectedVersion
+    ) ||
+    body.expectedVersion < 1
+  ) {
+    throw fail(
+      "Reload the application before saving. Its version is required."
+    );
+  }
+
+  if (
+    body.expectedVersion !== current.version
+  ) {
+    throw fail(
+      "This application changed. Reload it before saving again.",
+      409
+    );
+  }
+
+  const updates = {};
+
+  for (
+    const [field, [column, values]]
+    of Object.entries(REVIEW_ENUMS)
+  ) {
+    if (
+      body[field] === undefined
+    ) {
+      continue;
+    }
+
+    const nullable =
+      field === "assignedTrack" ||
+      field === "finalDecision";
+
+    if (
+      nullable &&
+      (
+        body[field] === null ||
+        body[field] === ""
+      )
+    ) {
+      updates[column] = null;
+    } else {
+      const value = text(
+        body[field],
+        80,
+        field
+      );
+
+      if (!values.has(value)) {
+        throw fail(
+          `Invalid ${field}.`,
+          400,
+          [field]
+        );
+      }
+
+      updates[column] = value;
+    }
+  }
+
+  for (const [field, column] of [
+    ["matchingRequired", "matching_required"],
+    ["interviewRequired", "interview_required"],
+  ]) {
+    if (
+      body[field] === undefined
+    ) {
+      continue;
+    }
+
+    if (
+      typeof body[field] !== "boolean"
+    ) {
+      throw fail(
+        `Invalid ${field}.`,
+        400,
+        [field]
+      );
+    }
+
+    updates[column] = body[field];
+  }
+
+  if (
+    body.interviewDate !== undefined
+  ) {
+    if (
+      body.interviewDate === null ||
+      body.interviewDate === ""
+    ) {
+      updates.interview_date = null;
+    } else {
+      if (
+        typeof body.interviewDate !== "string" ||
+        !Number.isFinite(
+          Date.parse(body.interviewDate)
+        )
+      ) {
+        throw fail(
+          "Invalid interview date.",
+          400,
+          ["interviewDate"]
+        );
+      }
+
+      updates.interview_date = new Date(
+        body.interviewDate
+      ).toISOString();
+    }
+  }
+
+  for (const [field, column] of [
+    ["reviewerNotes", "reviewer_notes"],
+    ["interviewNotes", "interview_notes"],
+    ["matchingNotes", "matching_notes"],
+    ["decisionNotes", "decision_notes"],
+  ]) {
+    if (
+      body[field] !== undefined
+    ) {
+      updates[column] = text(
+        body[field],
+        10000,
+        field
+      );
+    }
+  }
+
+  const next = {
+    ...current,
+    ...updates,
+  };
+
+  if (
+    next.final_decision &&
+    next.status !== "withdrawn"
+  ) {
+    next.status =
+      DECISION_STATUSES[
+        next.final_decision
+      ];
+
+    updates.status = next.status;
+  }
+
+  if (
+    next.final_decision ===
+      "ADMIT WITH TRACK PLACEMENT" &&
+    !next.assigned_track
+  ) {
+    throw fail(
+      "Select Genesis, Ascend or Horizon before admitting with track placement.",
+      400,
+      ["assignedTrack"]
+    );
+  }
+
+  if (
+    body.notifyApplicant !== undefined &&
+    typeof body.notifyApplicant !== "boolean"
+  ) {
+    throw fail(
+      "Invalid notifyApplicant value.",
+      400,
+      ["notifyApplicant"]
+    );
+  }
+
+  const notify =
+    body.notifyApplicant === true;
+
+  const message = text(
+    body.applicantMessage,
+    5000,
+    "applicantMessage"
+  );
+
+  if (
+    !Object.keys(updates).length
+  ) {
+    throw fail(
+      "No valid application updates were provided."
+    );
+  }
+
+  return {
+    updates,
+    next,
+    notify,
+    message,
+  };
+}
+
+// ============================================================
+// APPLICANT MESSAGE
+//
+// Internal review notes are never included.
+// ============================================================
+
+function applicantMessage(row, custom) {
+  if (custom) {
+    return custom;
+  }
+
+  switch (row.status) {
+    case "admitted":
+      return (
+        `Your application has been admitted${
+          row.assigned_track
+            ? ` to the ${row.assigned_track} track`
+            : ""
+        }. Our admissions team will contact you about the next steps.`
+      );
+
+    case "waitlisted":
+      return (
+        "Your application has been placed on the waitlist. Our admissions team will contact you if a place becomes available."
+      );
+
+    case "not_selected":
+      return (
+        "Thank you for applying. Your application has not been selected for this cohort."
+      );
+
+    case "withdrawn":
+      return (
+        "Your application has been marked as withdrawn."
+      );
+
+    default:
+      return (
+        `Your application is being reviewed. Current admissions stage: ${
+          String(
+            row.admissions_stage || "applied"
+          ).replace(/_/g, " ")
+        }. Our admissions team will contact you about any next steps.`
+      );
+  }
+}
+
+// ============================================================
+// ADMIN: EMAIL PREVIEW
+//
+// Does not save or send.
+// ============================================================
+
+async function previewApplicationEmail(req, res) {
+  try {
+    const current = await readApplication(
+      applicationId(req)
+    );
+
+    const review = buildReview(
+      req.body,
+      current
+    );
+
+    const message = applicantMessage(
+      review.next,
+      review.message
+    );
+
+    const subject =
+      `CFCV application update — ${current.application_reference}`;
+
+    const bodyText =
+      `Hello ${current.first_name || "Applicant"},\n\n` +
+      `Application reference: ${current.application_reference}\n\n` +
+      `${message}\n\n` +
+      "Continental Founders Admissions";
+
+    return res.json({
+      success: true,
+
+      preview: {
+        to: current.email,
+        recipient: current.email,
+        subject,
+        text: bodyText,
+        bodyText,
+      },
+
+      applicantMessage: message,
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Unable to preview the applicant email."
+    );
+  }
+}
+
+// ============================================================
+// ADMIN: SAVE REVIEW
+//
+// Atomic database transaction:
+// application + history + optional email queue.
+// ============================================================
 
 async function updateApplication(req, res) {
   try {
-    const id = cleanString(req.params.id, 100);
+    const id = applicationId(req);
 
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "Application ID is required.",
-      });
-    }
+    const current = await readApplication(id);
 
-    const body = req.body || {};
-    const updates = {};
+    const review = buildReview(
+      req.body,
+      current
+    );
 
-    /* --------------------------------------------------------
-       ADMISSIONS STAGE
-    -------------------------------------------------------- */
+    const actorId = req.admin?.id;
 
-    if (body.admissionsStage !== undefined) {
-      const value = cleanString(
-        body.admissionsStage,
-        50
-      );
-
-      if (!VALID_ADMISSIONS_STAGES.has(value)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid admissions stage.",
-        });
-      }
-
-      updates.admissions_stage = value;
-    }
-
-    /* --------------------------------------------------------
-       TRACK PLACEMENT
-    -------------------------------------------------------- */
-
-    if (body.assignedTrack !== undefined) {
-      if (
-        body.assignedTrack === null ||
-        body.assignedTrack === ""
-      ) {
-        updates.assigned_track = null;
-      } else {
-        const value = cleanString(
-          body.assignedTrack,
-          50
-        );
-
-        if (!VALID_TRACKS.has(value)) {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid CFCV track.",
-          });
-        }
-
-        updates.assigned_track = value;
-      }
-    }
-
-    /* --------------------------------------------------------
-       MATCHING
-    -------------------------------------------------------- */
-
-    if (body.matchingRequired !== undefined) {
-      const value = parseBoolean(
-        body.matchingRequired
-      );
-
-      if (value === null) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid matchingRequired value.",
-        });
-      }
-
-      updates.matching_required = value;
-    }
-
-    if (body.matchingStatus !== undefined) {
-      const value = cleanString(
-        body.matchingStatus,
-        50
-      );
-
-      if (!VALID_MATCHING_STATUSES.has(value)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid matching status.",
-        });
-      }
-
-      updates.matching_status = value;
-    }
-
-    /* --------------------------------------------------------
-       INTERVIEW
-    -------------------------------------------------------- */
-
-    if (body.interviewRequired !== undefined) {
-      const value = parseBoolean(
-        body.interviewRequired
-      );
-
-      if (value === null) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Invalid interviewRequired value.",
-        });
-      }
-
-      updates.interview_required = value;
-    }
-
-    if (body.interviewStatus !== undefined) {
-      const value = cleanString(
-        body.interviewStatus,
-        50
-      );
-
-      if (!VALID_INTERVIEW_STATUSES.has(value)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid interview status.",
-        });
-      }
-
-      updates.interview_status = value;
-    }
-
-    if (body.interviewDate !== undefined) {
-      if (!body.interviewDate) {
-        updates.interview_date = null;
-      } else {
-        const normalized = normalizeNullableDate(
-          body.interviewDate
-        );
-
-        if (!normalized) {
-          return res.status(400).json({
-            success: false,
-            message: "Invalid interview date.",
-          });
-        }
-
-        updates.interview_date = normalized;
-      }
-    }
-
-    /* --------------------------------------------------------
-       FINAL DECISION
-    -------------------------------------------------------- */
-
-    if (body.finalDecision !== undefined) {
-      if (
-        body.finalDecision === null ||
-        body.finalDecision === ""
-      ) {
-        updates.final_decision = null;
-      } else {
-        const value = cleanString(
-          body.finalDecision,
-          80
-        );
-
-        if (!VALID_FINAL_DECISIONS.has(value)) {
-          return res.status(400).json({
-            success: false,
-            message:
-              "Invalid final admissions decision.",
-          });
-        }
-
-        updates.final_decision = value;
-      }
-    }
-
-    /* --------------------------------------------------------
-       APPLICATION STATUS
-    -------------------------------------------------------- */
-
-    if (body.status !== undefined) {
-      const value = cleanString(body.status, 50);
-
-      if (!VALID_STATUSES.has(value)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid application status.",
-        });
-      }
-
-      updates.status = value;
-    }
-
-    /* --------------------------------------------------------
-       INTERNAL NOTES
-    -------------------------------------------------------- */
-
-    if (body.reviewerNotes !== undefined) {
-      updates.reviewer_notes = cleanString(
-        body.reviewerNotes,
-        10000
+    if (!actorId) {
+      throw fail(
+        "An authenticated admin is required.",
+        401
       );
     }
 
-    if (body.interviewNotes !== undefined) {
-      updates.interview_notes = cleanString(
-        body.interviewNotes,
-        10000
-      );
-    }
+    // No direct-update fallback.
+    const { data, error } = await db.rpc(
+      "cfcv_save_review",
+      {
+        p_application_id: id,
 
-    if (body.matchingNotes !== undefined) {
-      updates.matching_notes = cleanString(
-        body.matchingNotes,
-        10000
-      );
-    }
+        p_expected_version:
+          req.body.expectedVersion,
 
-    if (body.decisionNotes !== undefined) {
-      updates.decision_notes = cleanString(
-        body.decisionNotes,
-        10000
-      );
-    }
+        p_updates: review.updates,
+        p_actor_id: actorId,
+        p_notify: review.notify,
 
-    /* --------------------------------------------------------
-       ALIGN DECISION AND STATUS
-    -------------------------------------------------------- */
-
-    const decisionStatuses = {
-      ADMIT: "admitted",
-      "ADMIT WITH TRACK PLACEMENT": "admitted",
-      "MATCH REQUIRED": "in_progress",
-      WAITLIST: "waitlisted",
-      "NOT SELECTED": "not_selected",
-    };
-
-    // Explicit withdrawal takes precedence.
-    if (
-      updates.final_decision &&
-      updates.status !== "withdrawn"
-    ) {
-      updates.status =
-        decisionStatuses[updates.final_decision];
-    }
-
-    /* --------------------------------------------------------
-       REQUIRE A TRACK FOR TRACK-PLACEMENT ADMISSION
-    -------------------------------------------------------- */
-
-    if (
-      updates.final_decision ===
-      "ADMIT WITH TRACK PLACEMENT"
-    ) {
-      const {
-        data: current,
-        error: readError,
-      } = await supabaseAdmin
-        .from(CFCV_TABLE)
-        .select("assigned_track")
-        .eq("id", id)
-        .maybeSingle();
-
-      if (readError) {
-        throw readError;
+        p_message: applicantMessage(
+          review.next,
+          review.message
+        ),
       }
-
-      if (!current) {
-        return res.status(404).json({
-          success: false,
-          message: "Application not found.",
-        });
-      }
-
-      const track =
-        Object.prototype.hasOwnProperty.call(
-          updates,
-          "assigned_track"
-        )
-          ? updates.assigned_track
-          : current.assigned_track;
-
-      if (!track) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Select Genesis, Ascend or Horizon before admitting with track placement.",
-          field: "assignedTrack",
-        });
-      }
-    }
-
-    /* --------------------------------------------------------
-       NOTHING TO UPDATE
-    -------------------------------------------------------- */
-
-    if (Object.keys(updates).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "No valid application updates were provided.",
-      });
-    }
-
-    /* --------------------------------------------------------
-       REVIEW METADATA
-    -------------------------------------------------------- */
-
-    const adminId = getCurrentAdminId(req);
-
-    if (adminId) {
-      updates.reviewed_by = adminId;
-      updates.reviewed_at =
-        new Date().toISOString();
-    }
-
-    /* --------------------------------------------------------
-       SAVE UPDATE
-    -------------------------------------------------------- */
-
-    const { data, error } = await supabaseAdmin
-      .from(CFCV_TABLE)
-      .update(updates)
-      .eq("id", id)
-      .select("*")
-      .maybeSingle();
+    );
 
     if (error) {
-      console.error("CFCV update error:", error);
+      if (
+        error.code === "40001"
+      ) {
+        throw fail(
+          "This application changed. Reload it before saving again.",
+          409
+        );
+      }
 
-      return res.status(500).json({
-        success: false,
-        message: "Unable to update application.",
-      });
+      if (
+        error.code === "P0002"
+      ) {
+        throw fail(
+          "Application not found.",
+          404
+        );
+      }
+
+      if (
+        [
+          "22023",
+          "23514",
+          "23502",
+          "22P02",
+          "23503",
+        ].includes(error.code)
+      ) {
+        throw fail(
+          "The review data is invalid. Check the selected fields and try again."
+        );
+      }
+
+      throw error;
     }
 
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Application not found.",
-      });
+    const result = Array.isArray(data)
+      ? data[0]
+      : data;
+
+    const saved =
+      result?.application || result;
+
+    if (
+      !saved?.id ||
+      saved.id !== id ||
+      !Number.isInteger(saved.version) ||
+      saved.version <= req.body.expectedVersion
+    ) {
+      throw new Error(
+        "The database did not confirm the review update."
+      );
     }
 
     return res.json({
       success: true,
-      message:
-        "Application updated successfully.",
-      application: normalizeApplication(data),
+
+      application:
+        normalizeApplication(saved),
+
+      message: review.notify
+        ? "Review saved and applicant email queued."
+        : "Application updated successfully.",
+
+      emailQueued: review.notify,
     });
   } catch (error) {
-    console.error(
-      "CFCV update application error:",
-      error
+    return respondError(
+      res,
+      error,
+      "The review update could not be confirmed. Reload the application before trying again."
     );
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to update application.",
-    });
   }
 }
 
-/* ============================================================
-   ADMIN: APPLICATION STATISTICS
-============================================================ */
+// ============================================================
+// REMOVE PRIVATE METADATA FROM HISTORY SNAPSHOTS
+// ============================================================
+
+function hidePrivateFields(value) {
+  if (Array.isArray(value)) {
+    return value.map(
+      hidePrivateFields
+    );
+  }
+
+  if (
+    value &&
+    typeof value === "object"
+  ) {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(
+          ([key]) =>
+            ![
+              "resume_path",
+              "submission_key",
+              "submission_hash",
+            ].includes(key)
+        )
+        .map(
+          ([key, item]) => [
+            key,
+            hidePrivateFields(item),
+          ]
+        )
+    );
+  }
+
+  return value;
+}
+
+// ============================================================
+// ADMIN: REVIEW HISTORY
+// ============================================================
+
+async function getApplicationHistory(req, res) {
+  try {
+    const id = applicationId(req);
+
+    await readApplication(id);
+
+    const { data, error } = await db
+      .from(HISTORY_TABLE)
+      .select("*")
+      .eq("application_id", id)
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(200);
+
+    if (error) {
+      throw error;
+    }
+
+    return res.json({
+      success: true,
+      history:
+        hidePrivateFields(data || []),
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Unable to load application history."
+    );
+  }
+}
+
+// ============================================================
+// ADMIN: EMAIL QUEUE STATUS
+// ============================================================
+
+async function getApplicationEmails(req, res) {
+  try {
+    const id = applicationId(req);
+
+    await readApplication(id);
+
+    const { data, error } = await db
+      .from(EMAIL_TABLE)
+      .select(
+        "id,event_key,recipient,subject,body_text,status,attempts,first_attempt_at,next_attempt_at,provider_message_id,accepted_at,last_error,created_at"
+      )
+      .eq("application_id", id)
+      .order("created_at", {
+        ascending: false,
+      })
+      .limit(200);
+
+    if (error) {
+      throw error;
+    }
+
+    return res.json({
+      success: true,
+      emails: data || [],
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Unable to load application emails."
+    );
+  }
+}
+
+// ============================================================
+// ADMIN: STATISTICS
+// ============================================================
 
 async function getApplicationStats(req, res) {
   try {
     const rows = [];
     const pageSize = 500;
 
-    // Read every page to avoid an unpaginated result cap.
     for (
       let offset = 0;
       ;
       offset += pageSize
     ) {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await db
         .from(CFCV_TABLE)
         .select(
-          [
-            "id",
-            "status",
-            "admissions_stage",
-            "assigned_track",
-            "matching_required",
-            "final_decision",
-          ].join(",")
+          "id,status,admissions_stage,assigned_track,matching_required,final_decision"
         )
         .order("id", {
           ascending: true,
@@ -1622,55 +1815,46 @@ async function getApplicationStats(req, res) {
         throw error;
       }
 
-      const page = data || [];
+      rows.push(...(data || []));
 
-      rows.push(...page);
-
-      if (page.length < pageSize) {
+      if (
+        (data || []).length < pageSize
+      ) {
         break;
       }
     }
 
-    const effectiveStatus = (row) => {
-      if (row.status === "withdrawn") {
-        return "withdrawn";
-      }
+    const effectiveStatus = (row) =>
+      row.status === "withdrawn"
+        ? "withdrawn"
+        : DECISION_STATUSES[
+            row.final_decision
+          ] || row.status;
 
-      const decisionStatuses = {
-        ADMIT: "admitted",
-        "ADMIT WITH TRACK PLACEMENT": "admitted",
-        "MATCH REQUIRED": "in_progress",
-        WAITLIST: "waitlisted",
-        "NOT SELECTED": "not_selected",
-      };
-
-      return (
-        decisionStatuses[row.final_decision] ||
-        row.status
-      );
-    };
-
-    const countStatus = (value) =>
+    const countStatus = (status) =>
       rows.filter(
-        (row) => effectiveStatus(row) === value
+        (row) =>
+          effectiveStatus(row) === status
       ).length;
 
-    const configuredCapacity = Number(
+    const capacity = Number(
       process.env.CFCV_COHORT_CAPACITY ?? 30
     );
 
     const cohortCapacity =
-      Number.isInteger(configuredCapacity) &&
-      configuredCapacity >= 0
-        ? configuredCapacity
+      Number.isInteger(capacity) &&
+      capacity >= 0
+        ? capacity
         : 30;
 
     const stats = {
       totalApplications: rows.length,
 
-      submitted: countStatus("submitted"),
+      submitted:
+        countStatus("submitted"),
 
-      underReview: countStatus("under_review"),
+      underReview:
+        countStatus("under_review"),
 
       interviews: rows.filter(
         (row) =>
@@ -1684,20 +1868,25 @@ async function getApplicationStats(req, res) {
           row.status !== "withdrawn"
       ).length,
 
-      admitted: countStatus("admitted"),
+      admitted:
+        countStatus("admitted"),
 
-      waitlisted: countStatus("waitlisted"),
+      waitlisted:
+        countStatus("waitlisted"),
 
       genesis: rows.filter(
-        (row) => row.assigned_track === "Genesis"
+        (row) =>
+          row.assigned_track === "Genesis"
       ).length,
 
       ascend: rows.filter(
-        (row) => row.assigned_track === "Ascend"
+        (row) =>
+          row.assigned_track === "Ascend"
       ).length,
 
       horizon: rows.filter(
-        (row) => row.assigned_track === "Horizon"
+        (row) =>
+          row.assigned_track === "Horizon"
       ).length,
 
       cohortCapacity,
@@ -1713,18 +1902,17 @@ async function getApplicationStats(req, res) {
       stats,
     });
   } catch (error) {
-    console.error("CFCV stats error:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "Unable to load CFCV statistics.",
-    });
+    return respondError(
+      res,
+      error,
+      "Unable to load CFCV statistics."
+    );
   }
 }
 
-/* ============================================================
-   EXPORTS
-============================================================ */
+// ============================================================
+// EXPORTS
+// ============================================================
 
 module.exports = {
   createApplication,
@@ -1733,4 +1921,7 @@ module.exports = {
   getApplicationResume,
   updateApplication,
   getApplicationStats,
+  getApplicationHistory,
+  getApplicationEmails,
+  previewApplicationEmail,
 };

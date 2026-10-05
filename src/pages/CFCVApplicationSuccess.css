@@ -1,34 +1,32 @@
 /* ============================================================
-   CFCV APPLICATION SUCCESS
+   CFCV APPLICATION CONFIRMATION
+   File: src/pages/CFCVApplicationSuccess.css
 ============================================================ */
 
 .cfcv-success-page {
-  --cfcv-navy: #071c2c;
-  --cfcv-navy-light: #0c2b40;
-  --cfcv-gold: #c6a15b;
-  --cfcv-gold-light: #ead9b6;
-  --cfcv-cream: #f8f5ee;
-  --cfcv-white: #ffffff;
-  --cfcv-text: #17232d;
-  --cfcv-muted: #66727c;
-  --cfcv-border: rgba(7, 28, 44, 0.12);
+  --success-navy: #031b34;
+  --success-navy-deep: #021426;
+  --success-gold: #c69a3a;
+  --success-gold-dark: #9e7424;
+  --success-gold-light: #e3c77b;
+  --success-text: #17202a;
+  --success-muted: #66717d;
+  --success-border: rgba(3, 27, 52, 0.13);
 
+  width: 100%;
+  min-width: 0;
   min-height: 100vh;
 
-  background:
-    linear-gradient(
-      180deg,
-      var(--cfcv-navy) 0,
-      var(--cfcv-navy) 360px,
-      var(--cfcv-cream) 360px,
-      var(--cfcv-cream) 100%
-    );
+  background: #fbfaf7;
+  color: var(--success-text);
 
-  color: var(--cfcv-text);
-
-  overflow-x: hidden;
+  font-family: "Montserrat", Arial, sans-serif;
+  overflow-wrap: anywhere;
 }
 
+/* ============================================================
+   RESET AND ACCESSIBILITY
+============================================================ */
 
 .cfcv-success-page *,
 .cfcv-success-page *::before,
@@ -36,603 +34,665 @@
   box-sizing: border-box;
 }
 
-
-.cfcv-success-container {
-  width: min(
-    calc(100% - 40px),
-    900px
-  );
-
-  margin-inline: auto;
+.cfcv-success-page :is(h1, h2, h3, h4, p) {
+  margin-top: 0;
 }
 
+.cfcv-success-page :is(a, button):focus-visible {
+  outline: 3px solid var(--success-gold-dark);
+  outline-offset: 4px;
+}
+
+.cfcv-success-page button {
+  font: inherit;
+}
+
+.cfcv-success-page svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   CONTAINER
+============================================================ */
+
+.cfcv-success-container {
+  width: min(1120px, calc(100% - 48px));
+  margin-inline: auto;
+}
 
 /* ============================================================
    HERO
 ============================================================ */
 
 .cfcv-success-hero {
-  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
 
-  padding:
-    max(48px, env(safe-area-inset-top))
-    0
-    max(80px, env(safe-area-inset-bottom));
-}
-
-
-.cfcv-success-brand {
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 9px;
-
-  margin-bottom: 48px;
-
-  color: rgba(255, 255, 255, 0.82);
-
-  font-size: 0.82rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.08em;
-
-  text-decoration: none;
-
-  text-transform: uppercase;
-
-  transition:
-    color 180ms ease,
-    transform 180ms ease;
-}
-
-
-.cfcv-success-brand:hover {
-  color: var(--cfcv-white);
-
-  transform: translateX(-2px);
-}
-
-
-/* ============================================================
-   CARD
-============================================================ */
-
-.cfcv-success-card {
-  width: 100%;
-
-  padding: clamp(
-    32px,
-    6vw,
-    68px
-  );
-
-  background: var(--cfcv-white);
-
-  border:
-    1px solid
-    var(--cfcv-border);
-
-  border-radius: 8px;
-
-  box-shadow:
-    0 30px 80px
-    rgba(0, 0, 0, 0.14);
-}
-
-
-.cfcv-success-icon {
-  width: 76px;
-  height: 76px;
-
-  display: grid;
-
-  place-items: center;
-
-  margin-bottom: 28px;
+  padding: clamp(90px, 10vw, 132px) 0 100px;
 
   background:
-    rgba(198, 161, 91, 0.12);
+    linear-gradient(
+      120deg,
+      #021426,
+      #031b34 60%,
+      #0a3155
+    );
 
-  border:
-    1px solid
-    rgba(198, 161, 91, 0.28);
-
-  border-radius: 50%;
-
-  color: var(--cfcv-gold);
+  color: #fff;
 }
 
+.cfcv-success-hero::after {
+  content: "";
+
+  position: absolute;
+  z-index: -1;
+
+  width: clamp(300px, 50vw, 650px);
+  aspect-ratio: 1;
+
+  top: -45%;
+  right: -12%;
+
+  border: 1px solid rgba(198, 154, 58, 0.22);
+  border-radius: 50%;
+
+  pointer-events: none;
+}
+
+.cfcv-success-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 38px;
+
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.cfcv-success-back:hover {
+  color: var(--success-gold-light);
+}
 
 .cfcv-success-eyebrow {
   display: block;
+  margin-bottom: 18px;
 
-  margin-bottom: 14px;
+  color: var(--success-gold-light);
 
-  color: var(--cfcv-gold);
-
-  font-size: 0.74rem;
-
+  font-size: 0.72rem;
   font-weight: 800;
-
   letter-spacing: 0.16em;
 }
 
+.cfcv-success-hero h1 {
+  max-width: 900px;
+  margin-bottom: 24px;
 
-.cfcv-success-card h1 {
-  margin: 0;
+  font-family:
+    "Trajan Pro",
+    Georgia,
+    "Times New Roman",
+    serif;
 
-  color: var(--cfcv-navy);
+  font-size: clamp(2.6rem, 6vw, 5.3rem);
+  font-weight: 500;
 
-  font-size: clamp(
-    2.4rem,
-    7vw,
-    4.8rem
-  );
-
-  font-weight: 700;
-
-  line-height: 0.98;
-
-  letter-spacing: -0.045em;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
-
-.cfcv-success-card h1 em {
-  color: var(--cfcv-gold);
-
+.cfcv-success-hero h1 em {
+  color: var(--success-gold-light);
   font-family: Georgia, serif;
-
   font-weight: 400;
 }
 
-
-.cfcv-success-intro {
+.cfcv-success-hero p {
   max-width: 650px;
+  margin-bottom: 0;
 
-  margin:
-    28px 0 0;
+  color: rgba(255, 255, 255, 0.8);
 
-  color: var(--cfcv-muted);
-
-  font-size: clamp(
-    1rem,
-    2vw,
-    1.12rem
-  );
-
-  line-height: 1.75;
+  font-size: 0.95rem;
+  line-height: 1.8;
 }
-
 
 /* ============================================================
-   APPLICATION REFERENCE
+   MAIN AND CONFIRMATION CARD
 ============================================================ */
 
-.cfcv-success-reference {
-  margin-top: 38px;
-
-  padding: 24px 26px;
-
-  background: var(--cfcv-cream);
-
-  border-left:
-    4px solid
-    var(--cfcv-gold);
+.cfcv-success-main {
+  position: relative;
+  padding: 0 0 clamp(70px, 9vw, 120px);
 }
 
+.cfcv-success-card {
+  position: relative;
 
-.cfcv-success-reference span {
+  width: 100%;
+  max-width: 920px;
+
+  margin: -42px auto 0;
+  padding: clamp(26px, 5vw, 60px);
+
+  border: 1px solid var(--success-border);
+  border-top: 4px solid var(--success-gold);
+
+  background: #fff;
+
+  box-shadow:
+    0 22px 65px rgba(3, 27, 52, 0.09);
+}
+
+.cfcv-success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 76px;
+  height: 76px;
+
+  margin-bottom: 24px;
+
+  border: 1px solid rgba(198, 154, 58, 0.35);
+  border-radius: 50%;
+
+  background: #faf5e9;
+  color: var(--success-gold-dark);
+}
+
+.cfcv-success-label {
   display: block;
+  margin-bottom: 12px;
 
-  margin-bottom: 7px;
+  color: var(--success-gold-dark);
 
-  color: var(--cfcv-muted);
-
-  font-size: 0.72rem;
-
+  font-size: 0.68rem;
   font-weight: 800;
+  letter-spacing: 0.13em;
+}
 
-  letter-spacing: 0.12em;
+.cfcv-success-card h2 {
+  margin-bottom: 16px;
+  color: var(--success-navy);
+
+  font-family: Georgia, serif;
+
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.cfcv-success-card > p,
+.cfcv-success-intro {
+  max-width: 720px;
+  color: var(--success-muted);
+
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+/* ============================================================
+   RECEIPT
+============================================================ */
+
+.cfcv-success-receipt {
+  margin-top: 30px;
+  padding: clamp(20px, 3vw, 30px);
+
+  border: 1px solid var(--success-border);
+  background: #fbfaf7;
+}
+
+.cfcv-success-reference > span,
+.cfcv-success-date > span {
+  display: block;
+  margin-bottom: 8px;
+
+  color: var(--success-gold-dark);
+
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
 
   text-transform: uppercase;
 }
 
-
 .cfcv-success-reference strong {
   display: block;
+  color: var(--success-navy);
 
-  color: var(--cfcv-navy);
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Consolas,
+    monospace;
 
-  font-size: clamp(
-    1.05rem,
-    4vw,
-    1.45rem
-  );
+  font-size: clamp(1.1rem, 2.8vw, 1.55rem);
+  line-height: 1.5;
 
-  font-weight: 800;
-
-  letter-spacing: 0.04em;
-
-  overflow-wrap: anywhere;
+  user-select: all;
 }
-
-
-.cfcv-success-reference p {
-  margin:
-    8px 0 0;
-
-  color: var(--cfcv-muted);
-
-  font-size: 0.88rem;
-}
-
 
 .cfcv-success-date {
-  margin:
-    14px 0 0;
-
-  color: var(--cfcv-muted);
-
-  font-size: 0.84rem;
+  margin-top: 22px;
 }
 
+.cfcv-success-date time {
+  color: var(--success-text);
 
-/* ============================================================
-   DIVIDER
-============================================================ */
-
-.cfcv-success-divider {
-  width: 100%;
-
-  height: 1px;
-
-  margin: 42px 0;
-
-  background: var(--cfcv-border);
+  font-size: 0.85rem;
+  line-height: 1.7;
 }
 
+.cfcv-success-receipt-actions,
+.cfcv-success-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 12px;
+}
+
+.cfcv-success-receipt-actions {
+  margin-top: 25px;
+}
+
+.cfcv-success-copy-status {
+  margin: 12px 0 0;
+
+  color: var(--success-navy);
+
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.cfcv-success-copy-status:empty {
+  margin: 0;
+}
 
 /* ============================================================
    NEXT STEPS
 ============================================================ */
 
 .cfcv-success-next {
+  margin-top: 40px;
+}
+
+.cfcv-success-next h3 {
+  margin-bottom: 25px;
+  color: var(--success-navy);
+
+  font-family: Georgia, serif;
+
+  font-size: 1.55rem;
+  font-weight: 500;
+}
+
+.cfcv-success-steps {
+  display: grid;
+  gap: 24px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.cfcv-success-steps li {
+  display: grid;
+
+  grid-template-columns:
+    44px minmax(0, 1fr);
+
+  align-items: start;
+  gap: 18px;
+}
+
+.cfcv-success-steps li > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid rgba(198, 154, 58, 0.5);
+  color: var(--success-gold-dark);
+
+  font-family: Georgia, serif;
+  font-size: 0.8rem;
+}
+
+.cfcv-success-steps h4 {
+  margin-bottom: 7px;
+  color: var(--success-navy);
+
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.cfcv-success-steps p {
+  margin-bottom: 0;
+  color: var(--success-muted);
+
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+/* ============================================================
+   INFORMATION NOTE
+============================================================ */
+
+.cfcv-success-note {
   display: grid;
 
   grid-template-columns:
     auto minmax(0, 1fr);
 
-  gap: 20px;
-
   align-items: start;
+  gap: 13px;
+
+  margin-top: 34px;
+  padding: 20px;
+
+  border-left: 3px solid var(--success-gold);
+  background: #f6f4ef;
 }
 
-
-.cfcv-success-next__icon {
-  width: 48px;
-  height: 48px;
-
-  display: grid;
-
-  place-items: center;
-
-  flex: 0 0 auto;
-
-  background: var(--cfcv-navy);
-
-  color: var(--cfcv-white);
+.cfcv-success-note svg {
+  margin-top: 3px;
+  color: var(--success-gold-dark);
 }
 
-
-.cfcv-success-next span {
-  display: block;
-
-  margin-bottom: 9px;
-
-  color: var(--cfcv-gold);
-
-  font-size: 0.7rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.14em;
-}
-
-
-.cfcv-success-next h2 {
+.cfcv-success-note p {
   margin: 0;
+  color: var(--success-muted);
 
-  color: var(--cfcv-navy);
-
-  font-size: clamp(
-    1.25rem,
-    3vw,
-    1.7rem
-  );
-
-  line-height: 1.25;
+  font-size: 0.82rem;
+  line-height: 1.75;
 }
-
-
-.cfcv-success-next p {
-  max-width: 620px;
-
-  margin:
-    13px 0 0;
-
-  color: var(--cfcv-muted);
-
-  font-size: 0.96rem;
-
-  line-height: 1.7;
-}
-
 
 /* ============================================================
-   ACTIONS
+   ACTIONS AND BUTTONS
 ============================================================ */
 
 .cfcv-success-actions {
-  display: flex;
+  margin-top: 32px;
+  padding-top: 26px;
 
-  flex-wrap: wrap;
-
-  gap: 12px;
-
-  margin-top: 42px;
+  border-top: 1px solid var(--success-border);
 }
 
-
 .cfcv-success-button {
-  min-height: 50px;
-
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
 
-  gap: 10px;
+  gap: 9px;
 
-  padding:
-    0 22px;
+  min-height: 48px;
+  max-width: 100%;
 
-  border:
-    1px solid
-    transparent;
+  padding: 12px 18px;
 
-  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 0;
 
-  font-size: 0.86rem;
-
+  font-size: 0.78rem;
   font-weight: 800;
+  line-height: 1.5;
+
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+
+  cursor: pointer;
 
   transition:
     background-color 180ms ease,
-    color 180ms ease,
-    border-color 180ms ease,
-    transform 180ms ease;
+    border-color 180ms ease;
 }
-
 
 .cfcv-success-button--primary {
-  background: var(--cfcv-navy);
-
-  color: var(--cfcv-white);
+  background: var(--success-navy);
+  color: #fff;
 }
-
 
 .cfcv-success-button--primary:hover {
-  background: var(--cfcv-navy-light);
-
-  transform: translateY(-1px);
+  background: #0b2d4d;
 }
-
 
 .cfcv-success-button--secondary {
-  background: transparent;
+  border-color: var(--success-border);
 
-  border-color:
-    var(--cfcv-border);
-
-  color: var(--cfcv-navy);
+  background: #fff;
+  color: var(--success-navy);
 }
 
-
-.cfcv-success-button--secondary:hover {
-  border-color:
-    var(--cfcv-navy);
-
-  transform: translateY(-1px);
+.cfcv-success-button--secondary:hover:not(:disabled) {
+  border-color: var(--success-gold);
+  background: #faf5e9;
 }
 
+.cfcv-success-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ============================================================
-   TABLET
+   LARGE SCREENS
+============================================================ */
+
+@media (min-width: 1600px) {
+  .cfcv-success-container {
+    width:
+      min(1240px, calc(100% - 96px));
+  }
+}
+
+/* ============================================================
+   TABLETS
 ============================================================ */
 
 @media (max-width: 768px) {
-
-  .cfcv-success-page {
-    background:
-      linear-gradient(
-        180deg,
-        var(--cfcv-navy) 0,
-        var(--cfcv-navy) 280px,
-        var(--cfcv-cream) 280px,
-        var(--cfcv-cream) 100%
-      );
-  }
-
-
   .cfcv-success-container {
-    width:
-      min(
-        calc(100% - 30px),
-        900px
-      );
+    width: calc(100% - 32px);
   }
-
 
   .cfcv-success-hero {
-    padding-top:
-      max(
-        32px,
-        env(safe-area-inset-top)
-      );
+    padding: 85px 0 85px;
   }
-
-
-  .cfcv-success-brand {
-    margin-bottom: 32px;
-  }
-
 
   .cfcv-success-card {
-    padding:
-      clamp(
-        28px,
-        7vw,
-        44px
-      );
+    margin-top: -32px;
+    padding: 30px 24px;
   }
-
 }
 
-
 /* ============================================================
-   MOBILE
+   PHONES
 ============================================================ */
 
-@media (max-width: 520px) {
-
+@media (max-width: 480px) {
   .cfcv-success-container {
-    width:
-      min(
-        calc(100% - 22px),
-        900px
-      );
+    width: calc(100% - 24px);
   }
 
+  .cfcv-success-hero {
+    padding: 72px 0 75px;
+  }
+
+  .cfcv-success-hero h1 {
+    font-size:
+      clamp(2.15rem, 10vw, 3rem);
+  }
+
+  .cfcv-success-eyebrow {
+    font-size: 0.63rem;
+    letter-spacing: 0.12em;
+  }
 
   .cfcv-success-card {
-    padding:
-      28px 20px;
-
-    border-radius: 4px;
+    padding: 26px 18px;
   }
-
 
   .cfcv-success-icon {
-    width: 62px;
-    height: 62px;
-
-    margin-bottom: 24px;
+    width: 64px;
+    height: 64px;
   }
 
-
-  .cfcv-success-reference {
-    padding:
-      20px 17px;
+  .cfcv-success-receipt {
+    padding: 18px 14px;
   }
 
-
-  .cfcv-success-divider {
-    margin:
-      34px 0;
-  }
-
-
-  .cfcv-success-next {
-    grid-template-columns: 1fr;
-  }
-
-
-  .cfcv-success-next__icon {
-    width: 44px;
-    height: 44px;
-  }
-
-
+  .cfcv-success-receipt-actions,
   .cfcv-success-actions {
     flex-direction: column;
-
-    width: 100%;
+    align-items: stretch;
   }
-
 
   .cfcv-success-button {
     width: 100%;
   }
 
+  .cfcv-success-steps li {
+    grid-template-columns:
+      36px minmax(0, 1fr);
+
+    gap: 12px;
+  }
+
+  .cfcv-success-steps li > span {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cfcv-success-note {
+    padding: 16px;
+  }
 }
-
-
-/* ============================================================
-   VERY SMALL SCREENS
-============================================================ */
 
 @media (max-width: 350px) {
-
   .cfcv-success-container {
-    width:
-      calc(100% - 16px);
+    width: calc(100% - 16px);
   }
-
 
   .cfcv-success-card {
-    padding:
-      24px 16px;
+    padding: 22px 14px;
   }
 
-
-  .cfcv-success-card h1 {
-    font-size: 2.15rem;
+  .cfcv-success-card h2 {
+    font-size: 1.65rem;
   }
-
-
-  .cfcv-success-reference {
-    padding:
-      17px 14px;
-  }
-
 }
-
 
 /* ============================================================
-   LARGE / ULTRAWIDE
+   SAFE AREAS
 ============================================================ */
 
-@media (min-width: 1600px) {
+@supports (padding: max(0px)) {
+  .cfcv-success-hero,
+  .cfcv-success-main {
+    padding-left:
+      env(safe-area-inset-left);
 
-  .cfcv-success-container {
-    max-width: 980px;
+    padding-right:
+      env(safe-area-inset-right);
   }
 
-
-  .cfcv-success-card {
-    padding: 72px;
+  .cfcv-success-main {
+    padding-bottom:
+      max(
+        70px,
+        calc(env(safe-area-inset-bottom) + 40px)
+      );
   }
-
 }
-
 
 /* ============================================================
    ACCESSIBILITY
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
+  .cfcv-success-button {
+    transition: none;
+  }
+}
 
-  .cfcv-success-page *,
-  .cfcv-success-page *::before,
-  .cfcv-success-page *::after {
-    scroll-behavior: auto !important;
+@media (forced-colors: active) {
+  .cfcv-success-card,
+  .cfcv-success-receipt,
+  .cfcv-success-button,
+  .cfcv-success-icon {
+    border: 1px solid CanvasText;
+  }
+}
 
-    transition: none !important;
+/* ============================================================
+   PRINT CONFIRMATION
+============================================================ */
 
-    animation: none !important;
+@media print {
+  .cfcv-success-page {
+    min-height: 0;
+
+    background: #fff;
+    color: #000;
   }
 
+  .cfcv-success-container {
+    width: 100%;
+  }
+
+  .cfcv-success-hero {
+    padding: 20px 0;
+
+    background: #fff;
+    color: #000;
+  }
+
+  .cfcv-success-hero::after,
+  .cfcv-success-back,
+  .cfcv-success-receipt-actions,
+  .cfcv-success-actions,
+  .cfcv-success-copy-status {
+    display: none;
+  }
+
+  .cfcv-success-hero h1,
+  .cfcv-success-hero h1 em,
+  .cfcv-success-hero p,
+  .cfcv-success-eyebrow {
+    color: #000;
+  }
+
+  .cfcv-success-hero h1 {
+    font-size: 28pt;
+  }
+
+  .cfcv-success-main {
+    padding: 0;
+  }
+
+  .cfcv-success-card {
+    max-width: none;
+
+    margin: 0;
+    padding: 20px 0;
+
+    border: 0;
+    box-shadow: none;
+  }
+
+  .cfcv-success-receipt,
+  .cfcv-success-steps li,
+  .cfcv-success-note {
+    break-inside: avoid;
+  }
 }

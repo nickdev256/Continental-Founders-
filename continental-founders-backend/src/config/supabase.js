@@ -2,117 +2,122 @@ const {
   createClient,
 } = require("@supabase/supabase-js");
 
+// ============================================================
+// ENVIRONMENT VARIABLES
+//
+// server.js loads dotenv before importing this module.
+// ============================================================
 
-/* ============================================================
-   ENVIRONMENT VARIABLES
-============================================================ */
+function requiredEnv(name) {
+  const value = String(
+    process.env[name] || ""
+  ).trim();
+
+  if (!value) {
+    throw new Error(
+      `${name} is missing from environment variables.`
+    );
+  }
+
+  return value;
+}
 
 const supabaseUrl =
-  process.env.SUPABASE_URL;
+  requiredEnv("SUPABASE_URL");
 
 const supabaseServiceRoleKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY;
+  requiredEnv("SUPABASE_SERVICE_ROLE_KEY");
 
 const supabaseAnonKey =
-  process.env.SUPABASE_ANON_KEY;
+  requiredEnv("SUPABASE_ANON_KEY");
 
+// ============================================================
+// URL VALIDATION
+// ============================================================
 
-/* ============================================================
-   VALIDATE ENVIRONMENT
-============================================================ */
+let parsedUrl;
 
-if (!supabaseUrl) {
+try {
+  parsedUrl = new URL(supabaseUrl);
+} catch {
   throw new Error(
-    "SUPABASE_URL is missing from environment variables."
+    "SUPABASE_URL must be a valid HTTP or HTTPS URL."
   );
 }
 
-
-if (!supabaseServiceRoleKey) {
+if (
+  !["http:", "https:"].includes(parsedUrl.protocol)
+  || parsedUrl.username
+  || parsedUrl.password
+  || parsedUrl.search
+  || parsedUrl.hash
+) {
   throw new Error(
-    "SUPABASE_SERVICE_ROLE_KEY is missing from environment variables."
+    "SUPABASE_URL must be an HTTP or HTTPS project URL without credentials, query parameters or fragments."
   );
 }
 
+// ============================================================
+// SERVER ADMIN CLIENT
+//
+// Used by existing backend database operations,
+// the CFCV controller and the CFCV email worker.
+//
+// Keep the service-role key exclusively in the backend.
+// Do not sign users into this shared administrative client.
+// ============================================================
 
-if (!supabaseAnonKey) {
-  throw new Error(
-    "SUPABASE_ANON_KEY is missing from environment variables."
-  );
-}
+const supabaseAdmin = createClient(
+  supabaseUrl,
+  supabaseServiceRoleKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  }
+);
 
+// ============================================================
+// AUTH CLIENT
+//
+// Uses the anon key for existing backend auth operations.
+// ============================================================
 
-/* ============================================================
-   SERVER ADMIN CLIENT
+const supabaseAuth = createClient(
+  supabaseUrl,
+  supabaseAnonKey,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  }
+);
 
-   Uses the service-role key.
+// ============================================================
+// COMPATIBLE EXPORTS
+//
+// Existing direct import:
+//
+// const supabase = require("../config/supabase");
+//
+// CFCV controller and worker:
+//
+// const {
+//   supabaseAdmin,
+// } = require("../config/supabase");
+// ============================================================
 
-   Use this client for:
-   - Database operations
-   - Creating founder accounts
-   - Updating profiles
-   - OTP records
-   - Server-side administrative operations
-
-   NEVER expose this client/key to the frontend.
-============================================================ */
-
-const supabase =
-  createClient(
-    supabaseUrl,
-    supabaseServiceRoleKey,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    }
-  );
-
-
-/* ============================================================
-   AUTH CLIENT
-
-   Uses the anon key.
-
-   This client is used when we need normal Supabase
-   authentication behaviour such as checking a founder's
-   email and password.
-============================================================ */
-
-const supabaseAuth =
-  createClient(
-    supabaseUrl,
-    supabaseAnonKey,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    }
-  );
-
-
-/* ============================================================
-   EXPORTS
-
-   Keep "supabase" so your existing backend files that use:
-
-   const supabase = require("../config/supabase");
-
-   do not suddenly break.
-
-   The extra clients are attached as properties.
-============================================================ */
-
-module.exports =
-  supabase;
+module.exports = supabaseAdmin;
 
 module.exports.supabase =
-  supabase;
+  supabaseAdmin;
 
 module.exports.supabaseAdmin =
-  supabase;
+  supabaseAdmin;
 
 module.exports.supabaseAuth =
   supabaseAuth;

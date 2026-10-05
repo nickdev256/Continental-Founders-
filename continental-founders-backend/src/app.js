@@ -1,13 +1,15 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
+const rateLimitModule = require("express-rate-limit");
 const cookieParser = require("cookie-parser");
 
+const rateLimit =
+  rateLimitModule.rateLimit || rateLimitModule;
 
-/* ============================================================
-   ROUTES
-============================================================ */
+// ============================================================
+// ROUTES
+// ============================================================
 
 const authRoutes = require("./routes/authRoutes");
 const contactRoutes = require("./routes/contactRoutes");
@@ -16,17 +18,13 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const eventsRoutes = require("./routes/eventsRoutes");
 
-// Keep this filename lowercase because Git tracks it that way.
+// Preserve the lowercase filename used by your repository.
 const insightsRoutes = require("./routes/insightsroutes");
 
 const universityRoutes = require("./routes/universityRoutes");
 const venturesRoutes = require("./routes/venturesRoutes");
 const pagesRoutes = require("./routes/pagesRoutes");
-
-// Gallery
 const galleryRoutes = require("./routes/galleryRoutes");
-
-// CFCV Fellowship Admissions
 const cfcvRoutes = require("./routes/cfcvRoutes");
 
 const {
@@ -34,10 +32,9 @@ const {
   errorHandler,
 } = require("./middleware/error");
 
-
-/* ============================================================
-   APP
-============================================================ */
+// ============================================================
+// APPLICATION
+// ============================================================
 
 const app = express();
 
@@ -48,10 +45,9 @@ app.set("trust proxy", 1);
 
 app.disable("x-powered-by");
 
-
-/* ============================================================
-   SECURITY HEADERS
-============================================================ */
+// ============================================================
+// SECURITY HEADERS
+// ============================================================
 
 app.use(
   helmet({
@@ -60,8 +56,7 @@ app.use(
     },
 
     referrerPolicy: {
-      policy:
-        "strict-origin-when-cross-origin",
+      policy: "strict-origin-when-cross-origin",
     },
 
     hsts: isProduction
@@ -74,105 +69,84 @@ app.use(
   })
 );
 
+// ============================================================
+// PRIVATE RESPONSE CACHE CONTROL
+//
+// Apply before middleware that can reject a request.
+// ============================================================
 
-/* ============================================================
-   CORS
-============================================================ */
+app.use(
+  [
+    "/api/auth",
+    "/api/admin",
+    "/api/gallery/admin",
+    "/api/cfcv/admin",
+  ],
+  (req, res, next) => {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
 
-/*
- * CLIENT_URL can contain additional origins separated by commas.
- *
- * Example:
- *
- * CLIENT_URL=https://example.com,https://admin.example.com
- */
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
 
-const configuredOrigins =
-  (
-    process.env.CLIENT_URL ||
-    ""
-  )
-    .split(",")
-    .map((url) =>
-      url
-        .trim()
-        .replace(/\/+$/, "")
-    )
-    .filter(Boolean);
+    next();
+  }
+);
 
+// ============================================================
+// CORS
+//
+// CLIENT_URL supports comma-separated frontend origins.
+// Use origins without page paths.
+// ============================================================
 
-const defaultAllowedOrigins = [
+function normalizeOrigin(origin) {
+  return origin.trim().replace(/\/+$/, "");
+}
+
+const configuredOrigins = String(
+  process.env.CLIENT_URL || ""
+)
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const allowedOrigins = new Set([
   "http://localhost:5173",
-
   "http://127.0.0.1:5173",
 
   "https://continentalfounders.org",
-
   "https://www.continentalfounders.org",
 
   "https://continental-founders.vercel.app",
-];
 
-
-const allowedOrigins =
-  new Set([
-    ...defaultAllowedOrigins,
-
-    ...configuredOrigins,
-  ]);
-
+  ...configuredOrigins,
+]);
 
 const corsOptions = {
-  origin(
-    origin,
-    callback
-  ) {
-    /*
-     * Allow requests without an Origin header,
-     * such as health checks and server-to-server requests.
-     */
-
-    if (!origin) {
-      return callback(
-        null,
-        true
-      );
-    }
-
-
-    const normalizedOrigin =
-      origin
-        .trim()
-        .replace(/\/+$/, "");
-
-
+  origin(origin, callback) {
+    // Health checks and server-to-server requests
+    // may legitimately have no Origin header.
     if (
-      allowedOrigins.has(
-        normalizedOrigin
-      )
+      !origin
+      || allowedOrigins.has(normalizeOrigin(origin))
     ) {
-      return callback(
-        null,
-        true
-      );
+      return callback(null, true);
     }
 
-
-    console.warn(
-      `[CORS] Blocked origin: ${normalizedOrigin}`
+    const error = new Error(
+      "This origin is not allowed."
     );
 
+    error.status = 403;
+    error.statusCode = 403;
 
-    return callback(
-      new Error(
-        `Origin ${normalizedOrigin} is not allowed by CORS`
-      )
-    );
+    return callback(error);
   },
 
-
   credentials: true,
-
 
   methods: [
     "GET",
@@ -184,311 +158,200 @@ const corsOptions = {
     "OPTIONS",
   ],
 
-
   allowedHeaders: [
     "Content-Type",
     "Authorization",
     "Accept",
     "X-Requested-With",
+    "Idempotency-Key",
   ],
-
 
   exposedHeaders: [
     "Content-Length",
+    "Retry-After",
   ],
 
-
   maxAge: 86400,
-
 
   optionsSuccessStatus: 204,
 };
 
+app.use(cors(corsOptions));
 
-/*
- * CORS must run before API routes.
- */
+// ============================================================
+// ALLOWED HTTP METHODS
+// ============================================================
 
-app.use(
-  cors(corsOptions)
-);
+const allowedMethods = new Set([
+  "GET",
+  "HEAD",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "OPTIONS",
+]);
 
+app.use((req, res, next) => {
+  if (!allowedMethods.has(req.method)) {
+    res.setHeader(
+      "Allow",
+      [...allowedMethods].join(", ")
+    );
 
-/* ============================================================
-   REQUEST BODY PARSING
-============================================================ */
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed.",
+    });
+  }
+
+  next();
+});
+
+// ============================================================
+// GLOBAL API RATE LIMIT
+//
+// Apply before request body parsing.
+// Exempt preflight requests and health GET/HEAD requests.
+// ============================================================
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  max: 500,
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  skip: (req) =>
+    req.method === "OPTIONS"
+    || (
+      (
+        req.method === "GET"
+        || req.method === "HEAD"
+      )
+      && /^\/health\/?$/i.test(req.path)
+    ),
+
+  message: {
+    success: false,
+    message:
+      "Too many requests. Please try again later.",
+  },
+});
+
+app.use("/api", apiLimiter);
+
+// ============================================================
+// REQUEST PARSING
+//
+// Multipart résumé uploads are handled by Multer
+// inside cfcvRoutes.js.
+// ============================================================
 
 app.use(
   express.json({
     limit: "1mb",
-
     strict: true,
   })
 );
 
-
 app.use(
   express.urlencoded({
     extended: true,
-
     limit: "1mb",
-
     parameterLimit: 100,
   })
 );
 
+app.use(cookieParser());
 
-app.use(
-  cookieParser()
-);
+// ============================================================
+// PUBLIC FORM RATE LIMITS
+//
+// Skip non-POST requests and protected /admin paths.
+// The global API limiter still applies.
+// ============================================================
 
+function skipNonPublicPost(req) {
+  return (
+    req.method !== "POST"
+    || /^\/admin(?:\/|$)/i.test(req.path)
+  );
+}
 
-/* ============================================================
-   ALLOWED HTTP METHODS
-============================================================ */
+const publicFormLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
 
-const allowedMethods =
-  new Set([
-    "GET",
-    "HEAD",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS",
-  ]);
+  max: 20,
 
+  standardHeaders: true,
+  legacyHeaders: false,
 
-app.use(
-  (
-    req,
-    res,
-    next
-  ) => {
-    if (
-      !allowedMethods.has(
-        req.method
-      )
-    ) {
-      return res
-        .status(405)
-        .json({
-          success: false,
+  skip: skipNonPublicPost,
 
-          message:
-            "Method not allowed.",
-        });
-    }
+  message: {
+    success: false,
+    message:
+      "Too many submissions. Please try again later.",
+  },
+});
 
+const newsletterLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
 
-    return next();
-  }
-);
+  max: 15,
 
+  standardHeaders: true,
+  legacyHeaders: false,
 
-/* ============================================================
-   GLOBAL API RATE LIMIT
-============================================================ */
+  skip: skipNonPublicPost,
 
-const apiLimiter =
-  rateLimit({
-    windowMs:
-      15 *
-      60 *
-      1000,
+  message: {
+    success: false,
+    message:
+      "Too many newsletter requests. Please try again later.",
+  },
+});
 
-    limit: 500,
+const cfcvApplicationLimiter = rateLimit({
+  windowMs: 30 * 60 * 1000,
 
-    standardHeaders: true,
+  max: 10,
 
-    legacyHeaders: false,
+  standardHeaders: true,
+  legacyHeaders: false,
 
+  message: {
+    success: false,
+    message:
+      "Too many application submissions. Please wait and try again later.",
+  },
+});
 
-    skip: (req) =>
-      req.path ===
-      "/health",
+// ============================================================
+// HEALTH CHECK
+// ============================================================
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: "ok",
 
-    message: {
-      success: false,
-
-      message:
-        "Too many requests. Please try again later.",
-    },
+    environment: isProduction
+      ? "production"
+      : "development",
   });
+});
 
-
-app.use(
-  "/api",
-  apiLimiter
-);
-
-
-/* ============================================================
-   PUBLIC FORM RATE LIMIT
-============================================================ */
-
-const publicFormLimiter =
-  rateLimit({
-    windowMs:
-      15 *
-      60 *
-      1000,
-
-    limit: 20,
-
-    standardHeaders: true,
-
-    legacyHeaders: false,
-
-
-    message: {
-      success: false,
-
-      message:
-        "Too many submissions. Please try again later.",
-    },
-  });
-
-
-/* ============================================================
-   NEWSLETTER RATE LIMIT
-============================================================ */
-
-const newsletterLimiter =
-  rateLimit({
-    windowMs:
-      15 *
-      60 *
-      1000,
-
-    limit: 15,
-
-    standardHeaders: true,
-
-    legacyHeaders: false,
-
-
-    message: {
-      success: false,
-
-      message:
-        "Too many newsletter requests. Please try again later.",
-    },
-  });
-
-
-/* ============================================================
-   CFCV APPLICATION RATE LIMIT
-============================================================ */
-
-/*
- * Separate limiter for fellowship applications.
- *
- * This protects the public application endpoint
- * from automated spam without affecting the
- * protected admin admissions endpoints.
- */
-
-const cfcvApplicationLimiter =
-  rateLimit({
-    windowMs:
-      30 *
-      60 *
-      1000,
-
-    limit: 10,
-
-    standardHeaders: true,
-
-    legacyHeaders: false,
-
-
-    message: {
-      success: false,
-
-      message:
-        "Too many application submissions. Please wait and try again later.",
-    },
-  });
-
-
-/* ============================================================
-   NO-CACHE ADMIN / AUTH
-============================================================ */
-
-app.use(
-  [
-    "/api/auth",
-    "/api/admin",
-    "/api/gallery/admin",
-    "/api/cfcv/admin",
-  ],
-
-  (
-    req,
-    res,
-    next
-  ) => {
-    res.setHeader(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, private"
-    );
-
-
-    res.setHeader(
-      "Pragma",
-      "no-cache"
-    );
-
-
-    res.setHeader(
-      "Expires",
-      "0"
-    );
-
-
-    next();
-  }
-);
-
-
-/* ============================================================
-   HEALTH CHECK
-============================================================ */
-
-app.get(
-  "/api/health",
-
-  (
-    req,
-    res
-  ) => {
-    return res
-      .status(200)
-      .json({
-        success: true,
-
-        status: "ok",
-
-        environment:
-          isProduction
-            ? "production"
-            : "development",
-      });
-  }
-);
-
-
-/* ============================================================
-   API ROUTES
-============================================================ */
+// ============================================================
+// EXISTING API ROUTES
+// ============================================================
 
 app.use(
   "/api/auth",
   authRoutes
 );
-
 
 app.use(
   "/api/contact",
@@ -496,13 +359,11 @@ app.use(
   contactRoutes
 );
 
-
 app.use(
   "/api/partnerships",
   publicFormLimiter,
   partnershipRoutes
 );
-
 
 app.use(
   "/api/newsletter",
@@ -510,66 +371,44 @@ app.use(
   newsletterRoutes
 );
 
-
 app.use(
   "/api/events",
   eventsRoutes
 );
-
 
 app.use(
   "/api/insights",
   insightsRoutes
 );
 
-
 app.use(
   "/api/universities",
   universityRoutes
 );
-
 
 app.use(
   "/api/ventures",
   venturesRoutes
 );
 
-
 app.use(
   "/api/pages",
   pagesRoutes
 );
-
-
-/* ============================================================
-   GALLERY API
-============================================================ */
 
 app.use(
   "/api/gallery",
   galleryRoutes
 );
 
+// ============================================================
+// CFCV FELLOWSHIP ADMISSIONS
+//
+// Only the public submission POST gets this limiter.
+// Successful limiter checks continue to the mounted router.
+// ============================================================
 
-/* ============================================================
-   CFCV FELLOWSHIP ADMISSIONS API
-============================================================ */
-
-/*
- * Public:
- *
- * POST /api/cfcv/applications
- *
- *
- * Protected admin:
- *
- * GET   /api/cfcv/admin/stats
- * GET   /api/cfcv/admin/applications
- * GET   /api/cfcv/admin/applications/:id
- * PATCH /api/cfcv/admin/applications/:id
- */
-
-app.use(
+app.post(
   "/api/cfcv/applications",
   cfcvApplicationLimiter
 );
@@ -579,63 +418,39 @@ app.use(
   cfcvRoutes
 );
 
-
-/* ============================================================
-   ADMIN DASHBOARD
-============================================================ */
+// ============================================================
+// ADMIN DASHBOARD
+// ============================================================
 
 app.use(
   "/api/admin/dashboard",
   dashboardRoutes
 );
 
+// ============================================================
+// API ROOT
+// ============================================================
 
-/* ============================================================
-   API ROOT
-============================================================ */
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    success: true,
+    name: "Continental Founders API",
+    status: "online",
+  });
+});
 
-app.get(
-  "/api",
+// ============================================================
+// NOT FOUND AND ERROR HANDLING
+// ============================================================
 
-  (
-    req,
-    res
-  ) => {
-    return res
-      .status(200)
-      .json({
-        success: true,
+app.use(notFound);
 
-        name:
-          "Continental Founders API",
+app.use(errorHandler);
 
-        status:
-          "online",
-      });
-  }
-);
-
-
-/* ============================================================
-   404
-============================================================ */
-
-app.use(
-  notFound
-);
-
-
-/* ============================================================
-   GLOBAL ERROR HANDLER
-============================================================ */
-
-app.use(
-  errorHandler
-);
-
-
-/* ============================================================
-   EXPORT APP
-============================================================ */
+// ============================================================
+// EXPORT
+//
+// Start HTTP listening and the email worker from server.js.
+// ============================================================
 
 module.exports = app;

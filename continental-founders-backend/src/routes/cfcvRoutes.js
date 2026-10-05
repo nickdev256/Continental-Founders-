@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("multer");
+const path = require("node:path");
 
 const {
   createApplication,
@@ -8,424 +9,363 @@ const {
   getApplicationResume,
   updateApplication,
   getApplicationStats,
+  getApplicationHistory,
+  getApplicationEmails,
+  previewApplicationEmail,
 } = require("../controllers/cfcvController");
 
 const {
   requireAdmin,
 } = require("../middleware/auth");
 
-
 const router = express.Router();
 
+// ============================================================
+// RÉSUMÉ CONFIGURATION
+// ============================================================
 
-/* ============================================================
-   CFCV RESUME UPLOAD CONFIGURATION
+const MAX_RESUME_SIZE = 5 * 1024 * 1024;
 
-   Files are kept in memory temporarily.
-
-   The controller uploads the file buffer directly to the
-   PRIVATE Supabase Storage bucket: cfcv-resumes
-============================================================ */
-
-const MAX_RESUME_SIZE =
-  5 * 1024 * 1024;
-
-
-const ALLOWED_RESUME_TYPES =
-  new Set([
-    "application/pdf",
-
-    "application/msword",
-
+const RESUME_TYPES = {
+  ".pdf": "application/pdf",
+  ".doc": "application/msword",
+  ".docx":
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ]);
+};
 
+// ============================================================
+// ASYNC CONTROLLER ERROR HANDLING
+// ============================================================
 
-const resumeStorage =
-  multer.memoryStorage();
-
-
-const resumeUpload =
-  multer({
-    storage:
-      resumeStorage,
-
-    limits: {
-      fileSize:
-        MAX_RESUME_SIZE,
-
-      files:
-        1,
-
-      fields:
-        20,
-
-      parts:
-        25,
-    },
-
-    fileFilter: (
-      req,
-      file,
-      callback
-    ) => {
-      const mimeType =
-        String(
-          file?.mimetype || ""
-        )
-          .trim()
-          .toLowerCase();
-
-
-      if (
-        !ALLOWED_RESUME_TYPES.has(
-          mimeType
-        )
-      ) {
-        const error =
-          new Error(
-            "Only PDF, DOC and DOCX résumé files are allowed."
-          );
-
-        error.code =
-          "INVALID_RESUME_TYPE";
-
-        return callback(
-          error
-        );
-      }
-
-
-      return callback(
-        null,
-        true
-      );
-    },
-  });
-
-
-/* ============================================================
-   RESUME UPLOAD MIDDLEWARE
-
-   The frontend sends:
-
-   application = JSON string
-   resume      = applicant résumé/CV file
-
-   This wrapper converts Multer errors into clean JSON responses
-   instead of sending an HTML Express error page.
-============================================================ */
-
-function handleResumeUpload(
-  req,
-  res,
-  next
-) {
-  resumeUpload.single(
-    "resume"
-  )(
-    req,
-    res,
-    (error) => {
-      if (!error) {
-        return next();
-      }
-
-
-      console.error(
-        "[CFCV] Resume upload middleware error:",
-        error
-      );
-
-
-      /* ------------------------------------------------------
-         FILE TOO LARGE
-      ------------------------------------------------------- */
-
-      if (
-        error instanceof
-          multer.MulterError &&
-        error.code ===
-          "LIMIT_FILE_SIZE"
-      ) {
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "Your résumé or CV must not exceed 5 MB.",
-          });
-      }
-
-
-      /* ------------------------------------------------------
-         TOO MANY FILES
-      ------------------------------------------------------- */
-
-      if (
-        error instanceof
-          multer.MulterError &&
-        (
-          error.code ===
-            "LIMIT_FILE_COUNT" ||
-          error.code ===
-            "LIMIT_UNEXPECTED_FILE"
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "Please upload only one résumé or CV.",
-          });
-      }
-
-
-      /* ------------------------------------------------------
-         TOO MANY FORM FIELDS / PARTS
-      ------------------------------------------------------- */
-
-      if (
-        error instanceof
-          multer.MulterError &&
-        (
-          error.code ===
-            "LIMIT_FIELD_COUNT" ||
-          error.code ===
-            "LIMIT_PART_COUNT"
-        )
-      ) {
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              "The application contains too many form fields.",
-          });
-      }
-
-
-      /* ------------------------------------------------------
-         INVALID FILE TYPE
-      ------------------------------------------------------- */
-
-      if (
-        error.code ===
-        "INVALID_RESUME_TYPE"
-      ) {
-        return res
-          .status(400)
-          .json({
-            success:
-              false,
-
-            message:
-              error.message,
-          });
-      }
-
-
-      /* ------------------------------------------------------
-         UNKNOWN UPLOAD ERROR
-      ------------------------------------------------------- */
-
-      return res
-        .status(400)
-        .json({
-          success:
-            false,
-
-          message:
-            error.message ||
-            "Unable to process the résumé or CV upload.",
-        });
-    }
-  );
+function asyncHandler(handler) {
+  return (req, res, next) => {
+    Promise.resolve()
+      .then(() => handler(req, res, next))
+      .catch(next);
+  };
 }
 
+// ============================================================
+// CONSISTENT UPLOAD ERRORS
+// ============================================================
 
-/* ============================================================
-   CFCV ROUTES
+function uploadError(res, message, field = "") {
+  return res.status(400).json({
+    success: false,
+    message,
 
-   PUBLIC
+    ...(field
+      ? {
+          field,
+          fields: [field],
+        }
+      : {}),
+  });
+}
 
-   POST
-   /api/cfcv/applications
+// ============================================================
+// MEMORY UPLOAD
+//
+// Controller must validate file signatures before uploading
+// to the private résumé bucket.
+// ============================================================
 
+const resumeUpload = multer({
+  storage: multer.memoryStorage(),
 
-   ADMIN
+  limits: {
+    fileSize: MAX_RESUME_SIZE,
+    files: 1,
+    fields: 2,
+    parts: 3,
+    fieldSize: 256 * 1024,
+    fieldNameSize: 100,
+  },
 
-   GET
-   /api/cfcv/admin/stats
+  fileFilter(req, file, callback) {
+    const extension = path
+      .extname(file.originalname || "")
+      .toLowerCase();
 
-   GET
-   /api/cfcv/admin/applications
+    const mimeType = String(file.mimetype || "")
+      .trim()
+      .toLowerCase();
 
-   GET
-   /api/cfcv/admin/applications/:id
+    if (
+      !RESUME_TYPES[extension] ||
+      mimeType !== RESUME_TYPES[extension]
+    ) {
+      const error = new Error(
+        "Only PDF, DOC and DOCX résumé files are allowed."
+      );
 
-   GET
-   /api/cfcv/admin/applications/:id/resume
+      error.code = "INVALID_RESUME_TYPE";
 
-   PATCH
-   /api/cfcv/admin/applications/:id
-============================================================ */
+      return callback(error);
+    }
 
+    return callback(null, true);
+  },
+});
 
-/* ============================================================
-   PUBLIC
-   SUBMIT CFCV APPLICATION
+// ============================================================
+// REQUIRE MULTIPART FORM DATA
+//
+// application   JSON string
+// submissionKey UUID string
+// resume        PDF, DOC or DOCX file
+// ============================================================
 
-   multipart/form-data
+function requireMultipart(req, res, next) {
+  if (!req.is("multipart/form-data")) {
+    return res.status(415).json({
+      success: false,
+      message:
+        "Submit the application using multipart/form-data.",
+    });
+  }
 
-   Fields:
+  return next();
+}
 
-   application
-   JSON string containing the application form
+// ============================================================
+// HANDLE UPLOAD ERRORS
+// ============================================================
 
-   resume
-   PDF / DOC / DOCX file
-============================================================ */
+function handleResumeUpload(req, res, next) {
+  resumeUpload.single("resume")(req, res, (error) => {
+    if (!error) {
+      return next();
+    }
+
+    if (error.code === "INVALID_RESUME_TYPE") {
+      return uploadError(res, error.message, "resume");
+    }
+
+    if (error instanceof multer.MulterError) {
+      switch (error.code) {
+        case "LIMIT_FILE_SIZE":
+          return uploadError(
+            res,
+            "Your résumé or CV must not exceed 5 MB.",
+            "resume"
+          );
+
+        case "LIMIT_FILE_COUNT":
+        case "LIMIT_UNEXPECTED_FILE":
+          return uploadError(
+            res,
+            "Upload one résumé using the resume field.",
+            "resume"
+          );
+
+        case "LIMIT_FIELD_COUNT":
+        case "LIMIT_PART_COUNT":
+          return uploadError(
+            res,
+            "Submit only application, submissionKey and one résumé."
+          );
+
+        case "LIMIT_FIELD_VALUE":
+          return uploadError(
+            res,
+            "The application form data is too large.",
+            error.field
+          );
+
+        case "LIMIT_FIELD_KEY":
+          return uploadError(
+            res,
+            "The application contains an invalid field name."
+          );
+
+        default:
+          return uploadError(
+            res,
+            "Unable to process the application upload."
+          );
+      }
+    }
+
+    return uploadError(
+      res,
+      "Unable to process the application upload. Check your file and try again."
+    );
+  });
+}
+
+// ============================================================
+// VALIDATE MULTIPART FIELDS
+// ============================================================
+
+function validateSubmissionParts(req, res, next) {
+  const body = req.body || {};
+
+  const allowedFields = new Set([
+    "application",
+    "submissionKey",
+  ]);
+
+  if (
+    Object.keys(body).some(
+      (key) => !allowedFields.has(key)
+    )
+  ) {
+    return uploadError(
+      res,
+      "Only application and submissionKey text fields are allowed."
+    );
+  }
+
+  for (const field of allowedFields) {
+    if (
+      typeof body[field] !== "string" ||
+      !body[field].trim()
+    ) {
+      return uploadError(
+        res,
+        `Provide one non-empty ${field} field.`,
+        field
+      );
+    }
+  }
+
+  if (!req.file || !req.file.size) {
+    return uploadError(
+      res,
+      "Choose a non-empty résumé file.",
+      "resume"
+    );
+  }
+
+  // createApplication remains responsible for:
+  // - JSON parsing and application schema validation
+  // - submissionKey UUID validation
+  // - résumé signature validation
+  // - same-key retry handling and payload conflicts
+
+  return next();
+}
+
+// ============================================================
+// PREVENT CACHING
+// ============================================================
+
+function noStore(req, res, next) {
+  res.setHeader("Cache-Control", "no-store");
+
+  return next();
+}
+
+// ============================================================
+// PUBLIC: SUBMIT APPLICATION
+//
+// POST /api/cfcv/applications
+//
+// Public submission rate limiting remains in app.js.
+// ============================================================
 
 router.post(
   "/applications",
-
+  noStore,
+  requireMultipart,
   handleResumeUpload,
-
-  createApplication
+  validateSubmissionParts,
+  asyncHandler(createApplication)
 );
 
-
-/* ============================================================
-   ADMIN AUTHENTICATION
-
-   Everything below /admin requires an authenticated
-   Continental Founders CMS administrator.
-============================================================ */
+// ============================================================
+// ADMIN AUTHENTICATION
+//
+// Set no-store before authentication so authentication
+// errors also receive the header.
+// ============================================================
 
 router.use(
   "/admin",
-
+  noStore,
   requireAdmin
 );
 
-
-/* ============================================================
-   ADMIN
-   APPLICATION STATISTICS
-
-   Keep this route before dynamic application ID routes.
-============================================================ */
+// ============================================================
+// ADMIN: STATISTICS
+// ============================================================
 
 router.get(
   "/admin/stats",
-
-  getApplicationStats
+  asyncHandler(getApplicationStats)
 );
 
-
-/* ============================================================
-   ADMIN
-   GET ALL APPLICATIONS
-
-   Supported examples:
-
-   ?status=submitted
-
-   ?status=under_review
-
-   ?admissionsStage=interview
-
-   ?track=Genesis
-
-   ?track=Ascend
-
-   ?track=Horizon
-
-   ?geography=Africa
-
-   ?geography=United%20States
-
-   ?geography=Diaspora
-
-   ?search=John
-============================================================ */
+// ============================================================
+// ADMIN: APPLICATION LIST
+// ============================================================
 
 router.get(
   "/admin/applications",
-
-  getApplications
+  asyncHandler(getApplications)
 );
 
-
-/* ============================================================
-   ADMIN
-   SECURELY ACCESS APPLICANT RESUME
-
-   IMPORTANT:
-
-   The résumé bucket remains PRIVATE.
-
-   This route asks the controller to generate a temporary
-   signed Supabase Storage URL.
-
-   Example:
-
-   GET
-   /api/cfcv/admin/applications/<application-id>/resume
-============================================================ */
+// ============================================================
+// ADMIN: PRIVATE RÉSUMÉ LINK
+// ============================================================
 
 router.get(
   "/admin/applications/:id/resume",
-
-  getApplicationResume
+  asyncHandler(getApplicationResume)
 );
 
+// ============================================================
+// ADMIN: REVIEW HISTORY
+// ============================================================
 
-/* ============================================================
-   ADMIN
-   GET ONE APPLICATION
-============================================================ */
+router.get(
+  "/admin/applications/:id/history",
+  asyncHandler(getApplicationHistory)
+);
+
+// ============================================================
+// ADMIN: EMAIL QUEUE STATUS
+// ============================================================
+
+router.get(
+  "/admin/applications/:id/emails",
+  asyncHandler(getApplicationEmails)
+);
+
+// ============================================================
+// ADMIN: PREVIEW EMAIL
+//
+// Does not save a review or send an email.
+// ============================================================
+
+router.post(
+  "/admin/applications/:id/email-preview",
+  asyncHandler(previewApplicationEmail)
+);
+
+// ============================================================
+// ADMIN: APPLICATION DETAILS
+// ============================================================
 
 router.get(
   "/admin/applications/:id",
-
-  getApplicationById
+  asyncHandler(getApplicationById)
 );
 
-
-/* ============================================================
-   ADMIN
-   UPDATE APPLICATION
-
-   Used for:
-
-   - admissions stage
-   - founder assessment workflow
-   - interview information
-   - Genesis / Ascend / Horizon placement
-   - cross-continental matching
-   - compatibility workflow
-   - final admissions decision
-   - internal reviewer notes
-============================================================ */
+// ============================================================
+// ADMIN: SAVE REVIEW
+//
+// Controller enforces expectedVersion and handles
+// notifyApplicant and applicantMessage.
+// ============================================================
 
 router.patch(
   "/admin/applications/:id",
-
-  updateApplication
+  asyncHandler(updateApplication)
 );
 
-
-/* ============================================================
-   EXPORT
-============================================================ */
+// ============================================================
+// EXPORT
+// ============================================================
 
 module.exports = router;

@@ -1,126 +1,139 @@
-const { Resend } =
-  require("resend");
-
+const { Resend } = require("resend");
 
 // ============================================================
-// STATE
+// CLIENT STATE
 // ============================================================
 
-let resendClient =
-  null;
-
-let currentApiKey =
-  null;
-
+let resendClient = null;
+let currentApiKey = null;
 
 // ============================================================
 // CONFIGURATION
 // ============================================================
 
 function getEmailConfig() {
-  const apiKey =
-    String(
-      process.env.RESEND_API_KEY ||
-      ""
-    ).trim();
-
-  const from =
-    String(
-      process.env.EMAIL_FROM ||
-      "Continental Founders <noreply@continentalfounders.org>"
-    ).trim();
-
-  const defaultRecipient =
-    String(
-      process.env.EMAIL_TO ||
-      ""
-    ).trim();
-
   return {
-    apiKey,
-    from,
-    defaultRecipient,
+    apiKey: String(
+      process.env.RESEND_API_KEY || ""
+    ).trim(),
+
+    from: String(
+      process.env.EMAIL_FROM ||
+        "Continental Founders <noreply@continentalfounders.org>"
+    ).trim(),
+
+    defaultRecipient: String(
+      process.env.EMAIL_TO || ""
+    ).trim(),
+
+    defaultReplyTo: String(
+      process.env.EMAIL_REPLY_TO || ""
+    ).trim(),
   };
 }
 
+function isEmailConfigured() {
+  const config = getEmailConfig();
 
-// ============================================================
-// GET RESEND CLIENT
-// ============================================================
+  return Boolean(config.apiKey && config.from);
+}
 
 function getResendClient() {
-  const {
-    apiKey,
-  } =
-    getEmailConfig();
-
+  const { apiKey } = getEmailConfig();
 
   if (!apiKey) {
     return null;
   }
 
-
-  // Re-create client if environment configuration changes
-  // while using a development process manager.
-  if (
-    !resendClient ||
-    currentApiKey !== apiKey
-  ) {
-    resendClient =
-      new Resend(
-        apiKey
-      );
-
-    currentApiKey =
-      apiKey;
+  if (!resendClient || currentApiKey !== apiKey) {
+    resendClient = new Resend(apiKey);
+    currentApiKey = apiKey;
   }
-
 
   return resendClient;
 }
 
+// ============================================================
+// EMAIL ERRORS
+//
+// The queue worker uses retryable to decide whether to retry
+// automatically or flag a job for administrator review.
+// ============================================================
+
+class EmailSendError extends Error {
+  constructor(
+    message,
+    {
+      retryable = false,
+      statusCode = null,
+      providerErrorName = null,
+    } = {}
+  ) {
+    super(message);
+
+    this.name = "EmailSendError";
+    this.retryable = retryable;
+    this.statusCode = statusCode;
+    this.providerErrorName = providerErrorName;
+  }
+}
 
 // ============================================================
-// NORMALIZE RECIPIENTS
+// RECIPIENT NORMALIZATION
 // ============================================================
 
-function normalizeRecipients(
-  value
-) {
-  if (!value) {
+function normalizeRecipients(value) {
+  if (value === undefined || value === null) {
     return [];
   }
 
+  const values = Array.isArray(value)
+    ? value
+    : String(value).split(",");
 
-  if (
-    Array.isArray(
-      value
-    )
-  ) {
-    return value
-      .map(
-        (recipient) =>
-          String(
-            recipient ||
-            ""
-          ).trim()
-      )
-      .filter(Boolean);
-  }
-
-
-  return String(value)
-    .split(",")
-    .map(
-      (recipient) =>
-        recipient.trim()
-    )
-    .filter(Boolean);
+  return [
+    ...new Set(
+      values
+        .map((recipient) =>
+          String(recipient ?? "").trim()
+        )
+        .filter(Boolean)
+    ),
+  ];
 }
 
+function validateRecipients(recipients, label) {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (
+    recipients.some(
+      (recipient) =>
+        recipient.length > 320 ||
+        !emailPattern.test(recipient)
+    )
+  ) {
+    throw new EmailSendError(
+      `${label} contains an invalid email address.`
+    );
+  }
+}
 
 // ============================================================
 // SEND EMAIL
+//
+// Supported arguments:
+//
+// {
+//   to,
+//   subject,
+//   html,
+//   text,
+//   replyTo,
+//   from,
+//   idempotencyKey
+// }
+//
+// Queue retries must supply the SAME payload and key.
 // ============================================================
 
 async function sendEmail({
@@ -129,228 +142,221 @@ async function sendEmail({
   html,
   text,
   replyTo,
-}) {
-  const {
-    from,
-    defaultRecipient,
-  } =
-    getEmailConfig();
-
-
-  // ==========================================================
-  // RESEND CLIENT
-  // ==========================================================
-
-  const resend =
-    getResendClient();
-
+  from: explicitFrom,
+  idempotencyKey,
+} = {}) {
+  const config = getEmailConfig();
+  const resend = getResendClient();
 
   if (!resend) {
-    console.error(
-      "[EMAIL] RESEND_API_KEY is not configured."
-    );
-
-    throw new Error(
-      "Email service is not configured."
+    throw new EmailSendError(
+      "RESEND_API_KEY is not configured."
     );
   }
 
+  // Default recipient is used only when no recipient was
+  // supplied. An explicitly empty recipient must fail.
+  const recipients = normalizeRecipients(
+    to === undefined || to === null
+      ? config.defaultRecipient
+      : to
+  );
 
-  // ==========================================================
-  // RECIPIENT
-  // ==========================================================
-
-  const recipients =
-    normalizeRecipients(
-      to ||
-      defaultRecipient
-    );
-
-
-  if (
-    recipients.length === 0
-  ) {
-    console.error(
-      "[EMAIL] No recipient was supplied."
-    );
-
-    throw new Error(
-      "No email recipient is configured."
+  if (!recipients.length) {
+    throw new EmailSendError(
+      "An email recipient is required."
     );
   }
 
+  validateRecipients(recipients, "Recipient");
 
-  // ==========================================================
-  // SENDER
-  // ==========================================================
+  const from = String(
+    explicitFrom === undefined || explicitFrom === null
+      ? config.from
+      : explicitFrom
+  ).trim();
 
-  if (!from) {
-    console.error(
-      "[EMAIL] EMAIL_FROM is not configured."
-    );
-
-    throw new Error(
-      "Email sender is not configured."
-    );
-  }
-
-
-  // ==========================================================
-  // SUBJECT
-  // ==========================================================
-
-  const cleanSubject =
-    String(
-      subject ||
-      ""
-    ).trim();
-
-
-  if (!cleanSubject) {
-    throw new Error(
-      "Email subject is required."
+  if (!from || /[\r\n]/.test(from)) {
+    throw new EmailSendError(
+      "A valid email sender is required."
     );
   }
 
+  const cleanSubject = String(
+    subject ?? ""
+  ).trim();
 
-  // ==========================================================
-  // CONTENT
-  // ==========================================================
+  if (!cleanSubject || /[\r\n]/.test(cleanSubject)) {
+    throw new EmailSendError(
+      "A valid email subject is required."
+    );
+  }
 
-  if (
-    !html &&
-    !text
-  ) {
-    throw new Error(
+  const htmlContent =
+    html === undefined || html === null
+      ? ""
+      : String(html);
+
+  const textContent =
+    text === undefined || text === null
+      ? ""
+      : String(text);
+
+  if (!htmlContent.trim() && !textContent.trim()) {
+    throw new EmailSendError(
       "Email content is required."
     );
   }
 
+  const replyToRecipients = normalizeRecipients(
+    replyTo === undefined || replyTo === null
+      ? config.defaultReplyTo
+      : replyTo
+  );
 
-  // ==========================================================
-  // MESSAGE
-  // ==========================================================
+  validateRecipients(replyToRecipients, "Reply-to");
+
+  const cleanIdempotencyKey = String(
+    idempotencyKey ?? ""
+  ).trim();
+
+  if (
+    idempotencyKey !== undefined &&
+    idempotencyKey !== null &&
+    (
+      !cleanIdempotencyKey ||
+      cleanIdempotencyKey.length > 256
+    )
+  ) {
+    throw new EmailSendError(
+      "The email idempotency key must contain 1–256 characters."
+    );
+  }
 
   const message = {
     from,
-    to:
-      recipients,
-    subject:
-      cleanSubject,
+    to: recipients,
+    subject: cleanSubject,
   };
 
-
-  if (html) {
-    message.html =
-      html;
+  if (htmlContent.trim()) {
+    message.html = htmlContent;
   }
 
-
-  if (text) {
-    message.text =
-      text;
+  if (textContent.trim()) {
+    message.text = textContent;
   }
 
-
-  if (replyTo) {
+  if (replyToRecipients.length) {
     message.replyTo =
-      replyTo;
+      replyToRecipients.length === 1
+        ? replyToRecipients[0]
+        : replyToRecipients;
   }
 
-
-  // ==========================================================
-  // SEND
-  // ==========================================================
+  let result;
 
   try {
-    const {
-      data,
-      error,
-    } =
-      await resend.emails.send(
-        message
-      );
-
-
-    // ========================================================
-    // RESEND API ERROR
-    // ========================================================
-
-    if (error) {
-      console.error(
-        "[EMAIL] Resend rejected email:",
-        {
-          name:
-            error?.name ||
-            null,
-
-          message:
-            error?.message ||
-            "Unknown Resend error",
-
-          statusCode:
-            error?.statusCode ||
-            null,
-        }
-      );
-
-
-      throw new Error(
-        error?.message ||
-        "Unable to send email."
-      );
-    }
-
-
-    // ========================================================
-    // SUCCESS
-    // ========================================================
-
-    console.log(
-      "[EMAIL] Email sent successfully.",
+    result = cleanIdempotencyKey
+      ? await resend.emails.send(
+          message,
+          {
+            idempotencyKey: cleanIdempotencyKey,
+          }
+        )
+      : await resend.emails.send(message);
+  } catch {
+    // A network failure can occur after the provider accepts
+    // a request. Retry using the same payload and key.
+    throw new EmailSendError(
+      "The email provider request could not be completed.",
       {
-        messageId:
-          data?.id ||
-          null,
-
-        recipients:
-          recipients.length,
+        retryable: true,
       }
     );
-
-
-    return {
-      success:
-        true,
-
-      messageId:
-        data?.id ||
-        null,
-    };
-
-  } catch (error) {
-    console.error(
-      "[EMAIL] Email delivery failed:",
-      {
-        name:
-          error?.name ||
-          "Error",
-
-        message:
-          error?.message ||
-          "Unknown email error",
-      }
-    );
-
-
-    throw error;
   }
+
+  const { data, error } = result || {};
+
+  if (error) {
+    const numericStatus = Number(error.statusCode);
+
+    const statusCode =
+      Number.isInteger(numericStatus) &&
+      numericStatus >= 100 &&
+      numericStatus <= 599
+        ? numericStatus
+        : null;
+
+    const providerErrorName = String(
+      error.name || "provider_error"
+    );
+
+    const permanentErrors = new Set([
+      "validation_error",
+      "missing_required_field",
+      "invalid_access",
+      "restricted_api_key",
+      "invalid_api_key",
+      "missing_api_key",
+      "invalid_idempotent_request",
+    ]);
+
+    const retryable =
+      statusCode !== null
+        ? (
+            statusCode === 408 ||
+            statusCode === 429 ||
+            statusCode >= 500
+          )
+        : !permanentErrors.has(providerErrorName);
+
+    throw new EmailSendError(
+      String(
+        error.message ||
+          "The email provider rejected the request."
+      ),
+      {
+        retryable,
+        statusCode,
+        providerErrorName,
+      }
+    );
+  }
+
+  if (!data?.id) {
+    // Treat this as an uncertain outcome and use the same
+    // idempotency key if the worker retries.
+    throw new EmailSendError(
+      "The email provider did not confirm acceptance.",
+      {
+        retryable: true,
+      }
+    );
+  }
+
+  return {
+    success: true,
+    messageId: data.id,
+    status: "accepted",
+  };
 }
 
-
 // ============================================================
-// EXPORT
+// EXPORTS
+//
+// Existing imports remain supported:
+//
+// const sendEmail = require("../utils/sendEmail");
+//
+// The worker can also access:
+//
+// sendEmail.getEmailConfig()
+// sendEmail.isEmailConfigured()
 // ============================================================
 
-module.exports =
-  sendEmail;
+module.exports = sendEmail;
+
+module.exports.getEmailConfig = getEmailConfig;
+module.exports.isEmailConfigured = isEmailConfigured;
+module.exports.EmailSendError = EmailSendError;

@@ -1,1327 +1,1136 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import {
+  ArrowDown,
   ArrowRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Check,
   CheckCircle2,
-  ChevronRight,
   Clock3,
   Globe2,
   Handshake,
-  Lightbulb,
-  Rocket,
+  Layers3,
+  MapPin,
+  MessageSquare,
+  Network,
   Scale,
+  ShieldCheck,
   Target,
   TrendingUp,
-  UserCheck,
   Users,
+  XCircle,
 } from "lucide-react";
 
 import "./CFCV.css";
 
-/* ============================================================
-   CONTINENTAL FOUNDERS CATALYTIC VENTURES
-   CFCV FELLOWSHIP
+// ============================================================
+// IMAGE PATHS
+// Place these optional images in public/images/cfcv/.
+// Missing images fall back to the backgrounds defined in CSS.
+// ============================================================
 
-   Content on this page is based on the
-   CFCV Fellowship Admissions Framework.
-============================================================ */
+const IMAGE_ROOT = "/images/cfcv";
 
+// ============================================================
+// FELLOWSHIP FACTS
+// ============================================================
 
-/* ============================================================
-   PROGRAM TRACKS
-============================================================ */
+const facts = [
+  {
+    value: "6 months",
+    label: "INTENSIVE FELLOWSHIP",
+  },
+  {
+    value: "Up to 30 ventures",
+    label: "ACROSS THE COHORT",
+  },
+  {
+    value: "3 development tracks",
+    label: "GENESIS · ASCEND · HORIZON",
+  },
+  {
+    value: "Africa + U.S. / Diaspora",
+    label: "CROSS-CONTINENTAL COLLABORATION",
+  },
+];
+
+// ============================================================
+// ADMISSION PROCESS
+// ============================================================
+
+const stages = [
+  {
+    name: "Apply",
+    description: "Submit your founder and venture application.",
+  },
+  {
+    name: "Assess",
+    description: "Complete the founder and venture assessment.",
+  },
+  {
+    name: "Place",
+    description: "Be placed in the right development track.",
+  },
+  {
+    name: "Match",
+    description:
+      "Connect with potential collaborators across continents.",
+  },
+  {
+    name: "Admit",
+    description: "Receive your final decision and next steps.",
+  },
+];
+
+// ============================================================
+// DEVELOPMENT TRACKS
+// ============================================================
 
 const tracks = [
   {
-    number: "01",
-    name: "GENESIS",
-    tagline: "BUILD IT",
-    icon: Lightbulb,
-
-    bestFit:
-      "Idea, problem, or early concept", 
-
-    focus: [
-      "Customer discovery",
-      "Validation",
-      "Business model",
-      "Co-founder relationship",
-      "MVP / prototype",
-    ],
-
+    key: "genesis",
+    name: "Genesis",
+    title: "Build it.",
+    bestFit: "For founders with an idea or early concept.",
+    focus:
+      "Customer discovery, validation, business model, co-founder relationship, MVP / prototype.",
     outcome:
-      "Validated concept, cross-continental founding team, and MVP / proof of concept",
+      "A validated concept, cross-continental founding team, and MVP / proof of concept.",
+    image: `${IMAGE_ROOT}/genesis.jpg`,
   },
-
   {
-    number: "02",
-    name: "ASCEND",
-    tagline: "PROVE IT",
-    icon: TrendingUp,
-
+    key: "ascend",
+    name: "Ascend",
+    title: "Prove it.",
     bestFit:
-      "MVP, prototype, pilot, or early traction",
-
-    focus: [
-      "Market testing",
-      "Pilots",
-      "Financial model",
-      "Revenue strategy",
-      "Legal / governance",
-      "Investment readiness",
-    ],
-
+      "For founders with an MVP, prototype, pilot, or early traction.",
+    focus:
+      "Market testing, pilots, financial model, revenue strategy, legal / governance, investment readiness.",
     outcome:
-      "Stronger venture with demonstrated traction and investment pathway",
+      "Demonstrated traction and a clear investment pathway.",
+    image: `${IMAGE_ROOT}/ascend.jpg`,
   },
-
   {
-    number: "03",
-    name: "HORIZON",
-    tagline: "SCALE IT",
-    icon: Rocket,
-
+    key: "horizon",
+    name: "Horizon",
+    title: "Scale it.",
     bestFit:
-      "Operating business with customers, revenue, contracts, pilots, or partnerships",
-
-    focus: [
-      "Expansion",
-      "Capital strategy",
-      "Strategic partnerships",
-      "Governance",
-      "Scaling",
-    ],
-
+      "For founders with an operating business, customers, revenue, contracts, or partnerships.",
+    focus:
+      "Expansion, capital strategy, strategic partnerships, governance, and scaling.",
     outcome:
-      "Scale-ready venture positioned for market expansion and investment",
+      "A scale-ready venture positioned for market expansion and investment.",
+    image: `${IMAGE_ROOT}/horizon.jpg`,
   },
 ];
 
+// ============================================================
+// FOUNDER ASSESSMENT
+// ============================================================
 
-/* ============================================================
-   ADMISSIONS WORKFLOW
-============================================================ */
-
-const workflow = [
-  {
-    number: "01",
-    name: "APPLY",
-    description:
-      "Founder submits an application describing their background, venture or idea, current stage, target market, team, and goals.",
-  },
-
-  {
-    number: "02",
-    name: "ASSESS",
-    description:
-      "CFCV evaluates founder readiness, venture potential, commitment, integrity, relevant skills, collaboration, cross-cultural readiness, and ability to complete the six-month program.",
-  },
-
-  {
-    number: "03",
-    name: "PLACE",
-    description:
-      "CFCV determines whether the venture is best suited for Genesis, Ascend, or Horizon based on business readiness.",
-  },
-
-  {
-    number: "04",
-    name: "MATCH",
-    description:
-      "If needed, CFCV identifies a compatible collaborator from the other geography and conducts a founder compatibility process.",
-  },
-
-  {
-    number: "05",
-    name: "ADMIT",
-    description:
-      "CFCV makes final admissions decisions and selects up to 30 ventures across the three tracks.",
-  },
-];
-
-
-/* ============================================================
-   FOUNDER ASSESSMENT
-============================================================ */
-
-const founderAssessment = [
-  "Commitment to becoming or continuing as a serious founder",
+const assessment = [
+  "Commitment to building a serious venture",
   "Integrity and professionalism",
-  "Entrepreneurial potential and problem-solving ability",
+  "Entrepreneurial potential and resourcefulness",
   "Relevant skills and experience",
-  "Willingness and ability to collaborate",
-  "Ability to work effectively across cultures and geographies",
-  "Ability to complete the six-month program",
+  "Willingness to collaborate and learn",
+  "Cross-cultural readiness and adaptability",
+  "Availability for the six-month fellowship",
 ];
 
+// ============================================================
+// INTERVIEW QUESTIONS
+// ============================================================
 
-/* ============================================================
-   MATCHING CRITERIA
-============================================================ */
+const interviewQuestions = [
+  "Why entrepreneurship, and why this problem?",
+  "Why are you positioned to solve it?",
+  "What experience and skills do you bring?",
+  "What do you need in a cross-continental collaborator?",
+  "How do you handle disagreement and decision-making?",
+  "How do you work across cultures and geographies?",
+  "How much time can you commit?",
+  "What are your ownership and company expectations?",
+  "What does success look like in six months?",
+];
+
+// ============================================================
+// MATCHING CRITERIA
+// ============================================================
 
 const matchingCriteria = [
-  "Skills and complementary capabilities",
-  "Sector and business interests",
-  "Entrepreneurial and professional experience",
-  "Market knowledge",
-  "Geographic connections",
-  "Personality and working style",
-  "Time commitment",
-  "Leadership strengths",
-  "Long-term objectives",
-];
-
-
-/* ============================================================
-   COMPATIBILITY SPRINT
-============================================================ */
-
-const compatibilityQuestions = [
-  "Who is responsible for what?",
-  "How will decisions be made?",
-  "How much time can each founder commit?",
-  "What does each founder contribute?",
-  "How will disagreements be handled?",
-  "What are expectations regarding ownership?",
-  "What is the shared long-term vision?",
-];
-
-
-/* ============================================================
-   ADMISSION DECISIONS
-============================================================ */
-
-const decisions = [
   {
-    name: "ADMIT",
-    description:
-      "Applicant meets requirements and is ready for the fellowship.",
+    title: "Complementary skills",
+    description: "Diverse and complementary capabilities",
+    icon: Network,
   },
-
   {
-    name: "ADMIT WITH TRACK PLACEMENT",
-    description:
-      "Applicant is accepted and assigned to Genesis, Ascend, or Horizon.",
+    title: "Sector interests",
+    description: "Shared or adjacent business interests",
+    icon: Users,
   },
-
   {
-    name: "MATCH REQUIRED",
-    description:
-      "Applicant is promising but needs a cross-continental collaborator before final admission.",
+    title: "Relevant experience",
+    description: "Entrepreneurial and professional experience",
+    icon: BriefcaseBusiness,
   },
-
   {
-    name: "WAITLIST",
-    description:
-      "Strong applicant, but cohort capacity is limited.",
+    title: "Market knowledge",
+    description: "Local and global market insight",
+    icon: Globe2,
   },
-
   {
-    name: "NOT SELECTED",
-    description:
-      "Applicant does not currently meet fellowship requirements.",
+    title: "Geographic connections",
+    description: "Networks and connections across markets",
+    icon: MapPin,
+  },
+  {
+    title: "Working style",
+    description: "Compatible personalities and ways of working",
+    icon: Handshake,
+  },
+  {
+    title: "Time commitment",
+    description: "Aligned availability and commitment",
+    icon: Clock3,
+  },
+  {
+    title: "Leadership",
+    description: "Complementary leadership strengths",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Long-term goals",
+    description: "A shared vision for the venture",
+    icon: TrendingUp,
   },
 ];
 
+// ============================================================
+// COMPATIBILITY SPRINT
+// ============================================================
 
-/* ============================================================
-   ADMISSIONS TIMELINE
-============================================================ */
+const compatibility = [
+  {
+    title: "Roles",
+    icon: Users,
+    detail: "Who is responsible for what?",
+  },
+  {
+    title: "Decisions",
+    icon: Scale,
+    detail: "How will decisions be made?",
+  },
+  {
+    title: "Time",
+    icon: Clock3,
+    detail: "How much time can each founder commit?",
+  },
+  {
+    title: "Contributions",
+    icon: BriefcaseBusiness,
+    detail: "What does each founder contribute?",
+  },
+  {
+    title: "Conflict",
+    icon: MessageSquare,
+    detail: "How will disagreements be handled?",
+  },
+  {
+    title: "Ownership",
+    icon: Layers3,
+    detail: "What are the ownership expectations?",
+  },
+  {
+    title: "Shared vision",
+    icon: Target,
+    detail: "What is the shared long-term vision?",
+  },
+];
+
+// ============================================================
+// ADMISSION OUTCOMES
+// ============================================================
+
+const outcomes = [
+  {
+    title: "Admit",
+    description:
+      "You meet the requirements and are ready for the fellowship.",
+    icon: CheckCircle2,
+  },
+  {
+    title: "Admit with track placement",
+    description:
+      "You are accepted and assigned to Genesis, Ascend, or Horizon.",
+    icon: TrendingUp,
+  },
+  {
+    title: "Match required",
+    description:
+      "Your application is promising, but a cross-continental collaborator is needed before final admission.",
+    icon: Users,
+  },
+  {
+    title: "Waitlist",
+    description:
+      "You are a strong applicant, but cohort capacity is limited.",
+    icon: Clock3,
+  },
+  {
+    title: "Not selected",
+    description:
+      "You do not currently meet the fellowship requirements.",
+    icon: XCircle,
+  },
+];
+
+// ============================================================
+// PROPOSED ADMISSIONS TIMELINE
+// ============================================================
 
 const timeline = [
   {
     timing: "Week 1",
-    phase: "Launch",
-    activity: "Fellowship announced",
+    title: "Launch",
+    description: "Fellowship announced",
   },
-
   {
     timing: "Weeks 1–5",
-    phase: "Applications Open",
-    activity: "Applications accepted",
+    title: "Applications open",
+    description: "Applications accepted",
   },
-
   {
     timing: "Weeks 3–6",
-    phase: "Initial Screening",
-    activity: "Eligibility and application review",
+    title: "Initial screening",
+    description: "Eligibility and application review",
   },
-
   {
     timing: "Weeks 5–7",
-    phase: "Founder Assessment",
-    activity: "Founder and venture evaluation",
+    title: "Founder assessment",
+    description: "Founder and venture evaluation",
   },
-
   {
     timing: "Weeks 7–9",
-    phase: "Interviews",
-    activity: "Selected applicants interviewed",
+    title: "Interviews",
+    description: "Selected applicants interviewed",
   },
-
   {
     timing: "Weeks 8–10",
-    phase: "Track Placement",
-    activity: "Genesis, Ascend, or Horizon placement",
+    title: "Track placement",
+    description: "Development track assigned",
   },
-
   {
     timing: "Weeks 9–11",
-    phase: "Matching",
-    activity: "Cross-continental collaborator matching",
+    title: "Matching",
+    description: "Cross-continental collaborator matching",
   },
-
   {
     timing: "Weeks 10–12",
-    phase: "Compatibility Sprint",
-    activity: "Potential teams work together",
+    title: "Compatibility sprint",
+    description: "Potential teams work together",
   },
-
   {
     timing: "Week 12",
-    phase: "Final Selection",
-    activity: "Admissions Committee decision",
+    title: "Final selection",
+    description: "Admissions Committee decision",
   },
-
   {
     timing: "Week 13",
-    phase: "Offers Released",
-    activity: "Acceptance letters issued",
+    title: "Offers released",
+    description: "Acceptance letters issued",
   },
-
   {
     timing: "Week 14",
-    phase: "Enrollment / Orientation",
-    activity: "Fellow onboarding",
+    title: "Enrollment / orientation",
+    description: "Fellow onboarding",
   },
-
   {
     timing: "Week 15",
-    phase: "Program Begins",
-    activity: "Six-month fellowship begins",
+    title: "Program begins",
+    description: "Six-month fellowship begins",
   },
 ];
 
+// ============================================================
+// COMPLETE FELLOWSHIP PATH
+// ============================================================
 
-/* ============================================================
-   SMALL REUSABLE COMPONENTS
-============================================================ */
+const pathway = [
+  {
+    title: "Recruit",
+    description: "Learn about the fellowship.",
+  },
+  {
+    title: "Apply",
+    description: "Submit your application.",
+  },
+  {
+    title: "Assess",
+    description: "Founder and venture review.",
+  },
+  {
+    title: "Interview",
+    description: "Join a founder conversation.",
+  },
+  {
+    title: "Place",
+    description: "Enter the appropriate track.",
+  },
+  {
+    title: "Match",
+    description: "Connect across continents.",
+  },
+  {
+    title: "Compatibility",
+    description: "Work together before commitment.",
+  },
+  {
+    title: "Admit",
+    description: "Receive your admissions decision.",
+  },
+  {
+    title: "Orient",
+    description: "Complete fellowship onboarding.",
+  },
+  {
+    title: "Begin",
+    description: "Start the six-month fellowship.",
+  },
+];
 
-function SectionLabel({ children, light = false }) {
+// ============================================================
+// REUSABLE COMPONENTS
+// ============================================================
+
+function OptionalImage({
+  src,
+  className = "",
+  alt = "",
+  ...props
+}) {
+  const [failedSource, setFailedSource] = useState(null);
+
+  if (failedSource === src) {
+    return null;
+  }
+
   return (
-    <div
-      className={`cfcv-section-label ${
-        light ? "cfcv-section-label--light" : ""
+    <img
+      {...props}
+      src={src}
+      alt={alt}
+      className={className}
+      onError={() => setFailedSource(src)}
+    />
+  );
+}
+
+function SectionLabel({
+  children,
+  light = false,
+}) {
+  return (
+    <p
+      className={`cfcv-label${
+        light ? " cfcv-label--light" : ""
       }`}
     >
-      <span aria-hidden="true" />
-
-      <strong>{children}</strong>
-    </div>
+      <span>{children}</span>
+      <i aria-hidden="true" />
+    </p>
   );
 }
 
-
-function Checklist({ items }) {
+function ApplyButton({
+  gold = false,
+  children = "Start your application",
+}) {
   return (
-    <div className="cfcv-checklist">
-      {items.map((item) => (
-        <div
-          className="cfcv-checklist__item"
-          key={item}
+    <Link
+      to="/cfcv/apply"
+      className={`cfcv-button${
+        gold ? " cfcv-button--gold" : ""
+      }`}
+    >
+      <span>{children}</span>
+
+      <ArrowUpRight
+        size={17}
+        aria-hidden="true"
+      />
+    </Link>
+  );
+}
+
+function PageFooter() {
+  return (
+    <footer className="cfcv-footer">
+      <div className="cfcv-container cfcv-footer__inner">
+        <Link
+          to="/"
+          className="cfcv-wordmark"
         >
-          <span className="cfcv-checklist__icon">
-            <CheckCircle2 size={17} />
-          </span>
+          CONTINENTAL FOUNDERS
+        </Link>
 
-          <p>{item}</p>
-        </div>
-      ))}
-    </div>
+        <a href="https://www.continentalfounders.org">
+          www.continentalfounders.org
+        </a>
+
+        <span className="cfcv-footer__note">
+          Connecting founders across continents.
+        </span>
+      </div>
+    </footer>
   );
 }
 
+// ============================================================
+// PAGE — NO NAVBAR
+// ============================================================
 
-/* ============================================================
-   PAGE
-============================================================ */
-
-function CFCV() {
+export default function CFCV() {
   return (
-    <main className="cfcv-page">
+    <div className="cfcv-page">
+      <a
+        className="cfcv-skip-link"
+        href="#cfcv-main"
+      >
+        Skip to content
+      </a>
 
-      {/* ======================================================
-          HERO
-      ====================================================== */}
+      <main id="cfcv-main">
+        {/* ==================================================
+            HERO
+        ================================================== */}
 
-      <section className="cfcv-hero">
-
-        <div
-          className="cfcv-hero__pattern"
-          aria-hidden="true"
-        />
-
-        <div className="cfcv-container cfcv-hero__inner">
-
-          <div className="cfcv-hero__content">
-
-            <SectionLabel light>
-              CONTINENTAL FOUNDERS
+        <section
+          className="cfcv-hero"
+          aria-labelledby="cfcv-title"
+        >
+          <div className="cfcv-hero__copy">
+            <SectionLabel>
+              CFCV FELLOWSHIP
             </SectionLabel>
 
-            <p className="cfcv-hero__kicker">
-              CATALYTIC VENTURES
-            </p>
-
-            <h1>
-              CFCV Fellowship
+            <h1 id="cfcv-title">
+              Great ventures
               <br />
-              <em>Admissions.</em>
+              start with
+              <br />
+              <em>meaningful connections.</em>
             </h1>
 
-            <p className="cfcv-hero__lead">
-              Continental Founders Catalytic Ventures
-              (CFCV) is a six-month venture-development
-              program that brings together founders in the
-              United States/diaspora and Africa to build
-              commercially viable businesses together.
+            <p className="cfcv-hero__description">
+              A six-month fellowship bringing founders
+              in Africa and the United States / diaspora
+              together to build commercially viable
+              businesses.
             </p>
 
             <div className="cfcv-hero__actions">
-
-              <Link
-                to="/cfcv/apply"
-                className="cfcv-button cfcv-button--gold"
-              >
-                Apply to CFCV
-
-                <ArrowRight size={18} />
-              </Link>
+              <ApplyButton />
 
               <a
-                href="#admissions"
-                className="cfcv-button cfcv-button--outline"
+                className="cfcv-text-link"
+                href="#cfcv-overview"
               >
-                Explore Admissions
+                Explore the fellowship
 
-                <ChevronRight size={18} />
+                <ArrowDown
+                  size={17}
+                  aria-hidden="true"
+                />
               </a>
-
             </div>
-
           </div>
 
+          <div className="cfcv-hero__visual">
+            <OptionalImage
+              src={`${IMAGE_ROOT}/hero-map.png`}
+              className="cfcv-hero__map"
+              loading="eager"
+              decoding="async"
+            />
 
-          <div className="cfcv-hero__summary">
+            <div
+              className="cfcv-hero__orbits"
+              aria-hidden="true"
+            >
+              <span />
+              <span />
+              <span />
+            </div>
 
-            <div className="cfcv-summary-card">
-
-              <span className="cfcv-summary-card__label">
-                PROGRAM
-              </span>
-
-              <strong>
-                Six-Month
-              </strong>
-
-              <p>
-                Venture-development program
+            <div className="cfcv-hero__visual-copy">
+              <p className="cfcv-hero__connection">
+                Africa <span>↔</span> U.S.
               </p>
 
+              <p>Built across borders.</p>
+
+              <span
+                className="cfcv-gold-rule"
+                aria-hidden="true"
+              />
             </div>
-
-
-            <div className="cfcv-summary-card">
-
-              <span className="cfcv-summary-card__label">
-                COHORT
-              </span>
-
-              <strong>
-                Up to 30
-              </strong>
-
-              <p>
-                Ventures across three tracks
-              </p>
-
-            </div>
-
-
-            <div className="cfcv-summary-card">
-
-              <span className="cfcv-summary-card__label">
-                CONNECTION
-              </span>
-
-              <strong>
-                Africa ↔ U.S./Diaspora
-              </strong>
-
-              <p>
-                Cross-continental participation
-              </p>
-
-            </div>
-
           </div>
+        </section>
 
-        </div>
+        {/* ==================================================
+            FELLOWSHIP FACTS
+        ================================================== */}
 
-      </section>
-
-
-      {/* ======================================================
-          PROGRAM OVERVIEW
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-section--white">
-
-        <div className="cfcv-container cfcv-overview">
-
-          <div>
-
-            <SectionLabel>
-              PROGRAM OVERVIEW
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              A cross-continental
-              <br />
-              <em>venture-development program.</em>
-            </h2>
-
-          </div>
-
-
-          <div className="cfcv-overview__copy">
-
-            <p>
-              Continental Founders Catalytic Ventures
-              (CFCV) is a six-month venture-development
-              program that brings together founders in
-              the United States/diaspora and Africa to
-              build commercially viable businesses
-              together.
-            </p>
-
-            <p>
-              The admissions framework is designed to
-              identify promising founders, evaluate the
-              founder and venture, place each venture in
-              the appropriate development track, create
-              meaningful cross-continental
-              collaborations, and admit a strong cohort
-              of up to 30 ventures.
-            </p>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          ADMISSIONS WORKFLOW
-      ====================================================== */}
-
-      <section
-        className="cfcv-section cfcv-section--soft"
-        id="admissions"
-      >
-
-        <div className="cfcv-container">
-
-          <div className="cfcv-section-heading">
-
-            <SectionLabel>
-              ADMISSIONS WORKFLOW
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              Apply. Assess. Place.
-              <br />
-              <em>Match. Admit.</em>
-            </h2>
-
-            <p>
-              The admissions process moves applicants
-              from initial submission through founder
-              and venture assessment, track placement,
-              cross-continental matching, compatibility
-              review, and final cohort admission.
-            </p>
-
-          </div>
-
-
-          <div className="cfcv-workflow">
-
-            {workflow.map((stage) => (
-
-              <article
-                className="cfcv-workflow__item"
-                key={stage.name}
+        <section
+          className="cfcv-facts"
+          aria-label="Fellowship at a glance"
+        >
+          <div className="cfcv-container cfcv-facts__grid">
+            {facts.map((fact) => (
+              <div
+                className="cfcv-fact"
+                key={fact.value}
               >
-
-                <div className="cfcv-workflow__number">
-                  {stage.number}
-                </div>
-
-                <div className="cfcv-workflow__body">
-
-                  <h3>
-                    {stage.name}
-                  </h3>
-
-                  <p>
-                    {stage.description}
-                  </p>
-
-                </div>
-
-              </article>
-
+                <strong>{fact.value}</strong>
+                <span>{fact.label}</span>
+              </div>
             ))}
-
           </div>
+        </section>
 
-        </div>
+        {/* ==================================================
+            OVERVIEW
+        ================================================== */}
 
-      </section>
+        <section
+          id="cfcv-overview"
+          className="cfcv-overview cfcv-bordered"
+          aria-labelledby="cfcv-overview-title"
+        >
+          <div className="cfcv-container cfcv-overview__inner">
+            <div>
+              <SectionLabel>
+                OVERVIEW
+              </SectionLabel>
 
+              <h2 id="cfcv-overview-title">
+                More than a program.
+                A platform for building.
+              </h2>
 
-      {/* ======================================================
-          THREE TRACKS
-      ====================================================== */}
+              <p>
+                Continental Founders Catalytic Ventures
+                identifies promising founders, evaluates
+                their ventures, places them in the right
+                development track, and facilitates
+                cross-continental collaborations to build
+                commercially viable businesses.
+              </p>
+            </div>
 
-      <section className="cfcv-section cfcv-section--white">
+            <div
+              className="cfcv-overview__image"
+              aria-hidden="true"
+            >
+              <OptionalImage
+                src={`${IMAGE_ROOT}/overview-landscape.jpg`}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </section>
 
-        <div className="cfcv-container">
+        {/* ==================================================
+            ADMISSION PROCESS
+        ================================================== */}
 
-          <div className="cfcv-section-heading">
-
+        <section
+          id="cfcv-admissions"
+          className="cfcv-section cfcv-bordered"
+          aria-labelledby="cfcv-process-title"
+        >
+          <div className="cfcv-container">
             <SectionLabel>
-              TRACK PLACEMENT
+              ADMISSION PROCESS
             </SectionLabel>
 
-            <h2 className="cfcv-heading">
-              Three tracks based on
-              <br />
-              <em>venture readiness.</em>
+            <h2 id="cfcv-process-title">
+              A clear path into the fellowship.
             </h2>
 
-            <p>
-              Placement is based on the development
-              stage of the venture—not simply the
-              founder&apos;s academic level.
-            </p>
-
-          </div>
-
-
-          <div className="cfcv-tracks">
-
-            {tracks.map((track) => {
-
-              const Icon = track.icon;
-
-              return (
-
-                <article
-                  className="cfcv-track-card"
-                  key={track.name}
+            <ol className="cfcv-stages">
+              {stages.map((stage, index) => (
+                <li
+                  className="cfcv-stage"
+                  key={stage.name}
                 >
-
-                  <div className="cfcv-track-card__header">
-
-                    <span className="cfcv-track-card__number">
-                      {track.number}
+                  <div className="cfcv-stage__top">
+                    <span className="cfcv-number">
+                      {index + 1}
                     </span>
 
-                    <span className="cfcv-track-card__icon">
-                      <Icon size={25} />
+                    <span
+                      className="cfcv-stage__connector"
+                      aria-hidden="true"
+                    >
+                      <ArrowRight size={16} />
                     </span>
-
                   </div>
 
+                  <h3>{stage.name}</h3>
+                  <p>{stage.description}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
 
-                  <div className="cfcv-track-card__title">
+        {/* ==================================================
+            DEVELOPMENT TRACKS
+        ================================================== */}
 
-                    <span>
+        <section
+          id="cfcv-tracks"
+          className="cfcv-section cfcv-bordered"
+          aria-labelledby="cfcv-tracks-title"
+        >
+          <div className="cfcv-container">
+            <SectionLabel>
+              DEVELOPMENT TRACKS
+            </SectionLabel>
+
+            <h2 id="cfcv-tracks-title">
+              Start where you are.
+              Build what comes next.
+            </h2>
+
+            <div className="cfcv-tracks">
+              {tracks.map((track) => (
+                <article
+                  className={`cfcv-track cfcv-track--${track.key}`}
+                  key={track.key}
+                >
+                  <OptionalImage
+                    src={track.image}
+                    className="cfcv-track__image"
+                    loading="lazy"
+                    decoding="async"
+                  />
+
+                  <div className="cfcv-track__content">
+                    <p className="cfcv-track__name">
                       {track.name}
-                    </span>
+                    </p>
 
-                    <h3>
-                      {track.tagline}
-                    </h3>
+                    <h3>{track.title}</h3>
 
-                  </div>
-
-
-                  <div className="cfcv-track-card__section">
-
-                    <small>
-                      BEST FIT
-                    </small>
-
-                    <p>
+                    <p className="cfcv-track__fit">
                       {track.bestFit}
                     </p>
 
+                    <span
+                      className="cfcv-gold-rule"
+                      aria-hidden="true"
+                    />
+
+                    <dl className="cfcv-track__details">
+                      <div>
+                        <dt>Focus</dt>
+                        <dd>{track.focus}</dd>
+                      </div>
+
+                      <div>
+                        <dt>Outcome</dt>
+                        <dd>{track.outcome}</dd>
+                      </div>
+                    </dl>
                   </div>
-
-
-                  <div className="cfcv-track-card__section">
-
-                    <small>
-                      PRIMARY FOCUS
-                    </small>
-
-                    <ul>
-
-                      {track.focus.map((focus) => (
-
-                        <li key={focus}>
-                          {focus}
-                        </li>
-
-                      ))}
-
-                    </ul>
-
-                  </div>
-
-
-                  <div className="cfcv-track-card__outcome">
-
-                    <small>
-                      EXPECTED OUTCOME
-                    </small>
-
-                    <p>
-                      {track.outcome}
-                    </p>
-
-                  </div>
-
                 </article>
+              ))}
+            </div>
 
-              );
-
-            })}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          FOUNDER ASSESSMENT
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-assessment">
-
-        <div className="cfcv-container cfcv-two-column">
-
-          <div className="cfcv-two-column__content">
-
-            <SectionLabel light>
-              FOUNDER ASSESSMENT
-            </SectionLabel>
-
-            <h2>
-              What CFCV
-              <br />
-              <em>evaluates.</em>
-            </h2>
-
-            <p>
-              The admissions process evaluates both
-              the founder and the venture.
+            <p className="cfcv-section-note">
+              Placement reflects venture readiness,
+              rather than academic level.
             </p>
-
           </div>
-
-
-          <div className="cfcv-two-column__panel">
-
-            <Checklist
-              items={founderAssessment}
-            />
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          FOUNDER INTERVIEW
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-section--white">
-
-        <div className="cfcv-container cfcv-interview">
-
-          <div className="cfcv-interview__intro">
-
-            <SectionLabel>
-              FOUNDER INTERVIEW
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              Founder
-              <br />
-              <em>conversation.</em>
-            </h2>
-
-            <div className="cfcv-interview__duration">
-
-              <Clock3 size={21} />
-
-              <span>
-                Recommended format:
-                <strong> 30–45 minutes</strong>
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <div className="cfcv-interview__questions">
-
-            <div>
-              <span>01</span>
-              <p>
-                Why entrepreneurship and why this problem?
-              </p>
-            </div>
-
-            <div>
-              <span>02</span>
-              <p>
-                What makes you uniquely positioned to
-                address the opportunity?
-              </p>
-            </div>
-
-            <div>
-              <span>03</span>
-              <p>
-                What experience and skills do you bring?
-              </p>
-            </div>
-
-            <div>
-              <span>04</span>
-              <p>
-                What would you need from a
-                cross-continental collaborator?
-              </p>
-            </div>
-
-            <div>
-              <span>05</span>
-              <p>
-                How do you approach disagreement and
-                decision-making?
-              </p>
-            </div>
-
-            <div>
-              <span>06</span>
-              <p>
-                How do you work across cultures and
-                geographies?
-              </p>
-            </div>
-
-            <div>
-              <span>07</span>
-              <p>
-                How much time can you commit?
-              </p>
-            </div>
-
-            <div>
-              <span>08</span>
-              <p>
-                What are your expectations regarding
-                ownership and the future of the company?
-              </p>
-            </div>
-
-            <div>
-              <span>09</span>
-              <p>
-                What does success look like six months
-                from now?
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          CROSS-CONTINENTAL MATCHING
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-section--soft">
-
-        <div className="cfcv-container cfcv-matching">
-
-          <div className="cfcv-matching__intro">
-
-            <SectionLabel>
-              CROSS-CONTINENTAL MATCHING
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              Africa
-              <span className="cfcv-heading__connector">
-                ↔
-              </span>
-              U.S. / Diaspora
-            </h2>
-
-            <p>
-              Every CFCV venture must ultimately have
-              meaningful participation connecting
-              Africa and the U.S./diaspora.
-            </p>
-
-            <p>
-              Applicants may apply with an existing
-              team or as an individual founder.
-            </p>
-
-          </div>
-
-
-          <div className="cfcv-matching__criteria">
-
-            <h3>
-              Matching Criteria
-            </h3>
-
-            <Checklist
-              items={matchingCriteria}
-            />
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          COMPATIBILITY SPRINT
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-compatibility">
-
-        <div className="cfcv-container">
-
-          <div className="cfcv-compatibility__header">
-
-            <SectionLabel light>
-              FOUNDER COMPATIBILITY SPRINT
-            </SectionLabel>
-
-            <h2>
-              A match does not automatically become a
-              <br />
-              <em>co-founder relationship.</em>
-            </h2>
-
-            <p>
-              New pairs should complete a short working
-              period before being formally accepted as
-              a founding team.
-            </p>
-
-          </div>
-
-
-          <div className="cfcv-compatibility__grid">
-
-            {compatibilityQuestions.map(
-              (question, index) => (
-
-                <article
-                  key={question}
-                  className="cfcv-compatibility__item"
-                >
-
-                  <span>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <p>
-                    {question}
-                  </p>
-
-                </article>
-
-              )
-            )}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          FINAL ADMISSION DECISIONS
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-section--white">
-
-        <div className="cfcv-container">
-
-          <div className="cfcv-section-heading">
-
-            <SectionLabel>
-              FINAL ADMISSION DECISION
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              Admissions
-              <br />
-              <em>outcomes.</em>
-            </h2>
-
-          </div>
-
-
-          <div className="cfcv-decisions">
-
-            {decisions.map((decision) => (
-
-              <article
-                key={decision.name}
-                className="cfcv-decision"
-              >
-
-                <div className="cfcv-decision__icon">
-                  <UserCheck size={22} />
-                </div>
-
+        </section>
+
+        {/* ==================================================
+            ASSESSMENT AND INTERVIEW
+        ================================================== */}
+
+        <section
+          className="cfcv-section cfcv-bordered"
+          aria-label="Founder assessment and interview"
+        >
+          <div className="cfcv-container cfcv-founder-grid">
+            <article className="cfcv-assessment">
+              <SectionLabel>
+                THE FOUNDER BEHIND THE VENTURE
+              </SectionLabel>
+
+              <h2 className="cfcv-small-heading">
+                We look for founders who are committed,
+                principled and collaborative.
+              </h2>
+
+              <ul className="cfcv-checklist">
+                {assessment.map((item) => (
+                  <li key={item}>
+                    <span
+                      className="cfcv-check"
+                      aria-hidden="true"
+                    >
+                      <Check size={14} />
+                    </span>
+
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="cfcv-interview">
+              <div className="cfcv-interview__heading">
                 <div>
+                  <SectionLabel>
+                    FOUNDER INTERVIEW
+                  </SectionLabel>
 
-                  <h3>
-                    {decision.name}
-                  </h3>
-
-                  <p>
-                    {decision.description}
-                  </p>
-
+                  <h2 className="cfcv-small-heading">
+                    A 30–45 minute conversation.
+                  </h2>
                 </div>
 
-              </article>
+                <span className="cfcv-time-badge">
+                  <Clock3
+                    size={16}
+                    aria-hidden="true"
+                  />
 
-            ))}
+                  30–45 minutes
+                </span>
+              </div>
 
+              <p className="cfcv-interview__intro">
+                A recommended conversation to understand
+                you, your venture, and your readiness
+                for a successful collaboration.
+              </p>
+
+              <ol className="cfcv-questions">
+                {interviewQuestions.map((question, index) => (
+                  <li key={question}>
+                    <span className="cfcv-number cfcv-number--small">
+                      {index + 1}
+                    </span>
+
+                    <span>{question}</span>
+                  </li>
+                ))}
+              </ol>
+            </article>
           </div>
+        </section>
 
+        {/* ==================================================
+            CROSS-CONTINENTAL MATCHING
+        ================================================== */}
 
-          <div className="cfcv-cohort-note">
+        <section
+          id="cfcv-matching"
+          className="cfcv-section cfcv-bordered"
+          aria-labelledby="cfcv-matching-title"
+        >
+          <div className="cfcv-container">
+            <div className="cfcv-matching__header">
+              <div>
+                <SectionLabel>
+                  CROSS-CONTINENTAL MATCHING
+                </SectionLabel>
 
-            <Users size={25} />
+                <h2 id="cfcv-matching-title">
+                  Different perspectives.
+                  Shared ambition.
+                </h2>
 
-            <p>
-              CFCV admits up to
-              <strong> 30 ventures </strong>
-              across Genesis, Ascend, and Horizon.
-            </p>
+                <p>
+                  Existing teams and individual founders
+                  may apply. Every venture must ultimately
+                  have meaningful participation connecting
+                  Africa and the United States / diaspora.
+                </p>
+              </div>
 
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
-          ADMISSIONS TIMELINE
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-section--soft">
-
-        <div className="cfcv-container">
-
-          <div className="cfcv-section-heading">
-
-            <SectionLabel>
-              PROPOSED ADMISSIONS TIMELINE
-            </SectionLabel>
-
-            <h2 className="cfcv-heading">
-              From launch to
-              <br />
-              <em>fellowship.</em>
-            </h2>
-
-          </div>
-
-
-          <div className="cfcv-timeline">
-
-            {timeline.map((item, index) => (
-
-              <article
-                className="cfcv-timeline__item"
-                key={`${item.phase}-${item.timing}`}
+              <div
+                className="cfcv-matching__map"
+                aria-hidden="true"
               >
+                <OptionalImage
+                  src={`${IMAGE_ROOT}/matching-map.png`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            </div>
 
-                <div className="cfcv-timeline__marker">
+            <div className="cfcv-criteria">
+              {matchingCriteria.map(
+                ({ title, description, icon: Icon }) => (
+                  <div
+                    className="cfcv-criterion"
+                    key={title}
+                  >
+                    <Icon
+                      size={28}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
 
-                  <span>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                </div>
-
-
-                <div className="cfcv-timeline__content">
-
-                  <small>
-                    {item.timing}
-                  </small>
-
-                  <h3>
-                    {item.phase}
-                  </h3>
-
-                  <p>
-                    {item.activity}
-                  </p>
-
-                </div>
-
-              </article>
-
-            ))}
-
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{description}</p>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
           </div>
+        </section>
 
-        </div>
+        {/* ==================================================
+            COMPATIBILITY SPRINT
+        ================================================== */}
 
-      </section>
+        <section
+          className="cfcv-compatibility"
+          aria-labelledby="cfcv-compatibility-title"
+        >
+          <div className="cfcv-container cfcv-compatibility__inner">
+            <div className="cfcv-compatibility__copy">
+              <h2 id="cfcv-compatibility-title">
+                Build trust before you build together.
+              </h2>
 
+              <p>
+                Potential founding pairs complete a short
+                working period before formal acceptance
+                as a team, helping establish alignment,
+                trust, and shared commitment.
+              </p>
+            </div>
 
-      {/* ======================================================
-          ADMISSIONS FUNNEL
-      ====================================================== */}
+            <ul className="cfcv-compatibility__items">
+              {compatibility.map(
+                ({ title, icon: Icon, detail }) => (
+                  <li key={title}>
+                    <Icon
+                      size={27}
+                      strokeWidth={1.4}
+                      aria-hidden="true"
+                    />
 
-      <section className="cfcv-section cfcv-funnel">
-
-        <div className="cfcv-container">
-
-          <div className="cfcv-funnel__header">
-
-            <SectionLabel light>
-              CFCV ADMISSIONS FUNNEL
-            </SectionLabel>
-
-            <h2>
-              The path to
-              <br />
-              <em>admission.</em>
-            </h2>
-
+                    <span>{title}</span>
+                    <p>{detail}</p>
+                  </li>
+                )
+              )}
+            </ul>
           </div>
+        </section>
 
+        {/* ==================================================
+            OUTCOMES AND TIMELINE
+        ================================================== */}
 
-          <div className="cfcv-funnel__flow">
+        <section
+          className="cfcv-section cfcv-bordered"
+          aria-label="Admission outcomes and proposed timeline"
+        >
+          <div className="cfcv-container cfcv-results-grid">
+            <article className="cfcv-outcomes">
+              <SectionLabel>
+                ADMISSIONS OUTCOMES
+              </SectionLabel>
 
-            <span>
-              RECRUIT
-            </span>
+              <h2 className="cfcv-small-heading">
+                Clear outcomes for every applicant.
+              </h2>
 
-            <i>↓</i>
+              <ul className="cfcv-outcomes__list">
+                {outcomes.map(
+                  ({ title, description, icon: Icon }) => (
+                    <li key={title}>
+                      <Icon
+                        size={23}
+                        aria-hidden="true"
+                      />
 
-            <span>
-              APPLY
-            </span>
+                      <h3>{title}</h3>
+                      <p>{description}</p>
+                    </li>
+                  )
+                )}
+              </ul>
 
-            <i>↓</i>
+              <p className="cfcv-section-note">
+                Each cohort admits up to 30 ventures
+                across all three tracks.
+              </p>
+            </article>
 
-            <span>
-              ASSESS
-              <small>
-                Founder + Venture
-              </small>
-            </span>
+            <article className="cfcv-timeline">
+              <SectionLabel>
+                PROPOSED ADMISSIONS TIMELINE
+              </SectionLabel>
 
-            <i>↓</i>
+              <h2 className="cfcv-small-heading">
+                A transparent and structured process.
+              </h2>
 
-            <span>
-              INTERVIEW
-            </span>
+              <ol className="cfcv-timeline__grid">
+                {timeline.map((item, index) => (
+                  <li key={item.title}>
+                    <span className="cfcv-number cfcv-number--pale">
+                      {index + 1}
+                    </span>
 
-            <i>↓</i>
+                    <div>
+                      <p className="cfcv-timeline__timing">
+                        {item.timing}
+                      </p>
 
-            <span>
-              PLACE
-              <small>
-                Genesis | Ascend | Horizon
-              </small>
-            </span>
+                      <h3>{item.title}</h3>
 
-            <i>↓</i>
-
-            <span>
-              MATCH
-              <small>
-                Africa ↔ U.S./Diaspora
-              </small>
-            </span>
-
-            <i>↓</i>
-
-            <span>
-              COMPATIBILITY CHECK
-            </span>
-
-            <i>↓</i>
-
-            <span>
-              ADMIT
-              <small>
-                Up to 30 Ventures
-              </small>
-            </span>
-
-            <i>↓</i>
-
-            <span>
-              ORIENT
-            </span>
-
-            <i>↓</i>
-
-            <span>
-              BEGIN SIX-MONTH FELLOWSHIP
-            </span>
-
+                      <p className="cfcv-timeline__description">
+                        {item.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </article>
           </div>
+        </section>
 
-        </div>
+        {/* ==================================================
+            COMPLETE PATH
+        ================================================== */}
 
-      </section>
-
-
-      {/* ======================================================
-          POSITIONING
-      ====================================================== */}
-
-      <section className="cfcv-section cfcv-positioning">
-
-        <div className="cfcv-container cfcv-positioning__inner">
-
-          <div className="cfcv-positioning__icon">
-            <Globe2 size={34} />
-          </div>
-
-
-          <div>
-
+        <section
+          className="cfcv-section cfcv-bordered"
+          aria-labelledby="cfcv-path-title"
+        >
+          <div className="cfcv-container">
             <SectionLabel>
-              POSITIONING
+              THE COMPLETE PATH
             </SectionLabel>
 
-            <h2 className="cfcv-heading">
-              A selective, cross-continental
-              <br />
-              <em>venture fellowship.</em>
+            <h2
+              id="cfcv-path-title"
+              className="cfcv-small-heading"
+            >
+              From application to impact.
+            </h2>
+
+            <ol className="cfcv-path">
+              {pathway.map((item, index) => (
+                <li key={item.title}>
+                  <div className="cfcv-path__top">
+                    <span className="cfcv-number cfcv-number--small">
+                      {index + 1}
+                    </span>
+
+                    {index < pathway.length - 1 && (
+                      <ArrowRight
+                        size={16}
+                        className="cfcv-path__arrow"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
+
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ==================================================
+            MISSION
+        ================================================== */}
+
+        <section
+          className="cfcv-mission"
+          aria-labelledby="cfcv-mission-title"
+        >
+          <OptionalImage
+            src={`${IMAGE_ROOT}/mission-landscape.jpg`}
+            className="cfcv-mission__image"
+            loading="lazy"
+            decoding="async"
+          />
+
+          <div className="cfcv-container cfcv-mission__content">
+            <SectionLabel>
+              OUR MISSION
+            </SectionLabel>
+
+            <h2 id="cfcv-mission-title">
+              Real businesses.
+              Cross-continental opportunity.
             </h2>
 
             <p>
-              CFCV should be positioned as a selective,
-              cross-continental venture fellowship
-              rather than simply an entrepreneurship
-              training program.
+              We bring African and U.S. / diaspora founders
+              together to build real businesses, provide
+              catalytic capital to the strongest opportunities,
+              and create a pathway to investment readiness
+              and global growth.
             </p>
-
-            <p>
-              Its purpose is to bring African and
-              U.S./diaspora founders together, help them
-              build real businesses, provide catalytic
-              capital to the strongest opportunities,
-              and create a pathway from early idea to
-              investment readiness and global growth.
-            </p>
-
           </div>
+        </section>
 
-        </div>
+        {/* ==================================================
+            FINAL APPLICATION CTA
+        ================================================== */}
 
-      </section>
+        <section
+          className="cfcv-final"
+          aria-labelledby="cfcv-final-title"
+        >
+          <div className="cfcv-container cfcv-final__inner">
+            <div>
+              <h2 id="cfcv-final-title">
+                Build your next chapter.
+              </h2>
 
+              <span
+                className="cfcv-gold-rule"
+                aria-hidden="true"
+              />
+            </div>
 
-      {/* ======================================================
-          FINAL CTA
-      ====================================================== */}
+            <div className="cfcv-final__action">
+              <p>
+                Begin the CFCV admissions process.
+                Submit your founder and venture application.
+              </p>
 
-      <section className="cfcv-final">
-
-        <div
-          className="cfcv-final__pattern"
-          aria-hidden="true"
-        />
-
-        <div className="cfcv-container cfcv-final__inner">
-
-          <SectionLabel light>
-            CONTINENTAL FOUNDERS CATALYTIC VENTURES
-          </SectionLabel>
-
-          <h2>
-            Apply to the
-            <br />
-            <em>CFCV Fellowship.</em>
-          </h2>
-
-          <p>
-            Begin the CFCV admissions process by
-            submitting your founder and venture
-            application.
-          </p>
-
-
-          <div className="cfcv-final__actions">
-
-            <Link
-              to="/cfcv/apply"
-              className="cfcv-button cfcv-button--gold"
-            >
-              Start Application
-
-              <ArrowRight size={19} />
-            </Link>
-
+              <ApplyButton gold />
+            </div>
           </div>
+        </section>
+      </main>
 
-        </div>
-
-      </section>
-
-    </main>
+      <PageFooter />
+    </div>
   );
 }
-
-export default CFCV;

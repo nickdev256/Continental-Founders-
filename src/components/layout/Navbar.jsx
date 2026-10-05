@@ -24,10 +24,17 @@ import { navigation } from "../../data/navigation";
 
 import "./Navbar.css";
 
+
 const SUBSCRIPTION_URL =
   "https://ethtechsolutions.com/pricing";
 
-const MOBILE_QUERY = "(max-width: 1024px)";
+/*
+  Keep this breakpoint exactly the same as Navbar.css.
+  Desktop navigation stays visible above 1100px.
+  Hamburger navigation is used at 1100px and below.
+*/
+const MOBILE_QUERY = "(max-width: 1100px)";
+
 
 const searchItems = [
   {
@@ -137,6 +144,7 @@ const searchItems = [
   },
 ];
 
+
 function matchesPath(pathname, path) {
   return (
     pathname === path ||
@@ -144,9 +152,11 @@ function matchesPath(pathname, path) {
   );
 }
 
+
 function isCFCVPath(path) {
   return path === "/cfcv" || path?.startsWith("/cfcv/");
 }
+
 
 export default function Navbar() {
   const location = useLocation();
@@ -173,6 +183,7 @@ export default function Navbar() {
       : false
   );
 
+
   const query = searchQuery.trim().toLowerCase();
 
   const filteredResults = query
@@ -183,26 +194,31 @@ export default function Navbar() {
       )
     : [];
 
+
   function closeMenu() {
     setOpen(false);
     setActiveDropdown(null);
   }
+
 
   function closeSearch() {
     setSearchOpen(false);
     setSearchQuery("");
   }
 
+
   function openSearch() {
     closeMenu();
     setSearchOpen(true);
   }
+
 
   function toggleDropdown(label) {
     setActiveDropdown((current) =>
       current === label ? null : label
     );
   }
+
 
   function handleLogoClick(event) {
     const now = Date.now();
@@ -233,58 +249,111 @@ export default function Navbar() {
     }
   }
 
+
+  /*
+    RESPONSIVE BREAKPOINT
+    React and CSS both use 1100px.
+  */
   useEffect(() => {
     const media = window.matchMedia(MOBILE_QUERY);
 
     function handleResize() {
       setIsMobile(media.matches);
+
       setOpen(false);
       setActiveDropdown(null);
     }
 
     setIsMobile(media.matches);
-    media.addEventListener("change", handleResize);
+
+    if (media.addEventListener) {
+      media.addEventListener("change", handleResize);
+
+      return () => {
+        media.removeEventListener("change", handleResize);
+      };
+    }
+
+    media.addListener(handleResize);
 
     return () => {
-      media.removeEventListener("change", handleResize);
+      media.removeListener(handleResize);
     };
   }, []);
 
+
+  /*
+    CLOSE EVERYTHING WHEN ROUTE CHANGES
+  */
   useEffect(() => {
     setOpen(false);
     setActiveDropdown(null);
     setSearchOpen(false);
     setSearchQuery("");
-  }, [location.pathname, location.search]);  
+  }, [
+    location.pathname,
+    location.search,
+  ]);
 
+
+  /*
+    Prevent keyboard focus from entering the
+    closed mobile navigation.
+  */
   useEffect(() => {
     if (navRef.current) {
-      navRef.current.inert = isMobile && !open;
+      navRef.current.inert =
+        isMobile && !open;
     }
-  }, [isMobile, open]);
+  }, [
+    isMobile,
+    open,
+  ]);
 
+
+  /*
+    LOCK BODY SCROLL WHEN MOBILE MENU
+    OR SEARCH MODAL IS OPEN.
+  */
   useEffect(() => {
-    const shouldLock = searchOpen || (isMobile && open);
+    const shouldLock =
+      searchOpen ||
+      (isMobile && open);
 
     if (!shouldLock) {
       return;
     }
 
-    const previousOverflow = document.body.style.overflow;
+    const previousOverflow =
+      document.body.style.overflow;
+
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.body.style.overflow =
+        previousOverflow;
     };
-  }, [isMobile, open, searchOpen]);
+  }, [
+    isMobile,
+    open,
+    searchOpen,
+  ]);
 
+
+  /*
+    FOCUS SEARCH INPUT WHEN SEARCH OPENS.
+  */
   useEffect(() => {
     if (!searchOpen) {
       return;
     }
 
-    const previousFocus = document.activeElement;
-    searchInputRef.current?.focus();
+    const previousFocus =
+      document.activeElement;
+
+    requestAnimationFrame(() => {
+      searchInputRef.current?.focus();
+    });
 
     return () => {
       if (
@@ -298,6 +367,10 @@ export default function Navbar() {
     };
   }, [searchOpen]);
 
+
+  /*
+    ESCAPE + KEYBOARD FOCUS TRAP
+  */
   useEffect(() => {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
@@ -339,50 +412,82 @@ export default function Navbar() {
         return;
       }
 
-      const elements = candidates.filter(
-        (element) =>
-          element &&
-          element.getClientRects().length > 0 &&
-          !element.closest("[hidden], [inert]")
-      );
+      const elements =
+        candidates.filter(
+          (element) =>
+            element &&
+            element.getClientRects().length > 0 &&
+            !element.closest(
+              "[hidden], [inert]"
+            )
+        );
 
       if (!elements.length) {
         return;
       }
 
       const first = elements[0];
-      const last = elements[elements.length - 1];
-      const current = document.activeElement;
+      const last =
+        elements[elements.length - 1];
+
+      const current =
+        document.activeElement;
 
       if (!elements.includes(current)) {
         event.preventDefault();
         first.focus();
-      } else if (event.shiftKey && current === first) {
+      } else if (
+        event.shiftKey &&
+        current === first
+      ) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && current === last) {
+      } else if (
+        !event.shiftKey &&
+        current === last
+      ) {
         event.preventDefault();
         first.focus();
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
-  }, [isMobile, open, searchOpen]);
+  }, [
+    isMobile,
+    open,
+    searchOpen,
+  ]);
+
 
   function renderSearchResult(item) {
     const content = (
       <>
         <span className="search-result-icon">
           {item.cfcv ? (
-            <Rocket size={19} aria-hidden="true" />
+            <Rocket
+              size={19}
+              aria-hidden="true"
+            />
           ) : item.external ? (
-            <ArrowUpRight size={19} aria-hidden="true" />
+            <ArrowUpRight
+              size={19}
+              aria-hidden="true"
+            />
           ) : (
-            <Search size={19} aria-hidden="true" />
+            <Search
+              size={19}
+              aria-hidden="true"
+            />
           )}
         </span>
 
@@ -425,29 +530,62 @@ export default function Navbar() {
     );
   }
 
+
   return (
     <>
       <header className="navbar">
+
+        {/* ==========================================
+            TOP INSTITUTIONAL BAR
+        =========================================== */}
+
         <div className="navbar__top">
           <div className="navbar__top-inner">
+
             <div className="navbar__top-left">
               <span>Africa</span>
-              <span className="navbar__top-divider">|</span>
+
+              <span className="navbar__top-divider">
+                |
+              </span>
+
               <span>United States</span>
-              <span className="navbar__top-divider">|</span>
+
+              <span className="navbar__top-divider">
+                |
+              </span>
+
               <span>Global Partnerships</span>
             </div>
 
+
             <div className="navbar__top-right">
-              <Link to="/contact">Contact</Link>
-              <Link to="/strategic-partners">Partners</Link>
-              <Link to="/universities">Universities</Link>
+              <Link to="/contact">
+                Contact
+              </Link>
+
+              <Link to="/strategic-partners">
+                Partners
+              </Link>
+
+              <Link to="/universities">
+                Universities
+              </Link>
             </div>
+
           </div>
         </div>
 
+
+        {/* ==========================================
+            MAIN NAVBAR
+        =========================================== */}
+
         <div className="navbar__main">
           <div className="navbar__inner">
+
+            {/* LOGO */}
+
             <Link
               to="/"
               className="navbar__brand"
@@ -462,149 +600,239 @@ export default function Navbar() {
               />
             </Link>
 
+
+            {/* NAVIGATION */}
+
             <nav
               ref={navRef}
               id="primary-navigation"
-              className={`navbar__nav ${open ? "is-open" : ""}`}
+              className={`navbar__nav ${
+                open ? "is-open" : ""
+              }`}
               aria-label="Primary navigation"
-              aria-hidden={isMobile && !open ? true : undefined}
+              aria-hidden={
+                isMobile && !open
+                  ? true
+                  : undefined
+              }
             >
+
               <div className="navbar__links">
-                {navigation.map((item, index) => {
-                  if (!item.children?.length) {
-                    return (
-                      <NavLink
-                        key={item.path}
-                        to={item.path}
-                        end={item.path === "/"}
-                        className={({ isActive }) =>
-                          `navbar__link ${
-                            isActive ? "is-active" : ""
-                          }`
-                        }
-                        onClick={closeMenu}
-                      >
-                        <span>{item.label}</span>
-                      </NavLink>
-                    );
-                  }
 
-                  const expanded =
-                    activeDropdown === item.label;
+                {navigation.map(
+                  (item, index) => {
 
-                  const active =
-                    matchesPath(location.pathname, item.path) ||
-                    item.children.some((child) =>
-                      matchesPath(location.pathname, child.path)
-                    );
+                    /*
+                      NORMAL NAVIGATION ITEM
+                    */
 
-                  const submenuId = `navbar-submenu-${index}`;
-
-                  return (
-                    <div
-                      key={item.path}
-                      className={[
-                        "navbar__dropdown",
-                        expanded ? "is-expanded" : "",
-                        active ? "is-active" : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      onMouseEnter={() => {
-                        if (!isMobile) {
-                          setActiveDropdown(item.label);
-                        }
-                      }}
-                      onMouseLeave={(event) => {
-                        if (
-                          !isMobile &&
-                          !event.currentTarget.contains(
-                            document.activeElement
-                          )
-                        ) {
-                          setActiveDropdown(null);
-                        }
-                      }}
-                      onBlur={(event) => {
-                        if (
-                          !event.currentTarget.contains(
-                            event.relatedTarget
-                          )
-                        ) {
-                          setActiveDropdown((current) =>
-                            current === item.label ? null : current
-                          );
-                        }
-                      }}
-                    >
-                      <div className="navbar__dropdown-heading">
+                    if (!item.children?.length) {
+                      return (
                         <NavLink
+                          key={item.path}
                           to={item.path}
-                          className={[
-                            "navbar__link",
-                            "navbar__dropdown-trigger",
-                            active ? "is-active" : "",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
+                          end={item.path === "/"}
+                          className={({
+                            isActive,
+                          }) =>
+                            `navbar__link ${
+                              isActive
+                                ? "is-active"
+                                : ""
+                            }`
+                          }
                           onClick={closeMenu}
                         >
-                          <span>{item.label}</span>
+                          <span>
+                            {item.label}
+                          </span>
                         </NavLink>
+                      );
+                    }
 
-                        <button
-                          type="button"
-                          className="navbar__dropdown-toggle"
-                          onClick={() => toggleDropdown(item.label)}
-                          aria-expanded={expanded}
-                          aria-controls={submenuId}
-                          aria-label={`${
-                            expanded ? "Close" : "Open"
-                          } ${item.label} submenu`}
-                        >
-                          <ChevronDown
-                            size={16}
-                            strokeWidth={1.7}
-                            aria-hidden="true"
-                          />
-                        </button>
-                      </div>
 
+                    /*
+                      DROPDOWN
+                    */
+
+                    const expanded =
+                      activeDropdown ===
+                      item.label;
+
+                    const active =
+                      matchesPath(
+                        location.pathname,
+                        item.path
+                      ) ||
+                      item.children.some(
+                        (child) =>
+                          matchesPath(
+                            location.pathname,
+                            child.path
+                          )
+                      );
+
+                    const submenuId =
+                      `navbar-submenu-${index}`;
+
+
+                    return (
                       <div
-                        id={submenuId}
-                        className="navbar__dropdown-menu"
-                        hidden={!expanded}
+                        key={item.path}
+                        className={[
+                          "navbar__dropdown",
+                          expanded
+                            ? "is-expanded"
+                            : "",
+                          active
+                            ? "is-active"
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        onMouseEnter={() => {
+                          if (!isMobile) {
+                            setActiveDropdown(
+                              item.label
+                            );
+                          }
+                        }}
+                        onMouseLeave={(event) => {
+                          if (
+                            !isMobile &&
+                            !event.currentTarget.contains(
+                              document.activeElement
+                            )
+                          ) {
+                            setActiveDropdown(
+                              null
+                            );
+                          }
+                        }}
+                        onBlur={(event) => {
+                          if (
+                            !event.currentTarget.contains(
+                              event.relatedTarget
+                            )
+                          ) {
+                            setActiveDropdown(
+                              (current) =>
+                                current ===
+                                item.label
+                                  ? null
+                                  : current
+                            );
+                          }
+                        }}
                       >
-                        {item.children.map((child) => (
+
+                        <div className="navbar__dropdown-heading">
+
                           <NavLink
-                            key={child.path}
-                            to={child.path}
-                            end
-                            className={({ isActive }) =>
-                              [
-                                "navbar__dropdown-link",
-                                isActive ? "is-active" : "",
-                                isCFCVPath(child.path)
-                                  ? "navbar__dropdown-link--cfcv"
-                                  : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" ")
-                            }
+                            to={item.path}
+                            className={[
+                              "navbar__link",
+                              "navbar__dropdown-trigger",
+                              active
+                                ? "is-active"
+                                : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
                             onClick={closeMenu}
                           >
-                          <span className="navbar__dropdown-link-content">
-  <span>{child.label}</span>
-</span>
+                            <span>
+                              {item.label}
+                            </span>
                           </NavLink>
-                        ))}
+
+
+                          <button
+                            type="button"
+                            className="navbar__dropdown-toggle"
+                            onClick={() =>
+                              toggleDropdown(
+                                item.label
+                              )
+                            }
+                            aria-expanded={
+                              expanded
+                            }
+                            aria-controls={
+                              submenuId
+                            }
+                            aria-label={`${
+                              expanded
+                                ? "Close"
+                                : "Open"
+                            } ${
+                              item.label
+                            } submenu`}
+                          >
+                            <ChevronDown
+                              size={16}
+                              strokeWidth={1.7}
+                              aria-hidden="true"
+                            />
+                          </button>
+
+                        </div>
+
+
+                        <div
+                          id={submenuId}
+                          className="navbar__dropdown-menu"
+                          hidden={!expanded}
+                        >
+
+                          {item.children.map(
+                            (child) => (
+                              <NavLink
+                                key={child.path}
+                                to={child.path}
+                                end
+                                className={({
+                                  isActive,
+                                }) =>
+                                  [
+                                    "navbar__dropdown-link",
+                                    isActive
+                                      ? "is-active"
+                                      : "",
+                                    isCFCVPath(
+                                      child.path
+                                    )
+                                      ? "navbar__dropdown-link--cfcv"
+                                      : "",
+                                  ]
+                                    .filter(Boolean)
+                                    .join(" ")
+                                }
+                                onClick={closeMenu}
+                              >
+                                <span className="navbar__dropdown-link-content">
+                                  <span>
+                                    {child.label}
+                                  </span>
+                                </span>
+                              </NavLink>
+                            )
+                          )}
+
+                        </div>
+
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
+
               </div>
 
+
+              {/* ACTIONS */}
+
               <div className="navbar__actions">
+
                 <button
                   type="button"
                   className="navbar__search"
@@ -616,10 +844,12 @@ export default function Navbar() {
                     strokeWidth={1.6}
                     aria-hidden="true"
                   />
+
                   <span className="navbar__search-label">
                     Search website
                   </span>
                 </button>
+
 
                 <a
                   href={SUBSCRIPTION_URL}
@@ -630,55 +860,84 @@ export default function Navbar() {
                   aria-label="Subscribe — opens Eth Tech Solutions pricing in a new tab"
                   title="View subscription plans on Eth Tech Solutions"
                 >
-                  <span>Subscribe</span>
-                  
+                  <span>
+                    Subscribe
+                  </span>
                 </a>
+
 
                 <Link
                   to="/cfcv/apply"
                   className="navbar__cta navbar__cta--cfcv"
                   onClick={closeMenu}
                 >
-                  
-                  <span>Apply to CFCV</span>
-                  
+                  <span>
+                    Apply to CFCV
+                  </span>
                 </Link>
+
               </div>
+
             </nav>
+
+
+            {/* MOBILE MENU BUTTON */}
 
             <button
               ref={menuButtonRef}
               type="button"
               className="navbar__toggle"
               onClick={() => {
-                setOpen((current) => !current);
+                setOpen(
+                  (current) => !current
+                );
+
                 setActiveDropdown(null);
               }}
               aria-expanded={open}
               aria-controls="primary-navigation"
               aria-label={
-                open ? "Close navigation menu" : "Open navigation menu"
+                open
+                  ? "Close navigation menu"
+                  : "Open navigation menu"
               }
             >
               {open ? (
-                <X size={25} aria-hidden="true" />
+                <X
+                  size={25}
+                  aria-hidden="true"
+                />
               ) : (
-                <Menu size={25} aria-hidden="true" />
+                <Menu
+                  size={25}
+                  aria-hidden="true"
+                />
               )}
             </button>
+
           </div>
         </div>
+
       </header>
+
+
+      {/* ==========================================
+          SEARCH
+      =========================================== */}
 
       {searchOpen && (
         <div
           className="search-overlay"
           onClick={(event) => {
-            if (event.target === event.currentTarget) {
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
               closeSearch();
             }
           }}
         >
+
           <div
             ref={searchModalRef}
             className="search-modal"
@@ -686,21 +945,31 @@ export default function Navbar() {
             aria-modal="true"
             aria-label="Search Continental Founders"
           >
+
             <div className="search-header">
+
               <div className="search-input-wrapper">
-                <Search size={21} aria-hidden="true" />
+
+                <Search
+                  size={21}
+                  aria-hidden="true"
+                />
 
                 <input
                   ref={searchInputRef}
                   type="search"
                   value={searchQuery}
                   onChange={(event) =>
-                    setSearchQuery(event.target.value)
+                    setSearchQuery(
+                      event.target.value
+                    )
                   }
                   placeholder="Search the website…"
                   aria-label="Search the website"
                 />
+
               </div>
+
 
               <button
                 type="button"
@@ -708,35 +977,67 @@ export default function Navbar() {
                 onClick={closeSearch}
                 aria-label="Close search"
               >
-                <X size={21} aria-hidden="true" />
+                <X
+                  size={21}
+                  aria-hidden="true"
+                />
               </button>
+
             </div>
 
+
             <div className="search-results">
+
               {!query ? (
                 <div className="search-empty">
-                  <Search size={30} aria-hidden="true" />
-                  <h3>What are you looking for?</h3>
+                  <Search
+                    size={30}
+                    aria-hidden="true"
+                  />
+
+                  <h3>
+                    What are you looking for?
+                  </h3>
+
                   <p>
-                    Search ventures, fellowships, partners,
+                    Search ventures,
+                    fellowships, partners,
                     events and more.
                   </p>
                 </div>
               ) : filteredResults.length ? (
                 <div className="search-result-list">
-                  {filteredResults.map(renderSearchResult)}
+                  {filteredResults.map(
+                    renderSearchResult
+                  )}
                 </div>
               ) : (
-                <div className="search-empty" role="status">
-                  <Search size={30} aria-hidden="true" />
-                  <h3>No results found</h3>
-                  <p>Try another keyword.</p>
+                <div
+                  className="search-empty"
+                  role="status"
+                >
+                  <Search
+                    size={30}
+                    aria-hidden="true"
+                  />
+
+                  <h3>
+                    No results found
+                  </h3>
+
+                  <p>
+                    Try another keyword.
+                  </p>
                 </div>
               )}
+
             </div>
+
           </div>
+
         </div>
       )}
+
     </>
   );
 }

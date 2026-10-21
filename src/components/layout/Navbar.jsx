@@ -1,3 +1,4 @@
+
 import {
   useEffect,
   useRef,
@@ -47,6 +48,20 @@ const searchItems = [
     description:
       "Explore Potential, Preparation, Execution, Evidence and Opportunity.",
     url: "/our-model",
+  },
+  {
+    title: "Find Your Lane",
+    description:
+      "Explore the fellowship pathways and find the right lane for your founder journey.",
+    url: "/find-your-lane",
+    cfcv: true,
+  },
+  {
+    title: "Fellowship Community",
+    description:
+      "Discover the Continental Founders Fellowship community and its network.",
+    url: "/fellowship-community",
+    cfcv: true,
   },
   {
     title: "CFCV Fellowship",
@@ -255,7 +270,7 @@ export default function Navbar() {
     setActiveDropdown(null);
     setSearchOpen(false);
     setSearchQuery("");
-  }, [location.pathname, location.search]);  
+  }, [location.pathname, location.search]);
 
   useEffect(() => {
     if (navRef.current) {
@@ -593,9 +608,9 @@ export default function Navbar() {
                             }
                             onClick={closeMenu}
                           >
-                          <span className="navbar__dropdown-link-content">
-  <span>{child.label}</span>
-</span>
+                            <span className="navbar__dropdown-link-content">
+                              <span>{child.label}</span>
+                            </span>
                           </NavLink>
                         ))}
                       </div>
@@ -631,7 +646,6 @@ export default function Navbar() {
                   title="View subscription plans on Eth Tech Solutions"
                 >
                   <span>Subscribe</span>
-                  
                 </a>
 
                 <Link
@@ -639,9 +653,7 @@ export default function Navbar() {
                   className="navbar__cta navbar__cta--cfcv"
                   onClick={closeMenu}
                 >
-                  
                   <span>Apply to CFCV</span>
-                  
                 </Link>
               </div>
             </nav>
@@ -657,7 +669,9 @@ export default function Navbar() {
               aria-expanded={open}
               aria-controls="primary-navigation"
               aria-label={
-                open ? "Close navigation menu" : "Open navigation menu"
+                open
+                  ? "Close navigation menu"
+                  : "Open navigation menu"
               }
             >
               {open ? (

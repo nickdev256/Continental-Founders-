@@ -1,3 +1,4 @@
+
 export const navigation = [
   {
     label: "About",
@@ -24,6 +25,14 @@ export const navigation = [
         path: "/cfcv/apply",
       },
     ],
+  },
+  {
+    label: "Find Your Lane",
+    path: "/find-your-lane",
+  },
+  {
+    label: "Fellowship Community",
+    path: "/fellowship-community",
   },
   {
     label: "Partners",

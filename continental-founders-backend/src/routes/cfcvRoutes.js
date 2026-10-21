@@ -8,6 +8,7 @@ const {
   getApplicationById,
   getApplicationResume,
   updateApplication,
+  deleteApplication,
   getApplicationStats,
   getApplicationHistory,
   getApplicationEmails,
@@ -29,6 +30,7 @@ const MAX_RESUME_SIZE = 5 * 1024 * 1024;
 const RESUME_TYPES = {
   ".pdf": "application/pdf",
   ".doc": "application/msword",
+
   ".docx":
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
@@ -38,8 +40,14 @@ const RESUME_TYPES = {
 // ============================================================
 
 function asyncHandler(handler) {
+  if (typeof handler !== "function") {
+    throw new TypeError(
+      "A CFCV controller export is missing. Install the complete updated cfcvController.js."
+    );
+  }
+
   return (req, res, next) => {
-    Promise.resolve()
+    return Promise.resolve()
       .then(() => handler(req, res, next))
       .catch(next);
   };
@@ -66,7 +74,7 @@ function uploadError(res, message, field = "") {
 // ============================================================
 // MEMORY UPLOAD
 //
-// Controller must validate file signatures before uploading
+// The controller validates file signatures before uploading
 // to the private résumé bucket.
 // ============================================================
 
@@ -87,7 +95,9 @@ const resumeUpload = multer({
       .extname(file.originalname || "")
       .toLowerCase();
 
-    const mimeType = String(file.mimetype || "")
+    const mimeType = String(
+      file.mimetype || ""
+    )
       .trim()
       .toLowerCase();
 
@@ -120,6 +130,7 @@ function requireMultipart(req, res, next) {
   if (!req.is("multipart/form-data")) {
     return res.status(415).json({
       success: false,
+
       message:
         "Submit the application using multipart/form-data.",
     });
@@ -133,65 +144,77 @@ function requireMultipart(req, res, next) {
 // ============================================================
 
 function handleResumeUpload(req, res, next) {
-  resumeUpload.single("resume")(req, res, (error) => {
-    if (!error) {
-      return next();
-    }
-
-    if (error.code === "INVALID_RESUME_TYPE") {
-      return uploadError(res, error.message, "resume");
-    }
-
-    if (error instanceof multer.MulterError) {
-      switch (error.code) {
-        case "LIMIT_FILE_SIZE":
-          return uploadError(
-            res,
-            "Your résumé or CV must not exceed 5 MB.",
-            "resume"
-          );
-
-        case "LIMIT_FILE_COUNT":
-        case "LIMIT_UNEXPECTED_FILE":
-          return uploadError(
-            res,
-            "Upload one résumé using the resume field.",
-            "resume"
-          );
-
-        case "LIMIT_FIELD_COUNT":
-        case "LIMIT_PART_COUNT":
-          return uploadError(
-            res,
-            "Submit only application, submissionKey and one résumé."
-          );
-
-        case "LIMIT_FIELD_VALUE":
-          return uploadError(
-            res,
-            "The application form data is too large.",
-            error.field
-          );
-
-        case "LIMIT_FIELD_KEY":
-          return uploadError(
-            res,
-            "The application contains an invalid field name."
-          );
-
-        default:
-          return uploadError(
-            res,
-            "Unable to process the application upload."
-          );
+  resumeUpload.single("resume")(
+    req,
+    res,
+    (error) => {
+      if (!error) {
+        return next();
       }
-    }
 
-    return uploadError(
-      res,
-      "Unable to process the application upload. Check your file and try again."
-    );
-  });
+      if (
+        error.code === "INVALID_RESUME_TYPE"
+      ) {
+        return uploadError(
+          res,
+          error.message,
+          "resume"
+        );
+      }
+
+      if (
+        error instanceof multer.MulterError
+      ) {
+        switch (error.code) {
+          case "LIMIT_FILE_SIZE":
+            return uploadError(
+              res,
+              "Your résumé or CV must not exceed 5 MB.",
+              "resume"
+            );
+
+          case "LIMIT_FILE_COUNT":
+          case "LIMIT_UNEXPECTED_FILE":
+            return uploadError(
+              res,
+              "Upload one résumé using the resume field.",
+              "resume"
+            );
+
+          case "LIMIT_FIELD_COUNT":
+          case "LIMIT_PART_COUNT":
+            return uploadError(
+              res,
+              "Submit only application, submissionKey and one résumé."
+            );
+
+          case "LIMIT_FIELD_VALUE":
+            return uploadError(
+              res,
+              "The application form data is too large.",
+              error.field
+            );
+
+          case "LIMIT_FIELD_KEY":
+            return uploadError(
+              res,
+              "The application contains an invalid field name."
+            );
+
+          default:
+            return uploadError(
+              res,
+              "Unable to process the application upload."
+            );
+        }
+      }
+
+      return uploadError(
+        res,
+        "Unable to process the application upload. Check your file and try again."
+      );
+    }
+  );
 }
 
 // ============================================================
@@ -230,7 +253,10 @@ function validateSubmissionParts(req, res, next) {
     }
   }
 
-  if (!req.file || !req.file.size) {
+  if (
+    !req.file ||
+    !req.file.size
+  ) {
     return uploadError(
       res,
       "Choose a non-empty résumé file.",
@@ -252,7 +278,10 @@ function validateSubmissionParts(req, res, next) {
 // ============================================================
 
 function noStore(req, res, next) {
-  res.setHeader("Cache-Control", "no-store");
+  res.setHeader(
+    "Cache-Control",
+    "no-store, private"
+  );
 
   return next();
 }
@@ -277,8 +306,10 @@ router.post(
 // ============================================================
 // ADMIN AUTHENTICATION
 //
-// Set no-store before authentication so authentication
-// errors also receive the header.
+// Applies to every /admin endpoint below, including DELETE.
+//
+// Set no-store before authentication so authentication errors
+// also receive the header.
 // ============================================================
 
 router.use(
@@ -289,6 +320,8 @@ router.use(
 
 // ============================================================
 // ADMIN: STATISTICS
+//
+// GET /api/cfcv/admin/stats
 // ============================================================
 
 router.get(
@@ -298,6 +331,8 @@ router.get(
 
 // ============================================================
 // ADMIN: APPLICATION LIST
+//
+// GET /api/cfcv/admin/applications
 // ============================================================
 
 router.get(
@@ -306,7 +341,28 @@ router.get(
 );
 
 // ============================================================
-// ADMIN: PRIVATE RÉSUMÉ LINK
+// ADMIN: PRIVATE RÉSUMÉ LINKS
+//
+// View:
+// GET /api/cfcv/admin/applications/:id/resume?mode=view
+//
+// Download:
+// GET /api/cfcv/admin/applications/:id/resume?mode=download
+//
+// The updated controller returns:
+// - url
+// - signedUrl
+// - viewUrl
+// - downloadUrl
+// - fileName
+// - mimeType
+// - previewSupported
+// - expiresIn
+//
+// PDF files support browser preview.
+// DOC and DOCX files can be downloaded.
+//
+// These links expire after 300 seconds.
 // ============================================================
 
 router.get(
@@ -316,6 +372,8 @@ router.get(
 
 // ============================================================
 // ADMIN: REVIEW HISTORY
+//
+// GET /api/cfcv/admin/applications/:id/history
 // ============================================================
 
 router.get(
@@ -325,6 +383,8 @@ router.get(
 
 // ============================================================
 // ADMIN: EMAIL QUEUE STATUS
+//
+// GET /api/cfcv/admin/applications/:id/emails
 // ============================================================
 
 router.get(
@@ -334,6 +394,8 @@ router.get(
 
 // ============================================================
 // ADMIN: PREVIEW EMAIL
+//
+// POST /api/cfcv/admin/applications/:id/email-preview
 //
 // Does not save a review or send an email.
 // ============================================================
@@ -345,6 +407,8 @@ router.post(
 
 // ============================================================
 // ADMIN: APPLICATION DETAILS
+//
+// GET /api/cfcv/admin/applications/:id
 // ============================================================
 
 router.get(
@@ -355,13 +419,43 @@ router.get(
 // ============================================================
 // ADMIN: SAVE REVIEW
 //
-// Controller enforces expectedVersion and handles
-// notifyApplicant and applicantMessage.
+// PATCH /api/cfcv/admin/applications/:id
+//
+// The JSON body includes expectedVersion and review fields.
+//
+// The updated controller and SQL function queue applicant
+// feedback whenever a review is saved.
+//
+// applicantMessage can contain custom feedback.
+//
+// Internal notes are not automatically included in feedback.
 // ============================================================
 
 router.patch(
   "/admin/applications/:id",
   asyncHandler(updateApplication)
+);
+
+// ============================================================
+// ADMIN: DELETE APPLICATION
+//
+// DELETE /api/cfcv/admin/applications/:id
+//
+// Required JSON body:
+//
+// {
+//   "expectedVersion": 1,
+//   "confirmationReference": "THE-EXACT-APPLICATION-REFERENCE"
+// }
+//
+// Use the selected application's current version and reference.
+//
+// The controller validates both values before deletion.
+// ============================================================
+
+router.delete(
+  "/admin/applications/:id",
+  asyncHandler(deleteApplication)
 );
 
 // ============================================================

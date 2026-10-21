@@ -41,6 +41,9 @@ import GovernmentDevelopment from "./pages/GovernmentDevelopment";
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
 
+import FindYourLane from "./pages/FindYourLane/FindYourLane";
+import FellowshipCommunity from "./pages/FellowshipCommunity/FellowshipCommunity";
+
 import Events from "./pages/Events";
 import EventDetails from "./pages/EventDetails";
 
@@ -1247,6 +1250,16 @@ export default function App() {
               path="/contact"
               element={<Contact />}
             />
+<Route
+  path="/find-your-lane"
+  element={<FindYourLane />}
+/>
+
+<Route
+  path="/fellowship-community"
+  element={<FellowshipCommunity />}
+/>
+
 
             {/* ADMIN AUTH */}
 

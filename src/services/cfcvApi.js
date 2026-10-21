@@ -1,3 +1,12 @@
+// ============================================================
+// API CONFIGURATION
+//
+// Example:
+// VITE_API_URL=https://continental-founders-1.onrender.com
+//
+// Do not append /api to VITE_API_URL.
+// ============================================================
+
 const API_URL = String(
   import.meta.env.VITE_API_URL || "http://localhost:5000"
 )
@@ -5,8 +14,13 @@ const API_URL = String(
   .replace(/\/+$/, "");
 
 const ROOT = "/api/cfcv";
+
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// ============================================================
+// API ERROR
+// ============================================================
 
 export class CfcvApiError extends Error {
   constructor(
@@ -21,6 +35,7 @@ export class CfcvApiError extends Error {
     } = {}
   ) {
     super(message);
+
     this.name = "CfcvApiError";
     this.status = status;
     this.code = code;
@@ -31,31 +46,69 @@ export class CfcvApiError extends Error {
   }
 }
 
-function applicationPath(id) {
-  if (!UUID.test(String(id || ""))) {
-    throw new CfcvApiError("Invalid application ID.", {
-      code: "INVALID_INPUT",
-    });
-  }
-
-  return `${ROOT}/admin/applications/${id}`;
+function invalidInput(message, field = "") {
+  return new CfcvApiError(message, {
+    status: 400,
+    code: "INVALID_INPUT",
+    field,
+    fields: field ? [field] : [],
+  });
 }
 
+// ============================================================
+// APPLICATION PATH
+// ============================================================
+
+function applicationPath(id) {
+  if (
+    typeof id !== "string" ||
+    !UUID.test(id)
+  ) {
+    throw invalidInput(
+      "Invalid application ID."
+    );
+  }
+
+  return `${ROOT}/admin/applications/${id.toLowerCase()}`;
+}
+
+// ============================================================
+// RETRY-AFTER HEADER
+// ============================================================
+
 function readRetryAfter(value) {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
 
   const seconds = Number(value);
 
-  if (Number.isFinite(seconds) && seconds >= 0) {
+  if (
+    Number.isFinite(seconds) &&
+    seconds >= 0
+  ) {
     return Math.ceil(seconds);
   }
 
   const date = Date.parse(value);
 
   return Number.isFinite(date)
-    ? Math.max(0, Math.ceil((date - Date.now()) / 1000))
+    ? Math.max(
+        0,
+        Math.ceil((date - Date.now()) / 1000)
+      )
     : null;
 }
+
+// ============================================================
+// REQUEST HELPER
+//
+// Admin requests use the existing session cookie.
+//
+// Requests are not automatically retried because a failed
+// response does not prove that a submission, save, or deletion
+// failed on the server.
+// ============================================================
 
 async function request(
   endpoint,
@@ -68,19 +121,29 @@ async function request(
   } = {}
 ) {
   const controller = new AbortController();
+
   let timedOut = false;
 
-  const abortFromCaller = () => controller.abort();
+  const abortFromCaller = () => {
+    controller.abort();
+  };
 
   if (signal?.aborted) {
-    throw new CfcvApiError("The request was cancelled.", {
-      code: "ABORTED",
-    });
+    throw new CfcvApiError(
+      "The request was cancelled.",
+      {
+        code: "ABORTED",
+      }
+    );
   }
 
-  signal?.addEventListener("abort", abortFromCaller, {
-    once: true,
-  });
+  signal?.addEventListener(
+    "abort",
+    abortFromCaller,
+    {
+      once: true,
+    }
+  );
 
   const timeout = setTimeout(() => {
     timedOut = true;
@@ -88,38 +151,57 @@ async function request(
   }, timeoutMs);
 
   try {
-    const isFormData = body instanceof FormData;
-    const hasBody = body !== undefined && body !== null;
+    const isFormData =
+      body instanceof FormData;
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      method,
-      credentials: publicRequest ? "omit" : "include",
-      cache: "no-store",
-      signal: controller.signal,
-      headers: {
-        Accept: "application/json",
-        ...(hasBody && !isFormData
-          ? { "Content-Type": "application/json" }
+    const hasBody =
+      body !== undefined &&
+      body !== null;
+
+    const response = await fetch(
+      `${API_URL}${endpoint}`,
+      {
+        method,
+
+        credentials:
+          publicRequest ? "omit" : "include",
+
+        cache: "no-store",
+        signal: controller.signal,
+
+        headers: {
+          Accept: "application/json",
+
+          ...(hasBody && !isFormData
+            ? {
+                "Content-Type": "application/json",
+              }
+            : {}),
+        },
+
+        ...(hasBody
+          ? {
+              body: isFormData
+                ? body
+                : JSON.stringify(body),
+            }
           : {}),
-      },
-      ...(hasBody
-        ? {
-            body: isFormData ? body : JSON.stringify(body),
-          }
-        : {}),
-    });
+      }
+    );
 
     const raw = await response.text();
+
     let data = null;
 
     try {
       data = JSON.parse(raw);
     } catch {
-      // The response may contain a non-JSON server error.
+      // A proxy or server error may not be JSON.
     }
 
     if (!response.ok) {
-      let fallback = "The request failed. Please try again.";
+      let fallback =
+        "The request failed. Please try again.";
 
       if (response.status === 401) {
         fallback =
@@ -127,10 +209,13 @@ async function request(
       } else if (response.status === 403) {
         fallback =
           "You do not have permission to perform this action.";
+      } else if (response.status === 404) {
+        fallback =
+          "The requested application or endpoint was not found.";
       } else if (response.status === 409) {
         fallback = publicRequest
           ? "This submission key conflicts with another payload. Confirm the existing application before submitting again."
-          : "This application changed. Reload it before saving again.";
+          : "This application changed. Reload it before saving or deleting.";
       } else if (response.status === 429) {
         fallback =
           "Too many requests. Please wait before trying again.";
@@ -144,7 +229,9 @@ async function request(
             : "HTTP_ERROR";
 
       const fields = Array.isArray(data?.fields)
-        ? data.fields
+        ? data.fields.filter(
+            (field) => typeof field === "string"
+          )
         : typeof data?.field === "string"
           ? [data.field]
           : [];
@@ -157,11 +244,14 @@ async function request(
           status: response.status,
           code,
           fields,
+
           field:
             typeof data?.field === "string"
               ? data.field
               : "",
+
           details: data,
+
           retryAfter: readRetryAfter(
             response.headers.get("Retry-After")
           ),
@@ -194,44 +284,72 @@ async function request(
       throw new CfcvApiError(
         timedOut
           ? "The request timed out. It may have reached the server. Check the result before trying again."
-          : "The request was cancelled.",
+          : "The request was cancelled. It may have reached the server; check the result before retrying a change.",
         {
-          code: timedOut ? "TIMEOUT" : "ABORTED",
+          code:
+            timedOut ? "TIMEOUT" : "ABORTED",
         }
       );
     }
 
     throw new CfcvApiError(
-      "Unable to reach the server. Check your connection before trying again.",
+      "Unable to confirm the server response. Check your connection and the result before trying again.",
       {
         code: "NETWORK_ERROR",
       }
     );
   } finally {
     clearTimeout(timeout);
-    signal?.removeEventListener("abort", abortFromCaller);
+
+    signal?.removeEventListener(
+      "abort",
+      abortFromCaller
+    );
   }
 }
 
+// ============================================================
+// CREATE SUBMISSION KEY
+//
+// Keep the same key when retrying the same submission.
+// ============================================================
+
 export function createSubmissionKey() {
+  if (
+    typeof globalThis.crypto?.randomUUID !== "function"
+  ) {
+    throw new CfcvApiError(
+      "Open this application using HTTPS or localhost in a supported browser.",
+      {
+        code: "UNSUPPORTED_BROWSER",
+      }
+    );
+  }
+
   return globalThis.crypto.randomUUID();
 }
 
+// ============================================================
+// PUBLIC: SUBMIT APPLICATION
+// ============================================================
+
 export async function submitCfcvApplication(
-  { application, resume, submissionKey },
-  { signal } = {}
+  {
+    application,
+    resume,
+    submissionKey,
+  } = {},
+  {
+    signal,
+  } = {}
 ) {
   if (
     !application ||
     typeof application !== "object" ||
     Array.isArray(application)
   ) {
-    throw new CfcvApiError(
-      "Application details are required.",
-      {
-        status: 400,
-        code: "INVALID_INPUT",
-      }
+    throw invalidInput(
+      "Application details are required."
     );
   }
 
@@ -240,27 +358,26 @@ export async function submitCfcvApplication(
     typeof resume.name !== "string" ||
     !resume.name
   ) {
-    throw new CfcvApiError("Choose your résumé file.", {
-      status: 400,
-      code: "INVALID_INPUT",
-      field: "resume",
-      fields: ["resume"],
-    });
+    throw invalidInput(
+      "Choose your résumé file.",
+      "resume"
+    );
   }
 
-  if (!UUID.test(String(submissionKey || ""))) {
-    throw new CfcvApiError(
+  if (
+    typeof submissionKey !== "string" ||
+    !UUID.test(submissionKey)
+  ) {
+    throw invalidInput(
       "A valid submission key is required.",
-      {
-        status: 400,
-        code: "INVALID_INPUT",
-      }
+      "submissionKey"
     );
   }
 
   const resumeTypes = {
     pdf: "application/pdf",
     doc: "application/msword",
+
     docx:
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   };
@@ -270,48 +387,72 @@ export async function submitCfcvApplication(
     .pop()
     .toLowerCase();
 
-  if (!resume.size || resume.size > 5 * 1024 * 1024) {
-    throw new CfcvApiError(
+  if (
+    !resume.size ||
+    resume.size > 5 * 1024 * 1024
+  ) {
+    throw invalidInput(
       !resume.size
         ? "Your résumé file is empty."
         : "Your résumé must be 5 MB or smaller.",
-      {
-        status: 400,
-        code: "INVALID_INPUT",
-        field: "resume",
-        fields: ["resume"],
-      }
+      "resume"
     );
   }
 
   if (
-    !resumeTypes[extension] ||
-    (resume.type && resume.type !== resumeTypes[extension])
+    !Object.hasOwn(resumeTypes, extension) ||
+    (
+      resume.type &&
+      resume.type !== resumeTypes[extension]
+    )
   ) {
-    throw new CfcvApiError(
+    throw invalidInput(
       "Please upload a PDF, DOC, or DOCX résumé.",
-      {
-        status: 400,
-        code: "INVALID_INPUT",
-        field: "resume",
-        fields: ["resume"],
-      }
+      "resume"
     );
   }
 
+  // Some browsers supply an empty MIME type.
+  // Use the accepted extension to supply it.
+  // The backend still validates the actual file signature.
+
+  const upload = resume.type
+    ? resume
+    : new Blob(
+        [resume],
+        {
+          type: resumeTypes[extension],
+        }
+      );
+
   const formData = new FormData();
 
-  formData.append("application", JSON.stringify(application));
-  formData.append("submissionKey", submissionKey);
-  formData.append("resume", resume, resume.name);
+  formData.append(
+    "application",
+    JSON.stringify(application)
+  );
 
-  const data = await request(`${ROOT}/applications`, {
-    method: "POST",
-    body: formData,
-    signal,
-    timeoutMs: 120_000,
-    publicRequest: true,
-  });
+  formData.append(
+    "submissionKey",
+    submissionKey
+  );
+
+  formData.append(
+    "resume",
+    upload,
+    resume.name
+  );
+
+  const data = await request(
+    `${ROOT}/applications`,
+    {
+      method: "POST",
+      body: formData,
+      signal,
+      timeoutMs: 120_000,
+      publicRequest: true,
+    }
+  );
 
   if (
     typeof data.applicationReference !== "string" ||
@@ -328,13 +469,32 @@ export async function submitCfcvApplication(
   return data;
 }
 
-export function getCfcvStats({ signal } = {}) {
-  return request(`${ROOT}/admin/stats`, { signal });
+// ============================================================
+// ADMIN: STATISTICS
+// ============================================================
+
+export function getCfcvStats(
+  {
+    signal,
+  } = {}
+) {
+  return request(
+    `${ROOT}/admin/stats`,
+    {
+      signal,
+    }
+  );
 }
+
+// ============================================================
+// ADMIN: APPLICATION LIST
+// ============================================================
 
 export function getCfcvApplications(
   filters = {},
-  { signal } = {}
+  {
+    signal,
+  } = {}
 ) {
   const query = new URLSearchParams();
 
@@ -354,7 +514,10 @@ export function getCfcvApplications(
       value !== null &&
       value !== ""
     ) {
-      query.set(key, String(value));
+      query.set(
+        key,
+        String(value)
+      );
     }
   }
 
@@ -364,64 +527,275 @@ export function getCfcvApplications(
     `${ROOT}/admin/applications${
       suffix ? `?${suffix}` : ""
     }`,
-    { signal }
+    {
+      signal,
+    }
   );
 }
 
-export function getCfcvApplication(id, { signal } = {}) {
-  return request(applicationPath(id), { signal });
+// ============================================================
+// ADMIN: APPLICATION DETAILS
+// ============================================================
+
+export function getCfcvApplication(
+  id,
+  {
+    signal,
+  } = {}
+) {
+  return request(
+    applicationPath(id),
+    {
+      signal,
+    }
+  );
 }
 
-export function getCfcvResume(id, { signal } = {}) {
-  return request(`${applicationPath(id)}/resume`, {
+// ============================================================
+// ADMIN: RÉSUMÉ LINKS
+//
+// Existing callers default to download mode.
+//
+// Example:
+// getCfcvResume(id, { mode: "view" })
+//
+// The controller returns both viewUrl and downloadUrl.
+// These functions retrieve links; they do not open a window.
+// ============================================================
+
+export function getCfcvResume(
+  id,
+  {
     signal,
-  });
+    mode = "download",
+  } = {}
+) {
+  if (
+    !["view", "download"].includes(mode)
+  ) {
+    throw invalidInput(
+      "Choose view or download for résumé access."
+    );
+  }
+
+  return request(
+    `${applicationPath(id)}/resume?mode=${mode}`,
+    {
+      signal,
+    }
+  );
 }
 
-export function getCfcvHistory(id, { signal } = {}) {
-  return request(`${applicationPath(id)}/history`, {
+export function getCfcvResumeView(
+  id,
+  {
     signal,
-  });
+  } = {}
+) {
+  return getCfcvResume(
+    id,
+    {
+      signal,
+      mode: "view",
+    }
+  );
 }
 
-export function getCfcvEmails(id, { signal } = {}) {
-  return request(`${applicationPath(id)}/emails`, {
+export function getCfcvResumeDownload(
+  id,
+  {
     signal,
-  });
+  } = {}
+) {
+  return getCfcvResume(
+    id,
+    {
+      signal,
+      mode: "download",
+    }
+  );
 }
+
+// ============================================================
+// ADMIN: REVIEW HISTORY
+// ============================================================
+
+export function getCfcvHistory(
+  id,
+  {
+    signal,
+  } = {}
+) {
+  return request(
+    `${applicationPath(id)}/history`,
+    {
+      signal,
+    }
+  );
+}
+
+// ============================================================
+// ADMIN: EMAIL QUEUE
+// ============================================================
+
+export function getCfcvEmails(
+  id,
+  {
+    signal,
+  } = {}
+) {
+  return request(
+    `${applicationPath(id)}/emails`,
+    {
+      signal,
+    }
+  );
+}
+
+// ============================================================
+// REVIEW VALIDATION
+// ============================================================
+
+function validateReview(review) {
+  if (
+    !review ||
+    typeof review !== "object" ||
+    Array.isArray(review)
+  ) {
+    throw invalidInput(
+      "Review details are required."
+    );
+  }
+
+  if (
+    !Number.isSafeInteger(review.expectedVersion) ||
+    review.expectedVersion < 1
+  ) {
+    throw invalidInput(
+      "Reload the application before saving. Its version is required.",
+      "expectedVersion"
+    );
+  }
+}
+
+// ============================================================
+// ADMIN: PREVIEW FEEDBACK
+//
+// This request does not save the review or send an email.
+// ============================================================
 
 export function previewCfcvEmail(
   id,
   review,
-  { signal } = {}
-) {
-  return request(`${applicationPath(id)}/email-preview`, {
-    method: "POST",
-    body: review,
+  {
     signal,
-  });
+  } = {}
+) {
+  validateReview(review);
+
+  return request(
+    `${applicationPath(id)}/email-preview`,
+    {
+      method: "POST",
+
+      body: {
+        ...review,
+        notifyApplicant: true,
+      },
+
+      signal,
+    }
+  );
 }
+
+// ============================================================
+// ADMIN: SAVE REVIEW AND QUEUE FEEDBACK
+//
+// The controller and SQL perform the actual save and queuing.
+// Queued is not the same as delivered.
+// ============================================================
 
 export function saveCfcvReview(
   id,
   review,
-  { signal } = {}
+  {
+    signal,
+  } = {}
+) {
+  validateReview(review);
+
+  return request(
+    applicationPath(id),
+    {
+      method: "PATCH",
+
+      body: {
+        ...review,
+        notifyApplicant: true,
+      },
+
+      signal,
+    }
+  );
+}
+
+// ============================================================
+// ADMIN: DELETE APPLICATION
+//
+// Example:
+//
+// deleteCfcvApplication(application.id, {
+//   expectedVersion: application.version,
+//   confirmationReference: enteredReference,
+// });
+//
+// The admin page must show any resumeCleanupPending warning
+// returned by the server.
+// ============================================================
+
+export function deleteCfcvApplication(
+  id,
+  {
+    expectedVersion,
+    confirmationReference,
+  } = {},
+  {
+    signal,
+  } = {}
 ) {
   if (
-    !Number.isInteger(review?.expectedVersion) ||
-    review.expectedVersion < 1
+    !Number.isSafeInteger(expectedVersion) ||
+    expectedVersion < 1
   ) {
-    throw new CfcvApiError(
-      "Reload the application before saving. Its version is required.",
-      {
-        code: "INVALID_INPUT",
-      }
+    throw invalidInput(
+      "Reload the application before deleting. Its version is required.",
+      "expectedVersion"
     );
   }
 
-  return request(applicationPath(id), {
-    method: "PATCH",
-    body: review,
-    signal,
-  });
+  if (
+    typeof confirmationReference !== "string" ||
+    !confirmationReference.trim()
+  ) {
+    throw invalidInput(
+      "Enter the application reference to confirm deletion.",
+      "confirmationReference"
+    );
+  }
+
+  return request(
+    applicationPath(id),
+    {
+      method: "DELETE",
+
+      body: {
+        expectedVersion,
+
+        confirmationReference:
+          confirmationReference.trim(),
+      },
+
+      signal,
+    }
+  );
 }

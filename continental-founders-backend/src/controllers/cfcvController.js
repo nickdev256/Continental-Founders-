@@ -43,7 +43,10 @@ const VALID_TEAM_STATUSES = new Set([
   "Existing team",
 ]);
 
-const VALID_YES_NO = new Set(["Yes", "No"]);
+const VALID_YES_NO = new Set([
+  "Yes",
+  "No",
+]);
 
 const VALID_ADMISSIONS_STAGES = new Set([
   "applied",
@@ -105,7 +108,7 @@ const ALLOWED_RESUME_TYPES = new Set([
 // ============================================================
 // PUBLIC FORM FIELDS
 //
-// [database column, maximum text length]
+// Format: [database column, maximum text length]
 // ============================================================
 
 const PUBLIC_FIELDS = {
@@ -187,6 +190,10 @@ const REQUIRED_FIELDS = [
   "sixMonthGoals",
 ];
 
+// ============================================================
+// REVIEW FIELD MAPPINGS
+// ============================================================
+
 const REVIEW_ENUMS = {
   admissionsStage: [
     "admissions_stage",
@@ -213,7 +220,10 @@ const REVIEW_ENUMS = {
     VALID_FINAL_DECISIONS,
   ],
 
-  status: ["status", VALID_STATUSES],
+  status: [
+    "status",
+    VALID_STATUSES,
+  ],
 };
 
 const DECISION_STATUSES = {
@@ -241,7 +251,9 @@ function respondError(res, error, fallback) {
   const status = error.httpStatus || 500;
 
   if (status >= 500) {
-    console.error("[CFCV]", fallback, error);
+    console.error("[CFCV]", fallback, {
+      code: error?.code || null,
+    });
   }
 
   return res.status(status).json({
@@ -270,7 +282,11 @@ function text(value, maximum, field) {
   }
 
   if (typeof value !== "string") {
-    throw fail(`Invalid ${field}.`, 400, [field]);
+    throw fail(
+      `Invalid ${field}.`,
+      400,
+      [field]
+    );
   }
 
   const result = value.trim();
@@ -380,6 +396,7 @@ function parseApplication(req) {
     ["geography", VALID_GEOGRAPHIES],
     ["ventureStage", VALID_VENTURE_STAGES],
     ["teamStatus", VALID_TEAM_STATUSES],
+
     [
       "existingCrossContinentalTeam",
       VALID_YES_NO,
@@ -394,7 +411,10 @@ function parseApplication(req) {
     }
   }
 
-  return { body, payload };
+  return {
+    body,
+    payload,
+  };
 }
 
 // ============================================================
@@ -419,8 +439,9 @@ function sanitizeFileName(value) {
   return `${base || "resume"}${extension}`;
 }
 
-// Check DOCX ZIP directory names without decompressing
-// user-controlled data.
+// Inspect DOCX ZIP directory entries without decompressing
+// user-controlled file contents.
+
 function hasDocxEntries(buffer) {
   const minimum = Math.max(
     0,
@@ -571,6 +592,7 @@ function validateResume(file) {
   const extensions = {
     "application/pdf": ".pdf",
     "application/msword": ".doc",
+
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       ".docx",
   };
@@ -663,14 +685,13 @@ function submissionHash(body, file, mimeType) {
 // ============================================================
 // NORMALIZE ADMIN RESPONSE
 //
-// Do not expose storage paths or submission hashes.
+// Storage paths and submission hashes are excluded.
 // ============================================================
 
 function normalizeApplication(row) {
   const result = {
     id: row.id,
-    applicationReference:
-      row.application_reference,
+    applicationReference: row.application_reference,
   };
 
   for (
@@ -695,10 +716,9 @@ function normalizeApplication(row) {
     admissionsStage: row.admissions_stage,
     assignedTrack: row.assigned_track,
 
-    matchingRequired:
-      Boolean(row.matching_required),
-
+    matchingRequired: Boolean(row.matching_required),
     matchingStatus: row.matching_status,
+
     finalDecision: row.final_decision,
 
     reviewerNotes: row.reviewer_notes || "",
@@ -706,9 +726,7 @@ function normalizeApplication(row) {
     matchingNotes: row.matching_notes || "",
     decisionNotes: row.decision_notes || "",
 
-    interviewRequired:
-      Boolean(row.interview_required),
-
+    interviewRequired: Boolean(row.interview_required),
     interviewStatus: row.interview_status,
     interviewDate: row.interview_date,
 
@@ -746,12 +764,7 @@ async function findSubmission(key) {
   return data;
 }
 
-function receipt(
-  res,
-  row,
-  hash,
-  replayed
-) {
+function receipt(res, row, hash, replayed) {
   if (row.submission_hash !== hash) {
     throw fail(
       "This submission key was already used for different application details. Keep the original submission key when retrying the original application.",
@@ -768,9 +781,7 @@ function receipt(
         ? "Your application was already submitted."
         : "Your CFCV application has been submitted successfully.",
 
-      applicationReference:
-        row.application_reference,
-
+      applicationReference: row.application_reference,
       submittedAt: row.submitted_at,
       replayed,
     });
@@ -814,8 +825,10 @@ async function createApplication(req, res) {
 
     const submissionKey = key.toLowerCase();
 
-    const { body, payload } =
-      parseApplication(req);
+    const {
+      body,
+      payload,
+    } = parseApplication(req);
 
     const mimeType = validateResume(req.file);
 
@@ -849,18 +862,17 @@ async function createApplication(req, res) {
         req.file.originalname
       )}`;
 
-    const { error: uploadError } =
-      await db.storage
-        .from(RESUME_BUCKET)
-        .upload(
-          storagePath,
-          req.file.buffer,
-          {
-            contentType: mimeType,
-            upsert: false,
-            cacheControl: "0",
-          }
-        );
+    const { error: uploadError } = await db.storage
+      .from(RESUME_BUCKET)
+      .upload(
+        storagePath,
+        req.file.buffer,
+        {
+          contentType: mimeType,
+          upsert: false,
+          cacheControl: "0",
+        }
+      );
 
     if (uploadError) {
       throw uploadError;
@@ -870,7 +882,6 @@ async function createApplication(req, res) {
       ...payload,
 
       application_reference: reference,
-
       submission_key: submissionKey,
       submission_hash: hash,
 
@@ -897,10 +908,9 @@ async function createApplication(req, res) {
       version: 1,
     };
 
-    // UNIQUE submission_key arbitrates concurrent retries.
-    //
-    // Resolve uncertain inserts by reading the same key.
-    // Never remove a résumé if its insert may have committed.
+    // A unique submission_key handles concurrent retries.
+    // If an insert outcome is uncertain, check the same key.
+    // Do not remove a résumé whose insert may have committed.
 
     let data;
     let insertError;
@@ -929,9 +939,7 @@ async function createApplication(req, res) {
         if (
           saved.resume_path !== storagePath
         ) {
-          await removeUnusedResume(
-            storagePath
-          );
+          await removeUnusedResume(storagePath);
         }
 
         return receipt(
@@ -943,12 +951,11 @@ async function createApplication(req, res) {
       }
 
       // A unique-constraint rejection is definitive.
+
       if (
         insertError?.code === "23505"
       ) {
-        await removeUnusedResume(
-          storagePath
-        );
+        await removeUnusedResume(storagePath);
       }
 
       throw (
@@ -1037,7 +1044,11 @@ async function getApplications(req, res) {
     for (
       const [field, column, values]
       of [
-        ["status", "status", VALID_STATUSES],
+        [
+          "status",
+          "status",
+          VALID_STATUSES,
+        ],
         [
           "admissionsStage",
           "admissions_stage",
@@ -1164,8 +1175,8 @@ async function getApplicationById(req, res) {
 
     return res.json({
       success: true,
-      application:
-        normalizeApplication(row),
+
+      application: normalizeApplication(row),
     });
   } catch (error) {
     return respondError(
@@ -1177,7 +1188,18 @@ async function getApplicationById(req, res) {
 }
 
 // ============================================================
-// ADMIN: PRIVATE RÉSUMÉ LINK
+// ADMIN: PRIVATE RÉSUMÉ LINKS
+//
+// Returns both viewing and download URLs.
+//
+// Existing clients receive the download URL in:
+// - url
+// - signedUrl
+//
+// Clients can request ?mode=view for a viewing URL.
+//
+// PDF files support browser preview.
+// DOC and DOCX files can be downloaded.
 // ============================================================
 
 async function getApplicationResume(req, res) {
@@ -1193,40 +1215,80 @@ async function getApplicationResume(req, res) {
       );
     }
 
-    const { data, error } =
-      await db.storage
-        .from(RESUME_BUCKET)
-        .createSignedUrl(
-          row.resume_path,
-          300,
-          {
-            download:
-              row.resume_file_name ||
-              "resume",
-          }
-        );
+    const fileName = sanitizeFileName(
+      row.resume_file_name || "resume"
+    );
 
-    if (error) {
-      throw error;
+    const bucket = db.storage.from(
+      RESUME_BUCKET
+    );
+
+    const [
+      view,
+      download,
+    ] = await Promise.all([
+      bucket.createSignedUrl(
+        row.resume_path,
+        300
+      ),
+
+      bucket.createSignedUrl(
+        row.resume_path,
+        300,
+        {
+          download: fileName,
+        }
+      ),
+    ]);
+
+    if (view.error || download.error) {
+      throw view.error || download.error;
     }
 
-    if (!data?.signedUrl) {
+    if (
+      !view.data?.signedUrl ||
+      !download.data?.signedUrl
+    ) {
       throw new Error(
-        "Missing signed URL."
+        "Missing signed résumé URL."
       );
     }
+
+    const mode =
+      req.query?.mode || "download";
+
+    if (
+      !["view", "download"].includes(mode)
+    ) {
+      throw fail(
+        "Invalid résumé access mode."
+      );
+    }
+
+    const url =
+      mode === "view"
+        ? view.data.signedUrl
+        : download.data.signedUrl;
+
+    res.setHeader(
+      "Cache-Control",
+      "no-store, private"
+    );
 
     return res.json({
       success: true,
 
-      url: data.signedUrl,
-      signedUrl: data.signedUrl,
+      url,
+      signedUrl: url,
 
-      fileName:
-        row.resume_file_name || "resume",
+      viewUrl: view.data.signedUrl,
+      downloadUrl: download.data.signedUrl,
 
-      mimeType:
-        row.resume_mime_type || "",
+      fileName,
+      mimeType: row.resume_mime_type || "",
+
+      previewSupported:
+        row.resume_mime_type === "application/pdf",
 
       expiresIn: 300,
     });
@@ -1414,6 +1476,9 @@ function buildReview(body, current) {
     );
   }
 
+  // Accept the old property for frontend compatibility.
+  // Saving a review now always queues applicant feedback.
+
   if (
     body.notifyApplicant !== undefined &&
     typeof body.notifyApplicant !== "boolean"
@@ -1425,8 +1490,7 @@ function buildReview(body, current) {
     );
   }
 
-  const notify =
-    body.notifyApplicant === true;
+  const notify = true;
 
   const message = text(
     body.applicantMessage,
@@ -1453,7 +1517,10 @@ function buildReview(body, current) {
 // ============================================================
 // APPLICANT MESSAGE
 //
-// Internal review notes are never included.
+// A supplied applicantMessage is used as the feedback.
+// Otherwise, generate feedback from the review fields.
+//
+// Internal notes are not automatically included.
 // ============================================================
 
 function applicantMessage(row, custom) {
@@ -1461,46 +1528,51 @@ function applicantMessage(row, custom) {
     return custom;
   }
 
-  switch (row.status) {
-    case "admitted":
-      return (
-        `Your application has been admitted${
-          row.assigned_track
-            ? ` to the ${row.assigned_track} track`
-            : ""
-        }. Our admissions team will contact you about the next steps.`
-      );
+  const label = (value) =>
+    String(value || "Pending").replace(/_/g, " ");
 
-    case "waitlisted":
-      return (
-        "Your application has been placed on the waitlist. Our admissions team will contact you if a place becomes available."
-      );
+  const lines = [
+    "Your CFCV fellowship application has been updated.",
+    "",
 
-    case "not_selected":
-      return (
-        "Thank you for applying. Your application has not been selected for this cohort."
-      );
+    `Status: ${label(row.status)}`,
 
-    case "withdrawn":
-      return (
-        "Your application has been marked as withdrawn."
-      );
+    `Admissions stage: ${label(row.admissions_stage)}`,
 
-    default:
-      return (
-        `Your application is being reviewed. Current admissions stage: ${
-          String(
-            row.admissions_stage || "applied"
-          ).replace(/_/g, " ")
-        }. Our admissions team will contact you about any next steps.`
-      );
+    `Assigned track: ${row.assigned_track || "Not assigned"}`,
+
+    `Interview required: ${row.interview_required ? "Yes" : "No"}`,
+
+    `Interview status: ${label(row.interview_status)}`,
+  ];
+
+  if (row.interview_date) {
+    lines.push(
+      `Interview date (UTC): ${new Date(
+        row.interview_date
+      ).toISOString()}`
+    );
   }
+
+  lines.push(
+    `Matching required: ${row.matching_required ? "Yes" : "No"}`,
+
+    `Matching status: ${label(row.matching_status)}`,
+
+    `Final decision: ${row.final_decision || "Pending"}`,
+
+    "",
+
+    "Please reply to this email if you have any questions."
+  );
+
+  return lines.join("\n");
 }
 
 // ============================================================
 // ADMIN: EMAIL PREVIEW
 //
-// Does not save or send.
+// Does not save the review or send an email.
 // ============================================================
 
 async function previewApplicationEmail(req, res) {
@@ -1534,6 +1606,10 @@ async function previewApplicationEmail(req, res) {
       preview: {
         to: current.email,
         recipient: current.email,
+
+        officeCopyTo:
+          "continentalfounders.info@gmail.com",
+
         subject,
         text: bodyText,
         bodyText,
@@ -1553,8 +1629,14 @@ async function previewApplicationEmail(req, res) {
 // ============================================================
 // ADMIN: SAVE REVIEW
 //
-// Atomic database transaction:
-// application + history + optional email queue.
+// The database function atomically saves:
+// - application review
+// - review history
+// - applicant email job
+// - office-copy email job
+//
+// Queued does not mean delivered.
+// The email worker processes the queued jobs.
 // ============================================================
 
 async function updateApplication(req, res) {
@@ -1570,7 +1652,10 @@ async function updateApplication(req, res) {
 
     const actorId = req.admin?.id;
 
-    if (!actorId) {
+    if (
+      typeof actorId !== "string" ||
+      !UUID.test(actorId)
+    ) {
       throw fail(
         "An authenticated admin is required.",
         401
@@ -1578,6 +1663,8 @@ async function updateApplication(req, res) {
     }
 
     // No direct-update fallback.
+    // The SQL function must exist before using this controller.
+
     const { data, error } = await db.rpc(
       "cfcv_save_review",
       {
@@ -1658,10 +1745,16 @@ async function updateApplication(req, res) {
         normalizeApplication(saved),
 
       message: review.notify
-        ? "Review saved and applicant email queued."
+        ? "Review saved. Applicant feedback and the office copy have been queued."
         : "Application updated successfully.",
 
-      emailQueued: review.notify,
+      emailQueued: true,
+
+      officeCopyQueued:
+        current.email.trim().toLowerCase() !==
+        "continentalfounders.info@gmail.com",
+
+      emailStatus: "queued",
     });
   } catch (error) {
     return respondError(
@@ -1734,6 +1827,7 @@ async function getApplicationHistory(req, res) {
 
     return res.json({
       success: true,
+
       history:
         hidePrivateFields(data || []),
     });
@@ -1911,6 +2005,124 @@ async function getApplicationStats(req, res) {
 }
 
 // ============================================================
+// ADMIN: DELETE APPLICATION
+//
+// The DELETE route must use requireAdmin.
+//
+// Required JSON body:
+// {
+//   expectedVersion: application.version,
+//   confirmationReference: application.applicationReference
+// }
+//
+// Database deletion cascades to review history and email jobs.
+//
+// Emails already accepted or being sent cannot be recalled.
+// Storage is removed only after database deletion succeeds.
+// ============================================================
+
+async function deleteApplication(req, res) {
+  try {
+    if (
+      typeof req.admin?.id !== "string" ||
+      !UUID.test(req.admin.id)
+    ) {
+      throw fail(
+        "An authenticated admin is required.",
+        401
+      );
+    }
+
+    const id = applicationId(req);
+
+    const current = await readApplication(id);
+
+    const {
+      expectedVersion,
+      confirmationReference,
+    } = req.body || {};
+
+    if (
+      !Number.isSafeInteger(expectedVersion) ||
+      expectedVersion < 1
+    ) {
+      throw fail(
+        "Reload the application before deleting. Its version is required."
+      );
+    }
+
+    if (
+      confirmationReference !==
+      current.application_reference
+    ) {
+      throw fail(
+        "Enter the application reference to confirm deletion."
+      );
+    }
+
+    const { data, error } = await db
+      .from(CFCV_TABLE)
+      .delete()
+      .eq("id", id)
+      .eq("version", expectedVersion)
+      .select("id,resume_path")
+      .maybeSingle();
+
+    if (error) {
+      throw error;
+    }
+
+    if (!data) {
+      throw fail(
+        "The application changed or was deleted. Reload the list.",
+        409
+      );
+    }
+
+    let resumeCleanupPending = false;
+
+    if (data.resume_path) {
+      try {
+        const removed = await db.storage
+          .from(RESUME_BUCKET)
+          .remove([data.resume_path]);
+
+        if (removed.error) {
+          throw removed.error;
+        }
+      } catch {
+        resumeCleanupPending = true;
+
+        console.error(
+          "[CFCV] Manual résumé cleanup required",
+          {
+            applicationId: id,
+            bucket: RESUME_BUCKET,
+            path: data.resume_path,
+          }
+        );
+      }
+    }
+
+    return res.json({
+      success: true,
+      deletedId: id,
+      resumeCleanupPending,
+
+      message: resumeCleanupPending
+        ? "Application deleted. The résumé could not be removed; an administrator must remove the file from storage."
+        : "Application and its associated résumé have been deleted.",
+    });
+  } catch (error) {
+    return respondError(
+      res,
+      error,
+      "Deletion could not be confirmed. Refresh the application list before retrying."
+    );
+  }
+}
+
+// ============================================================
 // EXPORTS
 // ============================================================
 
@@ -1920,6 +2132,7 @@ module.exports = {
   getApplicationById,
   getApplicationResume,
   updateApplication,
+  deleteApplication,
   getApplicationStats,
   getApplicationHistory,
   getApplicationEmails,

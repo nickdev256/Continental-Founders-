@@ -1972,3 +1972,38 @@
     color: #333333;
   }
 }
+
+
+/* ==========================================================
+   CLEAN, PROFESSIONAL DECORATION
+   Keep gold as an accent; remove ornamental lines and orbit graphics.
+   ========================================================== */
+
+.cfcv-label {
+  gap: 0;
+}
+
+.cfcv-label i,
+.cfcv-gold-rule,
+.cfcv-hero__orbits {
+  display: none !important;
+}
+
+/* Use restrained, consistent surfaces instead of decorative effects. */
+.cfcv-hero__visual {
+  background: linear-gradient(140deg, #102b40, #071b2c);
+}
+
+.cfcv-track {
+  border-radius: 4px;
+  box-shadow: none;
+}
+
+.cfcv-track::after {
+  border-radius: inherit;
+}
+
+.cfcv-button,
+.cfcv-header__apply {
+  border-radius: 3px;
+}

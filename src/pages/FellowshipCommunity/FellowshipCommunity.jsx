@@ -18,16 +18,7 @@ import {
   BookOpen,
   TrendingUp,
 } from "lucide-react";
-import { useState } from "react";
 import "./FellowshipCommunity.css";
-
-const initialInterestForm = {
-  region: "",
-  stage: "",
-  challenge: "",
-  goal: "",
-  pathway: "Not sure",
-};
 
 const pathways = [
   {
@@ -209,13 +200,10 @@ export default function FellowshipCommunity() {
     <main className="fc-page">
       {/* HERO */}
       <section className="fc-hero">
-        <div className="fc-hero-pattern" aria-hidden="true">
-          <Globe2 size={280} strokeWidth={0.45} />
-        </div>
-
-        <div className="fc-container fc-hero-content">
+<div className="fc-container fc-hero-content">
           <span className="fc-eyebrow">
-            A TRANSATLANTIC FOUNDER FELLOWSHIP
+            <span className="fc-eyebrow-line" />
+            CONTINENTAL FOUNDERS FELLOWSHIP
           </span>
 
           <h1>

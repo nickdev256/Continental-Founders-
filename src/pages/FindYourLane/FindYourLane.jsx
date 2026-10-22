@@ -16,7 +16,7 @@ const pathways = [
   {
     id: 'genesis',
     name: 'GENESIS',
-    tagline: 'BUILD IT',
+    tagline: 'BUILD IT', 
     audience: 'I HAVE AN IDEA',
     description:
       'You have been thinking about starting something, but are not sure how to turn your idea into a real business.',
@@ -113,8 +113,6 @@ const CONTACT_EMAIL = 'hello@continentalfounders.org';
 function HeaderIntro() {
   return (
     <section className="fyl-hero">
-      <div className="fyl-hero-glow" aria-hidden="true" />
-
       <div className="fyl-container fyl-hero-content">
         <span className="fyl-eyebrow fyl-hero-eyebrow">
           <Compass size={16} />
@@ -139,7 +137,6 @@ function HeaderIntro() {
         </a>
 
         <div className="fyl-hero-note">
-          <span className="fyl-note-line" />
           One cohort. Two continents. Three pathways. A shared future.
         </div>
       </div>

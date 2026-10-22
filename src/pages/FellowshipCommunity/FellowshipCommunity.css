@@ -1114,3 +1114,211 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* =========================================================
+   PROFESSIONAL CLEANUP + ACCESSIBLE TYPE + PHOTO HERO
+   Overrides below preserve existing content and functionality.
+========================================================= */
+
+.fc-page {
+  font-size: 17px;
+}
+
+/* Remove decorative rings, glow, and ornamental heading lines. */
+.fc-hero::before,
+.fc-hero::after,
+.fc-hero-pattern,
+.fc-eyebrow-line {
+  display: none !important;
+}
+
+/* Photographic hero with a dark overlay to keep all copy readable. */
+.fc-hero {
+  isolation: isolate;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(4, 20, 39, 0.94) 0%,
+      rgba(5, 28, 53, 0.86) 48%,
+      rgba(5, 28, 53, 0.52) 100%
+    ),
+    url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=2200&q=85");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.fc-hero-content {
+  max-width: 1160px;
+}
+
+.fc-hero h1 {
+  color: #ffffff;
+  font-size: clamp(3.25rem, 7vw, 5.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.24);
+}
+
+.fc-hero h1 span {
+  color: #f4bd45;
+}
+
+.fc-eyebrow {
+  font-size: 0.9rem;
+  letter-spacing: 1.5px;
+  color: #ffd16b;
+}
+
+.fc-hero-description {
+  color: #f4f7fb;
+  font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  line-height: 1.85;
+}
+
+.fc-hero-note {
+  color: #f0f4f8;
+  font-size: 1rem;
+}
+
+/* Improve heading and body readability throughout the page. */
+.fc-section-label {
+  font-size: 0.88rem;
+  letter-spacing: 1.4px;
+}
+
+.fc-section-heading h2,
+.fc-intro-heading h2,
+.fc-transformation-copy h2,
+.fc-alumni-copy h2 {
+  font-size: clamp(2.15rem, 4.2vw, 3.35rem);
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+}
+
+.fc-section-heading > p,
+.fc-intro-copy p,
+.fc-transformation-copy > p,
+.fc-alumni-copy > p {
+  font-size: 1.1rem;
+  line-height: 1.85;
+}
+
+.fc-btn {
+  min-height: 52px;
+  padding: 14px 23px;
+  font-size: 1rem;
+}
+
+.fc-pathway-stage {
+  font-size: 0.84rem;
+}
+
+.fc-pathway-card h3 {
+  font-size: 1.7rem;
+}
+
+.fc-pathway-card h4 {
+  font-size: 1.25rem;
+}
+
+.fc-pathway-description,
+.fc-outcome,
+.fc-pathway-bottom p,
+.fc-pathway-link,
+.fc-text-link {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.fc-experience-card h3,
+.fc-shared-banner h3,
+.fc-transformation-item h3,
+.fc-journey-step h3 {
+  font-size: 1.2rem;
+}
+
+.fc-experience-card p,
+.fc-shared-banner p,
+.fc-transformation-item p,
+.fc-journey-step p,
+.fc-alumni-points > div {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.fc-journey-note {
+  font-size: 0.95rem;
+}
+
+.fc-final-cta-inner > p {
+  font-size: 1.1rem;
+}
+
+.fc-final-cta small {
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+/* A quieter, more professional interaction style. */
+.fc-pathway-card,
+.fc-experience-card,
+.fc-btn {
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.fc-pathway-card:hover,
+.fc-experience-card:hover,
+.fc-btn:hover {
+  transform: none;
+}
+
+/* Responsive typography and background positioning. */
+@media (max-width: 700px) {
+  .fc-hero {
+    min-height: auto;
+    padding: 76px 0 58px;
+    background-position: 58% center;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(4, 20, 39, 0.94) 0%,
+        rgba(5, 28, 53, 0.86) 100%
+      ),
+      url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85");
+  }
+
+  .fc-hero h1 {
+    font-size: clamp(2.7rem, 10.5vw, 4.1rem);
+    letter-spacing: -0.04em;
+  }
+
+  .fc-hero-description,
+  .fc-intro-copy p,
+  .fc-section-heading > p,
+  .fc-transformation-copy > p,
+  .fc-alumni-copy > p {
+    font-size: 1.05rem;
+  }
+
+  .fc-pathway-description,
+  .fc-outcome,
+  .fc-experience-card p,
+  .fc-shared-banner p,
+  .fc-transformation-item p,
+  .fc-journey-step p,
+  .fc-alumni-points > div {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-page *,
+  .fc-page *::before,
+  .fc-page *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+

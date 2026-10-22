@@ -88,6 +88,14 @@
   filter: blur(4px);
 }
 
+.fyl-hero h1 {
+  color: #ffffff !important;
+}
+
+.fyl-hero h1 span {
+  color: #f6b834 !important;
+}
+
 .fyl-hero-content {
   position: relative;
 }
@@ -971,5 +979,304 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================
+   FIND YOUR LANE — PROFESSIONAL REFINEMENT
+   Keep the navy and gold brand palette.
+========================================== */
+
+/* Use a real photography background with a dark overlay for legible text. */
+.find-your-lane-page .fyl-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background-color: #071d3c;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(5, 22, 45, 0.94) 0%,
+      rgba(5, 28, 55, 0.84) 48%,
+      rgba(5, 28, 55, 0.60) 100%
+    ),
+    url('/assets/sd.png');
+  background-size: cover;
+  background-position: center 42%;
+  background-repeat: no-repeat;
+}
+
+/* Remove decorative rings, glows, and other unnecessary hero ornaments. */
+.find-your-lane-page .fyl-hero::before,
+.find-your-lane-page .fyl-hero::after,
+.find-your-lane-page .fyl-hero-glow {
+  display: none !important;
+  content: none !important;
+}
+
+/* Keep heading styling clean: no extra rules or pseudo-elements beside headings. */
+.find-your-lane-page .fyl-section-heading h2::before,
+.find-your-lane-page .fyl-section-heading h2::after,
+.find-your-lane-page .fyl-hero h1::before,
+.find-your-lane-page .fyl-hero h1::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Retain gold as a restrained brand accent rather than decorative line work. */
+.find-your-lane-page .fyl-hero h1 span,
+.find-your-lane-page .fyl-section-heading h2 span {
+  color: #f4bd4b;
+}
+
+.find-your-lane-page .fyl-hero-note {
+  margin-top: 38px;
+}
+
+.find-your-lane-page .fyl-button-gold {
+  color: #142746;
+  background: #f4bd4b;
+  border: 1px solid #f4bd4b;
+  box-shadow: none;
+}
+
+.find-your-lane-page .fyl-button-gold:hover {
+  color: #142746;
+  background: #ffd16d;
+  border-color: #ffd16d;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+}
+
+/* Remove unnecessary filters and keep card interaction understated. */
+.find-your-lane-page .fyl-card-button:hover {
+  filter: none;
+}
+
+.find-your-lane-page .fyl-pathway-card {
+  box-shadow: 0 5px 20px rgba(12, 37, 69, 0.055);
+}
+
+.find-your-lane-page .fyl-pathway-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(12, 37, 69, 0.10);
+}
+
+/* Ensure the photo and text remain clear on smaller screens. */
+@media (max-width: 680px) {
+  .find-your-lane-page .fyl-hero {
+    background-position: 58% center;
+    background-image:
+      linear-gradient(
+        90deg,
+        rgba(5, 22, 45, 0.91) 0%,
+        rgba(5, 28, 55, 0.79) 100%
+      ),
+      url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1400&q=85');
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .find-your-lane-page .fyl-pathway-card,
+  .find-your-lane-page .fyl-button {
+    transition: none !important;
+  }
+}
+
+/* ==========================================
+   READABILITY PASS — LARGER TYPE THROUGHOUT
+========================================== */
+.find-your-lane-page {
+  font-size: 16px;
+}
+
+.find-your-lane-page .fyl-eyebrow {
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.11em;
+}
+
+.find-your-lane-page .fyl-hero h1 {
+  font-size: clamp(48px, 7.2vw, 88px);
+  line-height: 1.02;
+}
+
+.find-your-lane-page .fyl-hero-lead {
+  font-size: clamp(21px, 2.5vw, 29px);
+  line-height: 1.45;
+}
+
+.find-your-lane-page .fyl-hero-copy {
+  max-width: 680px;
+  font-size: clamp(16px, 1.3vw, 18px);
+  line-height: 1.8;
+}
+
+.find-your-lane-page .fyl-hero-note {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.find-your-lane-page .fyl-button {
+  min-height: 52px;
+  padding: 14px 22px;
+  font-size: 15px;
+}
+
+.find-your-lane-page .fyl-section-heading h2 {
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.2;
+}
+
+.find-your-lane-page .fyl-section-heading > p {
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.find-your-lane-page .fyl-pathway-card h3 {
+  font-size: 30px;
+}
+
+.find-your-lane-page .fyl-card-step,
+.find-your-lane-page .fyl-card-audience {
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+}
+
+.find-your-lane-page .fyl-card-description {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.find-your-lane-page .fyl-outcome-label,
+.find-your-lane-page .fyl-pain-label {
+  font-size: 11px !important;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+}
+
+.find-your-lane-page .fyl-card-outcome p,
+.find-your-lane-page .fyl-transformation-card p {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.find-your-lane-page .fyl-card-button {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.find-your-lane-page .fyl-unsure-card h3 {
+  font-size: 23px;
+}
+
+.find-your-lane-page .fyl-unsure-card p,
+.find-your-lane-page .fyl-detail-copy p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.find-your-lane-page .fyl-detail-copy h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.25;
+}
+
+.find-your-lane-page .fyl-small-note {
+  font-size: 14px !important;
+}
+
+.find-your-lane-page .fyl-transform-number {
+  font-size: 27px;
+}
+
+.find-your-lane-page .fyl-transformation-card h3 {
+  font-size: 22px;
+}
+
+.find-your-lane-page .fyl-disclaimer {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.find-your-lane-page .fyl-bottom-cta h2 {
+  font-size: clamp(28px, 3.5vw, 42px);
+  line-height: 1.2;
+}
+
+.find-your-lane-page .fyl-bottom-cta p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.find-your-lane-page .fyl-footer-brand,
+.find-your-lane-page .fyl-footer a {
+  font-size: 14px;
+}
+
+.find-your-lane-page .fyl-footer p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.find-your-lane-page .fyl-assessment h2 {
+  font-size: clamp(25px, 4vw, 34px);
+  line-height: 1.3;
+}
+
+.find-your-lane-page .fyl-progress-meta {
+  font-size: 14px;
+}
+
+.find-your-lane-page .fyl-answer {
+  padding: 16px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.find-your-lane-page .fyl-text-button {
+  font-size: 14px;
+}
+
+.find-your-lane-page .fyl-result p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.find-your-lane-page .fyl-result .fyl-result-disclaimer {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media (max-width: 680px) {
+  .find-your-lane-page .fyl-hero h1 {
+    font-size: clamp(42px, 12vw, 64px);
+  }
+
+  .find-your-lane-page .fyl-hero-copy {
+    font-size: 16px;
+  }
+
+  .find-your-lane-page .fyl-hero-note {
+    font-size: 13px;
+  }
+
+  .find-your-lane-page .fyl-section-heading h2 {
+    font-size: clamp(29px, 8vw, 36px);
+  }
+
+  .find-your-lane-page .fyl-section-heading > p,
+  .find-your-lane-page .fyl-card-description,
+  .find-your-lane-page .fyl-unsure-card p,
+  .find-your-lane-page .fyl-detail-copy p,
+  .find-your-lane-page .fyl-bottom-cta p {
+    font-size: 16px;
+  }
+
+  .find-your-lane-page .fyl-card-step,
+  .find-your-lane-page .fyl-card-audience,
+  .find-your-lane-page .fyl-outcome-label,
+  .find-your-lane-page .fyl-pain-label {
+    font-size: 11px !important;
   }
 }

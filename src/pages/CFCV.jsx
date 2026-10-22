@@ -112,7 +112,7 @@ const tracks = [
       "Demonstrated traction and a clear investment pathway.",
     image: `${IMAGE_ROOT}/ascend.jpg`,
   },
-  {
+  { 
     key: "horizon",
     name: "Horizon",
     title: "Scale it.",
@@ -439,7 +439,6 @@ function SectionLabel({
       }`}
     >
       <span>{children}</span>
-      <i aria-hidden="true" />
     </p>
   );
 }
@@ -556,26 +555,12 @@ export default function CFCV() {
               decoding="async"
             />
 
-            <div
-              className="cfcv-hero__orbits"
-              aria-hidden="true"
-            >
-              <span />
-              <span />
-              <span />
-            </div>
-
             <div className="cfcv-hero__visual-copy">
               <p className="cfcv-hero__connection">
                 Africa <span>↔</span> U.S.
               </p>
 
               <p>Built across borders.</p>
-
-              <span
-                className="cfcv-gold-rule"
-                aria-hidden="true"
-              />
             </div>
           </div>
         </section>
@@ -731,11 +716,6 @@ export default function CFCV() {
                     <p className="cfcv-track__fit">
                       {track.bestFit}
                     </p>
-
-                    <span
-                      className="cfcv-gold-rule"
-                      aria-hidden="true"
-                    />
 
                     <dl className="cfcv-track__details">
                       <div>
@@ -1111,11 +1091,6 @@ export default function CFCV() {
               <h2 id="cfcv-final-title">
                 Build your next chapter.
               </h2>
-
-              <span
-                className="cfcv-gold-rule"
-                aria-hidden="true"
-              />
             </div>
 
             <div className="cfcv-final__action">

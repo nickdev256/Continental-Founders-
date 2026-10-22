@@ -31,7 +31,7 @@ function readReceipt(state) {
   const reference =
     typeof state.applicationReference === "string"
       ? state.applicationReference.trim()
-      : "";
+      : ""; 
 
   if (!reference || reference.length > 200) {
     return null;

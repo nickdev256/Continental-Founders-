@@ -927,7 +927,7 @@ function CFCVApply() {
 
           <div className="cfcv-apply-hero__content">
             <div>
-              <span className="cfcv-apply-eyebrow">
+              <span className="cfcv-apply-eyebrow"> 
                 CONTINENTAL FOUNDERS
               </span>
 

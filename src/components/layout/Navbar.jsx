@@ -1,822 +1,247 @@
 
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
+import { useEffect, useRef, useState } from "react";
 import {
   Menu,
   X,
-  ArrowUpRight,
   ChevronDown,
   Search,
-  Rocket,
+  ArrowUpRight,
+  FileText,
 } from "lucide-react";
-
 import {
   Link,
   NavLink,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
-
 import { navigation } from "../../data/navigation";
-
 import "./Navbar.css";
 
-
-const SUBSCRIPTION_URL =
-  "https://ethtechsolutions.com/pricing";
-
-/*
-  Keep this breakpoint exactly the same as Navbar.css.
-  Desktop navigation stays visible above 1100px.
-  Hamburger navigation is used at 1100px and below.
-*/
-const MOBILE_QUERY = "(max-width: 1100px)";
-
+const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
 
 const searchItems = [
-  {
-    title: "About Continental Founders",
-    description:
-      "Learn about our mission, vision, leadership and global ecosystem.",
-    url: "/about",
-  },
-  {
-    title: "Ventures",
-    description:
-      "Discover founders and ventures across Africa and global markets.",
-    url: "/ventures",
-  },
-  {
-    title: "Our Model",
-    description:
-      "Explore Potential, Preparation, Execution, Evidence and Opportunity.",
-    url: "/our-model",
-  },
-  {
-    title: "Find Your Lane",
-    description:
-      "Explore the fellowship pathways and find the right lane for your founder journey.",
-    url: "/find-your-lane",
-    cfcv: true,
-  },
-  {
-    title: "Fellowship Community",
-    description:
-      "Discover the Continental Founders Fellowship community and its network.",
-    url: "/fellowship-community",
-    cfcv: true,
-  },
-  {
-    title: "CFCV Fellowship",
-    description:
-      "Explore our six-month cross-continental venture-development fellowship.",
-    url: "/cfcv",
-    cfcv: true,
-  },
-  {
-    title: "Apply to CFCV",
-    description:
-      "Start your application to the CFCV fellowship.",
-    url: "/cfcv/apply",
-    cfcv: true,
-  },
-  {
-    title: "Strategic Partners",
-    description:
-      "Explore institutional and commercial collaboration.",
-    url: "/strategic-partners",
-  },
-  {
-    title: "U.S.–Africa Trade & Business Network",
-    description:
-      "Explore business relationships and market access between Africa and the United States.",
-    url: "/partners/us-africa-trade-network",
-  },
-  {
-    title: "University Partnerships",
-    description:
-      "Explore research, faculty expertise and student engagement.",
-    url: "/universities",
-  },
-  {
-    title: "Corporate Partners",
-    description:
-      "Explore corporate collaboration, mentorship and sponsorship.",
-    url: "/partners/corporate",
-  },
-  {
-    title: "Government & Development Institutions",
-    description:
-      "Explore entrepreneurship and economic opportunity partnerships.",
-    url: "/partners/government-development",
-  },
-  {
-    title: "Programs",
-    description:
-      "Explore founder programs, expertise, markets and opportunities.",
-    url: "/programs",
-  },
-  {
-    title: "Impact",
-    description:
-      "Explore our impact across entrepreneurship and innovation.",
-    url: "/impact",
-  },
-  {
-    title: "Events",
-    description:
-      "Discover events, gatherings and conferences.",
-    url: "/events",
-  },
-  {
-    title: "Insights",
-    description:
-      "Read articles on entrepreneurship, leadership and markets.",
-    url: "/insights",
-  },
-  {
-    title: "Gallery",
-    description:
-      "Explore photos from our events, programs and activities.",
-    url: "/gallery",
-  },
-  {
-    title: "Contact Continental Founders",
-    description:
-      "Contact us about partnerships and founder opportunities.",
-    url: "/contact",
-  },
-  {
-    title: "Subscribe",
-    description:
-      "View subscription plans on Eth Tech Solutions. Opens in a new tab.",
-    url: SUBSCRIPTION_URL,
-    external: true,
-  },
+  { title: "About", description: "Learn about Continental Founders.", path: "/about" },
+  { title: "Fellowship Community", description: "Explore the fellowship community.", path: "/fellowship-community" },
+  { title: "Apply to CF Fellows", description: "Apply to join CF Fellows.", path: "/cfcv/apply" },
+  { title: "Partners", description: "Explore our strategic partnerships.", path: "/strategic-partners" },
+  { title: "U.S.–Africa Trade & Business Network", description: "Explore our trade network.", path: "/partners/us-africa-trade-network" },
+  { title: "Universities", description: "Explore university partnerships.", path: "/universities" },
+  { title: "Corporate Partners", description: "Explore corporate partnerships.", path: "/partners/corporate" },
+  { title: "Government & Development Institutions", description: "Explore institutional partnerships.", path: "/partners/government-development" },
+  { title: "Events", description: "Discover events and gatherings.", path: "/events" },
+  { title: "Insights", description: "Read our latest insights.", path: "/insights" },
+  { title: "Gallery", description: "Explore our gallery.", path: "/gallery" },
+  { title: "Contact", description: "Get in touch with our team.", path: "/contact" },
 ];
-
-
-function matchesPath(pathname, path) {
-  return (
-    pathname === path ||
-    (path !== "/" && pathname.startsWith(`${path}/`))
-  );
-}
-
-
-function isCFCVPath(path) {
-  return path === "/cfcv" || path?.startsWith("/cfcv/");
-}
-
 
 export default function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
-
   const navRef = useRef(null);
-  const menuButtonRef = useRef(null);
-  const searchModalRef = useRef(null);
-  const searchInputRef = useRef(null);
-
-  const logoClickRef = useRef({
-    count: 0,
-    lastClick: 0,
-  });
-
-  const [open, setOpen] = useState(false);
+  const searchRef = useRef(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [isMobile, setIsMobile] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia(MOBILE_QUERY).matches
-      : false
-  );
-
-
-  const query = searchQuery.trim().toLowerCase();
-
-  const filteredResults = query
+  const results = searchQuery.trim()
     ? searchItems.filter((item) =>
         `${item.title} ${item.description}`
           .toLowerCase()
-          .includes(query)
+          .includes(searchQuery.trim().toLowerCase())
       )
     : [];
 
-
-  function closeMenu() {
-    setOpen(false);
+  const closeMenus = () => {
+    setMobileOpen(false);
     setActiveDropdown(null);
-  }
+  };
 
-
-  function closeSearch() {
+  useEffect(() => {
+    closeMenus();
     setSearchOpen(false);
     setSearchQuery("");
-  }
+  }, [location.pathname]);
 
-
-  function openSearch() {
-    closeMenu();
-    setSearchOpen(true);
-  }
-
-
-  function toggleDropdown(label) {
-    setActiveDropdown((current) =>
-      current === label ? null : label
-    );
-  }
-
-
-  function handleLogoClick(event) {
-    const now = Date.now();
-    const previous = logoClickRef.current;
-
-    const count =
-      now - previous.lastClick <= 1500
-        ? previous.count + 1
-        : 1;
-
-    logoClickRef.current = {
-      count,
-      lastClick: now,
-    };
-
-    closeMenu();
-    closeSearch();
-
-    if (count >= 3) {
-      event.preventDefault();
-
-      logoClickRef.current = {
-        count: 0,
-        lastClick: 0,
-      };
-
-      navigate("/admin/login");
-    }
-  }
-
-
-  /*
-    RESPONSIVE BREAKPOINT
-    React and CSS both use 1100px.
-  */
   useEffect(() => {
-    const media = window.matchMedia(MOBILE_QUERY);
-
-    function handleResize() {
-      setIsMobile(media.matches);
-
-      setOpen(false);
-      setActiveDropdown(null);
-    }
-
-    setIsMobile(media.matches);
-
-    if (media.addEventListener) {
-      media.addEventListener("change", handleResize);
-
-      return () => {
-        media.removeEventListener("change", handleResize);
-      };
-    }
-
-    media.addListener(handleResize);
-
-    return () => {
-      media.removeListener(handleResize);
-    };
-  }, []);
-
-
-  /*
-    CLOSE EVERYTHING WHEN ROUTE CHANGES
-  */
-  useEffect(() => {
-    setOpen(false);
-    setActiveDropdown(null);
-    setSearchOpen(false);
-    setSearchQuery("");
-  }, [location.pathname, location.search]);  
-
-
-  /*
-    Prevent keyboard focus from entering the
-    closed mobile navigation.
-  */
-  useEffect(() => {
-    if (navRef.current) {
-      navRef.current.inert =
-        isMobile && !open;
-    }
-  }, [
-    isMobile,
-    open,
-  ]);
-
-
-  /*
-    LOCK BODY SCROLL WHEN MOBILE MENU
-    OR SEARCH MODAL IS OPEN.
-  */
-  useEffect(() => {
-    const shouldLock =
-      searchOpen ||
-      (isMobile && open);
-
-    if (!shouldLock) {
-      return;
-    }
-
-    const previousOverflow =
-      document.body.style.overflow;
-
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow =
-        previousOverflow;
-    };
-  }, [
-    isMobile,
-    open,
-    searchOpen,
-  ]);
-
-
-  /*
-    FOCUS SEARCH INPUT WHEN SEARCH OPENS.
-  */
-  useEffect(() => {
-    if (!searchOpen) {
-      return;
-    }
-
-    const previousFocus =
-      document.activeElement;
-
-    requestAnimationFrame(() => {
-      searchInputRef.current?.focus();
-    });
-
-    return () => {
-      if (
-        previousFocus instanceof HTMLElement &&
-        previousFocus.isConnected &&
-        previousFocus.getClientRects().length > 0 &&
-        !previousFocus.closest("[inert]")
-      ) {
-        previousFocus.focus();
-      }
-    };
+    if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
-
-  /*
-    ESCAPE + KEYBOARD FOCUS TRAP
-  */
   useEffect(() => {
-    function handleKeyDown(event) {
+    if (!mobileOpen && !searchOpen) return;
+
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event) => {
       if (event.key === "Escape") {
+        setMobileOpen(false);
         setActiveDropdown(null);
-
-        if (searchOpen) {
-          setSearchOpen(false);
-          setSearchQuery("");
-        } else if (open) {
-          setOpen(false);
-          menuButtonRef.current?.focus();
-        }
-
-        return;
+        setSearchOpen(false);
       }
+    };
 
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      let candidates = [];
-
-      if (searchOpen) {
-        candidates = Array.from(
-          searchModalRef.current?.querySelectorAll(
-            'a[href], button:not([disabled]), input'
-          ) || []
-        );
-      } else if (isMobile && open) {
-        candidates = [
-          menuButtonRef.current,
-          ...Array.from(
-            navRef.current?.querySelectorAll(
-              'a[href], button:not([disabled])'
-            ) || []
-          ),
-        ];
-      } else {
-        return;
-      }
-
-      const elements =
-        candidates.filter(
-          (element) =>
-            element &&
-            element.getClientRects().length > 0 &&
-            !element.closest(
-              "[hidden], [inert]"
-            )
-        );
-
-      if (!elements.length) {
-        return;
-      }
-
-      const first = elements[0];
-      const last =
-        elements[elements.length - 1];
-
-      const current =
-        document.activeElement;
-
-      if (!elements.includes(current)) {
-        event.preventDefault();
-        first.focus();
-      } else if (
-        event.shiftKey &&
-        current === first
-      ) {
-        event.preventDefault();
-        last.focus();
-      } else if (
-        !event.shiftKey &&
-        current === last
-      ) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      document.body.style.overflow = oldOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    isMobile,
-    open,
-    searchOpen,
-  ]);
+  }, [mobileOpen, searchOpen]);
 
+  const isItemActive = (item) => {
+    if (item.path && location.pathname === item.path) return true;
 
-  function renderSearchResult(item) {
-    const content = (
-      <>
-        <span className="search-result-icon">
-          {item.cfcv ? (
-            <Rocket
-              size={19}
-              aria-hidden="true"
-            />
-          ) : item.external ? (
-            <ArrowUpRight
-              size={19}
-              aria-hidden="true"
-            />
-          ) : (
-            <Search
-              size={19}
-              aria-hidden="true"
-            />
-          )}
-        </span>
-
-        <span className="search-result-content">
-          <span className="search-result-title">
-            {item.title}
-          </span>
-
-          <span className="search-result-description">
-            {item.description}
-          </span>
-        </span>
-      </>
-    );
-
-    if (item.external) {
-      return (
-        <a
-          key={item.url}
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="search-result"
-          onClick={closeSearch}
-        >
-          {content}
-        </a>
-      );
-    }
-
-    return (
-      <Link
-        key={item.url}
-        to={item.url}
-        className="search-result"
-        onClick={closeSearch}
-      >
-        {content}
-      </Link>
-    );
-  }
-
+    return item.children?.some(
+      (child) => location.pathname === child.path
+    ) || false;
+  };
 
   return (
     <>
       <header className="navbar">
-
-        {/* ==========================================
-            TOP INSTITUTIONAL BAR
-        =========================================== */}
-
+        {/* TOP UTILITY BAR */}
         <div className="navbar__top">
           <div className="navbar__top-inner">
-
-            <div className="navbar__top-left">
+            <div className="navbar__regions">
               <span>Africa</span>
-
-              <span className="navbar__top-divider">
-                |
-              </span>
-
+              <span className="navbar__separator">|</span>
               <span>United States</span>
-
-              <span className="navbar__top-divider">
-                |
-              </span>
-
+              <span className="navbar__separator">|</span>
               <span>Global Partnerships</span>
             </div>
 
-
-            <div className="navbar__top-right">
-              <Link to="/contact">
-                Contact
-              </Link>
-
-              <Link to="/strategic-partners">
-                Partners
-              </Link>
-
-              <Link to="/universities">
-                Universities
-              </Link>
+            <div className="navbar__utility-links">
+              <Link to="/contact">Contact</Link>
+              <Link to="/strategic-partners">Partners</Link>
+              <Link to="/universities">Universities</Link>
             </div>
-
           </div>
         </div>
 
-
-        {/* ==========================================
-            MAIN NAVBAR
-        =========================================== */}
-
+        {/* MAIN NAVIGATION */}
         <div className="navbar__main">
           <div className="navbar__inner">
-
-            {/* LOGO */}
-
             <Link
               to="/"
               className="navbar__brand"
               aria-label="Continental Founders home"
-              onClick={handleLogoClick}
+              onClick={closeMenus}
             >
               <img
                 src="/assets/continental-founders-logo.webp"
                 alt="Continental Founders"
                 className="navbar__logo"
-                draggable={false}
               />
             </Link>
 
-
-            {/* NAVIGATION */}
-
             <nav
               ref={navRef}
+              className={`navbar__nav ${mobileOpen ? "is-open" : ""}`}
               id="primary-navigation"
-              className={`navbar__nav ${
-                open ? "is-open" : ""
-              }`}
-              aria-label="Primary navigation"
-              aria-hidden={
-                isMobile && !open
-                  ? true
-                  : undefined
-              }
+              aria-label="Main navigation"
+              inert={!mobileOpen && typeof window !== "undefined" && window.innerWidth <= 1100}
             >
-
               <div className="navbar__links">
-
-                {navigation.map(
-                  (item, index) => {
-
-                    /*
-                      NORMAL NAVIGATION ITEM
-                    */
-
-                    if (!item.children?.length) {
-                      return (
-                        <NavLink
-                          key={item.path}
-                          to={item.path}
-                          end={item.path === "/"}
-                          className={({
-                            isActive,
-                          }) =>
-                            `navbar__link ${
-                              isActive
-                                ? "is-active"
-                                : ""
-                            }`
-                          }
-                          onClick={closeMenu}
-                        >
-                          <span>
-                            {item.label}
-                          </span>
-                        </NavLink>
-                      );
-                    }
-
-
-                    /*
-                      DROPDOWN
-                    */
-
-                    const expanded =
-                      activeDropdown ===
-                      item.label;
-
-                    const active =
-                      matchesPath(
-                        location.pathname,
-                        item.path
-                      ) ||
-                      item.children.some(
-                        (child) =>
-                          matchesPath(
-                            location.pathname,
-                            child.path
-                          )
-                      );
-
-                    const submenuId =
-                      `navbar-submenu-${index}`;
-
-
+                {navigation.map((item, index) => {
+                  if (!item.children?.length) {
                     return (
-                      <div
+                      <NavLink
                         key={item.path}
-                        className={[
-                          "navbar__dropdown",
-                          expanded
-                            ? "is-expanded"
-                            : "",
-                          active
-                            ? "is-active"
-                            : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                        onMouseEnter={() => {
-                          if (!isMobile) {
-                            setActiveDropdown(
-                              item.label
-                            );
-                          }
-                        }}
-                        onMouseLeave={(event) => {
-                          if (
-                            !isMobile &&
-                            !event.currentTarget.contains(
-                              document.activeElement
-                            )
-                          ) {
-                            setActiveDropdown(
-                              null
-                            );
-                          }
-                        }}
-                        onBlur={(event) => {
-                          if (
-                            !event.currentTarget.contains(
-                              event.relatedTarget
-                            )
-                          ) {
-                            setActiveDropdown(
-                              (current) =>
-                                current ===
-                                item.label
-                                  ? null
-                                  : current
-                            );
-                          }
-                        }}
+                        to={item.path}
+                        className={({ isActive }) =>
+                          `navbar__link ${isActive ? "is-active" : ""}`
+                        }
+                        onClick={closeMenus}
                       >
+                        {item.label}
+                      </NavLink>
+                    );
+                  }
 
-                        <div className="navbar__dropdown-heading">
+                  const expanded = activeDropdown === item.label;
+                  const active = isItemActive(item);
+                  const submenuId = `navbar-dropdown-${index}`;
 
+                  return (
+                    <div
+                      key={item.label}
+                      className={`navbar__dropdown ${
+                        expanded ? "is-expanded" : ""
+                      } ${active ? "is-active" : ""}`}
+                      onMouseEnter={() => {
+                        if (window.innerWidth > 1100) {
+                          setActiveDropdown(item.label);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (window.innerWidth > 1100) {
+                          setActiveDropdown(null);
+                        }
+                      }}
+                    >
+                      <div className="navbar__dropdown-heading">
+                        {item.path ? (
                           <NavLink
                             to={item.path}
-                            className={[
-                              "navbar__link",
-                              "navbar__dropdown-trigger",
-                              active
-                                ? "is-active"
-                                : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                            onClick={closeMenu}
+                            className={`navbar__link navbar__dropdown-label ${
+                              active ? "is-active" : ""
+                            }`}
+                            onClick={closeMenus}
                           >
-                            <span>
-                              {item.label}
-                            </span>
+                            {item.label}
                           </NavLink>
-
-
+                        ) : (
                           <button
                             type="button"
-                            className="navbar__dropdown-toggle"
+                            className={`navbar__link navbar__dropdown-label ${
+                              active ? "is-active" : ""
+                            }`}
+                            aria-expanded={expanded}
+                            aria-controls={submenuId}
                             onClick={() =>
-                              toggleDropdown(
-                                item.label
-                              )
+                              setActiveDropdown(expanded ? null : item.label)
                             }
-                            aria-expanded={
-                              expanded
-                            }
-                            aria-controls={
-                              submenuId
-                            }
-                            aria-label={`${
-                              expanded
-                                ? "Close"
-                                : "Open"
-                            } ${
-                              item.label
-                            } submenu`}
                           >
-                            <ChevronDown
-                              size={16}
-                              strokeWidth={1.7}
-                              aria-hidden="true"
-                            />
+                            {item.label}
                           </button>
+                        )}
 
-                        </div>
-
+                        <button
+                          type="button"
+                          className="navbar__chevron"
+                          aria-label={`${expanded ? "Close" : "Open"} ${item.label} dropdown`}
+                          aria-expanded={expanded}
+                          aria-controls={submenuId}
+                          onClick={() =>
+                            setActiveDropdown(expanded ? null : item.label)
+                          }
+                        >
+                          <ChevronDown size={16} />
+                        </button>
+                      </div>
 
                       <div
-                        id={submenuId}
                         className="navbar__dropdown-menu"
+                        id={submenuId}
                         hidden={!expanded}
                       >
                         {item.children.map((child) => (
                           <NavLink
                             key={child.path}
                             to={child.path}
-                            end
                             className={({ isActive }) =>
-                              [
-                                "navbar__dropdown-link",
-                                isActive ? "is-active" : "",
-                                isCFCVPath(child.path)
-                                  ? "navbar__dropdown-link--cfcv"
-                                  : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" ")
+                              `navbar__dropdown-link ${
+                                isActive ? "is-active" : ""
+                              }`
                             }
-                            onClick={closeMenu}
+                            onClick={closeMenus}
                           >
-                          <span className="navbar__dropdown-link-content">
-  <span>{child.label}</span>
-</span>
+                            <FileText size={19} aria-hidden="true" />
+                            <span>{child.label}</span>
+                            <ArrowUpRight
+                              className="navbar__dropdown-arrow"
+                              size={17}
+                              aria-hidden="true"
+                            />
                           </NavLink>
                         ))}
                       </div>
@@ -825,215 +250,122 @@ export default function Navbar() {
                 })}
               </div>
 
-
-              {/* ACTIONS */}
-
+              {/* RIGHT-SIDE ACTIONS: SEARCH + SUBSCRIBE */}
               <div className="navbar__actions">
-
                 <button
                   type="button"
                   className="navbar__search"
-                  aria-label="Search Continental Founders"
-                  onClick={openSearch}
+                  aria-label="Search website"
+                  onClick={() => {
+                    closeMenus();
+                    setSearchOpen(true);
+                  }}
                 >
-                  <Search
-                    size={18}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-
-                  <span className="navbar__search-label">
-                    Search website
-                  </span>
+                  <Search size={19} />
+                  <span className="navbar__search-label">Search</span>
                 </button>
-
 
                 <a
                   href={SUBSCRIPTION_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="navbar__subscribe"
-                  onClick={closeMenu}
-                  aria-label="Subscribe — opens Eth Tech Solutions pricing in a new tab"
-                  title="View subscription plans on Eth Tech Solutions"
+                  onClick={closeMenus}
                 >
-                  <span>Subscribe</span>
-                  
+                  Subscribe
                 </a>
 
-
-                <Link
-                  to="/cfcv/apply"
-                  className="navbar__cta navbar__cta--cfcv"
-                  onClick={closeMenu}
-                >
-                  
-                  <span>Apply to CFCV</span>
-                  
-                </Link>
-
+                {/* No standalone Apply to CFCV button */}
               </div>
-
             </nav>
 
-
-            {/* MOBILE MENU BUTTON */}
-
             <button
-              ref={menuButtonRef}
               type="button"
-              className="navbar__toggle"
+              className="navbar__mobile-toggle"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              aria-controls="primary-navigation"
               onClick={() => {
-                setOpen(
-                  (current) => !current
-                );
-
+                setMobileOpen((value) => !value);
                 setActiveDropdown(null);
               }}
-              aria-expanded={open}
-              aria-controls="primary-navigation"
-              aria-label={
-                open
-                  ? "Close navigation menu"
-                  : "Open navigation menu"
-              }
             >
-              {open ? (
-                <X
-                  size={25}
-                  aria-hidden="true"
-                />
-              ) : (
-                <Menu
-                  size={25}
-                  aria-hidden="true"
-                />
-              )}
+              {mobileOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
-
           </div>
         </div>
-
       </header>
 
-
-      {/* ==========================================
-          SEARCH
-      =========================================== */}
-
+      {/* SEARCH MODAL */}
       {searchOpen && (
         <div
-          className="search-overlay"
-          onClick={(event) => {
-            if (
-              event.target ===
-              event.currentTarget
-            ) {
-              closeSearch();
+          className="navbar-search-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSearchOpen(false);
+              setSearchQuery("");
             }
           }}
         >
-
-          <div
-            ref={searchModalRef}
-            className="search-modal"
+          <section
+            className="navbar-search-modal"
             role="dialog"
             aria-modal="true"
             aria-label="Search Continental Founders"
           >
-
-            <div className="search-header">
-
-              <div className="search-input-wrapper">
-
-                <Search
-                  size={21}
-                  aria-hidden="true"
-                />
-
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) =>
-                    setSearchQuery(
-                      event.target.value
-                    )
-                  }
-                  placeholder="Search the website…"
-                  aria-label="Search the website"
-                />
-
-              </div>
-
-
+            <div className="navbar-search-header">
+              <Search size={21} aria-hidden="true" />
+              <input
+                ref={searchRef}
+                type="search"
+                placeholder="Search Continental Founders..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
               <button
                 type="button"
-                className="search-close"
-                onClick={closeSearch}
                 aria-label="Close search"
+                onClick={() => {
+                  setSearchOpen(false);
+                  setSearchQuery("");
+                }}
               >
-                <X
-                  size={21}
-                  aria-hidden="true"
-                />
+                <X size={22} />
               </button>
-
             </div>
 
-
-            <div className="search-results">
-
-              {!query ? (
-                <div className="search-empty">
-                  <Search
-                    size={30}
-                    aria-hidden="true"
-                  />
-
-                  <h3>
-                    What are you looking for?
-                  </h3>
-
-                  <p>
-                    Search ventures,
-                    fellowships, partners,
-                    events and more.
-                  </p>
-                </div>
-              ) : filteredResults.length ? (
-                <div className="search-result-list">
-                  {filteredResults.map(
-                    renderSearchResult
-                  )}
-                </div>
+            <div className="navbar-search-results">
+              {!searchQuery.trim() ? (
+                <p className="navbar-search-empty">
+                  Search our website, fellowship, partners and events.
+                </p>
+              ) : results.length ? (
+                results.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className="navbar-search-result"
+                    onClick={() => {
+                      setSearchOpen(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    <span>
+                      <strong>{item.title}</strong>
+                      <small>{item.description}</small>
+                    </span>
+                    <ArrowUpRight size={18} />
+                  </Link>
+                ))
               ) : (
-                <div
-                  className="search-empty"
-                  role="status"
-                >
-                  <Search
-                    size={30}
-                    aria-hidden="true"
-                  />
-
-                  <h3>
-                    No results found
-                  </h3>
-
-                  <p>
-                    Try another keyword.
-                  </p>
-                </div>
+                <p className="navbar-search-empty">
+                  No results found. Try another keyword.
+                </p>
               )}
-
             </div>
-
-          </div>
-
+          </section>
         </div>
       )}
-
     </>
   );
 }

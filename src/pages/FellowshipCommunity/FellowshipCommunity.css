@@ -1,25 +1,32 @@
-
-/* =========================================
+/* =====================================================
    CONTINENTAL FOUNDERS FELLOWSHIP COMMUNITY
-   ========================================= */
+   Responsive design for mobile, tablet and desktop
+   ===================================================== */
 
 .fc-page {
   --fc-gold: #d99a08;
   --fc-gold-dark: #ad7400;
   --fc-navy: #092858;
   --fc-navy-deep: #061b3b;
+  --fc-teal: #177b73;
+  --fc-teal-dark: #105f59;
   --fc-text: #26354a;
   --fc-muted: #667085;
   --fc-light: #f7f8fb;
+  --fc-cream: #faf8f2;
   --fc-border: #e5e9f0;
   --fc-genesis: #d99a08;
   --fc-ascend: #0965c6;
   --fc-horizon: #087f6b;
 
+  width: 100%;
+  max-width: 100%;
   color: var(--fc-text);
-  font-family: inherit;
-  overflow: hidden;
   background: #fff;
+  font-family: inherit;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 .fc-page *,
@@ -28,27 +35,39 @@
   box-sizing: border-box;
 }
 
+.fc-page img,
+.fc-page svg,
+.fc-page video,
+.fc-page canvas {
+  max-width: 100%;
+}
+
+.fc-page img {
+  height: auto;
+}
+
 .fc-page a {
   text-decoration: none;
 }
 
-.fc-container {
+.fc-container,
+.fc-belongs .fc-container {
   width: min(1160px, calc(100% - 48px));
-  margin: 0 auto;
+  margin-inline: auto;
 }
 
 .fc-section {
-  padding: 94px 0;
+  padding: clamp(52px, 7vw, 94px) 0;
 }
 
 .fc-section-label {
   display: inline-block;
+  margin-bottom: 15px;
   color: var(--fc-gold-dark);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 2px;
   line-height: 1.6;
-  margin-bottom: 15px;
 }
 
 .fc-section-heading {
@@ -65,8 +84,10 @@
   color: var(--fc-navy);
   font-size: clamp(2rem, 4vw, 3.15rem);
   font-weight: 800;
-  letter-spacing: -1.5px;
-  line-height: 1.13;
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .fc-section-heading > p {
@@ -75,25 +96,22 @@
   color: var(--fc-muted);
   font-size: 1.02rem;
   line-height: 1.85;
+  overflow-wrap: anywhere;
 }
 
-/* HERO */
+/* =====================================================
+   HERO SECTION
+   ===================================================== */
 
 .fc-hero {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 630px;
-  padding: 100px 0 85px;
+  min-height: 0;
+  padding: clamp(48px, 7vw, 82px) 0 0;
   overflow: hidden;
-  color: #fff;
-  background:
-    radial-gradient(
-      ellipse at 90% 10%,
-      rgba(217, 154, 8, 0.19),
-      transparent 42%
-    ),
-    linear-gradient(120deg, #061a38 0%, #092b5b 64%, #0a3568 100%);
+  color: #193136;
+  background: var(--fc-cream);
 }
 
 .fc-hero::before {
@@ -102,9 +120,10 @@
   bottom: -290px;
   width: 650px;
   height: 650px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(23, 123, 115, 0.1);
   border-radius: 50%;
   content: "";
+  pointer-events: none;
 }
 
 .fc-hero::after {
@@ -113,147 +132,286 @@
   bottom: -195px;
   width: 450px;
   height: 450px;
-  border: 1px solid rgba(217, 154, 8, 0.2);
+  border: 1px solid rgba(217, 154, 8, 0.18);
   border-radius: 50%;
   content: "";
-}
-
-.fc-hero-pattern {
-  position: absolute;
-  top: 50%;
-  right: max(3%, calc((100vw - 1350px) / 2));
-  color: rgba(255, 255, 255, 0.055);
-  transform: translateY(-50%);
   pointer-events: none;
 }
 
 .fc-hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  width: 100%;
 }
 
 .fc-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 26px;
-  color: #f4c45c;
-  font-size: 0.77rem;
+  margin-bottom: 24px;
+  color: #08736d;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 2px;
+  line-height: 1.6;
+  text-transform: uppercase;
 }
 
 .fc-eyebrow-line {
   display: inline-block;
   width: 35px;
   height: 2px;
+  flex-shrink: 0;
   background: var(--fc-gold);
 }
 
 .fc-hero h1 {
-  max-width: 800px;
-  margin: 0;
-  color: #fff;
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  font-weight: 850;
-  letter-spacing: -3px;
-  line-height: 1.02;
+  max-width: 850px;
+  margin: 0 0 24px;
+  color: #1b3034;
+  font-size: clamp(2.7rem, 5.7vw, 4.75rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -2.5px;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .fc-hero h1 span {
-  color: #edb532;
+  color: #177b73;
 }
 
 .fc-hero-description {
-  max-width: 660px;
-  margin: 26px 0 30px;
-  color: rgba(255, 255, 255, 0.83);
-  font-size: 1.1rem;
-  line-height: 1.85;
+  max-width: 720px;
+  margin: 0 0 26px;
+  color: #34505c;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.75;
+  overflow-wrap: anywhere;
 }
+
+.fc-hero-pattern {
+  position: absolute;
+  top: -20px;
+  right: 4%;
+  z-index: 1;
+  max-width: 40%;
+  color: rgba(20, 72, 74, 0.055);
+  pointer-events: none;
+}
+
+.fc-hero-pattern svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* =====================================================
+   BUTTONS
+   ===================================================== */
 
 .fc-hero-actions,
 .fc-final-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
-.fc-btn {
+.fc-hero-actions {
+  margin-bottom: clamp(36px, 6vw, 72px);
+}
+
+.fc-page .fc-btn,
+.fc-page button.fc-btn,
+.fc-page a.fc-btn {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
-  min-height: 49px;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 13px 21px;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  font-size: 0.92rem;
+  min-height: 50px;
+  max-width: 100%;
+  padding: 13px 22px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
   font-weight: 750;
-  line-height: 1.3;
+  line-height: 1.35;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  opacity: 1;
+  visibility: visible;
   transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease;
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
-.fc-btn:hover {
+/* Primary button */
+
+.fc-page .fc-btn-gold {
+  color: #fff;
+  background: var(--fc-teal);
+  border-color: var(--fc-teal);
+  box-shadow: 0 4px 12px rgba(16, 72, 67, 0.16);
+}
+
+.fc-page .fc-btn-gold:hover {
+  color: #fff;
+  background: var(--fc-teal-dark);
+  border-color: var(--fc-teal-dark);
+  box-shadow: 0 7px 18px rgba(16, 72, 67, 0.2);
   transform: translateY(-2px);
 }
 
-.fc-btn:focus-visible,
-.fc-page a:focus-visible {
-  outline: 3px solid #f1c65b;
-  outline-offset: 4px;
+/* Secondary button */
+
+.fc-page .fc-btn-outline {
+  color: #075e58;
+  background: #fffdf8;
+  border-color: #087f78;
+  box-shadow: none;
 }
 
-.fc-btn-gold {
+.fc-page .fc-btn-outline:hover {
+  color: #064d48;
+  background: #e8f4f1;
+  border-color: #064d48;
+  transform: translateY(-2px);
+}
+
+/* Navy button */
+
+.fc-page .fc-btn-navy {
   color: #fff;
-  background: var(--fc-gold);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  background: #173e63;
+  border-color: #173e63;
 }
 
-.fc-btn-gold:hover {
+.fc-page .fc-btn-navy:hover {
   color: #fff;
-  background: #bd8200;
+  background: #102e4b;
+  border-color: #102e4b;
+  transform: translateY(-2px);
 }
 
-.fc-btn-outline {
+/* Button and link focus */
+
+.fc-page .fc-btn:focus-visible,
+.fc-page a:focus-visible,
+.fc-page button:focus-visible,
+.fc-page input:focus-visible,
+.fc-page select:focus-visible,
+.fc-page textarea:focus-visible {
+  outline: 3px solid #d99a08;
+  outline-offset: 3px;
+}
+
+.fc-page .fc-btn svg,
+.fc-page .fc-pathway-link svg,
+.fc-page .fc-text-link svg {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.1em;
+  height: 1.1em;
+  color: currentColor;
+}
+
+/* =====================================================
+   HERO HIGHLIGHTS
+   ===================================================== */
+
+.fc-hero-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  padding: 28px 18px;
+  border-radius: 16px;
+  background: #102d32;
+  text-align: center;
+}
+
+.fc-highlight {
+  min-width: 0;
+  padding: 10px 16px;
+}
+
+.fc-highlight + .fc-highlight {
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.fc-highlight h3 {
+  margin: 0 0 6px;
+  color: #ffcc83;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.fc-highlight p {
+  margin: 0;
   color: #fff;
-  border-color: rgba(255, 255, 255, 0.55);
-  background: transparent;
+  font-size: 0.94rem;
+  line-height: 1.6;
 }
 
-.fc-btn-outline:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+/* =====================================================
+   WHO BELONGS HERE
+   ===================================================== */
+
+.fc-belongs {
+  padding: 24px 0 80px;
+  color: #193136;
+  background: var(--fc-cream);
 }
 
-.fc-btn-navy {
-  color: #fff;
-  background: var(--fc-navy);
+.fc-belongs-eyebrow {
+  display: block;
+  margin-bottom: 18px;
+  color: #087f78;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  line-height: 1.5;
+  text-transform: uppercase;
 }
 
-.fc-btn-navy:hover {
-  color: #fff;
-  background: #123d77;
+.fc-belongs-title {
+  margin: 0 0 20px;
+  color: #1b3034;
+  font-size: clamp(1.8rem, 3.5vw, 2.7rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
 }
 
-.fc-hero-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 38px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.87rem;
+.fc-belongs-intro {
+  max-width: 720px;
+  margin: 0 0 20px;
+  color: #34505c;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.7;
 }
 
-.fc-hero-note svg {
-  color: #efb62d;
+.fc-belongs-description {
+  margin: 0;
+  color: #243b43;
+  font-size: 0.95rem;
+  line-height: 1.8;
 }
 
-/* INTRODUCTION */
+/* =====================================================
+   INTRODUCTION
+   ===================================================== */
 
 .fc-intro {
   background: #fff;
@@ -261,9 +419,9 @@
 
 .fc-intro-grid {
   display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   align-items: start;
-  gap: 80px;
+  gap: clamp(30px, 6vw, 80px);
 }
 
 .fc-intro-heading h2 span {
@@ -273,15 +431,17 @@
 .fc-intro-copy p {
   margin: 0 0 18px;
   color: #586579;
-  font-size: 1.02rem;
-  line-height: 1.95;
+  font-size: 1rem;
+  line-height: 1.9;
 }
 
 .fc-intro-copy p:last-child {
   margin-bottom: 0;
 }
 
-/* PATHWAYS */
+/* =====================================================
+   FELLOWSHIP PATHWAYS
+   ===================================================== */
 
 .fc-pathways {
   background: var(--fc-light);
@@ -304,14 +464,12 @@
   border-radius: 13px;
   background: #fff;
   box-shadow: 0 9px 30px rgba(13, 38, 76, 0.055);
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .fc-pathway-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 17px 35px rgba(13, 38, 76, 0.11);
+  transform: translateY(-4px);
+  box-shadow: 0 15px 32px rgba(13, 38, 76, 0.1);
 }
 
 .fc-genesis {
@@ -338,7 +496,7 @@
   display: grid;
   width: 58px;
   height: 58px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   place-items: center;
   border-radius: 12px;
   color: var(--fc-pathway-color);
@@ -346,9 +504,11 @@
 }
 
 .fc-pathway-stage {
+  max-width: 150px;
   color: #667085;
   font-size: 0.73rem;
   font-weight: 700;
+  line-height: 1.5;
   text-align: right;
 }
 
@@ -363,15 +523,16 @@
 .fc-pathway-card h4 {
   margin: 0 0 16px;
   color: var(--fc-navy);
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 750;
+  line-height: 1.45;
 }
 
 .fc-pathway-description {
   min-height: 108px;
   margin: 0 0 22px;
   color: #5d6879;
-  font-size: 0.91rem;
+  font-size: 0.92rem;
   line-height: 1.8;
 }
 
@@ -388,26 +549,39 @@
   align-items: flex-start;
   gap: 9px;
   color: #39485d;
-  font-size: 0.86rem;
-  line-height: 1.5;
+  font-size: 0.88rem;
+  line-height: 1.6;
 }
 
 .fc-outcome svg {
-  flex-shrink: 0;
-  margin-top: 2px;
+  flex: 0 0 auto;
+  margin-top: 3px;
   color: var(--fc-pathway-color);
 }
 
-.fc-pathway-link {
+.fc-page .fc-pathway-link,
+.fc-page .fc-text-link {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-top: auto;
-  padding-top: 23px;
-  color: var(--fc-pathway-color);
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 0;
+  color: var(--fc-pathway-color, var(--fc-navy));
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
   font-size: 0.9rem;
   font-weight: 800;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.fc-pathway-link {
+  margin-top: auto;
+  padding-top: 23px;
 }
 
 .fc-pathway-link svg,
@@ -432,29 +606,27 @@
 }
 
 .fc-pathway-bottom > svg {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   color: var(--fc-gold-dark);
 }
 
 .fc-pathway-bottom p {
   flex: 1;
+  min-width: 0;
   margin: 0;
   color: #665a3d;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1.7;
 }
 
-.fc-text-link {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 7px;
+.fc-pathway-bottom .fc-text-link {
+  flex: 0 0 auto;
   color: var(--fc-navy);
-  font-size: 0.88rem;
-  font-weight: 800;
 }
 
-/* SHARED EXPERIENCE */
+/* =====================================================
+   SHARED FELLOWSHIP EXPERIENCE
+   ===================================================== */
 
 .fc-experience {
   color: #fff;
@@ -472,7 +644,7 @@
 }
 
 .fc-heading-light > p {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .fc-heading-light .fc-section-label {
@@ -486,17 +658,16 @@
 }
 
 .fc-experience-card {
+  min-width: 0;
   padding: 27px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 11px;
   background: rgba(255, 255, 255, 0.045);
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .fc-experience-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   background: rgba(255, 255, 255, 0.085);
 }
 
@@ -515,14 +686,15 @@
   margin: 0 0 12px;
   color: #fff;
   font-size: 1.02rem;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .fc-experience-card p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.69);
-  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.88rem;
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .fc-shared-banner {
@@ -540,7 +712,7 @@
   display: grid;
   width: 61px;
   height: 61px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
   color: #f0bd45;
@@ -551,16 +723,19 @@
   margin: 0 0 8px;
   color: #fff;
   font-size: 1.15rem;
+  line-height: 1.5;
 }
 
 .fc-shared-banner p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.73);
-  font-size: 0.91rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.92rem;
   line-height: 1.8;
 }
 
-/* TRANSFORMATION */
+/* =====================================================
+   TRANSFORMATION
+   ===================================================== */
 
 .fc-transformation {
   background: #fff;
@@ -568,13 +743,13 @@
 
 .fc-transformation-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: 85px;
+  gap: clamp(32px, 6vw, 85px);
 }
 
 .fc-transformation-copy h2 {
-  font-size: clamp(2.3rem, 4vw, 3.5rem);
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
 }
 
 .fc-transformation-copy > p {
@@ -582,6 +757,7 @@
   color: #667085;
   font-size: 0.98rem;
   line-height: 1.9;
+  overflow-wrap: anywhere;
 }
 
 .fc-transformation-copy .fc-btn {
@@ -595,6 +771,7 @@
 
 .fc-transformation-item {
   display: flex;
+  align-items: flex-start;
   gap: 22px;
   padding: 23px 0;
   border-bottom: 1px solid var(--fc-border);
@@ -613,7 +790,7 @@
   display: grid;
   width: 45px;
   height: 45px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
   color: var(--fc-gold-dark);
@@ -626,16 +803,19 @@
   margin: 1px 0 7px;
   color: var(--fc-navy);
   font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 .fc-transformation-item p {
   margin: 0;
   color: #667085;
   font-size: 0.9rem;
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
-/* JOURNEY */
+/* =====================================================
+   FELLOWSHIP JOURNEY
+   ===================================================== */
 
 .fc-journey {
   background: #f6f8fc;
@@ -680,14 +860,15 @@
   margin: 0 0 11px;
   color: var(--fc-navy);
   font-size: 1.08rem;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .fc-journey-step p {
   margin: 0;
   color: #667085;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .fc-journey-arrow {
@@ -702,12 +883,14 @@
   max-width: 800px;
   margin: 29px auto 0;
   color: #7a8494;
-  font-size: 0.82rem;
-  line-height: 1.75;
+  font-size: 0.84rem;
+  line-height: 1.8;
   text-align: center;
 }
 
-/* GRADUATION AND ALUMNI */
+/* =====================================================
+   GRADUATION AND ALUMNI
+   ===================================================== */
 
 .fc-alumni {
   background: #fff;
@@ -715,7 +898,7 @@
 
 .fc-alumni-grid {
   display: grid;
-  grid-template-columns: auto 1fr 0.8fr;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.8fr);
   align-items: center;
   gap: 32px;
   padding: 39px;
@@ -742,7 +925,7 @@
 .fc-alumni-copy > p {
   margin: 0;
   color: #667085;
-  font-size: 0.91rem;
+  font-size: 0.92rem;
   line-height: 1.85;
 }
 
@@ -756,20 +939,22 @@
   align-items: flex-start;
   gap: 10px;
   color: #3d4a5f;
-  font-size: 0.85rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.7;
 }
 
 .fc-alumni-points svg {
-  flex-shrink: 0;
-  margin-top: 2px;
+  flex: 0 0 auto;
+  margin-top: 3px;
   color: #13846c;
 }
 
-/* FINAL CTA */
+/* =====================================================
+   FINAL CALL TO ACTION
+   ===================================================== */
 
 .fc-final-cta {
-  padding: 85px 0;
+  padding: clamp(58px, 7vw, 85px) 0;
   color: #fff;
   text-align: center;
   background:
@@ -782,7 +967,8 @@
 }
 
 .fc-final-cta-inner {
-  max-width: 790px;
+  width: min(790px, calc(100% - 48px));
+  margin-inline: auto;
 }
 
 .fc-final-cta .fc-section-label {
@@ -792,17 +978,21 @@
 .fc-final-cta h2 {
   margin: 0 0 17px;
   color: #fff;
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2.2rem, 5vw, 4rem);
   font-weight: 850;
-  letter-spacing: -1.8px;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .fc-final-cta-inner > p {
   max-width: 620px;
   margin: 0 auto 29px;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 1rem;
   line-height: 1.85;
+  overflow-wrap: anywhere;
 }
 
 .fc-final-actions {
@@ -813,154 +1003,372 @@
   display: block;
   max-width: 640px;
   margin: 27px auto 0;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.77rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
   line-height: 1.8;
 }
 
-/* RESPONSIVE TABLETS */
+/* =====================================================
+   EXPRESS YOUR INTEREST FORM
+   ===================================================== */
 
-@media (max-width: 1000px) {
-  .fc-section {
-    padding: 76px 0;
+.fc-interest-intro {
+  max-width: 750px;
+  margin: 0 0 28px;
+  color: #40585c;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.fc-interest-formwrap {
+  width: 100%;
+  max-width: 750px;
+  min-width: 0;
+  padding: 30px;
+  border: 1px solid #d8e1df;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgba(16, 43, 50, 0.05);
+}
+
+.fc-interest-formwrap label {
+  display: block;
+  margin: 18px 0 8px;
+  color: #193136;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.fc-interest-formwrap input,
+.fc-interest-formwrap select,
+.fc-interest-formwrap textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #a8b9b6;
+  border-radius: 8px;
+  color: #193136;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.fc-interest-formwrap select {
+  cursor: pointer;
+}
+
+.fc-interest-formwrap textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.fc-interest-formwrap input::placeholder,
+.fc-interest-formwrap textarea::placeholder {
+  color: #687b7c;
+  opacity: 1;
+}
+
+.fc-interest-formwrap input:focus,
+.fc-interest-formwrap select:focus,
+.fc-interest-formwrap textarea:focus {
+  border-color: #17776e;
+  outline: 3px solid rgba(23, 119, 110, 0.16);
+}
+
+.fc-interest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.fc-interest-actions .fc-btn {
+  min-width: 150px;
+}
+
+.fc-interest-note {
+  margin-top: 22px;
+  color: #576a6d;
+  font-size: 0.86rem;
+  line-height: 1.8;
+}
+
+/* =====================================================
+   RESPONSIVE: LARGE DESKTOPS
+   ===================================================== */
+
+@media (min-width: 1600px) {
+  .fc-container,
+  .fc-belongs .fc-container {
+    width: min(1240px, calc(100% - 96px));
   }
 
-  .fc-hero {
-    min-height: 570px;
+  .fc-hero h1 {
+    max-width: 950px;
   }
+}
 
-  .fc-hero-pattern {
-    right: -95px;
-    opacity: 0.6;
-  }
+/* =====================================================
+   RESPONSIVE: LAPTOPS AND SMALL DESKTOPS
+   ===================================================== */
 
+@media (max-width: 1100px) {
   .fc-intro-grid {
-    gap: 42px;
+    gap: 36px;
+  }
+
+  .fc-transformation-grid {
+    gap: 40px;
   }
 
   .fc-pathway-grid {
-    gap: 15px;
+    gap: 16px;
   }
 
   .fc-pathway-card {
-    padding: 24px 19px;
-  }
-
-  .fc-pathway-stage {
-    font-size: 0.66rem;
+    padding: 25px 20px;
   }
 
   .fc-pathway-description {
-    min-height: 145px;
+    min-height: 0;
+  }
+
+  .fc-experience-card {
+    padding: 24px 18px;
+  }
+
+  .fc-alumni-grid {
+    padding: 30px;
+    gap: 24px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE: TABLETS
+   ===================================================== */
+
+@media (max-width: 800px) {
+  .fc-container,
+  .fc-belongs .fc-container {
+    width: calc(100% - 40px);
+  }
+
+  .fc-section-heading {
+    margin-bottom: 36px;
+  }
+
+  .fc-hero h1 {
+    letter-spacing: -1.6px;
+  }
+
+  .fc-hero-pattern {
+    right: -80px;
+    opacity: 0.5;
+  }
+
+  .fc-intro-grid,
+  .fc-transformation-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .fc-pathway-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fc-pathway-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .fc-pathway-description {
+    min-height: 0;
   }
 
   .fc-experience-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .fc-transformation-grid {
-    gap: 45px;
+  .fc-journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .fc-alumni-grid {
-    grid-template-columns: auto 1fr;
-    gap: 25px;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .fc-alumni-points {
     grid-column: 2;
   }
+
+  .fc-journey-arrow {
+    display: none;
+  }
 }
 
-/* RESPONSIVE MOBILE */
+/* =====================================================
+   RESPONSIVE: PHONES
+   ===================================================== */
 
-@media (max-width: 700px) {
-  .fc-container {
-    width: min(100% - 36px, 540px);
+@media (max-width: 600px) {
+  .fc-container,
+  .fc-belongs .fc-container {
+    width: calc(100% - 32px);
   }
 
   .fc-section {
-    padding: 62px 0;
+    padding: 52px 0;
   }
 
   .fc-section-heading {
-    margin-bottom: 34px;
+    margin-bottom: 32px;
   }
 
   .fc-section-heading h2,
   .fc-intro-heading h2 {
-    letter-spacing: -0.8px;
+    letter-spacing: -0.7px;
   }
 
   .fc-section-heading > p {
-    font-size: 0.94rem;
+    font-size: 0.96rem;
     line-height: 1.8;
   }
 
   .fc-hero {
-    min-height: auto;
-    padding: 82px 0 65px;
+    padding-top: 38px;
+  }
+
+  .fc-hero h1 {
+    margin-bottom: 20px;
+    font-size: clamp(2.3rem, 9.5vw, 3.4rem);
+    line-height: 1.1;
+    letter-spacing: -1.1px;
+  }
+
+  .fc-eyebrow {
+    gap: 8px;
+    margin-bottom: 18px;
+    font-size: 0.68rem;
+    letter-spacing: 1.2px;
+    overflow-wrap: anywhere;
+  }
+
+  .fc-eyebrow-line {
+    width: 25px;
+  }
+
+  .fc-hero-description {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .fc-hero-actions,
+  .fc-final-actions,
+  .fc-interest-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fc-page .fc-hero-actions .fc-btn,
+  .fc-page .fc-final-actions .fc-btn,
+  .fc-page .fc-interest-actions .fc-btn {
+    width: 100%;
+    min-height: 50px;
+    padding: 13px 16px;
+  }
+
+  .fc-hero-highlights {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 8px 16px;
+    border-radius: 13px;
+  }
+
+  .fc-highlight {
+    padding: 16px 8px;
+  }
+
+  .fc-highlight + .fc-highlight {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-left: 0;
+  }
+
+  .fc-highlight h3 {
+    font-size: 1.05rem;
+  }
+
+  .fc-highlight p {
+    font-size: 0.9rem;
   }
 
   .fc-hero-pattern {
     top: auto;
-    right: -135px;
-    bottom: -30px;
+    right: -120px;
+    bottom: -20px;
+    opacity: 0.25;
     transform: none;
-    opacity: 0.35;
   }
 
   .fc-hero-pattern svg {
-    width: 240px;
-    height: 240px;
+    width: 230px;
+    height: auto;
   }
 
-  .fc-hero h1 {
-    font-size: clamp(2.8rem, 11vw, 4.2rem);
-    letter-spacing: -1.8px;
+  .fc-belongs {
+    padding: 24px 0 48px;
   }
 
-  .fc-eyebrow {
-    font-size: 0.67rem;
-    letter-spacing: 1.4px;
+  .fc-belongs-eyebrow {
+    margin-bottom: 14px;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
   }
 
-  .fc-hero-description {
-    font-size: 0.98rem;
-    line-height: 1.8;
+  .fc-belongs-title {
+    margin-bottom: 16px;
+    font-size: clamp(1.7rem, 7vw, 2.15rem);
+    letter-spacing: -0.5px;
   }
 
-  .fc-hero-actions {
-    align-items: stretch;
-    flex-direction: column;
+  .fc-belongs-intro {
+    margin-bottom: 18px;
+    font-size: 1rem;
   }
 
-  .fc-hero-actions .fc-btn {
-    width: 100%;
-  }
-
-  .fc-hero-note {
-    align-items: flex-start;
-    font-size: 0.8rem;
-    line-height: 1.7;
-  }
-
-  .fc-intro-grid {
-    grid-template-columns: 1fr;
-    gap: 22px;
+  .fc-belongs-description {
+    font-size: 0.92rem;
   }
 
   .fc-intro-copy p {
-    font-size: 0.95rem;
+    font-size: 0.96rem;
   }
 
-  .fc-pathway-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
+  .fc-pathway-grid,
+  .fc-experience-grid,
+  .fc-journey-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .fc-pathway-card:last-child {
+    grid-column: auto;
   }
 
   .fc-pathway-card {
-    padding: 26px;
+    padding: 24px 20px;
+  }
+
+  .fc-pathway-top {
+    align-items: flex-start;
+  }
+
+  .fc-pathway-stage {
+    max-width: 125px;
+    font-size: 0.72rem;
   }
 
   .fc-pathway-description {
@@ -975,16 +1383,11 @@
   }
 
   .fc-pathway-bottom p {
-    flex-basis: calc(100% - 42px);
+    flex-basis: calc(100% - 40px);
   }
 
   .fc-pathway-bottom .fc-text-link {
-    margin-left: 35px;
-  }
-
-  .fc-experience-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    margin-left: 0;
   }
 
   .fc-experience-card {
@@ -998,36 +1401,28 @@
   .fc-shared-banner {
     align-items: flex-start;
     flex-direction: column;
-    padding: 23px;
+    padding: 22px;
   }
 
-  .fc-transformation-grid {
-    grid-template-columns: 1fr;
-    gap: 38px;
+  .fc-transformation-copy h2,
+  .fc-final-cta h2 {
+    font-size: clamp(2.1rem, 8vw, 2.8rem);
+    letter-spacing: -0.7px;
   }
 
-  .fc-transformation-copy h2 {
-    font-size: 2.7rem;
-    letter-spacing: -1px;
-  }
-
-  .fc-journey-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
+  .fc-transformation-item {
+    gap: 16px;
+    padding: 20px 0;
   }
 
   .fc-journey-step {
     padding: 23px;
   }
 
-  .fc-journey-arrow {
-    display: none;
-  }
-
   .fc-alumni-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 22px;
-    padding: 26px 22px;
+    padding: 24px 20px;
   }
 
   .fc-alumni-icon {
@@ -1042,67 +1437,106 @@
   }
 
   .fc-final-cta {
-    padding: 66px 0;
+    padding: 60px 0;
   }
 
-  .fc-final-cta h2 {
-    font-size: 2.7rem;
-    letter-spacing: -1px;
+  .fc-final-cta-inner {
+    width: calc(100% - 32px);
   }
 
-  .fc-final-actions {
-    align-items: stretch;
-    flex-direction: column;
+  .fc-interest-formwrap {
+    padding: 20px 16px;
+    border-radius: 12px;
   }
 
-  .fc-final-actions .fc-btn {
-    width: 100%;
+  .fc-interest-formwrap label {
+    margin-top: 16px;
+  }
+
+  .fc-interest-formwrap input,
+  .fc-interest-formwrap select,
+  .fc-interest-formwrap textarea {
+    font-size: 16px;
   }
 }
 
-/* SMALL PHONES */
+/* =====================================================
+   RESPONSIVE: VERY SMALL PHONES
+   ===================================================== */
 
 @media (max-width: 380px) {
-  .fc-container {
-    width: calc(100% - 28px);
+  .fc-container,
+  .fc-belongs .fc-container {
+    width: calc(100% - 24px);
+  }
+
+  .fc-section {
+    padding: 42px 0;
   }
 
   .fc-hero {
-    padding-top: 65px;
+    padding-top: 32px;
   }
 
   .fc-hero h1 {
-    font-size: 2.55rem;
+    font-size: clamp(2rem, 9.5vw, 2.4rem);
+    letter-spacing: -0.8px;
   }
 
   .fc-eyebrow {
-    gap: 8px;
-    font-size: 0.6rem;
-    letter-spacing: 1px;
-  }
-
-  .fc-eyebrow-line {
-    width: 23px;
+    font-size: 0.62rem;
+    letter-spacing: 0.8px;
   }
 
   .fc-pathway-card {
-    padding: 21px;
+    padding: 21px 17px;
   }
 
   .fc-pathway-stage {
-    max-width: 115px;
+    max-width: 105px;
+    font-size: 0.68rem;
   }
 
-  .fc-transformation-copy h2 {
-    font-size: 2.35rem;
-  }
-
+  .fc-transformation-copy h2,
   .fc-final-cta h2 {
-    font-size: 2.35rem;
+    font-size: 2.15rem;
+  }
+
+  .fc-interest-formwrap {
+    padding: 18px 13px;
   }
 }
 
-/* REDUCED MOTION */
+/* =====================================================
+   TOUCHSCREENS
+   ===================================================== */
+
+@media (hover: none) {
+  .fc-pathway-card:hover,
+  .fc-experience-card:hover,
+  .fc-page .fc-btn:hover {
+    transform: none;
+  }
+}
+/* Keep Fellowship Community consistent with other nav links */
+.navbar__dropdown-trigger {
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 10px 6px;
+}
+
+/* Keep keyboard focus accessible without a persistent box */
+.navbar__link:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.navbar__link:focus-visible {
+  outline: 2px solid rgba(201, 154, 46, 0.7);
+  outline-offset: 2px;
+}
+/* =====================================================
+   REDUCED MOTION ACCESSIBILITY
+   ===================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .fc-page *,

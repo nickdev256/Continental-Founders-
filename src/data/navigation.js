@@ -1,38 +1,16 @@
-
 export const navigation = [
   {
     label: "About",
     path: "/about",
   },
   {
-    label: "Ventures",
-    path: "/ventures",
-  },
-  {
-    label: "Our Model",
-    path: "/our-model",
+    label: "Fellowship Community",
     children: [
       {
-        label: "Our Model Overview",
-        path: "/our-model",
-      },
-      {
-        label: "CFCV Fellowship",
-        path: "/cfcv",
-      },
-      {
-        label: "Apply to CFCV",
+        label: "Apply to CF Fellows",
         path: "/cfcv/apply",
       },
     ],
-  },
-  {
-    label: "Find Your Lane",
-    path: "/find-your-lane",
-  },
-  {
-    label: "Fellowship Community",
-    path: "/fellowship-community",
   },
   {
     label: "Partners",

@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -19,6 +19,14 @@ import {
   TrendingUp,
 } from "lucide-react";
 import "./FellowshipCommunity.css";
+
+const initialInterestForm = {
+  region: "",
+  stage: "",
+  challenge: "",
+  goal: "",
+  pathway: "Not sure",
+};
 
 const pathways = [
   {
@@ -141,8 +149,9 @@ const experiences = [
 ];
 
 export default function FellowshipCommunity() {
-  // EXPRESS YOUR INTEREST FORM STATE
-  const [interestForm, setInterestForm] = useState(initialInterestForm);
+  const [interestForm, setInterestForm] = useState({
+    ...initialInterestForm,
+  });
 
   const handleInterestChange = (event) => {
     const { name, value } = event.target;
@@ -200,7 +209,7 @@ export default function FellowshipCommunity() {
     <main className="fc-page">
       {/* HERO */}
       <section className="fc-hero">
-<div className="fc-container fc-hero-content">
+        <div className="fc-container fc-hero-content">
           <span className="fc-eyebrow">
             <span className="fc-eyebrow-line" />
             CONTINENTAL FOUNDERS FELLOWSHIP
@@ -287,6 +296,7 @@ export default function FellowshipCommunity() {
         <div className="fc-container fc-intro-grid">
           <div className="fc-intro-heading">
             <span className="fc-section-label">THE FELLOWSHIP</span>
+
             <h2>
               Different journeys.
               <br />
@@ -444,6 +454,7 @@ export default function FellowshipCommunity() {
 
             <div>
               <h3>Different stages. Shared learning.</h3>
+
               <p>
                 Genesis, Ascend, and Horizon founders move through the
                 fellowship as one cohort, with pathway-specific focus

@@ -1,3 +1,4 @@
+
 export const navigation = [
   {
     label: "About",
@@ -5,6 +6,7 @@ export const navigation = [
   },
   {
     label: "Fellowship Community",
+    path: "/fellowship-community",
     children: [
       {
         label: "Apply to CF Fellows",

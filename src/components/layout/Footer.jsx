@@ -371,7 +371,7 @@ export default function Footer() {
       <div
         className="cf-footer__background"
         aria-hidden="true" 
-      />
+      /> 
 
 
       {/* ======================================================
@@ -397,7 +397,7 @@ export default function Footer() {
               >
 
                 <img
-                  src="/assets/logo.png"
+                  src="/assets/logoo.png"
                   alt="Continental Founders"
                 />
 

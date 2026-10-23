@@ -1,0 +1,1093 @@
+
+/* =========================================
+   CONTINENTAL FOUNDERS — HORIZON
+   Full responsive stylesheet
+   ========================================= */
+
+.horizon-page {
+  --navy: #102b40;
+  --navy-dark: #0b2234;
+  --navy-light: #193e55;
+  --teal: #117768;
+  --teal-dark: #0c5d52;
+  --gold: #f0c778;
+  --gold-dark: #d8ad60;
+  --cream: #f9f8f5;
+  --white: #ffffff;
+  --text: #142a3c;
+  --muted: #536777;
+  --border: #e4e3de;
+
+  box-sizing: border-box;
+  margin: 0;
+  background: var(--cream);
+  color: var(--text);
+  font-family: Inter, Arial, sans-serif;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+
+.horizon-page *,
+.horizon-page *::before,
+.horizon-page *::after {
+  box-sizing: border-box;
+}
+
+.horizon-page img {
+  max-width: 100%;
+  height: auto;
+}
+
+.horizon-page a {
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.horizon-page button,
+.horizon-page input,
+.horizon-page select,
+.horizon-page textarea {
+  font: inherit;
+}
+
+.horizon-page .wrap {
+  width: 100%;
+  max-width: 1192px;
+  margin-inline: auto;
+  padding-inline: 26px;
+}
+
+/* =========================================
+   NAVBAR — NO LOGO
+   Navigation sits over the hero
+   ========================================= */
+
+.horizon-page .horizon-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  background: transparent;
+  border: 0;
+}
+
+.horizon-page header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 100%;
+  background: transparent;
+  border-bottom: 0;
+}
+
+.horizon-page .nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+  min-height: 82px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.horizon-page .brand {
+  display: none;
+}
+
+.horizon-page .brand img {
+  display: none;
+}
+
+.horizon-page .links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 27px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.horizon-page .links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: #ffffff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.horizon-page .links a:hover {
+  color: var(--gold);
+}
+
+.horizon-page .links a.active {
+  color: var(--gold);
+}
+
+.horizon-page .links .nav-cta {
+  padding: 10px 16px;
+  border: 1px solid rgba(240, 199, 120, 0.8);
+  border-radius: 6px;
+  color: var(--gold);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.horizon-page .links .nav-cta:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy-dark);
+}
+
+/* =========================================
+   HERO
+   ========================================= */
+
+.horizon-page .hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(
+    125deg,
+    var(--navy) 0%,
+    var(--navy-light) 67%,
+    #1c465b 100%
+  );
+  color: var(--white);
+  padding: 142px 0 88px;
+}
+
+.horizon-page .hero::before {
+  position: absolute;
+  z-index: -1;
+  top: -180px;
+  right: -140px;
+  width: 520px;
+  height: 520px;
+  border: 1px solid rgba(240, 199, 120, 0.15);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.horizon-page .hero::after {
+  position: absolute;
+  z-index: -1;
+  right: -70px;
+  bottom: -270px;
+  width: 560px;
+  height: 560px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.horizon-page .hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.7fr);
+  gap: 60px;
+  align-items: center;
+}
+
+.horizon-page .eyebrow {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.horizon-page .hero h1 {
+  margin: 22px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(40px, 5vw, 70px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.horizon-page .hero h1 em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.horizon-page .hero p {
+  max-width: 660px;
+  color: #e6edf0;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.horizon-page .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.horizon-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 13px 22px;
+  border: 1px solid var(--teal);
+  border-radius: 7px;
+  background: var(--teal);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.horizon-page .btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--teal-dark);
+  background: var(--teal-dark);
+}
+
+.horizon-page .btn:focus-visible,
+.horizon-page .links a:focus-visible,
+.horizon-page .path:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.horizon-page .btn.secondary {
+  border-color: #b9c7d0;
+  background: transparent;
+  color: var(--white);
+}
+
+.horizon-page .btn.secondary:hover {
+  border-color: var(--gold);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.horizon-page .hero-card {
+  min-width: 0;
+  padding: 28px;
+  border: 1px solid #648094;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+}
+
+.horizon-page .hero-card .num {
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+}
+
+.horizon-page .hero-card h2 {
+  margin: 12px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.2;
+}
+
+.horizon-page .hero-card p {
+  margin: 12px 0 20px;
+  font-size: 15px;
+}
+
+.horizon-page .pill {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 12px;
+  padding: 7px 12px;
+  border: 1px solid #a3b2bc;
+  border-radius: 99px;
+  color: #f0f4f5;
+  font-size: 12px;
+}
+
+/* =========================================
+   SECTIONS
+   ========================================= */
+
+.horizon-page .section {
+  padding: 76px 0;
+  scroll-margin-top: 20px;
+}
+
+.horizon-page .section.alt {
+  background: var(--white);
+}
+
+.horizon-page .kicker {
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.horizon-page .section h2 {
+  margin: 10px 0 20px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(28px, 3.2vw, 42px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.horizon-page .lead {
+  max-width: 790px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.horizon-page .section p {
+  overflow-wrap: anywhere;
+}
+
+/* =========================================
+   VALUE CARDS
+   ========================================= */
+
+.horizon-page .grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.horizon-page .card {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #e7e5e0;
+  border-radius: 12px;
+  background: var(--white);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.horizon-page .card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(17, 119, 104, 0.4);
+  box-shadow: 0 12px 28px rgba(16, 43, 64, 0.06);
+}
+
+.horizon-page .alt .card {
+  background: var(--cream);
+}
+
+.horizon-page .card h3 {
+  margin: 0 0 9px;
+  color: var(--navy);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.horizon-page .card p {
+  margin: 0;
+  color: #566a78;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* =========================================
+   RECOGNITION CHECKLIST
+   ========================================= */
+
+.horizon-page .check {
+  margin-top: 22px;
+  padding-left: 25px;
+}
+
+.horizon-page .check li {
+  margin: 12px 0;
+  padding-left: 5px;
+  line-height: 1.7;
+}
+
+.horizon-page .check li::marker {
+  color: var(--teal);
+}
+
+/* =========================================
+   CHALLENGES
+   ========================================= */
+
+.horizon-page .comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 28px;
+}
+
+.horizon-page .problem {
+  min-width: 0;
+  padding: 20px;
+  border-left: 4px solid var(--teal);
+  border-radius: 6px;
+  background: var(--cream);
+}
+
+.horizon-page .problem strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--navy);
+  line-height: 1.5;
+}
+
+.horizon-page .problem span {
+  display: block;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   FEATURE BAND
+   ========================================= */
+
+.horizon-page .band {
+  margin-top: 28px;
+  padding: 34px;
+  border-radius: 16px;
+  background: linear-gradient(
+    120deg,
+    var(--navy-dark),
+    var(--navy-light)
+  );
+  color: var(--white);
+}
+
+.horizon-page .band h2 {
+  color: var(--white);
+}
+
+.horizon-page .band p {
+  margin-bottom: 0;
+  color: #d9e5ec;
+}
+
+/* =========================================
+   FELLOWSHIP PATHWAYS
+   ========================================= */
+
+.horizon-page .pathways {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.horizon-page .path {
+  display: block;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #dce2e4;
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--navy);
+  line-height: 1.9;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.horizon-page .path:hover {
+  transform: translateY(-3px);
+  border-color: var(--teal);
+  box-shadow: 0 10px 24px rgba(16, 43, 64, 0.07);
+}
+
+.horizon-page .path.current {
+  border: 2px solid var(--teal);
+  background: #f0f7f4;
+}
+
+.horizon-page .path small {
+  display: block;
+  margin-bottom: 8px;
+  color: #60707c;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.horizon-page .path strong {
+  color: var(--navy);
+  font-size: 22px;
+  letter-spacing: 0.03em;
+}
+
+.horizon-page .path.current strong {
+  color: var(--teal);
+}
+
+/* =========================================
+   EXPRESSION OF INTEREST FORM
+   ========================================= */
+
+.horizon-page .formbox {
+  width: 100%;
+  max-width: 850px;
+  margin-top: 28px;
+  padding: 32px;
+  border: 1px solid #e4e3de;
+  border-radius: 15px;
+  background: var(--white);
+  box-shadow: 0 12px 35px rgba(16, 43, 64, 0.035);
+}
+
+.horizon-page .formgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.horizon-page .field {
+  min-width: 0;
+  margin-bottom: 19px;
+}
+
+.horizon-page .field label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.horizon-page input:not([type="checkbox"]),
+.horizon-page select,
+.horizon-page textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 13px;
+  border: 1px solid #cbd3d7;
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.horizon-page input:not([type="checkbox"])::placeholder,
+.horizon-page textarea::placeholder {
+  color: #7b8a94;
+  opacity: 1;
+}
+
+.horizon-page textarea {
+  min-height: 105px;
+  resize: vertical;
+}
+
+.horizon-page input:not([type="checkbox"]):focus,
+.horizon-page textarea:focus,
+.horizon-page select:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(17, 119, 104, 0.14);
+}
+
+.horizon-page .consent {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+  cursor: pointer;
+}
+
+.horizon-page .consent input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  margin: 4px 0 0;
+  accent-color: var(--teal);
+  cursor: pointer;
+}
+
+.horizon-page .note {
+  margin-top: 18px;
+  color: #5c6c77;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.horizon-page .formbox .btn {
+  max-width: 100%;
+  white-space: normal;
+}
+
+/* =========================================
+   FORM CONFIRMATION
+   ========================================= */
+
+.horizon-page .toast {
+  display: none;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #c8e1d4;
+  border-radius: 7px;
+  background: #e7f2ed;
+  color: #184b38;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.horizon-page .toast-visible {
+  display: block;
+}
+
+/* =========================================
+   FAQ
+   ========================================= */
+
+.horizon-page details {
+  padding: 18px 0;
+  border-bottom: 1px solid #dfe2e2;
+}
+
+.horizon-page details:first-of-type {
+  margin-top: 12px;
+  border-top: 1px solid #dfe2e2;
+}
+
+.horizon-page summary {
+  position: relative;
+  padding-right: 24px;
+  color: var(--navy);
+  font-weight: 750;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.horizon-page summary::marker {
+  color: var(--teal);
+}
+
+.horizon-page summary:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
+}
+
+.horizon-page details p {
+  margin: 12px 0 2px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+.horizon-page footer {
+  padding: 38px 0;
+  background: var(--navy-dark);
+  color: #e6e9ec;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.horizon-page footer strong {
+  display: inline-block;
+  color: var(--gold);
+  font-size: 14px;
+  letter-spacing: 0.07em;
+}
+
+.horizon-page footer p {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: #d0dce3;
+}
+
+.horizon-page footer a {
+  color: var(--white);
+}
+
+/* =========================================
+   TABLETS
+   ========================================= */
+
+@media (max-width: 1000px) {
+  .horizon-page .wrap {
+    padding-inline: 24px;
+  }
+
+  .horizon-page .nav {
+    min-height: 76px;
+  }
+
+  .horizon-page .links {
+    gap: 20px;
+  }
+
+  .horizon-page .hero {
+    padding-top: 130px;
+  }
+
+  .horizon-page .hero-inner {
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+    gap: 32px;
+  }
+
+  .horizon-page .hero-card {
+    padding: 23px;
+  }
+
+  .horizon-page .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .horizon-page .section {
+    padding: 64px 0;
+  }
+}
+
+/* =========================================
+   MOBILE AND SMALL TABLETS
+   ========================================= */
+
+@media (max-width: 750px) {
+  .horizon-page .wrap {
+    padding-inline: 22px;
+  }
+
+  .horizon-page .horizon-header,
+  .horizon-page header {
+    position: absolute;
+    background: transparent;
+  }
+
+  .horizon-page .nav {
+    min-height: 72px;
+    justify-content: center;
+    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .horizon-page .links {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 7px 17px;
+    font-size: 12px;
+  }
+
+  .horizon-page .links a {
+    min-height: 34px;
+  }
+
+  .horizon-page .links .nav-cta {
+    padding: 7px 10px;
+  }
+
+  .horizon-page .hero {
+    padding: 116px 0 52px;
+  }
+
+  .horizon-page .hero-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .horizon-page .hero h1 {
+    margin: 20px 0 17px;
+    font-size: clamp(37px, 7vw, 54px);
+    line-height: 1.1;
+  }
+
+  .horizon-page .hero p {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .horizon-page .hero-card {
+    padding: 24px;
+  }
+
+  .horizon-page .section {
+    padding: 52px 0;
+  }
+
+  .horizon-page .section h2 {
+    font-size: clamp(27px, 5.5vw, 36px);
+  }
+
+  .horizon-page .lead {
+    font-size: 16px;
+  }
+
+  .horizon-page .grid,
+  .horizon-page .pathways,
+  .horizon-page .comparison,
+  .horizon-page .formgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .horizon-page .grid {
+    gap: 13px;
+  }
+
+  .horizon-page .card {
+    padding: 21px;
+  }
+
+  .horizon-page .problem {
+    padding: 17px 18px;
+  }
+
+  .horizon-page .path {
+    padding: 20px;
+  }
+
+  .horizon-page .band {
+    padding: 24px;
+  }
+
+  .horizon-page .formbox {
+    padding: 22px;
+  }
+
+  .horizon-page .formgrid {
+    gap: 0;
+  }
+
+  .horizon-page .actions {
+    gap: 10px;
+  }
+
+  .horizon-page .actions .btn {
+    flex: 1 1 190px;
+  }
+}
+
+/* =========================================
+   SMALL PHONES
+   ========================================= */
+
+@media (max-width: 480px) {
+  .horizon-page .wrap {
+    padding-inline: 17px;
+  }
+
+  .horizon-page .nav {
+    min-height: 76px;
+    padding-inline: 12px;
+  }
+
+  .horizon-page .links {
+    gap: 5px 12px;
+    font-size: 11px;
+  }
+
+  .horizon-page .links a {
+    min-height: 32px;
+  }
+
+  .horizon-page .links .nav-cta {
+    padding: 6px 8px;
+    border-radius: 5px;
+  }
+
+  .horizon-page .hero {
+    padding: 112px 0 43px;
+  }
+
+  .horizon-page .hero h1 {
+    font-size: clamp(34px, 9vw, 43px);
+    letter-spacing: -0.03em;
+  }
+
+  .horizon-page .hero p {
+    font-size: 15px;
+  }
+
+  .horizon-page .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .horizon-page .hero-card {
+    padding: 20px;
+    border-radius: 13px;
+  }
+
+  .horizon-page .hero-card .num {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .horizon-page .section {
+    padding: 43px 0;
+  }
+
+  .horizon-page .section h2 {
+    font-size: 29px;
+  }
+
+  .horizon-page .lead {
+    font-size: 15px;
+  }
+
+  .horizon-page .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .horizon-page .actions .btn {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .horizon-page .btn {
+    padding: 13px 16px;
+    font-size: 13px;
+  }
+
+  .horizon-page .card,
+  .horizon-page .path {
+    padding: 18px;
+  }
+
+  .horizon-page .band {
+    padding: 21px;
+    border-radius: 12px;
+  }
+
+  .horizon-page .formbox {
+    padding: 17px;
+    border-radius: 11px;
+  }
+
+  .horizon-page .field {
+    margin-bottom: 16px;
+  }
+
+  .horizon-page input:not([type="checkbox"]),
+  .horizon-page select,
+  .horizon-page textarea {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .horizon-page .formbox .btn {
+    width: 100%;
+  }
+
+  .horizon-page footer {
+    padding: 30px 0;
+  }
+}
+
+/* =========================================
+   VERY SMALL PHONES
+   ========================================= */
+
+@media (max-width: 360px) {
+  .horizon-page .wrap {
+    padding-inline: 13px;
+  }
+
+  .horizon-page .nav {
+    padding-inline: 7px;
+  }
+
+  .horizon-page .links {
+    gap: 4px 9px;
+    font-size: 10px;
+  }
+
+  .horizon-page .links .nav-cta {
+    padding: 5px 7px;
+  }
+
+  .horizon-page .hero {
+    padding-top: 108px;
+  }
+
+  .horizon-page .hero h1 {
+    font-size: 32px;
+  }
+
+  .horizon-page .section h2 {
+    font-size: 26px;
+  }
+
+  .horizon-page .formbox {
+    padding: 14px;
+  }
+}
+
+/* =========================================
+   LANDSCAPE MOBILE
+   ========================================= */
+
+@media (max-width: 750px) and (orientation: landscape) {
+  .horizon-page .hero {
+    padding-top: 120px;
+  }
+
+  .horizon-page .hero-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.8fr);
+    gap: 22px;
+  }
+
+  .horizon-page .hero h1 {
+    font-size: clamp(31px, 5vw, 43px);
+  }
+
+  .horizon-page .hero-card {
+    padding: 18px;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY: REDUCED MOTION
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .horizon-page {
+    scroll-behavior: auto;
+  }
+
+  .horizon-page *,
+  .horizon-page *::before,
+  .horizon-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -210,6 +210,34 @@ export default function FellowshipCommunity() {
       {/* HERO */}
       <section className="fc-hero">
         <div className="fc-container fc-hero-content">
+
+          {/* FELLOWSHIP PATHWAY NAVIGATION */}
+          <nav
+            className="fc-pathway-nav"
+            aria-label="Fellowship pathways"
+          >
+            <Link
+              to="/genesis"
+              className="fc-pathway-nav-link fc-pathway-nav-genesis"
+            >
+              Genesis
+            </Link>
+
+            <Link
+              to="/ascend"
+              className="fc-pathway-nav-link fc-pathway-nav-ascend"
+            >
+              Ascend
+            </Link>
+
+            <Link
+              to="/horizon"
+              className="fc-pathway-nav-link fc-pathway-nav-horizon"
+            >
+              Horizon
+            </Link>
+          </nav>
+
           <span className="fc-eyebrow">
             <span className="fc-eyebrow-line" />
             CONTINENTAL FOUNDERS FELLOWSHIP
@@ -295,7 +323,9 @@ export default function FellowshipCommunity() {
       <section className="fc-section fc-intro">
         <div className="fc-container fc-intro-grid">
           <div className="fc-intro-heading">
-            <span className="fc-section-label">THE FELLOWSHIP</span>
+            <span className="fc-section-label">
+              THE FELLOWSHIP
+            </span>
 
             <h2>
               Different journeys.
@@ -469,7 +499,9 @@ export default function FellowshipCommunity() {
       <section className="fc-section fc-transformation">
         <div className="fc-container fc-transformation-grid">
           <div className="fc-transformation-copy">
-            <span className="fc-section-label">YOUR DEVELOPMENT</span>
+            <span className="fc-section-label">
+              YOUR DEVELOPMENT
+            </span>
 
             <h2>
               Build beyond

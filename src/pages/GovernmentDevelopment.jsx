@@ -2,18 +2,13 @@ import React from "react";
 
 import {
   ArrowRight,
-  ArrowUpRight,
-  BriefcaseBusiness,
   Building2,
   CirclePlay,
   FileText,
   Globe2,
-  Landmark,
   Network,
   TrendingUp,
   Users,
-  Lightbulb,
-  Handshake,
   Download,
 } from "lucide-react";
 
@@ -56,41 +51,6 @@ const engagementAreas = [
       "Support small and growing enterprises with knowledge, partnerships, market pathways, expertise, and growth opportunities.",
   },
 ];
-
-
-const impactStats = [
-  {
-    icon: BriefcaseBusiness,
-    number: "1,200+",
-    label: "Businesses Connected",
-  },
-  {
-    icon: Users,
-    number: "8,500+",
-    label: "Jobs Supported",
-  },
-  {
-    icon: Lightbulb,
-    number: "60+",
-    label: "Programs Enabled",
-  },
-  {
-    icon: Globe2,
-    number: "15+",
-    label: "Countries Impacted",
-  },
-];
-
-
-const partnerNames = [
-  "African Union",
-  "World Bank",
-  "UNDP",
-  "USAID",
-  "Afreximbank",
-];
-
-
 /* ============================================================
    PAGE
 ============================================================ */
@@ -179,49 +139,6 @@ export default function GovernmentDevelopment() {
                   </small>
                 </span>
               </button>
-
-            </div>
-
-
-            <div className="gd-hero__stats">
-
-              <div className="gd-hero-stat">
-                <strong>
-                  15+
-                </strong>
-
-                <span>
-                  Countries
-                  <br />
-                  Engaged
-                </span>
-              </div>
-
-
-              <div className="gd-hero-stat">
-                <strong>
-                  40+
-                </strong>
-
-                <span>
-                  Institutional
-                  <br />
-                  Partners
-                </span>
-              </div>
-
-
-              <div className="gd-hero-stat">
-                <strong>
-                  1,200+
-                </strong>
-
-                <span>
-                  Founders
-                  <br />
-                  Supported
-                </span>
-              </div>
 
             </div>
 
@@ -532,72 +449,7 @@ export default function GovernmentDevelopment() {
 
       </section>
 
-
-      {/* ======================================================
-          IMPACT BAND
-      ====================================================== */}
-
-      <section className="gd-impact">
-
-        <div className="gd-impact__pattern" aria-hidden="true" />
-
-
-        <div className="gd-container gd-impact__grid">
-
-          <div className="gd-impact__statement">
-
-            <h2>
-              A stronger
-              <br />
-              ecosystem.
-              <br />
-              A more prosperous
-              <br />
-              future.
-            </h2>
-
-          </div>
-
-
-          <div className="gd-impact__stats">
-
-            {impactStats.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <article
-                  key={item.label}
-                  className="gd-impact-stat"
-                >
-
-                  <Icon
-                    size={30}
-                    strokeWidth={1.4}
-                    aria-hidden="true"
-                  />
-
-
-                  <span>
-                    {item.label}
-                  </span>
-
-
-                  <strong>
-                    {item.number}
-                  </strong>
-
-                </article>
-              );
-            })}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
+{/* ======================================================
           CASE STUDY
       ====================================================== */}
 
@@ -672,61 +524,7 @@ export default function GovernmentDevelopment() {
 
       </section>
 
-
-      {/* ======================================================
-          PARTNER STRIP
-      ====================================================== */}
-
-      <section className="gd-partners">
-
-        <div className="gd-container">
-
-          <div className="gd-partners__top">
-
-            <span className="gd-eyebrow">
-              Working With Leading Institutions
-            </span>
-
-          </div>
-
-
-          <div className="gd-partners__row">
-
-            <div className="gd-partners__logos">
-
-              {partnerNames.map((partner) => (
-                <div
-                  key={partner}
-                  className="gd-partner-name"
-                >
-                  {partner}
-                </div>
-              ))}
-
-            </div>
-
-
-            <Link
-              to="/strategic-partners"
-              className="gd-inline-link"
-            >
-              View All Partners
-
-              <ArrowRight
-                size={16}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* ======================================================
+{/* ======================================================
           FINAL CTA
       ====================================================== */}
 

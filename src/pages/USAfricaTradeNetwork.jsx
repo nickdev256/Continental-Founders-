@@ -152,72 +152,7 @@ const DEFAULT_CONTENT = {
   },
 
 
-  /* ==========================================================
-     PROPOSED YEAR ONE TARGETS
-
-     These are targets from the proposal.
-     They must never be represented as completed impact.
-  ========================================================== */
-
-  statsLabel:
-    "Proposed Year One Targets",
-
-  statsTitle:
-    "What Year One could look like.",
-
-  statsDescription:
-    "The following figures represent proposed first-year targets for the partnership and provide a framework for measuring external engagement and commercial opportunity.",
-
-  stats: [
-    {
-      value:
-        "50+",
-
-      label:
-        "Curated founder–market introductions",
-    },
-
-    {
-      value:
-        "25+",
-
-      label:
-        "Investor interactions",
-    },
-
-    {
-      value:
-        "20+",
-
-      label:
-        "Corporate partners engaged",
-    },
-
-    {
-      value:
-        "10+",
-
-      label:
-        "Embassy / government engagements",
-    },
-
-    {
-      value:
-        "100+",
-
-      label:
-        "Qualified diaspora experts",
-    },
-
-    {
-      value:
-        "2–4",
-
-      label:
-        "Major applied-learning events",
-    },
-  ],
-
+  
 
   /* ==========================================================
      PROPOSED ROLE
@@ -332,7 +267,7 @@ const DEFAULT_CONTENT = {
       "A commercial proving ground for the Continental Founders model.",
 
     description:
-      "The proposed relationship is designed to create value for both institutions while preserving the independence and integrity of their respective roles.",
+      "The relationship is designed to create value for both institutions while preserving the independence and integrity of their respective roles.",
 
     cfTitle:
       "For Continental Founders",
@@ -360,7 +295,7 @@ const DEFAULT_CONTENT = {
 
   nextSteps: {
     eyebrow:
-      "Proposed Next Steps",
+      " Next Steps",
 
     title:
       "Move from proposal to pilot.",
@@ -396,7 +331,7 @@ const DEFAULT_CONTENT = {
           "03",
 
         title:
-          "Year-One Framework",
+          "Framework",
 
         text:
           "Agree on initial-year deliverables, responsibilities, target outcomes, and a lightweight reporting structure.",

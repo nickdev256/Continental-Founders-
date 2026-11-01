@@ -12,31 +12,89 @@ import {
   Link,
   NavLink,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { navigation } from "../../data/navigation";
 import "./Navbar.css";
 
 const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
+const ADMIN_LOGIN_PATH = "/admin/login";
+const LOGO_CLICK_DELAY = 800;
 
 const searchItems = [
-  { title: "About", description: "Learn about Continental Founders.", path: "/about" },
-  { title: "Fellowship Community", description: "Explore the fellowship community.", path: "/fellowship-community" },
-  { title: "Apply to CF Fellows", description: "Apply to join CF Fellows.", path: "/cfcv/apply" },
-  { title: "Partners", description: "Explore our strategic partnerships.", path: "/strategic-partners" },
-  { title: "U.S.–Africa Trade & Business Network", description: "Explore our trade network.", path: "/partners/us-africa-trade-network" },
-  { title: "Universities", description: "Explore university partnerships.", path: "/universities" },
-  { title: "Corporate Partners", description: "Explore corporate partnerships.", path: "/partners/corporate" },
-  { title: "Government & Development Institutions", description: "Explore institutional partnerships.", path: "/partners/government-development" },
-  { title: "Events", description: "Discover events and gatherings.", path: "/events" },
-  { title: "Insights", description: "Read our latest insights.", path: "/insights" },
-  { title: "Gallery", description: "Explore our gallery.", path: "/gallery" },
-  { title: "Contact", description: "Get in touch with our team.", path: "/contact" },
+  {
+    title: "About",
+    description: "Learn about Continental Founders.",
+    path: "/about",
+  },
+  {
+    title: "Fellowship Community",
+    description: "Explore the fellowship community.",
+    path: "/fellowship-community",
+  },
+  {
+    title: "Apply to CF Fellows",
+    description: "Apply to join CF Fellows.",
+    path: "/cfcv/apply",
+  },
+  {
+    title: "Partners",
+    description: "Explore our strategic partnerships.",
+    path: "/strategic-partners",
+  },
+  {
+    title: "U.S.–Africa Trade & Business Network",
+    description: "Explore our trade network.",
+    path: "/partners/us-africa-trade-network",
+  },
+  {
+    title: "Universities",
+    description: "Explore university partnerships.",
+    path: "/universities",
+  },
+  {
+    title: "Corporate Partners",
+    description: "Explore corporate partnerships.",
+    path: "/partners/corporate",
+  },
+  {
+    title: "Government & Development Institutions",
+    description: "Explore institutional partnerships.",
+    path: "/partners/government-development",
+  },
+  {
+    title: "Events",
+    description: "Discover events and gatherings.",
+    path: "/events",
+  },
+  {
+    title: "Insights",
+    description: "Read our latest insights.",
+    path: "/insights",
+  },
+  {
+    title: "Gallery",
+    description: "Explore our gallery.",
+    path: "/gallery",
+  },
+  {
+    title: "Contact",
+    description: "Get in touch with our team.",
+    path: "/contact",
+  },
 ];
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
   const navRef = useRef(null);
   const searchRef = useRef(null);
+
+  // Hidden admin access through three quick logo clicks.
+  const logoClickCount = useRef(0);
+  const logoClickTimer = useRef(null);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -55,6 +113,34 @@ export default function Navbar() {
     setActiveDropdown(null);
   };
 
+  // Three quick clicks on the logo open the existing admin login.
+  const handleLogoClick = (event) => {
+    logoClickCount.current += 1;
+
+    if (logoClickTimer.current) {
+      clearTimeout(logoClickTimer.current);
+    }
+
+    if (logoClickCount.current >= 3) {
+      event.preventDefault();
+
+      logoClickCount.current = 0;
+      logoClickTimer.current = null;
+
+      closeMenus();
+      setSearchOpen(false);
+      setSearchQuery("");
+
+      navigate(ADMIN_LOGIN_PATH);
+      return;
+    }
+
+    logoClickTimer.current = setTimeout(() => {
+      logoClickCount.current = 0;
+      logoClickTimer.current = null;
+    }, LOGO_CLICK_DELAY);
+  };
+
   useEffect(() => {
     closeMenus();
     setSearchOpen(false);
@@ -62,8 +148,18 @@ export default function Navbar() {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (searchOpen) searchRef.current?.focus();
+    if (searchOpen) {
+      searchRef.current?.focus();
+    }
   }, [searchOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (logoClickTimer.current) {
+        clearTimeout(logoClickTimer.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen && !searchOpen) return;
@@ -76,6 +172,7 @@ export default function Navbar() {
         setMobileOpen(false);
         setActiveDropdown(null);
         setSearchOpen(false);
+        setSearchQuery("");
       }
     };
 
@@ -88,11 +185,15 @@ export default function Navbar() {
   }, [mobileOpen, searchOpen]);
 
   const isItemActive = (item) => {
-    if (item.path && location.pathname === item.path) return true;
+    if (item.path && location.pathname === item.path) {
+      return true;
+    }
 
-    return item.children?.some(
-      (child) => location.pathname === child.path
-    ) || false;
+    return (
+      item.children?.some(
+        (child) => location.pathname === child.path
+      ) || false
+    );
   };
 
   return (
@@ -124,7 +225,10 @@ export default function Navbar() {
               to="/"
               className="navbar__brand"
               aria-label="Continental Founders home"
-              onClick={closeMenus}
+              onClick={(event) => {
+                handleLogoClick(event);
+                closeMenus();
+              }}
             >
               <img
                 src="/assets/continental-founders-logo.webp"
@@ -135,10 +239,16 @@ export default function Navbar() {
 
             <nav
               ref={navRef}
-              className={`navbar__nav ${mobileOpen ? "is-open" : ""}`}
+              className={`navbar__nav ${
+                mobileOpen ? "is-open" : ""
+              }`}
               id="primary-navigation"
               aria-label="Main navigation"
-              inert={!mobileOpen && typeof window !== "undefined" && window.innerWidth <= 1100}
+              inert={
+                !mobileOpen &&
+                typeof window !== "undefined" &&
+                window.innerWidth <= 1100
+              }
             >
               <div className="navbar__links">
                 {navigation.map((item, index) => {
@@ -148,7 +258,9 @@ export default function Navbar() {
                         key={item.path}
                         to={item.path}
                         className={({ isActive }) =>
-                          `navbar__link ${isActive ? "is-active" : ""}`
+                          `navbar__link ${
+                            isActive ? "is-active" : ""
+                          }`
                         }
                         onClick={closeMenus}
                       >
@@ -157,7 +269,9 @@ export default function Navbar() {
                     );
                   }
 
-                  const expanded = activeDropdown === item.label;
+                  const expanded =
+                    activeDropdown === item.label;
+
                   const active = isItemActive(item);
                   const submenuId = `navbar-dropdown-${index}`;
 
@@ -198,7 +312,9 @@ export default function Navbar() {
                             aria-expanded={expanded}
                             aria-controls={submenuId}
                             onClick={() =>
-                              setActiveDropdown(expanded ? null : item.label)
+                              setActiveDropdown(
+                                expanded ? null : item.label
+                              )
                             }
                           >
                             {item.label}
@@ -208,11 +324,15 @@ export default function Navbar() {
                         <button
                           type="button"
                           className="navbar__chevron"
-                          aria-label={`${expanded ? "Close" : "Open"} ${item.label} dropdown`}
+                          aria-label={`${
+                            expanded ? "Close" : "Open"
+                          } ${item.label} dropdown`}
                           aria-expanded={expanded}
                           aria-controls={submenuId}
                           onClick={() =>
-                            setActiveDropdown(expanded ? null : item.label)
+                            setActiveDropdown(
+                              expanded ? null : item.label
+                            )
                           }
                         >
                           <ChevronDown size={16} />
@@ -235,8 +355,13 @@ export default function Navbar() {
                             }
                             onClick={closeMenus}
                           >
-                            <FileText size={19} aria-hidden="true" />
+                            <FileText
+                              size={19}
+                              aria-hidden="true"
+                            />
+
                             <span>{child.label}</span>
+
                             <ArrowUpRight
                               className="navbar__dropdown-arrow"
                               size={17}
@@ -250,7 +375,7 @@ export default function Navbar() {
                 })}
               </div>
 
-              {/* RIGHT-SIDE ACTIONS: SEARCH + SUBSCRIBE */}
+              {/* SEARCH AND SUBSCRIBE ACTIONS */}
               <div className="navbar__actions">
                 <button
                   type="button"
@@ -262,7 +387,9 @@ export default function Navbar() {
                   }}
                 >
                   <Search size={19} />
-                  <span className="navbar__search-label">Search</span>
+                  <span className="navbar__search-label">
+                    Search
+                  </span>
                 </button>
 
                 <a
@@ -274,15 +401,16 @@ export default function Navbar() {
                 >
                   Subscribe
                 </a>
-
-                {/* No standalone Apply to CFCV button */}
               </div>
             </nav>
 
+            {/* MOBILE MENU BUTTON */}
             <button
               type="button"
               className="navbar__mobile-toggle"
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-label={
+                mobileOpen ? "Close menu" : "Open menu"
+              }
               aria-expanded={mobileOpen}
               aria-controls="primary-navigation"
               onClick={() => {
@@ -290,7 +418,11 @@ export default function Navbar() {
                 setActiveDropdown(null);
               }}
             >
-              {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+              {mobileOpen ? (
+                <X size={26} />
+              ) : (
+                <Menu size={26} />
+              )}
             </button>
           </div>
         </div>
@@ -315,13 +447,17 @@ export default function Navbar() {
           >
             <div className="navbar-search-header">
               <Search size={21} aria-hidden="true" />
+
               <input
                 ref={searchRef}
                 type="search"
                 placeholder="Search Continental Founders..."
                 value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
+                onChange={(event) =>
+                  setSearchQuery(event.target.value)
+                }
               />
+
               <button
                 type="button"
                 aria-label="Close search"
@@ -337,7 +473,8 @@ export default function Navbar() {
             <div className="navbar-search-results">
               {!searchQuery.trim() ? (
                 <p className="navbar-search-empty">
-                  Search our website, fellowship, partners and events.
+                  Search our website, fellowship, partners and
+                  events.
                 </p>
               ) : results.length ? (
                 results.map((item) => (
@@ -354,6 +491,7 @@ export default function Navbar() {
                       <strong>{item.title}</strong>
                       <small>{item.description}</small>
                     </span>
+
                     <ArrowUpRight size={18} />
                   </Link>
                 ))

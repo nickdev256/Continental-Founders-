@@ -76,18 +76,6 @@
   filter: blur(3px);
 }
 
-.fyl-hero-glow {
-  position: absolute;
-  z-index: -1;
-  width: 400px;
-  height: 400px;
-  left: -250px;
-  bottom: -270px;
-  background: rgba(244, 181, 54, 0.12);
-  border-radius: 50%;
-  filter: blur(4px);
-}
-
 .fyl-hero h1 {
   color: #ffffff !important;
 }
@@ -198,13 +186,6 @@
   letter-spacing: 0.04em;
 }
 
-.fyl-note-line {
-  display: block;
-  width: 44px;
-  height: 2px;
-  background: #e6a72b;
-}
-
 /* SECTION HEADINGS */
 
 .fyl-section {
@@ -275,7 +256,7 @@
 }
 
 .fyl-pathway-card.horizon {
-  --pathway-color: #087968;
+  --pathway-color: #031b34;
 }
 
 .fyl-card-top {
@@ -456,8 +437,8 @@
 
 .fyl-detail-mark.horizon,
 .fyl-mini-icon.horizon {
-  color: #087968;
-  background: #dff5ee;
+  color: #031b34;
+  background: #e6ebf2;
 }
 
 .fyl-detail-copy h2 {
@@ -788,8 +769,8 @@
   height: 68px;
   margin: 0 auto 20px;
   border-radius: 50%;
-  color: #087968;
-  background: #e0f5ed;
+  color: #031b34;
+  background: #e6ebf2;
 }
 
 .fyl-result h2 {
@@ -865,11 +846,6 @@
     margin-top: 38px;
     font-size: 10px;
     line-height: 1.7;
-  }
-
-  .fyl-note-line {
-    flex-shrink: 0;
-    margin-top: 7px;
   }
 
   .fyl-section {
@@ -1001,7 +977,7 @@
       rgba(5, 28, 55, 0.84) 48%,
       rgba(5, 28, 55, 0.60) 100%
     ),
-    url('/assets/sd.png');
+    url('/assets/sd.webp');
   background-size: cover;
   background-position: center 42%;
   background-repeat: no-repeat;
@@ -1009,8 +985,7 @@
 
 /* Remove decorative rings, glows, and other unnecessary hero ornaments. */
 .find-your-lane-page .fyl-hero::before,
-.find-your-lane-page .fyl-hero::after,
-.find-your-lane-page .fyl-hero-glow {
+.find-your-lane-page .fyl-hero::after {
   display: none !important;
   content: none !important;
 }

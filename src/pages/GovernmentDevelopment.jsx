@@ -1,15 +1,17 @@
-import React from "react";
+import React, {
+  useEffect,
+  useRef,
+} from "react";
 
 import {
   ArrowRight,
   Building2,
-  CirclePlay,
   FileText,
   Globe2,
   Network,
+  Quote,
   TrendingUp,
   Users,
-  Download,
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
@@ -19,45 +21,128 @@ import "./GovernmentDevelopment.css";
 
 /* ============================================================
    DATA
+   Cards cycle through the site's gold, navy and blue accents.
 ============================================================ */
 
 const engagementAreas = [
   {
-    number: "01",
     icon: FileText,
     title: "Policy Collaboration",
     text:
       "Engage around policies, frameworks, and enabling environments that strengthen entrepreneurship, innovation, and enterprise growth.",
+    color: "gold",
   },
   {
-    number: "02",
     icon: Building2,
     title: "Program Funding",
     text:
       "Support programs and initiatives that strengthen founder development, innovation, commercial readiness, and economic participation.",
+    color: "navy",
   },
   {
-    number: "03",
     icon: Network,
     title: "Market Access",
     text:
       "Create pathways into new markets through institutional, commercial, university, investor, and business networks.",
+    color: "blue",
   },
   {
-    number: "04",
     icon: TrendingUp,
     title: "SME Development",
     text:
       "Support small and growing enterprises with knowledge, partnerships, market pathways, expertise, and growth opportunities.",
+    color: "gold",
   },
 ];
+
+
+const benefits = [
+  {
+    icon: Users,
+    title: "Access Entrepreneurial Talent",
+    color: "gold",
+  },
+  {
+    icon: TrendingUp,
+    title: "Support Enterprise Development",
+    color: "navy",
+  },
+  {
+    icon: Globe2,
+    title: "Unlock Regional and Global Partnerships",
+    color: "blue",
+  },
+];
+
+
+const impactWords = [
+  "People",
+  "Ideas",
+  "Partnerships",
+  "Global Impact",
+];
+
+
 /* ============================================================
    PAGE
 ============================================================ */
 
 export default function GovernmentDevelopment() {
+  // Reveal sections as they scroll into view. Anything already
+  // above the fold (or skipped by a fast jump) is shown at once.
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("gd-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
   return (
-    <main className="gd-page">
+    <main className="gd-page" ref={pageRef}>
 
       {/* ======================================================
           HERO
@@ -65,212 +150,108 @@ export default function GovernmentDevelopment() {
 
       <section className="gd-hero">
 
-        <div className="gd-hero__grid">
+        <div className="gd-hero__media" aria-hidden="true">
+          <img
+            src="/assets/government/government-hero.webp"
+            alt=""
+            fetchPriority="high"
+          />
+        </div>
+
+        <div className="gd-container gd-hero__inner">
 
           <div className="gd-hero__content">
 
-            <div className="gd-eyebrow-row">
-
-              <span className="gd-eyebrow">
-                Government & Development Institutions
-              </span>
-
-              <span
-                className="gd-eyebrow-line"
-                aria-hidden="true"
-              />
-
-            </div>
-
+            <span className="gd-eyebrow gd-eyebrow--light">
+              Government & Development Institutions
+            </span>
 
             <h1>
-              Public institutions.
-              <br />
-              <span>
-                Real opportunity.
-              </span>
+              <span>Public institutions.</span>{" "}
+              <em>Real opportunity.</em>
             </h1>
 
-
-            <p className="gd-hero__description">
+            <p>
               Partnering with governments and development institutions
               to turn policy, programs, market access, and institutional
               resources into inclusive economic and commercial opportunity.
             </p>
 
-
             <div className="gd-hero__actions">
-
               <Link
                 to="/contact"
                 className="gd-button gd-button--gold"
               >
-                Explore Partnership
-
-                <ArrowRight
-                  size={17}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
-                />
+                Explore partnership
+                <ArrowRight size={18} aria-hidden="true" />
               </Link>
-
-
-              <button
-                type="button"
-                className="gd-video-button"
-              >
-                <span className="gd-video-button__icon">
-
-                  <CirclePlay
-                    size={21}
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                  />
-
-                </span>
-
-                <span>
-                  <strong>
-                    Watch Overview
-                  </strong>
-
-                  <small>
-                    2 min
-                  </small>
-                </span>
-              </button>
-
             </div>
 
           </div>
 
+          <figure className="gd-hero__quote">
+            <Quote size={26} aria-hidden="true" />
 
-          <div className="gd-hero__visual">
-
-            <img
-              src="/assets/government/government-hero.webp"
-              alt="Government and institutional partnership environment"
-            />
-
-
-            <div className="gd-hero__quote">
-
-              <span className="gd-quote-mark">
-                “
-              </span>
-
-              <p>
-                When institutions and entrepreneurs move together,
-                nations move forward.
-              </p>
-
-              <span
-                className="gd-hero__quote-line"
-                aria-hidden="true"
-              />
-
-            </div>
-
-
-            <div className="gd-hero__vertical-copy">
-              PEOPLE · IDEAS · PARTNERSHIPS · GLOBAL IMPACT
-            </div>
-
-          </div>
+            <blockquote>
+              When institutions and entrepreneurs move together,
+              nations move forward.
+            </blockquote>
+          </figure>
 
         </div>
 
       </section>
 
 
+      {/* Impact strip */}
+
+      <div className="gd-strip" aria-hidden="true">
+        <div className="gd-container gd-strip__inner">
+          {impactWords.map((word) => (
+            <span key={word}>{word}</span>
+          ))}
+        </div>
+      </div>
+
+
       {/* ======================================================
           WHY PARTNER WITH US
       ====================================================== */}
 
-      <section className="gd-bridge">
+      <section className="gd-section gd-bridge">
 
         <div className="gd-container gd-bridge__grid">
 
-          <div className="gd-bridge__visual">
+          <figure className="gd-bridge__visual" data-reveal>
 
-            <div className="gd-bridge__main-image">
-
+            <div className="gd-bridge__main">
               <img
                 src="/assets/government/institutional-meeting.webp"
                 alt="Institutional leaders in discussion"
+                loading="lazy"
               />
-
             </div>
 
-
-            <div className="gd-bridge__secondary-image">
-
+            <div className="gd-bridge__secondary">
               <img
                 src="/assets/government/government-building.webp"
                 alt="Government institution building"
+                loading="lazy"
               />
-
             </div>
 
-
-            <div className="gd-bridge__gold-card">
-              <span>
-                Policy
-              </span>
-
-              <span>
-                People
-              </span>
-
-              <span>
-                Opportunity
-              </span>
-            </div>
+          </figure>
 
 
-            <div className="gd-bridge__pattern">
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
+          <div className="gd-bridge__content" data-reveal>
 
+            <span className="gd-eyebrow">
+              Why Partner With Us
+            </span>
 
-            <p className="gd-bridge__caption">
-              Stronger institutions.
-              <br />
-              Brighter entrepreneurs.
-              <br />
-              A more inclusive future.
-            </p>
+            <h2>A bridge between policy and possibility.</h2>
 
-          </div>
-
-
-          <div className="gd-bridge__content">
-
-            <div className="gd-eyebrow-row">
-
-              <span className="gd-eyebrow">
-                Why Partner With Us
-              </span>
-
-              <span
-                className="gd-eyebrow-line"
-                aria-hidden="true"
-              />
-
-            </div>
-
-
-            <h2>
-              A bridge between
-              <br />
-              policy and possibility.
-            </h2>
-
-
-            <p className="gd-bridge__lead">
+            <p>
               Continental Founders helps government and development
               institutions connect their priorities with high-potential
               founders, businesses, universities, and strategic partners —
@@ -278,60 +259,20 @@ export default function GovernmentDevelopment() {
               for enterprise and opportunity.
             </p>
 
+            <ul className="gd-benefits">
+              {benefits.map(({ icon: Icon, title, color }) => (
+                <li
+                  key={title}
+                  className={`gd-benefit gd-tone--${color}`}
+                >
+                  <span className="gd-icon">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
 
-            <div className="gd-benefits">
-
-              <article className="gd-benefit">
-
-                <Users
-                  size={30}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
-
-                <h3>
-                  Access
-                  <br />
-                  Entrepreneurial Talent
-                </h3>
-
-              </article>
-
-
-              <article className="gd-benefit">
-
-                <TrendingUp
-                  size={30}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
-
-                <h3>
-                  Support
-                  <br />
-                  Enterprise Development
-                </h3>
-
-              </article>
-
-
-              <article className="gd-benefit">
-
-                <Globe2
-                  size={30}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
-
-                <h3>
-                  Unlock Regional
-                  <br />
-                  and Global Partnerships
-                </h3>
-
-              </article>
-
-            </div>
+                  <h3>{title}</h3>
+                </li>
+              ))}
+            </ul>
 
           </div>
 
@@ -344,141 +285,81 @@ export default function GovernmentDevelopment() {
           ENGAGEMENT PATHWAYS
       ====================================================== */}
 
-      <section className="gd-pathways">
+      <section className="gd-section gd-section--soft gd-pathways">
 
         <div className="gd-container">
 
-          <div className="gd-pathways__header">
-
+          <header className="gd-heading gd-heading--split" data-reveal>
             <div>
-
-              <div className="gd-eyebrow-row">
-
-                <span className="gd-eyebrow">
-                  How Institutions Can Engage
-                </span>
-
-                <span
-                  className="gd-eyebrow-line"
-                  aria-hidden="true"
-                />
-
-              </div>
-
-
-              <h2>
-                Multiple pathways
-                <br />
-                for greater impact.
-              </h2>
-
+              <span className="gd-eyebrow">How Institutions Can Engage</span>
+              <h2>Multiple pathways for greater impact.</h2>
             </div>
-
 
             <p>
               We work with governments and development institutions
               across several key areas, with partnership models
               designed around institutional priorities and goals.
             </p>
+          </header>
 
-          </div>
-
-
-          <div className="gd-pathways__grid">
-
-            {engagementAreas.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <article
-                  key={item.number}
-                  className="gd-pathway-card"
-                >
-
-                  <span className="gd-pathway-card__number">
-                    {item.number}
+          <ul className="gd-pathways__grid" data-reveal>
+            {engagementAreas.map(({ icon: Icon, title, text, color }, index) => (
+              <li
+                key={title}
+                className={`gd-pathway gd-tone--${color}`}
+              >
+                <div className="gd-pathway__top">
+                  <span className="gd-icon">
+                    <Icon size={24} aria-hidden="true" />
                   </span>
 
+                  <span className="gd-pathway__number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </div>
 
-                  <div className="gd-pathway-card__marker">
-                    <span />
-                  </div>
-
-
-                  <Icon
-                    size={30}
-                    strokeWidth={1.35}
-                    aria-hidden="true"
-                  />
-
-
-                  <h3>
-                    {item.title}
-                  </h3>
-
-
-                  <p>
-                    {item.text}
-                  </p>
-
-                </article>
-              );
-            })}
-
-          </div>
-
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </li>
+            ))}
+          </ul>
 
           <div className="gd-pathways__action">
-
             <Link
               to="/strategic-partners"
-              className="gd-button gd-button--gold"
+              className="gd-button gd-button--navy"
             >
-              See Our Partner Plan
-
-              <ArrowRight
-                size={17}
-                strokeWidth={1.6}
-                aria-hidden="true"
-              />
+              See our partner plan
+              <ArrowRight size={18} aria-hidden="true" />
             </Link>
-
           </div>
 
         </div>
 
       </section>
 
-{/* ======================================================
+
+      {/* ======================================================
           CASE STUDY
       ====================================================== */}
 
-      <section className="gd-case-study">
+      <section className="gd-section gd-case">
 
-        <div className="gd-container gd-case-study__grid">
+        <div className="gd-container gd-case__grid">
 
-          <div className="gd-case-study__image">
-
+          <figure className="gd-case__media" data-reveal>
             <img
               src="/assets/government/government-case-study.webp"
               alt="Urban commercial district representing national entrepreneurship development"
+              loading="lazy"
             />
+          </figure>
 
-          </div>
+          <div className="gd-case__content" data-reveal>
 
+            <span className="gd-eyebrow">In Focus</span>
 
-          <div className="gd-case-study__content">
-
-            <span className="gd-eyebrow">
-              In Focus
-            </span>
-
-
-            <h2>
-              Partnering for National
-              Entrepreneurship Strategies
-            </h2>
-
+            <h2>Partnering for National Entrepreneurship Strategies</h2>
 
             <p>
               Explore how institutional partners can align economic
@@ -486,137 +367,78 @@ export default function GovernmentDevelopment() {
               enterprise growth, and stronger entrepreneurial ecosystems.
             </p>
 
-
             <Link
               to="/insights"
-              className="gd-inline-link"
+              className="gd-text-link"
             >
-              Read the Case Study
-
-              <ArrowRight
-                size={16}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
+              Read the case study
+              <ArrowRight size={16} aria-hidden="true" />
             </Link>
 
+            <blockquote className="gd-case__quote">
+              <Quote size={22} aria-hidden="true" />
+
+              <p>
+                Development is not just about aid.
+                It’s about opportunity.
+              </p>
+
+              <cite>Continental Founders</cite>
+            </blockquote>
+
           </div>
-
-
-          <blockquote className="gd-case-study__quote">
-
-            <span>
-              “
-            </span>
-
-            <p>
-              Development is not just about aid.
-              It’s about opportunity.
-            </p>
-
-            <cite>
-              Continental Founders
-            </cite>
-
-          </blockquote>
 
         </div>
 
       </section>
 
-{/* ======================================================
+
+      {/* ======================================================
           FINAL CTA
       ====================================================== */}
 
-      <section className="gd-final-cta">
+      <section className="gd-cta">
 
-        <img
-          src="/assets/government/government-cta.webp"
-          alt=""
-          aria-hidden="true"
-          className="gd-final-cta__background"
-        />
+        <div className="gd-container">
 
+          <div className="gd-cta__card" data-reveal>
 
-        <div className="gd-final-cta__overlay" />
+            <img
+              src="/assets/government/government-cta.webp"
+              alt=""
+              loading="lazy"
+            />
 
+            <div className="gd-cta__content">
 
-        <div className="gd-container gd-final-cta__inner">
-
-          <div className="gd-final-cta__content">
-
-            <div className="gd-eyebrow-row gd-eyebrow-row--light">
-
-              <span className="gd-eyebrow">
-                Let's Build Together
+              <span className="gd-eyebrow gd-eyebrow--light">
+                Let&apos;s Build Together
               </span>
 
-              <span
-                className="gd-eyebrow-line"
-                aria-hidden="true"
-              />
+              <h2>From institutional priorities to real-world impact.</h2>
+
+              <p>
+                Connect with our team to explore partnership opportunities
+                across policy, enterprise development, markets, and
+                institutional collaboration.
+              </p>
+
+              <div className="gd-cta__actions">
+                <Link
+                  to="/contact"
+                  className="gd-button gd-button--gold"
+                >
+                  Start a conversation
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </div>
 
             </div>
 
-
-            <h2>
-              From institutional priorities
-              <br />
-              to real-world impact.
-            </h2>
-
-
-            <p>
-              Connect with our team to explore partnership opportunities
-              across policy, enterprise development, markets, and
-              institutional collaboration.
-            </p>
-
-
-            <div className="gd-final-cta__actions">
-
-              <Link
-                to="/contact"
-                className="gd-button gd-button--gold"
-              >
-                Start a Conversation
-
-                <ArrowRight
-                  size={17}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
-                />
-              </Link>
-
-
-              <button
-                type="button"
-                className="gd-button gd-button--outline-light"
-              >
-                <Download
-                  size={17}
-                  strokeWidth={1.6}
-                  aria-hidden="true"
-                />
-
-                Download Partner Overview
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div className="gd-final-cta__side">
-
-            <p>
-              PEOPLE.
-              <br />
-              IDEAS.
-              <br />
-              PARTNERSHIPS.
-              <br />
-              GLOBAL IMPACT.
+            <p className="gd-cta__side" aria-hidden="true">
+              {impactWords.map((word) => (
+                <span key={word}>{word}.</span>
+              ))}
             </p>
 
           </div>

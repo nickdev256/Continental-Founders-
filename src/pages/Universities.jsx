@@ -1,6 +1,7 @@
 import React, {
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -8,19 +9,19 @@ import {
   ArrowRight,
   ArrowUpRight,
   Building2,
-  GraduationCap, 
-  Lightbulb,
+  FlaskConical,
+  Globe2,
+  GraduationCap,
+  Landmark,
   Link2,
   MapPin,
+  Presentation,
+  Users,
 } from "lucide-react";
 
 import {
   Link,
 } from "react-router-dom";
-
-import SectionHeading from "../components/ui/SectionHeading";
-import MediaSplit from "../components/sections/MediaSplit";
-import CTASection from "../components/sections/CTASection";
 
 import "./Universities.css";
 
@@ -40,62 +41,86 @@ const API_URL =
 
 const participationAreas = [
   {
-    number: "01",
     title: "Faculty Expertise",
     text:
       "Professors and specialists can contribute knowledge, mentorship, research insight, and practical guidance to founders working through real venture challenges.",
+    icon: Presentation,
+    color: "gold",
   },
 
   {
-    number: "02",
     title: "Research Collaboration",
     text:
       "Connect relevant research, academic resources, and institutional knowledge with founders, industries, markets, and emerging commercial opportunities.",
+    icon: FlaskConical,
+    color: "navy",
   },
 
   {
-    number: "03",
     title: "Student Engagement",
     text:
       "Create opportunities for students to gain exposure to entrepreneurship, international collaboration, research, and real-world venture development.",
+    icon: Users,
+    color: "blue",
   },
 
   {
-    number: "04",
     title: "Institutional Partnerships",
     text:
       "Build relationships between universities and aligned institutions across Africa, the United States, and the wider global ecosystem.",
+    icon: Landmark,
+    color: "gold",
   },
 ];
 
 
 /* ============================================================
+   FOUNDER JOURNEY
+============================================================ */
+
+const founderJourney = [
+  "Potential",
+  "Preparation",
+  "Execution",
+  "Evidence",
+  "Opportunity",
+];
+
+
+/* ============================================================
    PARTNER ECOSYSTEM
+   Photos, icons and colours match the Partners page and menu.
 ============================================================ */
 
 const partnerEcosystem = [
   {
-    number: "01",
     title: "U.S.–Africa Trade & Business Network",
     text:
       "Connect academic expertise with broader trade, market, business, and commercial networks.",
     path: "/partners/us-africa-trade-network",
+    image: "/assets/images/us-africa/market-access.webp",
+    icon: Globe2,
+    color: "blue",
   },
 
   {
-    number: "02",
     title: "Corporate Partners",
     text:
       "Engage companies and industry leaders who can contribute expertise, mentorship, market insight, and commercial opportunity.",
     path: "/partners/corporate",
+    image: "/assets/images/us-africa/business-connections.webp",
+    icon: Building2,
+    color: "gold",
   },
 
   {
-    number: "03",
     title: "Government & Development Institutions",
     text:
       "Connect institutional knowledge with organizations supporting economic development, entrepreneurship, and market access.",
     path: "/partners/government-development",
+    image: "/assets/images/us-africa/final-cta.webp",
+    icon: Landmark,
+    color: "navy",
   },
 ];
 
@@ -371,87 +396,139 @@ export default function Universities() {
 
 
   /* ==========================================================
+     SCROLL REVEAL
+     Anything already above the fold (or skipped by a fast
+     jump) is shown at once.
+  ========================================================== */
+
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("uni-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
+
+  /* ==========================================================
      RENDER
   ========================================================== */
 
   return (
-    <>
+    <main className="uni-page" ref={pageRef}>
 
-{/* ======================================================
-    HERO
-====================================================== */}
+      {/* ======================================================
+          HERO
+      ====================================================== */}
 
-<section className="page-hero universities-hero">
+      <section className="uni-hero">
 
-  {/* Animated background image */}
-  <div
-    className="universities-hero__bg"
-    aria-hidden="true"
-  />
+        <div className="uni-hero__media" aria-hidden="true">
+          <img
+            src="/assets/images/universities/university-partnership.webp"
+            alt=""
+            fetchPriority="high"
+          />
+        </div>
 
-  <div className="container page-hero__inner">
+        <div className="uni-container uni-hero__inner">
 
-    <div className="universities-hero__content">
+          <span className="uni-eyebrow uni-eyebrow--light">
+            Universities
+          </span>
 
-      <span className="eyebrow eyebrow--light">
-        Universities
-      </span>
+          <h1>
+            Connecting academic expertise with founders,
+            markets, and <em>opportunity.</em>
+          </h1>
 
-      <h1>
-        Connecting academic expertise with founders,
-        markets, and opportunity.
-      </h1>
+          <p>
+            Continental Founders brings universities into a
+            wider ecosystem where faculty expertise, research,
+            students, founders, industry, and institutions can
+            contribute to meaningful commercial collaboration.
+          </p>
 
-    </div>
+          <div className="uni-hero__actions">
+            <Link
+              to="/contact"
+              className="uni-button uni-button--gold"
+            >
+              Explore partnership
+              <ArrowRight size={18} aria-hidden="true" />
+            </Link>
 
-    <div className="page-hero__aside">
+            <a
+              href="#uni-participate"
+              className="uni-button uni-button--ghost"
+            >
+              Ways to participate
+            </a>
+          </div>
 
-      <p>
-        Continental Founders brings universities into a
-        wider ecosystem where faculty expertise, research,
-        students, founders, industry, and institutions can
-        contribute to meaningful commercial collaboration.
-      </p>
+        </div>
 
-      <Link
-        to="/contact"
-        className="universities-hero__link"
-      >
-        Explore Partnership
-
-        <ArrowUpRight
-          size={17}
-          aria-hidden="true"
-        />
-      </Link>
-
-    </div>
-
-  </div>
-
-</section>
+      </section>
 
 
       {/* ======================================================
           INTRODUCTION
       ====================================================== */}
 
-      <section className="section university-opening">
+      <section className="uni-section uni-opening">
 
-        <div className="container university-opening__grid">
+        <div className="uni-container uni-opening__grid" data-reveal>
 
-          <div className="university-opening__label">
+          <span className="uni-eyebrow">
+            For Universities
+          </span>
 
-            <span className="eyebrow">
-              For Universities
-            </span>
+          <div className="uni-opening__content">
 
-          </div>
-
-
-          <div className="university-opening__content">
-
-            <h2 className="display">
+            <h2>
               Academic knowledge becomes more powerful when it
               moves beyond the institution.
             </h2>
@@ -467,7 +544,7 @@ export default function Universities() {
             <p>
               The objective is not simply to create another
               institutional relationship. It is to identify where
-              academic capability can contribute meaningful value, 
+              academic capability can contribute meaningful value,
               where universities can learn from emerging markets
               and entrepreneurs, and where collaboration can grow
               into lasting institutional engagement.
@@ -484,41 +561,91 @@ export default function Universities() {
           PARTNERSHIP VALUE
       ====================================================== */}
 
-      <MediaSplit
-        eyebrow="What Partnership Can Unlock"
-        title="A broader academic and commercial network."
-        text={[
-          "University partnerships can create access to research, faculty expertise, student perspectives, professional networks, emerging ventures, industries, and new markets.",
+      <section className="uni-section uni-value">
 
-          "Continental Founders is focused on reciprocal relationships where universities contribute knowledge while gaining meaningful opportunities for learning, research, engagement, and global collaboration.",
-        ]}
-        image="/assets/images/universities/university-partnership.webp"
-        imageAlt="University students and academic communities collaborating on a university campus"
-      />
+        <div className="uni-container uni-value__grid">
+
+          <figure className="uni-value__media" data-reveal>
+            <img
+              src="/assets/ff.webp"
+              alt="An international student arriving on a university campus lined with national flags"
+              loading="lazy"
+            />
+          </figure>
+
+          <div className="uni-value__content" data-reveal>
+
+            <span className="uni-eyebrow">
+              What Partnership Can Unlock
+            </span>
+
+            <h2>
+              A broader academic and commercial network.
+            </h2>
+
+            <p>
+              University partnerships can create access to research,
+              faculty expertise, student perspectives, professional
+              networks, emerging ventures, industries, and new
+              markets.
+            </p>
+
+            <p>
+              Continental Founders is focused on reciprocal
+              relationships where universities contribute knowledge
+              while gaining meaningful opportunities for learning,
+              research, engagement, and global collaboration.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
 
 
       {/* ======================================================
           UNIVERSITY DIRECTORY
       ====================================================== */}
 
-      <section className="section universities-partners">
+      <section className="uni-section uni-section--soft uni-directory">
 
-        <div className="container">
+        <div className="uni-container">
 
-          <SectionHeading
-            eyebrow="University Network"
-            title="Institutions connected to the Continental Founders ecosystem."
-            text="Explore universities participating across research, faculty engagement, student opportunity, entrepreneurship, and institutional collaboration."
-          />
+          <header className="uni-heading" data-reveal>
+            <span className="uni-eyebrow">University Network</span>
+
+            <h2>
+              Institutions connected to the Continental Founders
+              ecosystem.
+            </h2>
+
+            <p>
+              Explore universities participating across research,
+              faculty engagement, student opportunity,
+              entrepreneurship, and institutional collaboration.
+            </p>
+          </header>
 
 
           {loading && (
 
             <div
-              className="universities-partners__status"
+              className="uni-directory__grid"
               role="status"
+              aria-label="Loading universities"
             >
-              Loading universities...
+              {[0, 1, 2].map((item) => (
+                <div
+                  key={item}
+                  className="uni-card uni-card--skeleton"
+                  aria-hidden="true"
+                >
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              ))}
             </div>
 
           )}
@@ -527,22 +654,25 @@ export default function Universities() {
           {!loading &&
             error && (
 
-              <div className="universities-partners__empty">
+              <div className="uni-directory__empty">
 
-                <GraduationCap
-                  size={30}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
+                <span className="uni-directory__empty-icon">
+                  <GraduationCap
+                    size={28}
+                    aria-hidden="true"
+                  />
+                </span>
 
-                <h3>
-                  University network unavailable.
-                </h3>
+                <div>
+                  <h3>
+                    University network unavailable.
+                  </h3>
 
-                <p>
-                  We could not load the university directory at
-                  this time. Please try again later.
-                </p>
+                  <p>
+                    We could not load the university directory at
+                    this time. Please try again later.
+                  </p>
+                </div>
 
               </div>
 
@@ -553,23 +683,26 @@ export default function Universities() {
             !error &&
             activeUniversities.length === 0 && (
 
-              <div className="universities-partners__empty">
+              <div className="uni-directory__empty">
 
-                <GraduationCap
-                  size={30}
-                  strokeWidth={1.4}
-                  aria-hidden="true"
-                />
+                <span className="uni-directory__empty-icon">
+                  <GraduationCap
+                    size={28}
+                    aria-hidden="true"
+                  />
+                </span>
 
-                <h3>
-                  University partnerships are being developed.
-                </h3>
+                <div>
+                  <h3>
+                    University partnerships are being developed.
+                  </h3>
 
-                <p>
-                  Institutions participating in the Continental
-                  Founders ecosystem will appear here as
-                  partnerships are confirmed.
-                </p>
+                  <p>
+                    Institutions participating in the Continental
+                    Founders ecosystem will appear here as
+                    partnerships are confirmed.
+                  </p>
+                </div>
 
               </div>
 
@@ -580,7 +713,7 @@ export default function Universities() {
             !error &&
             activeUniversities.length > 0 && (
 
-              <div className="universities-partners__grid">
+              <div className="uni-directory__grid">
 
                 {activeUniversities.map(
                   (university) => {
@@ -617,12 +750,12 @@ export default function Universities() {
                           university.id ||
                           universityName
                         }
-                        className="universities-partner-card"
+                        className="uni-card"
                       >
 
-                        <div className="universities-partner-card__top">
+                        <div className="uni-card__top">
 
-                          <div className="universities-partner-card__logo">
+                          <div className="uni-card__logo">
 
                             {logo ? (
 
@@ -635,8 +768,7 @@ export default function Universities() {
                             ) : (
 
                               <GraduationCap
-                                size={27}
-                                strokeWidth={1.4}
+                                size={26}
                                 aria-hidden="true"
                               />
 
@@ -645,7 +777,7 @@ export default function Universities() {
                           </div>
 
 
-                          <div className="universities-partner-card__identity">
+                          <div className="uni-card__identity">
 
                             {shortName && (
 
@@ -664,13 +796,11 @@ export default function Universities() {
                         </div>
 
 
-                        <div className="universities-partner-card__meta">
+                        <ul className="uni-card__meta">
 
-                          <div>
-
+                          <li>
                             <MapPin
                               size={15}
-                              strokeWidth={1.5}
                               aria-hidden="true"
                             />
 
@@ -679,15 +809,11 @@ export default function Universities() {
                                 university
                               )}
                             </span>
+                          </li>
 
-                          </div>
-
-
-                          <div>
-
+                          <li>
                             <Building2
                               size={15}
-                              strokeWidth={1.5}
                               aria-hidden="true"
                             />
 
@@ -695,15 +821,14 @@ export default function Universities() {
                               {university.type ||
                               "University"}
                             </span>
+                          </li>
 
-                          </div>
-
-                        </div>
+                        </ul>
 
 
                         {university.description && (
 
-                          <p className="universities-partner-card__description">
+                          <p className="uni-card__description">
                             {university.description}
                           </p>
 
@@ -712,7 +837,7 @@ export default function Universities() {
 
                         {participation.length > 0 && (
 
-                          <div className="universities-partner-card__areas">
+                          <ul className="uni-card__areas">
 
                             {participation
                               .slice(
@@ -725,16 +850,16 @@ export default function Universities() {
                                   index
                                 ) => (
 
-                                  <span
+                                  <li
                                     key={`${area}-${index}`}
                                   >
                                     {area}
-                                  </span>
+                                  </li>
 
                                 )
                               )}
 
-                          </div>
+                          </ul>
 
                         )}
 
@@ -745,7 +870,7 @@ export default function Universities() {
                             href={website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="universities-partner-card__website"
+                            className="uni-card__website"
                           >
 
                             <Link2
@@ -753,7 +878,7 @@ export default function Universities() {
                               aria-hidden="true"
                             />
 
-                            Visit Institution
+                            Visit institution
 
                             <ArrowUpRight
                               size={15}
@@ -783,52 +908,63 @@ export default function Universities() {
           WAYS TO PARTICIPATE
       ====================================================== */}
 
-      <section className="section section--light universities-participation">
+      <section
+        className="uni-section uni-participate"
+        id="uni-participate"
+      >
 
-        <div className="container">
+        <div className="uni-container">
 
-          <SectionHeading
-            eyebrow="Ways To Participate"
-            title="Universities can contribute far beyond traditional academic partnership."
-            text="Continental Founders creates multiple points of engagement so institutions can participate where their expertise and priorities are most relevant."
-          />
+          <header className="uni-heading" data-reveal>
+            <span className="uni-eyebrow">Ways To Participate</span>
+
+            <h2>
+              Universities can contribute far beyond traditional
+              academic partnership.
+            </h2>
+
+            <p>
+              Continental Founders creates multiple points of
+              engagement so institutions can participate where
+              their expertise and priorities are most relevant.
+            </p>
+          </header>
 
 
-          <div className="universities-participation__grid">
+          <ul className="uni-participate__grid" data-reveal>
 
             {participationAreas.map(
-              (item) => (
+              ({ title, text, icon: Icon, color }, index) => (
 
-                <article
-                  key={
-                    item.title
-                  }
-                  className="universities-participation__item"
+                <li
+                  key={title}
+                  className={`uni-area uni-tone--${color}`}
                 >
 
-                  <span className="universities-participation__number">
-                    {item.number}
-                  </span>
+                  <div className="uni-area__top">
+                    <span className="uni-area__icon">
+                      <Icon size={22} aria-hidden="true" />
+                    </span>
 
-
-                  <div className="universities-participation__content">
-
-                    <h3>
-                      {item.title}
-                    </h3>
-
-                    <p>
-                      {item.text}
-                    </p>
-
+                    <span className="uni-area__number">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
                   </div>
 
-                </article>
+                  <h3>
+                    {title}
+                  </h3>
+
+                  <p>
+                    {text}
+                  </p>
+
+                </li>
 
               )
             )}
 
-          </div>
+          </ul>
 
         </div>
 
@@ -839,103 +975,53 @@ export default function Universities() {
           FOUNDER ENGAGEMENT
       ====================================================== */}
 
-      <section className="universities-fellowship">
+      <section className="uni-engage">
 
-        <div className="container universities-fellowship__grid">
+        <div className="uni-container">
 
-          <div className="universities-fellowship__label">
+          <div className="uni-engage__card" data-reveal>
 
-            <span className="eyebrow eyebrow--light">
-              Founder Engagement
-            </span>
+            <div className="uni-engage__content">
 
-
-            <div className="universities-fellowship__icon">
-
-              <Lightbulb
-                size={34}
-                strokeWidth={1.3}
-                aria-hidden="true"
-              />
-
-            </div>
-
-          </div>
-
-
-          <div className="universities-fellowship__content">
-
-            <h2>
-              Put academic expertise behind founders who are
-              actively building.
-            </h2>
-
-            <p>
-              Through the Continental Founders ecosystem,
-              universities can engage founders as they develop,
-              validate, execute, and strengthen their ventures.
-              Faculty expertise and research can become part of a
-              practical process focused on solving real problems
-              and creating commercial evidence.
-            </p>
-
-
-            <div className="universities-fellowship__journey">
-
-              <span>
-                Potential
+              <span className="uni-eyebrow uni-eyebrow--light">
+                Founder Engagement
               </span>
 
-              <ArrowRight
-                size={15}
-                aria-hidden="true"
-              />
+              <h2>
+                Put academic expertise behind founders who are
+                actively building.
+              </h2>
 
-              <span>
-                Preparation
-              </span>
+              <p>
+                Through the Continental Founders ecosystem,
+                universities can engage founders as they develop,
+                validate, execute, and strengthen their ventures.
+                Faculty expertise and research can become part of a
+                practical process focused on solving real problems
+                and creating commercial evidence.
+              </p>
 
-              <ArrowRight
-                size={15}
-                aria-hidden="true"
-              />
-
-              <span>
-                Execution
-              </span>
-
-              <ArrowRight
-                size={15}
-                aria-hidden="true"
-              />
-
-              <span>
-                Evidence
-              </span>
-
-              <ArrowRight
-                size={15}
-                aria-hidden="true"
-              />
-
-              <span>
-                Opportunity
-              </span>
+              <Link
+                to="/our-model"
+                className="uni-button uni-button--ghost"
+              >
+                Explore our model
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
 
             </div>
 
 
-            <Link
-              to="/our-model"
-              className="universities-text-link"
-            >
-              Explore Our Model
+            <ol className="uni-engage__journey">
 
-              <ArrowUpRight
-                size={17}
-                aria-hidden="true"
-              />
-            </Link>
+              {founderJourney.map((step, index) => (
+                <li key={step}>
+                  <span>{index + 1}</span>
+                  {step}
+                </li>
+              ))}
+
+            </ol>
 
           </div>
 
@@ -948,80 +1034,77 @@ export default function Universities() {
           WIDER PARTNERSHIP ECOSYSTEM
       ====================================================== */}
 
-      <section className="section universities-ecosystem">
+      <section className="uni-section uni-ecosystem">
 
-        <div className="container">
+        <div className="uni-container">
 
-          <SectionHeading
-            eyebrow="The Wider Ecosystem"
-            title="Universities are one part of a connected partnership network."
-            text="Continental Founders brings academic institutions together with trade networks, corporations, government, and development institutions around founders and commercial opportunity."
-          />
+          <header className="uni-heading uni-heading--split" data-reveal>
+            <div>
+              <span className="uni-eyebrow">The Wider Ecosystem</span>
+
+              <h2>
+                Universities are one part of a connected partnership
+                network.
+              </h2>
+            </div>
+
+            <div>
+              <p>
+                Continental Founders brings academic institutions
+                together with trade networks, corporations,
+                government, and development institutions around
+                founders and commercial opportunity.
+              </p>
+
+              <Link
+                to="/strategic-partners"
+                className="uni-text-link"
+              >
+                View all partners
+                <ArrowUpRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
+          </header>
 
 
-          <div className="universities-ecosystem__grid">
+          <div className="uni-ecosystem__grid" data-reveal>
 
             {partnerEcosystem.map(
-              (partner) => (
+              ({ title, text, path, image, icon: Icon, color }) => (
 
                 <Link
-                  key={
-                    partner.path
-                  }
-                  to={
-                    partner.path
-                  }
-                  className="universities-ecosystem__card"
+                  key={path}
+                  to={path}
+                  className={`uni-partner uni-tone--${color}`}
                 >
 
-                  <span className="universities-ecosystem__number">
-                    {partner.number}
-                  </span>
+                  <div className="uni-partner__media">
+                    <img src={image} alt="" loading="lazy" />
 
-                  <h3>
-                    {partner.title}
-                  </h3>
-
-                  <p>
-                    {partner.text}
-                  </p>
-
-
-                  <div className="universities-ecosystem__link">
-
-                    <span>
-                      Explore Partnership
+                    <span className="uni-partner__icon">
+                      <Icon size={20} aria-hidden="true" />
                     </span>
+                  </div>
 
-                    <ArrowUpRight
-                      size={17}
-                      strokeWidth={1.6}
-                      aria-hidden="true"
-                    />
+                  <div className="uni-partner__body">
+                    <h3>
+                      {title}
+                    </h3>
 
+                    <p>
+                      {text}
+                    </p>
+
+                    <span className="uni-partner__link">
+                      Explore partnership
+                      <ArrowRight size={16} aria-hidden="true" />
+                    </span>
                   </div>
 
                 </Link>
 
               )
             )}
-
-          </div>
-
-
-          <div className="universities-ecosystem__all">
-
-            <Link
-              to="/strategic-partners"
-              className="universities-text-link"
-            >
-              View All Partners
-
-              <ArrowUpRight
-                size={17}
-                aria-hidden="true"
-              />
-            </Link>
 
           </div>
 
@@ -1034,12 +1117,44 @@ export default function Universities() {
           FINAL CTA
       ====================================================== */}
 
-      <CTASection
-        eyebrow="For University Leaders"
-        title="Explore what your institution could contribute."
-        text="Share your institution, priority areas, expertise, geography, and the type of collaboration you are exploring. Continental Founders can help identify where your institution fits within the wider ecosystem."
-      />
+      <section className="uni-cta">
 
-    </>
+        <div className="uni-container">
+
+          <div className="uni-cta__card" data-reveal>
+
+            <div>
+              <span className="uni-eyebrow uni-eyebrow--light">
+                For University Leaders
+              </span>
+
+              <h2>
+                Explore what your institution could contribute.
+              </h2>
+
+              <p>
+                Share your institution, priority areas, expertise,
+                geography, and the type of collaboration you are
+                exploring. Continental Founders can help identify
+                where your institution fits within the wider
+                ecosystem.
+              </p>
+            </div>
+
+            <Link
+              to="/contact"
+              className="uni-button uni-button--gold"
+            >
+              Start a conversation
+              <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
   );
 }

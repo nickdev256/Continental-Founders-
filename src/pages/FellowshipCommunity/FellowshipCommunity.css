@@ -1,3190 +1,1454 @@
-/* =====================================================
+/* ============================================================
+   CONTINENTAL FOUNDERS — FELLOWSHIP COMMUNITY
 
-   CONTINENTAL FOUNDERS FELLOWSHIP COMMUNITY
-
-   Responsive design for mobile, tablet and desktop
-
-   ===================================================== */
-
-
+   Same design system as the home and About pages. Pathway
+   colours: Genesis gold, Ascend blue, Horizon navy.
+   Every rule is scoped to .fc-page. Widths match the navbar.
+   Sizes are in px because the site sets html { font-size: 20px }.
+============================================================ */
 
 .fc-page {
+  --navy: #031b34;
+  --navy-2: #072641;
+  --ink: #0b1f33;
+  --body: #3a4f63;
+  --gold: #c99220;
+  --gold-dark: #a97a16;
+  --gold-light: #e3bd69;
+  --blue: #2563c9;
+  --soft: #f6f4ef;
+  --line: #e3e7eb;
+  --radius: 18px;
+  --radius-lg: 24px;
+  --shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 12px 32px rgba(3, 27, 52, 0.06);
+  --shadow-hover: 0 2px 4px rgba(3, 27, 52, 0.05), 0 24px 52px rgba(3, 27, 52, 0.13);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --section-y: clamp(72px, 9vw, 128px);
+  --font-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+  --font-body: "Montserrat", Arial, sans-serif;
 
-  --fc-gold: #d99a08;
-
-  --fc-gold-dark: #ad7400;
-
-  --fc-navy: #092858;
-
-  --fc-navy-deep: #061b3b;
-
-  --fc-teal: #177b73;
-
-  --fc-teal-dark: #105f59;
-
-  --fc-text: #26354a;
-
-  --fc-muted: #667085;
-
-  --fc-light: #f7f8fb;
-
-  --fc-cream: #faf8f2;
-
-  --fc-border: #e5e9f0;
-
-  --fc-genesis: #d99a08;
-
-  --fc-ascend: #0965c6;
-
-  --fc-horizon: #087f6b;
-
-
-
-  width: 100%;
-
-  max-width: 100%;
-
-  color: var(--fc-text);
-
-  background: #fff;
-
-  font-family: inherit;
-
+  display: block;
   overflow-x: clip;
-
-  -webkit-text-size-adjust: 100%;
-
-  text-size-adjust: 100%;
-
+  color: var(--body);
+  background: #fff;
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.7;
 }
-
-
 
 .fc-page *,
-
 .fc-page *::before,
-
 .fc-page *::after {
-
   box-sizing: border-box;
-
 }
-
-
-
-.fc-page img,
-
-.fc-page svg,
-
-.fc-page video,
-
-.fc-page canvas {
-
-  max-width: 100%;
-
-}
-
-
 
 .fc-page img {
-
-  height: auto;
-
+  display: block;
+  max-width: 100%;
 }
 
-
-
-.fc-page a {
-
+/* Zero priority so button and link colours below always win */
+:where(.fc-page) a {
+  color: inherit;
   text-decoration: none;
-
 }
 
+/* :where() keeps resets at zero priority so component rules win */
+:where(.fc-page) h1,
+:where(.fc-page) h2,
+:where(.fc-page) h3,
+:where(.fc-page) h4,
+:where(.fc-page) p,
+:where(.fc-page) figure {
+  margin: 0;
+}
 
+:where(.fc-page) ul,
+:where(.fc-page) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-.fc-container,
+.fc-page h1,
+.fc-page h2,
+.fc-page h3 {
+  text-wrap: balance;
+}
 
-.fc-belongs .fc-container {
+.fc-page h1 em,
+.fc-page h2 em {
+  color: var(--gold-dark);
+  font-style: italic;
+}
 
-  width: min(1160px, calc(100% - 48px));
-
+.fc-container {
+  width: min(1440px, calc(100% - 64px));
   margin-inline: auto;
+}
 
+/* Pathway colours */
+.fc-page .fc-genesis {
+  --pathway: var(--gold);
+}
+
+.fc-page .fc-ascend {
+  --pathway: var(--blue);
+}
+
+.fc-page .fc-horizon {
+  --pathway: var(--navy);
 }
 
 
+/* ============================================================
+   SHARED PIECES
+============================================================ */
+
+.fc-kicker {
+  display: inline-block;
+  color: var(--gold-dark);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.fc-heading h2,
+.fc-copy h2 {
+  margin-top: 16px;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 2.4vw + 12px, 50px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.fc-heading {
+  max-width: 780px;
+  margin-bottom: clamp(36px, 5vw, 60px);
+}
+
+.fc-heading p {
+  max-width: 680px;
+  margin-top: 18px;
+}
+
+.fc-heading-center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.fc-heading-center p {
+  margin-inline: auto;
+}
+
+.fc-copy p {
+  max-width: 620px;
+  margin-top: 18px;
+}
+
+.fc-copy h2 + p {
+  margin-top: 24px;
+}
+
+.fc-lead {
+  color: var(--ink);
+  font-size: clamp(18px, 0.4vw + 16px, 21px);
+  line-height: 1.6;
+}
 
 .fc-section {
-
-  padding: clamp(52px, 7vw, 94px) 0;
-
+  padding-block: var(--section-y);
+  scroll-margin-top: 80px;
 }
 
-
-
-.fc-section-label {
-
-  display: inline-block;
-
-  margin-bottom: 15px;
-
-  color: var(--fc-gold-dark);
-
-  font-size: 0.76rem;
-
-  font-weight: 800;
-
-  letter-spacing: 2px;
-
-  line-height: 1.6;
-
+.fc-section-white {
+  background: #fff;
 }
 
+.fc-section-soft {
+  background: var(--soft);
+}
 
+/* Photo + copy */
+.fc-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(40px, 6vw, 96px);
+}
 
-.fc-section-heading {
+.fc-split-reverse > .fc-media {
+  order: -1;
+}
 
-  max-width: 760px;
+.fc-media {
+  overflow: hidden;
+  aspect-ratio: 5 / 4;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 70px rgba(3, 27, 52, 0.16);
+}
 
-  margin: 0 auto 48px;
+.fc-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease);
+}
 
+.fc-media:hover img {
+  transform: scale(1.04);
+}
+
+.fc-media-wide {
+  aspect-ratio: 16 / 9;
+  margin-bottom: 36px;
+}
+
+/* Buttons */
+.fc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.fc-btn {
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 26px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
   text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s var(--ease);
+}
 
+.fc-btn svg {
+  flex: 0 0 auto;
+  transition: transform 0.25s var(--ease);
+}
+
+.fc-btn:hover {
+  transform: translateY(-2px);
+}
+
+.fc-btn:hover svg {
+  transform: translateX(3px);
+}
+
+.fc-btn-gold {
+  color: var(--navy);
+  background: var(--gold);
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
+}
+
+.fc-btn-gold:hover {
+  background: var(--gold-light);
+}
+
+.fc-btn-navy {
+  color: #fff;
+  background: var(--navy);
+}
+
+.fc-btn-navy:hover {
+  background: var(--navy-2);
+}
+
+.fc-btn-outline {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.fc-btn-outline:hover {
+  color: var(--navy);
+  background: #fff;
+  border-color: #fff;
+}
+
+.fc-btn-ghost {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--line);
+}
+
+.fc-btn-ghost:hover {
+  border-color: var(--ink);
 }
 
 
-
-.fc-section-heading h2,
-
-.fc-intro-heading h2,
-
-.fc-transformation-copy h2,
-
-.fc-alumni-copy h2 {
-
-  margin: 0 0 18px;
-
-  color: var(--fc-navy);
-
-  font-size: clamp(2rem, 4vw, 3.15rem);
-
-  font-weight: 800;
-
-  letter-spacing: -1.2px;
-
-  line-height: 1.15;
-
-  overflow-wrap: anywhere;
-
-  text-wrap: balance;
-
-}
-
-
-
-.fc-section-heading > p {
-
-  max-width: 700px;
-
-  margin: 0 auto;
-
-  color: var(--fc-muted);
-
-  font-size: 1.02rem;
-
-  line-height: 1.85;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-/* =====================================================
-
-   HERO SECTION
-
-   ===================================================== */
-
-
+/* ============================================================
+   HERO
+============================================================ */
 
 .fc-hero {
-
   position: relative;
-
+  isolation: isolate;
   display: flex;
-
-  align-items: center;
-
-  min-height: 0;
-
-  padding: clamp(48px, 7vw, 82px) 0 0;
-
+  min-height: clamp(600px, calc(100svh - 136px), 860px);
   overflow: hidden;
-
-  color: #e0af0c;
-
-  background: var(--fc-cream);
-
+  color: #fff;
+  background: var(--navy);
 }
 
-
-
-.fc-hero::before {
-
+.fc-hero-background {
   position: absolute;
-
-  right: -130px;
-
-  bottom: -290px;
-
-  width: 650px;
-
-  height: 650px;
-
-  border: 1px solid rgba(23, 123, 115, 0.1);
-
-  border-radius: 50%;
-
-  content: "";
-
-  pointer-events: none;
-
+  inset: 0;
+  z-index: -2;
 }
 
+.fc-hero-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 65% center;
+  animation: fc-hero-zoom 14s ease-out both;
+}
 
+@keyframes fc-hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
 
-.fc-hero::after {
-
+.fc-hero-overlay {
   position: absolute;
-
-  right: -35px;
-
-  bottom: -195px;
-
-  width: 450px;
-
-  height: 450px;
-
-  border: 1px solid rgba(217, 154, 8, 0.18);
-
-  border-radius: 50%;
-
-  content: "";
-
-  pointer-events: none;
-
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to top, rgba(0, 18, 45, 0.92) 0%, rgba(0, 18, 45, 0) 42%),
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.97) 0%,
+      rgba(0, 18, 45, 0.9) 32%,
+      rgba(0, 18, 45, 0.66) 56%,
+      rgba(0, 18, 45, 0.22) 82%,
+      rgba(0, 18, 45, 0.08) 100%
+    );
 }
 
-
+.fc-hero-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(32px, 5vh, 64px);
+  padding-block: clamp(48px, 9vh, 112px) clamp(22px, 3.5vh, 36px);
+}
 
 .fc-hero-content {
-
-  position: relative;
-
-  z-index: 2;
-
-  width: 100%;
-
+  max-width: 820px;
+  animation: fc-fade-up 0.9s var(--ease) both;
 }
 
+@keyframes fc-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-
-.fc-eyebrow {
-
+.fc-pill {
   display: inline-flex;
-
   align-items: center;
-
-  gap: 12px;
-
-  margin-bottom: 24px;
-
-  color: #08736d;
-
-  font-size: 0.75rem;
-
-  font-weight: 800;
-
-  letter-spacing: 2px;
-
-  line-height: 1.6;
-
-  text-transform: uppercase;
-
+  gap: 10px;
+  margin-bottom: 26px;
+  padding: 8px 16px 8px 14px;
+  color: var(--gold-light);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-
-
-.fc-eyebrow-line {
-
-  display: inline-block;
-
-  width: 35px;
-
-  height: 2px;
-
-  flex-shrink: 0;
-
-  background: var(--fc-gold);
-
+.fc-pill::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  box-shadow: 0 0 0 4px rgba(227, 189, 105, 0.2);
 }
-
-
 
 .fc-hero h1 {
-
-  max-width: 850px;
-
-  margin: 0 0 24px;
-
-  color: #1b3034;
-
-  font-size: clamp(2.7rem, 5.7vw, 4.75rem);
-
-  font-weight: 800;
-
-  line-height: 1.08;
-
-  letter-spacing: -2.5px;
-
-  overflow-wrap: anywhere;
-
-  text-wrap: balance;
-
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(36px, 3.6vw + 14px, 74px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
 }
 
-
-
-.fc-hero h1 span {
-
-  color: #7b5817;
-
+.fc-hero h1 em {
+  color: var(--gold-light);
 }
-
-
 
 .fc-hero-description {
-
-  max-width: 720px;
-
-  margin: 0 0 26px;
-
-  color: #34505c;
-
-  font-size: clamp(1rem, 1.5vw, 1.125rem);
-
-  line-height: 1.75;
-
-  overflow-wrap: anywhere;
-
+  max-width: 640px;
+  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: clamp(16px, 0.35vw + 14.5px, 19px);
 }
 
-
-
-.fc-hero-pattern {
-
-  position: absolute;
-
-  top: -20px;
-
-  right: 4%;
-
-  z-index: 1;
-
-  max-width: 40%;
-
-  color: rgba(20, 72, 74, 0.055);
-
-  pointer-events: none;
-
-}
-
-
-
-.fc-hero-pattern svg {
-
-  max-width: 100%;
-
-  height: auto;
-
-}
-
-
-
-/* =====================================================
-
-   BUTTONS
-
-   ===================================================== */
-
-
-
-.fc-hero-actions,
-
-.fc-final-actions {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  align-items: center;
-
-  gap: 12px;
-
-}
-
-
-
-.fc-hero-actions {
-
-  margin-bottom: clamp(36px, 6vw, 72px);
-
-}
-
-
-
-.fc-page .fc-btn,
-
-.fc-page button.fc-btn,
-
-.fc-page a.fc-btn {
-
-  position: relative;
-
-  z-index: 1;
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 10px;
-
-  min-height: 50px;
-
-  max-width: 100%;
-
-  padding: 13px 22px;
-
-  border: 2px solid transparent;
-
-  border-radius: 8px;
-
-  font-family: inherit;
-
-  font-size: 0.95rem;
-
-  font-weight: 750;
-
-  line-height: 1.35;
-
-  text-align: center;
-
-  text-decoration: none;
-
-  white-space: normal;
-
-  overflow-wrap: anywhere;
-
-  cursor: pointer;
-
-  opacity: 1;
-
-  visibility: visible;
-
-  transition:
-
-    color 0.2s ease,
-
-    background-color 0.2s ease,
-
-    border-color 0.2s ease,
-
-    box-shadow 0.2s ease,
-
-    transform 0.2s ease;
-
-}
-
-
-
-
-/* Primary button */
-.fc-page .fc-btn-gold {
-  color: #ffffff;
-  background: var(--fc-teal);
-  border: 1px solid var(--fc-teal);
-  border-radius: 8px;
-  padding: 13px 26px;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-  box-shadow: 0 4px 12px rgba(16, 72, 67, 0.16);
-  transition: all 0.3s ease;
-}
-
-.fc-page .fc-btn-gold:hover {
-  color: #ffffff;
-  background: var(--fc-teal-dark);
-  border-color: var(--fc-teal-dark);
-  box-shadow: 0 8px 20px rgba(16, 72, 67, 0.24);
-  transform: translateY(-3px);
-}
-
-/* Secondary button */
-.fc-page .fc-btn-outline {
-  color: #173f3b;
-  background: #f3b10a;
-  border: 1px solid #e0a000;
-  border-radius: 8px;
-  padding: 13px 26px;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.3px;
-  box-shadow: 0 4px 12px rgba(243, 177, 10, 0.18);
-  transition: all 0.3s ease;
-}
-
-.fc-page .fc-btn-outline:hover {
-  color: #ffffff;
-  background: var(--fc-teal-dark);
-  border-color: var(--fc-teal-dark);
-  box-shadow: 0 8px 20px rgba(16, 72, 67, 0.22);
-  transform: translateY(-3px);
-}
-
-/* Push both buttons slightly to the right */
-.fc-page .fc-btn-gold,
-.fc-page .fc-btn-outline {
-  position: relative;
-  left: 20px;
-}
-
-/* Responsive adjustment */
-@media (max-width: 600px) {
-  .fc-page .fc-btn-gold,
-  .fc-page .fc-btn-outline {
-    left: 0;
-    padding: 12px 20px;
-    font-size: 14px;
+/* Laptops and up: the photo fills the right side so the wall logo
+   shows beside the headline instead of behind it */
+@media (min-width: 1101px) {
+  .fc-hero-background {
+    left: 40%;
+  }
+
+  .fc-hero-background img {
+    object-position: left center;
+  }
+
+  .fc-hero-overlay {
+    background:
+      linear-gradient(to top, rgba(0, 18, 45, 0.92) 0%, rgba(0, 18, 45, 0) 30%),
+      linear-gradient(
+        to right,
+        rgba(3, 27, 52, 1) 0%,
+        rgba(3, 27, 52, 1) 40%,
+        rgba(3, 27, 52, 0.55) 46%,
+        rgba(3, 27, 52, 0.1) 58%,
+        rgba(3, 27, 52, 0) 100%
+      );
   }
 }
 
-
-
-
-/* Navy button */
-
-
-
-.fc-page .fc-btn-navy {
-
-  color: #fff;
-
-  background: #173e63;
-
-  border-color: #173e63;
-
+/* Bottom strip: highlights + pathway links */
+.fc-hero-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 24px 48px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
 }
-
-
-
-.fc-page .fc-btn-navy:hover {
-
-  color: #fff;
-
-  background: #102e4b;
-
-  border-color: #102e4b;
-
-  transform: translateY(-2px);
-
-}
-
-
-
-/* Button and link focus */
-
-
-
-.fc-page .fc-btn:focus-visible,
-
-.fc-page a:focus-visible,
-
-.fc-page button:focus-visible,
-
-.fc-page input:focus-visible,
-
-.fc-page select:focus-visible,
-
-.fc-page textarea:focus-visible {
-
-  outline: 3px solid #d99a08;
-
-  outline-offset: 3px;
-
-}
-
-
-
-.fc-page .fc-btn svg,
-
-.fc-page .fc-pathway-link svg,
-
-.fc-page .fc-text-link svg {
-
-  display: inline-block;
-
-  flex: 0 0 auto;
-
-  width: 1.1em;
-
-  height: 1.1em;
-
-  color: currentColor;
-
-}
-
-
-
-/* =====================================================
-
-   HERO HIGHLIGHTS
-
-   ===================================================== */
-
-
 
 .fc-hero-highlights {
-
   display: grid;
-
   grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 0;
-
-  overflow: hidden;
-
-  padding: 28px 18px;
-
-  border-radius: 16px;
-
-  background: #102d32;
-
-  text-align: center;
-
+  gap: 18px 32px;
 }
 
-
-
-.fc-highlight {
-
-  min-width: 0;
-
-  padding: 10px 16px;
-
-}
-
-
-
-.fc-highlight + .fc-highlight {
-
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-
-}
-
-
-
-.fc-highlight h3 {
-
-  margin: 0 0 6px;
-
-  color: #ffcc83;
-
-  font-size: 1.2rem;
-
-  font-weight: 800;
-
-  line-height: 1.4;
-
-}
-
-
-
-.fc-highlight p {
-
-  margin: 0;
-
-  color: #fff;
-
-  font-size: 0.94rem;
-
-  line-height: 1.6;
-
-}
-
-
-
-/* =====================================================
-
-   WHO BELONGS HERE
-
-   ===================================================== */
-
-
-
-.fc-belongs {
-
-  padding: 24px 0 80px;
-
-  color: #193136;
-
-  background: var(--fc-cream);
-
-}
-
-
-
-.fc-belongs-eyebrow {
-
-  display: block;
-
-  margin-bottom: 18px;
-
-  color: #087f78;
-
-  font-size: 0.75rem;
-
-  font-weight: 800;
-
-  letter-spacing: 2px;
-
-  line-height: 1.5;
-
-  text-transform: uppercase;
-
-}
-
-
-
-.fc-belongs-title {
-
-  margin: 0 0 20px;
-
-  color: #1b3034;
-
-  font-size: clamp(1.8rem, 3.5vw, 2.7rem);
-
-  font-weight: 800;
-
-  line-height: 1.2;
-
-  letter-spacing: -0.8px;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-.fc-belongs-intro {
-
-  max-width: 720px;
-
-  margin: 0 0 20px;
-
-  color: #34505c;
-
-  font-size: clamp(1rem, 1.5vw, 1.125rem);
-
-  line-height: 1.7;
-
-}
-
-
-
-.fc-belongs-description {
-
-  margin: 0;
-
-  color: #243b43;
-
-  font-size: 0.95rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-/* =====================================================
-
-   INTRODUCTION
-
-   ===================================================== */
-
-
-
-.fc-intro {
-
-  background: #fff;
-
-}
-
-
-
-.fc-intro-grid {
-
-  display: grid;
-
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-
-  align-items: start;
-
-  gap: clamp(30px, 6vw, 80px);
-
-}
-
-
-
-.fc-intro-heading h2 span {
-
-  color: var(--fc-gold-dark);
-
-}
-
-
-
-.fc-intro-copy p {
-
-  margin: 0 0 18px;
-
-  color: #586579;
-
-  font-size: 1rem;
-
-  line-height: 1.9;
-
-}
-
-
-
-.fc-intro-copy p:last-child {
-
-  margin-bottom: 0;
-
-}
-
-
-
-/* =====================================================
-
-   FELLOWSHIP PATHWAYS
-
-   ===================================================== */
-
-
-
-.fc-pathways {
-
-  background: var(--fc-light);
-
-}
-
-
-
-.fc-pathway-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  align-items: stretch;
-
-  gap: 23px;
-
-}
-
-
-
-.fc-pathway-card {
-
+.fc-hero-highlights li {
   display: flex;
-
   flex-direction: column;
-
-  min-width: 0;
-
-  padding: 30px 26px 26px;
-
-  border: 1px solid var(--fc-border);
-
-  border-top: 5px solid var(--fc-pathway-color);
-
-  border-radius: 13px;
-
-  background: #fff;
-
-  box-shadow: 0 9px 30px rgba(13, 38, 76, 0.055);
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-
+  gap: 4px;
 }
 
-
-
-.fc-pathway-card:hover {
-
-  transform: translateY(-4px);
-
-  box-shadow: 0 15px 32px rgba(13, 38, 76, 0.1);
-
-}
-
-
-
-.fc-genesis {
-
-  --fc-pathway-color: var(--fc-genesis);
-
-}
-
-
-
-.fc-ascend {
-
-  --fc-pathway-color: var(--fc-ascend);
-
-}
-
-
-
-.fc-horizon {
-
-  --fc-pathway-color: var(--fc-horizon);
-
-}
-
-
-
-.fc-pathway-top {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 12px;
-
-  margin-bottom: 25px;
-
-}
-
-
-
-.fc-pathway-icon {
-
-  display: grid;
-
-  width: 58px;
-
-  height: 58px;
-
-  flex: 0 0 auto;
-
-  place-items: center;
-
-  border-radius: 12px;
-
-  color: var(--fc-pathway-color);
-
-  background: color-mix(in srgb, var(--fc-pathway-color) 11%, white);
-
-}
-
-
-
-.fc-pathway-stage {
-
-  max-width: 150px;
-
-  color: #667085;
-
-  font-size: 0.73rem;
-
+.fc-hero-highlights strong {
+  color: #fff;
+  font-size: 13px;
   font-weight: 700;
-
-  line-height: 1.5;
-
-  text-align: right;
-
-}
-
-
-
-.fc-pathway-card h3 {
-
-  margin: 0 0 4px;
-
-  color: var(--fc-pathway-color);
-
-  font-size: 1.5rem;
-
-  font-weight: 850;
-
-  letter-spacing: 1px;
-
-}
-
-
-
-.fc-pathway-card h4 {
-
-  margin: 0 0 16px;
-
-  color: var(--fc-navy);
-
-  font-size: 1.1rem;
-
-  font-weight: 750;
-
-  line-height: 1.45;
-
-}
-
-
-
-.fc-pathway-description {
-
-  min-height: 108px;
-
-  margin: 0 0 22px;
-
-  color: #5d6879;
-
-  font-size: 0.92rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-.fc-pathway-outcomes {
-
-  display: grid;
-
-  gap: 13px;
-
-  padding: 19px 0;
-
-  border-top: 1px solid var(--fc-border);
-
-  border-bottom: 1px solid var(--fc-border);
-
-}
-
-
-
-.fc-outcome {
-
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 9px;
-
-  color: #39485d;
-
-  font-size: 0.88rem;
-
-  line-height: 1.6;
-
-}
-
-
-
-.fc-outcome svg {
-
-  flex: 0 0 auto;
-
-  margin-top: 3px;
-
-  color: var(--fc-pathway-color);
-
-}
-
-
-
-.fc-page .fc-pathway-link,
-
-.fc-page .fc-text-link {
-
-  display: inline-flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 10px;
-
-  max-width: 100%;
-
-  min-height: 44px;
-
-  padding: 10px 0;
-
-  color: var(--fc-pathway-color, var(--fc-navy));
-
-  background: transparent;
-
-  border: 0;
-
-  border-radius: 4px;
-
-  font-size: 0.9rem;
-
-  font-weight: 800;
-
-  line-height: 1.5;
-
-  overflow-wrap: anywhere;
-
-  cursor: pointer;
-
-}
-
-
-
-.fc-pathway-link {
-
-  margin-top: auto;
-
-  padding-top: 23px;
-
-}
-
-
-
-.fc-pathway-link svg,
-
-.fc-text-link svg {
-
-  transition: transform 0.2s ease;
-
-}
-
-
-
-.fc-pathway-link:hover svg,
-
-.fc-text-link:hover svg {
-
-  transform: translateX(4px);
-
-}
-
-
-
-.fc-pathway-bottom {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 17px;
-
-  margin-top: 28px;
-
-  padding: 22px 25px;
-
-  border: 1px solid #ead8a6;
-
-  border-radius: 10px;
-
-  background: #fffaf0;
-
-}
-
-
-
-.fc-pathway-bottom > svg {
-
-  flex: 0 0 auto;
-
-  color: var(--fc-gold-dark);
-
-}
-
-
-
-.fc-pathway-bottom p {
-
-  flex: 1;
-
-  min-width: 0;
-
-  margin: 0;
-
-  color: #665a3d;
-
-  font-size: 0.9rem;
-
-  line-height: 1.7;
-
-}
-
-
-
-.fc-pathway-bottom .fc-text-link {
-
-  flex: 0 0 auto;
-
-  color: var(--fc-navy);
-
-}
-
-
-
-/* =====================================================
-
-   SHARED FELLOWSHIP EXPERIENCE
-
-   ===================================================== */
-
-
-
-.fc-experience {
-
-  color: #fff;
-
-  background:
-
-    radial-gradient(
-
-      ellipse at 100% 0%,
-
-      rgba(19, 70, 123, 0.6),
-
-      transparent 45%
-
-    ),
-
-    var(--fc-navy-deep);
-
-}
-
-
-
-.fc-heading-light h2 {
-
-  color: #fff;
-
-}
-
-
-
-.fc-heading-light > p {
-
-  color: rgba(255, 255, 255, 0.8);
-
-}
-
-
-
-.fc-heading-light .fc-section-label {
-
-  color: #f0bd45;
-
-}
-
-
-
-.fc-experience-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-
-  gap: 17px;
-
-}
-
-
-
-.fc-experience-card {
-
-  min-width: 0;
-
-  padding: 27px 22px;
-
-  border: 1px solid rgba(255, 255, 255, 0.15);
-
-  border-radius: 11px;
-
-  background: rgba(255, 255, 255, 0.045);
-
-  transition: background 0.2s ease, transform 0.2s ease;
-
-}
-
-
-
-.fc-experience-card:hover {
-
-  transform: translateY(-3px);
-
-  background: rgba(255, 255, 255, 0.085);
-
-}
-
-
-
-.fc-experience-icon {
-
-  display: grid;
-
-  width: 51px;
-
-  height: 51px;
-
-  margin-bottom: 23px;
-
-  place-items: center;
-
-  border-radius: 10px;
-
-  color: #f4bd3e;
-
-  background: rgba(217, 154, 8, 0.13);
-
-}
-
-
-
-.fc-experience-card h3 {
-
-  margin: 0 0 12px;
-
-  color: #fff;
-
-  font-size: 1.02rem;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-experience-card p {
-
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.78);
-
-  font-size: 0.88rem;
-
-  line-height: 1.8;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-.fc-shared-banner {
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 22px;
-
-  margin-top: 35px;
-
-  padding: 27px 30px;
-
-  border: 1px solid rgba(239, 182, 45, 0.3);
-
-  border-radius: 12px;
-
-  background: rgba(217, 154, 8, 0.08);
-
-}
-
-
-
-.fc-shared-symbol {
-
-  display: grid;
-
-  width: 61px;
-
-  height: 61px;
-
-  flex: 0 0 auto;
-
-  place-items: center;
-
-  border-radius: 50%;
-
-  color: #f0bd45;
-
-  background: rgba(217, 154, 8, 0.13);
-
-}
-
-
-
-.fc-shared-banner h3 {
-
-  margin: 0 0 8px;
-
-  color: #fff;
-
-  font-size: 1.15rem;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-shared-banner p {
-
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.8);
-
-  font-size: 0.92rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-/* =====================================================
-
-   TRANSFORMATION
-
-   ===================================================== */
-
-
-
-.fc-transformation {
-
-  background: #fff;
-
-}
-
-
-
-.fc-transformation-grid {
-
-  display: grid;
-
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-
-  align-items: center;
-
-  gap: clamp(32px, 6vw, 85px);
-
-}
-
-
-
-.fc-transformation-copy h2 {
-
-  font-size: clamp(2.2rem, 4vw, 3.5rem);
-
-}
-
-
-
-.fc-transformation-copy > p {
-
-  margin: 0 0 17px;
-
-  color: #667085;
-
-  font-size: 0.98rem;
-
-  line-height: 1.9;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-.fc-transformation-copy .fc-btn {
-
-  margin-top: 14px;
-
-}
-
-
-
-.fc-transformation-list {
-
-  display: grid;
-
-  gap: 0;
-
-}
-
-
-
-.fc-transformation-item {
-
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 22px;
-
-  padding: 23px 0;
-
-  border-bottom: 1px solid var(--fc-border);
-
-}
-
-
-
-.fc-transformation-item:first-child {
-
-  padding-top: 0;
-
-}
-
-
-
-.fc-transformation-item:last-child {
-
-  padding-bottom: 0;
-
-  border-bottom: 0;
-
-}
-
-
-
-.fc-transformation-item > span {
-
-  display: grid;
-
-  width: 45px;
-
-  height: 45px;
-
-  flex: 0 0 auto;
-
-  place-items: center;
-
-  border-radius: 50%;
-
-  color: var(--fc-gold-dark);
-
-  background: #fff5d9;
-
-  font-size: 0.85rem;
-
-  font-weight: 850;
-
-}
-
-
-
-.fc-transformation-item h3 {
-
-  margin: 1px 0 7px;
-
-  color: var(--fc-navy);
-
-  font-size: 1.05rem;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-transformation-item p {
-
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 0.9rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-/* =====================================================
-
-   FELLOWSHIP JOURNEY
-
-   ===================================================== */
-
-
-
-.fc-journey {
-
-  background: #f6f8fc;
-
-}
-
-
-
-.fc-journey-grid {
-
-  display: grid;
-
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: 30px 24px;
-
-}
-
-
-
-.fc-journey-step {
-
-  position: relative;
-
-  min-width: 0;
-
-  padding: 26px;
-
-  border: 1px solid #e5eaf2;
-
-  border-radius: 11px;
-
-  background: #fff;
-
-  box-shadow: 0 5px 20px rgba(13, 38, 76, 0.035);
-
-}
-
-
-
-.fc-journey-number {
-
-  margin-bottom: 20px;
-
-  color: var(--fc-gold-dark);
-
-  font-size: 0.84rem;
-
-  font-weight: 850;
-
-  letter-spacing: 1px;
-
-}
-
-
-
-.fc-journey-icon {
-
-  display: grid;
-
-  width: 49px;
-
-  height: 49px;
-
-  margin-bottom: 19px;
-
-  place-items: center;
-
-  border-radius: 10px;
-
-  color: var(--fc-navy);
-
-  background: #edf3fc;
-
-}
-
-
-
-.fc-journey-step h3 {
-
-  margin: 0 0 11px;
-
-  color: var(--fc-navy);
-
-  font-size: 1.08rem;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-journey-step p {
-
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 0.9rem;
-
-  line-height: 1.8;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-.fc-journey-arrow {
-
-  position: absolute;
-
-  top: 30px;
-
-  right: -23px;
-
-  z-index: 1;
-
-  color: var(--fc-gold-dark);
-
-}
-
-
-
-.fc-journey-note {
-
-  max-width: 800px;
-
-  margin: 29px auto 0;
-
-  color: #7a8494;
-
-  font-size: 0.84rem;
-
-  line-height: 1.8;
-
-  text-align: center;
-
-}
-
-
-
-/* =====================================================
-
-   GRADUATION AND ALUMNI
-
-   ===================================================== */
-
-
-
-.fc-alumni {
-
-  background: #fff;
-
-}
-
-
-
-.fc-alumni-grid {
-
-  display: grid;
-
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.8fr);
-
-  align-items: center;
-
-  gap: 32px;
-
-  padding: 39px;
-
-  border: 1px solid #e5eaf2;
-
-  border-radius: 14px;
-
-  background: #fbfcfe;
-
-}
-
-
-
-.fc-alumni-icon {
-
-  display: grid;
-
-  width: 80px;
-
-  height: 80px;
-
-  place-items: center;
-
-  border-radius: 16px;
-
-  color: var(--fc-gold-dark);
-
-  background: #fff1cb;
-
-}
-
-
-
-.fc-alumni-copy h2 {
-
-  font-size: clamp(1.65rem, 3vw, 2.25rem);
-
-  letter-spacing: -0.8px;
-
-}
-
-
-
-.fc-alumni-copy > p {
-
-  margin: 0;
-
-  color: #667085;
-
-  font-size: 0.92rem;
-
-  line-height: 1.85;
-
-}
-
-
-
-.fc-alumni-points {
-
-  display: grid;
-
-  gap: 17px;
-
-}
-
-
-
-.fc-alumni-points > div {
-
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 10px;
-
-  color: #3d4a5f;
-
-  font-size: 0.88rem;
-
-  line-height: 1.7;
-
-}
-
-
-
-.fc-alumni-points svg {
-
-  flex: 0 0 auto;
-
-  margin-top: 3px;
-
-  color: #13846c;
-
-}
-
-
-
-/* =====================================================
-
-   FINAL CALL TO ACTION
-
-   ===================================================== */
-
-
-
-.fc-final-cta {
-
-  padding: clamp(58px, 7vw, 85px) 0;
-
-  color: #fff;
-
-  text-align: center;
-
-  background:
-
-    radial-gradient(
-
-      ellipse at 50% 0%,
-
-      rgba(22, 66, 119, 0.7),
-
-      transparent 65%
-
-    ),
-
-    var(--fc-navy-deep);
-
-}
-
-
-
-.fc-final-cta-inner {
-
-  width: min(790px, calc(100% - 48px));
-
-  margin-inline: auto;
-
-}
-
-
-
-.fc-final-cta .fc-section-label {
-
-  color: #f0bd45;
-
-}
-
-
-
-.fc-final-cta h2 {
-
-  margin: 0 0 17px;
-
-  color: #fff;
-
-  font-size: clamp(2.2rem, 5vw, 4rem);
-
-  font-weight: 850;
-
-  letter-spacing: -1.5px;
-
-  line-height: 1.15;
-
-  overflow-wrap: anywhere;
-
-  text-wrap: balance;
-
-}
-
-
-
-.fc-final-cta-inner > p {
-
-  max-width: 620px;
-
-  margin: 0 auto 29px;
-
-  color: rgba(255, 255, 255, 0.82);
-
-  font-size: 1rem;
-
-  line-height: 1.85;
-
-  overflow-wrap: anywhere;
-
-}
-
-
-
-.fc-final-actions {
-
-  justify-content: center;
-
-}
-
-
-
-.fc-final-cta small {
-
-  display: block;
-
-  max-width: 640px;
-
-  margin: 27px auto 0;
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-size: 0.8rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-/* =====================================================
-
-   EXPRESS YOUR INTEREST FORM
-
-   ===================================================== */
-
-
-
-.fc-interest-intro {
-
-  max-width: 750px;
-
-  margin: 0 0 28px;
-
-  color: #40585c;
-
-  font-size: 1.05rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-.fc-interest-formwrap {
-
-  width: 100%;
-
-  max-width: 750px;
-
-  min-width: 0;
-
-  padding: 30px;
-
-  border: 1px solid #d8e1df;
-
-  border-radius: 16px;
-
-  background: #fff;
-
-  box-shadow: 0 5px 20px rgba(16, 43, 50, 0.05);
-
-}
-
-
-
-.fc-interest-formwrap label {
-
-  display: block;
-
-  margin: 18px 0 8px;
-
-  color: #193136;
-
-  font-size: 0.95rem;
-
-  font-weight: 700;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-interest-formwrap input,
-
-.fc-interest-formwrap select,
-
-.fc-interest-formwrap textarea {
-
-  display: block;
-
-  width: 100%;
-
-  max-width: 100%;
-
-  min-height: 48px;
-
-  padding: 12px 14px;
-
-  border: 1px solid #a8b9b6;
-
-  border-radius: 8px;
-
-  color: #193136;
-
-  background: #fff;
-
-  font-family: inherit;
-
-  font-size: 16px;
-
-  line-height: 1.5;
-
-}
-
-
-
-.fc-interest-formwrap select {
-
-  cursor: pointer;
-
-}
-
-
-
-.fc-interest-formwrap textarea {
-
-  min-height: 120px;
-
-  resize: vertical;
-
-}
-
-
-
-.fc-interest-formwrap input::placeholder,
-
-.fc-interest-formwrap textarea::placeholder {
-
-  color: #687b7c;
-
-  opacity: 1;
-
-}
-
-
-
-.fc-interest-formwrap input:focus,
-
-.fc-interest-formwrap select:focus,
-
-.fc-interest-formwrap textarea:focus {
-
-  border-color: #17776e;
-
-  outline: 3px solid rgba(23, 119, 110, 0.16);
-
-}
-
-
-
-.fc-interest-actions {
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  align-items: center;
-
-  gap: 12px;
-
-  margin-top: 26px;
-
-}
-
-
-
-.fc-interest-actions .fc-btn {
-
-  min-width: 150px;
-
-}
-
-
-
-.fc-interest-note {
-
-  margin-top: 22px;
-
-  color: #576a6d;
-
-  font-size: 0.86rem;
-
-  line-height: 1.8;
-
-}
-
-
-
-/* =====================================================
-
-   RESPONSIVE: LARGE DESKTOPS
-
-   ===================================================== */
-
-
-
-@media (min-width: 1600px) {
-
-  .fc-container,
-
-  .fc-belongs .fc-container {
-
-    width: min(1240px, calc(100% - 96px));
-
-  }
-
-
-
-  .fc-hero h1 {
-
-    max-width: 950px;
-
-  }
-
-}
-
-
-
-/* =====================================================
-
-   RESPONSIVE: LAPTOPS AND SMALL DESKTOPS
-
-   ===================================================== */
-
-
-
-@media (max-width: 1100px) {
-
-  .fc-intro-grid {
-
-    gap: 36px;
-
-  }
-
-
-
-  .fc-transformation-grid {
-
-    gap: 40px;
-
-  }
-
-
-
-  .fc-pathway-grid {
-
-    gap: 16px;
-
-  }
-
-
-
-  .fc-pathway-card {
-
-    padding: 25px 20px;
-
-  }
-
-
-
-  .fc-pathway-description {
-
-    min-height: 0;
-
-  }
-
-
-
-  .fc-experience-card {
-
-    padding: 24px 18px;
-
-  }
-
-
-
-  .fc-alumni-grid {
-
-    padding: 30px;
-
-    gap: 24px;
-
-  }
-
-}
-
-
-
-/* =====================================================
-
-   RESPONSIVE: TABLETS
-
-   ===================================================== */
-
-
-
-@media (max-width: 800px) {
-
-  .fc-container,
-
-  .fc-belongs .fc-container {
-
-    width: calc(100% - 40px);
-
-  }
-
-
-
-  .fc-section-heading {
-
-    margin-bottom: 36px;
-
-  }
-
-
-
-  .fc-hero h1 {
-
-    letter-spacing: -1.6px;
-
-  }
-
-
-
-  .fc-hero-pattern {
-
-    right: -80px;
-
-    opacity: 0.5;
-
-  }
-
-
-
-  .fc-intro-grid,
-
-  .fc-transformation-grid {
-
-    grid-template-columns: minmax(0, 1fr);
-
-    gap: 28px;
-
-  }
-
-
-
-  .fc-pathway-grid {
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  }
-
-
-
-  .fc-pathway-card:last-child {
-
-    grid-column: 1 / -1;
-
-  }
-
-
-
-  .fc-pathway-description {
-
-    min-height: 0;
-
-  }
-
-
-
-  .fc-experience-grid {
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  }
-
-
-
-  .fc-journey-grid {
-
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  }
-
-
-
-  .fc-alumni-grid {
-
-    grid-template-columns: auto minmax(0, 1fr);
-
-  }
-
-
-
-  .fc-alumni-points {
-
-    grid-column: 2;
-
-  }
-
-
-
-  .fc-journey-arrow {
-
-    display: none;
-
-  }
-
-}
-
-
-
-/* =====================================================
-
-   RESPONSIVE: PHONES
-
-   ===================================================== */
-
-
-
-@media (max-width: 600px) {
-
-  .fc-container,
-
-  .fc-belongs .fc-container {
-
-    width: calc(100% - 32px);
-
-  }
-
-
-
-  .fc-section {
-
-    padding: 52px 0;
-
-  }
-
-
-
-  .fc-section-heading {
-
-    margin-bottom: 32px;
-
-  }
-
-
-
-  .fc-section-heading h2,
-
-  .fc-intro-heading h2 {
-
-    letter-spacing: -0.7px;
-
-  }
-
-
-
-  .fc-section-heading > p {
-
-    font-size: 0.96rem;
-
-    line-height: 1.8;
-
-  }
-
-
-
-  .fc-hero {
-
-    padding-top: 38px;
-
-  }
-
-
-
-  .fc-hero h1 {
-
-    margin-bottom: 20px;
-
-    font-size: clamp(2.3rem, 9.5vw, 3.4rem);
-
-    line-height: 1.1;
-
-    letter-spacing: -1.1px;
-
-  }
-
-
-
-  .fc-eyebrow {
-
-    gap: 8px;
-
-    margin-bottom: 18px;
-
-    font-size: 0.68rem;
-
-    letter-spacing: 1.2px;
-
-    overflow-wrap: anywhere;
-
-  }
-
-
-
-  .fc-eyebrow-line {
-
-    width: 25px;
-
-  }
-
-
-
-  .fc-hero-description {
-
-    font-size: 1rem;
-
-    line-height: 1.75;
-
-  }
-
-
-
-  .fc-hero-actions,
-
-  .fc-final-actions,
-
-  .fc-interest-actions {
-
-    align-items: stretch;
-
-    flex-direction: column;
-
-    gap: 12px;
-
-  }
-
-
-
-  .fc-page .fc-hero-actions .fc-btn,
-
-  .fc-page .fc-final-actions .fc-btn,
-
-  .fc-page .fc-interest-actions .fc-btn {
-
-    width: 100%;
-
-    min-height: 50px;
-
-    padding: 13px 16px;
-
-  }
-
-
-
-  .fc-hero-highlights {
-
-    grid-template-columns: minmax(0, 1fr);
-
-    padding: 8px 16px;
-
-    border-radius: 13px;
-
-  }
-
-
-
-  .fc-highlight {
-
-    padding: 16px 8px;
-
-  }
-
-
-
-  .fc-highlight + .fc-highlight {
-
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-
-    border-left: 0;
-
-  }
-
-
-
-  .fc-highlight h3 {
-
-    font-size: 1.05rem;
-
-  }
-
-
-
-  .fc-highlight p {
-
-    font-size: 0.9rem;
-
-  }
-
-
-
-  .fc-hero-pattern {
-
-    top: auto;
-
-    right: -120px;
-
-    bottom: -20px;
-
-    opacity: 0.25;
-
-    transform: none;
-
-  }
-
-
-
-  .fc-hero-pattern svg {
-
-    width: 230px;
-
-    height: auto;
-
-  }
-
-
-
-  .fc-belongs {
-
-    padding: 24px 0 48px;
-
-  }
-
-
-
-  .fc-belongs-eyebrow {
-
-    margin-bottom: 14px;
-
-    font-size: 0.7rem;
-
-    letter-spacing: 1.5px;
-
-  }
-
-
-
-  .fc-belongs-title {
-
-    margin-bottom: 16px;
-
-    font-size: clamp(1.7rem, 7vw, 2.15rem);
-
-    letter-spacing: -0.5px;
-
-  }
-
-
-
-  .fc-belongs-intro {
-
-    margin-bottom: 18px;
-
-    font-size: 1rem;
-
-  }
-
-
-
-  .fc-belongs-description {
-
-    font-size: 0.92rem;
-
-  }
-
-
-
-  .fc-intro-copy p {
-
-    font-size: 0.96rem;
-
-  }
-
-
-
-  .fc-pathway-grid,
-
-  .fc-experience-grid,
-
-  .fc-journey-grid {
-
-    grid-template-columns: minmax(0, 1fr);
-
-    gap: 16px;
-
-  }
-
-
-
-  .fc-pathway-card:last-child {
-
-    grid-column: auto;
-
-  }
-
-
-
-  .fc-pathway-card {
-
-    padding: 24px 20px;
-
-  }
-
-
-
-  .fc-pathway-top {
-
-    align-items: flex-start;
-
-  }
-
-
-
-  .fc-pathway-stage {
-
-    max-width: 125px;
-
-    font-size: 0.72rem;
-
-  }
-
-
-
-  .fc-pathway-description {
-
-    min-height: 0;
-
-  }
-
-
-
-  .fc-pathway-bottom {
-
-    align-items: flex-start;
-
-    flex-wrap: wrap;
-
-    gap: 12px;
-
-    padding: 19px;
-
-  }
-
-
-
-  .fc-pathway-bottom p {
-
-    flex-basis: calc(100% - 40px);
-
-  }
-
-
-
-  .fc-pathway-bottom .fc-text-link {
-
-    margin-left: 0;
-
-  }
-
-
-
-  .fc-experience-card {
-
-    padding: 23px;
-
-  }
-
-
-
-  .fc-experience-icon {
-
-    margin-bottom: 16px;
-
-  }
-
-
-
-  .fc-shared-banner {
-
-    align-items: flex-start;
-
-    flex-direction: column;
-
-    padding: 22px;
-
-  }
-
-
-
-  .fc-transformation-copy h2,
-
-  .fc-final-cta h2 {
-
-    font-size: clamp(2.1rem, 8vw, 2.8rem);
-
-    letter-spacing: -0.7px;
-
-  }
-
-
-
-  .fc-transformation-item {
-
-    gap: 16px;
-
-    padding: 20px 0;
-
-  }
-
-
-
-  .fc-journey-step {
-
-    padding: 23px;
-
-  }
-
-
-
-  .fc-alumni-grid {
-
-    grid-template-columns: minmax(0, 1fr);
-
-    gap: 22px;
-
-    padding: 24px 20px;
-
-  }
-
-
-
-  .fc-alumni-icon {
-
-    width: 65px;
-
-    height: 65px;
-
-  }
-
-
-
-  .fc-alumni-points {
-
-    grid-column: auto;
-
-    padding-top: 20px;
-
-    border-top: 1px solid var(--fc-border);
-
-  }
-
-
-
-  .fc-final-cta {
-
-    padding: 60px 0;
-
-  }
-
-
-
-  .fc-final-cta-inner {
-
-    width: calc(100% - 32px);
-
-  }
-
-
-
-  .fc-interest-formwrap {
-
-    padding: 20px 16px;
-
-    border-radius: 12px;
-
-  }
-
-
-
-  .fc-interest-formwrap label {
-
-    margin-top: 16px;
-
-  }
-
-
-
-  .fc-interest-formwrap input,
-
-  .fc-interest-formwrap select,
-
-  .fc-interest-formwrap textarea {
-
-    font-size: 16px;
-
-  }
-
-}
-
-
-
-/* =====================================================
-
-   RESPONSIVE: VERY SMALL PHONES
-
-   ===================================================== */
-
-
-
-@media (max-width: 380px) {
-
-  .fc-container,
-
-  .fc-belongs .fc-container {
-
-    width: calc(100% - 24px);
-
-  }
-
-
-
-  .fc-section {
-
-    padding: 42px 0;
-
-  }
-
-
-
-  .fc-hero {
-
-    padding-top: 32px;
-
-  }
-
-
-
-  .fc-hero h1 {
-
-    font-size: clamp(2rem, 9.5vw, 2.4rem);
-
-    letter-spacing: -0.8px;
-
-  }
-
-
-
-  .fc-eyebrow {
-
-    font-size: 0.62rem;
-
-    letter-spacing: 0.8px;
-
-  }
-
-
-
-  .fc-pathway-card {
-
-    padding: 21px 17px;
-
-  }
-
-
-
-  .fc-pathway-stage {
-
-    max-width: 105px;
-
-    font-size: 0.68rem;
-
-  }
-
-
-
-  .fc-transformation-copy h2,
-
-  .fc-final-cta h2 {
-
-    font-size: 2.15rem;
-
-  }
-
-
-
-  .fc-interest-formwrap {
-
-    padding: 18px 13px;
-
-  }
-
-}
-
-
-
-/* =====================================================
-
-   TOUCHSCREENS
-
-   ===================================================== */
-
-
-
-@media (hover: none) {
-
-  .fc-pathway-card:hover,
-
-  .fc-experience-card:hover,
-
-  .fc-page .fc-btn:hover {
-
-    transform: none;
-
-  }
-
-}
-
-/* Keep Fellowship Community consistent with other nav links */
-
-.navbar__dropdown-trigger {
-
-  font-size: 0.82rem;
-
-  font-weight: 500;
-
-  padding: 10px 6px;
-
-}
-
-
-
-/* Keep keyboard focus accessible without a persistent box */
-
-.navbar__link:focus:not(:focus-visible) {
-
-  outline: none;
-
-}
-
-
-
-.navbar__link:focus-visible {
-
-  outline: 2px solid rgba(201, 154, 46, 0.7);
-
-  outline-offset: 2px;
-
+  letter-spacing: 0.14em;
 }
-
-/* =====================================================
-
-   REDUCED MOTION ACCESSIBILITY
-
-   ===================================================== */
-
-
-
-@media (prefers-reduced-motion: reduce) {
 
-  .fc-page *,
-
-  .fc-page *::before,
-
-  .fc-page *::after {
-
-    scroll-behavior: auto !important;
-
-    animation-duration: 0.01ms !important;
-
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0.01ms !important;
-
-  }
-
+.fc-hero-highlights span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 14px;
 }
-
-/* =====================================================
-   PATHWAY NAVIGATION ABOVE THE HERO CONTENT
-   Continental Founders navy, gold and teal palette
-   ===================================================== */
 
 .fc-pathway-nav {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  width: 100%;
-  margin: 0 0 clamp(24px, 3vw, 38px);
-  position: relative;
-  z-index: 3;
 }
 
-.fc-page .fc-pathway-nav-link {
+.fc-pathway-nav-link {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   min-height: 40px;
-  padding: 9px 17px;
-  border: 1px solid rgba(9, 40, 88, 0.22);
-  border-radius: 999px;
-  color: var(--fc-navy);
-  background: rgba(255, 255, 255, 0.9);
-  font-size: 0.82rem;
-  font-weight: 750;
-  line-height: 1.25;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease, transform 0.2s ease;
-}
-
-.fc-page .fc-pathway-nav-genesis {
-  border-color: var(--fc-gold);
-}
-
-.fc-page .fc-pathway-nav-ascend {
-  border-color: var(--fc-navy);
-}
-
-.fc-page .fc-pathway-nav-horizon {
-  border-color: var(--fc-teal);
-}
-
-.fc-page .fc-pathway-nav-link:hover {
+  padding: 0 16px;
   color: #fff;
-  background: var(--fc-navy);
-  border-color: var(--fc-navy);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.fc-page .fc-pathway-nav-link:focus-visible {
-  outline: 3px solid var(--fc-gold);
+.fc-pathway-nav-link::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pathway);
+}
+
+.fc-pathway-nav-link.fc-horizon::before {
+  background: #fff;
+}
+
+.fc-pathway-nav-link.fc-horizon:hover {
+  border-color: #fff;
+}
+
+.fc-pathway-nav-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: var(--pathway);
+}
+
+
+/* ============================================================
+   PATHWAYS
+============================================================ */
+
+.fc-pathway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.fc-pathway-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--pathway);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+.fc-pathway-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Visible overflow so the icon badge can sit across the photo's edge.
+   flex: none keeps every photo the same height inside stretched cards. */
+.fc-pathway-photo {
+  position: relative;
+  flex: none;
+  aspect-ratio: 16 / 10;
+}
+
+.fc-pathway-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fc-pathway-icon {
+  position: absolute;
+  left: 20px;
+  bottom: -24px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--pathway);
+  border: 3px solid #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(3, 27, 52, 0.2);
+}
+
+.fc-pathway-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px clamp(22px, 2.2vw, 32px) clamp(24px, 2.2vw, 32px);
+}
+
+.fc-pathway-stage {
+  align-self: flex-start;
+  padding: 5px 12px;
+  color: var(--pathway);
+  background: color-mix(in srgb, var(--pathway) 12%, #fff);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.fc-pathway-card h3 {
+  margin-top: 16px;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 0.8vw + 18px, 32px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+
+.fc-pathway-card h4 {
+  margin-top: 2px;
+  color: var(--pathway);
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.fc-pathway-description {
+  margin-top: 14px;
+  font-size: 15.5px;
+}
+
+.fc-pathway-outcomes {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.fc-pathway-outcomes li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fc-pathway-outcomes svg {
+  flex: 0 0 auto;
+  color: var(--pathway);
+}
+
+.fc-pathway-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 24px;
+  color: var(--pathway);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.fc-pathway-link svg {
+  transition: transform 0.25s var(--ease);
+}
+
+.fc-pathway-link:hover svg {
+  transform: translateX(4px);
+}
+
+.fc-pathway-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin-top: 32px;
+  padding: 22px 28px;
+  background: var(--soft);
+  border-radius: var(--radius);
+}
+
+.fc-pathway-bottom-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-dark);
+  background: #fff;
+  border-radius: 14px;
+}
+
+.fc-pathway-bottom p {
+  flex: 1 1 320px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+
+/* ============================================================
+   SHARED EXPERIENCE (navy)
+============================================================ */
+
+.fc-experience {
+  color: #fff;
+  background: var(--navy);
+}
+
+.fc-heading-light h2 {
+  color: #fff;
+}
+
+.fc-heading-light h2 em {
+  color: var(--gold-light);
+}
+
+.fc-heading-light .fc-kicker {
+  color: var(--gold-light);
+}
+
+.fc-heading-light p {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.fc-experience-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.fc-experience-card {
+  min-width: 0;
+  padding: clamp(24px, 2.2vw, 32px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: var(--radius-lg);
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+.fc-experience-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(227, 189, 105, 0.45);
+}
+
+.fc-experience-card:nth-child(4n + 1) { --accent: var(--gold); }
+/* White, not navy, on this navy section */
+.fc-experience-card:nth-child(4n + 2) { --accent: #fff; }
+.fc-experience-card:nth-child(4n + 3) { --accent: var(--blue); }
+.fc-experience-card:nth-child(4n + 4) { --accent: var(--gold-light); }
+
+.fc-experience-icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+  background: var(--accent);
+  border-radius: 16px;
+}
+
+.fc-experience-card h3 {
+  margin-top: 22px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 0.6vw + 15px, 24px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.fc-experience-card p {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 15.5px;
+}
+
+.fc-shared-banner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 32px;
+  padding: clamp(24px, 3vw, 36px);
+  background: rgba(227, 189, 105, 0.08);
+  border: 1px solid rgba(227, 189, 105, 0.3);
+  border-radius: var(--radius-lg);
+}
+
+.fc-shared-symbol {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--navy);
+  background: var(--gold-light);
+  border-radius: 50%;
+}
+
+.fc-shared-banner h3 {
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(22px, 0.8vw + 16px, 28px);
+  font-weight: 400;
+}
+
+.fc-shared-banner p {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+
+/* ============================================================
+   YOUR DEVELOPMENT
+============================================================ */
+
+.fc-transformation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.fc-transformation-list {
+  display: grid;
+  gap: 14px;
+}
+
+.fc-transformation-item {
+  display: flex;
+  gap: 20px;
+  padding: clamp(20px, 2vw, 28px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.35s var(--ease),
+    border-color 0.35s ease;
+}
+
+.fc-transformation-item:hover {
+  transform: translateX(6px);
+  border-color: rgba(201, 146, 32, 0.45);
+}
+
+.fc-transformation-item > span {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.fc-transformation-item:nth-child(4n + 1) { --accent: var(--gold); }
+.fc-transformation-item:nth-child(4n + 2) { --accent: var(--navy); }
+.fc-transformation-item:nth-child(4n + 3) { --accent: var(--blue); }
+.fc-transformation-item:nth-child(4n + 4) { --accent: var(--navy); }
+
+.fc-transformation-item h3 {
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 0.6vw + 15px, 24px);
+  font-weight: 400;
+}
+
+.fc-transformation-item p {
+  margin-top: 4px;
+  font-size: 15.5px;
+}
+
+
+/* ============================================================
+   JOURNEY
+============================================================ */
+
+.fc-journey-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  counter-reset: none;
+}
+
+.fc-journey-step {
+  min-width: 0;
+  padding: clamp(22px, 2vw, 30px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.35s var(--ease),
+    box-shadow 0.35s var(--ease);
+}
+
+.fc-journey-step:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hover);
+}
+
+.fc-journey-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-journey-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold-dark);
+  background: color-mix(in srgb, var(--gold) 12%, #fff);
+  border-radius: 14px;
+}
+
+.fc-journey-number {
+  color: #c6cdd4;
+  font-family: var(--font-heading);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.fc-journey-step h3 {
+  margin-top: 20px;
+  color: var(--ink);
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 0.6vw + 15px, 24px);
+  font-weight: 400;
+}
+
+.fc-journey-step p {
+  margin-top: 8px;
+  font-size: 15.5px;
+}
+
+.fc-journey-note {
+  max-width: 720px;
+  margin: 28px auto 0;
+  color: #5f7184;
+  font-size: 14px;
+  font-style: italic;
+  text-align: center;
+}
+
+
+/* ============================================================
+   GRADUATION AND ALUMNI (photo background)
+============================================================ */
+
+.fc-alumni {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--section-y);
+  color: #fff;
+  background: var(--navy);
+}
+
+.fc-alumni-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.fc-alumni-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.fc-alumni-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 27, 52, 0.78);
+}
+
+.fc-alumni-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+}
+
+.fc-alumni-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  color: var(--navy);
+  background: var(--gold-light);
+  border-radius: 18px;
+}
+
+.fc-alumni .fc-kicker {
+  color: var(--gold-light);
+}
+
+.fc-alumni-copy h2 {
+  margin-top: 16px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 2.4vw + 12px, 50px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.fc-alumni-copy h2 em {
+  color: var(--gold-light);
+}
+
+.fc-alumni-copy p {
+  max-width: 640px;
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.fc-alumni-points {
+  display: grid;
+  gap: 12px;
+}
+
+.fc-alumni-points li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius);
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.fc-alumni-points svg {
+  flex: 0 0 auto;
+  color: var(--gold-light);
+}
+
+
+/* ============================================================
+   EXPRESS YOUR INTEREST
+============================================================ */
+
+.fc-interest-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: clamp(40px, 6vw, 96px);
+}
+
+.fc-interest-apply {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  margin-top: 32px;
+  padding: 22px 24px;
+  background: var(--soft);
+  border-radius: var(--radius);
+}
+
+.fc-interest-apply > span {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.fc-interest-formwrap {
+  padding: clamp(24px, 3vw, 44px);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.fc-interest-formwrap form {
+  display: flex;
+  flex-direction: column;
+}
+
+.fc-interest-formwrap label {
+  margin: 20px 0 8px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fc-interest-formwrap label:first-child {
+  margin-top: 0;
+}
+
+.fc-interest-formwrap select,
+.fc-interest-formwrap textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #cfd6dd;
+  border-radius: 12px;
+  font: 500 15.5px/1.5 var(--font-body);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.fc-interest-formwrap textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.fc-interest-formwrap select:focus,
+.fc-interest-formwrap textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 146, 32, 0.18);
+}
+
+.fc-interest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.fc-interest-note {
+  margin-top: 18px;
+  color: #5f7184;
+  font-size: 13.5px;
+}
+
+
+/* ============================================================
+   FINAL CALL TO ACTION (photo background)
+============================================================ */
+
+.fc-final-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--section-y);
+  color: #fff;
+  text-align: center;
+  background: var(--navy);
+}
+
+.fc-final-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.fc-final-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fc-final-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 27, 52, 0.8);
+}
+
+.fc-final-cta-inner {
+  max-width: 820px;
+}
+
+.fc-final-cta .fc-kicker {
+  color: var(--gold-light);
+}
+
+.fc-final-cta h2 {
+  margin-top: 16px;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(32px, 3vw + 12px, 60px);
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.fc-final-cta h2 em {
+  color: var(--gold-light);
+}
+
+.fc-final-cta p {
+  max-width: 600px;
+  margin: 20px auto 0;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.fc-final-cta .fc-actions {
+  justify-content: center;
+}
+
+.fc-final-cta small {
+  display: block;
+  max-width: 560px;
+  margin: 24px auto 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   SCROLL REVEAL
+   Only active once the page script runs (.fc-page--reveal),
+   so content is never hidden if scripts fail.
+============================================================ */
+
+.fc-page--reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s var(--ease);
+}
+
+.fc-page--reveal [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ============================================================
+   FOCUS
+============================================================ */
+
+.fc-page a:focus-visible,
+.fc-page button:focus-visible {
+  outline: 3px solid var(--gold-light);
   outline-offset: 3px;
 }
 
+
+/* ============================================================
+   LARGE TABLET / SMALL LAPTOP (≤ 1200px)
+============================================================ */
+
+@media (max-width: 1200px) {
+  .fc-experience-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* ============================================================
+   TABLET (≤ 1100px) — matches navbar breakpoint
+============================================================ */
+
+@media (max-width: 1100px) {
+  .fc-container {
+    width: calc(100% - 36px);
+  }
+
+  .fc-split,
+  .fc-transformation-grid,
+  .fc-alumni-grid,
+  .fc-interest-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Copy first, photo second */
+  .fc-split > .fc-media,
+  .fc-split-reverse > .fc-media {
+    order: 2;
+  }
+
+  .fc-copy {
+    max-width: 760px;
+  }
+
+  .fc-pathway-grid {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  .fc-journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fc-hero-footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Phones and tablets: the lobby photo becomes a banner across the
+     top, fading into navy, with the headline below it */
+  .fc-hero {
+    --fc-banner: min(62vw, 440px);
+  }
+
+  .fc-hero-background {
+    bottom: auto;
+    height: var(--fc-banner);
+  }
+
+  .fc-hero-background img {
+    object-position: 33% 38%;
+  }
+
+  .fc-hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 27, 52, 0) 0,
+      rgba(3, 27, 52, 0) calc(var(--fc-banner) - 140px),
+      rgba(3, 27, 52, 1) var(--fc-banner),
+      rgba(3, 27, 52, 1) 100%
+    );
+  }
+
+  .fc-hero-inner {
+    padding-top: calc(var(--fc-banner) - 24px);
+  }
+}
+
+
+/* ============================================================
+   PHONE (≤ 600px)
+============================================================ */
+
 @media (max-width: 600px) {
-  .fc-pathway-nav {
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 26px;
+  .fc-page {
+    font-size: 16px;
   }
 
-  .fc-page .fc-pathway-nav-link {
-    min-height: 38px;
-    padding: 8px 13px;
-    font-size: 0.78rem;
+  .fc-hero {
+    min-height: 0;
+  }
+
+  .fc-hero-inner {
+    padding-bottom: 24px;
+  }
+
+  .fc-hero-highlights,
+  .fc-experience-grid,
+  .fc-journey-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fc-media {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+  }
+
+  .fc-shared-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 
-@media (max-width: 380px) {
-  .fc-pathway-nav {
-    gap: 5px;
+
+/* ============================================================
+   SMALL PHONE (≤ 480px) — full-width buttons
+============================================================ */
+
+@media (max-width: 480px) {
+  .fc-container {
+    width: calc(100% - 32px);
   }
 
-  .fc-page .fc-pathway-nav-link {
-    min-height: 36px;
-    padding: 7px 10px;
-    font-size: 0.74rem;
+  .fc-actions,
+  .fc-interest-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fc-btn {
+    width: 100%;
+    padding: 12px 20px;
+    white-space: normal;
+  }
+
+  .fc-pathway-bottom {
+    padding: 20px;
+  }
+
+  .fc-interest-apply {
+    padding: 20px;
   }
 }
+
+
+/* ============================================================
+   SHORT LAPTOP SCREENS — keep the hero within view
+============================================================ */
+
+@media (min-width: 1101px) and (max-height: 900px) {
+  .fc-hero {
+    min-height: calc(100svh - 136px);
+  }
+
+  .fc-hero-inner {
+    gap: 28px;
+    padding-block: clamp(28px, 4.5vh, 48px) 20px;
+  }
+
+  .fc-pill {
+    margin-bottom: 18px;
+  }
+
+  .fc-hero h1 {
+    font-size: clamp(38px, 6.2vh, 58px);
+  }
+
+  .fc-hero-description {
+    margin-top: 18px;
+    font-size: 16px;
+  }
+
+  .fc-hero .fc-actions {
+    margin-top: 26px;
+  }
+}
+
+@media (max-height: 700px) and (min-width: 601px) {
+  .fc-hero {
+    min-height: 0;
+  }
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .fc-page .fc-pathway-nav-link {
-    transition: none;
+  .fc-page *,
+  .fc-page *::before,
+  .fc-page *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

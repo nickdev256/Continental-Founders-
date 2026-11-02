@@ -1,12 +1,11 @@
-
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Menu,
   X,
   ChevronDown,
   Search,
+  ArrowRight,
   ArrowUpRight,
-  FileText,
 } from "lucide-react";
 import {
   Link,
@@ -18,29 +17,67 @@ import "./Navbar.css";
 
 const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
 
-const searchItems = [
-  { title: "About", description: "Learn about Continental Founders.", path: "/about" },
-  { title: "Fellowship Community", description: "Explore the fellowship community.", path: "/fellowship-community" },
-  { title: "Apply to CF Fellows", description: "Apply to join CF Fellows.", path: "/cfcv/apply" },
-  { title: "Partners", description: "Explore our strategic partnerships.", path: "/strategic-partners" },
-  { title: "U.S.–Africa Trade & Business Network", description: "Explore our trade network.", path: "/partners/us-africa-trade-network" },
-  { title: "Universities", description: "Explore university partnerships.", path: "/universities" },
-  { title: "Corporate Partners", description: "Explore corporate partnerships.", path: "/partners/corporate" },
-  { title: "Government & Development Institutions", description: "Explore institutional partnerships.", path: "/partners/government-development" },
-  { title: "Events", description: "Discover events and gatherings.", path: "/events" },
-  { title: "Insights", description: "Read our latest insights.", path: "/insights" },
-  { title: "Gallery", description: "Explore our gallery.", path: "/gallery" },
-  { title: "Contact", description: "Get in touch with our team.", path: "/contact" },
-];
+const COMPACT_QUERY = "(max-width: 1100px)";
+
+// Brand accent palette. Each section of the menu has its own colour.
+const ACCENTS = {
+  gold: "#c99220",
+  navy: "#031b34",
+  blue: "#2563c9",
+  coral: "#e4572e",
+  violet: "#6d4ae0",
+};
+
+const accent = (name) => ACCENTS[name] || ACCENTS.gold;
+
+// Colours shown in the thin ribbon across the top of the site.
+const RIBBON = [ACCENTS.gold, ACCENTS.navy, ACCENTS.blue];
+
+// Delay before a desktop menu closes, so the pointer can
+// travel from the link down into the open panel.
+const CLOSE_DELAY = 160;
+
+// Every page in the navigation, for the search box.
+const searchItems = navigation.flatMap((item) => [
+  {
+    title: item.label,
+    description: item.description || item.intro || "",
+    path: item.path,
+  },
+  ...(item.children || [])
+    .filter((child) => child.path !== item.path)
+    .map((child) => ({
+      title: child.label,
+      description: child.description,
+      path: child.path,
+    })),
+]);
+
+const isTouch = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(hover: none)").matches;
+
+const isMac =
+  typeof navigator !== "undefined" &&
+  /Mac|iPhone|iPad/.test(navigator.platform);
 
 export default function Navbar() {
   const location = useLocation();
+  const headerRef = useRef(null);
   const navRef = useRef(null);
   const searchRef = useRef(null);
+  const progressRef = useRef(null);
+  const closeTimerRef = useRef(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+  const [compact, setCompact] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia(COMPACT_QUERY).matches
+  );
 
   const results = searchQuery.trim()
     ? searchItems.filter((item) =>
@@ -50,42 +87,156 @@ export default function Navbar() {
       )
     : [];
 
-  const closeMenus = () => {
+  const cancelClose = () => {
+    window.clearTimeout(closeTimerRef.current);
+  };
+
+  const closeMenus = useCallback(() => {
+    window.clearTimeout(closeTimerRef.current);
     setMobileOpen(false);
     setActiveDropdown(null);
+  }, []);
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
   };
 
   useEffect(() => {
     closeMenus();
-    setSearchOpen(false);
-    setSearchQuery("");
-  }, [location.pathname]);
+    closeSearch();
+  }, [location.pathname, closeMenus]);
 
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus();
   }, [searchOpen]);
 
+  // Track the mobile breakpoint.
+  useEffect(() => {
+    const query = window.matchMedia(COMPACT_QUERY);
+    const update = () => {
+      setCompact(query.matches);
+      closeMenus();
+    };
+
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, [closeMenus]);
+
+  // Shrink the header once the page scrolls, fill the reading
+  // progress line, and tell the mobile menu where the header ends.
+  useEffect(() => {
+    let frame = 0;
+
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const max =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      // Different on/off points stop the header flickering
+      // when it changes height near the threshold.
+      setScrolled((wasScrolled) => (wasScrolled ? y > 8 : y > 80));
+
+      if (progressRef.current) {
+        const progress = max > 0 ? Math.min(y / max, 1) : 0;
+        progressRef.current.style.transform = `scaleX(${progress})`;
+      }
+
+      if (headerRef.current) {
+        const bottom = Math.max(
+          0,
+          Math.round(headerRef.current.getBoundingClientRect().bottom)
+        );
+        headerRef.current.style.setProperty("--nav-offset", `${bottom}px`);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [location.pathname, scrolled, mobileOpen]);
+
+  // Lock page scroll and listen for Escape while a menu is open.
   useEffect(() => {
     if (!mobileOpen && !searchOpen) return;
 
-    const oldOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // Lock <html>, not <body>: overflow on <body> would stop
+    // the sticky header from sticking.
+    const root = document.documentElement;
+    const oldOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {
-        setMobileOpen(false);
-        setActiveDropdown(null);
-        setSearchOpen(false);
+        closeMenus();
+        closeSearch();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = oldOverflow;
+      root.style.overflow = oldOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [mobileOpen, searchOpen]);
+  }, [mobileOpen, searchOpen, closeMenus]);
+
+  // Close an open desktop menu on Escape or an outside click.
+  useEffect(() => {
+    if (!activeDropdown || compact) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setActiveDropdown(null);
+    };
+
+    const handlePointerDown = (event) => {
+      if (!navRef.current?.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handlePointerDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handlePointerDown);
+    };
+  }, [activeDropdown, compact]);
+
+  // Ctrl/⌘ + K or "/" opens search.
+  useEffect(() => {
+    const handleShortcut = (event) => {
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(
+        event.target.tagName
+      ) || event.target.isContentEditable;
+
+      if (
+        (event.key.toLowerCase() === "k" && (event.metaKey || event.ctrlKey)) ||
+        (event.key === "/" && !typing)
+      ) {
+        event.preventDefault();
+        closeMenus();
+        setSearchOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
+  }, [closeMenus]);
+
+  useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
 
   const isItemActive = (item) => {
     if (item.path && location.pathname === item.path) return true;
@@ -95,24 +246,48 @@ export default function Navbar() {
     ) || false;
   };
 
+  const openDropdown = (label) => {
+    if (compact || isTouch()) return;
+    cancelClose();
+    setActiveDropdown(label);
+  };
+
+  const scheduleClose = () => {
+    if (compact || isTouch()) return;
+    cancelClose();
+    closeTimerRef.current = window.setTimeout(
+      () => setActiveDropdown(null),
+      CLOSE_DELAY
+    );
+  };
+
+  const desktopMenuOpen = Boolean(activeDropdown) && !compact;
+
+  const headerClassName = [
+    "navbar",
+    scrolled ? "is-scrolled" : "",
+    mobileOpen ? "is-menu-open" : "",
+    desktopMenuOpen ? "is-mega-open" : "",
+  ].filter(Boolean).join(" ");
+
   return (
     <>
-      <header className="navbar">
-        {/* TOP UTILITY BAR */}
+      <header ref={headerRef} className={headerClassName}>
+        {/* BRAND COLOUR RIBBON */}
+        <div className="navbar__ribbon" aria-hidden="true">
+          {RIBBON.map((color) => (
+            <span key={color} style={{ background: color }} />
+          ))}
+        </div>
+
+        {/* UTILITY BAR */}
         <div className="navbar__top">
           <div className="navbar__top-inner">
-            <div className="navbar__regions">
-              <span>Africa</span>
-              <span className="navbar__separator">|</span>
-              <span>United States</span>
-              <span className="navbar__separator">|</span>
-              <span>Global Partnerships</span>
-            </div>
-
             <div className="navbar__utility-links">
+              <span className="navbar__regions">Africa · United States</span>
+              <Link to="/events">Events</Link>
+              <Link to="/gallery">Gallery</Link>
               <Link to="/contact">Contact</Link>
-              <Link to="/strategic-partners">Partners</Link>
-              <Link to="/universities">Universities</Link>
             </div>
           </div>
         </div>
@@ -138,7 +313,7 @@ export default function Navbar() {
               className={`navbar__nav ${mobileOpen ? "is-open" : ""}`}
               id="primary-navigation"
               aria-label="Main navigation"
-              inert={!mobileOpen && typeof window !== "undefined" && window.innerWidth <= 1100}
+              inert={compact && !mobileOpen}
             >
               <div className="navbar__links">
                 {navigation.map((item, index) => {
@@ -147,8 +322,9 @@ export default function Navbar() {
                       <NavLink
                         key={item.path}
                         to={item.path}
+                        style={{ "--i": index, "--accent": accent(item.accent) }}
                         className={({ isActive }) =>
-                          `navbar__link ${isActive ? "is-active" : ""}`
+                          `navbar__link navbar__item ${isActive ? "is-active" : ""}`
                         }
                         onClick={closeMenus}
                       >
@@ -159,56 +335,43 @@ export default function Navbar() {
 
                   const expanded = activeDropdown === item.label;
                   const active = isItemActive(item);
-                  const submenuId = `navbar-dropdown-${index}`;
+                  const submenuId = `navbar-menu-${index}`;
 
                   return (
                     <div
                       key={item.label}
-                      className={`navbar__dropdown ${
+                      style={{ "--i": index, "--accent": accent(item.accent) }}
+                      className={`navbar__dropdown navbar__item ${
                         expanded ? "is-expanded" : ""
                       } ${active ? "is-active" : ""}`}
-                      onMouseEnter={() => {
-                        if (window.innerWidth > 1100) {
-                          setActiveDropdown(item.label);
-                        }
-                      }}
-                      onMouseLeave={() => {
-                        if (window.innerWidth > 1100) {
-                          setActiveDropdown(null);
-                        }
-                      }}
+                      onMouseEnter={() => openDropdown(item.label)}
+                      onMouseLeave={scheduleClose}
                     >
                       <div className="navbar__dropdown-heading">
-                        {item.path ? (
-                          <NavLink
-                            to={item.path}
-                            className={`navbar__link navbar__dropdown-label ${
-                              active ? "is-active" : ""
-                            }`}
-                            onClick={closeMenus}
-                          >
-                            {item.label}
-                          </NavLink>
-                        ) : (
-                          <button
-                            type="button"
-                            className={`navbar__link navbar__dropdown-label ${
-                              active ? "is-active" : ""
-                            }`}
-                            aria-expanded={expanded}
-                            aria-controls={submenuId}
-                            onClick={() =>
-                              setActiveDropdown(expanded ? null : item.label)
+                        <NavLink
+                          to={item.path}
+                          className={`navbar__link navbar__dropdown-label ${
+                            active ? "is-active" : ""
+                          }`}
+                          onClick={(event) => {
+                            // Touch screens can't hover: the first tap
+                            // opens the menu, the next one follows the link.
+                            if (!compact && !expanded && isTouch()) {
+                              event.preventDefault();
+                              cancelClose();
+                              setActiveDropdown(item.label);
+                              return;
                             }
-                          >
-                            {item.label}
-                          </button>
-                        )}
+                            closeMenus();
+                          }}
+                        >
+                          {item.label}
+                        </NavLink>
 
                         <button
                           type="button"
                           className="navbar__chevron"
-                          aria-label={`${expanded ? "Close" : "Open"} ${item.label} dropdown`}
+                          aria-label={`${expanded ? "Close" : "Open"} ${item.label} menu`}
                           aria-expanded={expanded}
                           aria-controls={submenuId}
                           onClick={() =>
@@ -220,30 +383,86 @@ export default function Navbar() {
                       </div>
 
                       <div
-                        className="navbar__dropdown-menu"
+                        className="navbar__mega"
                         id={submenuId}
                         hidden={!expanded}
                       >
-                        {item.children.map((child) => (
-                          <NavLink
-                            key={child.path}
-                            to={child.path}
-                            className={({ isActive }) =>
-                              `navbar__dropdown-link ${
-                                isActive ? "is-active" : ""
-                              }`
-                            }
-                            onClick={closeMenus}
-                          >
-                            <FileText size={19} aria-hidden="true" />
-                            <span>{child.label}</span>
-                            <ArrowUpRight
-                              className="navbar__dropdown-arrow"
-                              size={17}
-                              aria-hidden="true"
-                            />
-                          </NavLink>
-                        ))}
+                        <div className="navbar__mega-inner">
+                          <div className="navbar__mega-intro">
+                            <span className="navbar__mega-eyebrow">
+                              Explore
+                            </span>
+                            <h2>{item.label}</h2>
+                            {item.intro && <p>{item.intro}</p>}
+                            <Link
+                              to={item.path}
+                              className="navbar__mega-overview"
+                              onClick={closeMenus}
+                            >
+                              View overview
+                              <ArrowRight size={16} aria-hidden="true" />
+                            </Link>
+                          </div>
+
+                          <div className="navbar__mega-links">
+                            {item.children.map((child) => {
+                              const Icon = child.icon;
+
+                              return (
+                                <NavLink
+                                  key={child.path}
+                                  style={{ "--tile": accent(child.color) }}
+                                  to={child.path}
+                                  end
+                                  className={({ isActive }) =>
+                                    `navbar__mega-link ${
+                                      isActive ? "is-active" : ""
+                                    }`
+                                  }
+                                  onClick={closeMenus}
+                                >
+                                  {Icon && (
+                                    <span className="navbar__mega-icon">
+                                      <Icon size={19} aria-hidden="true" />
+                                    </span>
+                                  )}
+                                  <span className="navbar__mega-text">
+                                    <strong>{child.label}</strong>
+                                    {child.description && (
+                                      <small>{child.description}</small>
+                                    )}
+                                  </span>
+                                </NavLink>
+                              );
+                            })}
+                          </div>
+
+                          {item.feature && (
+                            <Link
+                              to={item.feature.path}
+                              className="navbar__mega-feature"
+                              onClick={closeMenus}
+                            >
+                              <img
+                                src={item.feature.image}
+                                alt=""
+                                loading="lazy"
+                              />
+                              <span className="navbar__mega-feature-body">
+                                <span className="navbar__mega-feature-eyebrow">
+                                  {item.feature.eyebrow}
+                                </span>
+                                <span className="navbar__mega-feature-title">
+                                  {item.feature.title}
+                                </span>
+                                <span className="navbar__mega-feature-cta">
+                                  {item.feature.cta}
+                                  <ArrowUpRight size={16} aria-hidden="true" />
+                                </span>
+                              </span>
+                            </Link>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -256,13 +475,15 @@ export default function Navbar() {
                   type="button"
                   className="navbar__search"
                   aria-label="Search website"
+                  aria-keyshortcuts={isMac ? "Meta+K" : "Control+K"}
                   onClick={() => {
                     closeMenus();
                     setSearchOpen(true);
                   }}
                 >
-                  <Search size={19} />
+                  <Search size={17} aria-hidden="true" />
                   <span className="navbar__search-label">Search</span>
+                  <kbd className="navbar__kbd">{isMac ? "⌘K" : "Ctrl K"}</kbd>
                 </button>
 
                 <a
@@ -273,9 +494,8 @@ export default function Navbar() {
                   onClick={closeMenus}
                 >
                   Subscribe
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </a>
-
-                {/* No standalone Apply to CFCV button */}
               </div>
             </nav>
 
@@ -290,21 +510,30 @@ export default function Navbar() {
                 setActiveDropdown(null);
               }}
             >
-              {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+          </div>
+
+          {/* READING PROGRESS */}
+          <div className="navbar__progress" aria-hidden="true">
+            <span ref={progressRef} />
           </div>
         </div>
       </header>
+
+      {/* Dims the page behind an open desktop menu */}
+      <div
+        className={`navbar-scrim ${desktopMenuOpen ? "is-visible" : ""}`}
+        aria-hidden="true"
+        onMouseEnter={scheduleClose}
+      />
 
       {/* SEARCH MODAL */}
       {searchOpen && (
         <div
           className="navbar-search-overlay"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setSearchOpen(false);
-              setSearchQuery("");
-            }
+            if (event.target === event.currentTarget) closeSearch();
           }}
         >
           <section
@@ -325,10 +554,7 @@ export default function Navbar() {
               <button
                 type="button"
                 aria-label="Close search"
-                onClick={() => {
-                  setSearchOpen(false);
-                  setSearchQuery("");
-                }}
+                onClick={closeSearch}
               >
                 <X size={22} />
               </button>
@@ -336,19 +562,34 @@ export default function Navbar() {
 
             <div className="navbar-search-results">
               {!searchQuery.trim() ? (
-                <p className="navbar-search-empty">
-                  Search our website, fellowship, partners and events.
-                </p>
+                <div className="navbar-search-suggestions">
+                  <p className="navbar-search-hint">Popular pages</p>
+                  {searchItems
+                    .filter((item) =>
+                      ["/cfcv", "/find-your-lane", "/strategic-partners", "/events"].includes(item.path)
+                    )
+                    .map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="navbar-search-result"
+                        onClick={closeSearch}
+                      >
+                        <span>
+                          <strong>{item.title}</strong>
+                          <small>{item.description}</small>
+                        </span>
+                        <ArrowUpRight size={18} />
+                      </Link>
+                    ))}
+                </div>
               ) : results.length ? (
                 results.map((item) => (
                   <Link
-                    key={item.path}
+                    key={`${item.title}-${item.path}`}
                     to={item.path}
                     className="navbar-search-result"
-                    onClick={() => {
-                      setSearchOpen(false);
-                      setSearchQuery("");
-                    }}
+                    onClick={closeSearch}
                   >
                     <span>
                       <strong>{item.title}</strong>

@@ -1,54 +1,44 @@
 /* ============================================================
    CFCV FELLOWSHIP APPLICATION
-   File: src/pages/CFCVApply.css
+
+   Same design system as the rest of the site: navy and gold,
+   rounded fields and cards, pill buttons. Desktop shows a
+   sticky progress sidebar beside the form; smaller screens
+   stack it above the form.
+   Every rule is scoped to .cfcv-apply-page.
+   Sizes are in px because the site sets html { font-size: 20px }.
 ============================================================ */
 
 .cfcv-apply-page {
   --cfcv-navy: #031b34;
-  --cfcv-navy-deep: #021426;
-  --cfcv-navy-light: #0b2d4d;
-
-  --cfcv-gold: #c69a3a;
-  --cfcv-gold-dark: #9e7424;
-  --cfcv-gold-light: #e3c77b;
-
-  --cfcv-white: #ffffff;
+  --cfcv-navy-2: #072641;
+  --cfcv-ink: #0b1f33;
+  --cfcv-body: #3a4f63;
+  --cfcv-muted: #5f7184;
+  --cfcv-gold: #c99220;
+  --cfcv-gold-dark: #a97a16;
+  --cfcv-gold-light: #e3bd69;
   --cfcv-soft: #f6f4ef;
-  --cfcv-soft-2: #fbfaf7;
-
-  --cfcv-text: #17202a;
-  --cfcv-muted: #66717d;
-
-  --cfcv-border: rgba(3, 27, 52, 0.12);
-  --cfcv-border-strong: rgba(3, 27, 52, 0.2);
-
+  --cfcv-line: #e3e7eb;
+  --cfcv-field: #cfd6dd;
   --cfcv-error: #b42318;
   --cfcv-error-bg: #fff4f2;
-  --cfcv-success: #217a4b;
-
-  --cfcv-shadow:
-    0 18px 55px rgba(3, 27, 52, 0.08);
-
-  --cfcv-shadow-lg:
-    0 28px 80px rgba(3, 27, 52, 0.12);
+  --cfcv-radius: 18px;
+  --cfcv-radius-lg: 24px;
+  --cfcv-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 12px 32px rgba(3, 27, 52, 0.06);
+  --cfcv-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cfcv-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+  --cfcv-font: "Montserrat", Arial, sans-serif;
 
   width: 100%;
-  min-width: 0;
   min-height: 100vh;
   overflow-x: clip;
-
-  background: var(--cfcv-soft-2);
-  color: var(--cfcv-text);
-
-  font-family:
-    "Montserrat",
-    Arial,
-    sans-serif;
+  color: var(--cfcv-body);
+  background: var(--cfcv-soft);
+  font-family: var(--cfcv-font);
+  font-size: 16px;
+  line-height: 1.65;
 }
-
-/* ============================================================
-   RESET
-============================================================ */
 
 .cfcv-apply-page *,
 .cfcv-apply-page *::before,
@@ -56,14 +46,21 @@
   box-sizing: border-box;
 }
 
-.cfcv-apply-page h1,
-.cfcv-apply-page h2,
-.cfcv-apply-page h3,
-.cfcv-apply-page p {
-  margin-top: 0;
+/* :where() keeps resets at zero priority so component rules win */
+:where(.cfcv-apply-page) h1,
+:where(.cfcv-apply-page) h2,
+:where(.cfcv-apply-page) h3,
+:where(.cfcv-apply-page) p {
+  margin: 0;
 }
 
-.cfcv-apply-page a {
+:where(.cfcv-apply-page) ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.cfcv-apply-page) a {
   color: inherit;
   text-decoration: none;
 }
@@ -75,34 +72,21 @@
   font: inherit;
 }
 
-.cfcv-apply-page button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.cfcv-apply-page input,
-.cfcv-apply-page textarea,
-.cfcv-apply-page select {
-  max-width: 100%;
-}
-
 .cfcv-apply-page svg {
   flex-shrink: 0;
 }
 
-.cfcv-apply-page
-:where(a, button, input, select, textarea):focus-visible {
-  outline: 3px solid var(--cfcv-gold-dark);
-  outline-offset: 4px;
+.cfcv-apply-page :where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--cfcv-gold);
+  outline-offset: 3px;
 }
 
-/* ============================================================
-   CONTAINER
-============================================================ */
-
+/* Same edges as the navbar */
 .cfcv-apply-container {
-  width: min(1180px, calc(100% - 48px));
+  width: min(1440px, calc(100% - 64px));
   margin-inline: auto;
 }
+
 
 /* ============================================================
    HERO
@@ -112,557 +96,431 @@
   position: relative;
   isolation: isolate;
   overflow: hidden;
-
-  padding: clamp(90px, 10vw, 135px) 0
-    clamp(55px, 7vw, 80px);
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(2, 20, 38, 0.96) 0%,
-      rgba(3, 27, 52, 0.86) 45%,
-      rgba(3, 27, 52, 0.42) 100%
-    ),
-    url("/assets/ll.webp") center 45% / cover no-repeat;
-
-  color: var(--cfcv-white);
+  padding-block: clamp(48px, 7vw, 96px) clamp(40px, 5vw, 64px);
+  color: #fff;
+  background: var(--cfcv-navy);
 }
 
-.cfcv-apply-hero::before,
-.cfcv-apply-hero::after {
-  display: none;
-  content: none;
-}
-
-.cfcv-apply-hero h1 em {
-  color: var(--cfcv-gold);
-}
-
-.cfcv-apply-eyebrow {
-  color: var(--cfcv-gold-light);
-}
-
-.cfcv-apply-hero__summary {
-  background: rgba(2, 20, 38, 0.78);
-  border-left: 3px solid var(--cfcv-gold);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-@media (max-width: 600px) {
-  .cfcv-apply-hero {
-    background-position: 60% center;
-  }
-}
-
-.cfcv-apply-hero::before {
-  content: "";
-
+.cfcv-apply-hero__background {
   position: absolute;
-  z-index: -1;
-
-  width: clamp(360px, 50vw, 700px);
-  aspect-ratio: 1;
-
-  right: -16%;
-  top: -70%;
-
-  border-radius: 50%;
-  border: 1px solid rgba(198, 154, 58, 0.16);
-}
-
-.cfcv-apply-hero::after {
-  content: "";
-
-  position: absolute;
-  z-index: -1;
   inset: 0;
-
-  opacity: 0.12;
-
-  background-image:
-    linear-gradient(
-      rgba(255, 255, 255, 0.06) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.06) 1px,
-      transparent 1px
-    );
-
-  background-size:
-    clamp(45px, 5vw, 72px)
-    clamp(45px, 5vw, 72px);
-
-  mask-image:
-    linear-gradient(
-      to right,
-      transparent,
-      black 40%,
-      black
-    );
+  z-index: -2;
 }
 
-/* Smooth hero background zoom-out */
-.cfcv-apply-hero {
-  background-size: 110% auto;
-  animation: cfcvHeroZoomOut 2s ease-out forwards;
+.cfcv-apply-hero__background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 40%;
+  animation: cfcv-apply-zoom 14s ease-out both;
 }
 
-@keyframes cfcvHeroZoomOut {
+@keyframes cfcv-apply-zoom {
   from {
-    background-size: 110% auto;
+    transform: scale(1.08);
   }
   to {
-    background-size: 100% auto;
+    transform: scale(1);
   }
 }
 
-/* Mobile: keep the image covering the hero */
-@media (max-width: 600px) {
-  .cfcv-apply-hero {
-    background-size: auto, 115% auto;
-    animation: cfcvHeroZoomOutMobile 2s ease-out forwards;
-  }
-
-  @keyframes cfcvHeroZoomOutMobile {
-    from {
-      background-size: auto, 115% auto;
-    }
-    to {
-      background-size: auto, cover;
-    }
-  }
-}
-
-/* Respect reduced-motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  .cfcv-apply-hero {
-    animation: none;
-  }
+.cfcv-apply-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.97) 0%,
+      rgba(0, 18, 45, 0.88) 38%,
+      rgba(0, 18, 45, 0.55) 70%,
+      rgba(0, 18, 45, 0.35) 100%
+    );
 }
 
 .cfcv-apply-back {
-  width: fit-content;
-
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
-  margin-bottom: 40px;
-
-  color: rgba(255, 255, 255, 0.68);
-
-  font-size: 0.78rem;
-  font-weight: 700;
-
+  margin-bottom: clamp(28px, 4vw, 44px);
+  padding: 8px 16px 8px 12px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition:
-    color 180ms ease,
-    transform 180ms ease;
+    background 0.2s ease,
+    transform 0.25s var(--cfcv-ease);
 }
 
 .cfcv-apply-back:hover {
-  color: var(--cfcv-gold-light);
+  background: rgba(255, 255, 255, 0.14);
   transform: translateX(-3px);
-}
-
-.cfcv-apply-back:focus-visible {
-  outline: 3px solid rgba(198, 154, 58, 0.4);
-  outline-offset: 5px;
 }
 
 .cfcv-apply-hero__content {
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1.35fr)
-    minmax(260px, 0.65fr);
-
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
   align-items: end;
-  gap: clamp(40px, 7vw, 100px);
+  gap: 32px clamp(40px, 6vw, 96px);
 }
 
-.cfcv-apply-hero__content > *,
-.cfcv-apply-grid > *,
-.cfcv-apply-step > header > div {
+.cfcv-apply-hero__content > * {
   min-width: 0;
 }
 
 .cfcv-apply-eyebrow {
   display: block;
-
-  margin-bottom: 15px;
+  margin-bottom: 16px;
   color: var(--cfcv-gold-light);
-
-  font-size: clamp(0.65rem, 1vw, 0.76rem);
-  font-weight: 800;
-
-  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .cfcv-apply-hero h1 {
-  margin-bottom: 0;
-  color: var(--cfcv-white);
-
-  font-family:
-    "Trajan Pro",
-    "Times New Roman",
-    Georgia,
-    serif;
-
-  font-size: clamp(2.8rem, 6vw, 5.7rem);
-  font-weight: 500;
-
-  line-height: 0.99;
-  letter-spacing: -0.05em;
-
-  overflow-wrap: anywhere;
+  color: #fff;
+  font-family: var(--cfcv-heading);
+  font-size: clamp(36px, 3.4vw + 14px, 72px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
 }
 
 .cfcv-apply-hero h1 em {
-  color: var(--cfcv-gold);
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-weight: 400;
+  color: var(--cfcv-gold-light);
+  font-style: italic;
 }
 
 .cfcv-apply-hero__summary {
-  display: grid;
-  grid-template-columns: auto 1fr;
-
-  align-items: start;
-  gap: 15px;
-
-  padding: clamp(20px, 3vw, 28px);
-
-  border-left: 3px solid var(--cfcv-gold);
-  background: rgba(255, 255, 255, 0.055);
-
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: clamp(20px, 2.5vw, 28px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--cfcv-radius);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .cfcv-apply-hero__summary svg {
-  color: var(--cfcv-gold);
+  color: var(--cfcv-gold-light);
 }
 
 .cfcv-apply-hero__summary p {
-  margin: 0;
-
-  color: rgba(255, 255, 255, 0.74);
-  font-size: clamp(0.82rem, 1.2vw, 0.9rem);
-
-  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15.5px;
+  line-height: 1.7;
 }
 
+
 /* ============================================================
-   MAIN
+   LAYOUT: sticky sidebar + form
 ============================================================ */
 
 .cfcv-apply-main {
-  position: relative;
-
-  padding:
-    clamp(50px, 7vw, 90px)
-    0
-    clamp(75px, 9vw, 120px);
-
-  background: var(--cfcv-soft-2);
+  padding-block: clamp(36px, 5vw, 72px) clamp(64px, 8vw, 112px);
+  scroll-margin-top: 90px;
 }
+
+.cfcv-apply-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 3vw, 40px);
+}
+
+.cfcv-apply-aside {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
 
 /* ============================================================
    PROGRESS
 ============================================================ */
 
 .cfcv-apply-progress {
-  position: relative;
-
-  margin-bottom: clamp(30px, 5vw, 52px);
-  padding: clamp(22px, 3vw, 32px);
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-white);
-
-  box-shadow:
-    0 12px 40px rgba(3, 27, 52, 0.055);
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: var(--cfcv-radius-lg);
+  box-shadow: var(--cfcv-shadow);
 }
 
 .cfcv-apply-progress__top {
   display: flex;
-
   align-items: flex-end;
   justify-content: space-between;
-
-  gap: 25px;
-  margin-bottom: 22px;
+  gap: 16px;
 }
 
 .cfcv-apply-progress__top > div {
   min-width: 0;
-
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .cfcv-apply-progress__top > div > span {
   color: var(--cfcv-gold-dark);
-
-  font-size: 0.64rem;
-  font-weight: 900;
-
-  letter-spacing: 0.13em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 
 .cfcv-apply-progress__top strong {
-  color: var(--cfcv-navy);
-
-  font-family: Georgia, serif;
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  font-weight: 500;
+  color: var(--cfcv-ink);
+  font-family: var(--cfcv-heading);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
 }
 
 .cfcv-apply-progress__top > span {
   flex: 0 0 auto;
-
   color: var(--cfcv-muted);
-
-  font-size: 0.78rem;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .cfcv-apply-progress__bar {
   position: relative;
-
-  width: 100%;
-  height: 4px;
-
+  height: 6px;
   overflow: hidden;
-  margin-bottom: 26px;
-
-  background: rgba(3, 27, 52, 0.09);
+  margin: 18px 0 20px;
+  background: #eef1f4;
+  border-radius: 999px;
 }
 
 .cfcv-apply-progress__bar > span {
   position: absolute;
-
-  top: 0;
-  left: 0;
-  bottom: 0;
-
-  min-width: 0;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--cfcv-gold-dark),
-      var(--cfcv-gold)
-    );
-
-  transition: width 300ms ease;
+  inset: 0 auto 0 0;
+  background: var(--cfcv-gold);
+  border-radius: 999px;
+  transition: width 0.4s var(--cfcv-ease);
 }
 
-/* ============================================================
-   STEP NAVIGATION
-============================================================ */
-
+/* Vertical step list (desktop) */
 .cfcv-apply-progress__steps {
   display: grid;
-
-  grid-template-columns:
-    repeat(7, minmax(0, 1fr));
-
-  gap: 8px;
+  gap: 4px;
 }
 
 .cfcv-apply-progress__steps button {
   min-width: 0;
-
   display: flex;
-  flex-direction: column;
   align-items: center;
-
-  gap: 8px;
-  padding: 4px;
-
-  border: 0;
-  background: transparent;
-
+  gap: 12px;
+  padding: 8px 10px;
   color: var(--cfcv-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  text-align: left;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .cfcv-apply-progress__steps button:disabled {
   cursor: default;
 }
 
+.cfcv-apply-progress__steps button:not(:disabled):hover {
+  background: var(--cfcv-soft);
+}
+
 .cfcv-apply-progress__steps button > span {
-  width: 32px;
-  height: 32px;
-
-  flex: 0 0 32px;
-
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border: 1px solid var(--cfcv-border-strong);
-  border-radius: 50%;
-
-  background: var(--cfcv-white);
   color: var(--cfcv-muted);
-
-  font-size: 0.72rem;
-  font-weight: 800;
-
+  background: #fff;
+  border: 1px solid var(--cfcv-field);
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
   transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease;
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .cfcv-apply-progress__steps button small {
-  width: 100%;
+  min-width: 0;
   overflow: hidden;
-
   color: inherit;
-
-  font-size: clamp(0.55rem, 0.9vw, 0.68rem);
-  font-weight: 700;
-
-  line-height: 1.25;
-  text-align: center;
-
+  font-size: 14.5px;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cfcv-apply-progress__steps button.is-active {
-  color: var(--cfcv-navy);
+  color: var(--cfcv-ink);
+  background: color-mix(in srgb, var(--cfcv-gold) 10%, #fff);
 }
 
 .cfcv-apply-progress__steps button.is-active > span {
-  border-color: var(--cfcv-gold);
+  color: var(--cfcv-navy);
   background: var(--cfcv-gold);
-
-  color: var(--cfcv-navy-deep);
+  border-color: var(--cfcv-gold);
 }
 
 .cfcv-apply-progress__steps button.is-complete {
-  color: var(--cfcv-gold-dark);
+  color: var(--cfcv-ink);
 }
 
 .cfcv-apply-progress__steps button.is-complete > span {
-  border-color: var(--cfcv-gold-dark);
+  color: #fff;
   background: var(--cfcv-navy);
+  border-color: var(--cfcv-navy);
+}
 
+/* At a glance */
+.cfcv-apply-glance {
+  padding: 22px 24px;
+  color: #fff;
+  background: var(--cfcv-navy);
+  border-radius: var(--cfcv-radius-lg);
+}
+
+.cfcv-apply-glance > span {
+  display: block;
+  margin-bottom: 14px;
   color: var(--cfcv-gold-light);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.cfcv-apply-progress__steps button:focus-visible {
-  outline: 3px solid rgba(198, 154, 58, 0.28);
-  outline-offset: 3px;
+.cfcv-apply-glance ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 14px;
 }
+
+.cfcv-apply-glance li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cfcv-apply-glance strong {
+  font-family: var(--cfcv-heading);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.cfcv-apply-glance small {
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
 
 /* ============================================================
-   FORM
+   FORM CARD
 ============================================================ */
 
 .cfcv-apply-form {
-  width: 100%;
+  min-width: 0;
   overflow: hidden;
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-white);
-
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: var(--cfcv-radius-lg);
   box-shadow: var(--cfcv-shadow);
 }
 
 .cfcv-apply-form > fieldset {
-  border: 0;
-
   min-width: 0;
   margin: 0;
   padding: 0;
+  border: 0;
 }
 
 .cfcv-apply-step {
-  padding: clamp(28px, 5vw, 58px);
+  padding: clamp(24px, 4vw, 52px);
+  animation: cfcv-step-in 0.45s var(--cfcv-ease);
+}
+
+@keyframes cfcv-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .cfcv-apply-step > header {
   display: grid;
-
-  grid-template-columns:
-    58px minmax(0, 1fr);
-
+  grid-template-columns: 56px minmax(0, 1fr);
   align-items: start;
-  gap: 22px;
+  gap: 20px;
+  margin-bottom: clamp(28px, 4vw, 44px);
+  padding-bottom: clamp(22px, 3vw, 32px);
+  border-bottom: 1px solid var(--cfcv-line);
+}
 
-  max-width: 830px;
-
-  margin-bottom: clamp(35px, 5vw, 55px);
-  padding-bottom: clamp(25px, 4vw, 36px);
-
-  border-bottom: 1px solid var(--cfcv-border);
+.cfcv-apply-step > header > div {
+  min-width: 0;
 }
 
 .cfcv-apply-step > header > span {
-  width: 52px;
-  height: 52px;
-
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border: 1px solid rgba(198, 154, 58, 0.55);
-  color: var(--cfcv-gold-dark);
-
-  font-family: Georgia, serif;
-  font-size: 0.78rem;
+  color: var(--cfcv-navy);
+  background: color-mix(in srgb, var(--cfcv-gold) 16%, #fff);
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .cfcv-apply-step > header h2 {
-  margin-bottom: 9px;
-  color: var(--cfcv-navy);
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-size: clamp(1.7rem, 3vw, 2.45rem);
-  font-weight: 500;
-
+  color: var(--cfcv-ink);
+  font-family: var(--cfcv-heading);
+  font-size: clamp(26px, 1.4vw + 16px, 38px);
+  font-weight: 400;
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
 
 .cfcv-apply-step > header p {
-  max-width: 650px;
-  margin-bottom: 0;
-
+  max-width: 640px;
+  margin-top: 8px;
   color: var(--cfcv-muted);
-  font-size: 0.9rem;
-
-  line-height: 1.75;
+  font-size: 15.5px;
 }
 
 .cfcv-apply-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px clamp(20px, 3vw, 32px);
+}
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap:
-    28px
-    clamp(24px, 4vw, 42px);
+.cfcv-apply-grid > * {
+  min-width: 0;
 }
 
 .cfcv-apply-grid__full {
@@ -670,8 +528,9 @@
 }
 
 .cfcv-apply-single-field {
-  margin-top: 35px;
+  margin-top: 32px;
 }
+
 
 /* ============================================================
    FIELDS
@@ -683,14 +542,11 @@
 
 .cfcv-apply-field > label {
   display: block;
-  margin-bottom: 9px;
-
-  color: var(--cfcv-navy);
-
-  font-size: 0.79rem;
-  font-weight: 800;
-
-  line-height: 1.5;
+  margin-bottom: 8px;
+  color: var(--cfcv-ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
@@ -700,12 +556,9 @@
 }
 
 .cfcv-apply-field__hint {
-  margin: -3px 0 10px;
-
+  margin: -2px 0 10px;
   color: var(--cfcv-muted);
-  font-size: 0.72rem;
-
-  line-height: 1.55;
+  font-size: 13.5px;
 }
 
 .cfcv-apply-field input,
@@ -713,184 +566,137 @@
 .cfcv-apply-field textarea {
   width: 100%;
   min-width: 0;
-
-  border: 1px solid rgba(3, 27, 52, 0.17);
-  border-radius: 0;
-
+  max-width: 100%;
+  color: var(--cfcv-ink);
+  background: #fff;
+  border: 1px solid var(--cfcv-field);
+  border-radius: 12px;
   outline: none;
-  background: var(--cfcv-white);
-
-  color: var(--cfcv-text);
-  font-size: max(16px, 0.88rem);
-
+  font-size: 16px;
   transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .cfcv-apply-field input,
 .cfcv-apply-field select {
   min-height: 52px;
-  padding: 0 15px;
-}
-
-.cfcv-apply-field textarea {
-  display: block;
-
-  min-height: 135px;
-  padding: 15px;
-
-  line-height: 1.65;
-  resize: vertical;
+  padding: 0 16px;
 }
 
 .cfcv-apply-field select {
   cursor: pointer;
 }
 
+.cfcv-apply-field textarea {
+  display: block;
+  min-height: 140px;
+  padding: 14px 16px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
 .cfcv-apply-field input:hover,
 .cfcv-apply-field select:hover,
 .cfcv-apply-field textarea:hover {
-  border-color: rgba(3, 27, 52, 0.3);
+  border-color: #aeb8c2;
 }
 
 .cfcv-apply-field input:focus,
 .cfcv-apply-field select:focus,
 .cfcv-apply-field textarea:focus {
   border-color: var(--cfcv-gold);
-
-  box-shadow:
-    0 0 0 3px rgba(198, 154, 58, 0.12);
+  box-shadow: 0 0 0 4px rgba(201, 146, 32, 0.16);
 }
 
 .cfcv-apply-field input::placeholder,
 .cfcv-apply-field textarea::placeholder {
-  color: rgba(102, 113, 125, 0.7);
+  color: #8a96a2;
 }
 
-/* Disabled fields remain readable during submission or retry. */
-
+/* Disabled fields stay readable during submission or retry */
 .cfcv-apply-field input:disabled,
 .cfcv-apply-field select:disabled,
 .cfcv-apply-field textarea:disabled {
+  color: var(--cfcv-ink);
   background: var(--cfcv-soft);
-  color: var(--cfcv-text);
-
   opacity: 1;
   cursor: not-allowed;
-
-  -webkit-text-fill-color: var(--cfcv-text);
+  -webkit-text-fill-color: var(--cfcv-ink);
 }
 
+
 /* ============================================================
-   VALIDATION AND SUBMISSION ERRORS
+   ERRORS
 ============================================================ */
 
 .cfcv-apply-error {
   display: block;
   margin-top: 8px;
-
   color: var(--cfcv-error);
-
-  font-size: 0.73rem;
-  font-weight: 650;
-
+  font-size: 13.5px;
+  font-weight: 600;
   line-height: 1.45;
+}
+
+.cfcv-apply-field :is(input, select, textarea)[aria-invalid="true"],
+.cfcv-apply-field:has(> .cfcv-apply-error) > :is(input, select, textarea) {
+  border-color: var(--cfcv-error);
 }
 
 .cfcv-apply-submit-error {
   margin-top: 18px;
-  padding: 14px 16px;
-
-  border-left: 3px solid var(--cfcv-error);
-
-  background: var(--cfcv-error-bg);
+  padding: 14px 18px;
   color: var(--cfcv-error);
-
-  font-size: 0.82rem;
-  line-height: 1.55;
-
+  background: var(--cfcv-error-bg);
+  border: 1px solid rgba(180, 35, 24, 0.25);
+  border-radius: 12px;
+  font-size: 15px;
   overflow-wrap: anywhere;
 }
 
-.cfcv-apply-field
-:is(input, select, textarea)[aria-invalid="true"] {
-  border-color: var(--cfcv-error);
-}
-
-.cfcv-apply-field:has(> .cfcv-apply-error)
-> :is(input, select, textarea) {
-  border-color: var(--cfcv-error);
-}
 
 /* ============================================================
    RÉSUMÉ UPLOAD
 ============================================================ */
 
-.cfcv-apply-step
-> .cfcv-apply-field:has(input[type="file"]) {
+.cfcv-apply-step > .cfcv-apply-field:has(input[type="file"]) {
   margin-top: 28px;
   padding: 22px;
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-soft-2);
+  background: var(--cfcv-soft);
+  border: 1px dashed #c3ccd5;
+  border-radius: var(--cfcv-radius);
 }
 
 .cfcv-apply-field input[type="file"] {
-  display: block;
-
-  height: auto;
   min-height: 58px;
-
-  padding: 10px;
-
-  font-size: 16px;
-  line-height: 1.5;
-
-  background: var(--cfcv-soft-2);
+  height: auto;
+  padding: 9px;
+  background: #fff;
   cursor: pointer;
 }
 
-.cfcv-apply-field
-input[type="file"]::file-selector-button {
+.cfcv-apply-field input[type="file"]::file-selector-button {
   min-height: 40px;
-
   margin-right: 12px;
-  padding: 9px 14px;
-
-  border: 1px solid var(--cfcv-navy);
-  border-radius: 0;
-
+  padding: 0 18px;
+  color: #fff;
   background: var(--cfcv-navy);
-  color: var(--cfcv-white);
-
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 700;
-
+  border: 0;
+  border-radius: 999px;
+  font: 600 14px/1 var(--cfcv-font);
   cursor: pointer;
 }
 
-.cfcv-apply-field
-input[type="file"]:not(:disabled)::file-selector-button:hover {
-  background: var(--cfcv-navy-light);
-}
-
-.cfcv-apply-field input[type="file"]:disabled,
-.cfcv-apply-field
-input[type="file"]:disabled::file-selector-button {
-  cursor: not-allowed;
+.cfcv-apply-field input[type="file"]:not(:disabled)::file-selector-button:hover {
+  background: var(--cfcv-navy-2);
 }
 
 #cfcv-resume-message {
   display: block;
   margin-top: 10px;
-
   color: var(--cfcv-muted);
-  font-size: 0.8rem;
-
-  line-height: 1.6;
+  font-size: 14px;
   overflow-wrap: anywhere;
 }
 
@@ -898,118 +704,91 @@ input[type="file"]:disabled::file-selector-button {
   margin-top: 0;
 }
 
+
 /* ============================================================
    VENTURE STAGE CARDS
 ============================================================ */
 
 .cfcv-stage-options {
   display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
   margin-bottom: 8px;
 }
 
 .cfcv-stage-option {
   position: relative;
-
   min-width: 0;
-  min-height: 220px;
-
   display: flex;
   flex-direction: column;
-
-  padding: clamp(22px, 3vw, 30px);
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-white);
-
+  padding: clamp(20px, 2.2vw, 28px);
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: var(--cfcv-radius);
   cursor: pointer;
-
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
+    transform 0.3s var(--cfcv-ease),
+    border-color 0.2s ease,
+    box-shadow 0.3s ease,
+    background 0.2s ease;
 }
 
 .cfcv-stage-option:hover {
   transform: translateY(-3px);
-
-  border-color: rgba(198, 154, 58, 0.55);
-
-  box-shadow:
-    0 14px 35px rgba(3, 27, 52, 0.07);
+  border-color: rgba(201, 146, 32, 0.5);
+  box-shadow: var(--cfcv-shadow);
 }
 
 .cfcv-stage-option input {
   position: absolute;
-
   width: 1px;
   height: 1px;
-
   opacity: 0;
   pointer-events: none;
 }
 
 .cfcv-stage-option__check {
-  width: 38px;
-  height: 38px;
-
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  margin-bottom: 28px;
-  border-radius: 50%;
-
-  background: rgba(3, 27, 52, 0.06);
-  color: rgba(3, 27, 52, 0.38);
-
+  margin-bottom: 22px;
+  color: #b6c0ca;
+  background: var(--cfcv-soft);
+  border-radius: 12px;
   transition:
-    background-color 180ms ease,
-    color 180ms ease;
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .cfcv-stage-option strong {
-  margin-bottom: 10px;
-
-  color: var(--cfcv-navy);
-
-  font-family: Georgia, serif;
-  font-size: 1.08rem;
-  font-weight: 500;
-
-  line-height: 1.4;
+  color: var(--cfcv-ink);
+  font-family: var(--cfcv-heading);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.3;
 }
 
 .cfcv-stage-option p {
-  margin: 0;
-
+  margin-top: 8px;
   color: var(--cfcv-muted);
-  font-size: 0.82rem;
-
-  line-height: 1.7;
+  font-size: 14.5px;
 }
 
 .cfcv-stage-option.is-selected {
+  background: color-mix(in srgb, var(--cfcv-gold) 6%, #fff);
   border-color: var(--cfcv-gold);
-  background: rgba(198, 154, 58, 0.035);
-
-  box-shadow:
-    0 0 0 1px var(--cfcv-gold);
+  box-shadow: 0 0 0 1px var(--cfcv-gold);
 }
 
-.cfcv-stage-option.is-selected
-.cfcv-stage-option__check {
-  background: var(--cfcv-navy);
-  color: var(--cfcv-gold);
+.cfcv-stage-option.is-selected .cfcv-stage-option__check {
+  color: var(--cfcv-navy);
+  background: var(--cfcv-gold);
 }
 
 .cfcv-stage-option:has(input:focus-visible) {
-  outline: 3px solid rgba(198, 154, 58, 0.28);
+  outline: 3px solid var(--cfcv-gold);
   outline-offset: 3px;
 }
 
@@ -1022,41 +801,33 @@ input[type="file"]:disabled::file-selector-button {
   box-shadow: none;
 }
 
+
 /* ============================================================
-   INFORMATION NOTE
+   NOTE
 ============================================================ */
 
 .cfcv-apply-note {
   display: grid;
-
-  grid-template-columns:
-    minmax(120px, 0.25fr)
-    minmax(0, 0.75fr);
-
-  gap: 25px;
-
-  margin-top: 35px;
-  padding: clamp(20px, 3vw, 27px);
-
-  border-left: 4px solid var(--cfcv-gold);
-  background: var(--cfcv-soft);
+  grid-template-columns: minmax(120px, 0.25fr) minmax(0, 0.75fr);
+  gap: 8px 24px;
+  margin-top: 32px;
+  padding: 20px 24px;
+  background: color-mix(in srgb, var(--cfcv-gold) 8%, #fff);
+  border: 1px solid rgba(201, 146, 32, 0.25);
+  border-radius: var(--cfcv-radius);
 }
 
 .cfcv-apply-note strong {
-  color: var(--cfcv-navy);
-
-  font-size: 0.8rem;
-  font-weight: 850;
+  color: var(--cfcv-ink);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .cfcv-apply-note p {
-  margin: 0;
-
-  color: var(--cfcv-muted);
-  font-size: 0.82rem;
-
-  line-height: 1.7;
+  color: var(--cfcv-body);
+  font-size: 15px;
 }
+
 
 /* ============================================================
    REVIEW
@@ -1064,68 +835,56 @@ input[type="file"]:disabled::file-selector-button {
 
 .cfcv-review {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .cfcv-review > section {
   min-width: 0;
-
-  padding: clamp(20px, 3vw, 30px);
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-soft-2);
+  padding: clamp(20px, 2.5vw, 28px);
+  background: var(--cfcv-soft);
+  border-radius: var(--cfcv-radius);
 }
 
 .cfcv-review__heading {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
-  gap: 20px;
-
-  margin-bottom: 22px;
-  padding-bottom: 18px;
-
-  border-bottom: 1px solid var(--cfcv-border);
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--cfcv-line);
 }
 
 .cfcv-review__heading > div {
   min-width: 0;
-
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .cfcv-review__heading svg {
-  flex: 0 0 auto;
   color: var(--cfcv-gold-dark);
 }
 
 .cfcv-review__heading h3 {
-  margin: 0;
-
-  color: var(--cfcv-navy);
-
-  font-family: Georgia, serif;
-  font-size: 1.1rem;
-  font-weight: 500;
+  color: var(--cfcv-ink);
+  font-family: var(--cfcv-heading);
+  font-size: 20px;
+  font-weight: 400;
 }
 
 .cfcv-review__heading button {
   flex: 0 0 auto;
-  padding: 7px 11px;
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-white);
-
+  min-height: 36px;
+  padding: 0 16px;
   color: var(--cfcv-gold-dark);
-
-  font-size: 0.7rem;
-  font-weight: 800;
-
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition: border-color 0.2s ease;
 }
 
 .cfcv-review__heading button:hover {
@@ -1139,11 +898,8 @@ input[type="file"]:disabled::file-selector-button {
 
 .cfcv-review__grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 22px 35px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
 }
 
 .cfcv-review-item {
@@ -1152,27 +908,21 @@ input[type="file"]:disabled::file-selector-button {
 
 .cfcv-review-item > span {
   display: block;
-  margin-bottom: 6px;
-
+  margin-bottom: 4px;
   color: var(--cfcv-gold-dark);
-
-  font-size: 0.63rem;
-  font-weight: 850;
-
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .cfcv-review-item p {
-  margin: 0;
-
-  color: var(--cfcv-text);
-  font-size: 0.82rem;
-
-  line-height: 1.7;
+  color: var(--cfcv-ink);
+  font-size: 15px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
+
 
 /* ============================================================
    CONFIRMATION
@@ -1180,83 +930,62 @@ input[type="file"]:disabled::file-selector-button {
 
 .cfcv-apply-confirmation {
   display: grid;
-
-  grid-template-columns:
-    auto minmax(0, 1fr);
-
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
-  gap: 13px;
-
-  margin-top: 30px;
-  padding: 20px;
-
-  border: 1px solid var(--cfcv-border);
-  background: var(--cfcv-white);
-
+  gap: 14px;
+  margin-top: 24px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: var(--cfcv-radius);
   cursor: pointer;
 }
 
 .cfcv-apply-confirmation input {
-  width: 18px;
-  height: 18px;
-
+  width: 20px;
+  height: 20px;
   margin-top: 2px;
   accent-color: var(--cfcv-navy);
 }
 
 .cfcv-apply-confirmation span {
-  color: var(--cfcv-text);
-  font-size: 0.82rem;
-
-  line-height: 1.6;
+  color: var(--cfcv-ink);
+  font-size: 15px;
 }
 
 .cfcv-apply-confirmation:has(input:disabled) {
   cursor: not-allowed;
 }
 
+
 /* ============================================================
    RETRY NOTICE
 ============================================================ */
 
 .cfcv-apply-form > p[role="status"] {
-  margin:
-    0
-    clamp(28px, 5vw, 58px)
-    24px;
-
-  padding: 16px 18px;
-
-  border: 1px solid rgba(198, 154, 58, 0.45);
-  border-left: 4px solid var(--cfcv-gold-dark);
-
+  margin: 0 clamp(24px, 4vw, 52px) 24px;
+  padding: 14px 18px;
+  color: var(--cfcv-ink);
   background: #fff8e8;
-  color: var(--cfcv-navy);
-
-  font-size: 0.85rem;
-  line-height: 1.65;
-
+  border: 1px solid rgba(201, 146, 32, 0.45);
+  border-radius: 12px;
+  font-size: 15px;
   overflow-wrap: anywhere;
 }
 
+
 /* ============================================================
-   ACTIONS AND BUTTONS
+   ACTIONS
 ============================================================ */
 
 .cfcv-apply-actions {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
-  gap: 20px;
-
-  padding:
-    24px
-    clamp(28px, 5vw, 58px);
-
-  border-top: 1px solid var(--cfcv-border);
-  background: var(--cfcv-soft-2);
+  gap: 16px;
+  padding: 20px clamp(24px, 4vw, 52px);
+  background: var(--cfcv-soft);
+  border-top: 1px solid var(--cfcv-line);
 }
 
 .cfcv-apply-actions > div {
@@ -1264,627 +993,237 @@ input[type="file"]:disabled::file-selector-button {
 }
 
 .cfcv-apply-button {
-  min-height: 50px;
+  min-height: 52px;
   max-width: 100%;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  gap: 9px;
-  padding: 13px 20px;
-
+  gap: 10px;
+  padding: 0 26px;
   border: 1px solid transparent;
-
-  font-size: 0.78rem;
-  font-weight: 800;
-
-  white-space: normal;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
   text-align: center;
-
   cursor: pointer;
-
   transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    background-color 180ms ease,
-    color 180ms ease,
-    box-shadow 180ms ease;
+    transform 0.25s var(--cfcv-ease),
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .cfcv-apply-button:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
-.cfcv-apply-button:focus-visible {
-  outline: 3px solid rgba(198, 154, 58, 0.3);
-  outline-offset: 3px;
-}
-
 .cfcv-apply-button:disabled {
-  opacity: 0.58;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
 .cfcv-apply-button--primary {
-  background: var(--cfcv-navy);
-  color: var(--cfcv-white);
-
-  box-shadow:
-    0 10px 25px rgba(3, 27, 52, 0.16);
+  color: var(--cfcv-navy);
+  background: var(--cfcv-gold);
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
 }
 
 .cfcv-apply-button--primary:hover:not(:disabled) {
-  background: var(--cfcv-navy-light);
+  background: var(--cfcv-gold-light);
 }
 
 .cfcv-apply-button--secondary {
-  border-color: var(--cfcv-border-strong);
-
-  background: var(--cfcv-white);
-  color: var(--cfcv-navy);
+  color: var(--cfcv-ink);
+  background: #fff;
+  border-color: var(--cfcv-field);
 }
 
 .cfcv-apply-button--secondary:hover:not(:disabled) {
-  border-color: var(--cfcv-gold);
+  border-color: var(--cfcv-ink);
 }
 
 .cfcv-apply-spinner {
-  animation:
-    cfcvApplySpin 0.8s linear infinite;
+  animation: cfcv-spin 0.8s linear infinite;
 }
 
-@keyframes cfcvApplySpin {
+@keyframes cfcv-spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* ============================================================
-   LARGE SCREENS
-============================================================ */
-
-@media (min-width: 1440px) {
-  .cfcv-apply-container {
-    width:
-      min(1240px, calc(100% - 96px));
-  }
-
-  .cfcv-apply-form {
-    max-width: 1180px;
-    margin-inline: auto;
-  }
-
-  .cfcv-apply-progress {
-    max-width: 1180px;
-
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 52px;
-  }
-}
-
-@media (min-width: 1920px) {
-  .cfcv-apply-container {
-    width:
-      min(1320px, calc(100% - 140px));
-  }
-
-  .cfcv-apply-form,
-  .cfcv-apply-progress {
-    max-width: 1240px;
-  }
-}
 
 /* ============================================================
-   LAPTOPS
+   TABLET (≤ 1100px) — matches navbar breakpoint
+   The sidebar moves above the form.
 ============================================================ */
 
 @media (max-width: 1100px) {
-  .cfcv-apply-hero__content {
-    grid-template-columns:
-      minmax(0, 1.2fr)
-      minmax(240px, 0.8fr);
-
-    gap: 45px;
-  }
-
-  .cfcv-stage-options {
-    gap: 12px;
-  }
-
-  .cfcv-stage-option {
-    padding: 23px;
-  }
-}
-
-/* ============================================================
-   TABLETS
-============================================================ */
-
-@media (max-width: 900px) {
   .cfcv-apply-container {
-    width:
-      min(calc(100% - 36px), 1180px);
+    width: calc(100% - 36px);
   }
 
-  .cfcv-apply-hero__content {
-    grid-template-columns: 1fr;
-    gap: 35px;
+  .cfcv-apply-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .cfcv-apply-hero__summary {
-    max-width: 650px;
+  .cfcv-apply-aside {
+    position: static;
   }
 
+  .cfcv-apply-glance {
+    display: none;
+  }
+
+  /* Steps become a horizontal row */
   .cfcv-apply-progress__steps {
-    display: flex;
-
-    width: 100%;
-    overflow-x: auto;
-
-    gap: 5px;
-    padding-bottom: 8px;
-
-    scrollbar-width: thin;
-    overscroll-behavior-x: contain;
-
-    -webkit-overflow-scrolling: touch;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
   .cfcv-apply-progress__steps button {
-    flex: 0 0 92px;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 2px;
+    text-align: center;
   }
 
   .cfcv-apply-progress__steps button small {
-    white-space: normal;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .cfcv-apply-progress__steps button.is-active {
+    background: transparent;
+  }
+
+  .cfcv-apply-hero__content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cfcv-apply-hero__summary {
+    max-width: 640px;
+  }
+}
+
+
+/* ============================================================
+   SMALL TABLET (≤ 760px)
+============================================================ */
+
+@media (max-width: 760px) {
+  .cfcv-apply-grid,
+  .cfcv-review__grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .cfcv-stage-options {
-    grid-template-columns: 1fr;
-  }
-
-  .cfcv-stage-option {
-    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .cfcv-stage-option__check {
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .cfcv-apply-container {
-    width: calc(100% - 30px);
-  }
-
-  .cfcv-apply-main {
-    padding-top: 40px;
-  }
-
-  .cfcv-apply-progress {
-    padding: 20px;
-  }
-
-  .cfcv-apply-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .cfcv-apply-grid__full {
-    grid-column: auto;
-  }
-
-  .cfcv-review__grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
+    margin-bottom: 16px;
   }
 
   .cfcv-apply-note {
-    grid-template-columns: 1fr;
-    gap: 9px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Step labels hide; numbers stay */
+  .cfcv-apply-progress__steps button small {
+    display: none;
   }
 }
 
+
 /* ============================================================
-   PHONES
+   PHONE (≤ 480px)
 ============================================================ */
 
-@media (max-width: 600px) {
-  .cfcv-apply-page {
-    overflow-x: hidden;
-  }
-
+@media (max-width: 480px) {
   .cfcv-apply-container {
-    width: calc(100% - 24px);
-  }
-
-  .cfcv-apply-hero {
-    padding: 75px 0 48px;
-  }
-
-  .cfcv-apply-back {
-    margin-bottom: 32px;
-    font-size: 0.72rem;
-  }
-
-  .cfcv-apply-hero h1 {
-    font-size:
-      clamp(2.4rem, 12vw, 3.8rem);
-
-    line-height: 1.02;
-  }
-
-  .cfcv-apply-hero__summary {
-    padding: 19px;
-
-    grid-template-columns:
-      24px minmax(0, 1fr);
+    width: calc(100% - 32px);
   }
 
   .cfcv-apply-progress {
-    margin-bottom: 24px;
-    padding: 18px 15px;
+    padding: 18px;
   }
 
-  .cfcv-apply-progress__top {
-    align-items: flex-start;
-    margin-bottom: 17px;
-  }
-
-  .cfcv-apply-progress__top strong {
-    font-size: 1.08rem;
-  }
-
-  .cfcv-apply-progress__bar {
-    margin-bottom: 20px;
-  }
-
-  .cfcv-apply-progress__steps button {
-    flex-basis: 75px;
+  .cfcv-apply-progress__steps {
+    gap: 2px;
   }
 
   .cfcv-apply-progress__steps button > span {
-    width: 30px;
-    height: 30px;
-
-    flex-basis: 30px;
-  }
-
-  .cfcv-apply-progress__steps button small {
-    font-size: 0.58rem;
-  }
-
-  .cfcv-apply-step {
-    padding: 26px 18px;
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+    font-size: 12px;
   }
 
   .cfcv-apply-step > header {
-    grid-template-columns:
-      44px minmax(0, 1fr);
-
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
-
-    margin-bottom: 32px;
-    padding-bottom: 25px;
   }
 
   .cfcv-apply-step > header > span {
-    width: 42px;
-    height: 42px;
-
-    font-size: 0.7rem;
-  }
-
-  .cfcv-apply-step > header h2 {
-    font-size:
-      clamp(1.5rem, 7vw, 1.95rem);
-  }
-
-  .cfcv-apply-step > header p {
-    font-size: 0.8rem;
-    line-height: 1.65;
-  }
-
-  .cfcv-apply-field input,
-  .cfcv-apply-field select {
-    min-height: 50px;
-    padding: 0 13px;
-  }
-
-  .cfcv-apply-field textarea {
-    min-height: 125px;
-    padding: 13px;
-  }
-
-  .cfcv-stage-option {
-    padding: 20px;
-  }
-
-  .cfcv-review > section {
-    padding: 18px;
-  }
-
-  .cfcv-review__heading {
-    align-items: flex-start;
-  }
-
-  .cfcv-apply-actions {
-    padding: 18px;
-    gap: 10px;
-  }
-
-  .cfcv-apply-button {
-    min-height: 48px;
-    padding: 12px 15px;
-  }
-
-  .cfcv-apply-step
-  > .cfcv-apply-field:has(input[type="file"]) {
-    padding: 15px;
-  }
-
-  .cfcv-apply-form > p[role="status"] {
-    margin: 0 18px 20px;
-    padding: 14px;
-  }
-}
-
-/* ============================================================
-   SMALL PHONES
-============================================================ */
-
-@media (max-width: 420px) {
-  .cfcv-apply-container {
-    width: calc(100% - 20px);
-  }
-
-  .cfcv-apply-hero {
-    padding-top: 68px;
-  }
-
-  .cfcv-apply-eyebrow {
-    letter-spacing: 0.13em;
-  }
-
-  .cfcv-apply-hero h1 {
-    font-size:
-      clamp(2.15rem, 12vw, 3rem);
-  }
-
-  .cfcv-apply-hero__summary {
-    grid-template-columns: 1fr;
-  }
-
-  .cfcv-apply-hero__summary svg {
-    margin-bottom: 2px;
-  }
-
-  .cfcv-apply-progress {
-    padding: 16px 12px;
-  }
-
-  .cfcv-apply-progress__top {
-    gap: 10px;
-  }
-
-  .cfcv-apply-progress__top > span {
-    font-size: 0.68rem;
-  }
-
-  .cfcv-apply-step {
-    padding: 23px 14px;
-  }
-
-  .cfcv-apply-step > header {
-    grid-template-columns: 1fr;
-    gap: 13px;
-  }
-
-  .cfcv-apply-step > header > span {
-    width: 38px;
-    height: 38px;
-  }
-
-  .cfcv-apply-field > label {
-    font-size: 0.76rem;
-  }
-
-  .cfcv-stage-option {
-    padding: 19px 16px;
-  }
-
-  .cfcv-review > section {
-    padding: 16px 13px;
-  }
-
-  .cfcv-review__heading {
-    gap: 10px;
-  }
-
-  .cfcv-review__heading h3 {
-    font-size: 0.98rem;
-  }
-
-  .cfcv-review__heading button {
-    padding: 6px 8px;
-  }
-
-  .cfcv-apply-confirmation {
-    padding: 15px;
+    width: 46px;
+    height: 46px;
   }
 
   .cfcv-apply-actions {
     flex-direction: column-reverse;
     align-items: stretch;
-
-    padding: 15px 14px;
   }
 
-  .cfcv-apply-actions > div {
-    width: 100%;
-  }
-
+  .cfcv-apply-actions > div,
   .cfcv-apply-button {
     width: 100%;
   }
 
-  .cfcv-apply-form > p[role="status"] {
-    margin-inline: 14px;
+  .cfcv-apply-actions > div:empty {
+    display: none;
   }
 
-  .cfcv-apply-field
-  input[type="file"]::file-selector-button {
-    display: block;
+  .cfcv-review__heading {
+    align-items: flex-start;
+  }
 
+  .cfcv-apply-field input[type="file"]::file-selector-button {
+    display: block;
     width: 100%;
     margin: 0 0 8px;
   }
 }
 
-/* ============================================================
-   VERY SMALL PHONES
-============================================================ */
-
-@media (max-width: 350px) {
-  .cfcv-apply-container {
-    width: calc(100% - 16px);
-  }
-
-  .cfcv-apply-hero h1 {
-    font-size: 2.05rem;
-  }
-
-  .cfcv-apply-progress {
-    padding: 14px 10px;
-  }
-
-  .cfcv-apply-step {
-    padding: 20px 11px;
-  }
-
-  .cfcv-apply-step > header h2 {
-    font-size: 1.45rem;
-  }
-
-  .cfcv-apply-field input,
-  .cfcv-apply-field select {
-    padding-inline: 10px;
-  }
-
-  .cfcv-apply-field textarea {
-    padding: 10px;
-  }
-
-  .cfcv-stage-option {
-    padding: 17px 13px;
-  }
-
-  .cfcv-review__heading {
-    flex-direction: column;
-  }
-
-  .cfcv-review__heading button {
-    align-self: flex-start;
-  }
-}
 
 /* ============================================================
-   LANDSCAPE
+   SHORT SCREENS (landscape phones)
 ============================================================ */
 
-@media
-  (max-height: 520px)
-  and (orientation: landscape) {
+@media (max-height: 520px) and (orientation: landscape) {
   .cfcv-apply-hero {
-    min-height: auto;
-    padding: 55px 0 38px;
+    padding-block: 32px 28px;
   }
 
   .cfcv-apply-back {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
-  .cfcv-apply-hero__content {
-    grid-template-columns:
-      minmax(0, 1.3fr)
-      minmax(230px, 0.7fr);
-
-    gap: 30px;
-  }
-
-  .cfcv-apply-hero h1 {
-    font-size:
-      clamp(2.3rem, 7vw, 3.8rem);
-  }
-
-  .cfcv-apply-main {
-    padding-top: 35px;
+  .cfcv-apply-aside {
+    position: static;
   }
 }
 
-@media
-  (max-height: 520px)
-  and (orientation: landscape)
-  and (max-width: 700px) {
-  .cfcv-apply-hero__content {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* ============================================================
    TOUCH DEVICES
 ============================================================ */
 
-@media
-  (hover: none)
-  and (pointer: coarse) {
-  .cfcv-apply-button {
-    min-height: 50px;
-  }
-
-  .cfcv-apply-progress__steps button {
-    min-height: 58px;
-  }
-
-  .cfcv-review__heading button {
-    min-height: 38px;
-    min-width: 48px;
-  }
-
+@media (hover: none) and (pointer: coarse) {
   .cfcv-stage-option:hover {
     transform: none;
     box-shadow: none;
   }
 }
 
-/* ============================================================
-   SAFE AREAS
-============================================================ */
-
-@supports (padding: max(0px)) {
-  .cfcv-apply-hero {
-    padding-left:
-      env(safe-area-inset-left);
-
-    padding-right:
-      env(safe-area-inset-right);
-  }
-
-  .cfcv-apply-main {
-    padding-left:
-      env(safe-area-inset-left);
-
-    padding-right:
-      env(safe-area-inset-right);
-
-    padding-bottom:
-      max(
-        clamp(75px, 9vw, 120px),
-        calc(env(safe-area-inset-bottom) + 40px)
-      );
-  }
-}
 
 /* ============================================================
    ACCESSIBILITY
@@ -1895,11 +1234,8 @@ input[type="file"]:disabled::file-selector-button {
   .cfcv-apply-page *::before,
   .cfcv-apply-page *::after {
     scroll-behavior: auto !important;
-
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-
-    transition-duration: 0.01ms !important;
+    animation: none !important;
+    transition: none !important;
   }
 }
 
@@ -1908,13 +1244,8 @@ input[type="file"]:disabled::file-selector-button {
   .cfcv-apply-field select,
   .cfcv-apply-field textarea,
   .cfcv-stage-option,
-  .cfcv-review > section,
   .cfcv-apply-form {
     border-color: rgba(3, 27, 52, 0.55);
-  }
-
-  .cfcv-apply-field > label {
-    color: var(--cfcv-navy-deep);
   }
 }
 
@@ -1929,42 +1260,39 @@ input[type="file"]:disabled::file-selector-button {
   }
 }
 
+
 /* ============================================================
    PRINT
 ============================================================ */
 
 @media print {
   .cfcv-apply-page {
-    background: #ffffff;
-    color: #000000;
+    color: #000;
+    background: #fff;
   }
 
   .cfcv-apply-hero {
-    padding: 25px 0;
-
-    background: #ffffff !important;
-    color: #000000;
+    padding: 24px 0;
+    color: #000;
+    background: #fff;
   }
 
-  .cfcv-apply-hero *,
-  .cfcv-apply-hero h1,
-  .cfcv-apply-hero h1 em {
-    color: #000000 !important;
-  }
-
-  .cfcv-apply-hero::before,
-  .cfcv-apply-hero::after {
-    display: none;
-  }
-
+  .cfcv-apply-hero__background,
+  .cfcv-apply-hero::after,
   .cfcv-apply-back,
-  .cfcv-apply-progress,
+  .cfcv-apply-aside,
   .cfcv-apply-actions {
     display: none;
   }
 
-  .cfcv-apply-main {
-    padding: 20px 0;
+  .cfcv-apply-hero h1,
+  .cfcv-apply-hero h1 em,
+  .cfcv-apply-hero__summary p {
+    color: #000;
+  }
+
+  .cfcv-apply-layout {
+    display: block;
   }
 
   .cfcv-apply-form {
@@ -1972,15 +1300,8 @@ input[type="file"]:disabled::file-selector-button {
     box-shadow: none;
   }
 
-  .cfcv-apply-step {
-    padding: 0;
-  }
-
   .cfcv-review > section,
   .cfcv-stage-option {
     break-inside: avoid;
-    box-shadow: none;
   }
 }
-
-

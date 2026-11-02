@@ -25,15 +25,13 @@ import {
   Landmark,
   TrendingUp,
   Users,
-  Globe2,
   Lightbulb,
   Rocket,
   Search,
   BriefcaseBusiness,
-  Microscope,
+  Globe2,
   CalendarDays,
   MapPin,
-  Download,
 } from "lucide-react";
 
 import "./Home.css";
@@ -90,6 +88,31 @@ const HERO_IMAGES = [
 
     alt:
       "Global opportunities connecting Africa and the United States",
+  },
+];
+
+
+// ============================================================
+// HERO FACTS
+// Same figures as the CFCV page.
+// ============================================================
+
+const HERO_FACTS = [
+  {
+    value: "6 months",
+    label: "Intensive fellowship",
+  },
+  {
+    value: "Up to 30",
+    label: "Ventures per cohort",
+  },
+  {
+    value: "3 tracks",
+    label: "Genesis · Ascend · Horizon",
+  },
+  {
+    value: "Africa + U.S.",
+    label: "And the global diaspora",
   },
 ];
 
@@ -242,7 +265,9 @@ export default function Home() {
   const videoFrameRef =
     useRef(null);
 
-  const hasUserInteractedRef =
+  // True once the viewer pauses the video themselves,
+  // so scrolling back does not restart it.
+  const userPausedRef =
     useRef(false);
 
   const savedVideoTimeRef =
@@ -266,7 +291,7 @@ export default function Home() {
     isMuted,
     setIsMuted,
   ] =
-    useState(false);
+    useState(true);
 
   const [
     volume,
@@ -594,11 +619,12 @@ export default function Home() {
     video.volume =
       1;
 
+    // Browsers only allow automatic playback without sound.
     video.muted =
-      false;
+      true;
 
     video.defaultMuted =
-      false;
+      true;
 
     const handlePlay =
       () => {
@@ -766,7 +792,9 @@ export default function Home() {
 
 
   // ==========================================================
-  // AUTOPLAY WITH SOUND WHEN VISIBLE
+  // AUTOPLAY (MUTED) WHEN VISIBLE
+  // Plays once at least half the video is on screen and pauses
+  // when it scrolls away. Viewers can unmute with the controls.
   // ==========================================================
 
   useEffect(() => {
@@ -778,147 +806,17 @@ export default function Home() {
 
     if (
       !video ||
-      !frame
+      !frame ||
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
       return undefined;
     }
 
 
-    // Browsers require a user gesture before autoplay with sound.
-    const playWithSound =
-      async () => {
-        const restoredVolume =
-          previousVolumeRef.current > 0
-            ? previousVolumeRef.current
-            : 1;
-
-        video.muted =
-          false;
-
-        video.defaultMuted =
-          false;
-
-        video.volume =
-          restoredVolume;
-
-        setIsMuted(
-          false
-        );
-
-        setVolume(
-          restoredVolume
-        );
-
-        if (
-          savedVideoTimeRef.current > 0 &&
-          Number.isFinite(
-            savedVideoTimeRef.current
-          ) &&
-          Math.abs(
-            video.currentTime -
-            savedVideoTimeRef.current
-          ) > 0.25
-        ) {
-          video.currentTime =
-            savedVideoTimeRef.current;
-        }
-
-        if (
-          video.paused
-        ) {
-          await video.play();
-        }
-      };
-
-
-    const registerInteraction =
-      async () => {
-        hasUserInteractedRef.current =
-          true;
-
-        window.removeEventListener(
-          "pointerdown",
-          registerInteraction
-        );
-
-        window.removeEventListener(
-          "keydown",
-          registerInteraction
-        );
-
-        window.removeEventListener(
-          "touchstart",
-          registerInteraction
-        );
-
-        const rectangle =
-          frame.getBoundingClientRect();
-
-        const visibleHeight =
-          Math.max(
-            0,
-            Math.min(
-              rectangle.bottom,
-              window.innerHeight
-            ) -
-              Math.max(
-                rectangle.top,
-                0
-              )
-          );
-
-        const visibleRatio =
-          rectangle.height > 0
-            ? visibleHeight /
-              rectangle.height
-            : 0;
-
-        if (
-          visibleRatio >= 0.5
-        ) {
-          try {
-            await playWithSound();
-          } catch (error) {
-            if (
-              import.meta.env.DEV
-            ) {
-              console.warn(
-                "Playback with sound was prevented:",
-                error
-              );
-            }
-          }
-        }
-      };
-
-
-    window.addEventListener(
-      "pointerdown",
-      registerInteraction,
-      {
-        passive: true,
-      }
-    );
-
-    window.addEventListener(
-      "keydown",
-      registerInteraction
-    );
-
-    window.addEventListener(
-      "touchstart",
-      registerInteraction,
-      {
-        passive: true,
-      }
-    );
-
-
     const observer =
       new IntersectionObserver(
-        async (
-          entries
-        ) => {
+        (entries) => {
           const entry =
             entries[0];
 
@@ -926,25 +824,23 @@ export default function Home() {
             entry.isIntersecting &&
             entry.intersectionRatio >= 0.5
           ) {
-            // Never start muted. Wait for a valid browser gesture.
             if (
-              !hasUserInteractedRef.current
+              userPausedRef.current ||
+              !video.paused
             ) {
               return;
             }
 
-            try {
-              await playWithSound();
-            } catch (error) {
-              if (
-                import.meta.env.DEV
-              ) {
-                console.warn(
-                  "Autoplay with sound was prevented:",
-                  error
-                );
-              }
-            }
+            video
+              .play()
+              .catch((error) => {
+                if (import.meta.env.DEV) {
+                  console.warn(
+                    "Video autoplay was prevented:",
+                    error
+                  );
+                }
+              });
           } else if (
             !video.paused
           ) {
@@ -958,7 +854,6 @@ export default function Home() {
           threshold: [
             0,
             0.5,
-            1,
           ],
         }
       );
@@ -971,21 +866,6 @@ export default function Home() {
 
     return () => {
       observer.disconnect();
-
-      window.removeEventListener(
-        "pointerdown",
-        registerInteraction
-      );
-
-      window.removeEventListener(
-        "keydown",
-        registerInteraction
-      );
-
-      window.removeEventListener(
-        "touchstart",
-        registerInteraction
-      );
 
       savedVideoTimeRef.current =
         video.currentTime;
@@ -1012,8 +892,14 @@ export default function Home() {
         if (
           video.paused
         ) {
+          userPausedRef.current =
+            false;
+
           await video.play();
         } else {
+          userPausedRef.current =
+            true;
+
           video.pause();
         }
       } catch (error) {
@@ -1293,11 +1179,93 @@ export default function Home() {
 
 
   // ==========================================================
+  // REVEAL SECTIONS AS THEY SCROLL INTO VIEW
+  // ==========================================================
+
+  const homeRef =
+    useRef(null);
+
+  useEffect(() => {
+    const root =
+      homeRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    // Content stays visible unless this script runs.
+    root.classList.add(
+      "cf-home--reveal"
+    );
+
+    let pending =
+      [...root.querySelectorAll("[data-reveal]")];
+
+    let frame =
+      0;
+
+    // Reveal everything that has reached the lower part of the
+    // screen, including sections skipped by a fast jump.
+    const reveal = () => {
+      frame = 0;
+
+      const limit =
+        window.innerHeight * 0.92;
+
+      pending = pending.filter(
+        (element) => {
+          if (
+            element.getBoundingClientRect().top < limit
+          ) {
+            element.classList.add(
+              "is-visible"
+            );
+
+            return false;
+          }
+
+          return true;
+        }
+      );
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) {
+        frame =
+          window.requestAnimationFrame(reveal);
+      }
+    };
+
+    reveal();
+
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
+
+  // ==========================================================
   // RENDER
   // ==========================================================
 
   return (
-    <main className="cf-home">
+    <main
+      className="cf-home"
+      ref={homeRef}
+    >
 
       {/* =====================================================
           01 — HERO
@@ -1308,129 +1276,163 @@ export default function Home() {
         aria-labelledby="home-main-heading"
       >
 
+        <div className="cf-home-hero__visual">
+
+          <div className="cf-home-hero__slides">
+
+            {HERO_IMAGES.map(
+              (
+                image,
+                index
+              ) => (
+                <img
+                  key={
+                    image.src
+                  }
+                  src={
+                    image.src
+                  }
+                  alt={
+                    index ===
+                    currentHero
+                      ? image.alt
+                      : ""
+                  }
+                  aria-hidden={
+                    index !==
+                    currentHero
+                  }
+                  fetchPriority={
+                    index === 0
+                      ? "high"
+                      : "low"
+                  }
+                  decoding="async"
+                  className={
+                    index ===
+                    currentHero
+                      ? "cf-home-hero__slide cf-home-hero__slide--active"
+                      : "cf-home-hero__slide"
+                  }
+                />
+              )
+            )}
+
+          </div>
+
+
+          <div
+            className="cf-home-hero__overlay"
+            aria-hidden="true"
+          />
+
+        </div>
+
+
         <NetworkBackground />
 
 
         <div className="cf-container cf-home-hero__container">
 
-          <div className="cf-home-hero__main">
+          <div className="cf-home-hero__content">
 
-            <div className="cf-home-hero__content">
+            <div className="cf-section-marker cf-section-marker--pill">
 
-              <div className="cf-section-marker">
-
-                <strong>
-                  CONTINENTAL FOUNDERS
-                </strong>
-
-              </div>
-
-
-              <h1 id="home-main-heading">
-
-                Empowering Global Founders.
-                <br />
-
-                Building a More Inclusive,{" "}
-
-                <em>
-                  Prosperous World.
-                </em>
-
-              </h1>
-
-
-              <p className="cf-home-hero__lead">
-                Continental Founders is a nonprofit organization building an interconnected ecosystem where founders, researchers, universities, corporations, investors, diaspora leaders, and global partners work together to transform entrepreneurial potential into sustainable economic impact.
-              </p>
-
-
-              <div className="cf-actions">
-
-                <Link
-                  to="/contact"
-                  className="cf-button cf-button--gold"
-                >
-
-                  <span>
-                    Partner With Us
-                  </span>
-
-                  <CalendarDays
-                    size={18}
-                    strokeWidth={1.7}
-                    aria-hidden="true"
-                  />
-
-                </Link>
-
-
-                <Link
-                  to="/our-model"
-                  className="cf-button cf-button--outline-dark"
-                >
-
-                  <span>
-                    Explore Our Ecosystem
-                  </span>
-
-                  <ArrowRight
-                    size={18}
-                    strokeWidth={1.7}
-                    aria-hidden="true"
-                  />
-
-                </Link>
-
-              </div>
+              <strong>
+                CONTINENTAL FOUNDERS
+              </strong>
 
             </div>
 
 
-            <div className="cf-home-hero__visual">
+            <h1 id="home-main-heading">
 
-              <div className="cf-home-hero__slides">
+              Empowering Global Founders.
+              <br />
 
-                {HERO_IMAGES.map(
-                  (
-                    image,
-                    index
-                  ) => (
-                    <img
-                      key={
-                        image.src
-                      }
-                      src={
-                        image.src
-                      }
-                      alt={
-                        index ===
-                        currentHero
-                          ? image.alt
-                          : ""
-                      }
-                      aria-hidden={
-                        index !==
-                        currentHero
-                      }
-                      className={
-                        index ===
-                        currentHero
-                          ? "cf-home-hero__slide cf-home-hero__slide--active"
-                          : "cf-home-hero__slide"
-                      }
-                    />
-                  )
-                )}
+              Building a More Inclusive,{" "}
 
-              </div>
+              <em>
+                Prosperous World.
+              </em>
+
+            </h1>
 
 
-              <div
-                className="cf-home-hero__overlay"
-                aria-hidden="true"
-              />
+            <p className="cf-home-hero__lead">
+              Continental Founders is a nonprofit organization building an interconnected ecosystem where founders, researchers, universities, corporations, investors, diaspora leaders, and global partners work together to transform entrepreneurial potential into sustainable economic impact.
+            </p>
 
+
+            <div className="cf-actions">
+
+              <Link
+                to="/contact"
+                className="cf-button cf-button--gold"
+              >
+
+                <span>
+                  Partner With Us
+                </span>
+
+                <ArrowUpRight
+                  size={18}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+
+              </Link>
+
+
+              <Link
+                to="/our-model"
+                className="cf-button cf-button--outline-dark"
+              >
+
+                <span>
+                  Explore Our Ecosystem
+                </span>
+
+                <ArrowRight
+                  size={18}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
+
+              </Link>
+
+            </div>
+
+          </div>
+
+
+          <div className="cf-home-hero__footer">
+
+            <ul
+              className="cf-home-hero__stats"
+              aria-label="CFCV fellowship at a glance"
+            >
+
+              {HERO_FACTS.map(
+                (fact) => (
+                  <li key={fact.value}>
+
+                    <strong>
+                      {fact.value}
+                    </strong>
+
+                    <span>
+                      {fact.label}
+                    </span>
+
+                  </li>
+                )
+              )}
+
+            </ul>
+
+
+            <div className="cf-home-hero__controls">
 
               <div className="cf-home-hero__visual-caption">
 
@@ -1500,15 +1502,18 @@ export default function Home() {
       ====================================================== */}
 
       <section
-        className="cf-vision-section" 
+        className="cf-vision-section"
         aria-labelledby="vision-heading"
       >
 
-        <div className="cf-container cf-vision-grid">
+        <div
+          className="cf-container cf-vision-grid"
+          data-reveal
+        >
 
           <div className="cf-vision-content">
 
-            <div className="cf-section-marker cf-section-marker--light">
+            <div className="cf-section-marker">
 
               <strong>
                 FROM POTENTIAL TO GLOBAL IMPACT
@@ -1528,13 +1533,13 @@ export default function Home() {
 
 
             <p>
-              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
+              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment, helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
             </p>
 
 
             <Link
-              to="/about"
-              className="cf-vision-link"
+              to="/our-model"
+              className="cf-button cf-button--gold"
             >
 
               <span>
@@ -1562,8 +1567,10 @@ export default function Home() {
               ref={
                 videoRef
               }
+              muted
               playsInline
               preload="metadata"
+              poster="/assets/images/home-video-poster.webp"
               className="cf-video__player"
               aria-label="Continental Founders video"
               onClick={toggleVideo}
@@ -1587,6 +1594,18 @@ export default function Home() {
 
 
             {!isPlaying && (
+              <div
+                className="cf-video__caption"
+                aria-hidden="true"
+              >
+                Founders Today.
+                <br />
+                A More Inclusive World Tomorrow.
+              </div>
+            )}
+
+
+            {!isPlaying && (
               <button
                 type="button"
                 className="cf-video__play"
@@ -1597,7 +1616,7 @@ export default function Home() {
               >
 
                 <Play
-                  size={34}
+                  size={30}
                   fill="currentColor"
                   aria-hidden="true"
                 />
@@ -1638,6 +1657,7 @@ export default function Home() {
 
               <button
                 type="button"
+                className="cf-video__mute"
                 onClick={
                   toggleMute
                 }
@@ -1665,6 +1685,7 @@ export default function Home() {
 
               <input
                 type="range"
+                className="cf-video__volume"
                 min="0"
                 max="1"
                 step="0.01"
@@ -1678,6 +1699,19 @@ export default function Home() {
                 }
                 aria-label="Video volume"
               />
+
+
+              <span className="cf-video__time">
+                {formatTime(
+                  currentTime
+                )}
+
+                {" / "}
+
+                {formatTime(
+                  duration
+                )}
+              </span>
 
 
               <input
@@ -1696,19 +1730,6 @@ export default function Home() {
                 }
                 aria-label="Video progress"
               />
-
-
-              <span>
-                {formatTime(
-                  currentTime
-                )}
-
-                {" / "}
-
-                {formatTime(
-                  duration
-                )}
-              </span>
 
 
               <button
@@ -1746,251 +1767,134 @@ export default function Home() {
       </section>
 
 
-
- {/* =====================================================
-    QUICK HIGHLIGHTS
-====================================================== */}
-
-<section className="cf-impact-highlights">
-  <div className="cf-container">
-
-    {/* =====================================================
-        SECTION HEADER
-    ====================================================== */}
-
-    <header className="cf-impact-highlights__header">
-
-      <span className="cf-impact-highlights__eyebrow">
-        QUICK HIGHLIGHTS
-      </span>
-
-      <h2>
-        Our Path to Global Impact
-      </h2>
-
-      <p>
-        Connecting founder development, research, and market
-        opportunity to build ventures prepared for lasting impact.
-      </p>
-
-    </header>
-
-
-    {/* =====================================================
-        HIGHLIGHTS
-    ====================================================== */}
-
-    <div className="cf-impact-highlights__grid">
-
-
-      {/* =================================================
-          01 — FOUNDER DEVELOPMENT
-
-          Opens:
-          Our Model
-          /our-model
-      ================================================== */}
-
-      <article className="cf-impact-item">
-
-        <span className="cf-impact-item__number">
-          01
-        </span>
-
-        <h3>
-          Founder Development
-        </h3>
-
-        <p>
-          Equipping founders with the tools, networks, and support
-          to develop, validate, and scale high-impact ventures.
-        </p>
-
-        <Link
-          to="/our-model"
-          className="cf-impact-item__link"
-          aria-label="Explore the Continental Founders development model"
-        >
-          <span>Learn More</span>
-
-          <ArrowRight
-            size={17}
-            aria-hidden="true"
-          />
-        </Link>
-
-      </article>
-
-
-      {/* =================================================
-          02 — RESEARCH & EVIDENCE
-
-          Opens:
-          Universities
-          /universities
-      ================================================== */}
-
-      <article className="cf-impact-item">
-
-        <span className="cf-impact-item__number">
-          02
-        </span>
-
-        <h3>
-          Research &amp; Evidence
-        </h3>
-
-        <p>
-          Generating evidence, insights, and practical solutions
-          to inform stronger entrepreneurship ecosystems.
-        </p>
-
-        <Link
-          to="/universities"
-          className="cf-impact-item__link"
-          aria-label="Explore Continental Founders university and research partnerships"
-        >
-          <span>Learn More</span>
-
-          <ArrowRight
-            size={17}
-            aria-hidden="true"
-          />
-        </Link>
-
-      </article>
-
-
-      {/* =================================================
-          03 — MARKET ACCESS
-
-          Opens:
-          U.S.–Africa Trade & Business Network
-          /partners/us-africa-trade-network
-      ================================================== */}
-
-      <article className="cf-impact-item">
-
-        <span className="cf-impact-item__number">
-          03
-        </span>
-
-        <h3>
-          Market Access
-        </h3>
-
-        <p>
-          Creating connections, opening opportunities, and enabling
-          global pathways for sustainable growth.
-        </p>
-
-        <Link
-          to="/partners/us-africa-trade-network"
-          className="cf-impact-item__link"
-          aria-label="Explore the U.S.–Africa Trade and Business Network"
-        >
-          <span>Learn More</span>
-
-          <ArrowRight
-            size={17}
-            aria-hidden="true"
-          />
-        </Link>
-
-      </article>
-
-    </div>
-
-  </div>
-</section>
-
-
       {/* =====================================================
-          03 — THE CONTINENTAL FOUNDERS DIFFERENCE
+          03 — QUICK HIGHLIGHTS
       ====================================================== */}
 
       <section
-        className="cf-section cf-section-white"
-        aria-labelledby="who-we-are-heading"
+        className="cf-impact-highlights"
+        aria-labelledby="highlights-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-section-header">
+          <header className="cf-section-header cf-section-header--center cf-section-header--dark">
 
-            <div>
-              
+            <span className="cf-eyebrow">
+              QUICK HIGHLIGHTS
+            </span>
 
-              <br/>
-              <br/>  
+            <h2 id="highlights-heading">
+              Our Path to Global Impact
+            </h2>
 
-              <span className="cf-eyebrow">
-                THE CONTINENTAL FOUNDERS DIFFERENCE
+            <p className="cf-section-intro">
+              Connecting founder development, research, and market
+              opportunity to build ventures prepared for lasting impact.
+            </p>
+
+          </header>
+
+
+          <div className="cf-impact-highlights__grid">
+
+            {/* Opens Our Model — /our-model */}
+            <article className="cf-impact-item">
+
+              <span className="cf-impact-item__number">
+                01
               </span>
 
-              <br/>
-
-              
-
-              <h2 id="who-we-are-heading">
-                Africa + Diaspora
-                <br />
-                <em>+ Global Ecosystem.</em>
-              </h2>
-              <br/>
-              <br/>
-
-            </div>
-
-          </div>
-
-
-          <div className="cf-who-grid">
-
-            <div className="cf-who-visual">
-
-              <img
-                src="/assets/images/africa-america-map.webp"
-                alt="Africa and the United States connected through Continental Founders partnerships"
-                loading="lazy"
-                decoding="async"
-              />
-
-            </div>
-
-
-            <div className="cf-who-content">
+              <h3>
+                Founder Development
+              </h3>
 
               <p>
-                One of the defining elements of Continental Founders is the deliberate connection between African founders and founders across the global African diaspora.
+                Equipping founders with the tools, networks, and support
+                to develop, validate, and scale high-impact ventures.
               </p>
-
-              <p>
-                These relationships create opportunities for knowledge exchange, cross-cultural learning, capstone collaborations, mentorship, joint ventures, market discovery, and long-term business partnerships.
-              </p>
-
-              <p>
-                We are developing globally minded founders who understand how to lead across cultures, markets, institutions, and borders.
-              </p>
-
 
               <Link
-                to="/about"
-                className="cf-text-link"
+                to="/our-model"
+                className="cf-impact-item__link"
+                aria-label="Explore the Continental Founders development model"
               >
-
-                <span>
-                  Discover Our Difference
-                </span>
+                <span>Learn More</span>
 
                 <ArrowRight
-                  size={17}
+                  size={16}
                   aria-hidden="true"
                 />
-
               </Link>
 
-            </div>
+            </article>
+
+
+            {/* Opens Universities — /universities */}
+            <article className="cf-impact-item">
+
+              <span className="cf-impact-item__number">
+                02
+              </span>
+
+              <h3>
+                Research &amp; Evidence
+              </h3>
+
+              <p>
+                Generating evidence, insights, and practical solutions
+                to inform stronger entrepreneurship ecosystems.
+              </p>
+
+              <Link
+                to="/universities"
+                className="cf-impact-item__link"
+                aria-label="Explore Continental Founders university and research partnerships"
+              >
+                <span>Learn More</span>
+
+                <ArrowRight
+                  size={16}
+                  aria-hidden="true"
+                />
+              </Link>
+
+            </article>
+
+
+            {/* Opens U.S.–Africa Trade & Business Network */}
+            <article className="cf-impact-item">
+
+              <span className="cf-impact-item__number">
+                03
+              </span>
+
+              <h3>
+                Market Access
+              </h3>
+
+              <p>
+                Creating connections, opening opportunities, and enabling
+                global pathways for sustainable growth.
+              </p>
+
+              <Link
+                to="/partners/us-africa-trade-network"
+                className="cf-impact-item__link"
+                aria-label="Explore the U.S.–Africa Trade and Business Network"
+              >
+                <span>Learn More</span>
+
+                <ArrowRight
+                  size={16}
+                  aria-hidden="true"
+                />
+              </Link>
+
+            </article>
 
           </div>
 
@@ -2000,7 +1904,81 @@ export default function Home() {
 
 
       {/* =====================================================
-          04 — OUR FLAGSHIP PROGRAM
+          04 — THE CONTINENTAL FOUNDERS DIFFERENCE
+      ====================================================== */}
+
+      <section
+        className="cf-section cf-section-white"
+        aria-labelledby="who-we-are-heading"
+      >
+
+        <div
+          className="cf-container cf-who-grid"
+          data-reveal
+        >
+
+          <div className="cf-who-visual">
+
+            <img
+              src="/assets/images/africa-america-map.webp"
+              alt="Africa and the United States connected through Continental Founders partnerships"
+              loading="lazy"
+              decoding="async"
+            />
+
+          </div>
+
+
+          <div className="cf-who-content">
+
+            <span className="cf-eyebrow">
+              THE CONTINENTAL FOUNDERS DIFFERENCE
+            </span>
+
+            <h2 id="who-we-are-heading">
+              Africa + Diaspora
+              <br />
+              <em>+ Global Ecosystem.</em>
+            </h2>
+
+            <p>
+              One of the defining elements of Continental Founders is the deliberate connection between African founders and founders across the global African diaspora.
+            </p>
+
+            <p>
+              These relationships create opportunities for knowledge exchange, cross-cultural learning, capstone collaborations, mentorship, joint ventures, market discovery, and long-term business partnerships.
+            </p>
+
+            <p>
+              We are developing globally minded founders who understand how to lead across cultures, markets, institutions, and borders.
+            </p>
+
+
+            <Link
+              to="/about"
+              className="cf-text-link"
+            >
+
+              <span>
+                Discover Our Difference
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          05 — OUR FLAGSHIP PROGRAM
       ====================================================== */}
 
       <section
@@ -2008,13 +1986,12 @@ export default function Home() {
         aria-labelledby="what-we-do-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-section-header">
-
-            <br/>
-            <br/>
-            <br/>
+          <div className="cf-section-header cf-section-header--split">
 
             <div>
 
@@ -2032,10 +2009,24 @@ export default function Home() {
                 Continental Founders Catalytic Ventures (CFCV) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
               </p>
 
-              <br />
-              <br/>
-
             </div>
+
+
+            <Link
+              to="/cfcv"
+              className="cf-text-link"
+            >
+
+              <span>
+                Explore CFCV
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
 
           </div>
 
@@ -2068,34 +2059,13 @@ export default function Home() {
 
           </div>
 
-
-          <div className="cf-centered-link">
-
-            <Link
-              to="/programs"
-              className="cf-text-link"
-            >
-
-              <span>
-                Explore CFCV
-              </span>
-
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
-
         </div>
 
       </section>
 
 
       {/* =====================================================
-          05 — OUR MODEL
+          06 — OUR MODEL
       ====================================================== */}
 
       <section
@@ -2103,14 +2073,14 @@ export default function Home() {
         aria-labelledby="our-model-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-section-header">
+          <div className="cf-section-header cf-section-header--split">
 
             <div>
-              <br/>
-              <br/>
-              <br/>
 
               <span className="cf-eyebrow">
                 OUR MODEL
@@ -2123,16 +2093,30 @@ export default function Home() {
                   global impact.
                 </em>
               </h2>
-              <br/>
 
             </div>
 
+
+            <Link
+              to="/our-model"
+              className="cf-text-link"
+            >
+
+              <span>
+                Understand Our Model
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
+
           </div>
 
-          <br />
 
-
-          <div className="cf-model-grid">
+          <ol className="cf-model-grid">
 
             <ModelStep
               number="01"
@@ -2170,28 +2154,7 @@ export default function Home() {
               text="Investment readiness, market access, procurement, partnerships, and capital help qualified ventures move toward growth and international expansion."
             />
 
-          </div>
-
-
-          <div className="cf-centered-link">
-
-            <Link
-              to="/our-model"
-              className="cf-text-link"
-            >
-
-              <span>
-                Understand Our Model
-              </span>
-
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
+          </ol>
 
         </div>
 
@@ -2199,7 +2162,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          06 — RESEARCH THAT STRENGTHENS ENTREPRENEURSHIP
+          07 — RESEARCH THAT STRENGTHENS ENTREPRENEURSHIP
       ====================================================== */}
 
       <section
@@ -2207,38 +2170,31 @@ export default function Home() {
         aria-labelledby="why-it-matters-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
           <div className="cf-section-header">
 
-            <br/>
-            <br/>
-
-            <div>
-
-              <span className="cf-eyebrow">
-                RESEARCH THAT STRENGTHENS ENTREPRENEURSHIP
-              </span>
+            <span className="cf-eyebrow">
+              RESEARCH &amp; EVIDENCE
+            </span>
 
 
-              <h2 id="why-it-matters-heading">
-                Research that strengthens{" "}
-                <em>
-                  entrepreneurship.
-                </em>
-              </h2>
+            <h2 id="why-it-matters-heading">
+              Research that strengthens{" "}
+              <em>
+                entrepreneurship.
+              </em>
+            </h2>
 
 
-              <p className="cf-section-intro">
-                CF Research Division Evidence. Insight. Impact.
-              </p>
-              <br/>
-
-            </div>
+            <p className="cf-section-intro">
+              CF Research Division — Evidence. Insight. Impact.
+            </p>
 
           </div>
-
-          <br />
 
 
           <div className="cf-matters-grid">
@@ -2273,12 +2229,9 @@ export default function Home() {
 
       </section>
 
-      <br/>
-      <br/>
-
 
       {/* =====================================================
-          07 — CF RESEARCH DIVISION
+          08 — CF RESEARCH DIVISION
       ====================================================== */}
 
       <section
@@ -2286,7 +2239,10 @@ export default function Home() {
         aria-labelledby="university-partnership-heading"
       >
 
-        <div className="cf-container cf-partnership-grid">
+        <div
+          className="cf-container cf-partnership-grid"
+          data-reveal
+        >
 
           <div className="cf-partnership-image">
 
@@ -2302,17 +2258,13 @@ export default function Home() {
 
           <div className="cf-partnership-content">
 
-            <div className="cf-section-marker">
-
-              <strong>
-                CF RESEARCH DIVISION
-              </strong>
-
-            </div>
+            <span className="cf-eyebrow">
+              CF RESEARCH DIVISION
+            </span>
 
 
             <h2 id="university-partnership-heading">
-              Evidence. Insight. Impact.
+              Evidence. Insight. <em>Impact.</em>
             </h2>
 
 
@@ -2326,21 +2278,25 @@ export default function Home() {
             </p>
 
 
-            <Link
-              to="/universities"
-              className="cf-button cf-button--gold"
-            >
+            <div className="cf-actions">
 
-              <span>
-                Explore Founder Development
-              </span>
+              <Link
+                to="/universities"
+                className="cf-button cf-button--gold"
+              >
 
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
+                <span>
+                  Explore University Partnerships
+                </span>
 
-            </Link>
+                <ArrowRight
+                  size={17}
+                  aria-hidden="true"
+                />
+
+              </Link>
+
+            </div>
 
           </div>
 
@@ -2350,7 +2306,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          08 — ECOSYSTEM
+          09 — ECOSYSTEM
       ====================================================== */}
 
       <section
@@ -2358,17 +2314,17 @@ export default function Home() {
         aria-labelledby="ecosystem-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-section-header">
-
-            <br/>
-            <br/>
+          <div className="cf-section-header cf-section-header--split">
 
             <div>
 
               <span className="cf-eyebrow">
-                AN ECOSYSTEM BUILT FOR COLLABORATION
+                OUR ECOSYSTEM
               </span>
 
 
@@ -2381,9 +2337,24 @@ export default function Home() {
 
             </div>
 
-          </div>
 
-          <br />
+            <Link
+              to="/strategic-partners"
+              className="cf-text-link"
+            >
+
+              <span>
+                Explore Strategic Partnerships
+              </span>
+
+              <ArrowRight
+                size={17}
+                aria-hidden="true"
+              />
+
+            </Link>
+
+          </div>
 
 
           <div className="cf-ecosystem-grid">
@@ -2430,7 +2401,7 @@ export default function Home() {
 
             <EcosystemCard
               icon={
-                <Microscope />
+                <Globe2 />
               }
               title="Diaspora & Global Partners"
               text="Diaspora leaders and global partners bridge countries, cultures, expertise, networks, markets, and opportunity."
@@ -2438,38 +2409,13 @@ export default function Home() {
 
           </div>
 
-
-          <div className="cf-centered-link">
-
-            <Link
-              to="/strategic-partners"
-              className="cf-text-link"
-            >
-
-              <span>
-                Explore Strategic Partnerships
-              </span>
-              
-
-              <ArrowRight
-                size={17}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
-
         </div>
 
       </section>
 
-      <br/>
-      <br/>
-
 
       {/* =====================================================
-          09 — STRATEGIC PARTNERS
+          10 — STRATEGIC PARTNERS
       ====================================================== */}
 
       <section
@@ -2477,17 +2423,16 @@ export default function Home() {
         aria-labelledby="strategic-partners-heading"
       >
 
-        <div className="cf-container cf-strategic-grid">
+        <div
+          className="cf-container cf-strategic-grid"
+          data-reveal
+        >
 
           <div className="cf-strategic-content">
 
-            <div className="cf-section-marker cf-section-marker--light">
-
-              <strong>
-                CORPORATE PARTNERS
-              </strong>
-
-            </div>
+            <span className="cf-eyebrow">
+              CORPORATE PARTNERS
+            </span>
 
 
             <h2 id="strategic-partners-heading">
@@ -2496,8 +2441,6 @@ export default function Home() {
                 Opportunities.
               </em>
             </h2>
-
-            <br />
 
 
             <p>
@@ -2513,7 +2456,7 @@ export default function Home() {
             <div className="cf-actions">
 
               <Link
-                to="/strategic-partners"
+                to="/partners/corporate"
                 className="cf-button cf-button--gold"
               >
 
@@ -2550,7 +2493,7 @@ export default function Home() {
 
 
       {/* =====================================================
-          10 — CONFERENCE & EVENTS — CMS POWERED
+          11 — CONFERENCE & EVENTS — CMS POWERED
       ====================================================== */}
 
       <section
@@ -2558,343 +2501,339 @@ export default function Home() {
         aria-labelledby="conference-heading"
       >
 
-        {eventLoading ? (
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-container cf-conference-grid">
+          {eventLoading ? (
 
-            <div className="cf-conference-info">
+            <div className="cf-conference-grid">
 
-              <div className="cf-section-marker">
+              <div className="cf-conference-info">
 
-                <strong>
-                  CONFERENCE & EVENTS
-                </strong>
-
-              </div>
-
-
-              <h2 id="conference-heading">
-                Upcoming
-                <br />
-
-                <em>
-                  programming.
-                </em>
-              </h2>
+                <span className="cf-eyebrow">
+                  CONFERENCE &amp; EVENTS
+                </span>
 
 
-              <p>
-                Loading the latest Continental
-                Founders event.
-              </p>
+                <h2 id="conference-heading">
+                  Upcoming
+                  <br />
 
-            </div>
+                  <em>
+                    programming.
+                  </em>
+                </h2>
 
-
-            <div
-              className="cf-conference-date"
-              aria-hidden="true"
-            >
-
-              <CalendarDays
-                size={42}
-                strokeWidth={1.4}
-              />
-
-              <span>
-                LOADING
-              </span>
-
-            </div>
-
-          </div>
-
-        ) : featuredEvent ? (
-
-          <div className="cf-container cf-conference-grid">
-
-            <div className="cf-conference-info">
-
-              <div className="cf-section-marker">
-
-                <strong>
-                  {featuredEventType.toUpperCase()}
-                </strong>
-
-              </div>
-
-
-              <h2 id="conference-heading">
-                {featuredEvent.title}
-              </h2>
-
-
-              {featuredEventLocation && (
-
-                <div className="cf-conference-location">
-
-                  <MapPin
-                    size={16}
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    {featuredEventLocation}
-                  </span>
-
-                </div>
-
-              )}
-
-
-              {featuredEventDate && (
-
-                <div className="cf-conference-location">
-
-                  <CalendarDays
-                    size={16}
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    {featuredEventDate.full}
-                  </span>
-
-                </div>
-
-              )}
-
-
-              {featuredEvent.description && (
 
                 <p>
-                  {featuredEvent.description}
+                  Loading the latest Continental
+                  Founders event.
                 </p>
 
-              )}
-
-              <br />
-
-
-              <div className="cf-actions">
-
-                <Link
-                  to={
-                    featuredEventPath
-                  }
-                  className="cf-button cf-button--gold"
-                >
-
-                  <span>
-                    View Event Details
-                  </span>
-
-                  <ArrowUpRight
-                    size={17}
-                    aria-hidden="true"
-                  />
-
-                </Link>
-
-
-                <Link
-                  to="/events"
-                  className="cf-text-link"
-                >
-
-                  <span>
-                    All Events
-                  </span>
-
-                  <ArrowRight
-                    size={17}
-                    aria-hidden="true"
-                  />
-
-                </Link>
-
               </div>
-
-            </div>
-
-
-            <div className="cf-conference-feature">
-
-              {featuredEventImage && (
-
-                <Link
-                  to={
-                    featuredEventPath
-                  }
-                  className="cf-conference-feature__image"
-                  aria-label={`View ${featuredEvent.title}`}
-                >
-
-                  <img
-                    src={
-                      featuredEventImage
-                    }
-                    alt={
-                      featuredEvent.title
-                    }
-                    loading="lazy"
-                    decoding="async"
-                    onError={(
-                      event
-                    ) => {
-                      event.currentTarget
-                        .style
-                        .display =
-                        "none";
-                    }}
-                  />
-
-                </Link>
-
-              )}
 
 
               <div
                 className="cf-conference-date"
-                aria-label={
-                  featuredEventDate?.full ||
-                  "Event date to be announced"
-                }
+                aria-hidden="true"
               >
 
-                {featuredEventDate ? (
-                  <>
+                <CalendarDays
+                  size={42}
+                  strokeWidth={1.4}
+                />
 
-                    <strong>
-                      {featuredEventDate.day}
-                    </strong>
+                <span>
+                  LOADING
+                </span>
 
-                    <span>
-                      {featuredEventDate.month}
-                    </span>
+              </div>
 
-                    <span>
-                      {featuredEventDate.year}
-                    </span>
+            </div>
 
-                  </>
-                ) : (
-                  <>
+          ) : featuredEvent ? (
 
-                    <CalendarDays
-                      size={38}
-                      strokeWidth={1.4}
+            <div className="cf-conference-grid">
+
+              <div className="cf-conference-info">
+
+                <span className="cf-eyebrow">
+                  {featuredEventType.toUpperCase()}
+                </span>
+
+
+                <h2 id="conference-heading">
+                  {featuredEvent.title}
+                </h2>
+
+
+                {featuredEventLocation && (
+
+                  <div className="cf-conference-location">
+
+                    <MapPin
+                      size={16}
+                      strokeWidth={1.8}
                       aria-hidden="true"
                     />
 
                     <span>
-                      DATE
+                      {featuredEventLocation}
                     </span>
+
+                  </div>
+
+                )}
+
+
+                {featuredEventDate && (
+
+                  <div className="cf-conference-location">
+
+                    <CalendarDays
+                      size={16}
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    />
 
                     <span>
-                      TBA
+                      {featuredEventDate.full}
                     </span>
 
-                  </>
+                  </div>
+
                 )}
+
+
+                {featuredEvent.description && (
+
+                  <p>
+                    {featuredEvent.description}
+                  </p>
+
+                )}
+
+
+                <div className="cf-actions">
+
+                  <Link
+                    to={
+                      featuredEventPath
+                    }
+                    className="cf-button cf-button--gold"
+                  >
+
+                    <span>
+                      View Event Details
+                    </span>
+
+                    <ArrowUpRight
+                      size={17}
+                      aria-hidden="true"
+                    />
+
+                  </Link>
+
+
+                  <Link
+                    to="/events"
+                    className="cf-text-link"
+                  >
+
+                    <span>
+                      All Events
+                    </span>
+
+                    <ArrowRight
+                      size={17}
+                      aria-hidden="true"
+                    />
+
+                  </Link>
+
+                </div>
+
+              </div>
+
+
+              <div className="cf-conference-feature">
+
+                {featuredEventImage && (
+
+                  <Link
+                    to={
+                      featuredEventPath
+                    }
+                    className="cf-conference-feature__image"
+                    aria-label={`View ${featuredEvent.title}`}
+                  >
+
+                    <img
+                      src={
+                        featuredEventImage
+                      }
+                      alt={
+                        featuredEvent.title
+                      }
+                      loading="lazy"
+                      decoding="async"
+                      onError={(
+                        event
+                      ) => {
+                        event.currentTarget
+                          .style
+                          .display =
+                          "none";
+                      }}
+                    />
+
+                  </Link>
+
+                )}
+
+
+                <div
+                  className="cf-conference-date"
+                  aria-label={
+                    featuredEventDate?.full ||
+                    "Event date to be announced"
+                  }
+                >
+
+                  {featuredEventDate ? (
+                    <>
+
+                      <strong>
+                        {featuredEventDate.day}
+                      </strong>
+
+                      <span>
+                        {featuredEventDate.month}
+                      </span>
+
+                      <span>
+                        {featuredEventDate.year}
+                      </span>
+
+                    </>
+                  ) : (
+                    <>
+
+                      <CalendarDays
+                        size={38}
+                        strokeWidth={1.4}
+                        aria-hidden="true"
+                      />
+
+                      <span>
+                        DATE
+                      </span>
+
+                      <span>
+                        TBA
+                      </span>
+
+                    </>
+                  )}
+
+                </div>
 
               </div>
 
             </div>
 
-          </div>
+          ) : (
 
-        ) : (
+            <div className="cf-conference-grid">
 
-          <div className="cf-container cf-conference-grid">
+              <div className="cf-conference-info">
 
-            <div className="cf-conference-info">
+                <span className="cf-eyebrow">
+                  CONFERENCE &amp; EVENTS
+                </span>
 
-              <div className="cf-section-marker">
 
-                <strong>
-                  CONFERENCE & EVENTS
-                </strong>
+                <h2 id="conference-heading">
+                  New events
+                  <br />
+
+                  <em>
+                    are coming.
+                  </em>
+                </h2>
+
+
+                <p>
+                  {eventError
+                    ? "Our latest event information is temporarily unavailable. Visit the events page for current programming."
+                    : "Upcoming Continental Founders conferences, forums, roundtables, and convenings will appear here when they are published."}
+                </p>
+
+
+                <div className="cf-actions">
+
+                  <Link
+                    to="/events"
+                    className="cf-button cf-button--gold"
+                  >
+
+                    <span>
+                      Explore Events
+                    </span>
+
+                    <ArrowUpRight
+                      size={17}
+                      aria-hidden="true"
+                    />
+
+                  </Link>
+
+                </div>
 
               </div>
 
 
-              <h2 id="conference-heading">
-                New events
-                <br />
-
-                <em>
-                  are coming.
-                </em>
-              </h2>
-
-
-              <p>
-                {eventError
-                  ? "Our latest event information is temporarily unavailable. Visit the events page for current programming."
-                  : "Upcoming Continental Founders conferences, forums, roundtables, and convenings will appear here when they are published."}
-              </p>
-
-              <br />
-
-
-              <Link
-                to="/events"
-                className="cf-button cf-button--gold"
+              <div
+                className="cf-conference-date"
+                aria-label="New events coming soon"
               >
 
-                <span>
-                  Explore Events
-                </span>
-
-                <ArrowUpRight
-                  size={17}
+                <CalendarDays
+                  size={42}
+                  strokeWidth={1.4}
                   aria-hidden="true"
                 />
 
-              </Link>
+                <span>
+                  COMING
+                </span>
+
+                <span>
+                  SOON
+                </span>
+
+              </div>
 
             </div>
 
+          )}
 
-            <div
-              className="cf-conference-date"
-              aria-label="New events coming soon"
-            >
-
-              <CalendarDays
-                size={42}
-                strokeWidth={1.4}
-                aria-hidden="true"
-              />
-
-              <span>
-                COMING
-              </span>
-
-              <span>
-                SOON
-              </span>
-
-            </div>
-
-          </div>
-
-        )}
+        </div>
 
       </section>
 
-{/* ============================================================
-    11 — NEWS & ANNOUNCEMENTS — CMS CONTENT
-============================================================ */}
 
-<NewsAnnouncements />
+      {/* =====================================================
+          12 — NEWS & ANNOUNCEMENTS — CMS CONTENT
+      ====================================================== */}
+
+      <NewsAnnouncements />
 
 
       {/* =====================================================
-          12 — THE CONTINENTAL FOUNDERS FLYWHEEL
+          13 — THE CONTINENTAL FOUNDERS FLYWHEEL
       ====================================================== */}
 
       <section
@@ -2902,12 +2841,12 @@ export default function Home() {
         aria-labelledby="explore-heading"
       >
 
-        <div className="cf-container">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div className="cf-section-header">
-            <br/>
-            <br/>
-            <br/>
+          <div className="cf-section-header cf-section-header--split">
 
             <div>
 
@@ -2931,77 +2870,13 @@ export default function Home() {
 
             </div>
 
-          </div>
-
-          <br />
-          <br/>
-
-
-          <div className="cf-program-grid">
-
-            <HomePageLink
-              title="Founder Development"
-              text="Develop globally ready leaders and stronger ventures through structured founder development."
-              to="/about"
-            />
-
-            <HomePageLink
-              title="Research & Evidence"
-              text="Generate evidence that informs strategy, improves programs, and strengthens the founder experience."
-              to="/ventures"
-            />
-
-            <HomePageLink
-              title="Market Access"
-              text="Connect qualified founders with procurement, customers, diaspora networks, institutions, and global markets."
-              to="/our-model"
-            />
-
-            <HomePageLink
-              title="Founder Development"
-              text="Explore collaboration opportunities for universities, faculty, researchers, students, and academic institutions."
-              to="/universities"
-            />
-
-            <HomePageLink
-              title="Investment"
-              text="Prepare ventures for appropriate capital, investor relationships, due diligence, validation, and growth."
-              to="/strategic-partners"
-            />
-
-            <HomePageLink
-              title="Measure Outcomes"
-              text="Track revenue, capital, contracts, customers, jobs, partnerships, markets entered, and international growth."
-              to="/programs"
-            />
-
-            <HomePageLink
-              title="Improve"
-              text="Turn founder experience and measurable outcomes into evidence that strengthens future cohorts."
-              to="/events"
-            />
-
-            <HomePageLink
-              title="Greater Impact"
-              text="Build an entrepreneurial ecosystem that becomes stronger with every founder, partner, and cycle of learning."
-              to="/insights"
-            />
-
-          </div>
-
-
-          <div className="cf-centered-link">
 
             <Link
               to="/contact"
               className="cf-text-link"
             >
 
-              <br/>
-              
-
               <span>
-                
                 Build With Us
               </span>
 
@@ -3014,16 +2889,74 @@ export default function Home() {
 
           </div>
 
+
+          <div className="cf-flywheel-grid">
+
+            <HomePageLink
+              number="01"
+              title="Founder Development"
+              text="Develop globally ready leaders and stronger ventures through structured founder development."
+              to="/cfcv"
+            />
+
+            <HomePageLink
+              number="02"
+              title="Research & Evidence"
+              text="Generate evidence that informs strategy, improves programs, and strengthens the founder experience."
+              to="/universities"
+            />
+
+            <HomePageLink
+              number="03"
+              title="Market Access"
+              text="Connect qualified founders with procurement, customers, diaspora networks, institutions, and global markets."
+              to="/partners/us-africa-trade-network"
+            />
+
+            <HomePageLink
+              number="04"
+              title="University Partnerships"
+              text="Explore collaboration opportunities for universities, faculty, researchers, students, and academic institutions."
+              to="/universities"
+            />
+
+            <HomePageLink
+              number="05"
+              title="Investment"
+              text="Prepare ventures for appropriate capital, investor relationships, due diligence, validation, and growth."
+              to="/strategic-partners"
+            />
+
+            <HomePageLink
+              number="06"
+              title="Measure Outcomes"
+              text="Track revenue, capital, contracts, customers, jobs, partnerships, markets entered, and international growth."
+              to="/impact"
+            />
+
+            <HomePageLink
+              number="07"
+              title="Improve"
+              text="Turn founder experience and measurable outcomes into evidence that strengthens future cohorts."
+              to="/our-model"
+            />
+
+            <HomePageLink
+              number="08"
+              title="Greater Impact"
+              text="Build an entrepreneurial ecosystem that becomes stronger with every founder, partner, and cycle of learning."
+              to="/about"
+            />
+
+          </div>
+
         </div>
 
       </section>
 
-      <br/>
-      <br/>
-
 
       {/* =====================================================
-          13 — BUILD WITH US
+          14 — BUILD WITH US
       ====================================================== */}
 
       <section
@@ -3031,96 +2964,81 @@ export default function Home() {
         aria-labelledby="partnership-materials-heading"
       >
 
-        <div className="cf-container cf-materials-grid">
+        <div
+          className="cf-container"
+          data-reveal
+        >
 
-          <div>
+          <div className="cf-materials-grid">
 
-            <span className="cf-eyebrow">
-              BUILD WITH US
-            </span>
+            <div>
+
+              <span className="cf-eyebrow">
+                BUILD WITH US
+              </span>
 
 
-            <h2 id="partnership-materials-heading">
-              The next generation of global founders is already emerging.
-            </h2>
+              <h2 id="partnership-materials-heading">
+                The next generation of global founders is{" "}
+                <em>already emerging.</em>
+              </h2>
+
+            </div>
+
+
+            <div className="cf-materials-body">
+
+              <p>
+                Across Africa and throughout the diaspora, entrepreneurs are developing solutions, creating businesses, generating employment, and imagining industries that can transform communities and economies. Continental Founders invites universities, researchers, corporations, investors, governments, foundations, diaspora organizations, mentors, and ecosystem builders to become part of this work.
+              </p>
+
+
+              <div className="cf-actions">
+
+                <Link
+                  to="/contact"
+                  className="cf-button cf-button--gold"
+                >
+
+                  <span>
+                    Support Continental Founders
+                  </span>
+
+                  <ArrowUpRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+
+                <Link
+                  to="/cfcv/apply"
+                  className="cf-button cf-button--outline-dark"
+                >
+
+                  <span>
+                    Apply to CF Fellows
+                  </span>
+
+                  <ArrowRight
+                    size={17}
+                    aria-hidden="true"
+                  />
+
+                </Link>
+
+              </div>
+
+            </div>
 
           </div>
-
-
-          <p>
-            Across Africa and throughout the diaspora, entrepreneurs are developing solutions, creating businesses, generating employment, and imagining industries that can transform communities and economies. Continental Founders invites universities, researchers, corporations, investors, governments, foundations, diaspora organizations, mentors, and ecosystem builders to become part of this work.
-          </p>
-
-
-          <a
-            href="/assets/documents/continental-founders-partnership.pdf"
-            className="cf-button cf-button--gold"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Download Continental Founders partnership materials PDF"
-          >
-
-            <span>
-              Support Continental Founders
-            </span>
-
-            <Download
-              size={17}
-              aria-hidden="true"
-            />
-
-          </a>
 
         </div>
 
       </section>
 
     </main>
-  );
-}
-
-
-// ============================================================
-// QUICK HIGHLIGHT
-// ============================================================
-
-function QuickHighlight({
-  number,
-  icon,
-  title,
-  text,
-}) {
-  return (
-    <div className="cf-quick-item">
-
-      {icon && (
-        <div
-          className="cf-quick-icon"
-          aria-hidden="true"
-        >
-          {icon}
-        </div>
-      )}
-
-
-      <span className="cf-quick-number">
-        {number}
-      </span>
-
-
-      <div className="cf-quick-content">
-
-        <strong>
-          {title}
-        </strong>
-
-        <small>
-          {text}
-        </small>
-
-      </div>
-
-    </div>
   );
 }
 
@@ -3167,7 +3085,7 @@ function ModelStep({
   text,
 }) {
   return (
-    <article className="cf-model-step">
+    <li className="cf-model-step">
 
       <div className="cf-model-step__top">
 
@@ -3178,8 +3096,11 @@ function ModelStep({
           {icon}
         </div>
 
-        <span className="sr-only">
-          Step {number}
+        <span className="cf-model-step__number">
+          <span className="sr-only">
+            Step{" "}
+          </span>
+          {number}
         </span>
 
       </div>
@@ -3194,7 +3115,7 @@ function ModelStep({
         {text}
       </p>
 
-    </article>
+    </li>
   );
 }
 
@@ -3265,42 +3186,25 @@ function EcosystemCard({
 
 
 // ============================================================
-// INSIGHT
+// FLYWHEEL LINK CARD
+// The whole card is one link.
 // ============================================================
 
-function Insight({
-  image,
-  category,
-  date,
+function HomePageLink({
+  number,
   title,
   text,
+  to,
 }) {
   return (
-    <article className="cf-news-card">
+    <Link
+      to={to}
+      className="cf-flywheel-card"
+    >
 
-      <div className="cf-news-image">
-
-        <img
-          src={image}
-          alt={title}
-          loading="lazy"
-          decoding="async"
-        />
-
-      </div>
-
-
-      <div className="cf-news-meta">
-
-        <span>
-          {category}
-        </span>
-
-        <span>
-          {date}
-        </span>
-
-      </div>
+      <span className="cf-flywheel-card__number">
+        {number}
+      </span>
 
 
       <h3>
@@ -3313,71 +3217,17 @@ function Insight({
       </p>
 
 
-      <Link
-        to="/insights"
-        className="cf-text-link"
-        aria-label={`Read more about ${title}`}
-      >
+      <span className="cf-flywheel-card__cta">
 
-        <span>
-          Read More
-        </span>
+        Learn More
 
-        <ArrowUpRight
+        <ArrowRight
           size={16}
           aria-hidden="true"
         />
 
-      </Link>
+      </span>
 
-    </article>
-  );
-}
-
-
-// ============================================================
-// HOMEPAGE INTERNAL LINK
-// ============================================================
-
-function HomePageLink({
-  title,
-  text,
-  to,
-}) {
-  return (
-    <article className="cf-program-card">
-
-      <h3 className="cf-program-title">
-
-        <Link to={to}>
-          {title}
-        </Link>
-
-      </h3>
-
-
-      <p className="cf-program-text">
-        {text}
-      </p>
-
-
-      <Link
-        to={to}
-        className="cf-text-link"
-        aria-label={`Learn more about ${title}`}
-      >
-
-        <span>
-          Learn More
-        </span>
-
-        <ArrowRight
-          size={17}
-          aria-hidden="true"
-        />
-
-      </Link>
-
-    </article>
+    </Link>
   );
 }

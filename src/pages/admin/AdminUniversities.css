@@ -138,8 +138,7 @@
     0 2px 7px rgba(17, 35, 55, 0.04);
 }
 
-.admin-universities__summary-card > svg,
-.admin-universities__summary-icon {
+.admin-universities__summary-card > svg {
   width: 38px;
   height: 38px;
 
@@ -154,10 +153,6 @@
 
   background: #fbf5e8;
   color: #b68a2c;
-}
-
-.admin-universities__summary-icon {
-  padding: 0;
 }
 
 .admin-universities__summary-card > div:last-child {
@@ -492,13 +487,6 @@
   text-overflow: ellipsis;
 }
 
-.admin-universities__arrow {
-  display: grid;
-  place-items: center;
-
-  color: #9aa6b2;
-}
-
 
 /* ============================================================
    STATUS
@@ -571,22 +559,9 @@
   text-align: center;
 }
 
-.admin-universities__empty > svg,
-.admin-universities__empty-icon {
+.admin-universities__empty > svg {
   margin-bottom: 10px;
   color: #8d99a5;
-}
-
-.admin-universities__empty-icon {
-  width: 50px;
-  height: 50px;
-
-  display: grid;
-  place-items: center;
-
-  border-radius: 8px;
-
-  background: #f3f6f8;
 }
 
 .admin-universities__empty h3 {

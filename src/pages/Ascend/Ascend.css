@@ -8,8 +8,8 @@
   --navy: #102b40;
   --navy-dark: #0b2234;
   --navy-light: #193e55;
-  --teal: #117768;
-  --teal-dark: #0c5d52;
+  --brand-navy: #031b34;
+  --brand-navy-dark: #010d1a;
   --gold: #f0c778;
   --gold-dark: #bb7b16;
   --cream: #f9f8f5;
@@ -165,7 +165,7 @@
   background:
     radial-gradient(
       ellipse at 85% 20%,
-      rgba(17, 119, 104, 0.3) 0%,
+      rgba(3, 27, 52, 0.3) 0%,
       transparent 38%
     ),
     linear-gradient(
@@ -259,9 +259,9 @@
   gap: 8px;
   min-height: 48px;
   padding: 13px 22px;
-  border: 1px solid var(--teal);
+  border: 1px solid var(--brand-navy);
   border-radius: 6px;
-  background: var(--teal);
+  background: var(--brand-navy);
   color: var(--white);
   font-size: 14px;
   font-weight: 750;
@@ -279,8 +279,8 @@
 
 .ascend-page .as-btn:hover {
   transform: translateY(-2px);
-  border-color: var(--teal-dark);
-  background: var(--teal-dark);
+  border-color: var(--brand-navy-dark);
+  background: var(--brand-navy-dark);
   box-shadow: 0 9px 22px rgba(11, 34, 52, 0.16);
 }
 
@@ -302,6 +302,20 @@
   background: rgba(255, 255, 255, 0.08);
   color: var(--gold);
   box-shadow: none;
+}
+
+/* Navy would vanish on the dark hero photo, so the main hero
+   button is white */
+.ascend-page .as-hero .as-btn:not(.secondary) {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--brand-navy);
+}
+
+.ascend-page .as-hero .as-btn:not(.secondary):hover {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--brand-navy);
 }
 
 .ascend-page .as-actions {
@@ -390,7 +404,7 @@
 
 .ascend-page .as-kicker {
   margin-bottom: 10px;
-  color: var(--teal);
+  color: var(--brand-navy);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -452,8 +466,8 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: rgba(17, 119, 104, 0.12);
-  color: var(--teal);
+  background: rgba(3, 27, 52, 0.12);
+  color: var(--brand-navy);
   content: "✓";
   font-size: 12px;
   font-weight: 800;
@@ -474,7 +488,7 @@
   min-width: 0;
   padding: 22px 23px;
   border: 1px solid var(--border);
-  border-left: 4px solid var(--teal);
+  border-left: 4px solid var(--brand-navy);
   border-radius: 7px;
   background: var(--cream);
   transition:
@@ -527,7 +541,7 @@
 
 .ascend-page .as-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(17, 119, 104, 0.4);
+  border-color: rgba(3, 27, 52, 0.4);
   box-shadow: 0 12px 28px rgba(20, 42, 60, 0.075);
 }
 
@@ -575,7 +589,7 @@
 
 .ascend-page .as-path:hover {
   transform: translateY(-4px);
-  border-color: var(--teal);
+  border-color: var(--brand-navy);
   box-shadow: 0 12px 26px rgba(20, 42, 60, 0.08);
 }
 
@@ -640,7 +654,7 @@
   background:
     radial-gradient(
       circle at 95% 0%,
-      rgba(17, 119, 104, 0.32),
+      rgba(3, 27, 52, 0.32),
       transparent 38%
     ),
     var(--navy);
@@ -736,9 +750,9 @@
 .ascend-page input:focus,
 .ascend-page select:focus,
 .ascend-page textarea:focus {
-  border-color: var(--teal);
+  border-color: var(--brand-navy);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(17, 119, 104, 0.12);
+  box-shadow: 0 0 0 3px rgba(3, 27, 52, 0.12);
 }
 
 /* Checkbox and consent labels */
@@ -761,7 +775,7 @@
   height: 17px;
   margin: 4px 0 0;
   padding: 0;
-  accent-color: var(--teal);
+  accent-color: var(--brand-navy);
   cursor: pointer;
 }
 
@@ -787,10 +801,10 @@
   display: block;
   margin-top: 16px;
   padding: 15px 17px;
-  border: 1px solid #c4e0d3;
+  border: 1px solid #cdd6e2;
   border-radius: 7px;
-  background: #e7f2ed;
-  color: #184b38;
+  background: #eef2f7;
+  color: #031b34;
   font-size: 14px;
   line-height: 1.7;
 }
@@ -822,11 +836,11 @@
 
 .ascend-page summary:hover,
 .ascend-page details[open] summary {
-  color: var(--teal);
+  color: var(--brand-navy);
 }
 
 .ascend-page summary:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--brand-navy);
   outline-offset: 4px;
 }
 

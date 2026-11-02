@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -9,15 +10,12 @@ import {
   CalendarDays,
   Lightbulb,
   MapPin,
+  RotateCw,
   Sprout,
   Users,
 } from "lucide-react";
 
-import {
-  Link,
-} from "react-router-dom";
-
-import SectionHeading from "../components/ui/SectionHeading";
+import { Link } from "react-router-dom";
 
 import "./Events.css";
 
@@ -32,7 +30,8 @@ const API_URL =
 
 
 // ============================================================
-// FALLBACK IMAGES
+// DATA
+// Cards cycle through the site's gold, navy and blue accents.
 // ============================================================
 
 const FALLBACK_IMAGES = [
@@ -40,6 +39,14 @@ const FALLBACK_IMAGES = [
   "/assets/images/events/event-2.webp",
   "/assets/images/events/event-3.webp",
   "/assets/images/events/event-4.webp",
+];
+
+const TONES = ["gold", "navy", "blue"];
+
+const pillars = [
+  { icon: Users, title: "Meaningful Connections", color: "gold" },
+  { icon: Lightbulb, title: "Practical Insights", color: "navy" },
+  { icon: Sprout, title: "Real Opportunities", color: "blue" },
 ];
 
 
@@ -60,60 +67,25 @@ function getEventDate(event) {
 
 
 function formatEventDate(value) {
-  if (!value) {
-    return {
-      day: "--",
-      month: "---",
-      year: "",
-    };
-  }
+  const empty = { day: "--", month: "---", year: "" };
 
-  const date =
-    new Date(value);
+  if (!value) return empty;
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return {
-      day: "--",
-      month: "---",
-      year: "",
-    };
-  }
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return empty;
 
   return {
-    day:
-      date.toLocaleDateString(
-        "en-US",
-        {
-          day: "2-digit",
-        }
-      ),
-
-    month:
-      date
-        .toLocaleDateString(
-          "en-US",
-          {
-            month: "short",
-          }
-        )
-        .toUpperCase(),
-
-    year:
-      String(
-        date.getFullYear()
-      ),
+    day: date.toLocaleDateString("en-US", { day: "2-digit" }),
+    month: date
+      .toLocaleDateString("en-US", { month: "short" })
+      .toUpperCase(),
+    year: String(date.getFullYear()),
   };
 }
 
 
-function getEventImage(
-  event,
-  index = 0
-) {
+function getEventImage(event, index = 0) {
   const image =
     event?.imageUrl ||
     event?.image_url ||
@@ -122,14 +94,7 @@ function getEventImage(
     event?.cover_image ||
     "";
 
-  if (image) {
-    return image;
-  }
-
-  return FALLBACK_IMAGES[
-    index %
-    FALLBACK_IMAGES.length
-  ];
+  return image || FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
 }
 
 
@@ -144,19 +109,12 @@ function getEventLocation(event) {
 
 
 function getEventType(event) {
-  return (
-    event?.type ||
-    event?.category ||
-    "Convening"
-  );
+  return event?.type || event?.category || "Convening";
 }
 
 
 function getEventTitle(event) {
-  return (
-    event?.title ||
-    "Continental Founders Event"
-  );
+  return event?.title || "Continental Founders Event";
 }
 
 
@@ -170,16 +128,9 @@ function getEventDescription(event) {
 
 
 function getEventSlug(event) {
-  const slug =
-    event?.slug;
+  const slug = event?.slug;
 
-  if (
-    typeof slug !== "string"
-  ) {
-    return "";
-  }
-
-  return slug.trim();
+  return typeof slug === "string" ? slug.trim() : "";
 }
 
 
@@ -188,220 +139,165 @@ function getEventSlug(event) {
 // ============================================================
 
 export default function Events() {
-  const [
-    events,
-    setEvents,
-  ] =
-    useState([]);
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(true);
-
-  const [
-    error,
-    setError,
-  ] =
-    useState("");
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
 
   // ==========================================================
   // LOAD PUBLISHED EVENTS
   // ==========================================================
 
-  const loadEvents =
-    useCallback(
-      async (
-        signal
-      ) => {
-        try {
-          setLoading(true);
-          setError("");
+  const loadEvents = useCallback(async (signal) => {
+    try {
+      setLoading(true);
+      setError("");
 
-          const response =
-            await fetch(
-              `${API_URL}/api/events/published`,
-              {
-                method: "GET",
-
-                headers: {
-                  Accept:
-                    "application/json",
-                },
-
-                signal,
-              }
-            );
-
-          const contentType =
-            response.headers.get(
-              "content-type"
-            ) || "";
-
-          let result = {};
-
-          if (
-            contentType.includes(
-              "application/json"
-            )
-          ) {
-            result =
-              await response.json();
-          } else {
-            const text =
-              await response.text();
-
-            console.error(
-              "Unexpected events response:",
-              text
-            );
-
-            throw new Error(
-              "The events service returned an unexpected response."
-            );
-          }
-
-          if (!response.ok) {
-            throw new Error(
-              result?.message ||
-              result?.error ||
-              "Unable to load events."
-            );
-          }
-
-          const eventData =
-            Array.isArray(
-              result?.events
-            )
-              ? result.events
-              : Array.isArray(
-                  result?.data
-                )
-                ? result.data
-                : Array.isArray(
-                    result?.data?.events
-                  )
-                  ? result.data.events
-                  : [];
-
-          setEvents(
-            eventData
-          );
-        } catch (
-          requestError
-        ) {
-          if (
-            requestError?.name ===
-            "AbortError"
-          ) {
-            return;
-          }
-
-          console.error(
-            "Events loading error:",
-            requestError
-          );
-
-          setEvents([]);
-
-          setError(
-            requestError?.message ||
-            "We could not load the events calendar at the moment."
-          );
-        } finally {
-          if (
-            !signal?.aborted
-          ) {
-            setLoading(false);
-          }
+      const response = await fetch(
+        `${API_URL}/api/events/published`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
+          signal,
         }
-      },
-      []
-    );
-
-
-  // ==========================================================
-  // INITIAL LOAD
-  // ==========================================================
-
-  useEffect(
-    () => {
-      const controller =
-        new AbortController();
-
-      loadEvents(
-        controller.signal
       );
 
-      return () => {
-        controller.abort();
-      };
-    },
-    [
-      loadEvents,
-    ]
-  );
+      const contentType = response.headers.get("content-type") || "";
+
+      let result = {};
+
+      if (contentType.includes("application/json")) {
+        result = await response.json();
+      } else {
+        const text = await response.text();
+
+        console.error("Unexpected events response:", text);
+
+        throw new Error(
+          "The events service returned an unexpected response."
+        );
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          result?.message ||
+          result?.error ||
+          "Unable to load events."
+        );
+      }
+
+      const eventData = Array.isArray(result?.events)
+        ? result.events
+        : Array.isArray(result?.data)
+          ? result.data
+          : Array.isArray(result?.data?.events)
+            ? result.data.events
+            : [];
+
+      setEvents(eventData);
+    } catch (requestError) {
+      if (requestError?.name === "AbortError") return;
+
+      console.error("Events loading error:", requestError);
+
+      setEvents([]);
+
+      // A network failure only says "Failed to fetch"; show
+      // visitors a plain sentence instead.
+      setError(
+        requestError instanceof TypeError || !requestError?.message
+          ? "We could not load the events calendar at the moment. Please try again shortly."
+          : requestError.message
+      );
+    } finally {
+      if (!signal?.aborted) setLoading(false);
+    }
+  }, []);
 
 
-  // ==========================================================
-  // RETRY
-  // ==========================================================
+  useEffect(() => {
+    const controller = new AbortController();
+
+    loadEvents(controller.signal);
+
+    return () => controller.abort();
+  }, [loadEvents]);
+
+
+  // Reveal sections as they scroll into view. Anything already
+  // above the fold (or skipped by a fast jump) is shown at once.
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("ev-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
 
   function handleRetry() {
     loadEvents();
   }
 
 
-  // ==========================================================
-  // SCROLL TO EVENTS
-  // ==========================================================
-
   function scrollToEvents() {
-    const section =
-      document.getElementById(
-        "events-calendar"
-      );
-
-    if (section) {
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
+    document
+      .getElementById("events-calendar")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
 
-  // ==========================================================
-  // IMAGE ERROR
-  // ==========================================================
+  // Swap a broken event photo for one of ours, once.
+  function handleImageError(event, index) {
+    const image = event.currentTarget;
 
-  function handleImageError(
-    event,
-    index
-  ) {
-    const image =
-      event.currentTarget;
+    if (image.dataset.fallbackApplied === "true") return;
 
-    const fallback =
-      FALLBACK_IMAGES[
-        index %
-        FALLBACK_IMAGES.length
-      ];
-
-    if (
-      image.dataset.fallbackApplied ===
-      "true"
-    ) {
-      return;
-    }
-
-    image.dataset.fallbackApplied =
-      "true";
-
-    image.src =
-      fallback;
+    image.dataset.fallbackApplied = "true";
+    image.src = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
   }
 
 
@@ -410,45 +306,36 @@ export default function Events() {
   // ==========================================================
 
   return (
-    <main className="events-page">
+    <main className="ev-page" ref={pageRef}>
 
       {/* ======================================================
           HERO
       ====================================================== */}
 
-      <section className="events-hero">
+      <section className="ev-hero">
 
-        <div
-          className="events-hero__media"
-          aria-hidden="true"
-        />
+        <div className="ev-hero__media" aria-hidden="true">
+          <img
+            src="/assets/images/events/events-hero.webp"
+            alt=""
+            fetchPriority="high"
+          />
+        </div>
 
-        <div
-          className="events-hero__overlay"
-          aria-hidden="true"
-        />
+        <div className="ev-container">
 
+          <div className="ev-hero__content">
 
-        <div className="container events-hero__inner">
-
-          <div className="events-hero__content">
-
-            <span className="eyebrow eyebrow--light">
+            <span className="ev-eyebrow ev-eyebrow--light">
               Events & Convenings
             </span>
 
-
             <h1>
-              Where relationships
-              <br />
-
-              find a{" "}
-
-              <em>
-                room to grow.
-              </em>
+              <span>Where relationships</span>{" "}
+              <span>
+                find a <em>room to grow.</em>
+              </span>
             </h1>
-
 
             <p>
               Curated conversations, roundtables,
@@ -456,23 +343,13 @@ export default function Events() {
               around practical institutional questions.
             </p>
 
-
             <button
               type="button"
-              className="events-hero__cta"
-              onClick={
-                scrollToEvents
-              }
+              className="ev-button ev-button--gold"
+              onClick={scrollToEvents}
             >
-              <span>
-                Explore Our Events
-              </span>
-
-              <ArrowRight
-                size={18}
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
+              Explore our events
+              <ArrowRight size={18} aria-hidden="true" />
             </button>
 
           </div>
@@ -486,86 +363,41 @@ export default function Events() {
           WHY CONVENE
       ====================================================== */}
 
-      <section className="section events-intro">
+      <section className="ev-section ev-intro">
 
-        <div className="container">
+        <div className="ev-container ev-intro__grid">
 
-          <div className="events-intro__grid">
+          <div className="ev-intro__heading" data-reveal>
+            <span className="ev-eyebrow">Why Convene</span>
 
-            <div className="events-intro__heading">
+            <h2>
+              The right conversation can be the beginning
+              of a durable partnership.
+            </h2>
+          </div>
 
-              <span className="eyebrow">
-                Why Convene
-              </span>
+          <div className="ev-intro__content" data-reveal>
+            <p>
+              Our convenings are designed to bring relevant
+              people into focused conversations where
+              opportunities can be identified, tested,
+              and moved toward action.
+            </p>
 
-              <h2>
-                The right conversation can be the beginning
-                of a durable partnership.
-              </h2>
-
-            </div>
-
-
-            <div className="events-intro__content">
-
-              <p>
-                Our convenings are designed to bring relevant
-                people into focused conversations where
-                opportunities can be identified, tested,
-                and moved toward action.
-              </p>
-
-
-              <div className="events-intro__pillars">
-
-                <div className="events-intro__pillar">
-
-                  <Users
-                    size={23}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    Meaningful Connections
+            <ul className="ev-pillars">
+              {pillars.map(({ icon: Icon, title, color }) => (
+                <li
+                  key={title}
+                  className={`ev-pillar ev-tone--${color}`}
+                >
+                  <span className="ev-icon">
+                    <Icon size={22} aria-hidden="true" />
                   </span>
 
-                </div>
-
-
-                <div className="events-intro__pillar">
-
-                  <Lightbulb
-                    size={23}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    Practical Insights
-                  </span>
-
-                </div>
-
-
-                <div className="events-intro__pillar">
-
-                  <Sprout
-                    size={23}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-
-                  <span>
-                    Real Opportunities
-                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
+                  <h3>{title}</h3>
+                </li>
+              ))}
+            </ul>
           </div>
 
         </div>
@@ -578,348 +410,222 @@ export default function Events() {
       ====================================================== */}
 
       <section
-        className="section events-calendar"
+        className="ev-section ev-section--soft ev-calendar"
         id="events-calendar"
       >
 
-        <div className="container">
+        <div className="ev-container ev-calendar__grid">
 
-          <div className="events-calendar__columns">
+          <div className="ev-calendar__main">
 
-            {/* ==================================================
-                LEFT — CALENDAR
-            ================================================== */}
-
-            <div className="events-calendar__calendar">
-
-              <div className="events-calendar__header">
-
-                <SectionHeading
-                  eyebrow="Calendar"
-                  title="Upcoming and planned programming."
-                />
-
-                {events.length > 0 && (
-                  <button
-                    type="button"
-                    className="events-calendar__view-all"
-                    onClick={
-                      scrollToEvents
-                    }
-                  >
-                    <span>
-                      View All Events
-                    </span>
-
-                    <ArrowRight
-                      size={16}
-                      strokeWidth={1.7}
-                      aria-hidden="true" 
-                    />
-                  </button>
-                )}
-
+            <header className="ev-calendar__header" data-reveal>
+              <div>
+                <span className="ev-eyebrow">Calendar</span>
+                <h2>Upcoming and planned programming.</h2>
               </div>
 
-
-              {/* ================================================
-                  LOADING
-              ================================================ */}
-
-              {loading && (
-                <div
-                  className="events-status"
-                  aria-live="polite"
+              {events.length > 0 && (
+                <button
+                  type="button"
+                  className="ev-button ev-button--outline"
+                  onClick={scrollToEvents}
                 >
-                  <div
-                    className="events-status__loader"
-                    aria-hidden="true"
-                  />
-
-                  <p>
-                    Loading upcoming events...
-                  </p>
-                </div>
+                  View all events
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
               )}
+            </header>
 
 
-              {/* ================================================
-                  ERROR
-              ================================================ */}
+            {/* Loading: placeholder cards in the shape of real ones */}
 
-              {!loading &&
-                error && (
+            {loading && (
+              <div
+                className="ev-grid"
+                aria-live="polite"
+                aria-busy="true"
+              >
+                <span className="ev-visually-hidden">
+                  Loading upcoming events...
+                </span>
 
+                {[0, 1].map((item) => (
                   <div
-                    className="events-status events-status--error"
-                    role="alert"
+                    key={item}
+                    className="ev-card ev-card--skeleton"
+                    aria-hidden="true"
                   >
+                    <div className="ev-card__media" />
 
-                    <CalendarDays
-                      size={30}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
+                    <div className="ev-card__body">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
-                    <span className="eyebrow">
-                      Calendar Unavailable
-                    </span>
 
-                    <h3>
-                      We could not load the event calendar.
-                    </h3>
+            {/* Error */}
 
-                    <p>
-                      {error}
-                    </p>
+            {!loading && error && (
+              <div
+                className="ev-status ev-status--error"
+                role="alert"
+              >
+                <span className="ev-status__icon">
+                  <CalendarDays size={28} aria-hidden="true" />
+                </span>
 
-                    <button
-                      type="button"
-                      onClick={
-                        handleRetry
-                      }
+                <span className="ev-eyebrow">
+                  Calendar Unavailable
+                </span>
+
+                <h3>We could not load the event calendar.</h3>
+
+                <p>{error}</p>
+
+                <button
+                  type="button"
+                  className="ev-button ev-button--navy"
+                  onClick={handleRetry}
+                >
+                  <RotateCw size={16} aria-hidden="true" />
+                  Try again
+                </button>
+              </div>
+            )}
+
+
+            {/* Empty */}
+
+            {!loading && !error && events.length === 0 && (
+              <div className="ev-status">
+                <span className="ev-status__icon">
+                  <CalendarDays size={28} aria-hidden="true" />
+                </span>
+
+                <span className="ev-eyebrow">Coming Soon</span>
+
+                <h3>New convenings are being prepared.</h3>
+
+                <p>
+                  Upcoming Continental Founders events
+                  and programming will appear here as
+                  they are published.
+                </p>
+              </div>
+            )}
+
+
+            {/* Event cards */}
+
+            {!loading && !error && events.length > 0 && (
+              <div className="ev-grid">
+                {events.map((event, index) => {
+                  const rawDate = getEventDate(event);
+                  const date = formatEventDate(rawDate);
+                  const title = getEventTitle(event);
+                  const slug = getEventSlug(event);
+                  const image = getEventImage(event, index);
+
+                  const eventPath = slug
+                    ? `/events/${encodeURIComponent(slug)}`
+                    : "";
+
+                  return (
+                    <article
+                      key={event?.id || slug || `${title}-${index}`}
+                      className={`ev-card ev-tone--${TONES[index % TONES.length]}`}
                     >
-                      Try Again
-                    </button>
 
-                  </div>
+                      <div className="ev-card__media">
+                        {/* Blurred copy fills the frame so posters
+                            and flyers are never cropped */}
+                        <img
+                          className="ev-card__backdrop"
+                          src={image}
+                          alt=""
+                          aria-hidden="true"
+                          loading="lazy"
+                          decoding="async"
+                          onError={(imageEvent) =>
+                            handleImageError(imageEvent, index)
+                          }
+                        />
 
-                )}
+                        <img
+                          className="ev-card__image"
+                          src={image}
+                          alt={title}
+                          loading="lazy"
+                          decoding="async"
+                          onError={(imageEvent) =>
+                            handleImageError(imageEvent, index)
+                          }
+                        />
 
-
-              {/* ================================================
-                  EMPTY
-              ================================================ */}
-
-              {!loading &&
-                !error &&
-                events.length === 0 && (
-
-                  <div className="events-status">
-
-                    <CalendarDays
-                      size={30}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
-
-                    <span className="eyebrow">
-                      Coming Soon
-                    </span>
-
-                    <h3>
-                      New convenings are being prepared.
-                    </h3>
-
-                    <p>
-                      Upcoming Continental Founders events
-                      and programming will appear here as
-                      they are published.
-                    </p>
-
-                  </div>
-
-                )}
-
-
-              {/* ================================================
-                  EVENT CARDS
-              ================================================ */}
-
-              {!loading &&
-                !error &&
-                events.length > 0 && (
-
-                  <div className="events-grid">
-
-                    {events.map(
-                      (
-                        event,
-                        index
-                      ) => {
-                        const rawDate =
-                          getEventDate(
-                            event
-                          );
-
-                        const date =
-                          formatEventDate(
+                        <div
+                          className="ev-card__date"
+                          aria-label={
                             rawDate
-                          );
+                              ? `Event date: ${date.day} ${date.month} ${date.year}`
+                              : "Event date to be announced"
+                          }
+                        >
+                          <strong>{date.day}</strong>
+                          <span>{date.month}</span>
+                          <small>{date.year}</small>
+                        </div>
+                      </div>
 
-                        const location =
-                          getEventLocation(
-                            event
-                          );
+                      <div className="ev-card__body">
+                        <span className="ev-card__type">
+                          {getEventType(event)}
+                        </span>
 
-                        const eventType =
-                          getEventType(
-                            event
-                          );
+                        <h3>{title}</h3>
 
-                        const title =
-                          getEventTitle(
-                            event
-                          );
+                        <p className="ev-card__location">
+                          <MapPin size={16} aria-hidden="true" />
+                          <span>{getEventLocation(event)}</span>
+                        </p>
 
-                        const description =
-                          getEventDescription(
-                            event
-                          );
+                        <p className="ev-card__text">
+                          {getEventDescription(event)}
+                        </p>
 
-                        const slug =
-                          getEventSlug(
-                            event
-                          );
-
-                        const eventPath =
-                          slug
-                            ? `/events/${encodeURIComponent(
-                                slug
-                              )}`
-                            : "";
-
-                        return (
-                          <article
-                            className="event-card"
-                            key={
-                              event?.id ||
-                              slug ||
-                              `${title}-${index}`
-                            }
+                        {eventPath && (
+                          <Link
+                            to={eventPath}
+                            className="ev-card__link"
+                            aria-label={`Learn more about ${title}`}
                           >
+                            Learn more
+                            <ArrowRight size={16} aria-hidden="true" />
+                          </Link>
+                        )}
+                      </div>
 
-                            <div className="event-card__media">
-
-                              <img
-                                src={
-                                  getEventImage(
-                                    event,
-                                    index
-                                  )
-                                }
-                                alt={title}
-                                loading="lazy"
-                                decoding="async"
-                                onError={(
-                                  imageEvent
-                                ) =>
-                                  handleImageError(
-                                    imageEvent,
-                                    index
-                                  )
-                                }
-                              />
-
-
-                              <div
-                                className="event-card__date"
-                                aria-label={
-                                  rawDate
-                                    ? `Event date: ${date.day} ${date.month} ${date.year}`
-                                    : "Event date to be announced"
-                                }
-                              >
-
-                                <strong>
-                                  {date.day}
-                                </strong>
-
-                                <span>
-                                  {date.month}
-                                </span>
-
-                                <small>
-                                  {date.year}
-                                </small>
-
-                              </div>
-
-                            </div>
-
-
-                            <div className="event-card__body">
-
-                              <span className="event-card__type">
-                                {eventType}
-                              </span>
-
-
-                              <h3>
-                                {title}
-                              </h3>
-
-
-                              <div className="event-card__location">
-
-                                <MapPin
-                                  size={15}
-                                  strokeWidth={1.8}
-                                  aria-hidden="true"
-                                />
-
-                                <span>
-                                  {location}
-                                </span>
-
-                              </div>
-
-
-                              <p>
-                                {description}
-                              </p>
-
-
-                              {eventPath && (
-                                <Link
-                                  to={eventPath}
-                                  className="event-card__link"
-                                  aria-label={
-                                    `Learn more about ${title}`
-                                  }
-                                >
-                                  <span>
-                                    Learn More
-                                  </span>
-
-                                  <ArrowRight
-                                    size={15}
-                                    strokeWidth={1.8}
-                                    aria-hidden="true"
-                                  />
-                                </Link>
-                              )}
-
-                            </div>
-
-                          </article>
-                        );
-                      }
-                    )}
-
-                  </div>
-
-                )}
-
-            </div>
-
-
-            {/* ==================================================
-                RIGHT — PHOTO
-            ================================================== */}
-
-            <div className="events-calendar__photo">
-
-              <img
-                src="/assets/z.webp"
-                alt="Continental Founders convening"
-                loading="lazy"
-                decoding="async"
-              />
-
-            </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
 
           </div>
+
+
+          <figure className="ev-calendar__photo" data-reveal>
+            <img
+              src="/assets/z.webp"
+              alt="Continental Founders convening"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
 
         </div>
 
@@ -930,73 +636,48 @@ export default function Events() {
           CTA
       ====================================================== */}
 
-      <section className="events-cta">
+      <section className="ev-cta">
 
-        <div
-          className="events-cta__background"
-          aria-hidden="true"
-        />
+        <div className="ev-container">
 
-        <div
-          className="events-cta__overlay"
-          aria-hidden="true"
-        />
+          <div className="ev-cta__card" data-reveal>
 
+            <img
+              src="/assets/images/events/events-cta.webp"
+              alt=""
+              loading="lazy"
+            />
 
-        <div className="container events-cta__inner">
-
-          <div className="events-cta__heading">
-
-            <span className="events-cta__eyebrow">
-              HOST OR COLLABORATE
-            </span>
-
-            <h2>
-              Have a convening that
-              <br />
-              should be in the room?
-            </h2>
-
-          </div>
-
-
-          <div className="events-cta__content">
-
-            <p>
-              We welcome conversations with institutions
-              and organizations interested in co-creating
-              thoughtful forums and knowledge exchange
-              opportunities.
-            </p>
-
-
-            <Link
-              to="/contact"
-              className="events-cta__button"
-            >
-              <span>
-                Start a Conversation
+            <div className="ev-cta__content">
+              <span className="ev-eyebrow ev-eyebrow--light">
+                Host or Collaborate
               </span>
 
-              <ArrowRight
-                size={17}
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-            </Link>
+              <h2>
+                Have a convening that should be in the room?
+              </h2>
 
-          </div>
+              <p>
+                We welcome conversations with institutions
+                and organizations interested in co-creating
+                thoughtful forums and knowledge exchange
+                opportunities.
+              </p>
 
+              <Link
+                to="/contact"
+                className="ev-button ev-button--gold"
+              >
+                Start a conversation
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
 
-          <div className="events-cta__mark">
-
-            <strong>
-              A STRONGER
-              <br />
-              AFRICA
-              <br />
-              TOGETHER
-            </strong>
+            <p className="ev-cta__mark">
+              <span>A stronger</span>
+              <span>Africa</span>
+              <span>together</span>
+            </p>
 
           </div>
 

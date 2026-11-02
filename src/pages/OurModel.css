@@ -439,49 +439,6 @@
   line-height: 1.75;
 }
 
-.our-model-page .media-split__media {
-  position: relative;
-
-  min-height: 620px;
-  min-width: 0;
-
-  overflow: hidden;
-
-  background: var(--navy-900);
-}
-
-.our-model-page .media-split__media img {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-  object-position: center;
-
-  transition: transform 0.7s ease;
-}
-
-.our-model-page .media-split__media:hover img {
-  transform: scale(1.025);
-}
-
-.our-model-page .media-split__media::after {
-  content: "";
-
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(8, 24, 42, 0.02),
-      rgba(8, 24, 42, 0.16)
-    );
-
-  pointer-events: none;
-}
-
 .model-companies-cta__eyebrow::before,
 .model-companies-cta__eyebrow::after {
   display: none !important;
@@ -979,15 +936,6 @@
   overflow-wrap: break-word;
 }
 
-.model-companies-cta__line {
-  width: 64px;
-  height: 2px;
-
-  margin: 32px 0;
-
-  background: var(--gold-600);
-}
-
 .model-companies-cta__statement p {
   max-width: 470px;
 
@@ -1117,42 +1065,6 @@
 /* ============================================================
    IMAGE CAPTION
 ============================================================ */
-
-.model-final-cta__image-caption {
-  position: absolute;
-
-  left: 28px;
-  right: 28px;
-  bottom: 26px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 12px;
-
-  z-index: 2;
-
-  color: #fff;
-
-  font-family: var(--font-secondary);
-
-  font-size: 0.62rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.15em;
-}
-
-.model-final-cta__image-line {
-  width: 35px;
-
-  height: 1px;
-
-  flex-shrink: 0;
-
-  background: var(--gold-600);
-}
 
 
 /* ============================================================
@@ -1483,8 +1395,7 @@
     padding: 34px 24px;
   }
 
-  .our-model-page .media-split__content,
-  .our-model-page .media-split__media {
+  .our-model-page .media-split__content {
     min-height: 540px;
   }
 
@@ -1651,14 +1562,6 @@
 
   .our-model-page .media-split__content p {
     font-size: 0.98rem;
-  }
-
-  .our-model-page .media-split__media {
-    min-height: 420px;
-  }
-
-  .our-model-page .media-split__media img {
-    object-position: center center;
   }
 
   .model-lenses {
@@ -1843,14 +1746,6 @@
     line-height: 1.7;
   }
 
-  .our-model-page .media-split__media {
-    min-height: 330px;
-  }
-
-  .our-model-page .media-split__media img {
-    object-position: 50% center;
-  }
-
   .model-lenses article {
     min-height: auto;
 
@@ -1904,10 +1799,6 @@
 
   .model-companies-cta__statement > span {
     margin-bottom: 22px;
-  }
-
-  .model-companies-cta__line {
-    margin: 26px 0;
   }
 
   .model-final-cta__inner {
@@ -1978,10 +1869,6 @@
 
   .our-model-page .media-split__content {
     padding: 48px 18px;
-  }
-
-  .our-model-page .media-split__media {
-    min-height: 300px;
   }
 
   .model-companies-cta__content h2,
@@ -2158,10 +2045,6 @@
 
 @media (hover: none) {
 
-  .our-model-page .media-split__media:hover img {
-    transform: none;
-  }
-
   .model-lenses article:hover {
     background: transparent;
   }
@@ -2205,12 +2088,11 @@
     animation-iteration-count: 1 !important;
   }
 
-  .our-model-page .media-split__media img,
   .model-lenses article,
-  .model-companies-cta__button,
-  .model-companies-cta__button svg,
-  .model-final-cta__button,
-  .model-final-cta__button svg {
+.model-companies-cta__button,
+.model-companies-cta__button svg,
+.model-final-cta__button,
+.model-final-cta__button svg {
     transition: none;
   }
 
@@ -2553,20 +2435,6 @@
     text-align: center !important;
   }
 
-  .model-intro__heading {
-    text-align: center !important;
-  }
-
-  .model-intro__heading h2 {
-    max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    font-size: 2.2rem !important;
-    line-height: 1.02 !important;
-    letter-spacing: -0.035em !important;
-  }
-
   .model-intro__content {
     text-align: center !important;
     margin-left: auto !important;
@@ -2716,7 +2584,7 @@
 }
 
 @media (max-width: 700px) {
-  h2 {
+  .our-model-page h2 {
     font-size: 2.0rem !important;
     line-height: 1 !important;
   }
@@ -2724,7 +2592,7 @@
 
 
 @media (max-width: 700px) {
-  strong {
+  .our-model-page strong {
     font-size: 2.2rem !important;
     line-height: 1.05 !important;
   }

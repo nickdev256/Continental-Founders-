@@ -48,7 +48,7 @@ const FALLBACK_CONTENT = {
       "Connecting entrepreneurs, companies, and institutions across the United States and Africa to create real business opportunities, expand markets, and build lasting commercial relationships.",
 
     image:
-      "/assets/images/us-africa/hero.webp",
+      "/assets/images/us-africa/business-week.webp",
 
     primaryButtonText:
       "Explore Partnership",

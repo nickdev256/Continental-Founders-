@@ -30,10 +30,6 @@ import PageTransition from "./components/layout/PageTransition";
 
 
 
-import EthTechPopup from "./components/common/EthTechPopup";
-
-
-
 /* ============================================================
 
    PUBLIC PAGES
@@ -853,6 +849,28 @@ const SEO_ROUTES = {
 
 
 
+  "/find-your-lane": {
+    title: "Find Your Lane | Continental Founders Fellowship",
+    description:
+      "Every founder starts somewhere. Answer a few guided questions to explore which fellowship pathway — Genesis, Ascend, or Horizon — fits your next step.",
+    canonical: "/find-your-lane",
+    breadcrumb: [
+      { name: "Fellowship", path: "/cfcv" },
+      { name: "Find Your Lane", path: "/find-your-lane" },
+    ],
+  },
+
+  "/fellowship-community": {
+    title: "Fellowship Community | Continental Founders",
+    description:
+      "Join a cross-continental cohort of founders in Africa and U.S.-based founders of African descent. Three pathways — Genesis, Ascend, and Horizon — in one shared fellowship.",
+    canonical: "/fellowship-community",
+    breadcrumb: [
+      { name: "Fellowship", path: "/cfcv" },
+      { name: "Fellowship Community", path: "/fellowship-community" },
+    ],
+  },
+
   "/genesis": {
     title: "Genesis Fellowship Pathway | Continental Founders",
     description:
@@ -1019,24 +1037,6 @@ function setMetaTag(
 
 
   element.setAttribute("content", content);
-
-}
-
-
-
-function removeMetaTag(selector) {
-
-  const element =
-
-    document.head.querySelector(selector);
-
-
-
-  if (element) {
-
-    element.remove();
-
-  }
 
 }
 
@@ -2258,16 +2258,6 @@ export default function App() {
 
 
 
-  const showPromotionalPopup =
-
-    !isAdminRoute &&
-
-    cleanPath !== "/cfcv/apply" &&
-
-    cleanPath !== "/cfcv/application-success";
-
-
-
   return (
 
     <div
@@ -2779,15 +2769,6 @@ export default function App() {
 
 
       {!isAdminRoute && <Footer />}
-
-
-
-      {showPromotionalPopup && (
-
-        <EthTechPopup />
-
-      )}
-
     </div>
 
   );

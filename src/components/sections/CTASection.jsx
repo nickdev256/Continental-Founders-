@@ -1,6 +1,4 @@
 import React from "react";
-import { ArrowUpRight } from "lucide-react";
-import Button from "../ui/Button";
 import "./CTASection.css";
 
 export default function CTASection({

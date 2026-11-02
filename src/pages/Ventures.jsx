@@ -14,7 +14,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Globe2,
-  MapPin,
   UserRound,
   TrendingUp,
   BriefcaseBusiness,

@@ -402,8 +402,9 @@ export default function EventDetails() {
 
       <section className="ed-hero">
 
+        {/* Soft blurred copy behind everything, for colour only */}
         <div className="ed-hero__media" aria-hidden="true">
-          <img src={eventImage} alt="" fetchPriority="high" />
+          <img src={eventImage} alt="" />
         </div>
 
         <div className="ed-container ed-hero__inner">
@@ -453,11 +454,25 @@ export default function EventDetails() {
 
           </div>
 
-          <figure className="ed-hero__quote">
-            <Quote size={26} aria-hidden="true" />
-            <blockquote>“Conversations that create opportunity.”</blockquote>
-            <figcaption>Continental Founders</figcaption>
-          </figure>
+          {/* The event image is shown whole: event photos are often
+              banners or logos (like US AFRICA) that must stay readable. */}
+          <div className="ed-hero__visual">
+            <div className="ed-hero__frame">
+              <img className="ed-hero__frame-fill" src={eventImage} alt="" aria-hidden="true" />
+              <img
+                className="ed-hero__frame-image"
+                src={eventImage}
+                alt={event.title ? `${event.title} event image` : "Event image"}
+                fetchPriority="high"
+              />
+            </div>
+
+            <figure className="ed-hero__quote">
+              <Quote size={22} aria-hidden="true" />
+              <blockquote>“Conversations that create opportunity.”</blockquote>
+              <figcaption>Continental Founders</figcaption>
+            </figure>
+          </div>
 
         </div>
 

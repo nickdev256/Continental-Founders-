@@ -9,15 +9,18 @@ import {
 } from "react-router-dom";
 
 import {
+  AlertCircle,
+  ArrowLeft,
   ArrowRight,
   Eye,
   EyeOff,
   LockKeyhole,
   Mail,
+  MailCheck,
   ShieldCheck,
 } from "lucide-react";
 
-import "./AdminLogin.css";
+import "./AdminAuth.css";
 
 
 /* ============================================================
@@ -83,6 +86,20 @@ export default function AdminLogin() {
     setError,
   ] =
     useState("");
+
+
+  // Warn when Caps Lock is on while typing the password.
+  const [
+    capsLock,
+    setCapsLock,
+  ] =
+    useState(false);
+
+  function trackCapsLock(event) {
+    if (typeof event.getModifierState === "function") {
+      setCapsLock(event.getModifierState("CapsLock"));
+    }
+  }
 
 
   /* ==========================================================
@@ -574,44 +591,24 @@ export default function AdminLogin() {
 
     return (
 
-      <main className="cf-admin-login-loading">
+      <main className="al-loading" aria-busy="true">
 
-        <div className="cf-admin-login-loading__box">
+        <div className="al-loading__card">
 
-          <div className="cf-admin-login-loading__icon">
-
-            <ShieldCheck
-              size={30}
-              strokeWidth={1.5}
-            />
-
-          </div>
-
-
-          <span>
-            SECURE CMS ACCESS
+          <span className="al-loading__icon">
+            <ShieldCheck size={30} strokeWidth={1.6} aria-hidden="true" />
           </span>
 
+          <span className="al-eyebrow">Secure CMS Access</span>
 
-          <h1>
-            Verifying your session
-          </h1>
-
+          <h1>Verifying your session</h1>
 
           <p>
-            Please wait while we confirm
-            your Continental Founders
+            Please wait while we confirm your Continental Founders
             administration session.
           </p>
 
-
-          <div className="cf-admin-login-loading__dots">
-
-            <i />
-            <i />
-            <i />
-
-          </div>
+          <span className="al-loading__bar" aria-hidden="true" />
 
         </div>
 
@@ -628,147 +625,112 @@ export default function AdminLogin() {
 
   return (
 
-    <main className="cf-admin-login">
+    <main className="al-page">
 
       {/* ======================================================
-          LEFT VISUAL SIDE
+          BRAND PANEL
       ====================================================== */}
 
-      <section className="cf-admin-login__visual">
+      <section className="al-visual" aria-label="Continental Founders">
 
-        <div className="cf-admin-login__visual-background" />
+        <img
+          className="al-visual__photo"
+          src="/assets/images/admin-login-africa.webp"
+          alt=""
+        />
 
-        <div className="cf-admin-login__visual-shade" />
+        <Link
+          to="/"
+          className="al-visual__brand"
+          aria-label="Continental Founders home"
+        >
+          <img
+            src="/assets/continental-founders-logo.webp"
+            alt="Continental Founders"
+          />
+        </Link>
 
-
-        <div className="cf-admin-login__visual-top">
-
-          <Link
-            to="/"
-            className="cf-admin-login__brand"
-            aria-label="Continental Founders home"
-          >
-
-            <img
-              src="/assets/continental-founders-logo.webp"
-              alt="Continental Founders"
-            />
-
-          </Link>
-
-        </div>
-
-
-        <div className="cf-admin-login__visual-copy">
+        <div className="al-visual__copy">
 
           <h1>
-
-            Talent is
-            <br />
-
-            everywhere.
-
-            <em>
-              Access is not.
-            </em>
-
+            Talent is everywhere.{" "}
+            <em>Access is not.</em>
           </h1>
 
-
-          <div className="cf-admin-login__visual-description">
-
-            <span className="cf-admin-login__gold-line" />
-
-
-            <p>
-              A global platform connecting
-              founders, universities,
-              professionals, markets and
-              opportunity across Africa and
-              beyond.
-            </p>
-
-          </div>
+          <p>
+            A global platform connecting founders, universities,
+            professionals, markets and opportunity across Africa and
+            beyond.
+          </p>
 
         </div>
 
-
-        <div className="cf-admin-login__visual-footer">
-
-          <strong>
-            CONTINENTAL FOUNDERS™
-          </strong>
-
-
-          <span>
-            BUILDING A MORE INCLUSIVE TOMORROW
-          </span>
-
+        <div className="al-visual__footer">
+          <strong>CONTINENTAL FOUNDERS™</strong>
+          <span>Building a more inclusive tomorrow</span>
         </div>
 
       </section>
 
 
       {/* ======================================================
-          RIGHT LOGIN SIDE
+          SIGN-IN PANEL
       ====================================================== */}
 
-      <section className="cf-admin-login__form-side">
+      <section className="al-panel">
 
-        <div className="cf-admin-login__cms-label">
-          CMS ADMINISTRATION
+        <div className="al-panel__top">
+          <span className="al-eyebrow">CMS Administration</span>
+
+          <Link to="/" className="al-panel__back">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Return to Continental Founders
+          </Link>
         </div>
 
+        <div className="al-card">
 
-        <div className="cf-admin-login__card">
+          {/* Two steps: password here, then the emailed code */}
+          <ol className="al-steps" aria-label="Sign-in steps">
+            <li className="is-current" aria-current="step">
+              <span>1</span>
+              Sign in
+            </li>
+            <li>
+              <span>2</span>
+              Verify code
+            </li>
+          </ol>
 
-          <div className="cf-admin-login__shield">
+          <div className="al-card__heading">
+            <span className="al-card__icon">
+              <ShieldCheck size={28} strokeWidth={1.6} aria-hidden="true" />
+            </span>
 
-            <ShieldCheck
-              size={36}
-              strokeWidth={1.45}
-            />
-
-          </div>
-
-
-          <div className="cf-admin-login__heading">
-
-            <h2>
-              Welcome back.
-            </h2>
-
+            <h2>Welcome back.</h2>
 
             <p>
-              Sign in to access the
-              Continental Founders Content
+              Sign in to access the Continental Founders Content
               Management System.
             </p>
-
           </div>
 
-
           <form
-            className="cf-admin-login__form"
+            className="al-form"
             onSubmit={
               handleSubmit
             }
           >
 
-            <div className="cf-admin-login__field">
+            <div className="al-field">
 
               <label htmlFor="admin-email">
                 Email address
               </label>
 
+              <div className="al-input">
 
-              <div className="cf-admin-login__input">
-
-                <Mail
-                  size={19}
-                  strokeWidth={1.5}
-                />
-
+                <Mail size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
                   id="admin-email"
@@ -779,9 +741,14 @@ export default function AdminLogin() {
                   }
                   placeholder="your@email.com"
                   autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   disabled={
                     loading
                   }
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "admin-login-error" : undefined}
                   onChange={(
                     event
                   ) => {
@@ -789,7 +756,6 @@ export default function AdminLogin() {
                     setEmail(
                       event.target.value
                     );
-
 
                     if (
                       error
@@ -810,20 +776,15 @@ export default function AdminLogin() {
             </div>
 
 
-            <div className="cf-admin-login__field">
+            <div className="al-field">
 
               <label htmlFor="admin-password">
                 Password
               </label>
 
+              <div className="al-input">
 
-              <div className="cf-admin-login__input">
-
-                <LockKeyhole
-                  size={19}
-                  strokeWidth={1.5}
-                />
-
+                <LockKeyhole size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
                   id="admin-password"
@@ -841,6 +802,15 @@ export default function AdminLogin() {
                   disabled={
                     loading
                   }
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={
+                    [error && "admin-login-error", capsLock && "admin-caps-lock"]
+                      .filter(Boolean)
+                      .join(" ") || undefined
+                  }
+                  onKeyDown={trackCapsLock}
+                  onKeyUp={trackCapsLock}
+                  onBlur={() => setCapsLock(false)}
                   onChange={(
                     event
                   ) => {
@@ -848,7 +818,6 @@ export default function AdminLogin() {
                     setPassword(
                       event.target.value
                     );
-
 
                     if (
                       error
@@ -864,10 +833,9 @@ export default function AdminLogin() {
                   required
                 />
 
-
                 <button
                   type="button"
-                  className="cf-admin-login__password-toggle"
+                  className="al-input__toggle"
                   disabled={
                     loading
                   }
@@ -884,25 +852,24 @@ export default function AdminLogin() {
                       ? "Hide password"
                       : "Show password"
                   }
+                  aria-pressed={showPassword}
                 >
 
                   {showPassword ? (
-
-                    <EyeOff
-                      size={19}
-                    />
-
+                    <EyeOff size={19} aria-hidden="true" />
                   ) : (
-
-                    <Eye
-                      size={19}
-                    />
-
+                    <Eye size={19} aria-hidden="true" />
                   )}
 
                 </button>
 
               </div>
+
+              {capsLock && (
+                <span className="al-field__hint" id="admin-caps-lock">
+                  Caps Lock is on.
+                </span>
+              )}
 
             </div>
 
@@ -910,12 +877,12 @@ export default function AdminLogin() {
             {error && (
 
               <div
-                className="cf-admin-login__error"
+                className="al-alert"
+                id="admin-login-error"
                 role="alert"
               >
-
-                {error}
-
+                <AlertCircle size={18} aria-hidden="true" />
+                <span>{error}</span>
               </div>
 
             )}
@@ -923,75 +890,54 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              className="cf-admin-login__submit"
+              className="al-submit"
               disabled={
                 loading
               }
             >
 
-              <span>
+              {loading ? (
+                <span className="al-submit__spinner" aria-hidden="true" />
+              ) : null}
 
+              <span>
                 {loading
                   ? "Verifying..."
-                  : "Continue Securely"}
-
+                  : "Continue securely"}
               </span>
 
-
-              <ArrowRight
-                size={18}
-              />
+              {!loading && <ArrowRight size={18} aria-hidden="true" />}
 
             </button>
 
           </form>
 
 
-          <div className="cf-admin-login__security-note">
+          <div className="al-note">
 
-            <LockKeyhole
-              size={19}
-              strokeWidth={1.6}
-            />
-
+            <MailCheck size={20} strokeWidth={1.6} aria-hidden="true" />
 
             <p>
-              A one-time verification code
-              will be sent to your email
+              A one-time verification code will be sent to your email
               before CMS access is granted.
             </p>
 
           </div>
 
-
-          <div className="cf-admin-login__register">
+          <div className="al-register">
 
             <span>
               New to Continental Founders?
             </span>
 
-
             <Link to="/admin/register">
-
               Create an account
-
-              <ArrowRight
-                size={15}
-              />
-
+              <ArrowRight size={15} aria-hidden="true" />
             </Link>
 
           </div>
 
         </div>
-
-
-        <Link
-          to="/"
-          className="cf-admin-login__return"
-        >
-          Return to Continental Founders
-        </Link>
 
       </section>
 

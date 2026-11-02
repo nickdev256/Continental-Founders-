@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 
 import {
+  AlertCircle,
+  ArrowLeft,
   ArrowRight,
   Check,
   Eye,
@@ -18,7 +20,7 @@ import {
   UserRound,
 } from "lucide-react";
 
-import "./AdminRegister.css";
+import "./AdminAuth.css";
 
 
 const API_URL =
@@ -389,145 +391,124 @@ export default function AdminRegister() {
   }
 
 
+  // Shared props for the two password inputs.
+  const passwordField = (id, name, visible, placeholder) => ({
+    id,
+    name,
+    type: visible ? "text" : "password",
+    value: form[name],
+    placeholder,
+    autoComplete: "new-password",
+    disabled: loading,
+    onChange: handleChange,
+    required: true,
+  });
+
   return (
 
-    <main className="cf-admin-register">
+    <main className="al-page">
 
-      <section className="cf-admin-register__visual">
+      {/* ======================================================
+          BRAND PANEL
+      ====================================================== */}
 
-        <div className="cf-admin-register__visual-background" />
+      <section className="al-visual" aria-label="Continental Founders">
 
-        <div className="cf-admin-register__visual-shade" />
+        <img
+          className="al-visual__photo"
+          src="/assets/images/admin-login-africa.webp"
+          alt=""
+        />
 
+        <Link
+          to="/"
+          className="al-visual__brand"
+          aria-label="Continental Founders home"
+        >
+          <img
+            src="/assets/continental-founders-logo.webp"
+            alt="Continental Founders"
+          />
+        </Link>
 
-        <div className="cf-admin-register__visual-top">
-
-          <Link
-            to="/"
-            className="cf-admin-register__brand"
-            aria-label="Continental Founders home"
-          >
-
-            <img
-              src="/assets/continental-founders-logo.webp"
-              alt="Continental Founders"
-            />
-
-          </Link>
-
-        </div>
-
-
-        <div className="cf-admin-register__visual-copy">
-
-          <span className="cf-admin-register__eyebrow">
-            CONTINENTAL FOUNDERS
+        <div className="al-visual__copy">
+          <span className="al-eyebrow al-visual__eyebrow">
+            Continental Founders
           </span>
-
 
           <h1>
-
-            Build the
-            <br />
-
-            next chapter.
-
-            <em>
-              Start here.
-            </em>
-
+            Build the next chapter.{" "}
+            <em>Start here.</em>
           </h1>
 
-
-          <div className="cf-admin-register__visual-description">
-
-            <span className="cf-admin-register__gold-line" />
-
-
-            <p>
-              Create your Continental Founders
-              account and access the secure
-              workspace supporting founders,
-              institutions and opportunity.
-            </p>
-
-          </div>
-
+          <p>
+            Create your Continental Founders account and access the
+            secure workspace supporting founders, institutions and
+            opportunity.
+          </p>
         </div>
 
-
-        <div className="cf-admin-register__visual-footer">
-
-          <strong>
-            CONTINENTAL FOUNDERS™
-          </strong>
-
-          <span>
-            BUILDING A MORE INCLUSIVE TOMORROW
-          </span>
-
+        <div className="al-visual__footer">
+          <strong>CONTINENTAL FOUNDERS™</strong>
+          <span>Building a more inclusive tomorrow</span>
         </div>
 
       </section>
 
 
-      <section className="cf-admin-register__form-side">
+      {/* ======================================================
+          REGISTER PANEL
+      ====================================================== */}
 
-        <div className="cf-admin-register__cms-label">
-          CMS REGISTRATION
+      <section className="al-panel">
+
+        <div className="al-panel__top">
+          <span className="al-eyebrow">CMS Registration</span>
+
+          <Link to="/" className="al-panel__back">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Return to Continental Founders
+          </Link>
         </div>
 
+        <div className="al-card">
 
-        <div className="cf-admin-register__card">
+          <ol className="al-steps" aria-label="Registration steps">
+            <li className="is-current" aria-current="step">
+              <span>1</span>
+              Create account
+            </li>
+            <li>
+              <span>2</span>
+              Verify email
+            </li>
+          </ol>
 
-          <div className="cf-admin-register__shield">
+          <div className="al-card__heading">
+            <span className="al-card__icon">
+              <ShieldCheck size={28} strokeWidth={1.6} aria-hidden="true" />
+            </span>
 
-            <ShieldCheck
-              size={38}
-              strokeWidth={1.45}
-            />
-
-          </div>
-
-
-          <div className="cf-admin-register__heading">
-
-            <h2>
-              Create your account.
-            </h2>
-
+            <h2>Create your account.</h2>
 
             <p>
-              Register with your personal
-              email address. Verification
-              is required before access is
-              activated.
+              Register with your personal email address. Verification is
+              required before access is activated.
             </p>
-
           </div>
 
-
           <form
-            className="cf-admin-register__form"
+            className="al-form"
             onSubmit={
               handleSubmit
             }
           >
 
-            <div className="cf-admin-register__field">
+            <div className="al-field">
+              <label htmlFor="register-name">Full name</label>
 
-              <label htmlFor="register-name">
-                Full name
-              </label>
-
-
-              <div className="cf-admin-register__input">
-
-                <UserRound
-                  size={20}
-                  strokeWidth={1.5}
-                />
-
+              <div className="al-input">
+                <UserRound size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
                   id="register-name"
@@ -546,26 +527,14 @@ export default function AdminRegister() {
                   }
                   required
                 />
-
               </div>
-
             </div>
 
+            <div className="al-field">
+              <label htmlFor="register-email">Personal email address</label>
 
-            <div className="cf-admin-register__field">
-
-              <label htmlFor="register-email">
-                Personal email address
-              </label>
-
-
-              <div className="cf-admin-register__input">
-
-                <Mail
-                  size={20}
-                  strokeWidth={1.5}
-                />
-
+              <div className="al-input">
+                <Mail size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
                   id="register-email"
@@ -576,66 +545,44 @@ export default function AdminRegister() {
                   }
                   placeholder="your@email.com"
                   autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
                   disabled={
                     loading
                   }
                   onChange={
                     handleChange
                   }
+                  aria-describedby="register-email-note"
                   required
                 />
-
               </div>
 
-
-              <span className="cf-admin-register__field-note">
+              <span className="al-field__note" id="register-email-note">
                 Your verification code will be sent to this email.
               </span>
-
             </div>
 
+            <div className="al-field">
+              <label htmlFor="register-password">Password</label>
 
-            <div className="cf-admin-register__field">
-
-              <label htmlFor="register-password">
-                Password
-              </label>
-
-
-              <div className="cf-admin-register__input">
-
-                <LockKeyhole
-                  size={20}
-                  strokeWidth={1.5}
-                />
-
+              <div className="al-input">
+                <LockKeyhole size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
-                  id="register-password"
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="password"
-                  value={
-                    form.password
-                  }
-                  placeholder="Create a password"
-                  autoComplete="new-password"
-                  disabled={
-                    loading
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
+                  {...passwordField(
+                    "register-password",
+                    "password",
+                    showPassword,
+                    "Create a password"
+                  )}
+                  aria-describedby={form.password ? "register-rules" : undefined}
                 />
-
 
                 <button
                   type="button"
-                  className="cf-admin-register__password-toggle"
+                  className="al-input__toggle"
                   onClick={() =>
                     setShowPassword(
                       (current) =>
@@ -650,110 +597,64 @@ export default function AdminRegister() {
                       ? "Hide password"
                       : "Show password"
                   }
+                  aria-pressed={showPassword}
                 >
-
                   {showPassword ? (
-
-                    <EyeOff
-                      size={19}
-                    />
-
+                    <EyeOff size={19} aria-hidden="true" />
                   ) : (
-
-                    <Eye
-                      size={19}
-                    />
-
+                    <Eye size={19} aria-hidden="true" />
                   )}
-
                 </button>
-
               </div>
-
             </div>
 
-
             {form.password && (
-
-              <div className="cf-admin-register__requirements">
-
+              <ul className="al-rules" id="register-rules" aria-label="Password requirements">
                 <PasswordRequirement
                   passed={
                     passwordChecks.length
                   }
                   text="At least 8 characters"
                 />
-
-
                 <PasswordRequirement
                   passed={
                     passwordChecks.uppercase
                   }
                   text="One uppercase letter"
                 />
-
-
                 <PasswordRequirement
                   passed={
                     passwordChecks.lowercase
                   }
                   text="One lowercase letter"
                 />
-
-
                 <PasswordRequirement
                   passed={
                     passwordChecks.number
                   }
                   text="One number"
                 />
-
-              </div>
-
+              </ul>
             )}
 
+            <div className="al-field">
+              <label htmlFor="register-confirm-password">Confirm password</label>
 
-            <div className="cf-admin-register__field">
-
-              <label htmlFor="register-confirm-password">
-                Confirm password
-              </label>
-
-
-              <div className="cf-admin-register__input">
-
-                <LockKeyhole
-                  size={20}
-                  strokeWidth={1.5}
-                />
-
+              <div className="al-input">
+                <LockKeyhole size={19} strokeWidth={1.6} aria-hidden="true" />
 
                 <input
-                  id="register-confirm-password"
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
-                  name="confirmPassword"
-                  value={
-                    form.confirmPassword
-                  }
-                  placeholder="Confirm your password"
-                  autoComplete="new-password"
-                  disabled={
-                    loading
-                  }
-                  onChange={
-                    handleChange
-                  }
-                  required
+                  {...passwordField(
+                    "register-confirm-password",
+                    "confirmPassword",
+                    showConfirmPassword,
+                    "Confirm your password"
+                  )}
                 />
-
 
                 <button
                   type="button"
-                  className="cf-admin-register__password-toggle"
+                  className="al-input__toggle"
                   onClick={() =>
                     setShowConfirmPassword(
                       (current) =>
@@ -768,116 +669,66 @@ export default function AdminRegister() {
                       ? "Hide password"
                       : "Show password"
                   }
+                  aria-pressed={showConfirmPassword}
                 >
-
                   {showConfirmPassword ? (
-
-                    <EyeOff
-                      size={19}
-                    />
-
+                    <EyeOff size={19} aria-hidden="true" />
                   ) : (
-
-                    <Eye
-                      size={19}
-                    />
-
+                    <Eye size={19} aria-hidden="true" />
                   )}
-
                 </button>
-
               </div>
-
             </div>
 
-
             {error && (
-
-              <div
-                className="cf-admin-register__error"
-                role="alert"
-              >
-
-                {error}
-
+              <div className="al-alert" role="alert">
+                <AlertCircle size={18} aria-hidden="true" />
+                <span>{error}</span>
               </div>
-
             )}
-
 
             <button
               type="submit"
-              className="cf-admin-register__submit"
+              className="al-submit"
               disabled={
                 loading
               }
             >
+              {loading ? (
+                <span className="al-submit__spinner" aria-hidden="true" />
+              ) : null}
 
               <span>
-
                 {loading
                   ? "Creating account..."
-                  : "Create Account"}
-
+                  : "Create account"}
               </span>
 
-
-              <ArrowRight
-                size={18}
-              />
-
+              {!loading && <ArrowRight size={18} aria-hidden="true" />}
             </button>
 
           </form>
 
-
-          <div className="cf-admin-register__security-note">
-
-            <ShieldCheck
-              size={20}
-              strokeWidth={1.55}
-            />
-
+          <div className="al-note">
+            <ShieldCheck size={20} strokeWidth={1.6} aria-hidden="true" />
 
             <p>
-              Your account becomes active
-              only after your email
-              verification code is confirmed.
-              CMS permissions are managed
+              Your account becomes active only after your email
+              verification code is confirmed. CMS permissions are managed
               securely by Continental Founders.
             </p>
-
           </div>
 
-
-          <div className="cf-admin-register__login">
-
-            <span>
-              Already have an account?
-            </span>
-
+          <div className="al-register">
+            <span>Already have an account?</span>
 
             <Link to="/admin/login">
-
               Sign in
-
-              <ArrowRight
-                size={15}
-              />
-
+              <ArrowRight size={15} aria-hidden="true" />
             </Link>
-
           </div>
 
         </div>
-
-
-        <Link
-          to="/"
-          className="cf-admin-register__return"
-        >
-          Return to Continental Founders
-        </Link>
 
       </section>
 
@@ -894,35 +745,18 @@ function PasswordRequirement({
 }) {
 
   return (
-
-    <div
-      className={
-        passed
-          ? "cf-admin-register__requirement cf-admin-register__requirement--passed"
-          : "cf-admin-register__requirement"
-      }
-    >
-
-      <span className="cf-admin-register__requirement-icon">
-
-        {passed && (
-
-          <Check
-            size={12}
-            strokeWidth={2.5}
-          />
-
-        )}
-
+    <li className={passed ? "is-met" : ""}>
+      <span className="al-rules__icon" aria-hidden="true">
+        {passed && <Check size={11} strokeWidth={3} />}
       </span>
-
 
       <span>
         {text}
+        <span className="al-visually-hidden">
+          {passed ? " (met)" : " (not yet met)"}
+        </span>
       </span>
-
-    </div>
-
+    </li>
   );
 
 }

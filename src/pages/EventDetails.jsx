@@ -17,7 +17,7 @@ import {
   Clock3,
   ExternalLink,
   MapPin,
-  RefreshCw,
+  Quote,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -32,6 +32,34 @@ import "./EventDetails.css";
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:5000";
+
+
+/* ============================================================
+   CONTENT
+============================================================ */
+
+const keywords = ["People", "Ideas", "Capital", "Impact"];
+
+const purposes = [
+  {
+    icon: Users,
+    title: "Connect",
+    text: "Bring founders, institutions, professionals and partners into the same conversation.",
+    tone: "gold",
+  },
+  {
+    icon: BookOpen,
+    title: "Exchange",
+    text: "Create room for useful knowledge, experience and practical insight to move across networks.",
+    tone: "navy",
+  },
+  {
+    icon: TrendingUp,
+    title: "Act",
+    text: "Move promising conversations toward relationships, collaboration and opportunity.",
+    tone: "blue",
+  },
+];
 
 
 /* ============================================================
@@ -51,11 +79,7 @@ function getEventDate(event) {
 
 
 function getEventEndDate(event) {
-  return (
-    event?.endDate ||
-    event?.end_date ||
-    null
-  );
+  return event?.endDate || event?.end_date || null;
 }
 
 
@@ -91,11 +115,7 @@ function getEventType(event) {
 
 
 function getEventDescription(event) {
-  return (
-    event?.description ||
-    event?.summary ||
-    ""
-  );
+  return event?.description || event?.summary || "";
 }
 
 
@@ -112,13 +132,30 @@ function getEventContent(event) {
 }
 
 
+// A separate time field wins; otherwise use the time saved with the
+// date (the admin form stores both together), unless it is midnight.
 function getEventTime(event) {
-  return (
-    event?.time ||
-    event?.eventTime ||
-    event?.event_time ||
-    ""
-  );
+  const explicit = event?.time || event?.eventTime || event?.event_time;
+
+  if (explicit) return explicit;
+
+  const value = getEventDate(event);
+
+  if (typeof value !== "string" || !value.includes("T")) return "";
+
+  const date = new Date(value);
+
+  if (
+    Number.isNaN(date.getTime()) ||
+    (date.getHours() === 0 && date.getMinutes() === 0)
+  ) {
+    return "";
+  }
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 
@@ -138,76 +175,34 @@ function formatFullDate(value) {
     return "Date to be announced";
   }
 
-  const date =
-    new Date(value);
+  const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return "Date to be announced";
   }
 
-  return date.toLocaleDateString(
-    "en-US",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }
-  );
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 
 function formatDateBlock(value) {
-  if (!value) {
-    return {
-      day: "--",
-      month: "---",
-      year: "",
-    };
-  }
+  const empty = { day: "--", month: "---", year: "" };
 
-  const date =
-    new Date(value);
+  if (!value) return empty;
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-    return {
-      day: "--",
-      month: "---",
-      year: "",
-    };
-  }
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) return empty;
 
   return {
-    day:
-      date.toLocaleDateString(
-        "en-US",
-        {
-          day: "2-digit",
-        }
-      ),
-
-    month:
-      date
-        .toLocaleDateString(
-          "en-US",
-          {
-            month: "short",
-          }
-        )
-        .toUpperCase(),
-
-    year:
-      String(
-        date.getFullYear()
-      ),
+    day: date.toLocaleDateString("en-US", { day: "2-digit" }),
+    month: date.toLocaleDateString("en-US", { month: "short" }).toUpperCase(),
+    year: String(date.getFullYear()),
   };
 }
 
@@ -217,31 +212,11 @@ function formatDateBlock(value) {
 ============================================================ */
 
 export default function EventDetails() {
-  const {
-    slug,
-  } =
-    useParams();
+  const { slug } = useParams();
 
-
-  const [
-    event,
-    setEvent,
-  ] =
-    useState(null);
-
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(true);
-
-
-  const [
-    error,
-    setError,
-  ] =
-    useState("");
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
 
   /* ==========================================================
@@ -249,84 +224,41 @@ export default function EventDetails() {
   ========================================================== */
 
   useEffect(() => {
-    const controller =
-      new AbortController();
-
+    const controller = new AbortController();
 
     async function loadEvent() {
       try {
         setLoading(true);
         setError("");
 
+        const response = await fetch(
+          `${API_URL}/api/events/published/${encodeURIComponent(slug)}`,
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          }
+        );
 
-        const response =
-          await fetch(
-            `${API_URL}/api/events/published/${encodeURIComponent(
-              slug
-            )}`,
-            {
-              method: "GET",
+        const contentType = response.headers.get("content-type") || "";
 
-              headers: {
-                Accept:
-                  "application/json",
-              },
+        if (!contentType.includes("application/json")) {
+          const text = await response.text();
 
-              signal:
-                controller.signal,
-            }
-          );
+          console.error("Unexpected event details response:", text);
 
-
-        const contentType =
-          response.headers.get(
-            "content-type"
-          ) || "";
-
-
-        if (
-          !contentType.includes(
-            "application/json"
-          )
-        ) {
-          const text =
-            await response.text();
-
-
-          console.error(
-            "Unexpected event details response:",
-            text
-          );
-
-
-          throw new Error(
-            "The event service returned an unexpected response."
-          );
+          throw new Error("The event service returned an unexpected response.");
         }
 
+        const result = await response.json();
 
-        const result =
-          await response.json();
-
-
-        if (
-          response.status ===
-          404
-        ) {
+        if (response.status === 404) {
           setEvent(null);
-
-          setError(
-            result?.message ||
-            "Event not found."
-          );
-
+          setError(result?.message || "Event not found.");
           return;
         }
 
-
-        if (
-          !response.ok
-        ) {
+        if (!response.ok) {
           throw new Error(
             result?.message ||
             result?.error ||
@@ -334,249 +266,124 @@ export default function EventDetails() {
           );
         }
 
+        const loadedEvent = result?.event || result?.data || null;
 
-        const loadedEvent =
-          result?.event ||
-          result?.data ||
-          null;
-
-
-        if (
-          !loadedEvent
-        ) {
-          throw new Error(
-            "Event information is unavailable."
-          );
+        if (!loadedEvent) {
+          throw new Error("Event information is unavailable.");
         }
 
-
-        setEvent(
-          loadedEvent
-        );
-      } catch (
-        requestError
-      ) {
-        if (
-          requestError?.name ===
-          "AbortError"
-        ) {
+        setEvent(loadedEvent);
+      } catch (requestError) {
+        if (requestError?.name === "AbortError") {
           return;
         }
 
-
-        console.error(
-          "Event details error:",
-          requestError
-        );
-
+        console.error("Event details error:", requestError);
 
         setEvent(null);
 
+        // A network failure only says "Failed to fetch".
         setError(
-          requestError?.message ||
-          "Unable to load this event."
+          requestError instanceof TypeError
+            ? "We could not load this event right now. Please try again shortly."
+            : requestError?.message || "Unable to load this event."
         );
       } finally {
-        if (
-          !controller.signal.aborted
-        ) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
     }
 
-
-    if (
-      slug
-    ) {
+    if (slug) {
       loadEvent();
     } else {
       setLoading(false);
-
-      setError(
-        "Event not found."
-      );
+      setError("Event not found.");
     }
-
 
     return () => {
       controller.abort();
     };
-  }, [
-    slug,
-  ]);
+  }, [slug]);
 
 
   /* ==========================================================
      NORMALIZED EVENT DATA
   ========================================================== */
 
-  const eventDate =
-    useMemo(
-      () =>
-        getEventDate(
-          event
-        ),
-      [
-        event,
-      ]
-    );
+  const eventDate = useMemo(() => getEventDate(event), [event]);
+  const dateBlock = useMemo(() => formatDateBlock(eventDate), [eventDate]);
 
+  const eventImage = getEventImage(event);
+  const location = getEventLocation(event);
+  const eventType = getEventType(event);
+  const description = getEventDescription(event);
+  const content = getEventContent(event);
+  const eventTime = getEventTime(event);
+  const registrationUrl = getRegistrationUrl(event);
+  const endDate = getEventEndDate(event);
 
-  const dateBlock =
-    useMemo(
-      () =>
-        formatDateBlock(
-          eventDate
-        ),
-      [
-        eventDate,
-      ]
-    );
-
-
-  const eventImage =
-    getEventImage(
-      event
-    );
-
-
-  const location =
-    getEventLocation(
-      event
-    );
-
-
-  const eventType =
-    getEventType(
-      event
-    );
-
-
-  const description =
-    getEventDescription(
-      event
-    );
-
-
-  const content =
-    getEventContent(
-      event
-    );
-
-
-  const eventTime =
-    getEventTime(
-      event
-    );
-
-
-  const registrationUrl =
-    getRegistrationUrl(
-      event
-    );
-
-
-  const endDate =
-    getEventEndDate(
-      event
-    );
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
 
 
   /* ==========================================================
      LOADING
+     A hero-shaped placeholder, so the page doesn't jump.
   ========================================================== */
 
-  if (
-    loading
-  ) {
+  if (loading) {
     return (
-      <main className="event-details-page">
-
-        <section className="event-details-state">
-
-          <div className="event-details-state__inner">
-
-            <div className="event-details-state__icon">
-              <RefreshCw
-                size={28}
-                className="event-details-spinner"
-                aria-hidden="true"
-              />
+      <main className="ed-page" aria-busy="true">
+        <section className="ed-hero ed-hero--loading">
+          <div className="ed-container ed-hero__inner">
+            <div className="ed-hero__content">
+              <span className="ed-visually-hidden">Loading event details</span>
+              <span className="ed-skeleton ed-skeleton--line" />
+              <span className="ed-skeleton ed-skeleton--title" />
+              <span className="ed-skeleton ed-skeleton--title ed-skeleton--short" />
+              <span className="ed-skeleton ed-skeleton--line ed-skeleton--wide" />
             </div>
-
-            <span className="event-details-eyebrow">
-              Continental Founders
-            </span>
-
-            <h1>
-              Loading event details
-            </h1>
-
-            <p>
-              Retrieving the latest event information.
-            </p>
-
           </div>
-
         </section>
-
       </main>
     );
   }
 
 
   /* ==========================================================
-     ERROR
+     ERROR / NOT FOUND
   ========================================================== */
 
-  if (
-    error ||
-    !event
-  ) {
+  if (error || !event) {
     return (
-      <main className="event-details-page">
+      <main className="ed-page">
+        <section className="ed-state">
+          <div className="ed-container">
+            <div className="ed-state__card">
+              <span className="ed-state__icon">
+                <CalendarDays size={30} aria-hidden="true" />
+              </span>
 
-        <section className="event-details-state">
+              <span className="ed-eyebrow">Event Not Found</span>
 
-          <div className="event-details-state__inner">
+              <h1>We couldn't find this event.</h1>
 
-            <div className="event-details-state__icon">
-              <CalendarDays
-                size={30}
-                aria-hidden="true"
-              />
+              <p>
+                {error ||
+                  "The event may have been removed, renamed, or unpublished."}
+              </p>
+
+              <Link to="/events" className="ed-button ed-button--gold">
+                <ArrowLeft size={17} aria-hidden="true" />
+                Back to events
+              </Link>
             </div>
-
-            <span className="event-details-eyebrow">
-              Event Not Found
-            </span>
-
-            <h1>
-              We couldn't find this event.
-            </h1>
-
-            <p>
-              {error ||
-                "The event may have been removed, renamed, or unpublished."}
-            </p>
-
-            <Link
-              to="/events"
-              className="event-details-button event-details-button--gold"
-            >
-              <ArrowLeft
-                size={17}
-                aria-hidden="true"
-              />
-
-              Back to Events
-            </Link>
-
           </div>
-
         </section>
-
       </main>
     );
   }
@@ -587,269 +394,136 @@ export default function EventDetails() {
   ========================================================== */
 
   return (
-    <main className="event-details-page">
-
+    <main className="ed-page">
 
       {/* ======================================================
           HERO
       ====================================================== */}
 
-      <section className="event-details-hero">
+      <section className="ed-hero">
 
-        {/* ONLY EVENT PHOTO ON THIS PAGE */}
+        <div className="ed-hero__media" aria-hidden="true">
+          <img src={eventImage} alt="" fetchPriority="high" />
+        </div>
 
-        <div
-          className="event-details-hero__photo"
-          style={{
-            backgroundImage:
-              `url("${eventImage}")`,
-          }}
-          aria-hidden="true"
-        />
+        <div className="ed-container ed-hero__inner">
 
+          <div className="ed-hero__content">
 
-        <div
-          className="event-details-hero__shade"
-          aria-hidden="true"
-        />
-
-
-        <div
-          className="event-details-hero__texture"
-          aria-hidden="true"
-        />
-
-
-        <div className="event-details-container event-details-hero__inner">
-
-
-          {/* LEFT CONTENT */}
-
-          <div className="event-details-hero__content">
-
-            <Link
-              to="/events"
-              className="event-details-back"
-            >
-              <ArrowLeft
-                size={16}
-                aria-hidden="true"
-              />
-
-              All Events
+            <Link to="/events" className="ed-back">
+              <ArrowLeft size={16} aria-hidden="true" />
+              All events
             </Link>
 
+            <span className="ed-hero__type">{eventType}</span>
 
-            <div className="event-details-hero__type">
-
-              <span
-                aria-hidden="true"
-              />
-
-              {eventType}
-
-            </div>
-
-
-            <h1>
-              {event.title ||
-                "Continental Founders Event"}
-            </h1>
-
+            <h1>{event.title || "Continental Founders Event"}</h1>
 
             {description && (
-              <p className="event-details-hero__description">
-                {description}
-              </p>
+              <p className="ed-hero__description">{description}</p>
             )}
 
-
-            <div className="event-details-hero__actions">
-
+            <div className="ed-hero__actions">
               {registrationUrl && (
                 <a
                   href={registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="event-details-button event-details-button--gold"
+                  className="ed-button ed-button--gold"
                 >
-                  Register for Event
-
-                  <ArrowRight
-                    size={17}
-                    aria-hidden="true"
-                  />
+                  Register for event
+                  <ArrowRight size={17} aria-hidden="true" />
                 </a>
               )}
 
-
               <a
                 href="#event-overview"
-                className="event-details-button event-details-button--outline-light"
+                className={`ed-button ${registrationUrl ? "ed-button--ghost" : "ed-button--gold"}`}
               >
-                Explore Event
-
-                <ArrowRight
-                  size={17}
-                  aria-hidden="true"
-                />
+                Explore event
+                <ArrowRight size={17} aria-hidden="true" />
               </a>
-
             </div>
 
-          </div>
-
-
-          {/* RIGHT QUOTE */}
-
-          <div className="event-details-hero__quote">
-
-            <span
-              className="event-details-hero__quote-line"
-              aria-hidden="true"
-            />
-
-            <blockquote>
-              “Conversations that create opportunity.”
-            </blockquote>
-
-            <small>
-              Continental Founders
-            </small>
+            <ul className="ed-hero__keywords" aria-label="What we bring together">
+              {keywords.map((word) => (
+                <li key={word}>{word}</li>
+              ))}
+            </ul>
 
           </div>
 
-        </div>
+          <figure className="ed-hero__quote">
+            <Quote size={26} aria-hidden="true" />
+            <blockquote>“Conversations that create opportunity.”</blockquote>
+            <figcaption>Continental Founders</figcaption>
+          </figure>
 
-
-        {/* SIDE WORDS */}
-
-        <div
-          className="event-details-hero__keywords"
-          aria-hidden="true"
-        >
-          <span>People</span>
-          <span>Ideas</span>
-          <span>Capital</span>
-          <span>Impact</span>
-
-          <i />
         </div>
 
       </section>
 
 
       {/* ======================================================
-          HERO INFORMATION BAR
+          QUICK FACTS
       ====================================================== */}
 
-      <section className="event-details-quick-info">
+      <section className="ed-facts" aria-label="Event summary">
+        <div className="ed-container">
+          <div className="ed-facts__card">
 
-        <div className="event-details-container event-details-quick-info__inner">
-
-
-          <div className="event-details-quick-info__date">
-
-            <strong>
-              {dateBlock.day}
-            </strong>
-
-            <span>
-              {dateBlock.month}
-            </span>
-
-            <small>
-              {dateBlock.year}
-            </small>
-
-          </div>
-
-
-          <div className="event-details-quick-info__item">
-
-            <CalendarDays
-              size={22}
-              aria-hidden="true"
-            />
-
-            <div>
-              <span>
-                Date
-              </span>
-
-              <strong>
-                {formatFullDate(
-                  eventDate
-                )}
-              </strong>
+            <div className="ed-facts__date">
+              <strong>{dateBlock.day}</strong>
+              <span>{dateBlock.month}</span>
+              <small>{dateBlock.year}</small>
             </div>
 
-          </div>
-
-
-          {eventTime && (
-            <div className="event-details-quick-info__item">
-
-              <Clock3
-                size={22}
-                aria-hidden="true"
-              />
-
-              <div>
-                <span>
-                  Time
+            <ul className="ed-facts__list">
+              <li>
+                <span className="ed-facts__icon">
+                  <CalendarDays size={20} aria-hidden="true" />
                 </span>
+                <span>
+                  <small>Date</small>
+                  <strong>{formatFullDate(eventDate)}</strong>
+                </span>
+              </li>
 
-                <strong>
-                  {eventTime}
-                </strong>
-              </div>
+              {eventTime && (
+                <li>
+                  <span className="ed-facts__icon">
+                    <Clock3 size={20} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Time</small>
+                    <strong>{eventTime}</strong>
+                  </span>
+                </li>
+              )}
 
-            </div>
-          )}
+              <li>
+                <span className="ed-facts__icon">
+                  <MapPin size={20} aria-hidden="true" />
+                </span>
+                <span>
+                  <small>Location</small>
+                  <strong>{location}</strong>
+                </span>
+              </li>
 
-
-          <div className="event-details-quick-info__item">
-
-            <MapPin
-              size={22}
-              aria-hidden="true"
-            />
-
-            <div>
-              <span>
-                Location
-              </span>
-
-              <strong>
-                {location}
-              </strong>
-            </div>
-
-          </div>
-
-
-          <div className="event-details-quick-info__item">
-
-            <Users
-              size={22}
-              aria-hidden="true"
-            />
-
-            <div>
-              <span>
-                Event Type
-              </span>
-
-              <strong>
-                {eventType}
-              </strong>
-            </div>
+              <li>
+                <span className="ed-facts__icon">
+                  <Users size={20} aria-hidden="true" />
+                </span>
+                <span>
+                  <small>Event Type</small>
+                  <strong>{eventType}</strong>
+                </span>
+              </li>
+            </ul>
 
           </div>
-
         </div>
-
       </section>
 
 
@@ -857,232 +531,110 @@ export default function EventDetails() {
           OVERVIEW
       ====================================================== */}
 
-      <section
-        id="event-overview"
-        className="event-details-overview"
-      >
+      <section id="event-overview" className="ed-section ed-overview">
+        <div className="ed-container ed-overview__grid">
 
-        <div className="event-details-container">
+          <article className="ed-overview__main">
 
+            <span className="ed-eyebrow">Event Overview</span>
 
-          <div className="event-details-overview__grid">
+            <h2>A space for meaningful conversations and action.</h2>
 
+            <div className="ed-prose">
+              {paragraphs.length ? (
+                paragraphs.map((paragraph, index) => (
+                  <p key={`${index}-${paragraph.slice(0, 18)}`}>{paragraph}</p>
+                ))
+              ) : (
+                <p>
+                  More information about this event will be shared as
+                  programming is confirmed.
+                </p>
+              )}
+            </div>
 
-            {/* MAIN CONTENT */}
+            <a href="#why-we-convene" className="ed-text-link">
+              Explore event details
+              <ArrowRight size={18} aria-hidden="true" />
+            </a>
 
-            <article className="event-details-overview__main">
+          </article>
 
-              <div className="event-details-section-label">
+          <aside className="ed-info">
 
-                <span className="event-details-section-number">
-                  01
+            <h3>Key Information</h3>
+
+            <ul>
+              <li>
+                <span className="ed-info__icon">
+                  <CalendarDays size={20} aria-hidden="true" />
                 </span>
-
-                <span className="event-details-eyebrow">
-                  Event Overview
+                <span>
+                  <small>Date</small>
+                  <strong>{formatFullDate(eventDate)}</strong>
                 </span>
-
-                <i
-                  aria-hidden="true"
-                />
-
-              </div>
-
-
-              <h2>
-                A space for meaningful
-                conversations and action.
-              </h2>
-
-
-              <div className="event-details-prose">
-
-                {content ? (
-                  content
-                    .split(
-                      /\n{2,}/
-                    )
-                    .map(
-                      (
-                        paragraph
-                      ) =>
-                        paragraph.trim()
-                    )
-                    .filter(
-                      Boolean
-                    )
-                    .map(
-                      (
-                        paragraph,
-                        index
-                      ) => (
-                        <p
-                          key={`${index}-${paragraph.slice(
-                            0,
-                            18
-                          )}`}
-                        >
-                          {paragraph}
-                        </p>
-                      )
-                    )
-                ) : (
-                  <p>
-                    More information about this event will be
-                    shared as programming is confirmed.
-                  </p>
-                )}
-
-              </div>
-
-
-              <a
-                href="#why-we-convene"
-                className="event-details-text-link"
-              >
-                Explore Event Details
-
-                <ArrowRight
-                  size={18}
-                  aria-hidden="true"
-                />
-              </a>
-
-            </article>
-
-
-            {/* KEY INFORMATION */}
-
-            <aside className="event-details-information">
-
-              <span className="event-details-information__heading">
-                Key Information
-              </span>
-
-
-              <div className="event-details-information__item">
-
-                <div className="event-details-information__icon">
-                  <CalendarDays
-                    size={23}
-                    aria-hidden="true"
-                  />
-                </div>
-
-                <div>
-                  <span>
-                    Date
-                  </span>
-
-                  <strong>
-                    {formatFullDate(
-                      eventDate
-                    )}
-                  </strong>
-                </div>
-
-              </div>
-
+              </li>
 
               {endDate && (
-                <div className="event-details-information__item">
-
-                  <div className="event-details-information__icon">
-                    <CalendarDays
-                      size={23}
-                      aria-hidden="true"
-                    />
-                  </div>
-
-                  <div>
-                    <span>
-                      End Date
-                    </span>
-
-                    <strong>
-                      {formatFullDate(
-                        endDate
-                      )}
-                    </strong>
-                  </div>
-
-                </div>
+                <li>
+                  <span className="ed-info__icon">
+                    <CalendarDays size={20} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>End Date</small>
+                    <strong>{formatFullDate(endDate)}</strong>
+                  </span>
+                </li>
               )}
-
 
               {eventTime && (
-                <div className="event-details-information__item">
-
-                  <div className="event-details-information__icon">
-                    <Clock3
-                      size={23}
-                      aria-hidden="true"
-                    />
-                  </div>
-
-                  <div>
-                    <span>
-                      Time
-                    </span>
-
-                    <strong>
-                      {eventTime}
-                    </strong>
-                  </div>
-
-                </div>
+                <li>
+                  <span className="ed-info__icon">
+                    <Clock3 size={20} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <small>Time</small>
+                    <strong>{eventTime}</strong>
+                  </span>
+                </li>
               )}
 
+              <li>
+                <span className="ed-info__icon">
+                  <MapPin size={20} aria-hidden="true" />
+                </span>
+                <span>
+                  <small>Location</small>
+                  <strong>{location}</strong>
+                </span>
+              </li>
 
-              <div className="event-details-information__item">
+              <li>
+                <span className="ed-info__icon">
+                  <Users size={20} aria-hidden="true" />
+                </span>
+                <span>
+                  <small>Event Type</small>
+                  <strong>{eventType}</strong>
+                </span>
+              </li>
+            </ul>
 
-                <div className="event-details-information__icon">
-                  <MapPin
-                    size={23}
-                    aria-hidden="true"
-                  />
-                </div>
+            {registrationUrl && (
+              <a
+                href={registrationUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ed-button ed-button--gold ed-info__register"
+              >
+                Register for event
+                <ExternalLink size={16} aria-hidden="true" />
+              </a>
+            )}
 
-                <div>
-                  <span>
-                    Location
-                  </span>
-
-                  <strong>
-                    {location}
-                  </strong>
-                </div>
-
-              </div>
-
-
-              <div className="event-details-information__item">
-
-                <div className="event-details-information__icon">
-                  <Users
-                    size={23}
-                    aria-hidden="true"
-                  />
-                </div>
-
-                <div>
-                  <span>
-                    Event Type
-                  </span>
-
-                  <strong>
-                    {eventType}
-                  </strong>
-                </div>
-
-              </div>
-
-            </aside>
-
-          </div>
+          </aside>
 
         </div>
-
       </section>
 
 
@@ -1090,167 +642,41 @@ export default function EventDetails() {
           WHY WE CONVENE
       ====================================================== */}
 
-      <section
-        id="why-we-convene"
-        className="event-details-purpose"
-      >
+      <section id="why-we-convene" className="ed-section ed-section--soft">
+        <div className="ed-container">
 
-        <div className="event-details-container">
-
-
-          <div className="event-details-purpose__top">
-
+          <header className="ed-heading">
             <div>
-
-              <div className="event-details-section-label">
-
-                <span className="event-details-section-number">
-                  02
-                </span>
-
-                <span className="event-details-eyebrow">
-                  Why We Convene
-                </span>
-
-                <i
-                  aria-hidden="true"
-                />
-
-              </div>
-
-
-              <h2>
-                Relationships create
-                pathways to opportunity.
-              </h2>
-
+              <span className="ed-eyebrow">Why We Convene</span>
+              <h2>Relationships create pathways to opportunity.</h2>
             </div>
 
-
             <p>
-              Continental Founders convenings bring together
-              diverse stakeholders to turn shared ambition
-              into real progress for people, businesses and
-              communities across Africa.
+              Continental Founders convenings bring together diverse
+              stakeholders to turn shared ambition into real progress
+              for people, businesses and communities across Africa.
             </p>
+          </header>
 
-          </div>
-
-
-          <div className="event-details-purpose__grid">
-
-
-            <article className="event-details-purpose-card">
-
-              <div className="event-details-purpose-card__icon">
-                <Users
-                  size={34}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-              </div>
-
-
-              <div>
-
-                <div className="event-details-purpose-card__heading">
-
-                  <span>
-                    01.
+          <ol className="ed-purpose">
+            {purposes.map(({ icon: Icon, title, text, tone }, index) => (
+              <li key={title} className={`ed-tone--${tone}`}>
+                <div className="ed-purpose__top">
+                  <span className="ed-purpose__icon">
+                    <Icon size={24} aria-hidden="true" />
                   </span>
-
-                  <h3>
-                    Connect
-                  </h3>
-
+                  <span className="ed-purpose__number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
                 </div>
 
-                <p>
-                  Bring founders, institutions,
-                  professionals and partners into
-                  the same conversation.
-                </p>
-
-              </div>
-
-            </article>
-
-
-            <article className="event-details-purpose-card">
-
-              <div className="event-details-purpose-card__icon">
-                <BookOpen
-                  size={34}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-              </div>
-
-
-              <div>
-
-                <div className="event-details-purpose-card__heading">
-
-                  <span>
-                    02.
-                  </span>
-
-                  <h3>
-                    Exchange
-                  </h3>
-
-                </div>
-
-                <p>
-                  Create room for useful knowledge,
-                  experience and practical insight
-                  to move across networks.
-                </p>
-
-              </div>
-
-            </article>
-
-
-            <article className="event-details-purpose-card">
-
-              <div className="event-details-purpose-card__icon">
-                <TrendingUp
-                  size={34}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-              </div>
-
-
-              <div>
-
-                <div className="event-details-purpose-card__heading">
-
-                  <span>
-                    03.
-                  </span>
-
-                  <h3>
-                    Act
-                  </h3>
-
-                </div>
-
-                <p>
-                  Move promising conversations toward
-                  relationships, collaboration and
-                  opportunity.
-                </p>
-
-              </div>
-
-            </article>
-
-          </div>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </li>
+            ))}
+          </ol>
 
         </div>
-
       </section>
 
 
@@ -1258,95 +684,52 @@ export default function EventDetails() {
           JOIN
       ====================================================== */}
 
-      <section className="event-details-connect">
+      <section className="ed-join">
+        <div className="ed-container">
+          <div className="ed-join__card">
 
-        <div
-          className="event-details-connect__pattern"
-          aria-hidden="true"
-        />
+            <img src={eventImage} alt="" loading="lazy" />
 
+            <div className="ed-join__content">
+              <span className="ed-eyebrow ed-eyebrow--light">Join the Conversation</span>
 
-        <div className="event-details-container event-details-connect__grid">
+              <h2>Be part of the room where connections begin.</h2>
 
+              <p>
+                Secure your place and join a community of founders,
+                professionals, institutions and partners working toward
+                practical connections, collaboration and opportunity.
+              </p>
 
-          <div>
+              <div className="ed-join__actions">
+                {registrationUrl && (
+                  <a
+                    href={registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ed-button ed-button--gold"
+                  >
+                    Register for event
+                    <ExternalLink size={16} aria-hidden="true" />
+                  </a>
+                )}
 
-            <div className="event-details-connect__label">
-
-              <i
-                aria-hidden="true"
-              />
-
-              <span>
-                Join the Conversation
-              </span>
-
-            </div>
-
-
-            <h2>
-              Be part of the room
-              where connections begin.
-            </h2>
-
-          </div>
-
-
-          <div className="event-details-connect__content">
-
-            <p>
-              Secure your place and join a community of
-              founders, professionals, institutions and
-              partners working toward practical connections,
-              collaboration and opportunity.
-            </p>
-
-
-            <div className="event-details-connect__actions">
-
-              {registrationUrl && (
-                <a
-                  href={registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="event-details-button event-details-button--gold"
+                <Link
+                  to="/contact"
+                  className={`ed-button ${registrationUrl ? "ed-button--ghost" : "ed-button--gold"}`}
                 >
-                  Register for Event
+                  Contact us
+                  <ArrowRight size={16} aria-hidden="true" />
+                </Link>
 
-                  <ExternalLink
-                    size={16}
-                    aria-hidden="true"
-                  />
-                </a>
-              )}
-
-
-              <Link
-                to="/contact"
-                className="event-details-button event-details-button--outline-light"
-              >
-                Contact Us
-
-                <ArrowRight
-                  size={16}
-                  aria-hidden="true"
-                />
-              </Link>
-
-
-              <Link
-                to="/events"
-                className="event-details-connect__all-events"
-              >
-                View All Events
-              </Link>
-
+                <Link to="/events" className="ed-join__all">
+                  View all events
+                </Link>
+              </div>
             </div>
 
           </div>
-
         </div>
-
       </section>
 
 
@@ -1354,39 +737,15 @@ export default function EventDetails() {
           BRAND BAND
       ====================================================== */}
 
-      <section className="event-details-brand-band">
-
-        <div className="event-details-container event-details-brand-band__inner">
-
-          <span>
-            Continental Founders
-          </span>
-
-          <i
-            aria-hidden="true"
-          />
-
-          <strong>
-            Talent is everywhere. Access is not.
-          </strong>
-
-          <i
-            aria-hidden="true"
-          />
-
-          <Link
-            to="/contact"
-          >
-            Connect With Us
-
-            <ArrowRight
-              size={15}
-              aria-hidden="true"
-            />
+      <section className="ed-band">
+        <div className="ed-container ed-band__inner">
+          <span>Continental Founders</span>
+          <strong>Talent is everywhere. Access is not.</strong>
+          <Link to="/contact">
+            Connect with us
+            <ArrowRight size={15} aria-hidden="true" />
           </Link>
-
         </div>
-
       </section>
 
     </main>

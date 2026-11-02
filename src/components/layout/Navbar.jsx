@@ -11,11 +11,14 @@ import {
   Link,
   NavLink,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import { navigation } from "../../data/navigation";
 import "./Navbar.css";
 
 const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
+const ADMIN_LOGIN_PATH = "/admin/login";
+const LOGO_CLICK_DELAY = 800;
 
 const COMPACT_QUERY = "(max-width: 1100px)";
 
@@ -63,11 +66,17 @@ const isMac =
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const searchRef = useRef(null);
   const progressRef = useRef(null);
   const closeTimerRef = useRef(null);
+
+  // Hidden admin access through three quick logo clicks.
+  const logoClickCount = useRef(0);
+  const logoClickTimer = useRef(null);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -238,6 +247,31 @@ export default function Navbar() {
 
   useEffect(() => () => window.clearTimeout(closeTimerRef.current), []);
 
+  useEffect(() => () => window.clearTimeout(logoClickTimer.current), []);
+
+  // Three quick clicks on the logo open the existing admin login.
+  const handleLogoClick = (event) => {
+    logoClickCount.current += 1;
+    window.clearTimeout(logoClickTimer.current);
+
+    if (logoClickCount.current >= 3) {
+      event.preventDefault();
+      logoClickCount.current = 0;
+      logoClickTimer.current = null;
+      closeMenus();
+      closeSearch();
+      navigate(ADMIN_LOGIN_PATH);
+      return;
+    }
+
+    logoClickTimer.current = window.setTimeout(() => {
+      logoClickCount.current = 0;
+      logoClickTimer.current = null;
+    }, LOGO_CLICK_DELAY);
+
+    closeMenus();
+  };
+
   const isItemActive = (item) => {
     if (item.path && location.pathname === item.path) return true;
 
@@ -299,7 +333,7 @@ export default function Navbar() {
               to="/"
               className="navbar__brand"
               aria-label="Continental Founders home"
-              onClick={closeMenus}
+              onClick={handleLogoClick}
             >
               <img
                 src="/assets/continental-founders-logo.webp"

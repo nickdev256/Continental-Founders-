@@ -21,7 +21,6 @@ import {
   Image as ImageIcon,
   Images,
   LoaderCircle,
-  MoreVertical,
   Plus,
   RefreshCw,
   Search,

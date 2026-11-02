@@ -22,7 +22,6 @@ import {
   Mail,
   MailCheck,
   Megaphone,
-  MousePointerClick,
   Plus,
   RefreshCcw,
   Search,

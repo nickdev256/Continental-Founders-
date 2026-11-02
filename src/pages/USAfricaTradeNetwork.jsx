@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -11,13 +12,13 @@ import {
   ArrowRight,
   Building2,
   CheckCircle2,
+  ChevronRight,
   Globe2,
   GraduationCap,
   Handshake,
   Landmark,
   Lightbulb,
   Network,
-  RefreshCw,
   Rocket,
   TrendingUp,
   Users,
@@ -42,7 +43,7 @@ const DEFAULT_CONTENT = {
     titleHighlight: "Real opportunity.",
     description:
       "Continental Founders is proposing USAfrica as a Strategic Ecosystem & Market Access Partner — connecting CFCV fellows and alumni to markets, capital networks, corporate relationships, government stakeholders, and diaspora expertise.",
-    image: "/assets/images/us-africa/hero.webp",
+    image: "/assets/images/us-africa/business-week.webp",
     primaryButtonText: "Explore the Partnership",
     primaryButtonLink: "/contact",
     secondaryButtonText: "See the Opportunity",
@@ -113,7 +114,7 @@ const DEFAULT_CONTENT = {
         title: "Strategic Partnership Engine",
         description:
           "Source institutional relationships with universities, chambers of commerce, embassies, development finance institutions, corporations, and other ecosystem partners.",
-        image: "/assets/images/us-africa/strategic-partnerships.webp",
+        image: "/assets/m.webp",
       },
     ],
   },
@@ -257,7 +258,10 @@ function mergeContent(content = {}) {
 
 /* ============================================================
    ICON HELPERS
+   Cards cycle through the site's gold, navy and blue accents.
 ============================================================ */
+
+const TONES = ["gold", "navy", "blue"];
 
 function getHighlightIcon(index) {
   const icons = [Handshake, TrendingUp, Network];
@@ -315,16 +319,16 @@ function handleImageError(event) {
 
 export default function USAfricaTradeNetwork() {
   const [page, setPage] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   /* ==========================================================
      LOAD CMS PAGE
+     The default content renders at once; CMS content replaces
+     it when it arrives, so visitors never see a loading bar.
   ========================================================== */
 
   const loadPage = useCallback(async (signal) => {
     try {
-      setLoading(true);
       setError("");
 
       const response = await fetch(
@@ -379,10 +383,6 @@ export default function USAfricaTradeNetwork() {
         requestError?.message ||
           "Unable to load the latest page content."
       );
-    } finally {
-      if (!signal?.aborted) {
-        setLoading(false);
-      }
     }
   }, []);
 
@@ -420,24 +420,68 @@ export default function USAfricaTradeNetwork() {
   } = content;
 
   /* ==========================================================
+     SCROLL REVEAL
+     Anything already above the fold (or skipped by a fast
+     jump) is shown at once.
+  ========================================================== */
+
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("trade-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
+  /* ==========================================================
      PAGE LAYOUT
   ========================================================== */
 
   return (
-    <main className="us-africa-page">
-      {/* CMS STATUS */}
-
-      {loading && (
-        <div
-          className="trade-cms-status"
-          role="status"
-          aria-live="polite"
-        >
-          <RefreshCw size={15} aria-hidden="true" />
-          Loading latest content...
-        </div>
-      )}
-
+    <main className="us-africa-page" ref={pageRef}>
       {error && import.meta.env.DEV && (
         <div
           className="trade-cms-status trade-cms-status--error"
@@ -450,7 +494,7 @@ export default function USAfricaTradeNetwork() {
       {/* HERO */}
 
       <section className="trade-hero">
-        <div className="trade-hero__media">
+        <div className="trade-hero__media" aria-hidden="true">
           <img
             src={hero.image}
             alt=""
@@ -458,30 +502,18 @@ export default function USAfricaTradeNetwork() {
             decoding="async"
             onError={handleImageError}
           />
-
-          <div
-            className="trade-hero__overlay"
-            aria-hidden="true"
-          />
-
-          <div
-            className="trade-hero__glow"
-            aria-hidden="true"
-          />
         </div>
 
-        <div className="container trade-hero__inner">
+        <div className="trade-container trade-hero__inner">
           <div className="trade-hero__content">
-            <span className="trade-eyebrow trade-eyebrow--gold">
+            <span className="trade-eyebrow trade-eyebrow--light">
               {hero.eyebrow}
             </span>
 
             <h1>
-              {hero.titleLine1}
-              <br />
-              {hero.titleLine2}
-              <br />
-              <span>{hero.titleHighlight}</span>
+              <span>{hero.titleLine1}</span>{" "}
+              <span>{hero.titleLine2}</span>{" "}
+              <em>{hero.titleHighlight}</em>
             </h1>
 
             <p>{hero.description}</p>
@@ -497,100 +529,99 @@ export default function USAfricaTradeNetwork() {
 
               <a
                 href="#network-opportunity"
-                className="trade-button trade-button--outline"
+                className="trade-button trade-button--ghost"
               >
                 {hero.secondaryButtonText}
               </a>
             </div>
-
-            <div className="trade-hero__highlights">
-              {content.highlights.map((item, index) => {
-                const Icon = getHighlightIcon(index);
-
-                return (
-                  <div key={`${item.title}-${index}`}>
-                    <Icon size={23} aria-hidden="true" />
-                    <span>{item.title}</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
-          <div
-            className="trade-hero__side-message"
-            aria-hidden="true"
-          >
-            {content.sideMessage.map((item, index) => (
-              <span key={`${item}-${index}`}>{item}</span>
-            ))}
-          </div>
+          <ul className="trade-hero__highlights">
+            {content.highlights.map((item, index) => {
+              const Icon = getHighlightIcon(index);
+
+              return (
+                <li
+                  key={`${item.title}-${index}`}
+                  className={`trade-tone--${TONES[index % TONES.length]}`}
+                >
+                  <span className="trade-hero__highlight-icon">
+                    <Icon size={18} aria-hidden="true" />
+                  </span>
+                  {item.title}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
+
+      {/* VALUE CHAIN */}
+
+      <div className="trade-chain" aria-hidden="true">
+        <div className="trade-container trade-chain__inner">
+          {content.sideMessage.map((item, index) => (
+            <React.Fragment key={`${item}-${index}`}>
+              {index > 0 && <ChevronRight size={16} />}
+              <span>{item}</span>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
 
       {/* OPPORTUNITY */}
 
       <section
-        className="trade-opportunity trade-opportunity--without-stats"
+        className="trade-section trade-opportunity"
         id="network-opportunity"
       >
-        <div className="trade-opportunity__image">
-          <img
-            src={intro.image}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={handleImageError}
-          />
+        <div className="trade-container trade-opportunity__grid">
+          <figure className="trade-opportunity__media" data-reveal>
+            <img
+              src={intro.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
+            />
 
-          <div
-            className="trade-opportunity__image-shade"
-            aria-hidden="true"
-          />
+            <figcaption>{intro.imageCaption}</figcaption>
+          </figure>
 
-          <div className="trade-opportunity__image-caption">
-            {intro.imageCaption}
+          <div className="trade-opportunity__content" data-reveal>
+            <span className="trade-eyebrow">{intro.eyebrow}</span>
+
+            <h2>{intro.title}</h2>
+
+            <p>{intro.paragraph1}</p>
+
+            <p>{intro.paragraph2}</p>
+
+            <Link
+              to={intro.buttonLink || "/our-model"}
+              className="trade-button trade-button--navy"
+            >
+              {intro.buttonText}
+              <ArrowRight size={17} aria-hidden="true" />
+            </Link>
           </div>
-        </div>
-
-        <div className="trade-opportunity__content">
-          <span className="trade-eyebrow">
-            {intro.eyebrow}
-          </span>
-
-          <h2>{intro.title}</h2>
-
-          <p>{intro.paragraph1}</p>
-
-          <p>{intro.paragraph2}</p>
-
-          <Link
-            to={intro.buttonLink || "/our-model"}
-            className="trade-button trade-button--soft"
-          >
-            {intro.buttonText}
-            <ArrowRight size={17} aria-hidden="true" />
-          </Link>
         </div>
       </section>
 
       {/* PROPOSED ROLE */}
 
-      <section className="trade-enables">
-        <div className="container">
-          <div className="trade-enables__top">
+      <section className="trade-section trade-section--soft trade-roles">
+        <div className="trade-container">
+          <header className="trade-heading trade-heading--split" data-reveal>
             <div>
-              <span className="trade-eyebrow trade-eyebrow--gold">
-                {features.eyebrow}
-              </span>
-
+              <span className="trade-eyebrow">{features.eyebrow}</span>
               <h2>{features.title}</h2>
             </div>
 
             <p>{features.description}</p>
-          </div>
+          </header>
 
-          <div className="trade-enables__grid">
+          <div className="trade-roles__grid" data-reveal>
             {features.items.map((item, index) => {
               const Icon = getFeatureIcon(index);
 
@@ -599,10 +630,10 @@ export default function USAfricaTradeNetwork() {
 
               return (
                 <article
-                  className="trade-enable-card"
+                  className={`trade-role trade-tone--${TONES[index % TONES.length]}`}
                   key={`${item.title}-${index}`}
                 >
-                  <div className="trade-enable-card__image">
+                  <div className="trade-role__media">
                     <img
                       src={item.image || fallbackImage}
                       alt=""
@@ -610,13 +641,13 @@ export default function USAfricaTradeNetwork() {
                       decoding="async"
                       onError={handleImageError}
                     />
+
+                    <span className="trade-role__icon">
+                      <Icon size={20} aria-hidden="true" />
+                    </span>
                   </div>
 
-                  <div className="trade-enable-card__icon">
-                    <Icon size={22} aria-hidden="true" />
-                  </div>
-
-                  <div className="trade-enable-card__body">
+                  <div className="trade-role__body">
                     <h3>{item.title}</h3>
                     <p>{item.description}</p>
                   </div>
@@ -629,61 +660,56 @@ export default function USAfricaTradeNetwork() {
 
       {/* EXTERNAL ECOSYSTEM */}
 
-      <section className="trade-network">
-        <div className="container">
-          <div className="trade-network__intro">
-            <span className="trade-eyebrow">
-              {network.eyebrow}
-            </span>
+      <section className="trade-section trade-network">
+        <div className="trade-container trade-network__grid">
+          <header className="trade-network__intro" data-reveal>
+            <span className="trade-eyebrow">{network.eyebrow}</span>
 
             <h2>
-              {network.titleLine1}
-              <br />
-              {network.titleLine2}
+              <span>{network.titleLine1}</span>{" "}
+              <em>{network.titleLine2}</em>
             </h2>
 
             <p>{network.description}</p>
-          </div>
+          </header>
 
-          <div className="trade-network__grid">
+          <ul className="trade-network__list" data-reveal>
             {network.items.map((item, index) => {
               const Icon = getNetworkIcon(index);
 
               return (
-                <div
-                  className="trade-network__item"
+                <li
+                  className={`trade-network__item trade-tone--${TONES[index % TONES.length]}`}
                   key={`${item}-${index}`}
                 >
-                  <Icon size={28} aria-hidden="true" />
+                  <span className="trade-network__icon">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
                   <span>{item}</span>
-                </div>
+                </li>
               );
             })}
-          </div>
+          </ul>
         </div>
       </section>
 
       {/* WHY THIS PARTNERSHIP */}
 
-      <section className="trade-partnership">
-        <div className="container">
-          <div className="trade-partnership__header">
-            <span className="trade-eyebrow">
-              {partnership.eyebrow}
-            </span>
-
+      <section className="trade-section trade-section--soft trade-partnership">
+        <div className="trade-container">
+          <header className="trade-heading" data-reveal>
+            <span className="trade-eyebrow">{partnership.eyebrow}</span>
             <h2>{partnership.title}</h2>
-
             <p>{partnership.description}</p>
-          </div>
+          </header>
 
-          <div className="trade-partnership__grid">
-            <article className="trade-partnership-card">
-              <div className="trade-partnership-card__icon">
-                <Lightbulb size={27} aria-hidden="true" />
-              </div>
+          <div className="trade-partnership__grid" data-reveal>
+            <article className="trade-partner-card trade-tone--gold">
+              <span className="trade-partner-card__icon">
+                <Lightbulb size={24} aria-hidden="true" />
+              </span>
 
-              <span className="trade-partnership-card__label">
+              <span className="trade-partner-card__label">
                 Continental Founders
               </span>
 
@@ -692,12 +718,12 @@ export default function USAfricaTradeNetwork() {
               <p>{partnership.cfText}</p>
             </article>
 
-            <article className="trade-partnership-card">
-              <div className="trade-partnership-card__icon">
-                <Globe2 size={27} aria-hidden="true" />
-              </div>
+            <article className="trade-partner-card trade-tone--navy">
+              <span className="trade-partner-card__icon">
+                <Globe2 size={24} aria-hidden="true" />
+              </span>
 
-              <span className="trade-partnership-card__label">
+              <span className="trade-partner-card__label">
                 USAfrica
               </span>
 
@@ -709,13 +735,15 @@ export default function USAfricaTradeNetwork() {
 
           {/* GOVERNANCE */}
 
-          <div className="trade-governance">
-            <div className="trade-governance__icon">
-              <Landmark size={28} aria-hidden="true" />
-            </div>
+          <div className="trade-governance" data-reveal>
+            <span className="trade-governance__icon">
+              <Landmark size={26} aria-hidden="true" />
+            </span>
 
             <div>
-              <span>Partnership Governance</span>
+              <span className="trade-eyebrow trade-eyebrow--light">
+                Partnership Governance
+              </span>
 
               <h3>{partnership.governanceTitle}</h3>
 
@@ -727,79 +755,73 @@ export default function USAfricaTradeNetwork() {
 
       {/* NEXT STEPS */}
 
-      <section className="trade-next-steps">
-        <div className="container">
-          <div className="trade-next-steps__header">
-            <span className="trade-eyebrow trade-eyebrow--gold">
-              {nextSteps.eyebrow}
-            </span>
-
+      <section className="trade-section trade-steps">
+        <div className="trade-container">
+          <header className="trade-heading" data-reveal>
+            <span className="trade-eyebrow">{nextSteps.eyebrow}</span>
             <h2>{nextSteps.title}</h2>
-
             <p>{nextSteps.description}</p>
-          </div>
+          </header>
 
-          <div className="trade-next-steps__grid">
+          <ol className="trade-steps__list" data-reveal>
             {nextSteps.items.map((item, index) => {
               const Icon = getNextStepIcon(index);
 
               return (
-                <article
-                  className="trade-next-step"
+                <li
+                  className={`trade-step trade-tone--${TONES[index % TONES.length]}`}
                   key={`${item.number}-${item.title}`}
                 >
-                  <div className="trade-next-step__top">
+                  <div className="trade-step__marker">
                     <span>{item.number}</span>
-                    <Icon size={25} aria-hidden="true" />
                   </div>
 
-                  <h3>{item.title}</h3>
-
-                  <p>{item.text}</p>
-                </article>
+                  <div className="trade-step__body">
+                    <Icon size={22} aria-hidden="true" />
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </div>
+                </li>
               );
             })}
-          </div>
+          </ol>
         </div>
       </section>
 
       {/* FINAL CTA */}
 
-      <section className="trade-final-cta">
-        <div className="trade-final-cta__image">
-          <img
-            src={cta.image}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={handleImageError}
-          />
+      <section className="trade-cta">
+        <div className="trade-container">
+          <div className="trade-cta__card" data-reveal>
+            <img
+              src={cta.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
+            />
 
-          <div aria-hidden="true" />
-        </div>
+            <div className="trade-cta__content">
+              <span className="trade-eyebrow trade-eyebrow--light">
+                {cta.eyebrow}
+              </span>
 
-        <div className="container trade-final-cta__inner">
-          <div>
-            <span className="trade-eyebrow trade-eyebrow--gold">
-              {cta.eyebrow}
-            </span>
+              <h2>
+                <span>{cta.titleLine1}</span>{" "}
+                <em>{cta.titleLine2}</em>
+              </h2>
 
-            <h2>
-              {cta.titleLine1}
-              <br />
-              {cta.titleLine2}
-            </h2>
+              <p>{cta.description}</p>
+
+              <Link
+                to={cta.buttonLink || "/contact"}
+                className="trade-button trade-button--gold"
+              >
+                {cta.buttonText}
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
           </div>
-
-          <p>{cta.description}</p>
-
-          <Link
-            to={cta.buttonLink || "/contact"}
-            className="trade-button trade-button--gold"
-          >
-            {cta.buttonText}
-            <ArrowRight size={18} aria-hidden="true" />
-          </Link>
         </div>
       </section>
     </main>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -31,6 +31,8 @@ const initialInterestForm = {
 const pathways = [
   {
     name: "GENESIS",
+    image: "/assets/kk.webp",
+    imageAlt: "Founder starting a venture on a laptop",
     subtitle: "Build It",
     description:
       "Turn your idea into an opportunity. Develop the foundations, skills, and confidence to begin building your venture.",
@@ -46,6 +48,8 @@ const pathways = [
   },
   {
     name: "ASCEND",
+    image: "/assets/x.webp",
+    imageAlt: "Founders refining their business model in a workshop",
     subtitle: "Prove It",
     description:
       "Strengthen your business, validate demand, refine your model, and build the momentum to move forward.",
@@ -61,6 +65,8 @@ const pathways = [
   },
   {
     name: "HORIZON",
+    image: "/assets/venture.webp",
+    imageAlt: "Founders planning growth in an office overlooking the city",
     subtitle: "Scale It",
     description:
       "Expand your reach through stronger systems, strategic partnerships, and opportunities across markets.",
@@ -205,136 +211,225 @@ export default function FellowshipCommunity() {
     }, 1000);
   };
 
+  // Reveal sections as they scroll into view. Anything already
+  // above the fold (or skipped by a fast jump) is shown at once.
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("fc-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
+
   return (
-    <main className="fc-page">
+    <main
+      className="fc-page"
+      ref={pageRef}
+    >
       {/* HERO */}
       <section className="fc-hero">
-        <div className="fc-container fc-hero-content">
+        <div
+          className="fc-hero-background"
+          aria-hidden="true"
+        >
+          <img
+            src="/assets/p1.1.webp"
+            alt=""
+            fetchPriority="high"
+          />
+        </div>
 
-          {/* FELLOWSHIP PATHWAY NAVIGATION */}
-          <nav
-            className="fc-pathway-nav"
-            aria-label="Fellowship pathways"
-          >
-            <Link
-              to="/genesis"
-              className="fc-pathway-nav-link fc-pathway-nav-genesis"
-            >
-              Genesis
-            </Link>
+        <div
+          className="fc-hero-overlay"
+          aria-hidden="true"
+        />
 
-            <Link
-              to="/ascend"
-              className="fc-pathway-nav-link fc-pathway-nav-ascend"
-            >
-              Ascend
-            </Link>
+        <div className="fc-container fc-hero-inner">
+          <div className="fc-hero-content">
+            <span className="fc-pill">
+              CONTINENTAL FOUNDERS FELLOWSHIP
+            </span>
 
-            <Link
-              to="/horizon"
-              className="fc-pathway-nav-link fc-pathway-nav-horizon"
-            >
-              Horizon
-            </Link>
-          </nav>
+            <h1>
+              Build Your Business.
+              <br />
+              <em>Connect Continents.</em>
+            </h1>
 
-          <span className="fc-eyebrow">
-            <span className="fc-eyebrow-line" />
-            CONTINENTAL FOUNDERS FELLOWSHIP
-          </span>
+            <p className="fc-hero-description">
+              For entrepreneurs across Africa and U.S.-based entrepreneurs
+              of African descent. Different stages. One shared cohort.
+              Professional relationships that can open doors to future
+              international trade.
+            </p>
 
-          <h1>
-            Build Your Business.
-            <br />
-            Connect Continents.
-          </h1>
+            <div className="fc-actions">
+              <Link
+                to="/find-your-lane"
+                className="fc-btn fc-btn-gold"
+              >
+                Find Your Lane <ArrowRight size={18} aria-hidden="true" />
+              </Link>
 
-          <p className="fc-hero-description">
-            For entrepreneurs across Africa and U.S.-based entrepreneurs
-            of African descent. Different stages. One shared cohort.
-            Professional relationships that can open doors to future
-            international trade.
-          </p>
-
-          <div className="fc-hero-actions">
-            <Link
-              to="/find-your-lane"
-              className="fc-btn fc-btn-gold"
-            >
-              Find Your Lane <ArrowRight size={18} />
-            </Link>
-
-            <a
-              href="#fc-experience"
-              className="fc-btn fc-btn-outline"
-            >
-              Explore Our Community
-            </a>
+              <a
+                href="#fc-experience"
+                className="fc-btn fc-btn-outline"
+              >
+                Explore Our Community
+              </a>
+            </div>
           </div>
 
-          <div className="fc-hero-highlights">
-            <div className="fc-highlight">
-              <h3>ONE COHORT</h3>
-              <p>Learn and collaborate together</p>
-            </div>
+          <div className="fc-hero-footer">
+            <ul className="fc-hero-highlights">
+              <li>
+                <strong>ONE COHORT</strong>
+                <span>Learn and collaborate together</span>
+              </li>
 
-            <div className="fc-highlight">
-              <h3>TWO CONTINENTS</h3>
-              <p>Africa and the United States</p>
-            </div>
+              <li>
+                <strong>TWO CONTINENTS</strong>
+                <span>Africa and the United States</span>
+              </li>
 
-            <div className="fc-highlight">
-              <h3>THREE PATHWAYS</h3>
-              <p>Genesis · Ascend · Horizon</p>
-            </div>
+              <li>
+                <strong>THREE PATHWAYS</strong>
+                <span>Genesis · Ascend · Horizon</span>
+              </li>
+            </ul>
+
+            {/* FELLOWSHIP PATHWAY NAVIGATION */}
+            <nav
+              className="fc-pathway-nav"
+              aria-label="Fellowship pathways"
+            >
+              <Link
+                to="/genesis"
+                className="fc-pathway-nav-link fc-genesis"
+              >
+                Genesis
+              </Link>
+
+              <Link
+                to="/ascend"
+                className="fc-pathway-nav-link fc-ascend"
+              >
+                Ascend
+              </Link>
+
+              <Link
+                to="/horizon"
+                className="fc-pathway-nav-link fc-horizon"
+              >
+                Horizon
+              </Link>
+            </nav>
           </div>
         </div>
       </section>
 
       {/* WHO BELONGS HERE */}
-      <section className="fc-belongs">
-        <div className="fc-container">
-          <span className="fc-belongs-eyebrow">
-            WHO BELONGS HERE
-          </span>
+      <section className="fc-section fc-section-white">
+        <div
+          className="fc-container fc-split"
+          data-reveal
+        >
+          <div className="fc-copy">
+            <span className="fc-kicker">
+              WHO BELONGS HERE
+            </span>
 
-          <h2 className="fc-belongs-title">
-            Built for a connected African entrepreneurial future.
-          </h2>
+            <h2>
+              Built for a connected African{" "}
+              <em>entrepreneurial future.</em>
+            </h2>
 
-          <p className="fc-belongs-intro">
-            Our intended Fellowship community brings together
-            entrepreneurs based in African countries and U.S.-based
-            founders of African descent—including African Americans,
-            Afro-Caribbeans, African immigrants, and others of African
-            ancestry.
-          </p>
+            <p className="fc-lead">
+              Our intended Fellowship community brings together
+              entrepreneurs based in African countries and U.S.-based
+              founders of African descent including African Americans,
+              Afro-Caribbeans, African immigrants, and others of African
+              ancestry.
+            </p>
 
-          <p className="fc-belongs-description">
-            Whether you have an idea, are building traction, or are ready
-            to expand, you can contribute to a cohort where founders
-            share perspectives, exchange market knowledge, and build
-            lasting professional relationships.
-          </p>
+            <p>
+              Whether you have an idea, are building traction, or are ready
+              to expand, you can contribute to a cohort where founders
+              share perspectives, exchange market knowledge, and build
+              lasting professional relationships.
+            </p>
+          </div>
+
+          <figure className="fc-media">
+            <img
+              src="/assets/ll.webp"
+              alt="Founders from across the African diaspora walking together"
+              loading="lazy"
+            />
+          </figure>
         </div>
       </section>
 
       {/* INTRODUCTION */}
-      <section className="fc-section fc-intro">
-        <div className="fc-container fc-intro-grid">
-          <div className="fc-intro-heading">
-            <span className="fc-section-label">
+      <section className="fc-section fc-section-soft">
+        <div
+          className="fc-container fc-split fc-split-reverse"
+          data-reveal
+        >
+          <div className="fc-copy">
+            <span className="fc-kicker">
               THE FELLOWSHIP
             </span>
 
             <h2>
               Different journeys.
               <br />
-              <span>A shared future.</span>
+              <em>A shared future.</em>
             </h2>
-          </div>
 
-          <div className="fc-intro-copy">
             <p>
               Every founder starts somewhere. Some are turning an idea
               into their first venture. Others are proving their
@@ -349,21 +444,34 @@ export default function FellowshipCommunity() {
               relationships.
             </p>
           </div>
+
+          <figure className="fc-media">
+            <img
+              src="/assets/p2.webp"
+              alt="Founders learning together in a workshop"
+              loading="lazy"
+            />
+          </figure>
         </div>
       </section>
 
       {/* THREE PATHWAYS */}
       <section
-        className="fc-section fc-pathways"
+        className="fc-section fc-section-white"
         id="fc-pathways"
       >
-        <div className="fc-container">
-          <div className="fc-section-heading">
-            <span className="fc-section-label">
+        <div
+          className="fc-container"
+          data-reveal
+        >
+          <div className="fc-heading fc-heading-center">
+            <span className="fc-kicker">
               YOUR ENTREPRENEURIAL JOURNEY
             </span>
 
-            <h2>Three Pathways. One Cohort.</h2>
+            <h2>
+              Three Pathways. <em>One Cohort.</em>
+            </h2>
 
             <p>
               Find the pathway that reflects where you are and where
@@ -381,45 +489,58 @@ export default function FellowshipCommunity() {
                   className={`fc-pathway-card fc-${pathway.color}`}
                   key={pathway.name}
                 >
-                  <div className="fc-pathway-top">
-                    <span className="fc-pathway-icon">
-                      <Icon size={31} strokeWidth={1.8} />
-                    </span>
+                  <div className="fc-pathway-photo">
+                    <img
+                      src={pathway.image}
+                      alt={pathway.imageAlt}
+                      loading="lazy"
+                    />
 
+                    <span className="fc-pathway-icon">
+                      <Icon size={24} strokeWidth={1.8} aria-hidden="true" />
+                    </span>
+                  </div>
+
+                  <div className="fc-pathway-body">
                     <span className="fc-pathway-stage">
                       {pathway.stage}
                     </span>
+
+                    <h3>{pathway.name}</h3>
+                    <h4>{pathway.subtitle}</h4>
+
+                    <p className="fc-pathway-description">
+                      {pathway.description}
+                    </p>
+
+                    <ul className="fc-pathway-outcomes">
+                      {pathway.outcomes.map((outcome) => (
+                        <li key={outcome}>
+                          <CheckCircle2 size={17} aria-hidden="true" />
+                          <span>{outcome}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link
+                      to={pathway.link}
+                      className="fc-pathway-link"
+                    >
+                      Explore {pathway.name} <ArrowRight size={17} aria-hidden="true" />
+                    </Link>
                   </div>
-
-                  <h3>{pathway.name}</h3>
-                  <h4>{pathway.subtitle}</h4>
-
-                  <p className="fc-pathway-description">
-                    {pathway.description}
-                  </p>
-
-                  <div className="fc-pathway-outcomes">
-                    {pathway.outcomes.map((outcome) => (
-                      <div className="fc-outcome" key={outcome}>
-                        <CheckCircle2 size={16} />
-                        <span>{outcome}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Link
-                    to={pathway.link}
-                    className="fc-pathway-link"
-                  >
-                    Explore {pathway.name} <ArrowRight size={17} />
-                  </Link>
                 </article>
               );
             })}
           </div>
 
           <div className="fc-pathway-bottom">
-            <Compass size={23} />
+            <span
+              className="fc-pathway-bottom-icon"
+              aria-hidden="true"
+            >
+              <Compass size={22} />
+            </span>
 
             <p>
               Not sure where you fit? Start with a few guided questions
@@ -429,9 +550,9 @@ export default function FellowshipCommunity() {
 
             <Link
               to="/find-your-lane"
-              className="fc-text-link"
+              className="fc-btn fc-btn-gold"
             >
-              Find Your Lane <ArrowRight size={16} />
+              Find Your Lane <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -442,13 +563,18 @@ export default function FellowshipCommunity() {
         className="fc-section fc-experience"
         id="fc-experience"
       >
-        <div className="fc-container">
-          <div className="fc-section-heading fc-heading-light">
-            <span className="fc-section-label">
+        <div
+          className="fc-container"
+          data-reveal
+        >
+          <div className="fc-heading fc-heading-center fc-heading-light">
+            <span className="fc-kicker">
               BEYOND THE PATHWAY
             </span>
 
-            <h2>One Fellowship. A Shared Experience.</h2>
+            <h2>
+              One Fellowship. <em>A Shared Experience.</em>
+            </h2>
 
             <p>
               Your pathway provides a focus. The fellowship creates
@@ -466,8 +592,11 @@ export default function FellowshipCommunity() {
                   className="fc-experience-card"
                   key={item.title}
                 >
-                  <div className="fc-experience-icon">
-                    <Icon size={25} />
+                  <div
+                    className="fc-experience-icon"
+                    aria-hidden="true"
+                  >
+                    <Icon size={24} />
                   </div>
 
                   <h3>{item.title}</h3>
@@ -478,8 +607,11 @@ export default function FellowshipCommunity() {
           </div>
 
           <div className="fc-shared-banner">
-            <div className="fc-shared-symbol">
-              <HeartHandshake size={34} />
+            <div
+              className="fc-shared-symbol"
+              aria-hidden="true"
+            >
+              <HeartHandshake size={30} />
             </div>
 
             <div>
@@ -496,17 +628,28 @@ export default function FellowshipCommunity() {
       </section>
 
       {/* FOUNDER TRANSFORMATION */}
-      <section className="fc-section fc-transformation">
-        <div className="fc-container fc-transformation-grid">
-          <div className="fc-transformation-copy">
-            <span className="fc-section-label">
+      <section className="fc-section fc-section-white">
+        <div
+          className="fc-container fc-transformation-grid"
+          data-reveal
+        >
+          <div className="fc-copy">
+            <figure className="fc-media fc-media-wide">
+              <img
+                src="/assets/n.webp"
+                alt="A mentor working with founders"
+                loading="lazy"
+              />
+            </figure>
+
+            <span className="fc-kicker">
               YOUR DEVELOPMENT
             </span>
 
             <h2>
               Build beyond
               <br />
-              where you are.
+              <em>where you are.</em>
             </h2>
 
             <p>
@@ -521,16 +664,18 @@ export default function FellowshipCommunity() {
               you undertake, and the goals you pursue.
             </p>
 
-            <Link
-              to="/find-your-lane"
-              className="fc-btn fc-btn-navy"
-            >
-              Start Your Journey <ArrowRight size={18} />
-            </Link>
+            <div className="fc-actions">
+              <Link
+                to="/find-your-lane"
+                className="fc-btn fc-btn-navy"
+              >
+                Start Your Journey <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
           </div>
 
-          <div className="fc-transformation-list">
-            <div className="fc-transformation-item">
+          <ol className="fc-transformation-list">
+            <li className="fc-transformation-item">
               <span>01</span>
               <div>
                 <h3>Clarity</h3>
@@ -539,9 +684,9 @@ export default function FellowshipCommunity() {
                   your venture.
                 </p>
               </div>
-            </div>
+            </li>
 
-            <div className="fc-transformation-item">
+            <li className="fc-transformation-item">
               <span>02</span>
               <div>
                 <h3>Capability</h3>
@@ -550,9 +695,9 @@ export default function FellowshipCommunity() {
                   building.
                 </p>
               </div>
-            </div>
+            </li>
 
-            <div className="fc-transformation-item">
+            <li className="fc-transformation-item">
               <span>03</span>
               <div>
                 <h3>Connection</h3>
@@ -561,9 +706,9 @@ export default function FellowshipCommunity() {
                   markets.
                 </p>
               </div>
-            </div>
+            </li>
 
-            <div className="fc-transformation-item">
+            <li className="fc-transformation-item">
               <span>04</span>
               <div>
                 <h3>Opportunity</h3>
@@ -572,23 +717,28 @@ export default function FellowshipCommunity() {
                   growth.
                 </p>
               </div>
-            </div>
-          </div>
+            </li>
+          </ol>
         </div>
       </section>
 
       {/* THE JOURNEY */}
       <section
-        className="fc-section fc-journey"
+        className="fc-section fc-section-soft"
         id="fc-journey"
       >
-        <div className="fc-container">
-          <div className="fc-section-heading">
-            <span className="fc-section-label">
+        <div
+          className="fc-container"
+          data-reveal
+        >
+          <div className="fc-heading fc-heading-center">
+            <span className="fc-kicker">
               FROM INTEREST TO BEYOND
             </span>
 
-            <h2>Your Fellowship Journey</h2>
+            <h2>
+              Your Fellowship <em>Journey</em>
+            </h2>
 
             <p>
               Explore the steps from discovering your pathway to
@@ -597,37 +747,34 @@ export default function FellowshipCommunity() {
             </p>
           </div>
 
-          <div className="fc-journey-grid">
-            {journey.map((step, index) => {
+          <ol className="fc-journey-grid">
+            {journey.map((step) => {
               const Icon = step.icon;
 
               return (
-                <article
+                <li
                   className="fc-journey-step"
                   key={step.number}
                 >
-                  <div className="fc-journey-number">
-                    {step.number}
-                  </div>
+                  <div className="fc-journey-top">
+                    <span
+                      className="fc-journey-icon"
+                      aria-hidden="true"
+                    >
+                      <Icon size={22} />
+                    </span>
 
-                  <div className="fc-journey-icon">
-                    <Icon size={25} />
+                    <span className="fc-journey-number">
+                      {step.number}
+                    </span>
                   </div>
 
                   <h3>{step.title}</h3>
                   <p>{step.description}</p>
-
-                  {index < journey.length - 1 && (
-                    <ArrowRight
-                      className="fc-journey-arrow"
-                      size={20}
-                      aria-hidden="true"
-                    />
-                  )}
-                </article>
+                </li>
               );
             })}
-          </div>
+          </ol>
 
           <p className="fc-journey-note">
             Application, review, selection, and final pathway placement
@@ -637,18 +784,37 @@ export default function FellowshipCommunity() {
       </section>
 
       {/* GRADUATION AND ALUMNI */}
-      <section className="fc-section fc-alumni">
-        <div className="fc-container fc-alumni-grid">
-          <div className="fc-alumni-icon">
-            <GraduationCap size={44} />
-          </div>
+      <section className="fc-alumni">
+        <div
+          className="fc-alumni-background"
+          aria-hidden="true"
+        >
+          <img
+            src="/assets/cc.webp"
+            alt=""
+            loading="lazy"
+          />
+        </div>
 
+        <div
+          className="fc-container fc-alumni-grid"
+          data-reveal
+        >
           <div className="fc-alumni-copy">
-            <span className="fc-section-label">
+            <span
+              className="fc-alumni-icon"
+              aria-hidden="true"
+            >
+              <GraduationCap size={30} />
+            </span>
+
+            <span className="fc-kicker">
               THE JOURNEY CONTINUES
             </span>
 
-            <h2>Graduation is a milestone, not the end.</h2>
+            <h2>
+              Graduation is a milestone, <em>not the end.</em>
+            </h2>
 
             <p>
               The fellowship journey extends beyond the six-month
@@ -659,77 +825,57 @@ export default function FellowshipCommunity() {
             </p>
           </div>
 
-          <div className="fc-alumni-points">
-            <div>
-              <CheckCircle2 size={18} />
+          <ul className="fc-alumni-points">
+            <li>
+              <CheckCircle2 size={20} aria-hidden="true" />
               <span>Celebrate progress and learning</span>
-            </div>
+            </li>
 
-            <div>
-              <CheckCircle2 size={18} />
+            <li>
+              <CheckCircle2 size={20} aria-hidden="true" />
               <span>Showcase your venture's development</span>
-            </div>
+            </li>
 
-            <div>
-              <CheckCircle2 size={18} />
+            <li>
+              <CheckCircle2 size={20} aria-hidden="true" />
               <span>Stay connected with fellow founders</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="fc-section fc-final-cta">
-        <div className="fc-container fc-final-cta-inner">
-          <span className="fc-section-label">
-            YOUR NEXT CHAPTER STARTS HERE
-          </span>
-
-          <h2>Your vision has a future.</h2>
-
-          <p>
-            Discover your starting point and explore the pathway that
-            may fit your entrepreneurial journey.
-          </p>
-
-          <div className="fc-final-actions">
-            <Link
-              to="/find-your-lane"
-              className="fc-btn fc-btn-gold"
-            >
-              Find Your Lane <ArrowRight size={18} />
-            </Link>
-
-            <Link
-              to="/pathways"
-              className="fc-btn fc-btn-outline"
-            >
-              View All Pathways
-            </Link>
-          </div>
-
-          <small>
-            Exploring a pathway is not an offer of admission. Final
-            placement depends on the fellowship's review process,
-            readiness, goals, and needs.
-          </small>
+            </li>
+          </ul>
         </div>
       </section>
 
       {/* EXPRESS YOUR INTEREST */}
       <section
-        className="fc-section fc-interest"
+        className="fc-section fc-section-white fc-interest"
         id="interest"
       >
-        <div className="fc-container">
-          <span className="fc-eyebrow">Your next step</span>
+        <div
+          className="fc-container fc-interest-grid"
+          data-reveal
+        >
+          <div className="fc-copy">
+            <span className="fc-kicker">Your next step</span>
 
-          <h2>Express Your Interest</h2>
+            <h2>
+              Express Your <em>Interest</em>
+            </h2>
 
-          <p className="fc-interest-intro">
-            Share a little about yourself. This form lets you prepare
-            your answers without submitting personal data to a server.
-          </p>
+            <p>
+              Share a little about yourself. This form lets you prepare
+              your answers without submitting personal data to a server.
+            </p>
+
+            <div className="fc-interest-apply">
+              <span>Ready to apply now?</span>
+
+              <Link
+                to="/cfcv/apply"
+                className="fc-btn fc-btn-navy"
+              >
+                Apply to CF Fellows <ArrowRight size={17} aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
 
           <div className="fc-interest-formwrap">
             <form
@@ -848,7 +994,7 @@ export default function FellowshipCommunity() {
                 </button>
 
                 <button
-                  className="fc-btn fc-btn-outline"
+                  className="fc-btn fc-btn-ghost"
                   type="reset"
                 >
                   Clear Form
@@ -862,6 +1008,60 @@ export default function FellowshipCommunity() {
               </p>
             </form>
           </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section className="fc-final-cta">
+        <div
+          className="fc-final-background"
+          aria-hidden="true"
+        >
+          <img
+            src="/assets/ss.webp"
+            alt=""
+            loading="lazy"
+          />
+        </div>
+
+        <div
+          className="fc-container fc-final-cta-inner"
+          data-reveal
+        >
+          <span className="fc-kicker">
+            YOUR NEXT CHAPTER STARTS HERE
+          </span>
+
+          <h2>
+            Your vision <em>has a future.</em>
+          </h2>
+
+          <p>
+            Discover your starting point and explore the pathway that
+            may fit your entrepreneurial journey.
+          </p>
+
+          <div className="fc-actions">
+            <Link
+              to="/find-your-lane"
+              className="fc-btn fc-btn-gold"
+            >
+              Find Your Lane <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+
+            <a
+              href="#fc-pathways"
+              className="fc-btn fc-btn-outline"
+            >
+              View All Pathways
+            </a>
+          </div>
+
+          <small>
+            Exploring a pathway is not an offer of admission. Final
+            placement depends on the fellowship's review process,
+            readiness, goals, and needs.
+          </small>
         </div>
       </section>
     </main>

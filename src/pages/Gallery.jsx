@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -12,11 +13,15 @@ import {
   Download,
   Expand,
   Image as ImageIcon,
+  Images,
   LoaderCircle,
   RefreshCw,
   Search,
   X,
 } from "lucide-react";
+
+import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 
 import "./Gallery.css";
 
@@ -35,6 +40,17 @@ const API_URL = (
 
 const ALL_CATEGORY = "All";
 
+// Photos shown at first, and added by each "Load more".
+const PAGE_SIZE = 24;
+
+// Our own event photos, shown in the hero slideshow.
+const HERO_SLIDES = [
+  "/assets/gallery/DZ9A1318 (1).webp",
+  "/assets/gallery/DZ9A1311.webp",
+  "/assets/gallery/DZ9A0696.webp",
+  "/assets/gallery/DZ9A0973.webp",
+];
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -46,16 +62,11 @@ function cleanString(value) {
 }
 
 function normalizeCategory(value) {
-  const category = cleanString(value);
-
-  return category || "General";
+  return cleanString(value) || "General";
 }
 
 function normalizeGalleryItem(item) {
-  if (
-    !item ||
-    typeof item !== "object"
-  ) {
+  if (!item || typeof item !== "object") {
     return null;
   }
 
@@ -72,46 +83,25 @@ function normalizeGalleryItem(item) {
   }
 
   return {
-    id:
-      item.id ||
-      imageUrl,
+    id: item.id || imageUrl,
 
-    title:
-      cleanString(item.title) ||
-      "Continental Founders",
+    title: cleanString(item.title) || "Continental Founders",
 
-    caption:
-      cleanString(
-        item.caption ||
-          item.description
-      ),
+    caption: cleanString(item.caption || item.description),
 
-    category:
-      normalizeCategory(
-        item.category
-      ),
+    category: normalizeCategory(item.category),
 
     imageUrl,
 
     downloadUrl:
-      cleanString(
-        item.downloadUrl ||
-          item.download_url
-      ) || imageUrl,
+      cleanString(item.downloadUrl || item.download_url) || imageUrl,
 
     altText:
-      cleanString(
-        item.altText ||
-          item.alt_text
-      ) ||
+      cleanString(item.altText || item.alt_text) ||
       cleanString(item.title) ||
       "Continental Founders gallery image",
 
-    eventDate:
-      item.eventDate ||
-      item.event_date ||
-      item.date ||
-      null,
+    eventDate: item.eventDate || item.event_date || item.date || null,
 
     publishedAt:
       item.publishedAt ||
@@ -120,47 +110,28 @@ function normalizeGalleryItem(item) {
       item.created_at ||
       null,
 
-    sortOrder:
-      Number(
-        item.sortOrder ??
-          item.sort_order ??
-          0
-      ) || 0,
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? 0) || 0,
   };
 }
 
-function normalizeGalleryResponse(
-  payload
-) {
+function normalizeGalleryResponse(payload) {
   let records = [];
 
   if (Array.isArray(payload)) {
     records = payload;
-  } else if (
-    Array.isArray(payload?.items)
-  ) {
+  } else if (Array.isArray(payload?.items)) {
     records = payload.items;
-  } else if (
-    Array.isArray(payload?.gallery)
-  ) {
+  } else if (Array.isArray(payload?.gallery)) {
     records = payload.gallery;
-  } else if (
-    Array.isArray(payload?.data)
-  ) {
+  } else if (Array.isArray(payload?.data)) {
     records = payload.data;
-  } else if (
-    Array.isArray(payload?.data?.items)
-  ) {
+  } else if (Array.isArray(payload?.data?.items)) {
     records = payload.data.items;
-  } else if (
-    Array.isArray(payload?.data?.gallery)
-  ) {
+  } else if (Array.isArray(payload?.data?.gallery)) {
     records = payload.data.gallery;
   }
 
-  return records
-    .map(normalizeGalleryItem)
-    .filter(Boolean);
+  return records.map(normalizeGalleryItem).filter(Boolean);
 }
 
 function formatDate(value) {
@@ -170,63 +141,35 @@ function formatDate(value) {
 
   const date = new Date(value);
 
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
+  if (Number.isNaN(date.getTime())) {
     return "";
   }
 
-  return new Intl.DateTimeFormat(
-    "en",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  ).format(date);
+  return new Intl.DateTimeFormat("en", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
 }
 
-function createSafeFileName(
-  title,
-  imageUrl
-) {
+function createSafeFileName(title, imageUrl) {
   const base =
     cleanString(title)
       .toLowerCase()
-      .replace(
-        /[^a-z0-9]+/g,
-        "-"
-      )
-      .replace(
-        /^-+|-+$/g,
-        ""
-      ) ||
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") ||
     "continental-founders-photo";
 
   let extension = "jpg";
 
   try {
     const url = new URL(imageUrl);
-
-    const match =
-      url.pathname.match(
-        /\.([a-zA-Z0-9]+)$/
-      );
+    const match = url.pathname.match(/\.([a-zA-Z0-9]+)$/);
 
     if (match?.[1]) {
-      const candidate =
-        match[1].toLowerCase();
+      const candidate = match[1].toLowerCase();
 
-      if (
-        [
-          "jpg",
-          "jpeg",
-          "png",
-          "webp",
-        ].includes(candidate)
-      ) {
+      if (["jpg", "jpeg", "png", "webp"].includes(candidate)) {
         extension = candidate;
       }
     }
@@ -235,6 +178,17 @@ function createSafeFileName(
   }
 
   return `${base}.${extension}`;
+}
+
+// Tile shape from the photo's real proportions, once it has loaded.
+function shapeFor(width, height) {
+  if (!width || !height) return "";
+
+  const ratio = width / height;
+
+  if (ratio > 1.9) return "wide";
+  if (ratio < 0.85) return "tall";
+  return "";
 }
 
 // ============================================================
@@ -246,1306 +200,624 @@ export default function Gallery() {
   // GALLERY DATA
   // ----------------------------------------------------------
 
-  const [
-    gallery,
-    setGallery,
-  ] = useState([]);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [gallery, setGallery] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // ----------------------------------------------------------
   // FILTERS
   // ----------------------------------------------------------
 
-  const [
-    activeCategory,
-    setActiveCategory,
-  ] = useState(
-    ALL_CATEGORY
-  );
+  const [activeCategory, setActiveCategory] = useState(ALL_CATEGORY);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState("");
+  // Tile shapes keyed by photo id, filled in as photos load.
+  const [shapes, setShapes] = useState({});
 
   // ----------------------------------------------------------
-  // LIGHTBOX
+  // LIGHTBOX + DOWNLOAD
   // ----------------------------------------------------------
 
-  const [
-    selectedIndex,
-    setSelectedIndex,
-  ] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
 
-  // ----------------------------------------------------------
-  // DOWNLOAD
-  // ----------------------------------------------------------
-
-  const [
-    downloadingId,
-    setDownloadingId,
-  ] = useState(null);
-
-  // ----------------------------------------------------------
-  // CAROUSEL
-  // ----------------------------------------------------------
-
-  const [
-    carouselIndex,
-    setCarouselIndex,
-  ] = useState(0);
-
-  const carouselPointerRef =
-    useRef({
-      startX: 0,
-      currentX: 0,
-      dragging: false,
-    });
-
-  const carouselMovedRef =
-    useRef(false);
+  const lastFocusRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const thumbsRef = useRef(null);
+  const swipeRef = useRef({ startX: 0, startY: 0, active: false });
 
   // ==========================================================
   // LOAD PUBLISHED GALLERY
   // ==========================================================
 
-  const loadGallery =
-    async () => {
-      setLoading(true);
-      setError("");
+  const loadGallery = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
-      try {
-        const response =
-          await fetch(
-            `${API_URL}/api/gallery/published`,
-            {
-              method: "GET",
-              headers: {
-                Accept:
-                  "application/json",
-              },
-            }
-          );
-
-        let payload = {};
-
-        try {
-          payload =
-            await response.json();
-        } catch {
-          payload = {};
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            payload?.message ||
-              payload?.error ||
-              "Unable to load the gallery."
-          );
-        }
-
-        const normalized =
-          normalizeGalleryResponse(
-            payload
-          );
-
-        setGallery(normalized);
-      } catch (requestError) {
-        console.error(
-          "Gallery loading error:",
-          requestError
-        );
-
-        setGallery([]);
-
-        setError(
-          requestError?.message ||
-            "Unable to load the gallery."
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
-  useEffect(() => {
-    loadGallery();
-  }, []);
-
-  // ==========================================================
-  // CATEGORIES
-  // ==========================================================
-
-  const categories =
-    useMemo(() => {
-      const unique = new Set();
-
-      gallery.forEach(
-        (item) => {
-          if (item.category) {
-            unique.add(
-              item.category
-            );
-          }
+    try {
+      const response = await fetch(
+        `${API_URL}/api/gallery/published`,
+        {
+          method: "GET",
+          headers: { Accept: "application/json" },
         }
       );
 
-      return [
-        ALL_CATEGORY,
-        ...Array.from(unique).sort(
-          (a, b) =>
-            a.localeCompare(b)
-        ),
-      ];
-    }, [gallery]);
+      let payload = {};
+
+      try {
+        payload = await response.json();
+      } catch {
+        payload = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          payload?.message ||
+            payload?.error ||
+            "Unable to load the gallery."
+        );
+      }
+
+      setGallery(normalizeGalleryResponse(payload));
+    } catch (requestError) {
+      console.error("Gallery loading error:", requestError);
+
+      setGallery([]);
+
+      // A network failure only says "Failed to fetch".
+      setError(
+        requestError instanceof TypeError
+          ? "We could not reach the gallery right now. Please try again shortly."
+          : requestError?.message || "Unable to load the gallery."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadGallery();
+  }, [loadGallery]);
+
+  // ==========================================================
+  // CATEGORIES (with photo counts)
+  // ==========================================================
+
+  const categories = useMemo(() => {
+    const counts = new Map();
+
+    gallery.forEach((item) => {
+      counts.set(item.category, (counts.get(item.category) || 0) + 1);
+    });
+
+    return [
+      { name: ALL_CATEGORY, count: gallery.length },
+      ...Array.from(counts, ([name, count]) => ({ name, count })).sort(
+        (a, b) => a.name.localeCompare(b.name)
+      ),
+    ];
+  }, [gallery]);
 
   // ==========================================================
   // FILTERED GALLERY
   // ==========================================================
 
-  const filteredGallery =
-    useMemo(() => {
-      const query =
-        searchQuery
-          .trim()
-          .toLowerCase();
+  const filteredGallery = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
 
-      return gallery.filter(
-        (item) => {
-          const matchesCategory =
-            activeCategory ===
-              ALL_CATEGORY ||
-            item.category ===
-              activeCategory;
+    return gallery.filter((item) => {
+      if (
+        activeCategory !== ALL_CATEGORY &&
+        item.category !== activeCategory
+      ) {
+        return false;
+      }
 
-          if (!matchesCategory) {
-            return false;
-          }
+      if (!query) {
+        return true;
+      }
 
-          if (!query) {
-            return true;
-          }
+      return [item.title, item.caption, item.category]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [gallery, activeCategory, searchQuery]);
 
-          const searchable = [
-            item.title,
-            item.caption,
-            item.category,
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
+  const visibleItems = filteredGallery.slice(0, visibleCount);
+  const remaining = filteredGallery.length - visibleItems.length;
+  const isFiltering =
+    searchQuery.trim() !== "" || activeCategory !== ALL_CATEGORY;
 
-          return searchable.includes(
-            query
-          );
-        }
-      );
-    }, [
-      gallery,
-      activeCategory,
-      searchQuery,
-    ]);
-
-  // ==========================================================
-  // KEEP CAROUSEL INDEX VALID
-  // ==========================================================
-
+  // A new search or category starts again from the first page.
   useEffect(() => {
-    if (
-      filteredGallery.length === 0
-    ) {
-      setCarouselIndex(0);
-      return;
-    }
+    setVisibleCount(PAGE_SIZE);
+  }, [activeCategory, searchQuery]);
 
-    setCarouselIndex(
-      (current) =>
-        Math.min(
-          current,
-          filteredGallery.length - 1
-        )
+  function clearFilters() {
+    setSearchQuery("");
+    setActiveCategory(ALL_CATEGORY);
+  }
+
+  function rememberShape(id, image) {
+    const shape = shapeFor(image.naturalWidth, image.naturalHeight);
+
+    setShapes((current) =>
+      current[id] === shape ? current : { ...current, [id]: shape }
     );
-  }, [filteredGallery.length]);
-
-  // ==========================================================
-  // CAROUSEL ITEM
-  // ==========================================================
-
-  const getCarouselItem =
-    (offset) => {
-      if (
-        filteredGallery.length === 0
-      ) {
-        return null;
-      }
-
-      const index =
-        (carouselIndex +
-          offset +
-          filteredGallery.length) %
-        filteredGallery.length;
-
-      return {
-        item:
-          filteredGallery[index],
-        index,
-      };
-    };
-
-  // ==========================================================
-  // MOVE CAROUSEL
-  // ==========================================================
-
-  const moveCarousel =
-    (direction) => {
-      if (
-        filteredGallery.length <= 1
-      ) {
-        return;
-      }
-
-      setCarouselIndex(
-        (current) =>
-          (
-            current +
-            direction +
-            filteredGallery.length
-          ) %
-          filteredGallery.length
-      );
-    };
-
-  // ==========================================================
-  // CAROUSEL POINTER CONTROLS
-  // ==========================================================
-
-const handleCarouselPointerDown =
-  (event) => {
-    carouselPointerRef.current = {
-      startX: event.clientX,
-      currentX: event.clientX,
-      dragging: true,
-    };
-
-    carouselMovedRef.current =
-      false;
-  };
-
-  const handleCarouselPointerMove =
-    (event) => {
-      const pointer =
-        carouselPointerRef.current;
-
-      if (!pointer.dragging) {
-        return;
-      }
-
-      pointer.currentX =
-        event.clientX;
-
-      if (
-        Math.abs(
-          pointer.currentX -
-            pointer.startX
-        ) > 8
-      ) {
-        carouselMovedRef.current =
-          true;
-      }
-    };
-
- const handleCarouselPointerUp =
-  () => {
-    const pointer =
-      carouselPointerRef.current;
-
-    if (!pointer.dragging) {
-      return;
-    }
-
-    const distance =
-      pointer.currentX -
-      pointer.startX;
-
-    pointer.dragging = false;
-
-    if (Math.abs(distance) < 55) {
-      return;
-    }
-
-    if (distance < 0) {
-      moveCarousel(1);
-    } else {
-      moveCarousel(-1);
-    }
-
-    window.setTimeout(() => {
-      carouselMovedRef.current =
-        false;
-    }, 150);
-  };
-
-  const handleCarouselPointerCancel =
-    () => {
-      carouselPointerRef.current.dragging =
-        false;
-    };
-
-  // ==========================================================
-  // OPEN LIGHTBOX FROM CAROUSEL
-  // ==========================================================
-
-  const openCarouselLightbox =
-    (index) => {
-      if (
-        carouselMovedRef.current
-      ) {
-        return;
-      }
-
-      setSelectedIndex(index);
-    };
-
-  // ==========================================================
-  // LIGHTBOX INDEX VALIDATION
-  // ==========================================================
-
-  useEffect(() => {
-    if (selectedIndex === null) {
-      return;
-    }
-
-    if (
-      filteredGallery.length === 0
-    ) {
-      setSelectedIndex(null);
-      return;
-    }
-
-    if (
-      selectedIndex >=
-      filteredGallery.length
-    ) {
-      setSelectedIndex(0);
-    }
-  }, [
-    filteredGallery,
-    selectedIndex,
-  ]);
-
-  const selectedItem =
-    selectedIndex === null
-      ? null
-      : filteredGallery[
-          selectedIndex
-        ];
+  }
 
   // ==========================================================
   // LIGHTBOX
   // ==========================================================
 
-  const openLightbox =
-    (index) => {
-      setSelectedIndex(index);
-    };
+  const selectedItem =
+    selectedIndex === null ? null : filteredGallery[selectedIndex];
 
-  const closeLightbox =
-    () => {
+  // Close if the open photo is filtered away.
+  useEffect(() => {
+    if (selectedIndex !== null && !filteredGallery[selectedIndex]) {
       setSelectedIndex(null);
-    };
+    }
+  }, [filteredGallery, selectedIndex]);
 
-  const showPrevious =
-    () => {
-      if (
-        filteredGallery.length <= 1
-      ) {
-        return;
-      }
+  function openLightbox(index, event) {
+    lastFocusRef.current = event?.currentTarget || null;
+    setSelectedIndex(index);
+  }
 
-      setSelectedIndex(
-        (current) => {
-          if (current === null) {
-            return 0;
-          }
+  const closeLightbox = useCallback(() => {
+    setSelectedIndex(null);
+    lastFocusRef.current?.focus?.();
+  }, []);
 
-          return (
-            current -
-            1 +
-            filteredGallery.length
-          ) %
-            filteredGallery.length;
-        }
+  const step = useCallback(
+    (direction) => {
+      const total = filteredGallery.length;
+
+      if (total <= 1) return;
+
+      setSelectedIndex((current) =>
+        current === null ? 0 : (current + direction + total) % total
       );
-    };
+    },
+    [filteredGallery.length]
+  );
 
-  const showNext =
-    () => {
-      if (
-        filteredGallery.length <= 1
-      ) {
-        return;
-      }
-
-      setSelectedIndex(
-        (current) => {
-          if (current === null) {
-            return 0;
-          }
-
-          return (
-            current + 1
-          ) %
-            filteredGallery.length;
-        }
-      );
-    };
-
-  // ==========================================================
-  // KEYBOARD LIGHTBOX CONTROLS
-  // ==========================================================
-
+  // Keyboard, scroll lock and focus while the viewer is open.
   useEffect(() => {
     if (!selectedItem) {
       return undefined;
     }
 
-    const handleKeyDown =
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          closeLightbox();
-        }
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") closeLightbox();
+      if (event.key === "ArrowLeft") step(-1);
+      if (event.key === "ArrowRight") step(1);
+    };
 
-        if (
-          event.key ===
-          "ArrowLeft"
-        ) {
-          showPrevious();
-        }
+    const previousOverflow = document.body.style.overflow;
 
-        if (
-          event.key ===
-          "ArrowRight"
-        ) {
-          showNext();
-        }
-      };
-
-    document.body.style.overflow =
-      "hidden";
-
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow =
-        "";
-
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    selectedItem,
-    filteredGallery.length,
-  ]);
+  }, [selectedItem, closeLightbox, step]);
+
+  const lightboxOpen = Boolean(selectedItem);
+
+  useEffect(() => {
+    if (lightboxOpen) closeButtonRef.current?.focus();
+  }, [lightboxOpen]);
+
+  // Keep the active thumbnail in view.
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    thumbsRef.current
+      ?.querySelector('[aria-current="true"]')
+      ?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [selectedIndex]);
+
+  // Swipe left or right on touch screens.
+  function handleTouchStart(event) {
+    const touch = event.touches[0];
+    swipeRef.current = { startX: touch.clientX, startY: touch.clientY, active: true };
+  }
+
+  function handleTouchEnd(event) {
+    const swipe = swipeRef.current;
+
+    if (!swipe.active) return;
+
+    swipe.active = false;
+
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - swipe.startX;
+    const dy = touch.clientY - swipe.startY;
+
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      step(dx < 0 ? 1 : -1);
+    }
+  }
 
   // ==========================================================
   // DOWNLOAD IMAGE
   // ==========================================================
 
-  const handleDownload =
-    async (
-      item,
-      event
-    ) => {
-      event?.stopPropagation();
+  const handleDownload = async (item, event) => {
+    event?.stopPropagation();
 
-      if (!item?.downloadUrl) {
-        return;
+    if (!item?.downloadUrl) {
+      return;
+    }
+
+    setDownloadingId(item.id);
+
+    try {
+      const response = await fetch(item.downloadUrl);
+
+      if (!response.ok) {
+        throw new Error("Unable to download image.");
       }
 
-      setDownloadingId(item.id);
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
 
-      try {
-        const response =
-          await fetch(
-            item.downloadUrl
-          );
+      anchor.href = objectUrl;
+      anchor.download = createSafeFileName(item.title, item.downloadUrl);
 
-        if (!response.ok) {
-          throw new Error(
-            "Unable to download image."
-          );
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      URL.revokeObjectURL(objectUrl);
+    } catch (downloadError) {
+      console.error("Gallery download error:", downloadError);
+
+      window.open(item.downloadUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  // ==========================================================
+  // SCROLL REVEAL
+  // Anything already above the fold (or skipped by a fast
+  // jump) is shown at once.
+  // ==========================================================
+
+  const pageRef = useRef(null);
+
+  useEffect(() => {
+    const root = pageRef.current;
+
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("gl-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
         }
 
-        const blob =
-          await response.blob();
+        return true;
+      });
 
-        const objectUrl =
-          URL.createObjectURL(
-            blob
-          );
-
-        const anchor =
-          document.createElement(
-            "a"
-          );
-
-        anchor.href =
-          objectUrl;
-
-        anchor.download =
-          createSafeFileName(
-            item.title,
-            item.downloadUrl
-          );
-
-        document.body.appendChild(
-          anchor
-        );
-
-        anchor.click();
-
-        anchor.remove();
-
-        URL.revokeObjectURL(
-          objectUrl
-        );
-      } catch (downloadError) {
-        console.error(
-          "Gallery download error:",
-          downloadError
-        );
-
-        window.open(
-          item.downloadUrl,
-          "_blank",
-          "noopener,noreferrer"
-        );
-      } finally {
-        setDownloadingId(null);
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
       }
     };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, []);
 
   // ==========================================================
   // RENDER
   // ==========================================================
 
+  const collectionCount = categories.length - 1;
+
   return (
-    <div className="gallery-page">
+    <main className="gl-page" ref={pageRef}>
 
       {/* =====================================================
           HERO
       ====================================================== */}
 
-      <section className="gallery-hero">
+      <section className="gl-hero">
 
-        <div
-          className="gallery-hero__slideshow"
-          aria-hidden="true"
-        >
-          <div className="gallery-hero__slide gallery-hero__slide--1" />
-          <div className="gallery-hero__slide gallery-hero__slide--2" />
-          <div className="gallery-hero__slide gallery-hero__slide--3" />
-          <div className="gallery-hero__slide gallery-hero__slide--4" />
+        <div className="gl-hero__slideshow" aria-hidden="true">
+          {HERO_SLIDES.map((src) => (
+            <img key={src} src={src} alt="" />
+          ))}
         </div>
 
-        <div
-          className="gallery-hero__overlay"
-        />
+        <div className="gl-container gl-hero__inner">
 
-        <div className="gallery-hero__content">
+          <div className="gl-hero__content">
+            <span className="gl-eyebrow gl-eyebrow--light">Gallery</span>
 
-          <div className="gallery-hero__eyebrow">
-            <span />
+            <h1>
+              <span>Stories behind</span>{" "}
+              <span>
+                our <em>journey together.</em>
+              </span>
+            </h1>
 
             <p>
-              Gallery
+              Explore moments from Continental Founders events,
+              founder programs, university engagements, partnerships,
+              and community activities.
             </p>
           </div>
-          <br />
-         
 
-          <h1>
-            Stories
-            <br />
-            Behind Our
-            <br />
-            Journey Together
-          </h1>
-          <br />
+          {/* Live totals from the backend */}
+          {!loading && !error && gallery.length > 0 && (
+            <dl className="gl-hero__stats">
+              <div>
+                <dt>Photos</dt>
+                <dd>{gallery.length}</dd>
+              </div>
 
-          <p className="gallery-hero__description">
-            Explore moments from
-            Continental Founders events,
-            founder programs, university
-            engagements, partnerships,
-            and community activities.
-          </p>
+              <div>
+                <dt>{collectionCount === 1 ? "Collection" : "Collections"}</dt>
+                <dd>{collectionCount}</dd>
+              </div>
+            </dl>
+          )}
 
         </div>
-
-        <div
-          className="gallery-hero__mark"
-          aria-hidden="true"
-        />
 
       </section>
 
       {/* =====================================================
-          GALLERY CONTENT
+          GALLERY
       ====================================================== */}
 
-      <section className="gallery-content">
+      <section className="gl-section" id="gallery-photos">
 
-        <div className="gallery-container">
+        <div className="gl-container">
 
-          {/* =================================================
-              TOOLBAR
-          ================================================= */}
+          {/* Toolbar: only when there are photos to browse */}
 
-          <div className="gallery-toolbar">
+          {gallery.length > 0 && (
+            <div className="gl-toolbar">
 
-            <div
-              className="gallery-categories"
-              aria-label="Gallery categories"
-            >
-              {categories.map(
-                (category) => (
-                  <button
-                    key={category}
-                    type="button"
-                    className={
-                      activeCategory ===
-                      category
-                        ? "gallery-category is-active"
-                        : "gallery-category"
-                    }
-                    onClick={() =>
-                      setActiveCategory(
-                        category
-                      )
-                    }
-                  >
-                    {category}
-                  </button>
-                )
-              )}
-            </div>
-
-            <div className="gallery-search">
-
-              <Search
-                size={19}
-                strokeWidth={1.8}
-                aria-hidden="true"
-              />
-
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) =>
-                  setSearchQuery(
-                    event.target.value
-                  )
-                }
-                placeholder="Search gallery..."
-                aria-label="Search gallery"
-              />
-
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="gallery-search__clear"
-                  onClick={() =>
-                    setSearchQuery("")
-                  }
-                  aria-label="Clear gallery search"
+              {categories.length > 2 && (
+                <div
+                  className="gl-categories"
+                  role="group"
+                  aria-label="Filter by collection"
                 >
-                  <X
-                    size={16}
-                    aria-hidden="true"
-                  />
-                </button>
+                  {categories.map(({ name, count }) => (
+                    <button
+                      key={name}
+                      type="button"
+                      className={activeCategory === name ? "is-active" : ""}
+                      aria-pressed={activeCategory === name}
+                      onClick={() => setActiveCategory(name)}
+                    >
+                      {name}
+                      <span>{count}</span>
+                    </button>
+                  ))}
+                </div>
               )}
 
+              <label className="gl-search">
+                <span className="gl-visually-hidden">Search gallery</span>
+
+                <Search size={18} aria-hidden="true" />
+
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search photos"
+                  aria-label="Search gallery"
+                />
+
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="gl-search__clear"
+                    onClick={() => setSearchQuery("")}
+                    aria-label="Clear gallery search"
+                  >
+                    <X size={16} aria-hidden="true" />
+                  </button>
+                )}
+              </label>
+
             </div>
+          )}
 
-          </div>
+          {/* Result line when filtering */}
 
-          {/* =================================================
-              LOADING
-          ================================================= */}
+          {!loading && !error && isFiltering && filteredGallery.length > 0 && (
+            <p className="gl-result" aria-live="polite">
+              Showing {filteredGallery.length}{" "}
+              {filteredGallery.length === 1 ? "photo" : "photos"}
+              {activeCategory !== ALL_CATEGORY && (
+                <> in <strong>{activeCategory}</strong></>
+              )}
+              <button type="button" onClick={clearFilters}>
+                Clear
+              </button>
+            </p>
+          )}
+
+          {/* Loading: placeholder tiles in the shape of the wall */}
 
           {loading && (
-            <div className="gallery-state">
+            <div className="gl-grid" aria-busy="true" aria-live="polite">
+              <span className="gl-visually-hidden">Loading gallery...</span>
 
-              <LoaderCircle
-                className="gallery-state__spinner"
-                size={34}
-                strokeWidth={1.7}
-                aria-hidden="true"
-              />
-
-              <h2>
-                Loading gallery
-              </h2>
-
-              <p>
-                Gathering the latest
-                Continental Founders
-                moments.
-              </p>
-
+              {Array.from({ length: 8 }, (_, index) => (
+                <div
+                  key={index}
+                  className={`gl-tile gl-tile--skeleton${index === 0 ? " gl-tile--feature" : ""}`}
+                  aria-hidden="true"
+                />
+              ))}
             </div>
           )}
 
-          {/* =================================================
-              ERROR
-          ================================================= */}
+          {/* Error */}
 
           {!loading && error && (
-            <div className="gallery-state gallery-state--error">
+            <div className="gl-state gl-state--error" role="alert">
+              <span className="gl-state__icon">
+                <ImageIcon size={28} aria-hidden="true" />
+              </span>
 
-              <ImageIcon
-                size={36}
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
+              <h2>Gallery unavailable</h2>
 
-              <h2>
-                Gallery unavailable
-              </h2>
-
-              <p>
-                {error}
-              </p>
+              <p>{error}</p>
 
               <button
                 type="button"
+                className="gl-button gl-button--navy"
                 onClick={loadGallery}
               >
-                <RefreshCw
-                  size={17}
-                  aria-hidden="true"
-                />
-
-                Try Again
+                <RefreshCw size={16} aria-hidden="true" />
+                Try again
               </button>
-
             </div>
           )}
 
-          {/* =================================================
-              EMPTY
-          ================================================= */}
+          {/* Empty: nothing published, or nothing matches */}
 
-          {!loading &&
-            !error &&
-            filteredGallery.length === 0 && (
-              <div className="gallery-state">
+          {!loading && !error && filteredGallery.length === 0 && (
+            <div className="gl-state">
+              <span className="gl-state__icon">
+                <Images size={28} aria-hidden="true" />
+              </span>
 
-                <ImageIcon
-                  size={36}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
+              {gallery.length === 0 ? (
+                <>
+                  <h2>New photos are on the way.</h2>
+                  <p>
+                    Moments from our latest events and programs will
+                    appear here as soon as they are published.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2>No matching photos.</h2>
+                  <p>
+                    No published images match your current search or
+                    collection.
+                  </p>
 
-                <h2>
-                  No gallery images
-                </h2>
+                  <button
+                    type="button"
+                    className="gl-button gl-button--navy"
+                    onClick={clearFilters}
+                  >
+                    <X size={16} aria-hidden="true" />
+                    Clear search
+                  </button>
+                </>
+              )}
+            </div>
+          )}
 
-                <p>
-                  No published images
-                  match your current
-                  search or category.
-                </p>
+          {/* Photo wall */}
 
-              </div>
-            )}
+          {!loading && !error && visibleItems.length > 0 && (
+            <ul className="gl-grid">
+              {visibleItems.map((item, index) => {
+                const shape = shapes[item.id];
+                const date = formatDate(item.eventDate || item.publishedAt);
 
-          {/* =================================================
-              THREE-IMAGE CAROUSEL
-          ================================================= */}
+                // The first photo leads the wall when nothing is filtered.
+                const feature = index === 0 && !isFiltering && visibleItems.length > 4;
 
-          {!loading &&
-            !error &&
-            filteredGallery.length > 0 && (
-              <div className="cf-gallery-carousel">
-
-                <div
-                  className="cf-gallery-carousel__stage"
-                  onPointerDown={
-                    handleCarouselPointerDown
-                  }
-                  onPointerMove={
-                    handleCarouselPointerMove
-                  }
-                  onPointerUp={
-                    handleCarouselPointerUp
-                  }
-                  onPointerCancel={
-                    handleCarouselPointerCancel
-                  }
-                >
-
-                  {/* LEFT IMAGE */}
-
-                  {filteredGallery.length > 1 &&
-                    (() => {
-                      const previous =
-                        getCarouselItem(-1);
-
-                      return (
-                        <button
-                          type="button"
-                          className="cf-gallery-carousel__card cf-gallery-carousel__card--left"
-                          onClick={() =>
-                            moveCarousel(-1)
-                          }
-                          aria-label="Previous gallery image"
-                        >
-                          <img
-                            src={
-                              previous.item.imageUrl
-                            }
-                            alt={
-                              previous.item.altText
-                            }
-                            draggable="false"
-                          />
-                        </button>
-                      );
-                    })()}
-
-                  {/* CENTER IMAGE */}
-
-                  {(() => {
-                    const current =
-                      getCarouselItem(0);
-
-                    if (!current) {
-                      return null;
-                    }
-
-                    return (
-                      <button
-                        type="button"
-                        className="cf-gallery-carousel__card cf-gallery-carousel__card--center"
-                        onClick={() =>
-                          openCarouselLightbox(
-                            current.index
-                          )
+                return (
+                  <li
+                    key={item.id}
+                    className={[
+                      "gl-tile",
+                      feature ? "gl-tile--feature" : shape ? `gl-tile--${shape}` : "",
+                    ].join(" ")}
+                  >
+                    <button
+                      type="button"
+                      className="gl-tile__button"
+                      onClick={(event) => openLightbox(index, event)}
+                      aria-label={`Open photo: ${item.title}`}
+                    >
+                      <img
+                        src={item.imageUrl}
+                        alt={item.altText}
+                        loading={index < 8 ? "eager" : "lazy"}
+                        decoding="async"
+                        onLoad={(event) =>
+                          rememberShape(item.id, event.currentTarget)
                         }
-                        aria-label={`Open ${current.item.title}`}
-                      >
-
-                        <img
-                          src={
-                            current.item.imageUrl
-                          }
-                          alt={
-                            current.item.altText
-                          }
-                          draggable="false"
-                        />
-
-                        <span className="cf-gallery-carousel__expand">
-                          <Expand
-                            size={21}
-                            strokeWidth={1.7}
-                            aria-hidden="true"
-                          />
-                        </span>
-
-                      </button>
-                    );
-                  })()}
-
-                  {/* RIGHT IMAGE */}
-
-                  {filteredGallery.length > 1 &&
-                    (() => {
-                      const next =
-                        getCarouselItem(1);
-
-                      return (
-                        <button
-                          type="button"
-                          className="cf-gallery-carousel__card cf-gallery-carousel__card--right"
-                          onClick={() =>
-                            moveCarousel(1)
-                          }
-                          aria-label="Next gallery image"
-                        >
-                          <img
-                            src={
-                              next.item.imageUrl
-                            }
-                            alt={
-                              next.item.altText
-                            }
-                            draggable="false"
-                          />
-                        </button>
-                      );
-                    })()}
-
-                  {/* LEFT ARROW */}
-
-                  {filteredGallery.length > 1 && (
-                    <button
-                      type="button"
-                      className="cf-gallery-carousel__arrow cf-gallery-carousel__arrow--left"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        moveCarousel(-1);
-                      }}
-                      aria-label="Previous gallery image"
-                    >
-                      <ArrowLeft
-                        size={22}
-                        strokeWidth={1.7}
-                        aria-hidden="true"
                       />
+
+                      <span className="gl-tile__overlay">
+                        <span className="gl-tile__category">{item.category}</span>
+                        <strong>{item.title}</strong>
+                        {date && <small>{date}</small>}
+                      </span>
+
+                      <span className="gl-tile__expand" aria-hidden="true">
+                        <Expand size={18} />
+                      </span>
                     </button>
-                  )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-                  {/* RIGHT ARROW */}
-
-                  {filteredGallery.length > 1 && (
-                    <button
-                      type="button"
-                      className="cf-gallery-carousel__arrow cf-gallery-carousel__arrow--right"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        moveCarousel(1);
-                      }}
-                      aria-label="Next gallery image"
-                    >
-                      <ArrowRight
-                        size={22}
-                        strokeWidth={1.7}
-                        aria-hidden="true"
-                      />
-                    </button>
-                  )}
-
-                </div>
-
-                {/* =================================================
-                    IMAGE INFORMATION
-                ================================================= */}
-
-                {(() => {
-                  const current =
-                    getCarouselItem(0);
-
-                  if (!current) {
-                    return null;
-                  }
-
-                  const item =
-                    current.item;
-
-                  const displayDate =
-                    formatDate(
-                      item.eventDate ||
-                        item.publishedAt
-                    );
-
-                  return (
-                    <div className="cf-gallery-carousel__information">
-
-                      <div className="cf-gallery-carousel__meta">
-
-                        {item.category && (
-                          <span className="cf-gallery-carousel__category">
-                            {item.category}
-                          </span>
-                        )}
-
-                        {displayDate && (
-                          <span className="cf-gallery-carousel__date">
-
-                            <CalendarDays
-                              size={14}
-                              strokeWidth={1.7}
-                              aria-hidden="true"
-                            />
-
-                            {displayDate}
-
-                          </span>
-                        )}
-
-                      </div>
-
-                      <div className="cf-gallery-carousel__bottom">
-
-                        <div className="cf-gallery-carousel__text">
-
-                          <h2>
-                            {item.title}
-                          </h2>
-
-                          {item.caption && (
-                            <p>
-                              {item.caption}
-                            </p>
-                          )}
-
-                        </div>
-
-                        <button
-                          type="button"
-                          className="cf-gallery-carousel__download"
-                          onClick={(event) =>
-                            handleDownload(
-                              item,
-                              event
-                            )
-                          }
-                          disabled={
-                            downloadingId ===
-                            item.id
-                          }
-                        >
-                          {downloadingId ===
-                          item.id ? (
-                            <LoaderCircle
-                              size={18}
-                              strokeWidth={1.8}
-                              aria-hidden="true"
-                            />
-                          ) : (
-                            <Download
-                              size={18}
-                              strokeWidth={1.8}
-                              aria-hidden="true"
-                            />
-                          )}
-
-                          <span>
-                            Download
-                          </span>
-                        </button>
-
-                      </div>
-
-                      <div className="cf-gallery-carousel__counter">
-                        {carouselIndex + 1}
-                        {" / "}
-                        {filteredGallery.length}
-                      </div>
-
-                    </div>
-                  );
-                })()}
-
-              </div>
-            )}
-
-          {/* =================================================
-              LIGHTBOX
-          ================================================= */}
-
-          {selectedItem && (
-            <div
-              className="gallery-lightbox"
-              role="dialog"
-              aria-modal="true"
-              aria-label="Gallery image viewer"
-              onClick={closeLightbox}
-            >
-
-              {/* CLOSE */}
-
+          {remaining > 0 && !loading && !error && (
+            <div className="gl-more">
               <button
                 type="button"
-                className="gallery-lightbox__close"
-                onClick={closeLightbox}
-                aria-label="Close image viewer"
+                className="gl-button gl-button--outline"
+                onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
               >
-                <X
-                  size={25}
-                  strokeWidth={1.7}
-                  aria-hidden="true"
-                />
+                Load more photos
+                <span className="gl-more__count">{remaining}</span>
               </button>
-
-              {/* PREVIOUS */}
-
-              {filteredGallery.length > 1 && (
-                <button
-                  type="button"
-                  className="gallery-lightbox__navigation gallery-lightbox__navigation--previous"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    showPrevious();
-                  }}
-                  aria-label="Previous image"
-                >
-                  <ArrowLeft
-                    size={25}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-                </button>
-              )}
-
-              {/* LIGHTBOX CONTENT */}
-
-              <div
-                className="gallery-lightbox__content"
-                onClick={(event) =>
-                  event.stopPropagation()
-                }
-              >
-
-                <div className="gallery-lightbox__image-wrapper">
-
-                  <img
-                    src={
-                      selectedItem.imageUrl
-                    }
-                    alt={
-                      selectedItem.altText
-                    }
-                  />
-
-                </div>
-
-                <div className="gallery-lightbox__information">
-
-                  <div className="gallery-lightbox__meta">
-
-                    <span className="gallery-lightbox__category">
-                      {
-                        selectedItem.category
-                      }
-                    </span>
-
-                    {(selectedItem.eventDate ||
-                      selectedItem.publishedAt) && (
-                      <span className="gallery-lightbox__date">
-
-                        <CalendarDays
-                          size={14}
-                          strokeWidth={1.7}
-                          aria-hidden="true"
-                        />
-
-                        {formatDate(
-                          selectedItem.eventDate ||
-                            selectedItem.publishedAt
-                        )}
-
-                      </span>
-                    )}
-
-                  </div>
-
-                  <div className="gallery-lightbox__title-row">
-
-                    <div>
-
-                      <h2>
-                        {
-                          selectedItem.title
-                        }
-                      </h2>
-
-                      {selectedItem.caption && (
-                        <p>
-                          {
-                            selectedItem.caption
-                          }
-                        </p>
-                      )}
-
-                    </div>
-
-                    <button
-                      type="button"
-                      className="gallery-lightbox__download"
-                      onClick={(event) =>
-                        handleDownload(
-                          selectedItem,
-                          event
-                        )
-                      }
-                      disabled={
-                        downloadingId ===
-                        selectedItem.id
-                      }
-                    >
-
-                      {downloadingId ===
-                      selectedItem.id ? (
-                        <LoaderCircle
-                          size={18}
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <Download
-                          size={18}
-                          aria-hidden="true"
-                        />
-                      )}
-
-                      <span>
-                        Download
-                      </span>
-
-                    </button>
-
-                  </div>
-
-                  <div className="gallery-lightbox__counter">
-                    {selectedIndex + 1}
-                    {" / "}
-                    {filteredGallery.length}
-                  </div>
-
-                </div>
-
-              </div>
-
-              {/* NEXT */}
-
-              {filteredGallery.length > 1 && (
-                <button
-                  type="button"
-                  className="gallery-lightbox__navigation gallery-lightbox__navigation--next"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    showNext();
-                  }}
-                  aria-label="Next image"
-                >
-                  <ArrowRight
-                    size={25}
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-                </button>
-              )}
-
             </div>
           )}
 
@@ -1553,6 +825,156 @@ const handleCarouselPointerDown =
 
       </section>
 
-    </div>
+      {/* =====================================================
+          CTA
+      ====================================================== */}
+
+      <section className="gl-cta">
+        <div className="gl-container">
+          <div className="gl-cta__card" data-reveal>
+            <div>
+              <span className="gl-eyebrow gl-eyebrow--light">Be Part of the Story</span>
+              <h2>The next photo could include you.</h2>
+              <p>
+                Join a Continental Founders convening or talk to us
+                about hosting one with your institution.
+              </p>
+            </div>
+
+            <div className="gl-cta__actions">
+              <Link to="/events" className="gl-button gl-button--gold">
+                See upcoming events
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+
+              <Link to="/contact" className="gl-button gl-button--ghost">
+                Start a conversation
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =====================================================
+          LIGHTBOX
+      ====================================================== */}
+
+      {/* Rendered on <body>: the page transition wrapper uses a
+          transform, which would trap a fixed overlay inside it. */}
+      {selectedItem && createPortal(
+        <div
+          className="gl-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Photo viewer: ${selectedItem.title}`}
+        >
+
+          <div className="gl-lightbox__bar">
+            <span className="gl-lightbox__counter">
+              {selectedIndex + 1} / {filteredGallery.length}
+            </span>
+
+            <div className="gl-lightbox__tools">
+              <button
+                type="button"
+                className="gl-lightbox__tool"
+                onClick={(event) => handleDownload(selectedItem, event)}
+                disabled={downloadingId === selectedItem.id}
+              >
+                {downloadingId === selectedItem.id ? (
+                  <LoaderCircle className="gl-spin" size={18} aria-hidden="true" />
+                ) : (
+                  <Download size={18} aria-hidden="true" />
+                )}
+                <span>Download</span>
+              </button>
+
+              <button
+                ref={closeButtonRef}
+                type="button"
+                className="gl-lightbox__tool gl-lightbox__tool--icon"
+                onClick={closeLightbox}
+                aria-label="Close photo viewer"
+              >
+                <X size={22} aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            className="gl-lightbox__stage"
+            onClick={(event) => {
+              if (event.target === event.currentTarget) closeLightbox();
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {filteredGallery.length > 1 && (
+              <button
+                type="button"
+                className="gl-lightbox__nav gl-lightbox__nav--prev"
+                onClick={() => step(-1)}
+                aria-label="Previous photo"
+              >
+                <ArrowLeft size={22} aria-hidden="true" />
+              </button>
+            )}
+
+            <img
+              key={selectedItem.id}
+              src={selectedItem.imageUrl}
+              alt={selectedItem.altText}
+            />
+
+            {filteredGallery.length > 1 && (
+              <button
+                type="button"
+                className="gl-lightbox__nav gl-lightbox__nav--next"
+                onClick={() => step(1)}
+                aria-label="Next photo"
+              >
+                <ArrowRight size={22} aria-hidden="true" />
+              </button>
+            )}
+          </div>
+
+          <div className="gl-lightbox__info">
+            <div className="gl-lightbox__meta">
+              <span className="gl-lightbox__category">{selectedItem.category}</span>
+
+              {(selectedItem.eventDate || selectedItem.publishedAt) && (
+                <span className="gl-lightbox__date">
+                  <CalendarDays size={14} aria-hidden="true" />
+                  {formatDate(selectedItem.eventDate || selectedItem.publishedAt)}
+                </span>
+              )}
+            </div>
+
+            <h2>{selectedItem.title}</h2>
+
+            {selectedItem.caption && <p>{selectedItem.caption}</p>}
+          </div>
+
+          {filteredGallery.length > 1 && (
+            <div className="gl-lightbox__thumbs" ref={thumbsRef}>
+              {filteredGallery.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-label={`Show photo ${index + 1}: ${item.title}`}
+                  aria-current={index === selectedIndex}
+                  onClick={() => setSelectedIndex(index)}
+                >
+                  <img src={item.imageUrl} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+
+        </div>,
+        document.body
+      )}
+
+    </main>
   );
 }

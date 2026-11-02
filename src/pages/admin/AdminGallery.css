@@ -1448,7 +1448,6 @@
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
-.admin-gallery-upload.is-disabled,
 .admin-gallery-upload:has(input:disabled) {
   cursor: progress;
   opacity: 0.72;

@@ -1,835 +1,698 @@
 /* ============================================================
-   UNIVERSITIES PAGE
+   UNIVERSITIES
+
+   Same design system as the rest of the site: navy and gold
+   with navy and blue accents, real photos, rounded cards and
+   pill buttons. Every rule is scoped to .uni-page.
+   Sizes are in px because the site sets html { font-size: 20px }.
 ============================================================ */
 
-.universities-hero,
-.university-opening,
-.universities-partners,
-.universities-participation,
-.universities-fellowship,
-.universities-ecosystem {
-  --uni-navy: #071a2d;
-  --uni-navy-2: #0d2944;
-  --uni-navy-3: #123a5e;
+.uni-page {
+  --uni-navy: #031b34;
+  --uni-navy-2: #072641;
+  --uni-ink: #0b1f33;
+  --uni-body: #3a4f63;
+  --uni-muted: #5f7184;
+  --uni-gold: #c99220;
+  --uni-gold-dark: #a97a16;
+  --uni-gold-light: #e3bd69;
+  --uni-blue: #2563c9;
+  --uni-soft: #f6f4ef;
+  --uni-line: #e3e7eb;
+  --uni-radius: 18px;
+  --uni-radius-lg: 24px;
+  --uni-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 16px 40px rgba(3, 27, 52, 0.08);
+  --uni-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --uni-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+  --uni-font: "Montserrat", Arial, sans-serif;
 
-  --uni-gold: #c79a45;
-  --uni-gold-light: #e7c878;
+  width: 100%;
+  overflow-x: clip;
+  color: var(--uni-body);
+  background: #fff;
+  font-family: var(--uni-font);
+  font-size: 16px;
+  line-height: 1.65;
+}
 
-  --uni-cream: #f7f4ed;
-  --uni-paper: #fcfbf8;
+.uni-page *,
+.uni-page *::before,
+.uni-page *::after {
+  box-sizing: border-box;
+}
 
-  --uni-text: #22364a;
-  --uni-muted: #687887;
+/* :where() keeps resets at zero priority so component rules win */
+:where(.uni-page) h1,
+:where(.uni-page) h2,
+:where(.uni-page) h3,
+:where(.uni-page) p,
+:where(.uni-page) figure {
+  margin: 0;
+}
 
-  --uni-border: #e4e1da;
-  --uni-border-soft: rgba(7, 26, 45, 0.08);
+:where(.uni-page) ul,
+:where(.uni-page) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  --uni-white: #ffffff;
+:where(.uni-page) a {
+  color: inherit;
+  text-decoration: none;
+}
 
-  --uni-shadow:
-    0 18px 50px
-    rgba(7, 26, 45, 0.08);
+.uni-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.uni-page svg {
+  flex-shrink: 0;
+}
+
+.uni-page h1,
+.uni-page h2,
+.uni-page h3 {
+  text-wrap: balance;
+}
+
+.uni-page :where(a, button):focus-visible {
+  outline: 3px solid var(--uni-gold);
+  outline-offset: 3px;
+}
+
+/* Same edges as the navbar */
+.uni-container {
+  width: min(1440px, calc(100% - 64px));
+  margin-inline: auto;
+}
+
+.uni-section {
+  padding-block: clamp(64px, 8vw, 120px);
+}
+
+.uni-section--soft {
+  background: var(--uni-soft);
 }
 
 
-/* =========================================
-   UNIVERSITIES HERO — CINEMATIC ZOOM OUT
-========================================= */
+/* ============================================================
+   SHARED: eyebrow, headings, buttons, tones
+============================================================ */
 
-.universities-hero {
+.uni-eyebrow {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--uni-gold-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.uni-eyebrow--light {
+  color: var(--uni-gold-light);
+}
+
+.uni-page h2 {
+  color: var(--uni-ink);
+  font-family: var(--uni-heading);
+  font-size: clamp(30px, 2vw + 18px, 52px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.uni-heading {
+  max-width: 780px;
+  margin-bottom: clamp(36px, 5vw, 60px);
+}
+
+.uni-heading p {
+  margin-top: 18px;
+  color: var(--uni-muted);
+  font-size: 17px;
+}
+
+.uni-heading--split {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  align-items: end;
+  gap: 24px clamp(32px, 6vw, 96px);
+}
+
+.uni-heading--split p {
+  margin-top: 0;
+}
+
+.uni-button {
+  min-height: 52px;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 26px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  transition:
+    transform 0.25s var(--uni-ease),
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.uni-button:hover {
+  transform: translateY(-2px);
+}
+
+.uni-button svg {
+  transition: transform 0.25s var(--uni-ease);
+}
+
+.uni-button:hover svg {
+  transform: translateX(3px);
+}
+
+.uni-button--gold {
+  color: var(--uni-navy);
+  background: var(--uni-gold);
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
+}
+
+.uni-button--gold:hover {
+  background: var(--uni-gold-light);
+}
+
+.uni-button--ghost {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.uni-button--ghost:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+}
+
+.uni-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--uni-ink);
+  font-size: 15px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--uni-gold);
+  padding-bottom: 2px;
+}
+
+.uni-text-link svg {
+  color: var(--uni-gold-dark);
+  transition: transform 0.25s var(--uni-ease);
+}
+
+.uni-text-link:hover svg {
+  transform: translate(2px, -2px);
+}
+
+.uni-tone--gold {
+  --uni-tone: var(--uni-gold);
+}
+
+
+.uni-tone--blue {
+  --uni-tone: var(--uni-blue);
+}
+
+.uni-tone--navy {
+  --uni-tone: var(--uni-navy);
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.uni-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: #061421;
+  min-height: min(720px, calc(100svh - 90px));
+  display: flex;
+  align-items: center;
+  padding-block: clamp(64px, 8vw, 112px);
+  color: #fff;
+  background: var(--uni-navy);
 }
 
-/* Animated background image */
-.universities-hero__bg {
+.uni-hero__media {
   position: absolute;
   inset: 0;
-  z-index: 0;
-
-      background-image: linear-gradient(90deg, #031220d1, #031220ad 35%, #03122073 65%
-65%
-, #0312204d), url(/assets/images/universities/university-partnership.webp) !important;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* Initial zoom */
-  transform: scale(1.3);
-
-  /* Smooth zoom-out on page load */
-  animation: universitiesHeroZoomOut 5s
-    cubic-bezier(0.22, 1, 0.36, 1) both;
-
-  will-change: transform;
+  z-index: -2;
 }
 
-/* Dark overlay */
-.universities-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-
-  background: linear-gradient(
-    90deg,
-    rgba(4, 17, 30, 0.82) 0%,
-    rgba(4, 17, 30, 0.68) 50%,
-    rgba(4, 17, 30, 0.48) 100%
-  );
-
-  pointer-events: none;
+.uni-hero__media img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center 40%;
+  animation: uni-zoom 14s ease-out both;
 }
 
-/* Keep all hero content above the image */
-.universities-hero .page-hero__inner {
-  position: relative;
-  z-index: 2;
-}
-
-/* Zoom-out animation */
-@keyframes universitiesHeroZoomOut {
+@keyframes uni-zoom {
   from {
-    transform: scale(1.3);
+    transform: scale(1.08);
   }
-
   to {
     transform: scale(1);
   }
 }
 
-/* Mobile image positioning */
-@media (max-width: 600px) {
-  .universities-hero__bg {
-    background-position: 58% center;
-  }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
-  .universities-hero__bg {
-    animation: none;
-    transform: scale(1);
-  }
-}
-
-
-/* ============================================================
-   OPENING
-============================================================ */
-
-.university-opening {
-  padding:
-    clamp(5.5rem, 9vw, 8rem)
-    0;
-
-  background: var(--uni-paper);
-}
-
-
-.university-opening__grid {
-  display: grid;
-
-  grid-template-columns:
-    220px
-    minmax(0, 820px);
-
-  justify-content: space-between;
-
-  gap:
-    clamp(2.5rem, 6vw, 6rem);
-}
-
-
-.university-opening__label {
-  padding-top: 0.4rem;
-}
-
-
-.university-opening__content h2 {
-  max-width: 820px;
-
-  margin:
-    0
-    0
-    2rem;
-
-  color: var(--uni-navy);
-
-  font-size:
-    clamp(2.2rem, 4vw, 4rem);
-
-  line-height: 1.07;
-
-  letter-spacing: -0.04em;
-}
-
-
-.university-opening__content p {
-  max-width: 720px;
-
-  margin:
-    0
-    0
-    1.4rem;
-
-  color: var(--uni-muted);
-
-  font-size:
-    clamp(1rem, 1.3vw, 1.1rem);
-
-  line-height: 1.85;
-}
-
-
-/* ============================================================
-   UNIVERSITY NETWORK
-============================================================ */
-
-.universities-partners {
-  position: relative;
-
-  overflow: hidden;
-
-  padding:
-    clamp(6rem, 9vw, 8.5rem)
-    0;
-
+.uni-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background:
     linear-gradient(
-      180deg,
-      #f5f2eb 0%,
-      #fbfaf6 100%
-    );
+      to right,
+      rgba(0, 18, 45, 0.97) 0%,
+      rgba(0, 18, 45, 0.86) 42%,
+      rgba(0, 18, 45, 0.4) 78%,
+      rgba(0, 18, 45, 0.25) 100%
+    ),
+    linear-gradient(to top, rgba(0, 18, 45, 0.6), transparent 45%);
 }
 
-
-.universities-partners::before {
-  content: "";
-
-  position: absolute;
-
-  width: 560px;
-  height: 560px;
-
-  left: -300px;
-  top: -270px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(199, 154, 69, 0.12),
-      rgba(199, 154, 69, 0) 70%
-    );
-
-  pointer-events: none;
+.uni-hero__inner > * {
+  max-width: 800px;
 }
 
-
-.universities-partners::after {
-  content: "";
-
-  position: absolute;
-
-  width: 480px;
-  height: 480px;
-
-  right: -240px;
-  bottom: -240px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(18, 58, 94, 0.08),
-      rgba(18, 58, 94, 0) 70%
-    );
-
-  pointer-events: none;
-}
-
-
-.universities-partners > .container {
-  position: relative;
-  z-index: 2;
-}
-
-
-/* ============================================================
-   NETWORK STATUS / EMPTY STATES
-============================================================ */
-
-.universities-partners__status,
-.universities-partners__empty {
-  margin-top:
-    clamp(2.5rem, 5vw, 4rem);
-}
-
-
-.universities-partners__status {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  min-height: 180px;
-
-  padding: 2rem;
-
-  border:
-    1px solid
-    var(--uni-border);
-
-  border-radius: 12px;
-
-  background:
-    rgba(255, 255, 255, 0.75);
-
-  color: var(--uni-muted);
-
-  font-size: 0.9rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.02em;
-}
-
-
-.universities-partners__empty {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: flex-start;
-
-  max-width: 720px;
-
-  min-height: 240px;
-
-  padding:
-    clamp(2rem, 4vw, 3rem);
-
-  border:
-    1px solid
-    var(--uni-border);
-
-  border-radius: 14px;
-
-  background:
-    rgba(255, 255, 255, 0.88);
-
-  box-shadow:
-    0 12px 35px
-    rgba(7, 26, 45, 0.04);
-}
-
-
-.universities-partners__empty svg {
-  margin-bottom: 1.5rem;
-
-  color: var(--uni-gold);
-}
-
-
-.universities-partners__empty h3 {
-  margin:
-    0
-    0
-    0.8rem;
-
-  color: var(--uni-navy);
-
-  font-size:
-    clamp(1.35rem, 2vw, 1.8rem);
-
+.uni-hero h1 {
+  color: #fff;
+  font-family: var(--uni-heading);
+  font-size: clamp(36px, 3.4vw + 14px, 70px);
+  font-weight: 400;
+  line-height: 1.06;
   letter-spacing: -0.025em;
 }
 
+.uni-hero h1 em {
+  color: var(--uni-gold-light);
+  font-style: italic;
+}
 
-.universities-partners__empty p {
-  max-width: 580px;
+.uni-hero__inner > p {
+  max-width: 600px;
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: clamp(16px, 0.4vw + 14px, 19px);
+  line-height: 1.7;
+}
 
-  margin: 0;
+.uni-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
 
+
+/* ============================================================
+   INTRODUCTION
+============================================================ */
+
+.uni-opening__grid {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.3fr) minmax(0, 1fr);
+  gap: 24px clamp(32px, 6vw, 96px);
+}
+
+.uni-opening__grid > .uni-eyebrow {
+  padding-top: 12px;
+}
+
+.uni-opening__content {
+  max-width: 940px;
+}
+
+.uni-opening h2 {
+  font-size: clamp(30px, 2.6vw + 16px, 58px);
+}
+
+.uni-opening__content p {
+  max-width: 760px;
+  margin-top: 22px;
   color: var(--uni-muted);
-
-  font-size: 0.95rem;
-
+  font-size: clamp(16px, 0.3vw + 14px, 18px);
   line-height: 1.75;
 }
 
 
 /* ============================================================
-   UNIVERSITY GRID
+   PARTNERSHIP VALUE
 ============================================================ */
 
-.universities-partners__grid {
+.uni-value {
+  padding-top: 0;
+}
+
+.uni-value__grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 1.4rem;
-
-  margin-top:
-    clamp(3rem, 5vw, 4.5rem);
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
 }
 
-
-/* ============================================================
-   UNIVERSITY CARD
-============================================================ */
-
-.universities-partner-card {
-  position: relative;
-
-  display: flex;
-
-  flex-direction: column;
-
-  min-height: 390px;
-
+.uni-value__media {
   overflow: hidden;
-
-  padding:
-    1.8rem
-    1.8rem
-    1.9rem;
-
-  border:
-    1px solid
-    rgba(7, 26, 45, 0.09);
-
-  border-radius: 16px;
-
-  background:
-    rgba(255, 255, 255, 0.97);
-
-  box-shadow:
-    0 12px 34px
-    rgba(7, 26, 45, 0.045);
-
-  transition:
-    transform 0.28s ease,
-    border-color 0.28s ease,
-    box-shadow 0.28s ease;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--uni-radius-lg);
+  box-shadow: var(--uni-shadow);
 }
 
-
-.universities-partner-card::before {
-  content: "";
-
-  position: absolute;
-
-  left: 0;
-  top: 0;
-
-  width: 4px;
-  height: 100%;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--uni-gold),
-      var(--uni-gold-light)
-    );
-
-  opacity: 0;
-
-  transition:
-    opacity 0.25s ease;
-}
-
-
-.universities-partner-card::after {
-  content: "";
-
-  position: absolute;
-
-  width: 240px;
-  height: 240px;
-
-  right: -130px;
-  bottom: -150px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(199, 154, 69, 0.1),
-      rgba(199, 154, 69, 0)
-    );
-
-  pointer-events: none;
-}
-
-
-.universities-partner-card:hover {
-  transform: translateY(-6px);
-
-  border-color:
-    rgba(199, 154, 69, 0.34);
-
-  box-shadow:
-    0 24px 60px
-    rgba(7, 26, 45, 0.09);
-}
-
-
-.universities-partner-card:hover::before {
-  opacity: 1;
-}
-
-
-/* ============================================================
-   CARD HEADER
-============================================================ */
-
-.universities-partner-card__top {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-
-  align-items: flex-start;
-
-  gap: 1rem;
-
-  margin-bottom: 1.5rem;
-}
-
-
-.universities-partner-card__logo {
-  flex: 0 0 auto;
-
-  display: grid;
-
-  place-items: center;
-
-  width: 62px;
-  height: 62px;
-
-  overflow: hidden;
-
-  border:
-    1px solid
-    rgba(7, 26, 45, 0.09);
-
-  border-radius: 12px;
-
-  background:
-    #ffffff;
-
-  color: var(--uni-gold);
-}
-
-
-.universities-partner-card__logo img {
-  display: block;
-
+.uni-value__media img {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--uni-ease);
+}
 
+.uni-value__media:hover img {
+  transform: scale(1.04);
+}
+
+.uni-value__content p {
+  margin-top: 20px;
+  color: var(--uni-body);
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.uni-value__content h2 + p {
+  margin-top: 24px;
+}
+
+
+/* ============================================================
+   UNIVERSITY DIRECTORY
+============================================================ */
+
+.uni-directory__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.uni-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 2.4vw, 32px);
+  background: #fff;
+  border: 1px solid var(--uni-line);
+  border-top: 4px solid var(--uni-blue);
+  border-radius: var(--uni-radius-lg);
+  transition:
+    transform 0.3s var(--uni-ease),
+    box-shadow 0.3s ease;
+}
+
+.uni-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--uni-shadow);
+}
+
+.uni-card__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.uni-card__logo {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
   padding: 8px;
+  color: var(--uni-blue);
+  background: color-mix(in srgb, var(--uni-blue) 10%, #fff);
+  border-radius: 16px;
+}
 
+.uni-card__logo img {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
-
-.universities-partner-card__identity {
+.uni-card__identity {
   min-width: 0;
 }
 
-
-.universities-partner-card__identity > span {
-  display: inline-flex;
-
-  margin-bottom: 0.45rem;
-
-  color: var(--uni-gold);
-
-  font-size: 0.7rem;
-
-  font-weight: 800;
-
+.uni-card__identity span {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--uni-gold-dark);
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.12em;
-
   text-transform: uppercase;
 }
 
-
-.universities-partner-card__identity h3 {
-  margin: 0;
-
-  color: var(--uni-navy);
-
-  font-size:
-    clamp(1.25rem, 2vw, 1.55rem);
-
-  line-height: 1.18;
-
-  letter-spacing: -0.025em;
+.uni-card h3 {
+  color: var(--uni-ink);
+  font-family: var(--uni-heading);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
+.uni-card__meta {
+  display: grid;
+  gap: 6px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--uni-line);
+}
 
-/* ============================================================
-   CARD META
-============================================================ */
-
-.universities-partner-card__meta {
-  position: relative;
-  z-index: 2;
-
+.uni-card__meta li {
   display: flex;
-
-  flex-wrap: wrap;
-
-  gap:
-    0.55rem
-    1.2rem;
-
-  padding:
-    0.9rem
-    0;
-
-  border-top:
-    1px solid
-    var(--uni-border-soft);
-
-  border-bottom:
-    1px solid
-    var(--uni-border-soft);
+  align-items: center;
+  gap: 8px;
+  color: var(--uni-muted);
+  font-size: 14px;
 }
 
+.uni-card__meta svg {
+  color: var(--uni-navy);
+}
 
-.universities-partner-card__meta > div {
-  display: inline-flex;
+.uni-card__description {
+  margin-top: 16px;
+  color: var(--uni-body);
+  font-size: 15px;
+  line-height: 1.65;
+}
 
-  align-items: center;
+.uni-card__areas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
 
-  gap: 0.45rem;
-
-  color: var(--uni-muted);
-
-  font-size: 0.78rem;
-
+.uni-card__areas li {
+  padding: 5px 12px;
+  color: var(--uni-ink);
+  background: var(--uni-soft);
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
 }
 
-
-.universities-partner-card__meta svg {
-  flex: 0 0 auto;
-
-  color: var(--uni-gold);
-}
-
-
-/* ============================================================
-   CARD DESCRIPTION
-============================================================ */
-
-.universities-partner-card__description {
-  position: relative;
-  z-index: 2;
-
-  margin:
-    1.3rem
-    0
-    1.25rem;
-
-  color: var(--uni-muted);
-
-  font-size: 0.94rem;
-
-  line-height: 1.72;
-}
-
-
-/* ============================================================
-   CARD PARTICIPATION TAGS
-============================================================ */
-
-.universities-partner-card__areas {
-  position: relative;
-  z-index: 2;
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: 0.45rem;
-
-  margin-bottom: 1.5rem;
-}
-
-
-.universities-partner-card__areas span {
+.uni-card__website {
   display: inline-flex;
-
   align-items: center;
-
-  min-height: 30px;
-
-  padding:
-    0.35rem
-    0.7rem;
-
-  border:
-    1px solid
-    rgba(199, 154, 69, 0.2);
-
-  border-radius: 999px;
-
-  background:
-    rgba(199, 154, 69, 0.07);
-
-  color: #775d2d;
-
-  font-size: 0.7rem;
-
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+  color: var(--uni-ink);
+  font-size: 14.5px;
   font-weight: 700;
 }
 
+.uni-card__website svg {
+  color: var(--uni-blue);
+}
 
-/* ============================================================
-   CARD WEBSITE
-============================================================ */
+/* Loading placeholders */
+.uni-card--skeleton {
+  min-height: 240px;
+  gap: 14px;
+  border-top-color: var(--uni-line);
+}
 
-.universities-partner-card__website {
-  position: relative;
-  z-index: 2;
+.uni-card--skeleton:hover {
+  transform: none;
+  box-shadow: none;
+}
 
-  display: inline-flex;
+.uni-card--skeleton span {
+  height: 14px;
+  background: linear-gradient(90deg, #eef1f4, #f7f8fa, #eef1f4);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  animation: uni-shimmer 1.4s linear infinite;
+}
 
+.uni-card--skeleton span:first-child {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+}
+
+.uni-card--skeleton span:nth-child(2) {
+  width: 70%;
+}
+
+.uni-card--skeleton span:nth-child(3) {
+  width: 45%;
+}
+
+@keyframes uni-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Empty and error states */
+.uni-directory__empty {
+  display: flex;
   align-items: center;
-
-  gap: 0.5rem;
-
-  width: fit-content;
-
-  margin-top: auto;
-
-  color: var(--uni-navy);
-
-  font-size: 0.78rem;
-
-  font-weight: 800;
-
-  text-decoration: none;
-
-  transition:
-    color 0.2s ease,
-    gap 0.2s ease;
+  gap: 20px;
+  max-width: 760px;
+  padding: clamp(24px, 3vw, 36px);
+  background: #fff;
+  border: 1px dashed #c3ccd5;
+  border-radius: var(--uni-radius-lg);
 }
 
+.uni-directory__empty-icon {
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uni-blue);
+  background: color-mix(in srgb, var(--uni-blue) 10%, #fff);
+  border-radius: 16px;
+}
 
-.universities-partner-card__website:hover {
-  gap: 0.7rem;
+.uni-directory__empty h3 {
+  color: var(--uni-ink);
+  font-family: var(--uni-heading);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.3;
+}
 
-  color: var(--uni-gold);
+.uni-directory__empty p {
+  margin-top: 6px;
+  color: var(--uni-muted);
+  font-size: 15px;
 }
 
 
 /* ============================================================
-   PARTICIPATION
+   WAYS TO PARTICIPATE
 ============================================================ */
 
-.universities-participation {
-  padding:
-    clamp(6rem, 9vw, 8rem)
-    0;
-
-  background: #ffffff;
+.uni-participate {
+  scroll-margin-top: 80px;
 }
 
-
-.universities-participation__grid {
+.uni-participate__grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap:
-    0
-    3.5rem;
-
-  margin-top:
-    clamp(3rem, 5vw, 4.5rem);
-
-  border-top:
-    1px solid
-    var(--uni-border);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
 }
 
-
-.universities-participation__item {
-  display: grid;
-
-  grid-template-columns:
-    70px
-    1fr;
-
-  gap: 1rem;
-
-  padding:
-    2.2rem
-    0;
-
-  border-bottom:
-    1px solid
-    var(--uni-border);
-
+.uni-area {
+  min-width: 0;
+  padding: clamp(24px, 2.4vw, 32px);
+  background: #fff;
+  border: 1px solid var(--uni-line);
+  border-radius: var(--uni-radius);
   transition:
-    transform 0.2s ease;
+    transform 0.3s var(--uni-ease),
+    box-shadow 0.3s ease,
+    border-color 0.2s ease;
 }
 
-
-.universities-participation__item:hover {
-  transform: translateX(5px);
+.uni-area:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--uni-tone) 45%, #fff);
+  box-shadow: var(--uni-shadow);
 }
 
-
-.universities-participation__number {
-  color: var(--uni-gold);
-
-  font-size: 0.75rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.13em;
+.uni-area__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 28px;
 }
 
-
-.universities-participation__content h3 {
-  margin:
-    0
-    0
-    0.7rem;
-
-  color: var(--uni-navy);
-
-  font-size: 1.2rem;
-
-  letter-spacing: -0.02em;
+.uni-area__icon {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uni-tone);
+  background: color-mix(in srgb, var(--uni-tone) 12%, #fff);
+  border-radius: 14px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
+.uni-area:hover .uni-area__icon {
+  color: #fff;
+  background: var(--uni-tone);
+}
 
-.universities-participation__content p {
-  margin: 0;
+.uni-area__number {
+  color: #b3bdc7;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
 
+.uni-area h3 {
+  color: var(--uni-ink);
+  font-family: var(--uni-heading);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.uni-area p {
+  margin-top: 12px;
   color: var(--uni-muted);
-
-  font-size: 0.94rem;
-
-  line-height: 1.7;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
 
@@ -837,877 +700,537 @@
    FOUNDER ENGAGEMENT
 ============================================================ */
 
-.universities-fellowship {
-  position: relative;
-
-  overflow: hidden;
-
-  padding:
-    clamp(6rem, 9vw, 8rem)
-    0;
-
-  background:
-    linear-gradient(
-      125deg,
-      #061523,
-      #0b2b48
-    );
-
-  color: #ffffff;
-}
-
-
-.universities-fellowship::before {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  background-image:
-    linear-gradient(
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.02) 1px,
-      transparent 1px
-    );
-
-  background-size: 70px 70px;
-}
-
-
-.universities-fellowship::after {
-  content: "";
-
-  position: absolute;
-
-  width: 520px;
-  height: 520px;
-
-  right: -170px;
-  bottom: -250px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(199, 154, 69, 0.19),
-      rgba(199, 154, 69, 0)
-    );
-}
-
-
-.universities-fellowship__grid {
-  position: relative;
-  z-index: 2;
-
+.uni-engage__card {
   display: grid;
-
-  grid-template-columns:
-    240px
-    minmax(0, 780px);
-
-  justify-content: space-between;
-
-  gap:
-    clamp(3rem, 7vw, 7rem);
-}
-
-
-.universities-fellowship__label {
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: flex-start;
-
-  gap: 2rem;
-}
-
-
-.universities-fellowship__icon {
-  display: grid;
-
-  place-items: center;
-
-  width: 70px;
-  height: 70px;
-
-  border:
-    1px solid
-    rgba(231, 200, 120, 0.3);
-
-  border-radius: 50%;
-
-  color: var(--uni-gold-light);
-
-  background:
-    rgba(231, 200, 120, 0.07);
-}
-
-
-.universities-fellowship__content h2 {
-  max-width: 720px;
-
-  margin:
-    0
-    0
-    1.5rem;
-
-  color: #ffffff;
-
-  font-size:
-    clamp(2.2rem, 4vw, 4rem);
-
-  line-height: 1.07;
-
-  letter-spacing: -0.04em;
-}
-
-
-.universities-fellowship__content > p {
-  max-width: 680px;
-
-  margin:
-    0
-    0
-    2.5rem;
-
-  color:
-    rgba(255, 255, 255, 0.78);
-
-  font-size: 1rem;
-
-  line-height: 1.8;
-}
-
-
-/* ============================================================
-   JOURNEY
-============================================================ */
-
-.universities-fellowship__journey {
-  display: flex;
-
-  flex-wrap: wrap;
-
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
   align-items: center;
-
-  gap: 0.8rem;
-
-  margin-bottom: 2rem;
-
-  padding:
-    1.1rem
-    1.3rem;
-
-  border:
-    1px solid
-    rgba(255, 255, 255, 0.12);
-
-  border-radius: 10px;
-
+  gap: 40px clamp(40px, 6vw, 96px);
+  padding: clamp(32px, 5vw, 72px);
+  color: #fff;
   background:
-    rgba(255, 255, 255, 0.045);
+    radial-gradient(circle at 100% 0%, rgba(37, 99, 201, 0.32), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(37, 99, 201, 0.3), transparent 50%),
+    var(--uni-navy);
+  border-radius: var(--uni-radius-lg);
 }
 
-
-.universities-fellowship__journey span {
-  color: #ffffff;
-
-  font-size: 0.78rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.04em;
+.uni-engage__card > * {
+  min-width: 0;
 }
 
-
-.universities-fellowship__journey svg {
-  color: var(--uni-gold-light);
+.uni-engage h2 {
+  color: #fff;
+  font-size: clamp(28px, 1.8vw + 16px, 46px);
 }
 
-
-/* ============================================================
-   TEXT LINKS
-============================================================ */
-
-.universities-text-link {
-  display: inline-flex;
-
-  align-items: center;
-
-  gap: 0.55rem;
-
-  color: var(--uni-gold);
-
-  font-size: 0.88rem;
-
-  font-weight: 800;
-
-  text-decoration: none;
-
-  transition:
-    gap 0.2s ease,
-    color 0.2s ease;
+.uni-engage__content p {
+  max-width: 620px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 16.5px;
+  line-height: 1.75;
 }
 
-
-.universities-fellowship
-.universities-text-link {
-  color: var(--uni-gold-light);
-}
-
-
-.universities-text-link:hover {
-  gap: 0.8rem;
-}
-
-
-/* ============================================================
-   ECOSYSTEM
-============================================================ */
-
-.universities-ecosystem {
-  padding:
-    clamp(6rem, 9vw, 8rem)
-    0;
-
-  background: var(--uni-paper);
-}
-
-
-.universities-ecosystem__grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
-
-  gap: 1.2rem;
-
-  margin-top:
-    clamp(3rem, 5vw, 4rem);
-}
-
-
-.universities-ecosystem__card {
+/* Journey: vertical steps joined by a line */
+.uni-engage__journey {
   position: relative;
+  display: grid;
+  gap: 12px;
+}
 
+.uni-engage__journey::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: 21px;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    var(--uni-gold),
+    var(--uni-navy),
+    var(--uni-blue)
+  );
+  opacity: 0.6;
+}
+
+.uni-engage__journey li {
+  position: relative;
   display: flex;
-
-  flex-direction: column;
-
-  min-height: 310px;
-
-  padding: 1.8rem;
-
-  border:
-    1px solid
-    var(--uni-border);
-
-  border-radius: 12px;
-
-  background: #ffffff;
-
-  color: inherit;
-
-  text-decoration: none;
-
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 18px 8px 0;
+  font-family: var(--uni-heading);
+  font-size: 20px;
 }
 
-
-.universities-ecosystem__card:hover {
-  transform: translateY(-5px);
-
-  border-color:
-    rgba(199, 154, 69, 0.32);
-
-  box-shadow:
-    0 20px 50px
-    rgba(7, 26, 45, 0.08);
-}
-
-
-.universities-ecosystem__number {
-  margin-bottom: 3rem;
-
-  color: var(--uni-gold);
-
-  font-size: 0.72rem;
-
-  font-weight: 800;
-
-  letter-spacing: 0.14em;
-}
-
-
-.universities-ecosystem__card h3 {
-  margin:
-    0
-    0
-    0.9rem;
-
+.uni-engage__journey li span {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--uni-navy);
+  background: var(--uni-gold-light);
+  border: 4px solid var(--uni-navy);
+  border-radius: 50%;
+  font-family: var(--uni-font);
+  font-size: 14px;
+  font-weight: 700;
+}
 
-  font-size: 1.35rem;
-
-  line-height: 1.22;
-
-  letter-spacing: -0.025em;
+.uni-engage__journey li:last-child span {
+  color: var(--uni-navy);
+  background: #fff;
 }
 
 
-.universities-ecosystem__card p {
-  margin:
-    0
-    0
-    1.5rem;
+/* ============================================================
+   WIDER PARTNERSHIP ECOSYSTEM
+============================================================ */
 
+.uni-ecosystem__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.uni-partner {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--uni-line);
+  border-radius: var(--uni-radius-lg);
+  transition:
+    transform 0.3s var(--uni-ease),
+    box-shadow 0.3s ease;
+}
+
+.uni-partner:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--uni-shadow);
+}
+
+.uni-partner__media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-bottom: 4px solid var(--uni-tone);
+}
+
+.uni-partner__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--uni-ease);
+}
+
+.uni-partner:hover .uni-partner__media img {
+  transform: scale(1.06);
+}
+
+.uni-partner__icon {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--uni-tone);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(3, 27, 52, 0.25);
+}
+
+.uni-partner__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(22px, 2vw, 28px);
+}
+
+.uni-partner h3 {
+  color: var(--uni-ink);
+  font-family: var(--uni-heading);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.uni-partner p {
+  margin-top: 12px;
+  margin-bottom: 22px;
   color: var(--uni-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
 
-  font-size: 0.92rem;
+.uni-partner__link {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--uni-ink);
+  font-size: 14.5px;
+  font-weight: 700;
+}
 
+.uni-partner__link svg {
+  color: var(--uni-tone);
+  transition: transform 0.25s var(--uni-ease);
+}
+
+.uni-partner:hover .uni-partner__link svg {
+  transform: translateX(4px);
+}
+
+
+/* ============================================================
+   FINAL CTA
+============================================================ */
+
+.uni-cta {
+  padding-bottom: clamp(64px, 8vw, 120px);
+}
+
+.uni-cta__card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px 48px;
+  padding: clamp(32px, 5vw, 64px);
+  background: var(--uni-soft);
+  border: 1px solid var(--uni-line);
+  border-left: 6px solid var(--uni-gold);
+  border-radius: var(--uni-radius-lg);
+}
+
+.uni-cta__card > * {
+  min-width: 0;
+}
+
+.uni-cta .uni-eyebrow--light {
+  color: var(--uni-gold-dark);
+}
+
+.uni-cta h2 {
+  max-width: 760px;
+  font-size: clamp(28px, 1.8vw + 16px, 46px);
+}
+
+.uni-cta p {
+  max-width: 720px;
+  margin-top: 16px;
+  color: var(--uni-muted);
+  font-size: 16.5px;
   line-height: 1.7;
 }
 
 
-.universities-ecosystem__link {
-  display: flex;
+/* ============================================================
+   SCROLL REVEAL
+   Only active once the page script runs (.uni-page--reveal),
+   so content is never hidden if scripts fail.
+============================================================ */
 
-  align-items: center;
-
-  justify-content: space-between;
-
-  gap: 1rem;
-
-  margin-top: auto;
-
-  color: var(--uni-navy);
-
-  font-size: 0.78rem;
-
-  font-weight: 800;
+.uni-page--reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s var(--uni-ease);
 }
 
-
-.universities-ecosystem__card:hover
-.universities-ecosystem__link {
-  color: var(--uni-gold);
-}
-
-
-.universities-ecosystem__all {
-  margin-top: 2.5rem;
+.uni-page--reveal [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
 }
 
 
 /* ============================================================
-   TABLET
+   SHORT LAPTOPS — hero fits the first screen
 ============================================================ */
 
-@media (max-width: 960px) {
-
-  .universities-hero .page-hero__inner {
-    grid-template-columns: 1fr;
+@media (min-width: 1101px) and (max-height: 900px) {
+  .uni-hero {
+    min-height: calc(100svh - 90px);
+    padding-block: 48px;
   }
 
-
-  .universities-hero .page-hero__aside {
-    max-width: 620px;
+  .uni-hero h1 {
+    font-size: clamp(36px, 2.6vw + 14px, 60px);
   }
-
-
-  .university-opening__grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .universities-partners__grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
-
-  .universities-fellowship__grid {
-    grid-template-columns: 1fr;
-  }
-
-
-  .universities-ecosystem__grid {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-  }
-
 }
 
 
 /* ============================================================
-   MOBILE
+   TABLET (≤ 1100px) — matches navbar breakpoint
 ============================================================ */
 
-@media (max-width: 680px) {
-
-  .universities-hero {
-    padding:
-      5rem
-      0
-      4.8rem;
+@media (max-width: 1100px) {
+  .uni-container {
+    width: calc(100% - 36px);
   }
 
-
-  .universities-hero h1 {
-    font-size:
-      clamp(2.6rem, 11vw, 3.8rem);
+  .uni-hero {
+    min-height: 0;
   }
 
-
-  .universities-hero .page-hero__aside {
-    padding-left: 1.2rem;
+  .uni-value__grid,
+  .uni-heading--split,
+  .uni-engage__card,
+  .uni-cta__card {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-
-  .universities-partners__grid {
-    grid-template-columns: 1fr;
+  .uni-value__media {
+    aspect-ratio: 16 / 9;
   }
 
-
-  .universities-partner-card {
-    min-height: auto;
-
-    padding:
-      1.5rem
-      1.4rem
-      1.6rem;
+  .uni-directory__grid,
+  .uni-participate__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-
-  .universities-partner-card__top {
-    align-items: center;
+  .uni-ecosystem__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
   }
 
-
-  .universities-partner-card__logo {
-    width: 56px;
-    height: 56px;
+  /* Journey turns into a horizontal row of steps */
+  .uni-engage__journey {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
-
-  .universities-participation__grid {
-    grid-template-columns: 1fr;
+  .uni-engage__journey::before {
+    top: 22px;
+    bottom: auto;
+    left: 10%;
+    right: 10%;
+    width: auto;
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--uni-gold),
+      var(--uni-navy),
+      var(--uni-blue)
+    );
   }
 
-
-  .universities-participation__item {
-    grid-template-columns:
-      52px
-      1fr;
-  }
-
-
-  .universities-fellowship__journey {
-    gap: 0.55rem;
-  }
-
-
-  .universities-fellowship__journey svg {
-    width: 13px;
-  }
-
-
-  .universities-ecosystem__grid {
-    grid-template-columns: 1fr;
-  }
-
-}
-
-
-/* ============================================================
-   VERY SMALL SCREENS
-============================================================ */
-
-@media (max-width: 420px) {
-
-  .universities-hero h1 {
-    font-size: 2.35rem;
-  }
-
-
-  .universities-partner-card__top {
-    align-items: flex-start;
-  }
-
-
-  .universities-partner-card__meta {
+  .uni-engage__journey li {
     flex-direction: column;
-
-    align-items: flex-start;
+    gap: 10px;
+    padding: 0;
+    font-size: 16px;
+    text-align: center;
   }
 
-
-  .universities-partner-card__areas {
-    gap: 0.35rem;
+  .uni-cta__card .uni-button {
+    justify-self: start;
   }
-
-
-  .universities-fellowship__journey {
-    flex-direction: column;
-
-    align-items: flex-start;
-  }
-
-
-  .universities-fellowship__journey svg {
-    transform: rotate(90deg);
-  }
-
 }
 
 
 /* ============================================================
-   REDUCED MOTION
+   SMALL TABLET (≤ 860px)
+============================================================ */
+
+@media (max-width: 860px) {
+  .uni-opening__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .uni-opening__grid > .uni-eyebrow {
+    padding-top: 0;
+    margin-bottom: 0;
+  }
+
+  .uni-ecosystem__grid,
+  .uni-directory__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .uni-partner {
+    flex-direction: row;
+  }
+
+  .uni-partner__media {
+    flex: 0 0 38%;
+    aspect-ratio: auto;
+    min-height: 220px;
+    border-bottom: 0;
+    border-right: 4px solid var(--uni-tone);
+  }
+
+  .uni-partner__media img {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+
+/* ============================================================
+   PHONE (≤ 600px)
+============================================================ */
+
+@media (max-width: 600px) {
+  .uni-hero__actions .uni-button,
+  .uni-cta .uni-button,
+  .uni-engage .uni-button {
+    width: 100%;
+  }
+
+  .uni-participate__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .uni-area__top {
+    margin-bottom: 18px;
+  }
+
+  /* Journey back to a vertical list */
+  .uni-engage__journey {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .uni-engage__journey::before {
+    top: 22px;
+    bottom: 22px;
+    left: 21px;
+    right: auto;
+    width: 2px;
+    height: auto;
+    background: linear-gradient(
+      to bottom,
+      var(--uni-gold),
+      var(--uni-navy),
+      var(--uni-blue)
+    );
+  }
+
+  .uni-engage__journey li {
+    flex-direction: row;
+    gap: 16px;
+    font-size: 18px;
+    text-align: left;
+  }
+
+  .uni-partner {
+    flex-direction: column;
+  }
+
+  .uni-partner__media {
+    flex: none;
+    aspect-ratio: 16 / 10;
+    min-height: 0;
+    border-right: 0;
+    border-bottom: 4px solid var(--uni-tone);
+  }
+
+  .uni-partner__media img {
+    position: static;
+  }
+
+  .uni-directory__empty {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .uni-cta__card {
+    border-left-width: 4px;
+  }
+}
+
+
+/* ============================================================
+   SMALL PHONE (≤ 480px)
+============================================================ */
+
+@media (max-width: 480px) {
+  .uni-container {
+    width: calc(100% - 32px);
+  }
+}
+
+
+/* ============================================================
+   SHORT SCREENS (landscape phones)
+============================================================ */
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .uni-hero {
+    min-height: 0;
+    padding-block: 40px;
+  }
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (hover: none) and (pointer: coarse) {
+  .uni-card:hover,
+  .uni-area:hover,
+  .uni-partner:hover {
+    transform: none;
+  }
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
 ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-
-  .universities-partner-card,
-  .universities-partner-card::before,
-  .universities-partner-card__website,
-  .universities-participation__item,
-  .universities-ecosystem__card,
-  .universities-hero__link,
-  .universities-text-link {
-    transition: none;
+  .uni-page *,
+  .uni-page *::before,
+  .uni-page *::after {
+    animation: none !important;
+    transition: none !important;
   }
-
 }
 
-
+@media (forced-colors: active) {
+  .uni-card,
+  .uni-area,
+  .uni-partner {
+    border: 1px solid CanvasText;
+  }
+}
 
 
 /* ============================================================
-   UNIVERSITIES HERO — FINAL FIX
-   Remove circular overlay and show background image properly
-   ============================================================ */
+   PRINT
+============================================================ */
 
-.universities-hero {
-  position: relative !important;
-  overflow: hidden !important;
-  isolation: isolate !important;
-
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(3, 18, 32, 0.82) 0%,
-      rgba(3, 18, 32, 0.68) 35%,
-      rgba(3, 18, 32, 0.45) 65%,
-      rgba(3, 18, 32, 0.30) 100%
-    ),
-    url("/assets/images/universities/university-partnership.webp") !important;
-
-  background-size: cover !important;
-  background-position: center center !important;
-  background-repeat: no-repeat !important;
-
-  color: #ffffff !important;
-}
-
-
-/* ------------------------------------------------------------
-   REMOVE THE OLD GRID / CIRCLE SHAPES
-   ------------------------------------------------------------ */
-
-.universities-hero::before {
-  content: "" !important;
-
-  position: absolute !important;
-  inset: 0 !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  border-radius: 0 !important;
-  transform: none !important;
-
-  background-image:
-    linear-gradient(
-      rgba(255, 255, 255, 0.018) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.018) 1px,
-      transparent 1px
-    ) !important;
-
-  background-size: 72px 72px !important;
-
-  z-index: 0 !important;
-  pointer-events: none !important;
-}
-
-
-/* ------------------------------------------------------------
-   REPLACE THE 620px CIRCLE WITH A FULL HERO OVERLAY
-   ------------------------------------------------------------ */
-
-.universities-hero::after {
-  content: "" !important;
-
-  position: absolute !important;
-  inset: 0 !important;
-
-  width: 100% !important;
-  height: 100% !important;
-
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  left: 0 !important;
-
-  border-radius: 0 !important;
-  transform: none !important;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(3, 18, 32, 0.20) 0%,
-      rgba(3, 18, 32, 0.10) 55%,
-      rgba(3, 18, 32, 0.05) 100%
-    ) !important;
-
-  z-index: 1 !important;
-  pointer-events: none !important;
-}
-
-
-/* ------------------------------------------------------------
-   KEEP CONTENT ABOVE IMAGE + OVERLAY
-   ------------------------------------------------------------ */
-
-.universities-hero .page-hero__inner {
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-.universities-hero__content {
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-.universities-hero .page-hero__aside {
-  position: relative !important;
-  z-index: 3 !important;
-}
-
-
-/* ------------------------------------------------------------
-   HERO TEXT
-   ------------------------------------------------------------ */
-
-.universities-hero h1 {
-  position: relative;
-  z-index: 4;
-
-  color: #ffffff !important;
-
-  text-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.28) !important;
-}
-
-
-/* ------------------------------------------------------------
-   MOBILE
-   ------------------------------------------------------------ */
-
-@media (max-width: 700px) {
-
-  .universities-hero {
-    background-position: center center !important;
+@media print {
+  .uni-hero,
+  .uni-engage__card {
+    min-height: 0;
+    color: #000;
+    background: #fff;
   }
 
-  .universities-hero::before {
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    border-radius: 0 !important;
+  .uni-hero__media,
+  .uni-hero::after,
+  .uni-hero__actions {
+    display: none;
   }
 
-  .universities-hero::after {
-    inset: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    border-radius: 0 !important;
-
-    background:
-      linear-gradient(
-        90deg,
-        rgba(3, 18, 32, 0.38) 0%,
-        rgba(3, 18, 32, 0.24) 60%,
-        rgba(3, 18, 32, 0.18) 100%
-      ) !important;
+  .uni-hero h1,
+  .uni-hero h1 em,
+  .uni-hero__inner > p,
+  .uni-engage h2,
+  .uni-engage__content p {
+    color: #000;
   }
-
-  .universities-hero .page-hero__inner,
-  .universities-hero__content,
-  .universities-hero .page-hero__aside {
-    position: relative !important;
-    z-index: 3 !important;
-  }
-}
-
-/* ============================================================
-   UNIVERSITY OPENING — FORCE REMOVE DECORATIVE LINE
-   ============================================================ */
-
-.university-opening__label {
-  display: block !important;
-}
-
-.university-opening__label .eyebrow {
-  display: inline-block !important;
-  position: relative !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  color: var(--uni-gold) !important;
-}
-
-.university-opening__label .eyebrow::before,
-.university-opening__label .eyebrow::after {
-  content: none !important;
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: none !important;
-}
-
-
-
-/* ============================================================
-   UNIVERSITIES PAGE — REDUCED H1 & H2 SIZES
-   Append this at the VERY BOTTOM of Universities.css
-   ============================================================ */
-
-/* HERO H1 */
-.universities-hero h1 {
-  font-size: clamp(2.5rem, 4.5vw, 4.2rem) !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.035em !important;
-}
-
-/* ALL H2 HEADINGS THROUGHOUT THE UNIVERSITIES PAGE */
-.university-opening h2,
-.universities-partners h2,
-.universities-participation h2,
-.universities-fellowship h2,
-.universities-ecosystem h2,
-.universities-hero h2,
-.universities-partners .section-heading h2,
-.universities-participation .section-heading h2,
-.universities-ecosystem .section-heading h2 {
-  font-size: clamp(1.75rem, 3vw, 2.8rem) !important;
-  line-height: 1.18 !important;
-  letter-spacing: -0.03em !important;
-}
-
-/* OPENING SECTION */
-.university-opening__content h2 {
-  font-size: clamp(1.8rem, 3vw, 2.75rem) !important;
-  line-height: 1.2 !important;
-}
-
-/* FOUNDER ENGAGEMENT SECTION */
-.universities-fellowship__content h2 {
-  font-size: clamp(1.8rem, 3vw, 2.7rem) !important;
-  line-height: 1.2 !important;
-}
-
-/* TABLET */
-@media (max-width: 960px) {
-  .universities-hero h1 {
-    font-size: clamp(2.3rem, 5vw, 3.5rem) !important;
-  }
-
-  .university-opening h2,
-  .universities-partners h2,
-  .universities-participation h2,
-  .universities-fellowship h2,
-  .universities-ecosystem h2 {
-    font-size: clamp(1.7rem, 3.5vw, 2.4rem) !important;
-  }
-}
-
-/* MOBILE */
-@media (max-width: 680px) {
-  .universities-hero h1 {
-    font-size: clamp(2rem, 8vw, 2.8rem) !important;
-    line-height: 1.12 !important;
-  }
-
-  .university-opening h2,
-  .universities-partners h2,
-  .universities-participation h2,
-  .universities-fellowship h2,
-  .universities-ecosystem h2 {
-    font-size: clamp(1.55rem, 6vw, 2rem) !important;
-    line-height: 1.22 !important;
-  }
-}
-
-/* VERY SMALL SCREENS */
-@media (max-width: 420px) {
-  .universities-hero h1 {
-    font-size: 2rem !important;
-  }
-
-  .university-opening h2,
-  .universities-partners h2,
-  .universities-participation h2,
-  .universities-fellowship h2,
-  .universities-ecosystem h2 {
-    font-size: 1.55rem !important;
-  }
-}
-
-
-.eyebrow--light::before,
-.eyebrow--light::after {
-  display: none !important;
-  content: none !important;
-}
-
-.eyebrow--light {
-  border: none !important;
-  background-image: none !important;
-}
-
-
-/* Remove golden decorative lines from SectionHeading */
-.eyebrow::before,
-.eyebrow::after,
-.section-heading::before,
-.section-heading::after {
-  display: none !important;
-  content: none !important;
-}
-
-.section-heading__eyebrow {
-  border: none !important;
-  background-image: none !important;
 }

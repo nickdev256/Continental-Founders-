@@ -8,8 +8,8 @@
   --navy: #102b40;
   --navy-dark: #0b2234;
   --navy-light: #193e55;
-  --teal: #117768;
-  --teal-dark: #0c5d52;
+  --brand-navy: #031b34;
+  --brand-navy-dark: #010d1a;
   --gold: #f0c778;
   --gold-dark: #d8ad60;
   --cream: #f9f8f5;
@@ -240,9 +240,9 @@
   gap: 8px;
   min-height: 48px;
   padding: 13px 22px;
-  border: 1px solid var(--teal);
+  border: 1px solid var(--brand-navy);
   border-radius: 7px;
-  background: var(--teal);
+  background: var(--brand-navy);
   color: var(--white);
   font-size: 14px;
   font-weight: 750;
@@ -258,8 +258,8 @@
 
 .horizon-page .btn:hover {
   transform: translateY(-1px);
-  border-color: var(--teal-dark);
-  background: var(--teal-dark);
+  border-color: var(--brand-navy-dark);
+  background: var(--brand-navy-dark);
 }
 
 .horizon-page .btn:focus-visible,
@@ -278,6 +278,20 @@
 .horizon-page .btn.secondary:hover {
   border-color: var(--gold);
   background: rgba(255, 255, 255, 0.07);
+}
+
+/* Navy would vanish on the dark hero photo, so the main hero
+   button is white */
+.horizon-page .hero .btn:not(.secondary) {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--brand-navy);
+}
+
+.horizon-page .hero .btn:not(.secondary):hover {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--brand-navy);
 }
 
 .horizon-page .hero-card {
@@ -334,7 +348,7 @@
 }
 
 .horizon-page .kicker {
-  color: var(--teal);
+  color: var(--brand-navy);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -386,7 +400,7 @@
 
 .horizon-page .card:hover {
   transform: translateY(-3px);
-  border-color: rgba(17, 119, 104, 0.4);
+  border-color: rgba(3, 27, 52, 0.4);
   box-shadow: 0 12px 28px rgba(16, 43, 64, 0.06);
 }
 
@@ -424,7 +438,7 @@
 }
 
 .horizon-page .check li::marker {
-  color: var(--teal);
+  color: var(--brand-navy);
 }
 
 /* =========================================
@@ -441,7 +455,7 @@
 .horizon-page .problem {
   min-width: 0;
   padding: 20px;
-  border-left: 4px solid var(--teal);
+  border-left: 4px solid var(--brand-navy);
   border-radius: 6px;
   background: var(--cream);
 }
@@ -514,12 +528,12 @@
 
 .horizon-page .path:hover {
   transform: translateY(-3px);
-  border-color: var(--teal);
+  border-color: var(--brand-navy);
   box-shadow: 0 10px 24px rgba(16, 43, 64, 0.07);
 }
 
 .horizon-page .path.current {
-  border: 2px solid var(--teal);
+  border: 2px solid var(--brand-navy);
   background: #f0f7f4;
 }
 
@@ -539,7 +553,7 @@
 }
 
 .horizon-page .path.current strong {
-  color: var(--teal);
+  color: var(--brand-navy);
 }
 
 /* =========================================
@@ -611,8 +625,8 @@
 .horizon-page textarea:focus,
 .horizon-page select:focus {
   outline: none;
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(17, 119, 104, 0.14);
+  border-color: var(--brand-navy);
+  box-shadow: 0 0 0 3px rgba(3, 27, 52, 0.14);
 }
 
 .horizon-page .consent {
@@ -631,7 +645,7 @@
   width: 17px;
   height: 17px;
   margin: 4px 0 0;
-  accent-color: var(--teal);
+  accent-color: var(--brand-navy);
   cursor: pointer;
 }
 
@@ -655,10 +669,10 @@
   display: none;
   margin-top: 16px;
   padding: 14px 16px;
-  border: 1px solid #c8e1d4;
+  border: 1px solid #cdd6e2;
   border-radius: 7px;
-  background: #e7f2ed;
-  color: #184b38;
+  background: #eef2f7;
+  color: #031b34;
   font-size: 14px;
   line-height: 1.65;
 }
@@ -691,11 +705,11 @@
 }
 
 .horizon-page summary::marker {
-  color: var(--teal);
+  color: var(--brand-navy);
 }
 
 .horizon-page summary:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--brand-navy);
   outline-offset: 4px;
 }
 

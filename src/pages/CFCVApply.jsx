@@ -129,6 +129,40 @@ async function submissionKeyFor(application, resume) {
 }
 
 /* ============================================================
+   SCROLLING
+   Step changes bring the top of the form into view instead of
+   jumping back to the top of the page.
+============================================================ */
+
+function scrollToForm() {
+  const target = document.getElementById("cfcv-apply-start");
+
+  if (!target) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  const header = document.querySelector("header.navbar");
+  const offset = (header?.getBoundingClientRect().height || 0) + 16;
+
+  window.scrollTo({
+    top: target.getBoundingClientRect().top + window.scrollY - offset,
+    behavior: "smooth",
+  });
+}
+
+/* ============================================================
+   CFCV AT A GLANCE (same figures as the CFCV page)
+============================================================ */
+
+const GLANCE = [
+  { value: "6 months", label: "Intensive fellowship" },
+  { value: "Up to 30", label: "Ventures across the cohort" },
+  { value: "3 tracks", label: "Genesis · Ascend · Horizon" },
+  { value: "Africa + U.S.", label: "And the diaspora" },
+];
+
+/* ============================================================
    APPLICATION STEPS
 ============================================================ */
 
@@ -557,10 +591,7 @@ function CFCVApply() {
     }
 
     if (!validateStep(currentStep)) {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
+      scrollToForm();
 
       return;
     }
@@ -572,10 +603,7 @@ function CFCVApply() {
       )
     );
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    scrollToForm();
   }
 
   function previousStep() {
@@ -593,10 +621,7 @@ function CFCVApply() {
       Math.max(previous - 1, 1)
     );
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    scrollToForm();
   }
 
   function goToStep(step) {
@@ -614,10 +639,7 @@ function CFCVApply() {
     setErrors({});
     setCurrentStep(step);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    scrollToForm();
   }
 
   /* ==========================================================
@@ -652,10 +674,7 @@ function CFCVApply() {
         if (!validateStep(step)) {
           setCurrentStep(step);
 
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth",
-          });
+          scrollToForm();
 
           return;
         }
@@ -916,6 +935,17 @@ function CFCVApply() {
       {/* HERO */}
 
       <section className="cfcv-apply-hero">
+        <div
+          className="cfcv-apply-hero__background"
+          aria-hidden="true"
+        >
+          <img
+            src="/assets/c.webp"
+            alt=""
+            fetchPriority="high"
+          />
+        </div>
+
         <div className="cfcv-apply-container">
           <Link
             to="/cfcv"
@@ -932,7 +962,7 @@ function CFCVApply() {
               </span>
 
               <h1>
-                CFCV Fellowship
+                CFCV Fellowship 
                 <br />
                 <em>Application</em>
               </h1>
@@ -954,8 +984,12 @@ function CFCVApply() {
 
       {/* APPLICATION */}
 
-      <section className="cfcv-apply-main">
-        <div className="cfcv-apply-container">
+      <section
+        className="cfcv-apply-main"
+        id="cfcv-apply-start"
+      >
+        <div className="cfcv-apply-container cfcv-apply-layout">
+          <aside className="cfcv-apply-aside">
           {/* PROGRESS */}
 
           <div className="cfcv-apply-progress">
@@ -1029,6 +1063,20 @@ function CFCVApply() {
               })}
             </div>
           </div>
+
+          <div className="cfcv-apply-glance">
+            <span>CFCV at a glance</span>
+
+            <ul>
+              {GLANCE.map((item) => (
+                <li key={item.value}>
+                  <strong>{item.value}</strong>
+                  <small>{item.label}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+          </aside>
 
           <form
             className="cfcv-apply-form"

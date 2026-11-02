@@ -14,10 +14,14 @@ import {
   ArrowRight,
   BookOpen,
   CalendarDays,
+  CalendarPlus,
+  Check,
   Clock3,
   ExternalLink,
   MapPin,
+  Navigation,
   Quote,
+  Share2,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -207,6 +211,85 @@ function formatDateBlock(value) {
 }
 
 
+// "Upcoming · 23 days to go", "Happening today" or "Past event".
+function getEventStatus(value, endValue) {
+  const start = value ? new Date(value) : null;
+
+  if (!start || Number.isNaN(start.getTime())) return null;
+
+  const end = endValue ? new Date(endValue) : start;
+  const today = new Date();
+  const dayStart = (date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+  const days = Math.round((dayStart(start) - dayStart(today)) / 86400000);
+  const ended = dayStart(Number.isNaN(end.getTime()) ? start : end) < dayStart(today);
+
+  if (ended) return { tone: "past", label: "Past event" };
+  if (days <= 0) return { tone: "live", label: "Happening today" };
+  if (days === 1) return { tone: "soon", label: "Upcoming · Tomorrow" };
+  if (days <= 60) return { tone: "soon", label: `Upcoming · ${days} days to go` };
+
+  return { tone: "soon", label: "Upcoming" };
+}
+
+
+// A location that is a real place (not a placeholder) can open in Maps.
+function getDirectionsUrl(location) {
+  if (!location || /to be announced|online|virtual/i.test(location)) return "";
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
+}
+
+
+// Calendar file (.ics) that Apple, Google and Outlook calendars open.
+// Midnight dates become all-day events; timed events last two hours
+// unless an end date is given.
+function buildCalendarFile({ title, start, end, location, details, url }) {
+  const date = new Date(start);
+
+  if (Number.isNaN(date.getTime())) return null;
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const allDay = date.getHours() === 0 && date.getMinutes() === 0;
+  const dayStamp = (d) => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const utcStamp = (d) =>
+    `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+  const escape = (text) =>
+    String(text || "").replace(/\\/g, "\\\\").replace(/([,;])/g, "\\$1").replace(/\n/g, "\\n");
+
+  let endDate = end ? new Date(end) : null;
+
+  if (!endDate || Number.isNaN(endDate.getTime())) {
+    endDate = allDay
+      ? new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+      : new Date(date.getTime() + 2 * 3600000);
+  } else if (allDay) {
+    // All-day end dates are exclusive in calendar files.
+    endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() + 1);
+  }
+
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Continental Founders//Events//EN",
+    "BEGIN:VEVENT",
+    `UID:${dayStamp(date)}-${encodeURIComponent(title).slice(0, 40)}@continentalfounders`,
+    `DTSTAMP:${utcStamp(new Date())}`,
+    allDay ? `DTSTART;VALUE=DATE:${dayStamp(date)}` : `DTSTART:${utcStamp(date)}`,
+    allDay ? `DTEND;VALUE=DATE:${dayStamp(endDate)}` : `DTEND:${utcStamp(endDate)}`,
+    `SUMMARY:${escape(title)}`,
+    location ? `LOCATION:${escape(location)}` : "",
+    details ? `DESCRIPTION:${escape(details)}` : "",
+    url ? `URL:${url}` : "",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].filter(Boolean);
+
+  return new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+}
+
+
 /* ============================================================
    EVENT DETAILS
 ============================================================ */
@@ -324,6 +407,59 @@ export default function EventDetails() {
   const registrationUrl = getRegistrationUrl(event);
   const endDate = getEventEndDate(event);
 
+  const title = event?.title || "Continental Founders Event";
+  const status = getEventStatus(eventDate, endDate);
+  const directionsUrl = getDirectionsUrl(event ? location : "");
+  const canAddToCalendar = Boolean(
+    eventDate && !Number.isNaN(new Date(eventDate).getTime()) && status?.tone !== "past"
+  );
+
+  const [shareNote, setShareNote] = useState("");
+
+  function addToCalendar() {
+    const file = buildCalendarFile({
+      title,
+      start: eventDate,
+      end: endDate,
+      location: directionsUrl ? location : "",
+      details: description,
+      url: window.location.href,
+    });
+
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `${(slug || "event").replace(/[^a-z0-9-]+/gi, "-")}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // Phones get the system share sheet; elsewhere the link is copied.
+  async function shareEvent() {
+    const shareData = { title, text: description || title, url: window.location.href };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+      setShareNote("Link copied");
+    } catch (shareError) {
+      if (shareError?.name === "AbortError") return;
+      setShareNote("Copy the link from your address bar");
+    }
+
+    window.setTimeout(() => setShareNote(""), 2500);
+  }
+
   const paragraphs = content
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.trim())
@@ -416,9 +552,17 @@ export default function EventDetails() {
               All events
             </Link>
 
-            <span className="ed-hero__type">{eventType}</span>
+            <div className="ed-hero__tags">
+              <span className="ed-hero__type">{eventType}</span>
 
-            <h1>{event.title || "Continental Founders Event"}</h1>
+              {status && (
+                <span className={`ed-hero__status ed-hero__status--${status.tone}`}>
+                  {status.label}
+                </span>
+              )}
+            </div>
+
+            <h1>{title}</h1>
 
             {description && (
               <p className="ed-hero__description">{description}</p>
@@ -437,9 +581,22 @@ export default function EventDetails() {
                 </a>
               )}
 
+              {canAddToCalendar && (
+                <button
+                  type="button"
+                  onClick={addToCalendar}
+                  className={`ed-button ${registrationUrl ? "ed-button--ghost" : "ed-button--gold"}`}
+                >
+                  <CalendarPlus size={17} aria-hidden="true" />
+                  Add to calendar
+                </button>
+              )}
+
               <a
                 href="#event-overview"
-                className={`ed-button ${registrationUrl ? "ed-button--ghost" : "ed-button--gold"}`}
+                className={`ed-button ${
+                  registrationUrl || canAddToCalendar ? "ed-button--ghost" : "ed-button--gold"
+                }`}
               >
                 Explore event
                 <ArrowRight size={17} aria-hidden="true" />
@@ -635,17 +792,49 @@ export default function EventDetails() {
               </li>
             </ul>
 
-            {registrationUrl && (
-              <a
-                href={registrationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ed-button ed-button--gold ed-info__register"
-              >
-                Register for event
-                <ExternalLink size={16} aria-hidden="true" />
-              </a>
-            )}
+            {/* Things a visitor can do next */}
+            <div className="ed-info__actions">
+              {registrationUrl && (
+                <a
+                  href={registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ed-button ed-button--gold ed-info__register"
+                >
+                  Register for event
+                  <ExternalLink size={16} aria-hidden="true" />
+                </a>
+              )}
+
+              {canAddToCalendar && (
+                <button type="button" className="ed-info__action" onClick={addToCalendar}>
+                  <CalendarPlus size={18} aria-hidden="true" />
+                  Add to calendar
+                </button>
+              )}
+
+              {directionsUrl && (
+                <a
+                  className="ed-info__action"
+                  href={directionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Navigation size={18} aria-hidden="true" />
+                  Get directions
+                  <ExternalLink size={14} aria-hidden="true" className="ed-info__external" />
+                </a>
+              )}
+
+              <button type="button" className="ed-info__action" onClick={shareEvent}>
+                {shareNote ? (
+                  <Check size={18} aria-hidden="true" />
+                ) : (
+                  <Share2 size={18} aria-hidden="true" />
+                )}
+                <span aria-live="polite">{shareNote || "Share this event"}</span>
+              </button>
+            </div>
 
           </aside>
 
@@ -702,8 +891,6 @@ export default function EventDetails() {
       <section className="ed-join">
         <div className="ed-container">
           <div className="ed-join__card">
-
-            <img src={eventImage} alt="" loading="lazy" />
 
             <div className="ed-join__content">
               <span className="ed-eyebrow ed-eyebrow--light">Join the Conversation</span>

@@ -1,0 +1,1030 @@
+/* ============================================================
+   CONTINENTAL FOUNDERS — ADMIN SIGN-IN SCREENS
+   Shared by AdminLogin, AdminRegister and AdminOtp.
+
+   Same brand system as the public site: navy and gold, Trajan /
+   Georgia headings, Montserrat text, rounded cards and pill
+   buttons. Full screen, because admin pages have no site navbar.
+   Sizes are in px because the site sets html { font-size: 20px }.
+============================================================ */
+
+.al-page,
+.al-loading {
+  --al-navy: #031b34;
+  --al-navy-2: #072641;
+  --al-ink: #0b1f33;
+  --al-body: #3a4f63;
+  --al-muted: #5f7184;
+  --al-gold: #c99220;
+  --al-gold-dark: #a97a16;
+  --al-gold-light: #e3bd69;
+  --al-error: #b42318;
+  --al-soft: #f6f4ef;
+  --al-line: #dfe3e8;
+  --al-radius: 14px;
+  --al-radius-lg: 24px;
+  --al-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --al-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+  --al-font: "Montserrat", Arial, sans-serif;
+
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-height: 100svh;
+  color: var(--al-body);
+  font-family: var(--al-font);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.al-page *,
+.al-page *::before,
+.al-page *::after,
+.al-loading *,
+.al-loading *::before,
+.al-loading *::after {
+  box-sizing: border-box;
+}
+
+:where(.al-page, .al-loading) h1,
+:where(.al-page, .al-loading) h2,
+:where(.al-page, .al-loading) p {
+  margin: 0;
+}
+
+/* The site's global paragraph size would otherwise win here */
+.al-page p,
+.al-loading p {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+:where(.al-page) ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.al-page) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.al-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.al-page svg {
+  flex-shrink: 0;
+}
+
+.al-page :where(a, button):focus-visible {
+  outline: 3px solid var(--al-gold);
+  outline-offset: 3px;
+}
+
+.al-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.al-eyebrow {
+  display: block;
+  color: var(--al-gold-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   LAYOUT — brand panel left, sign-in right
+============================================================ */
+
+.al-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(440px, 0.9fr);
+  background: var(--al-soft);
+}
+
+
+/* ============================================================
+   BRAND PANEL
+============================================================ */
+
+.al-visual {
+  position: sticky;
+  top: 0;
+  isolation: isolate;
+  overflow: hidden;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 4vw, 56px);
+  color: #fff;
+  background: var(--al-navy);
+}
+
+.al-visual__photo {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  max-width: none !important;
+  object-fit: cover;
+  animation: al-zoom 16s ease-out both;
+}
+
+@keyframes al-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.al-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 18, 45, 0.96) 0%,
+      rgba(0, 18, 45, 0.7) 45%,
+      rgba(0, 18, 45, 0.45) 100%
+    ),
+    linear-gradient(to right, rgba(0, 18, 45, 0.55), transparent 70%);
+}
+
+.al-visual__brand {
+  width: fit-content;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 16px;
+}
+
+.al-visual__brand img {
+  width: 120px;
+  height: auto;
+}
+
+.al-visual__copy {
+  max-width: 620px;
+}
+
+.al-visual h1 {
+  color: #fff;
+  font-family: var(--al-heading);
+  font-size: clamp(40px, 3.6vw + 12px, 80px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.al-visual h1 em {
+  display: block;
+  color: var(--al-gold-light);
+  font-style: italic;
+}
+
+.al-visual__copy p {
+  max-width: 500px;
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.al-visual__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.al-visual__footer strong {
+  font-family: var(--al-heading);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+}
+
+.al-visual__footer span {
+  color: var(--al-gold-light);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+
+/* ============================================================
+   SIGN-IN PANEL
+============================================================ */
+
+.al-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(24px, 3vw, 40px) clamp(20px, 4vw, 64px) 40px;
+}
+
+.al-panel__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.al-panel__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--al-ink);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.al-panel__back:hover {
+  color: var(--al-gold-dark);
+}
+
+.al-panel__back svg {
+  transition: transform 0.25s var(--al-ease);
+}
+
+.al-panel__back:hover svg {
+  transform: translateX(-3px);
+}
+
+.al-card {
+  width: min(100%, 480px);
+  margin: auto;
+  padding: clamp(26px, 3vw, 40px);
+  background: #fff;
+  border: 1px solid #e3e7eb;
+  border-top: 4px solid var(--al-gold);
+  border-radius: var(--al-radius-lg);
+  box-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 24px 60px rgba(3, 27, 52, 0.1);
+  animation: al-rise 0.6s var(--al-ease) both;
+}
+
+@keyframes al-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* Margin above the card keeps it clear of the top bar */
+.al-panel__top + .al-card {
+  margin-top: clamp(28px, 6vh, 72px);
+}
+
+
+/* Steps */
+
+.al-steps {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.al-steps li {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  color: var(--al-muted);
+  border-bottom: 3px solid var(--al-line);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.al-steps span {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--al-muted);
+  background: var(--al-soft);
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.al-steps li.is-current {
+  color: var(--al-ink);
+  border-bottom-color: var(--al-gold);
+}
+
+.al-steps li.is-current span {
+  color: var(--al-navy);
+  background: var(--al-gold-light);
+}
+
+.al-steps li.is-done {
+  color: var(--al-ink);
+  border-bottom-color: var(--al-navy);
+}
+
+.al-steps li.is-done span {
+  color: #fff;
+  background: var(--al-navy);
+}
+
+
+/* Heading */
+
+.al-card__heading {
+  margin-bottom: 26px;
+}
+
+.al-card__icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  color: var(--al-gold-dark);
+  background: color-mix(in srgb, var(--al-gold) 13%, #fff);
+  border-radius: 16px;
+}
+
+.al-card h2 {
+  color: var(--al-ink);
+  font-family: var(--al-heading);
+  font-size: clamp(30px, 1.2vw + 22px, 40px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.al-card__heading p {
+  margin-top: 10px;
+  color: var(--al-body);
+  font-size: 16px;
+}
+
+
+/* Form */
+
+.al-form {
+  display: grid;
+  gap: 18px;
+}
+
+.al-field {
+  display: grid;
+  gap: 8px;
+}
+
+.al-field label {
+  color: var(--al-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.al-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.al-input > svg {
+  position: absolute;
+  left: 16px;
+  color: var(--al-muted);
+  pointer-events: none;
+}
+
+.al-input input {
+  width: 100%;
+  height: 54px;
+  padding: 0 16px 0 48px;
+  color: var(--al-ink);
+  background: #fbfaf8;
+  border: 1px solid var(--al-line);
+  border-radius: var(--al-radius);
+  font: inherit;
+  font-size: 16px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.al-input input[type="password"],
+.al-input input#admin-password {
+  padding-right: 54px;
+}
+
+.al-input input::placeholder {
+  color: #8a97a5;
+}
+
+.al-input input:hover {
+  border-color: #c5ccd4;
+}
+
+.al-input input:focus {
+  background: #fff;
+  border-color: var(--al-gold);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(201, 146, 32, 0.16);
+}
+
+.al-input input[aria-invalid="true"] {
+  border-color: var(--al-error);
+}
+
+.al-input input:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.al-input__toggle {
+  position: absolute;
+  right: 6px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--al-muted);
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.al-input__toggle:hover {
+  color: var(--al-ink);
+  background: var(--al-soft);
+}
+
+.al-field__hint {
+  color: var(--al-gold-dark);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.al-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  color: var(--al-error);
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.al-alert svg {
+  margin-top: 1px;
+}
+
+.al-submit {
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  color: var(--al-navy);
+  background: var(--al-gold);
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.25s var(--al-ease),
+    background 0.2s ease;
+}
+
+.al-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: var(--al-gold-light);
+}
+
+.al-submit svg {
+  transition: transform 0.25s var(--al-ease);
+}
+
+.al-submit:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+.al-submit:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.al-submit__spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(3, 27, 52, 0.25);
+  border-top-color: var(--al-navy);
+  border-radius: 50%;
+  animation: al-spin 0.8s linear infinite;
+}
+
+@keyframes al-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Note and register link */
+
+.al-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 14px 16px;
+  color: var(--al-ink);
+  background: var(--al-soft);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.al-note svg {
+  margin-top: 1px;
+  color: var(--al-gold-dark);
+}
+
+.al-register {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 10px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #e3e7eb;
+  color: var(--al-muted);
+  font-size: 14px;
+}
+
+.al-register a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--al-ink);
+  font-weight: 700;
+}
+
+.al-register a:hover {
+  color: var(--al-gold-dark);
+}
+
+
+/* Back link can be a button (it clears the pending sign-in) */
+.al-panel__back--button {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.al-visual__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--al-gold-light);
+}
+
+.al-card__heading .al-eyebrow {
+  margin-bottom: 8px;
+}
+
+.al-submit--full {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.al-field--code {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.al-field--code legend {
+  margin-bottom: 8px;
+  padding: 0;
+  color: var(--al-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+/* Field note and success message */
+
+.al-field__note {
+  color: var(--al-muted);
+  font-size: 13px;
+}
+
+.al-success {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  color: var(--al-navy);
+  background: color-mix(in srgb, var(--al-gold) 13%, #fff);
+  border: 1px solid color-mix(in srgb, var(--al-gold) 40%, #fff);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.al-success svg {
+  margin-top: 1px;
+  color: var(--al-gold-dark);
+}
+
+
+/* Password rules (register) */
+
+.al-rules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  margin: -6px 0 2px;
+  padding: 14px;
+  background: var(--al-soft);
+  border-radius: 12px;
+}
+
+.al-rules li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--al-muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.al-rules__icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #fff;
+  border: 2px solid var(--al-line);
+  border-radius: 50%;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.al-rules li.is-met {
+  color: var(--al-ink);
+}
+
+.al-rules li.is-met .al-rules__icon {
+  background: var(--al-navy);
+  border-color: var(--al-navy);
+}
+
+
+/* Code entry (verify) */
+
+.al-email-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  margin-top: 16px;
+  padding: 8px 14px;
+  color: var(--al-ink);
+  background: var(--al-soft);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.al-email-chip svg {
+  color: var(--al-gold-dark);
+}
+
+.al-code {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(6px, 1.5vw, 10px);
+}
+
+.al-code input {
+  width: 100%;
+  min-width: 0;
+  height: clamp(52px, 12vw, 60px);
+  padding: 0;
+  color: var(--al-ink);
+  background: #fbfaf8;
+  border: 1px solid var(--al-line);
+  border-radius: 12px;
+  font-family: var(--al-heading);
+  font-size: clamp(22px, 5vw, 28px);
+  font-variant-numeric: lining-nums;
+  text-align: center;
+  caret-color: var(--al-gold);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.al-code input:focus {
+  background: #fff;
+  border-color: var(--al-gold);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(201, 146, 32, 0.16);
+}
+
+.al-code input.is-filled {
+  background: #fff;
+  border-color: var(--al-navy);
+}
+
+.al-code input:disabled {
+  opacity: 0.7;
+}
+
+.al-resend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 10px;
+  margin-top: 20px;
+  color: var(--al-muted);
+  font-size: 14px;
+}
+
+.al-resend button,
+.al-text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  color: var(--al-ink);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.al-resend button:hover:not(:disabled),
+.al-text-button:hover {
+  color: var(--al-gold-dark);
+}
+
+.al-resend button:disabled {
+  color: var(--al-muted);
+  cursor: default;
+  font-variant-numeric: tabular-nums;
+}
+
+.al-text-button {
+  margin: 14px auto 0;
+  display: flex;
+  font-size: 14px;
+}
+
+
+/* ============================================================
+   SESSION CHECK SCREEN
+============================================================ */
+
+.al-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(37, 99, 201, 0.25), transparent 50%),
+    var(--al-navy);
+}
+
+.al-loading__card {
+  width: min(100%, 440px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 28px;
+  background: #fff;
+  border-top: 4px solid var(--al-gold);
+  border-radius: var(--al-radius-lg);
+  text-align: center;
+}
+
+.al-loading__icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  color: var(--al-gold-dark);
+  background: color-mix(in srgb, var(--al-gold) 13%, #fff);
+  border-radius: 18px;
+}
+
+.al-loading h1 {
+  margin-top: 10px;
+  color: var(--al-ink);
+  font-family: var(--al-heading);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.al-loading p {
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+/* Thin sliding bar while the session is checked */
+.al-loading__bar {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  margin-top: 26px;
+  overflow: hidden;
+  background: var(--al-soft);
+  border-radius: 999px;
+}
+
+.al-loading__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: var(--al-gold);
+  border-radius: 999px;
+  animation: al-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes al-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+
+/* ============================================================
+   TABLET (≤ 1000px) — brand panel becomes a header
+============================================================ */
+
+@media (max-width: 1000px) {
+  .al-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .al-visual {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    gap: 40px;
+    padding: 28px 24px 36px;
+  }
+
+  .al-visual h1 {
+    font-size: clamp(32px, 5vw + 12px, 52px);
+  }
+
+  .al-visual h1 em {
+    display: inline;
+  }
+
+  .al-visual__copy p {
+    font-size: 16px;
+  }
+
+  .al-visual__footer {
+    display: none;
+  }
+
+  .al-panel__top + .al-card {
+    margin-top: 28px;
+  }
+}
+
+
+/* ============================================================
+   PHONE (≤ 520px)
+============================================================ */
+
+@media (max-width: 520px) {
+  .al-visual {
+    gap: 28px;
+    padding: 20px 16px 28px;
+  }
+
+  .al-visual__brand img {
+    width: 96px;
+  }
+
+  .al-visual__copy p {
+    display: none;
+  }
+
+  .al-panel {
+    padding: 20px 16px 32px;
+  }
+
+  .al-card {
+    padding: 24px 18px;
+  }
+
+  .al-steps li {
+    font-size: 12px;
+  }
+
+  .al-rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+
+/* ============================================================
+   SHORT SCREENS (landscape phones)
+============================================================ */
+
+@media (max-height: 520px) and (orientation: landscape) and (min-width: 1001px) {
+  .al-visual {
+    position: relative;
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .al-page *,
+  .al-page *::before,
+  .al-page *::after,
+  .al-loading *,
+  .al-loading *::before,
+  .al-loading *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .al-card,
+  .al-input input {
+    border: 1px solid CanvasText;
+  }
+}

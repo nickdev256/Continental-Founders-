@@ -5,11 +5,13 @@ import React, {
 } from "react";
 
 import {
+  Link,
   useLocation,
   useNavigate,
 } from "react-router-dom";
 
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
@@ -19,7 +21,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import "./AdminOtp.css";
+import "./AdminAuth.css";
 
 
 // ============================================================
@@ -900,264 +902,263 @@ export default function AdminOtp() {
   // ==========================================================
 
   return (
-    <main className="admin-otp">
+    <main className="al-page">
 
-      <section className="admin-otp__panel">
+      {/* ======================================================
+          BRAND PANEL
+      ====================================================== */}
 
-        <div className="admin-otp__brand">
+      <section className="al-visual" aria-label="Secure access">
 
-          <a
-            href="/"
-            className="admin-otp__brand-link"
-            aria-label="Continental Founders home"
-          >
-            <img
-              src="/assets/continental-founders-logo.webp"
-              alt="Continental Founders"
-            />
-          </a>
+        <img className="al-visual__photo" src="/assets/a.webp" alt="" />
 
-          <span>
-            CMS SECURITY
+        <Link
+          to="/"
+          className="al-visual__brand"
+          aria-label="Continental Founders home"
+        >
+          <img
+            src="/assets/continental-founders-logo.webp"
+            alt="Continental Founders"
+          />
+        </Link>
+
+        <div className="al-visual__copy">
+          <span className="al-eyebrow al-visual__eyebrow">
+            <KeyRound size={16} aria-hidden="true" />
+            Secure Access
           </span>
 
+          <h1>
+            {approvalRequired
+              ? "Identity verified."
+              : "One more step."}
+          </h1>
+
+          <p>
+            {approvalRequired
+              ? "Your email has been confirmed. CMS access becomes available after your account has been approved."
+              : "Continental Founders CMS access is protected with additional identity verification for authorized users."}
+          </p>
         </div>
 
+        <div className="al-visual__footer">
+          <strong>Continental Founders™</strong>
+          <span>Secure CMS Access</span>
+        </div>
 
-        <div className="admin-otp__content">
+      </section>
 
-          <div className="admin-otp__security-icon">
 
-            {approvalRequired ? (
-              <CheckCircle2
-                size={26}
-                strokeWidth={1.6}
-              />
-            ) : (
-              <ShieldCheck
-                size={26}
-                strokeWidth={1.6}
-              />
-            )}
+      {/* ======================================================
+          VERIFY PANEL
+      ====================================================== */}
 
-          </div>
+      <section className="al-panel">
 
+        <div className="al-panel__top">
+          <span className="al-eyebrow">CMS Security</span>
+
+          <button
+            type="button"
+            className="al-panel__back al-panel__back--button"
+            onClick={handleBackToLogin}
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            Back to sign in
+          </button>
+        </div>
+
+        <div className="al-card">
+
+          <ol className="al-steps" aria-label="Sign-in steps">
+            <li className="is-done">
+              <span>1</span>
+              {otpPurpose === "registration" ? "Create account" : "Sign in"}
+            </li>
+            <li
+              className={approvalRequired ? "is-done" : "is-current"}
+              aria-current={approvalRequired ? undefined : "step"}
+            >
+              <span>2</span>
+              Verify code
+            </li>
+          </ol>
 
           {approvalRequired ? (
             <>
-              <span className="admin-otp__eyebrow">
-                EMAIL VERIFIED
-              </span>
+              <div className="al-card__heading">
+                <span className="al-card__icon">
+                  <CheckCircle2 size={28} strokeWidth={1.6} aria-hidden="true" />
+                </span>
 
-              <h1>
-                Verification complete.
-              </h1>
+                <span className="al-eyebrow">Email Verified</span>
 
-              <p className="admin-otp__intro">
-                Your email address has been
-                successfully verified. Your
-                Continental Founders CMS account
-                is now awaiting approval before
-                access can be granted.
-              </p>
+                <h2>Verification complete.</h2>
+
+                <p>
+                  Your email address has been successfully verified. Your
+                  Continental Founders CMS account is now awaiting approval
+                  before access can be granted.
+                </p>
+              </div>
 
               {message && (
-                <div
-                  className="admin-otp__success"
-                  role="status"
-                >
-                  {message}
+                <div className="al-success" role="status">
+                  <CheckCircle2 size={18} aria-hidden="true" />
+                  <span>{message}</span>
                 </div>
               )}
 
               <button
                 type="button"
-                className="admin-otp__verify"
+                className="al-submit al-submit--full"
                 onClick={
                   handleBackToLogin
                 }
               >
-                <span>
-                  Return to sign in
-                </span>
-
-                <ArrowRight
-                  size={18}
-                  strokeWidth={1.8}
-                />
+                <span>Return to sign in</span>
+                <ArrowRight size={18} aria-hidden="true" />
               </button>
             </>
           ) : (
             <>
-              <span className="admin-otp__eyebrow">
-                TWO-STEP VERIFICATION
-              </span>
+              <div className="al-card__heading">
+                <span className="al-card__icon">
+                  <ShieldCheck size={28} strokeWidth={1.6} aria-hidden="true" />
+                </span>
 
-              <h1>
-                Verify your identity.
-              </h1>
+                <span className="al-eyebrow">Two-Step Verification</span>
 
-              <p className="admin-otp__intro">
+                <h2>Verify your identity.</h2>
 
-                {otpPurpose ===
-                "registration"
-                  ? "We sent a six-digit verification code to the email address you used to create your Continental Founders account."
-                  : "We sent a six-digit security code to your registered Continental Founders account email."}
+                <p>
+                  {otpPurpose ===
+                  "registration"
+                    ? "We sent a six-digit verification code to the email address you used to create your Continental Founders account."
+                    : "We sent a six-digit security code to your registered Continental Founders account email."}
+                </p>
 
-              </p>
-
-
-              <div className="admin-otp__email">
-
-                <Mail
-                  size={17}
-                  strokeWidth={1.7}
-                />
-
-                <span>
+                <span className="al-email-chip">
+                  <Mail size={16} aria-hidden="true" />
                   {maskEmail(
                     loginEmail
                   )}
                 </span>
-
               </div>
 
-
               <form
-                className="admin-otp__form"
+                className="al-form"
                 onSubmit={
                   handleVerify
                 }
               >
 
-                <label className="admin-otp__label">
-                  Verification Code
-                </label>
+                <fieldset className="al-field al-field--code">
+                  <legend>Verification code</legend>
 
-
-                <div
-                  className="admin-otp__inputs"
-                  onPaste={
-                    handlePaste
-                  }
-                >
-
-                  {otp.map(
-                    (
-                      digit,
-                      index
-                    ) => (
-
-                      <input
-                        key={
-                          index
-                        }
-
-                        ref={(
-                          element
-                        ) => {
-                          inputRefs.current[
+                  <div
+                    className="al-code"
+                    onPaste={
+                      handlePaste
+                    }
+                  >
+                    {otp.map(
+                      (
+                        digit,
+                        index
+                      ) => (
+                        <input
+                          key={
                             index
-                          ] =
-                            element;
-                        }}
-
-                        type="text"
-
-                        inputMode="numeric"
-
-                        autoComplete={
-                          index === 0
-                            ? "one-time-code"
-                            : "off"
-                        }
-
-                        maxLength={1}
-
-                        value={
-                          digit
-                        }
-
-                        disabled={
-                          loading
-                        }
-
-                        aria-label={`Verification digit ${
-                          index + 1
-                        }`}
-
-                        onChange={(
-                          event
-                        ) =>
-                          handleOtpChange(
-                            index,
-                            event.target.value
-                          )
-                        }
-
-                        onKeyDown={(
-                          event
-                        ) =>
-                          handleKeyDown(
-                            index,
+                          }
+                          ref={(
+                            element
+                          ) => {
+                            inputRefs.current[
+                              index
+                            ] =
+                              element;
+                          }}
+                          className={digit ? "is-filled" : ""}
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete={
+                            index === 0
+                              ? "one-time-code"
+                              : "off"
+                          }
+                          maxLength={1}
+                          value={
+                            digit
+                          }
+                          disabled={
+                            loading
+                          }
+                          aria-label={`Verification digit ${
+                            index + 1
+                          }`}
+                          aria-invalid={Boolean(error)}
+                          onChange={(
                             event
-                          )
-                        }
-                      />
-
-                    )
-                  )}
-
-                </div>
-
+                          ) =>
+                            handleOtpChange(
+                              index,
+                              event.target.value
+                            )
+                          }
+                          onKeyDown={(
+                            event
+                          ) =>
+                            handleKeyDown(
+                              index,
+                              event
+                            )
+                          }
+                        />
+                      )
+                    )}
+                  </div>
+                </fieldset>
 
                 {error && (
-                  <div
-                    className="admin-otp__error"
-                    role="alert"
-                  >
-                    {error}
+                  <div className="al-alert" role="alert">
+                    <AlertCircle size={18} aria-hidden="true" />
+                    <span>{error}</span>
                   </div>
                 )}
-
 
                 {message && (
-                  <div
-                    className="admin-otp__success"
-                    role="status"
-                  >
-                    {message}
+                  <div className="al-success" role="status">
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <span>{message}</span>
                   </div>
                 )}
-
 
                 <button
                   type="submit"
-                  className="admin-otp__verify"
+                  className="al-submit"
                   disabled={
                     loading
                   }
                 >
+                  {loading ? (
+                    <span className="al-submit__spinner" aria-hidden="true" />
+                  ) : null}
+
                   <span>
                     {loading
                       ? "Verifying..."
-                      : "Verify & Continue"}
+                      : "Verify & continue"}
                   </span>
 
-                  <ArrowRight
-                    size={18}
-                    strokeWidth={1.8}
-                  />
+                  {!loading && <ArrowRight size={18} aria-hidden="true" />}
                 </button>
 
               </form>
 
-
-              <div className="admin-otp__resend">
-
-                <p>
-                  Didn't receive the code?
-                </p>
+              <div className="al-resend">
+                <span>Didn't receive the code?</span>
 
                 <button
                   type="button"
@@ -1168,11 +1169,9 @@ export default function AdminOtp() {
                     countdown > 0 ||
                     resending
                   }
+                  aria-live="polite"
                 >
-                  <RefreshCw
-                    size={14}
-                    strokeWidth={1.8}
-                  />
+                  <RefreshCw size={14} aria-hidden="true" />
 
                   {resending
                     ? "Sending..."
@@ -1180,77 +1179,9 @@ export default function AdminOtp() {
                       ? `Resend in ${countdown}s`
                       : "Resend code"}
                 </button>
-
               </div>
-
-
-              <button
-                type="button"
-                className="admin-otp__back"
-                onClick={
-                  handleBackToLogin
-                }
-              >
-                <ArrowLeft
-                  size={15}
-                  strokeWidth={1.8}
-                />
-
-                Back to sign in
-              </button>
             </>
           )}
-
-        </div>
-
-
-        <div className="admin-otp__footer">
-
-          <span>
-            Continental Founders™
-          </span>
-
-          <span>
-            Secure CMS Access
-          </span>
-
-        </div>
-
-      </section>
-
-
-      <section
-        className="admin-otp__visual"
-        aria-hidden="true"
-      >
-
-        <div className="admin-otp__overlay" />
-
-
-        <div className="admin-otp__visual-content">
-
-          <KeyRound
-            size={31}
-            strokeWidth={1.4}
-          />
-
-          <span>
-            SECURE ACCESS
-          </span>
-
-          <h2>
-            {approvalRequired
-              ? "Identity verified."
-              : "One more step."}
-          </h2>
-
-          <p>
-            {approvalRequired
-              ? "Your email has been confirmed. CMS access becomes available after your account has been approved."
-              : "Continental Founders CMS access is protected with additional identity verification for authorized users."}
-          </p>
-
-          <div className="admin-otp__line" />
 
         </div>
 

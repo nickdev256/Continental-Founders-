@@ -934,10 +934,9 @@
   background: rgba(227, 189, 105, 0.1);
   border: 1px solid rgba(227, 189, 105, 0.38);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   transition:
     background 0.25s ease,
     color 0.25s ease;
@@ -1834,5 +1833,12 @@
 
   .cf-home .cf-home-hero__slide {
     transform: none;
+  }
+}
+
+/* Smallest phones: long text links may wrap instead of overflowing */
+@media (max-width: 360px) {
+  .cf-home .cf-text-link {
+    white-space: normal;
   }
 }

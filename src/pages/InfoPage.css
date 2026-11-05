@@ -1,0 +1,519 @@
+/* ============================================================
+   INFO PAGES — Impact and Programs
+
+   Same design system as the rest of the site: navy and gold
+   with blue accents, real photos, rounded cards and pill
+   buttons. Every rule is scoped to .ip-page.
+   Sizes are in px because the site sets html { font-size: 20px }.
+============================================================ */
+
+.ip-page {
+  --ip-navy: #031b34;
+  --ip-navy-2: #072641;
+  --ip-ink: #0b1f33;
+  --ip-body: #3a4f63;
+  --ip-muted: #5f7184;
+  --ip-gold: #c99220;
+  --ip-gold-dark: #a97a16;
+  --ip-gold-light: #e3bd69;
+  --ip-blue: #2563c9;
+  --ip-soft: #f6f4ef;
+  --ip-line: #e3e7eb;
+  --ip-radius: 18px;
+  --ip-radius-lg: 28px;
+  --ip-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 16px 40px rgba(3, 27, 52, 0.08);
+  --ip-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ip-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+
+  width: 100%;
+  overflow-x: clip;
+  color: var(--ip-body);
+  background: #fff;
+  font-family: "Montserrat", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.ip-page *,
+.ip-page *::before,
+.ip-page *::after {
+  box-sizing: border-box;
+}
+
+:where(.ip-page) :where(h1, h2, h3, p) {
+  margin: 0;
+  padding: 0;
+}
+
+:where(.ip-page) :where(ul, ol) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+:where(.ip-page) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ip-page p {
+  font-size: inherit;
+}
+
+.ip-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.ip-page svg {
+  flex-shrink: 0;
+}
+
+.ip-page :where(h1, h2, h3) {
+  text-wrap: balance;
+  font-variant-numeric: lining-nums;
+}
+
+.ip-page :where(a, button):focus-visible {
+  outline: 3px solid var(--ip-gold);
+  outline-offset: 3px;
+}
+
+.ip-container {
+  width: min(1440px, calc(100% - 64px));
+  margin-inline: auto;
+}
+
+
+/* ============================================================
+   SHARED
+============================================================ */
+
+.ip-section {
+  padding-block: clamp(64px, 8vw, 120px);
+}
+
+.ip-section--soft {
+  background: var(--ip-soft);
+}
+
+.ip-eyebrow {
+  display: block;
+  margin-bottom: 16px;
+  color: var(--ip-gold-dark);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ip-eyebrow--light {
+  color: var(--ip-gold-light);
+}
+
+.ip-page h2 {
+  color: var(--ip-ink);
+  font-family: var(--ip-heading);
+  font-size: clamp(30px, 1.8vw + 18px, 48px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.ip-heading {
+  max-width: 760px;
+  margin-bottom: clamp(32px, 4vw, 48px);
+}
+
+.ip-button {
+  min-height: 54px;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 28px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  transition:
+    transform 0.25s var(--ip-ease),
+    background 0.2s ease;
+}
+
+.ip-button:hover {
+  transform: translateY(-2px);
+}
+
+.ip-button--gold {
+  color: var(--ip-navy);
+  background: var(--ip-gold);
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
+}
+
+.ip-button--gold:hover {
+  background: var(--ip-gold-light);
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.ip-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: min(600px, calc(100svh - 90px));
+  display: flex;
+  align-items: flex-end;
+  padding-block: clamp(80px, 10vw, 140px) clamp(56px, 6vw, 88px);
+  color: #fff;
+  background: var(--ip-navy);
+}
+
+.ip-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.ip-hero__media img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center 40%;
+  animation: ip-zoom 14s ease-out both;
+}
+
+@keyframes ip-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.ip-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.95) 0%,
+      rgba(0, 18, 45, 0.8) 42%,
+      rgba(0, 18, 45, 0.35) 100%
+    ),
+    linear-gradient(to top, rgba(0, 18, 45, 0.65), transparent 55%);
+}
+
+.ip-hero__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+  align-items: end;
+  gap: 28px clamp(40px, 6vw, 96px);
+}
+
+.ip-hero h1 {
+  max-width: 820px;
+  color: #fff;
+  font-family: var(--ip-heading);
+  font-size: clamp(38px, 3.8vw + 14px, 78px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.ip-hero h1 em {
+  color: var(--ip-gold-light);
+  font-style: italic;
+}
+
+.ip-hero__aside {
+  padding-left: 22px;
+  color: rgba(255, 255, 255, 0.86);
+  border-left: 2px solid var(--ip-gold);
+  font-size: clamp(16px, 0.3vw + 14px, 18px);
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   INTRO — label beside a large statement
+============================================================ */
+
+.ip-intro__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.35fr) minmax(0, 1fr);
+  gap: 20px clamp(40px, 6vw, 96px);
+}
+
+.ip-intro__grid > div {
+  min-width: 0;
+  max-width: 880px;
+}
+
+.ip-intro p {
+  max-width: 720px;
+  margin-top: 22px;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   CARD GRID
+============================================================ */
+
+.ip-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.ip-card {
+  --tone: var(--ip-gold);
+  --tone-text: var(--ip-gold-dark);
+  --tone-soft: rgba(201, 146, 32, 0.12);
+
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--ip-line);
+  border-radius: var(--ip-radius);
+  box-shadow: var(--ip-shadow);
+  transition:
+    transform 0.3s var(--ip-ease),
+    box-shadow 0.3s ease;
+}
+
+.ip-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--tone);
+}
+
+.ip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 24px 48px rgba(3, 27, 52, 0.12);
+}
+
+.ip-card:nth-child(4n + 2) {
+  --tone: var(--ip-blue);
+  --tone-text: var(--ip-blue);
+  --tone-soft: rgba(37, 99, 201, 0.1);
+}
+
+.ip-card:nth-child(4n + 3) {
+  --tone: var(--ip-navy);
+  --tone-text: var(--ip-navy);
+  --tone-soft: rgba(3, 27, 52, 0.08);
+}
+
+.ip-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.ip-card__icon {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  color: var(--tone-text);
+  background: var(--tone-soft);
+  border-radius: 14px;
+}
+
+.ip-card__label {
+  color: var(--ip-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.ip-card h3 {
+  margin-top: 24px;
+  color: var(--ip-ink);
+  font-family: var(--ip-heading);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.ip-card p {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.ip-card__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.ip-card__list li {
+  padding: 6px 12px;
+  color: var(--ip-navy);
+  background: var(--ip-soft);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   NOTE BAND — navy statement
+============================================================ */
+
+.ip-band {
+  color: rgba(255, 255, 255, 0.8);
+  background:
+    radial-gradient(circle at 85% 0%, rgba(37, 99, 201, 0.3), transparent 45%),
+    linear-gradient(160deg, var(--ip-navy) 0%, var(--ip-navy-2) 100%);
+}
+
+.ip-band__inner {
+  max-width: 900px;
+}
+
+.ip-band h2 {
+  color: #fff;
+}
+
+.ip-band p {
+  max-width: 720px;
+  margin-top: 22px;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   CLOSING CTA
+============================================================ */
+
+.ip-cta__card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 28px clamp(40px, 6vw, 96px);
+  padding: clamp(32px, 5vw, 64px);
+  background:
+    radial-gradient(circle at 100% 100%, rgba(201, 146, 32, 0.16), transparent 50%),
+    var(--ip-soft);
+  border: 1px solid var(--ip-line);
+  border-radius: var(--ip-radius-lg);
+}
+
+.ip-cta__card > div {
+  min-width: 0;
+}
+
+.ip-cta p {
+  max-width: 640px;
+  margin-top: 16px;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+  .ip-hero__inner,
+  .ip-intro__grid,
+  .ip-cta__card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ip-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ip-cta__card .ip-button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .ip-container {
+    width: calc(100% - 40px);
+  }
+
+  .ip-hero {
+    min-height: 0;
+    padding-block: 72px 48px;
+  }
+
+  .ip-hero::after {
+    background: linear-gradient(
+      to top,
+      rgba(0, 18, 45, 0.95) 0%,
+      rgba(0, 18, 45, 0.8) 60%,
+      rgba(0, 18, 45, 0.6) 100%
+    );
+  }
+
+  .ip-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ip-card {
+    padding: 24px;
+  }
+
+  .ip-cta__card {
+    padding: 28px 22px;
+  }
+
+  .ip-button {
+    width: 100%;
+  }
+
+  .ip-cta__card .ip-button {
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 360px) {
+  .ip-container {
+    width: calc(100% - 32px);
+  }
+
+  .ip-hero h1 {
+    font-size: 32px;
+  }
+
+  .ip-page h2 {
+    font-size: 27px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ip-page *,
+  .ip-page *::before,
+  .ip-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

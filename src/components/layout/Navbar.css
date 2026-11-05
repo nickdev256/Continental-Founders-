@@ -612,17 +612,6 @@
   border-color: var(--gold-light);
 }
 
-.navbar__kbd {
-  padding: 3px 7px;
-  color: var(--muted);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-family: inherit;
-  font-size: 0.68rem;
-  font-weight: 600;
-}
-
 /* SUBSCRIBE BUTTON */
 
 .navbar__subscribe {
@@ -649,13 +638,23 @@
   transition: transform 0.25s var(--ease);
 }
 
-.navbar__subscribe:hover {
+/* Shown but inactive until subscriptions open */
+button.navbar__subscribe {
+  border: 0;
+  font-family: inherit;
+}
+
+.navbar__subscribe:disabled {
+  cursor: default;
+}
+
+.navbar__subscribe:not(:disabled):hover {
   background: var(--navy);
   box-shadow: 0 10px 24px rgba(7, 26, 45, 0.25);
   transform: translateY(-1px);
 }
 
-.navbar__subscribe:hover svg {
+.navbar__subscribe:not(:disabled):hover svg {
   transform: translate(2px, -2px);
 }
 
@@ -708,8 +707,7 @@
 ========================================================= */
 
 @media (max-width: 1320px) {
-  .navbar__regions,
-  .navbar__kbd {
+  .navbar__regions {
     display: none;
   }
 
@@ -966,10 +964,6 @@
   .navbar__search-label {
     display: inline;
   }
-
-  .navbar__kbd {
-    display: none;
-  }
 }
 
 /* =========================================================
@@ -1194,5 +1188,105 @@
   .navbar__mega-link {
     opacity: 1;
     transform: none;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP LINKS IN A ROUNDED FRAME
+   The links sit in one soft pill; the open or current
+   section gets a white pill in its accent colour.
+========================================================= */
+
+@media (min-width: 1101px) {
+  .navbar__links {
+    height: auto;
+    align-self: center;
+    align-items: center;
+    gap: 2px;
+    padding: 5px;
+    background: #f5f6f8;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+
+  .navbar__links > .navbar__link,
+  .navbar__dropdown-heading {
+    min-height: 40px;
+    border-radius: 999px;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .navbar__links > .navbar__link {
+    padding: 0 15px;
+  }
+
+  .navbar__dropdown {
+    align-items: center;
+  }
+
+  .navbar__dropdown-heading {
+    align-items: center;
+    padding: 0 8px 0 15px;
+  }
+
+  .navbar__dropdown-heading .navbar__link {
+    min-height: 40px;
+    padding: 0 2px 0 0;
+  }
+
+  .navbar__chevron {
+    height: 40px;
+  }
+
+  /* The frame replaces the underline */
+  .navbar__link::after {
+    display: none;
+  }
+
+  .navbar__links > .navbar__link:hover,
+  .navbar__dropdown:hover .navbar__dropdown-heading {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .navbar__dropdown:hover .navbar__dropdown-heading .navbar__link {
+    color: var(--accent);
+  }
+
+  .navbar__links > .navbar__link.is-active,
+  .navbar__dropdown.is-active .navbar__dropdown-heading,
+  .navbar__dropdown.is-expanded .navbar__dropdown-heading {
+    background: #fff;
+    box-shadow:
+      0 3px 12px rgba(7, 26, 45, 0.08),
+      inset 0 0 0 1px rgba(7, 26, 45, 0.06);
+  }
+
+  .navbar__links > .navbar__link.is-active,
+  .navbar__dropdown.is-active .navbar__link {
+    font-weight: 600;
+  }
+}
+
+/* Narrower laptops: tighter pills so every link still fits */
+@media (min-width: 1101px) and (max-width: 1320px) {
+  .navbar__links {
+    gap: 0;
+    padding: 4px;
+  }
+
+  .navbar__links > .navbar__link {
+    padding: 0 11px;
+  }
+
+  .navbar__dropdown-heading {
+    padding: 0 4px 0 11px;
+  }
+
+  .navbar__chevron {
+    width: 20px;
   }
 }

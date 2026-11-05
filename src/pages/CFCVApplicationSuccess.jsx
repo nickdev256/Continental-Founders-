@@ -196,7 +196,7 @@ export default function CFCVApplicationSuccess() {
                   to="/cfcv"
                   className="cfcv-success-button cfcv-success-button--primary"
                 >
-                  View the Fellowship
+                  View the fellowship
                   <ArrowRight size={18} />
                 </Link>
 
@@ -204,7 +204,7 @@ export default function CFCVApplicationSuccess() {
                   to="/"
                   className="cfcv-success-button cfcv-success-button--secondary"
                 >
-                  Return Home
+                  Return home
                 </Link>
               </div>
             </div>
@@ -444,7 +444,7 @@ export default function CFCVApplicationSuccess() {
                 to="/"
                 className="cfcv-success-button cfcv-success-button--secondary"
               >
-                Return Home
+                Return home
               </Link>
             </div>
           </div>

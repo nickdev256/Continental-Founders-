@@ -311,14 +311,14 @@ export default function FellowshipCommunity() {
                 to="/find-your-lane"
                 className="fc-btn fc-btn-gold"
               >
-                Find Your Lane <ArrowRight size={18} aria-hidden="true" />
+                Find your lane <ArrowRight size={18} aria-hidden="true" />
               </Link>
 
               <a
                 href="#fc-experience"
                 className="fc-btn fc-btn-outline"
               >
-                Explore Our Community
+                Explore our community
               </a>
             </div>
           </div>
@@ -552,7 +552,7 @@ export default function FellowshipCommunity() {
               to="/find-your-lane"
               className="fc-btn fc-btn-gold"
             >
-              Find Your Lane <ArrowRight size={16} aria-hidden="true" />
+              Find your lane <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -669,7 +669,7 @@ export default function FellowshipCommunity() {
                 to="/find-your-lane"
                 className="fc-btn fc-btn-navy"
               >
-                Start Your Journey <ArrowRight size={18} aria-hidden="true" />
+                Start your journey <ArrowRight size={18} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -990,14 +990,14 @@ export default function FellowshipCommunity() {
                   className="fc-btn fc-btn-gold"
                   type="submit"
                 >
-                  Save My Answers
+                  Save my answers
                 </button>
 
                 <button
                   className="fc-btn fc-btn-ghost"
                   type="reset"
                 >
-                  Clear Form
+                  Clear form
                 </button>
               </div>
 
@@ -1046,14 +1046,14 @@ export default function FellowshipCommunity() {
               to="/find-your-lane"
               className="fc-btn fc-btn-gold"
             >
-              Find Your Lane <ArrowRight size={18} aria-hidden="true" />
+              Find your lane <ArrowRight size={18} aria-hidden="true" />
             </Link>
 
             <a
               href="#fc-pathways"
               className="fc-btn fc-btn-outline"
             >
-              View All Pathways
+              View all pathways
             </a>
           </div>
 

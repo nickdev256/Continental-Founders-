@@ -106,6 +106,7 @@ import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 
 import NotFound from "./pages/NotFound";
+import PolicyPage from "./pages/PolicyPage";
 
 
 
@@ -361,7 +362,7 @@ const SEO_ROUTES = {
 
     description:
 
-      "Explore Continental Founders Catalytic Ventures, a six-month cross-continental venture-development fellowship connecting founders in Africa and the U.S./diaspora.",
+      "Explore Continental Founders Fellowship, a six-month cross-continental venture-development fellowship connecting founders in Africa and the U.S./diaspora.",
 
 
 
@@ -395,7 +396,7 @@ const SEO_ROUTES = {
 
     description:
 
-      "Apply to the Continental Founders Catalytic Ventures fellowship and begin the CFCV admissions process.",
+      "Apply to the Continental Founders Fellowship and begin the CFCV admissions process.",
 
 
 
@@ -437,7 +438,7 @@ const SEO_ROUTES = {
 
     description:
 
-      "Confirmation of a Continental Founders Catalytic Ventures fellowship application submission.",
+      "Confirmation of a Continental Founders Fellowship application submission.",
 
 
 
@@ -902,6 +903,30 @@ const SEO_ROUTES = {
       { name: "Fellowship", path: "/cfcv" },
       { name: "Horizon", path: "/horizon" },
     ],
+  },
+
+  "/privacy": {
+    title: "Privacy Policy | Continental Founders",
+    description:
+      "How Continental Founders collects, uses and protects personal information.",
+    canonical: "/privacy",
+    breadcrumb: [{ name: "Privacy", path: "/privacy" }],
+  },
+
+  "/terms": {
+    title: "Terms of Use | Continental Founders",
+    description:
+      "The terms that apply when you use the Continental Founders website.",
+    canonical: "/terms",
+    breadcrumb: [{ name: "Terms", path: "/terms" }],
+  },
+
+  "/accessibility": {
+    title: "Accessibility | Continental Founders",
+    description:
+      "Continental Founders' commitment to a website that everyone can use.",
+    canonical: "/accessibility",
+    breadcrumb: [{ name: "Accessibility", path: "/accessibility" }],
   },
 
   "/contact": {
@@ -2748,13 +2773,32 @@ export default function App() {
 
 
 
+            {/* POLICY PAGES */}
+
+            <Route
+              path="/privacy"
+              element={<PolicyPage policy="privacy" />}
+            />
+
+            <Route
+              path="/terms"
+              element={<PolicyPage policy="terms" />}
+            />
+
+            <Route
+              path="/accessibility"
+              element={<PolicyPage policy="accessibility" />}
+            />
+
+
+
             {/* NOT FOUND */}
 
 
 
             <Route
 
-              path="\*"
+              path="*"
 
               element={<NotFound />}
 

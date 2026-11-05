@@ -1,6 +1,8 @@
-
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import {
+  ArrowDown,
   ArrowRight,
   Lightbulb,
   TrendingUp,
@@ -8,7 +10,7 @@ import {
   Compass,
   CheckCircle2,
   ChevronRight,
-  Globe2,
+  X,
 } from 'lucide-react';
 import './FindYourLane.css';
 
@@ -16,7 +18,7 @@ const pathways = [
   {
     id: 'genesis',
     name: 'GENESIS',
-    tagline: 'BUILD IT', 
+    tagline: 'BUILD IT',
     audience: 'I HAVE AN IDEA',
     description:
       'You have been thinking about starting something, but are not sure how to turn your idea into a real business.',
@@ -27,6 +29,7 @@ const pathways = [
     pain: 'Uncertainty and lack of direction',
     Icon: Lightbulb,
     className: 'genesis',
+    to: '/genesis',
   },
   {
     id: 'ascend',
@@ -42,6 +45,7 @@ const pathways = [
     pain: 'Inconsistent demand and weak systems',
     Icon: TrendingUp,
     className: 'ascend',
+    to: '/ascend',
   },
   {
     id: 'horizon',
@@ -57,6 +61,7 @@ const pathways = [
     pain: 'Expansion barriers and limited connections',
     Icon: Rocket,
     className: 'horizon',
+    to: '/horizon',
   },
 ];
 
@@ -110,17 +115,25 @@ const questions = [
 
 const CONTACT_EMAIL = 'hello@continentalfounders.org';
 
+// "GENESIS" → "Genesis" for headings and buttons
+const titleCase = (name) =>
+  name.charAt(0) + name.slice(1).toLowerCase();
+
 function HeaderIntro() {
   return (
     <section className="fyl-hero">
+      <div className="fyl-hero-media" aria-hidden="true">
+        <img src="/assets/sd.webp" alt="" fetchPriority="high" />
+      </div>
+
       <div className="fyl-container fyl-hero-content">
-        <span className="fyl-eyebrow fyl-hero-eyebrow">
-          <Compass size={16} />
+        <span className="fyl-eyebrow fyl-eyebrow-light">
+          <Compass size={16} aria-hidden="true" />
           CONTINENTAL FOUNDERS
         </span>
 
         <h1>
-          FIND YOUR <span>LANE.</span>
+          Find your <em>lane.</em>
         </h1>
 
         <p className="fyl-hero-lead">
@@ -132,26 +145,33 @@ function HeaderIntro() {
           and we’ll help you explore the support that fits your next step.
         </p>
 
-        <a className="fyl-button fyl-button-gold" href="#choose-lane">
-          Find your starting point <ArrowRight size={18} />
-        </a>
+        <div className="fyl-hero-actions">
+          <a className="fyl-button fyl-button-gold" href="#choose-lane">
+            Find your starting point
+            <ArrowDown size={18} aria-hidden="true" />
+          </a>
 
-        <div className="fyl-hero-note">
-          One cohort. Two continents. Three pathways. A shared future.
+          <p className="fyl-hero-note">
+            One cohort. Two continents. Three pathways. A shared future.
+          </p>
         </div>
       </div>
     </section>
   );
 }
 
-function PathwayCard({ pathway, onExplore }) {
+function PathwayCard({ pathway, selected, onExplore }) {
   const Icon = pathway.Icon;
 
   return (
-    <article className={`fyl-pathway-card ${pathway.className}`}>
+    <article
+      className={`fyl-pathway-card ${pathway.className}${
+        selected ? ' is-selected' : ''
+      }`}
+    >
       <div className="fyl-card-top">
         <span className="fyl-card-icon">
-          <Icon size={26} strokeWidth={2.1} />
+          <Icon size={24} aria-hidden="true" />
         </span>
 
         <span className="fyl-card-step">{pathway.tagline}</span>
@@ -159,7 +179,7 @@ function PathwayCard({ pathway, onExplore }) {
 
       <p className="fyl-card-audience">{pathway.audience}</p>
 
-      <h3>{pathway.name}</h3>
+      <h3>{titleCase(pathway.name)}</h3>
 
       <p className="fyl-card-description">
         {pathway.description}
@@ -173,11 +193,12 @@ function PathwayCard({ pathway, onExplore }) {
       <button
         className="fyl-card-button"
         type="button"
+        aria-expanded={selected}
+        aria-controls="fyl-pathway-details"
         onClick={() => onExplore(pathway)}
       >
-        Explore {pathway.name.charAt(0) +
-          pathway.name.slice(1).toLowerCase()}
-        <ArrowRight size={17} />
+        Explore {titleCase(pathway.name)}
+        <ArrowRight size={17} aria-hidden="true" />
       </button>
     </article>
   );
@@ -186,9 +207,14 @@ function PathwayCard({ pathway, onExplore }) {
 function Assessment({ onClose, onRecommendation }) {
   const [answers, setAnswers] = useState({});
   const [step, setStep] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  const dialogRef = useRef(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
 
   const current = questions[step];
-  const complete = Object.keys(answers).length === questions.length;
+  const progress = ((step + 1) / questions.length) * 100;
 
   const recommendation = useMemo(() => {
     const totals = {
@@ -215,6 +241,30 @@ function Assessment({ onClose, onRecommendation }) {
     return winner;
   }, [answers]);
 
+  const recommended = pathways.find((item) => item.id === recommendation);
+
+  // Escape closes, the page behind stays still, and focus
+  // starts inside the dialog and returns afterwards.
+  useEffect(() => {
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+    dialogRef.current?.focus();
+
+    function handleKey(event) {
+      if (event.key === 'Escape') closeRef.current();
+    }
+
+    document.addEventListener('keydown', handleKey);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKey);
+      previousFocus?.focus?.();
+    };
+  }, []);
+
   function choose(value) {
     setAnswers((previous) => ({
       ...previous,
@@ -226,11 +276,19 @@ function Assessment({ onClose, onRecommendation }) {
     if (step < questions.length - 1) {
       setStep((previous) => previous + 1);
     } else {
-      setAnswers((previous) => ({ ...previous }));
+      setFinished(true);
     }
   }
 
-  return (
+  function startAgain() {
+    setAnswers({});
+    setStep(0);
+    setFinished(false);
+  }
+
+  // Rendered on <body> so the page transition's transform
+  // cannot trap the fixed overlay inside the page.
+  return createPortal(
     <div
       className="fyl-modal-backdrop"
       role="presentation"
@@ -239,10 +297,12 @@ function Assessment({ onClose, onRecommendation }) {
       }}
     >
       <section
+        ref={dialogRef}
         className="fyl-assessment"
         role="dialog"
         aria-modal="true"
         aria-labelledby="fyl-assessment-title"
+        tabIndex={-1}
       >
         <button
           className="fyl-modal-close"
@@ -250,33 +310,38 @@ function Assessment({ onClose, onRecommendation }) {
           onClick={onClose}
           aria-label="Close assessment"
         >
-          ×
+          <X size={20} aria-hidden="true" />
         </button>
 
-        {!complete ? (
+        {!finished ? (
           <>
             <span className="fyl-eyebrow">
-              <Compass size={15} /> FIND YOUR LANE
+              <Compass size={15} aria-hidden="true" /> FIND YOUR LANE
             </span>
 
             <div className="fyl-progress-meta">
               <span>Question {step + 1} of {questions.length}</span>
-              <span>
-                {Math.round(((step + 1) / questions.length) * 100)}%
-              </span>
+              <span>{Math.round(progress)}%</span>
             </div>
 
-            <div className="fyl-progress">
-              <span
-                style={{
-                  width: `${((step + 1) / questions.length) * 100}%`,
-                }}
-              />
+            <div
+              className="fyl-progress"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progress)}
+              aria-label="Assessment progress"
+            >
+              <span style={{ width: `${progress}%` }} />
             </div>
 
             <h2 id="fyl-assessment-title">{current.title}</h2>
 
-            <div className="fyl-answer-list">
+            <div
+              className="fyl-answer-list"
+              role="radiogroup"
+              aria-labelledby="fyl-assessment-title"
+            >
               {current.options.map((option) => (
                 <label
                   className={`fyl-answer ${
@@ -293,7 +358,7 @@ function Assessment({ onClose, onRecommendation }) {
                   />
 
                   <span>{option.label}</span>
-                  <span className="fyl-radio-dot" />
+                  <span className="fyl-radio-dot" aria-hidden="true" />
                 </label>
               ))}
             </div>
@@ -317,14 +382,14 @@ function Assessment({ onClose, onRecommendation }) {
                 {step === questions.length - 1
                   ? 'See recommendation'
                   : 'Next question'}
-                <ArrowRight size={17} />
+                <ArrowRight size={17} aria-hidden="true" />
               </button>
             </div>
           </>
         ) : (
           <div className="fyl-result">
             <span className="fyl-result-icon">
-              <CheckCircle2 size={34} />
+              <CheckCircle2 size={32} aria-hidden="true" />
             </span>
 
             <span className="fyl-eyebrow">
@@ -334,15 +399,13 @@ function Assessment({ onClose, onRecommendation }) {
             <h2 id="fyl-assessment-title">
               {recommendation === 'unsure'
                 ? 'Let’s explore your options together.'
-                : `Explore ${
-                    pathways.find((item) => item.id === recommendation)?.name
-                  }.`}
+                : `Explore ${titleCase(recommended.name)}.`}
             </h2>
 
             <p>
               {recommendation === 'unsure'
                 ? 'Your journey may touch more than one pathway. Tell our team about your goals and challenges so we can help you identify a suitable starting point.'
-                : pathways.find((item) => item.id === recommendation)?.support}
+                : recommended.support}
             </p>
 
             <p className="fyl-result-disclaimer">
@@ -350,36 +413,50 @@ function Assessment({ onClose, onRecommendation }) {
               Our team can help you explore the right next step.
             </p>
 
-            <a
-              className="fyl-button fyl-button-gold"
-              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                'Help me find my lane'
-              )}&body=${encodeURIComponent(
-                `I completed the Find Your Lane assessment. My provisional recommendation is ${recommendation}. Please contact me to discuss next steps.`
-              )}`}
-            >
-              Express your interest <ArrowRight size={17} />
-            </a>
+            <div className="fyl-result-actions">
+              <a
+                className="fyl-button fyl-button-gold"
+                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                  'Help me find my lane'
+                )}&body=${encodeURIComponent(
+                  `I completed the Find Your Lane assessment. My provisional recommendation is ${recommendation}. Please contact me to discuss next steps.`
+                )}`}
+              >
+                Express your interest
+                <ArrowRight size={17} aria-hidden="true" />
+              </a>
 
-            <button
-              className="fyl-text-button"
-              type="button"
-              onClick={() => onRecommendation(recommendation)}
-            >
-              View pathway details
-            </button>
+              <button
+                className="fyl-button fyl-button-outline"
+                type="button"
+                onClick={() => onRecommendation(recommendation)}
+              >
+                View pathway details
+              </button>
+            </div>
 
-            <button
-              className="fyl-text-button"
-              type="button"
-              onClick={onClose}
-            >
-              Close assessment
-            </button>
+            <div className="fyl-result-links">
+              <button
+                className="fyl-text-button"
+                type="button"
+                onClick={startAgain}
+              >
+                Start again
+              </button>
+
+              <button
+                className="fyl-text-button"
+                type="button"
+                onClick={onClose}
+              >
+                Close assessment
+              </button>
+            </div>
           </div>
         )}
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -412,17 +489,19 @@ export default function FindYourLane() {
     if (pathway) explorePathway(pathway);
   }
 
+  const closeAssessment = () => setAssessmentOpen(false);
+
   return (
     <main className="find-your-lane-page">
       <HeaderIntro />
 
-      <section className="fyl-section" id="choose-lane">
+      <section className="fyl-section fyl-section-soft" id="choose-lane">
         <div className="fyl-container">
           <div className="fyl-section-heading">
             <span className="fyl-eyebrow">START WHERE YOU ARE</span>
 
             <h2>
-              Which founder sounds <span>like you?</span>
+              Which founder sounds <em>like you?</em>
             </h2>
 
             <p>
@@ -436,18 +515,88 @@ export default function FindYourLane() {
               <PathwayCard
                 key={pathway.id}
                 pathway={pathway}
+                selected={selectedPathway?.id === pathway.id}
                 onExplore={explorePathway}
               />
             ))}
           </div>
 
+          {selectedPathway && (
+            <div
+              className={`fyl-detail ${selectedPathway.className}`}
+              id="fyl-pathway-details"
+            >
+              <div className="fyl-detail-mark">
+                <selectedPathway.Icon size={28} aria-hidden="true" />
+              </div>
+
+              <div className="fyl-detail-copy">
+                <span className="fyl-eyebrow">
+                  {selectedPathway.name} · {selectedPathway.tagline}
+                </span>
+
+                <h2>{selectedPathway.transformation}</h2>
+                <p>{selectedPathway.support}</p>
+
+                <p>
+                  <strong>Common challenge:</strong> {selectedPathway.pain}.
+                </p>
+
+                <p className="fyl-small-note">
+                  Exploring this pathway is not final placement. Our team
+                  will consider your readiness, goals, and support needs.
+                </p>
+
+                <div className="fyl-detail-actions">
+                  <a
+                    className="fyl-button fyl-button-gold"
+                    href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                      `Explore ${selectedPathway.name}`
+                    )}&body=${encodeURIComponent(
+                      `I would like to express interest in the ${selectedPathway.name} pathway. Please contact me about next steps.`
+                    )}`}
+                  >
+                    Express your interest
+                    <ArrowRight size={17} aria-hidden="true" />
+                  </a>
+
+                  <Link
+                    className="fyl-button fyl-button-outline"
+                    to={selectedPathway.to}
+                  >
+                    See the full {titleCase(selectedPathway.name)} pathway
+                  </Link>
+
+                  <button
+                    className="fyl-text-button"
+                    type="button"
+                    onClick={() => setAssessmentOpen(true)}
+                  >
+                    Take the assessment
+                  </button>
+                </div>
+              </div>
+
+              <button
+                className="fyl-detail-close"
+                type="button"
+                onClick={() => setSelectedPathway(null)}
+                aria-label="Close pathway details"
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
           <div className="fyl-unsure-card" id="fyl-help">
             <div className="fyl-unsure-icon">
-              <Compass size={28} />
+              <Compass size={26} aria-hidden="true" />
             </div>
 
-            <div>
-              <span className="fyl-eyebrow">NEED A LITTLE GUIDANCE?</span>
+            <div className="fyl-unsure-copy">
+              <span className="fyl-eyebrow fyl-eyebrow-light">
+                NEED A LITTLE GUIDANCE?
+              </span>
               <h3>Not sure where you fit?</h3>
 
               <p>
@@ -457,75 +606,18 @@ export default function FindYourLane() {
             </div>
 
             <button
-              className="fyl-button fyl-button-navy"
+              className="fyl-button fyl-button-gold"
               type="button"
               onClick={() => setAssessmentOpen(true)}
             >
-              Help me find my lane <ArrowRight size={17} />
+              Help me find my lane
+              <ArrowRight size={17} aria-hidden="true" />
             </button>
           </div>
         </div>
       </section>
 
-      {selectedPathway && (
-        <section className="fyl-detail-section" id="fyl-pathway-details">
-          <div className="fyl-container fyl-detail-inner">
-            <div className={`fyl-detail-mark ${selectedPathway.className}`}>
-              <selectedPathway.Icon size={30} />
-            </div>
-
-            <div className="fyl-detail-copy">
-              <span className="fyl-eyebrow">
-                {selectedPathway.name} · {selectedPathway.tagline}
-              </span>
-
-              <h2>{selectedPathway.transformation}</h2>
-              <p>{selectedPathway.support}</p>
-
-              <p>
-                <strong>Common challenge:</strong> {selectedPathway.pain}.
-              </p>
-
-              <p className="fyl-small-note">
-                Exploring this pathway is not final placement. Our team
-                will consider your readiness, goals, and support needs.
-              </p>
-
-              <div className="fyl-detail-actions">
-                <a
-                  className="fyl-button fyl-button-gold"
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                    `Explore ${selectedPathway.name}`
-                  )}&body=${encodeURIComponent(
-                    `I would like to express interest in the ${selectedPathway.name} pathway. Please contact me about next steps.`
-                  )}`}
-                >
-                  Express your interest <ArrowRight size={17} />
-                </a>
-
-                <button
-                  className="fyl-text-button"
-                  type="button"
-                  onClick={() => setAssessmentOpen(true)}
-                >
-                  Take the assessment
-                </button>
-              </div>
-            </div>
-
-            <button
-              className="fyl-detail-close"
-              type="button"
-              onClick={() => setSelectedPathway(null)}
-              aria-label="Close pathway details"
-            >
-              ×
-            </button>
-          </div>
-        </section>
-      )}
-
-      <section className="fyl-section fyl-transformation-section">
+      <section className="fyl-section">
         <div className="fyl-container">
           <div className="fyl-section-heading">
             <span className="fyl-eyebrow">
@@ -533,7 +625,7 @@ export default function FindYourLane() {
             </span>
 
             <h2>
-              Move from where you are to <span>what’s next.</span>
+              Move from where you are to <em>what’s next.</em>
             </h2>
           </div>
 
@@ -543,31 +635,36 @@ export default function FindYourLane() {
 
               return (
                 <article
-                  className="fyl-transformation-card"
+                  className={`fyl-transformation-card ${pathway.className}`}
                   key={pathway.id}
                 >
-                  <div className={`fyl-mini-icon ${pathway.className}`}>
-                    <Icon size={22} />
+                  <div className="fyl-transform-top">
+                    <span className="fyl-mini-icon">
+                      <Icon size={20} aria-hidden="true" />
+                    </span>
+
+                    <span className="fyl-transform-number" aria-hidden="true">
+                      0{index + 1}
+                    </span>
                   </div>
 
-                  <span className="fyl-transform-number">
-                    0{index + 1}
+                  <h3>{titleCase(pathway.name)}</h3>
+
+                  <div className="fyl-transform-row">
+                    <p className="fyl-pain-label">THE CHALLENGE</p>
+                    <p>{pathway.pain}</p>
+                  </div>
+
+                  <span className="fyl-transform-arrow" aria-hidden="true">
+                    <ChevronRight size={18} />
                   </span>
 
-                  <h3>{pathway.name}</h3>
-
-                  <p className="fyl-pain-label">THE CHALLENGE</p>
-                  <p>{pathway.pain}</p>
-
-                  <ChevronRight
-                    className="fyl-transform-arrow"
-                    size={22}
-                  />
-
-                  <p className="fyl-pain-label">
-                    THE INTENDED OUTCOME
-                  </p>
-                  <p>{pathway.transformation}</p>
+                  <div className="fyl-transform-row fyl-transform-row-outcome">
+                    <p className="fyl-pain-label">
+                      THE INTENDED OUTCOME
+                    </p>
+                    <p>{pathway.transformation}</p>
+                  </div>
                 </article>
               );
             })}
@@ -580,51 +677,38 @@ export default function FindYourLane() {
         </div>
       </section>
 
-      <section className="fyl-bottom-cta">
-        <div className="fyl-container fyl-bottom-cta-inner">
-          <div>
-            <span className="fyl-eyebrow">
-              YOUR NEXT CHAPTER STARTS HERE
-            </span>
+      <section className="fyl-section fyl-bottom-section">
+        <div className="fyl-container">
+          <div className="fyl-bottom-cta">
+            <div>
+              <span className="fyl-eyebrow fyl-eyebrow-light">
+                YOUR NEXT CHAPTER STARTS HERE
+              </span>
 
-            <h2>Every founder starts somewhere.</h2>
+              <h2>Every founder starts somewhere.</h2>
 
-            <p>
-              Discover the support that fits your next step—with guidance
-              from a community that believes in your future.
-            </p>
+              <p>
+                Discover the support that fits your next step—with guidance
+                from a community that believes in your future.
+              </p>
+            </div>
+
+            <button
+              className="fyl-button fyl-button-gold"
+              type="button"
+              onClick={() => setAssessmentOpen(true)}
+            >
+              Find my lane
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
           </div>
-
-          <button
-            className="fyl-button fyl-button-gold"
-            type="button"
-            onClick={() => setAssessmentOpen(true)}
-          >
-            Find my lane <ArrowRight size={18} />
-          </button>
         </div>
       </section>
 
-      <footer className="fyl-footer">
-        <div className="fyl-container fyl-footer-inner">
-          <div className="fyl-footer-brand">
-            <Globe2 size={25} />
-            <span>
-              CONTINENTAL <strong>FOUNDERS</strong>
-            </span>
-          </div>
-
-          <p>Connecting talent. Building across continents.</p>
-
-          <a href={`mailto:${CONTACT_EMAIL}`}>
-            Get in touch <ArrowRight size={15} />
-          </a>
-        </div>
-      </footer>
 
       {assessmentOpen && (
         <Assessment
-          onClose={() => setAssessmentOpen(false)}
+          onClose={closeAssessment}
           onRecommendation={viewRecommendation}
         />
       )}

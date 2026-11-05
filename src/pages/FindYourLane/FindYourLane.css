@@ -1,167 +1,191 @@
+/* ============================================================
+   FIND YOUR LANE
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+   Same design system as the rest of the site: navy and gold
+   with blue accents, real photos, rounded cards and pill
+   buttons. Rules are scoped to .find-your-lane-page, and the
+   assessment (rendered on <body>) to .fyl-modal-backdrop.
+   Sizes are in px because the site sets html { font-size: 20px }.
+============================================================ */
 
-.find-your-lane-page {
-  --fyl-navy: #092d5d;
-  --fyl-deep: #061e40;
-  --fyl-gold: #c9870b;
-  --fyl-gold-light: #f4b536;
-  --fyl-ink: #142746;
-  --fyl-muted: #627087;
-  --fyl-paper: #fbfaf7;
+.find-your-lane-page,
+.fyl-modal-backdrop {
+  --fyl-navy: #031b34;
+  --fyl-navy-2: #072641;
+  --fyl-ink: #0b1f33;
+  --fyl-body: #3a4f63;
+  --fyl-muted: #5f7184;
+  --fyl-gold: #c99220;
+  --fyl-gold-dark: #a97a16;
+  --fyl-gold-light: #e3bd69;
+  --fyl-blue: #2563c9;
+  --fyl-soft: #f6f4ef;
+  --fyl-line: #e3e7eb;
+  --fyl-radius: 18px;
+  --fyl-radius-lg: 28px;
+  --fyl-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 16px 40px rgba(3, 27, 52, 0.08);
+  --fyl-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --fyl-heading: "Trajan Pro", "Trajan Pro 3", Georgia, "Times New Roman", serif;
+  --fyl-font: "Montserrat", Arial, sans-serif;
 
-  color: var(--fyl-ink);
-  background: var(--fyl-paper);
-  font-family: 'DM Sans', sans-serif;
-  overflow: hidden;
+  color: var(--fyl-body);
+  font-family: var(--fyl-font);
+  font-size: 16px;
+  line-height: 1.65;
 }
 
-.find-your-lane-page * {
+.find-your-lane-page {
+  width: 100%;
+  overflow-x: clip;
+  background: #fff;
+}
+
+:where(.find-your-lane-page, .fyl-modal-backdrop) *,
+:where(.find-your-lane-page, .fyl-modal-backdrop) *::before,
+:where(.find-your-lane-page, .fyl-modal-backdrop) *::after {
   box-sizing: border-box;
 }
 
-.find-your-lane-page h1,
-.find-your-lane-page h2,
-.find-your-lane-page h3 {
-  font-family: 'Manrope', sans-serif;
+/* :where() keeps resets at zero priority so component rules win */
+:where(.find-your-lane-page, .fyl-modal-backdrop) :where(h1, h2, h3, p) {
+  margin: 0;
+  padding: 0;
 }
 
+:where(.find-your-lane-page, .fyl-modal-backdrop) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The global p size would otherwise win over these rules */
+.find-your-lane-page p,
+.fyl-modal-backdrop p {
+  font-size: inherit;
+}
+
+.find-your-lane-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.find-your-lane-page svg,
+.fyl-modal-backdrop svg {
+  flex-shrink: 0;
+}
+
+.find-your-lane-page :where(h1, h2, h3),
+.fyl-modal-backdrop :where(h2) {
+  text-wrap: balance;
+  font-variant-numeric: lining-nums;
+}
+
+.find-your-lane-page :where(a, button):focus-visible,
+.fyl-modal-backdrop :where(a, button, label):focus-visible {
+  outline: 3px solid var(--fyl-gold);
+  outline-offset: 3px;
+}
+
+/* Same edges as the navbar */
 .fyl-container {
-  width: min(1160px, calc(100% - 48px));
+  width: min(1440px, calc(100% - 64px));
   margin-inline: auto;
 }
 
-/* HERO */
 
-.fyl-hero {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  color: #fff;
-  background: linear-gradient(
-    115deg,
-    #071d3c 0%,
-    #0a3569 58%,
-    #0b4776 100%
-  );
-  padding: 88px 0 46px;
+/* ============================================================
+   SHARED: sections, eyebrow, headings, buttons
+============================================================ */
+
+.fyl-section {
+  padding-block: clamp(64px, 8vw, 120px);
 }
 
-.fyl-hero::before,
-.fyl-hero::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.fyl-hero::before {
-  width: 540px;
-  height: 540px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  right: -95px;
-  top: -190px;
-  box-shadow:
-    0 0 0 48px rgba(255, 255, 255, 0.025),
-    0 0 0 100px rgba(255, 255, 255, 0.02);
-}
-
-.fyl-hero::after {
-  width: 340px;
-  height: 340px;
-  right: 5%;
-  bottom: -260px;
-  background: rgba(201, 135, 11, 0.16);
-  filter: blur(3px);
-}
-
-.fyl-hero h1 {
-  color: #ffffff !important;
-}
-
-.fyl-hero h1 span {
-  color: #f6b834 !important;
-}
-
-.fyl-hero-content {
-  position: relative;
+.fyl-section-soft {
+  background: var(--fyl-soft);
 }
 
 .fyl-eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--fyl-gold);
-  font-size: 11px;
+  margin-bottom: 16px;
+  color: var(--fyl-gold-dark);
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.16em;
-  font-weight: 800;
+  text-transform: uppercase;
 }
 
-.fyl-hero .fyl-hero-eyebrow {
-  color: #f8c45e;
+.fyl-eyebrow-light {
+  color: var(--fyl-gold-light);
 }
 
-.fyl-hero h1 {
-  max-width: 800px;
-  margin: 20px 0 12px;
-  font-size: clamp(44px, 7vw, 82px);
-  line-height: 0.99;
-  letter-spacing: -0.055em;
-  font-weight: 800;
+.find-your-lane-page h2,
+.fyl-modal-backdrop h2 {
+  color: var(--fyl-ink);
+  font-family: var(--fyl-heading);
+  font-size: clamp(30px, 1.8vw + 18px, 48px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
 }
 
-.fyl-hero h1 span {
-  color: #f6b834;
+.find-your-lane-page h2 em {
+  color: var(--fyl-gold-dark);
+  font-style: italic;
 }
 
-.fyl-hero-lead {
-  margin: 20px 0 10px;
-  font: 700 clamp(19px, 2.4vw, 27px) / 1.35 'Manrope',
-    sans-serif;
+.fyl-section-heading {
+  max-width: 760px;
+  margin: 0 auto clamp(36px, 4vw, 56px);
+  text-align: center;
 }
 
-.fyl-hero-copy {
-  max-width: 620px;
-  color: #e0e8f3;
-  font-size: 16px;
-  line-height: 1.8;
-  margin: 0 0 28px;
+.fyl-section-heading > p {
+  margin-top: 18px;
+  font-size: 17px;
+  line-height: 1.75;
 }
 
 .fyl-button {
+  min-height: 54px;
+  max-width: 100%;
   display: inline-flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  min-height: 48px;
-  padding: 13px 20px;
-  border: 0;
-  border-radius: 8px;
-  text-decoration: none;
-  font: 700 13px 'DM Sans', sans-serif;
+  padding: 0 28px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
   cursor: pointer;
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    transform 0.25s var(--fyl-ease),
+    background 0.2s ease,
+    border-color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-.fyl-button:hover {
+.fyl-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(4, 20, 43, 0.16);
 }
 
-.fyl-button:focus-visible,
-.fyl-text-button:focus-visible,
-.fyl-card-button:focus-visible {
-  outline: 3px solid #eab54a;
-  outline-offset: 3px;
+.fyl-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .fyl-button-gold {
-  color: #fff;
-  background: linear-gradient(135deg, #d99b1c, #b97800);
+  color: var(--fyl-navy);
+  background: var(--fyl-gold);
+  box-shadow: 0 10px 24px rgba(201, 146, 32, 0.28);
+}
+
+.fyl-button-gold:hover:not(:disabled) {
+  background: var(--fyl-gold-light);
 }
 
 .fyl-button-navy {
@@ -169,552 +193,727 @@
   background: var(--fyl-navy);
 }
 
-.fyl-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.fyl-button-navy:hover:not(:disabled) {
+  background: var(--fyl-blue);
 }
 
-.fyl-hero-note {
+.fyl-button-outline {
+  color: var(--fyl-navy);
+  background: #fff;
+  border-color: var(--fyl-line);
+}
+
+.fyl-button-outline:hover {
+  border-color: var(--fyl-gold);
+}
+
+.fyl-text-button {
+  padding: 8px 4px;
+  color: var(--fyl-navy);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 146, 32, 0.6);
+  text-underline-offset: 4px;
+}
+
+.fyl-text-button:hover:not(:disabled) {
+  color: var(--fyl-blue);
+}
+
+.fyl-text-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+  text-decoration: none;
+}
+
+
+/* ============================================================
+   HERO
+============================================================ */
+
+.fyl-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: min(640px, calc(100svh - 90px));
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 54px;
-  color: #d9e3f0;
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  padding-block: clamp(72px, 9vw, 120px);
+  color: #fff;
+  background: var(--fyl-navy);
 }
 
-/* SECTION HEADINGS */
-
-.fyl-section {
-  padding: 82px 0;
+.fyl-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
 }
 
-.fyl-section-heading {
-  max-width: 690px;
-  margin: 0 auto 36px;
-  text-align: center;
+.fyl-hero-media img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center 42%;
+  animation: fyl-zoom 14s ease-out both;
 }
 
-.fyl-section-heading h2 {
-  margin: 12px 0;
-  font-size: clamp(28px, 4vw, 43px);
-  line-height: 1.16;
-  letter-spacing: -0.04em;
-  color: var(--fyl-deep);
+@keyframes fyl-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
-.fyl-section-heading h2 span {
-  color: var(--fyl-gold);
+.fyl-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.95) 0%,
+      rgba(0, 18, 45, 0.82) 45%,
+      rgba(0, 18, 45, 0.3) 100%
+    ),
+    linear-gradient(to top, rgba(0, 18, 45, 0.6), transparent 50%);
 }
 
-.fyl-section-heading > p {
-  margin: 0;
-  color: var(--fyl-muted);
-  font-size: 15px;
+.fyl-hero-content {
+  min-width: 0;
+}
+
+.fyl-hero h1 {
+  color: #fff;
+  font-family: var(--fyl-heading);
+  font-size: clamp(42px, 4.4vw + 14px, 92px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.fyl-hero h1 em {
+  color: var(--fyl-gold-light);
+  font-style: italic;
+}
+
+.fyl-hero-lead {
+  max-width: 640px;
+  margin-top: 24px;
+  color: #fff;
+  font-family: var(--fyl-heading);
+  font-size: clamp(20px, 0.8vw + 15px, 28px);
+  line-height: 1.3;
+}
+
+.fyl-hero-copy {
+  max-width: 580px;
+  margin-top: 16px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: clamp(16px, 0.3vw + 14px, 18px);
   line-height: 1.7;
 }
 
-/* PATHWAY CARDS */
+.fyl-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 32px;
+  margin-top: 36px;
+}
+
+.fyl-hero-note {
+  padding-left: 20px;
+  color: rgba(255, 255, 255, 0.82);
+  border-left: 2px solid var(--fyl-gold);
+  font-family: var(--fyl-heading);
+  font-size: 16px;
+  font-style: italic;
+}
+
+
+/* ============================================================
+   PATHWAY CARDS
+============================================================ */
 
 .fyl-pathway-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  align-items: stretch;
+  gap: 24px;
+}
+
+.fyl-pathway-card,
+.fyl-transformation-card,
+.fyl-detail {
+  --tone: var(--fyl-gold);
+  --tone-text: var(--fyl-gold-dark);
+  --tone-soft: rgba(201, 146, 32, 0.12);
+}
+
+.find-your-lane-page .ascend {
+  --tone: var(--fyl-blue);
+  --tone-text: var(--fyl-blue);
+  --tone-soft: rgba(37, 99, 201, 0.1);
+}
+
+.find-your-lane-page .horizon {
+  --tone: var(--fyl-navy);
+  --tone-text: var(--fyl-navy);
+  --tone-soft: rgba(3, 27, 52, 0.08);
 }
 
 .fyl-pathway-card {
-  --pathway-color: #c98a0b;
-
   position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 25px;
-  border: 1px solid #e8e7e2;
-  border-radius: 16px;
+  padding: 32px;
+  overflow: hidden;
   background: #fff;
-  box-shadow: 0 10px 28px rgba(12, 37, 69, 0.065);
+  border: 1px solid var(--fyl-line);
+  border-radius: var(--fyl-radius-lg);
+  box-shadow: var(--fyl-shadow);
   transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.3s var(--fyl-ease),
+    box-shadow 0.3s ease,
+    border-color 0.2s ease;
+}
+
+.fyl-pathway-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--tone);
 }
 
 .fyl-pathway-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 18px 38px rgba(12, 37, 69, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 1px 2px rgba(3, 27, 52, 0.04), 0 24px 48px rgba(3, 27, 52, 0.12);
 }
 
-.fyl-pathway-card.genesis {
-  --pathway-color: #c9890b;
-}
-
-.fyl-pathway-card.ascend {
-  --pathway-color: #1263b7;
-}
-
-.fyl-pathway-card.horizon {
-  --pathway-color: #031b34;
+.fyl-pathway-card.is-selected {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 1px var(--tone), 0 24px 48px rgba(3, 27, 52, 0.12);
 }
 
 .fyl-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 16px;
 }
 
 .fyl-card-icon {
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 13px;
-  color: var(--pathway-color);
-  background: color-mix(
-    in srgb,
-    var(--pathway-color) 11%,
-    white
-  );
+  color: var(--tone-text);
+  background: var(--tone-soft);
+  border-radius: 14px;
 }
 
 .fyl-card-step {
-  padding: 7px 10px;
-  border-radius: 20px;
-  color: var(--pathway-color);
-  background: color-mix(
-    in srgb,
-    var(--pathway-color) 10%,
-    white
-  );
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  font-weight: 800;
+  padding: 6px 12px;
+  color: var(--tone-text);
+  background: var(--tone-soft);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 
 .fyl-card-audience {
-  margin: 25px 0 8px;
-  color: var(--pathway-color);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.13em;
+  margin-top: 28px;
+  color: var(--fyl-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
 }
 
 .fyl-pathway-card h3 {
-  margin: 0 0 12px;
-  color: var(--fyl-deep);
-  font-size: 27px;
-  letter-spacing: -0.04em;
+  margin-top: 8px;
+  color: var(--fyl-ink);
+  font-family: var(--fyl-heading);
+  font-size: clamp(30px, 1vw + 20px, 38px);
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .fyl-card-description {
-  min-height: 88px;
-  margin: 0;
-  color: #5d687a;
-  font-size: 13px;
-  line-height: 1.75;
+  margin-top: 14px;
+  font-size: 15.5px;
+  line-height: 1.7;
 }
 
 .fyl-card-outcome {
-  margin: 22px 0 23px;
-  padding: 15px;
-  border-left: 3px solid var(--pathway-color);
-  background: #f8f8f6;
+  margin-top: 22px;
+  padding: 16px 18px;
+  background: var(--fyl-soft);
+  border-left: 3px solid var(--tone);
+  border-radius: 0 14px 14px 0;
 }
 
-.fyl-outcome-label {
-  color: #7a8491;
-  font-size: 9px;
+.fyl-outcome-label,
+.fyl-pain-label {
+  display: block;
+  color: var(--fyl-muted);
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.14em;
-  font-weight: 800;
 }
 
 .fyl-card-outcome p {
-  margin: 7px 0 0;
+  margin-top: 4px;
   color: var(--fyl-ink);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.6;
+  font-weight: 600;
+  line-height: 1.55;
 }
 
 .fyl-card-button {
-  display: flex;
+  align-self: flex-start;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
-  width: 100%;
   margin-top: auto;
-  padding: 13px 15px;
-  color: #fff;
-  background: var(--pathway-color);
+  padding: 24px 0 0;
+  color: var(--fyl-navy);
+  background: none;
   border: 0;
-  border-radius: 7px;
-  font: 700 12px 'DM Sans', sans-serif;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
 }
 
+.fyl-card-button svg {
+  color: var(--fyl-gold-dark);
+  transition: transform 0.25s var(--fyl-ease);
+}
+
 .fyl-card-button:hover {
-  filter: brightness(0.94);
+  color: var(--fyl-blue);
 }
 
-/* NOT SURE CARD */
-
-.fyl-unsure-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 22px;
-  margin-top: 24px;
-  padding: 25px 28px;
-  border: 1px solid #e5e6e8;
-  border-radius: 14px;
-  background: #fff;
+.fyl-card-button:hover svg {
+  transform: translateX(4px);
 }
 
-.fyl-unsure-icon {
-  display: grid;
-  place-items: center;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  color: var(--fyl-navy);
-  background: #edf2f8;
-}
 
-.fyl-unsure-card h3 {
-  margin: 6px 0;
-  color: var(--fyl-deep);
-  font-size: 20px;
-}
+/* ============================================================
+   PATHWAY DETAILS (opens under the cards)
+============================================================ */
 
-.fyl-unsure-card p {
-  margin: 0;
-  max-width: 580px;
-  color: var(--fyl-muted);
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-/* PATHWAY DETAIL */
-
-.fyl-detail-section {
-  padding: 0 0 65px;
-}
-
-.fyl-detail-inner {
+.fyl-detail {
   position: relative;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 24px;
-  padding: 30px;
-  border: 1px solid #e4e7ec;
-  border-radius: 16px;
+  margin-top: 24px;
+  padding: clamp(28px, 4vw, 48px);
+  padding-right: clamp(56px, 6vw, 80px);
   background: #fff;
-  box-shadow: 0 12px 30px rgba(12, 37, 69, 0.07);
+  border: 1px solid var(--fyl-line);
+  border-top: 4px solid var(--tone);
+  border-radius: var(--fyl-radius-lg);
+  box-shadow: var(--fyl-shadow);
+  animation: fyl-rise 0.45s var(--fyl-ease) both;
+}
+
+@keyframes fyl-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .fyl-detail-mark {
-  display: grid;
-  place-items: center;
   width: 60px;
   height: 60px;
-  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  color: var(--tone-text);
+  background: var(--tone-soft);
+  border-radius: 16px;
 }
 
-.fyl-detail-mark.genesis,
-.fyl-mini-icon.genesis {
-  color: #b67b07;
-  background: #fff3d7;
+.fyl-detail-copy {
+  min-width: 0;
 }
 
-.fyl-detail-mark.ascend,
-.fyl-mini-icon.ascend {
-  color: #1263b7;
-  background: #e4f0ff;
+.fyl-detail h2 {
+  font-size: clamp(26px, 1vw + 18px, 34px);
+  line-height: 1.2;
 }
 
-.fyl-detail-mark.horizon,
-.fyl-mini-icon.horizon {
-  color: #031b34;
-  background: #e6ebf2;
-}
-
-.fyl-detail-copy h2 {
-  margin: 10px 30px 10px 0;
-  color: var(--fyl-deep);
-  font-size: clamp(22px, 3vw, 32px);
-}
-
-.fyl-detail-copy p {
-  color: #5b6678;
-  font-size: 13px;
+.fyl-detail-copy > p {
+  max-width: 720px;
+  margin-top: 14px;
   line-height: 1.7;
 }
 
-.fyl-detail-copy p strong {
+.fyl-detail-copy strong {
   color: var(--fyl-ink);
 }
 
-.fyl-small-note {
-  font-size: 11px !important;
+.fyl-detail-copy .fyl-small-note {
+  color: var(--fyl-muted);
+  font-size: 14.5px;
+  font-style: italic;
 }
 
 .fyl-detail-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  margin-top: 18px;
+  gap: 12px 16px;
+  margin-top: 28px;
 }
 
-.fyl-detail-close,
-.fyl-modal-close {
+.fyl-detail-close {
   position: absolute;
-  top: 14px;
-  right: 16px;
-  width: 34px;
-  height: 34px;
+  top: 18px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--fyl-navy);
+  background: var(--fyl-soft);
   border: 0;
   border-radius: 50%;
-  color: #596579;
-  background: #f0f2f5;
-  font-size: 24px;
-  line-height: 1;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-/* PROBLEM TO TRANSFORMATION */
-
-.fyl-transformation-section {
-  background: #f1f4f7;
+.fyl-detail-close:hover {
+  background: var(--fyl-line);
 }
+
+
+/* ============================================================
+   GUIDANCE CARD
+============================================================ */
+
+.fyl-unsure-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px clamp(24px, 3vw, 40px);
+  margin-top: 24px;
+  padding: clamp(28px, 3.5vw, 44px);
+  color: rgba(255, 255, 255, 0.8);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(37, 99, 201, 0.35), transparent 55%),
+    linear-gradient(160deg, var(--fyl-navy) 0%, var(--fyl-navy-2) 100%);
+  border-radius: var(--fyl-radius-lg);
+  box-shadow: 0 24px 60px rgba(3, 27, 52, 0.2);
+}
+
+.fyl-unsure-icon {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  color: var(--fyl-gold-light);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+}
+
+.fyl-unsure-copy {
+  min-width: 0;
+}
+
+.fyl-unsure-copy .fyl-eyebrow {
+  margin-bottom: 8px;
+}
+
+.fyl-unsure-card h3 {
+  color: #fff;
+  font-family: var(--fyl-heading);
+  font-size: clamp(24px, 0.8vw + 18px, 30px);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.fyl-unsure-card p {
+  max-width: 620px;
+  margin-top: 8px;
+  line-height: 1.7;
+}
+
+
+/* ============================================================
+   FROM CHALLENGE TO POSSIBILITY
+============================================================ */
 
 .fyl-transformation-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 24px;
 }
 
 .fyl-transformation-card {
-  position: relative;
-  padding: 24px;
-  border: 1px solid #e2e7ed;
-  border-radius: 13px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
   background: #fff;
+  border: 1px solid var(--fyl-line);
+  border-radius: var(--fyl-radius-lg);
+}
+
+.fyl-transform-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .fyl-mini-icon {
-  display: grid;
-  place-items: center;
   width: 44px;
   height: 44px;
-  margin-bottom: 15px;
-  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  color: var(--tone-text);
+  background: var(--tone-soft);
+  border-radius: 12px;
 }
 
 .fyl-transform-number {
-  position: absolute;
-  top: 25px;
-  right: 23px;
-  color: #c9d0d9;
-  font: 800 24px 'Manrope', sans-serif;
+  color: var(--fyl-muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .fyl-transformation-card h3 {
-  margin: 0 0 18px;
-  color: var(--fyl-deep);
-  font-size: 18px;
+  margin-top: 20px;
+  color: var(--fyl-ink);
+  font-family: var(--fyl-heading);
+  font-size: 26px;
+  font-weight: 400;
 }
 
-.fyl-pain-label {
-  margin: 13px 0 4px !important;
-  color: #8b95a3 !important;
-  font-size: 9px !important;
-  letter-spacing: 0.13em;
-  font-weight: 800;
+.fyl-transform-row {
+  margin-top: 18px;
+  padding: 16px 18px;
+  background: var(--fyl-soft);
+  border-radius: 14px;
 }
 
-.fyl-transformation-card p {
-  margin: 0;
-  color: #5d6879;
-  font-size: 12px;
-  line-height: 1.65;
+.fyl-transform-row p:not(.fyl-pain-label) {
+  margin-top: 4px;
+  color: var(--fyl-ink);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.fyl-transform-row-outcome {
+  margin-top: 0;
+  background: var(--tone-soft);
 }
 
 .fyl-transform-arrow {
-  display: block;
-  margin: 10px 0;
-  color: var(--fyl-gold);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  margin: -6px auto;
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  background: var(--tone);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  transform: rotate(90deg);
 }
 
 .fyl-disclaimer {
-  margin: 22px 0 0;
+  margin-top: 28px;
+  color: var(--fyl-muted);
+  font-size: 14.5px;
+  font-style: italic;
   text-align: center;
-  color: #7d8795;
-  font-size: 11px;
-  line-height: 1.6;
 }
 
-/* BOTTOM CTA */
+
+/* ============================================================
+   BOTTOM CTA
+============================================================ */
+
+.fyl-bottom-section {
+  padding-top: 0;
+}
 
 .fyl-bottom-cta {
-  padding: 60px 0;
-  color: #fff;
-  background: linear-gradient(115deg, #08244a, #0b3e70);
-}
-
-.fyl-bottom-cta-inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 30px;
+  gap: 28px clamp(32px, 5vw, 80px);
+  padding: clamp(32px, 5vw, 72px);
+  color: rgba(255, 255, 255, 0.82);
+  background:
+    radial-gradient(circle at 0% 100%, rgba(201, 146, 32, 0.2), transparent 50%),
+    linear-gradient(160deg, var(--fyl-navy) 0%, var(--fyl-navy-2) 100%);
+  border-radius: var(--fyl-radius-lg);
+  box-shadow: 0 24px 60px rgba(3, 27, 52, 0.2);
 }
 
-.fyl-bottom-cta .fyl-eyebrow {
-  color: #f4bd4b;
+.fyl-bottom-cta > div {
+  min-width: 0;
 }
 
-.fyl-bottom-cta h2 {
-  margin: 12px 0 8px;
-  font-size: clamp(25px, 3.5vw, 38px);
-  letter-spacing: -0.035em;
+.find-your-lane-page .fyl-bottom-cta h2 {
+  color: #fff;
 }
 
 .fyl-bottom-cta p {
-  max-width: 630px;
-  margin: 0;
-  color: #d5e0ed;
-  font-size: 13px;
-  line-height: 1.8;
+  max-width: 620px;
+  margin-top: 16px;
+  font-size: 17px;
+  line-height: 1.75;
 }
 
-.fyl-bottom-cta .fyl-button {
-  flex-shrink: 0;
-}
 
-/* FOOTER */
-
-.fyl-footer {
-  padding: 25px 0;
-  background: #06182f;
-  color: #c4cfdd;
-}
-
-.fyl-footer-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.fyl-footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: #f4bd4b;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-
-.fyl-footer-brand strong {
-  color: #fff;
-}
-
-.fyl-footer p {
-  margin: 0;
-  font-size: 11px;
-}
-
-.fyl-footer a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: #f4bd4b;
-  font-size: 12px;
-  text-decoration: none;
-}
-
-/* ASSESSMENT POPUP */
+/* ============================================================
+   ASSESSMENT DIALOG
+============================================================ */
 
 .fyl-modal-backdrop {
   position: fixed;
-  z-index: 1000;
   inset: 0;
+  z-index: 2000;
   display: grid;
   place-items: center;
   padding: 20px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(3, 15, 33, 0.72);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(6px);
+  animation: fyl-fade 0.25s ease both;
+}
+
+@keyframes fyl-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .fyl-assessment {
   position: relative;
-  width: min(590px, 100%);
-  max-height: min(850px, calc(100vh - 40px));
-  overflow-y: auto;
-  padding: clamp(24px, 5vw, 40px);
-  border-radius: 18px;
+  width: min(640px, 100%);
+  padding: clamp(28px, 4vw, 44px);
   background: #fff;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.28);
+  border-radius: var(--fyl-radius-lg);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.35);
+  animation: fyl-rise 0.35s var(--fyl-ease) both;
 }
 
-.fyl-assessment h2 {
-  margin: 18px 0 22px;
-  color: var(--fyl-deep);
-  font-size: clamp(23px, 4vw, 31px);
-  line-height: 1.25;
-  letter-spacing: -0.035em;
+.fyl-assessment:focus {
+  outline: none;
+}
+
+.fyl-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--fyl-navy);
+  background: var(--fyl-soft);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.fyl-modal-close:hover {
+  background: var(--fyl-line);
 }
 
 .fyl-progress-meta {
   display: flex;
   justify-content: space-between;
-  margin-top: 26px;
-  color: #6f7b8d;
-  font-size: 11px;
-  font-weight: 700;
+  color: var(--fyl-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .fyl-progress {
-  height: 5px;
+  height: 6px;
   margin-top: 8px;
   overflow: hidden;
-  border-radius: 8px;
-  background: #e8edf2;
+  background: var(--fyl-soft);
+  border-radius: 999px;
 }
 
 .fyl-progress span {
   display: block;
   height: 100%;
+  background: linear-gradient(90deg, var(--fyl-gold), var(--fyl-blue));
   border-radius: inherit;
-  background: var(--fyl-gold);
-  transition: width 0.2s ease;
+  transition: width 0.4s var(--fyl-ease);
+}
+
+.fyl-assessment h2 {
+  margin-top: 24px;
+  font-size: clamp(24px, 1vw + 16px, 30px);
+  line-height: 1.2;
 }
 
 .fyl-answer-list {
   display: grid;
   gap: 10px;
+  margin-top: 24px;
 }
 
 .fyl-answer {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid #e1e5eb;
-  border-radius: 9px;
-  color: #33445c;
-  font-size: 12px;
-  line-height: 1.5;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  color: var(--fyl-ink);
+  background: #fff;
+  border: 1px solid var(--fyl-line);
+  border-radius: 14px;
+  font-weight: 500;
+  line-height: 1.45;
   cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.fyl-answer:hover {
+  border-color: var(--fyl-gold-light);
 }
 
 .fyl-answer.selected {
-  border-color: var(--fyl-navy);
-  background: #f0f5fb;
+  background: rgba(201, 146, 32, 0.08);
+  border-color: var(--fyl-gold);
 }
 
 .fyl-answer input {
@@ -723,39 +922,33 @@
   pointer-events: none;
 }
 
+.fyl-answer:has(input:focus-visible) {
+  outline: 3px solid var(--fyl-gold);
+  outline-offset: 2px;
+}
+
 .fyl-radio-dot {
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
-  width: 17px;
-  height: 17px;
-  margin-left: auto;
-  border: 1.5px solid #b3bdca;
+  border: 2px solid var(--fyl-line);
   border-radius: 50%;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .fyl-answer.selected .fyl-radio-dot {
-  border: 5px solid var(--fyl-navy);
+  border-color: var(--fyl-gold);
+  box-shadow: inset 0 0 0 4px #fff, inset 0 0 0 12px var(--fyl-gold);
 }
 
 .fyl-assessment-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  margin-top: 25px;
-}
-
-.fyl-text-button {
-  padding: 8px 0;
-  border: 0;
-  color: var(--fyl-navy);
-  background: transparent;
-  font: 700 12px 'DM Sans', sans-serif;
-  cursor: pointer;
-}
-
-.fyl-text-button:disabled {
-  color: #a8b0bc;
-  cursor: not-allowed;
+  gap: 16px;
+  margin-top: 28px;
 }
 
 .fyl-result {
@@ -763,495 +956,237 @@
 }
 
 .fyl-result-icon {
+  width: 64px;
+  height: 64px;
   display: grid;
   place-items: center;
-  width: 68px;
-  height: 68px;
   margin: 0 auto 20px;
+  color: var(--fyl-gold-dark);
+  background: rgba(201, 146, 32, 0.12);
   border-radius: 50%;
-  color: #031b34;
-  background: #e6ebf2;
+}
+
+.fyl-result .fyl-eyebrow {
+  margin-bottom: 0;
 }
 
 .fyl-result h2 {
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
-.fyl-result p {
-  color: #5d6879;
-  font-size: 13px;
-  line-height: 1.75;
+.fyl-result > p {
+  margin-top: 14px;
+  line-height: 1.7;
 }
 
 .fyl-result .fyl-result-disclaimer {
-  margin: 18px 0 23px;
-  padding: 13px;
-  border-radius: 8px;
-  background: #f4f6f8;
-  font-size: 11px;
+  padding: 14px 16px;
+  color: var(--fyl-muted);
+  background: var(--fyl-soft);
+  border-radius: 14px;
+  font-size: 14px;
+  font-style: italic;
 }
 
-.fyl-result .fyl-text-button {
-  display: block;
-  margin: 8px auto 0;
+.fyl-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-/* TABLET */
+.fyl-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 20px;
+  margin-top: 12px;
+}
 
-@media (max-width: 900px) {
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 1100px) {
   .fyl-pathway-grid,
   .fyl-transformation-grid {
-    gap: 13px;
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 720px;
+    margin-inline: auto;
   }
 
-  .fyl-pathway-card {
-    padding: 20px;
-  }
-
-  .fyl-card-description {
-    min-height: 115px;
+  .fyl-detail,
+  .fyl-unsure-card {
+    max-width: 720px;
+    margin-inline: auto;
   }
 
   .fyl-unsure-card {
-    grid-template-columns: auto 1fr;
-  }
-
-  .fyl-unsure-card .fyl-button {
-    grid-column: 2;
-    justify-self: start;
-  }
-}
-
-/* MOBILE */
-
-@media (max-width: 680px) {
-  .fyl-container {
-    width: min(calc(100% - 32px), 520px);
-  }
-
-  .fyl-hero {
-    padding: 66px 0 35px;
-  }
-
-  .fyl-hero h1 {
-    font-size: clamp(42px, 13vw, 66px);
-  }
-
-  .fyl-hero-copy {
-    font-size: 14px;
-  }
-
-  .fyl-hero-note {
-    align-items: flex-start;
-    margin-top: 38px;
-    font-size: 10px;
-    line-height: 1.7;
-  }
-
-  .fyl-section {
-    padding: 58px 0;
-  }
-
-  .fyl-section-heading {
-    margin-bottom: 26px;
-  }
-
-  .fyl-section-heading > p {
-    font-size: 13px;
-  }
-
-  .fyl-pathway-grid,
-  .fyl-transformation-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .fyl-pathway-card {
-    padding: 23px;
-  }
-
-  .fyl-card-description {
-    min-height: 0;
-  }
-
-  .fyl-card-outcome {
-    margin: 18px 0;
-  }
-
-  .fyl-unsure-card {
-    grid-template-columns: auto 1fr;
-    gap: 14px;
-    padding: 20px;
-  }
-
-  .fyl-unsure-icon {
-    width: 45px;
-    height: 45px;
-  }
-
-  .fyl-unsure-card h3 {
-    font-size: 18px;
+    grid-template-columns: auto minmax(0, 1fr);
   }
 
   .fyl-unsure-card .fyl-button {
     grid-column: 1 / -1;
-    width: 100%;
-  }
-
-  .fyl-detail-inner {
-    grid-template-columns: 1fr;
-    gap: 15px;
-    padding: 23px;
-  }
-
-  .fyl-detail-mark {
-    width: 50px;
-    height: 50px;
-  }
-
-  .fyl-detail-copy h2 {
-    margin-right: 18px;
+    justify-self: start;
   }
 
   .fyl-bottom-cta {
-    padding: 45px 0;
-  }
-
-  .fyl-bottom-cta-inner {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 22px;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .fyl-bottom-cta .fyl-button {
-    width: 100%;
+    justify-self: start;
   }
 
-  .fyl-footer-inner {
-    align-items: flex-start;
+  .fyl-hero::after {
+    background: linear-gradient(
+      to right,
+      rgba(0, 18, 45, 0.93) 0%,
+      rgba(0, 18, 45, 0.75) 100%
+    );
+  }
+}
+
+
+/* ============================================================
+   PHONES
+============================================================ */
+
+@media (max-width: 640px) {
+  .fyl-container {
+    width: calc(100% - 40px);
+  }
+
+  .fyl-hero {
+    min-height: 0;
+    padding-block: 72px 56px;
+  }
+
+  .fyl-hero-media img {
+    object-position: 70% center;
+  }
+
+  .fyl-hero-actions {
     flex-direction: column;
-    gap: 12px;
+    align-items: stretch;
   }
 
-  .fyl-footer p {
-    line-height: 1.6;
+  .find-your-lane-page .fyl-button {
+    width: 100%;
+    padding-inline: 20px;
+  }
+
+  .fyl-pathway-card,
+  .fyl-transformation-card {
+    padding: 24px;
+  }
+
+  .fyl-detail {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 28px 22px;
+  }
+
+  .fyl-detail-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fyl-unsure-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 28px 22px;
+  }
+
+  .fyl-bottom-cta {
+    padding: 32px 22px;
+  }
+
+  .fyl-modal-backdrop {
+    padding: 12px;
+    place-items: end center;
   }
 
   .fyl-assessment {
-    padding: 25px 20px;
-    border-radius: 14px;
+    padding: 28px 20px 24px;
   }
 
   .fyl-assessment-actions .fyl-button {
-    padding: 12px 14px;
+    flex: 1;
+    padding-inline: 18px;
+  }
+
+  .fyl-result-actions .fyl-button {
+    width: 100%;
   }
 }
 
-/* ACCESSIBILITY */
+@media (max-width: 360px) {
+  .fyl-container {
+    width: calc(100% - 32px);
+  }
+
+  .fyl-hero h1 {
+    font-size: 38px;
+  }
+
+  .find-your-lane-page h2 {
+    font-size: 27px;
+  }
+
+  .fyl-answer {
+    padding: 14px;
+    font-size: 15px;
+  }
+
+  .fyl-assessment-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+
+/* ============================================================
+   ACCESSIBILITY + PRINT
+============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
-  .find-your-lane-page *,
-  .find-your-lane-page *::before,
-  .find-your-lane-page *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-}
-
-/* ==========================================
-   FIND YOUR LANE — PROFESSIONAL REFINEMENT
-   Keep the navy and gold brand palette.
-========================================== */
-
-/* Use a real photography background with a dark overlay for legible text. */
-.find-your-lane-page .fyl-hero {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  color: #fff;
-  background-color: #071d3c;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(5, 22, 45, 0.94) 0%,
-      rgba(5, 28, 55, 0.84) 48%,
-      rgba(5, 28, 55, 0.60) 100%
-    ),
-    url('/assets/sd.webp');
-  background-size: cover;
-  background-position: center 42%;
-  background-repeat: no-repeat;
-}
-
-/* Remove decorative rings, glows, and other unnecessary hero ornaments. */
-.find-your-lane-page .fyl-hero::before,
-.find-your-lane-page .fyl-hero::after {
-  display: none !important;
-  content: none !important;
-}
-
-/* Keep heading styling clean: no extra rules or pseudo-elements beside headings. */
-.find-your-lane-page .fyl-section-heading h2::before,
-.find-your-lane-page .fyl-section-heading h2::after,
-.find-your-lane-page .fyl-hero h1::before,
-.find-your-lane-page .fyl-hero h1::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* Retain gold as a restrained brand accent rather than decorative line work. */
-.find-your-lane-page .fyl-hero h1 span,
-.find-your-lane-page .fyl-section-heading h2 span {
-  color: #f4bd4b;
-}
-
-.find-your-lane-page .fyl-hero-note {
-  margin-top: 38px;
-}
-
-.find-your-lane-page .fyl-button-gold {
-  color: #142746;
-  background: #f4bd4b;
-  border: 1px solid #f4bd4b;
-  box-shadow: none;
-}
-
-.find-your-lane-page .fyl-button-gold:hover {
-  color: #142746;
-  background: #ffd16d;
-  border-color: #ffd16d;
-  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
-}
-
-/* Remove unnecessary filters and keep card interaction understated. */
-.find-your-lane-page .fyl-card-button:hover {
-  filter: none;
-}
-
-.find-your-lane-page .fyl-pathway-card {
-  box-shadow: 0 5px 20px rgba(12, 37, 69, 0.055);
-}
-
-.find-your-lane-page .fyl-pathway-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(12, 37, 69, 0.10);
-}
-
-/* Ensure the photo and text remain clear on smaller screens. */
-@media (max-width: 680px) {
-  .find-your-lane-page .fyl-hero {
-    background-position: 58% center;
-    background-image:
-      linear-gradient(
-        90deg,
-        rgba(5, 22, 45, 0.91) 0%,
-        rgba(5, 28, 55, 0.79) 100%
-      ),
-      url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1400&q=85');
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .find-your-lane-page .fyl-pathway-card,
-  .find-your-lane-page .fyl-button {
+  :where(.find-your-lane-page, .fyl-modal-backdrop) *,
+  :where(.find-your-lane-page, .fyl-modal-backdrop) *::before,
+  .fyl-modal-backdrop {
+    animation: none !important;
     transition: none !important;
   }
 }
 
-/* ==========================================
-   READABILITY PASS — LARGER TYPE THROUGHOUT
-========================================== */
-.find-your-lane-page {
-  font-size: 16px;
+@media (forced-colors: active) {
+  .fyl-pathway-card,
+  .fyl-transformation-card,
+  .fyl-detail,
+  .fyl-unsure-card,
+  .fyl-bottom-cta,
+  .fyl-answer {
+    border: 1px solid CanvasText;
+  }
 }
 
-.find-your-lane-page .fyl-eyebrow {
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: 0.11em;
-}
-
-.find-your-lane-page .fyl-hero h1 {
-  font-size: clamp(48px, 7.2vw, 88px);
-  line-height: 1.02;
-}
-
-.find-your-lane-page .fyl-hero-lead {
-  font-size: clamp(21px, 2.5vw, 29px);
-  line-height: 1.45;
-}
-
-.find-your-lane-page .fyl-hero-copy {
-  max-width: 680px;
-  font-size: clamp(16px, 1.3vw, 18px);
-  line-height: 1.8;
-}
-
-.find-your-lane-page .fyl-hero-note {
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.find-your-lane-page .fyl-button {
-  min-height: 52px;
-  padding: 14px 22px;
-  font-size: 15px;
-}
-
-.find-your-lane-page .fyl-section-heading h2 {
-  font-size: clamp(32px, 4vw, 46px);
-  line-height: 1.2;
-}
-
-.find-your-lane-page .fyl-section-heading > p {
-  font-size: 17px;
-  line-height: 1.8;
-}
-
-.find-your-lane-page .fyl-pathway-card h3 {
-  font-size: 30px;
-}
-
-.find-your-lane-page .fyl-card-step,
-.find-your-lane-page .fyl-card-audience {
-  font-size: 12px;
-  line-height: 1.5;
-  letter-spacing: 0.08em;
-}
-
-.find-your-lane-page .fyl-card-description {
-  font-size: 16px;
-  line-height: 1.75;
-}
-
-.find-your-lane-page .fyl-outcome-label,
-.find-your-lane-page .fyl-pain-label {
-  font-size: 11px !important;
-  line-height: 1.5;
-  letter-spacing: 0.08em;
-}
-
-.find-your-lane-page .fyl-card-outcome p,
-.find-your-lane-page .fyl-transformation-card p {
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-.find-your-lane-page .fyl-card-button {
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.find-your-lane-page .fyl-unsure-card h3 {
-  font-size: 23px;
-}
-
-.find-your-lane-page .fyl-unsure-card p,
-.find-your-lane-page .fyl-detail-copy p {
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.find-your-lane-page .fyl-detail-copy h2 {
-  font-size: clamp(26px, 3vw, 36px);
-  line-height: 1.25;
-}
-
-.find-your-lane-page .fyl-small-note {
-  font-size: 14px !important;
-}
-
-.find-your-lane-page .fyl-transform-number {
-  font-size: 27px;
-}
-
-.find-your-lane-page .fyl-transformation-card h3 {
-  font-size: 22px;
-}
-
-.find-your-lane-page .fyl-disclaimer {
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.find-your-lane-page .fyl-bottom-cta h2 {
-  font-size: clamp(28px, 3.5vw, 42px);
-  line-height: 1.2;
-}
-
-.find-your-lane-page .fyl-bottom-cta p {
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.find-your-lane-page .fyl-footer-brand,
-.find-your-lane-page .fyl-footer a {
-  font-size: 14px;
-}
-
-.find-your-lane-page .fyl-footer p {
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-.find-your-lane-page .fyl-assessment h2 {
-  font-size: clamp(25px, 4vw, 34px);
-  line-height: 1.3;
-}
-
-.find-your-lane-page .fyl-progress-meta {
-  font-size: 14px;
-}
-
-.find-your-lane-page .fyl-answer {
-  padding: 16px;
-  font-size: 15px;
-  line-height: 1.65;
-}
-
-.find-your-lane-page .fyl-text-button {
-  font-size: 14px;
-}
-
-.find-your-lane-page .fyl-result p {
-  font-size: 16px;
-  line-height: 1.8;
-}
-
-.find-your-lane-page .fyl-result .fyl-result-disclaimer {
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-@media (max-width: 680px) {
-  .find-your-lane-page .fyl-hero h1 {
-    font-size: clamp(42px, 12vw, 64px);
+@media print {
+  .fyl-hero,
+  .fyl-unsure-card,
+  .fyl-bottom-cta {
+    color: #000;
+    background: none;
   }
 
-  .find-your-lane-page .fyl-hero-copy {
-    font-size: 16px;
+  .fyl-hero-media,
+  .fyl-hero::after,
+  .fyl-button {
+    display: none;
   }
 
-  .find-your-lane-page .fyl-hero-note {
-    font-size: 13px;
-  }
-
-  .find-your-lane-page .fyl-section-heading h2 {
-    font-size: clamp(29px, 8vw, 36px);
-  }
-
-  .find-your-lane-page .fyl-section-heading > p,
-  .find-your-lane-page .fyl-card-description,
-  .find-your-lane-page .fyl-unsure-card p,
-  .find-your-lane-page .fyl-detail-copy p,
-  .find-your-lane-page .fyl-bottom-cta p {
-    font-size: 16px;
-  }
-
-  .find-your-lane-page .fyl-card-step,
-  .find-your-lane-page .fyl-card-audience,
-  .find-your-lane-page .fyl-outcome-label,
-  .find-your-lane-page .fyl-pain-label {
-    font-size: 11px !important;
+  .find-your-lane-page h1,
+  .find-your-lane-page h2,
+  .find-your-lane-page h3 {
+    color: #000;
   }
 }

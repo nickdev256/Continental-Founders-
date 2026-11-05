@@ -530,7 +530,7 @@ export default function NewsAnnouncements() {
               to="/insights"
               className="cf-news-section__all-link"
             >
-              View Insights
+              View insights
 
               <ArrowRight
                 size={17}
@@ -542,7 +542,7 @@ export default function NewsAnnouncements() {
               to="/events"
               className="cf-news-section__all-link"
             >
-              View Events
+              View events
 
               <ArrowRight
                 size={17}
@@ -663,8 +663,8 @@ export default function NewsAnnouncements() {
                       >
                         {item.contentType ===
                         "event"
-                          ? "View Event"
-                          : "Read Insight"}
+                          ? "View event"
+                          : "Read insight"}
 
                         <ArrowRight
                           size={16}

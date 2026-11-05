@@ -204,12 +204,11 @@ html {
   font-size: 0.7rem;
   font-weight: 800;
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
   line-height: 1;
 
   text-align: center;
   text-decoration: none;
-  text-transform: uppercase;
 
   cursor: pointer;
 
@@ -472,10 +471,9 @@ html {
   font-size: 0.7rem;
   font-weight: 800;
 
-  letter-spacing: 0.08em;
+  letter-spacing: 0.01em;
 
   text-decoration: none;
-  text-transform: uppercase;
 
   transition:
     color 0.2s ease,

@@ -17,6 +17,8 @@ import { navigation } from "../../data/navigation";
 import "./Navbar.css";
 
 const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
+// Subscribe button is shown but inactive for now; set to true to link it again.
+const SUBSCRIBE_ACTIVE = false;
 const ADMIN_LOGIN_PATH = "/admin/login";
 const LOGO_CLICK_DELAY = 800;
 
@@ -34,7 +36,8 @@ const ACCENTS = {
 const accent = (name) => ACCENTS[name] || ACCENTS.gold;
 
 // Colours shown in the thin ribbon across the top of the site.
-const RIBBON = [ACCENTS.gold, ACCENTS.navy, ACCENTS.blue];
+// White instead of navy, so it stays visible above the navy utility bar.
+const RIBBON = [ACCENTS.gold, "#ffffff", ACCENTS.blue];
 
 // Delay before a desktop menu closes, so the pointer can
 // travel from the link down into the open panel.
@@ -517,19 +520,28 @@ export default function Navbar() {
                 >
                   <Search size={17} aria-hidden="true" />
                   <span className="navbar__search-label">Search</span>
-                  <kbd className="navbar__kbd">{isMac ? "⌘K" : "Ctrl K"}</kbd>
                 </button>
 
-                <a
-                  href={SUBSCRIPTION_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="navbar__subscribe"
-                  onClick={closeMenus}
-                >
-                  Subscribe
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </a>
+                {SUBSCRIBE_ACTIVE ? (
+                  <a
+                    href={SUBSCRIPTION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="navbar__subscribe"
+                    onClick={closeMenus}
+                  >
+                    Subscribe
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="navbar__subscribe"
+                    title="Coming soon"
+                    disabled
+                  >
+                    Subscribe
+                  </button>
+                )}
               </div>
             </nav>
 

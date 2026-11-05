@@ -160,7 +160,7 @@ const opportunity = [
 const sections = [
   { id: "mission", label: "Mission" },
   { id: "vision", label: "Vision" },
-  { id: "story", label: "Our Story" },
+  { id: "story", label: "Our story" },
   { id: "approach", label: "Approach" },
   { id: "principles", label: "Principles" },
   { id: "leadership", label: "Leadership" },
@@ -280,7 +280,7 @@ export default function About() {
                 to="/contact"
                 className="about-button about-button--gold"
               >
-                Connect With Us
+                Connect with us
                 <ArrowUpRight size={17} aria-hidden="true" />
               </Link>
 
@@ -288,7 +288,7 @@ export default function About() {
                 href="#story"
                 className="about-button about-button--glass"
               >
-                Discover Our Story
+                Discover our story
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
 
@@ -453,7 +453,7 @@ export default function About() {
                 to="/our-model"
                 className="about-button about-button--gold"
               >
-                Explore Our Model
+                Explore our model
                 <ArrowUpRight size={17} aria-hidden="true" />
               </Link>
             </div>
@@ -1097,7 +1097,7 @@ export default function About() {
                 to="/contact"
                 className="about-button about-button--gold"
               >
-                Become a Founding Partner
+                Become a founding partner
                 <ArrowUpRight size={17} aria-hidden="true" />
               </Link>
             </div>

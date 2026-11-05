@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -8,6 +8,7 @@ import {
   BriefcaseBusiness,
   Check,
   CheckCircle2,
+  CalendarDays,
   Clock3,
   Globe2,
   Handshake,
@@ -27,8 +28,7 @@ import "./CFCV.css";
 
 // ============================================================
 // IMAGE PATHS
-// Place these optional images in public/images/cfcv/.
-// Missing images fall back to the backgrounds defined in CSS.
+// Missing images simply leave their navy or soft background.
 // ============================================================
 
 const IMAGE_ROOT = "/images/cfcv";
@@ -41,18 +41,22 @@ const facts = [
   {
     value: "6 months",
     label: "INTENSIVE FELLOWSHIP",
+    icon: CalendarDays,
   },
   {
     value: "Up to 30 ventures",
     label: "ACROSS THE COHORT",
+    icon: BriefcaseBusiness,
   },
   {
     value: "3 development tracks",
     label: "GENESIS · ASCEND · HORIZON",
+    icon: Layers3,
   },
   {
     value: "Africa + U.S. / Diaspora",
     label: "CROSS-CONTINENTAL COLLABORATION",
+    icon: Globe2,
   },
 ];
 
@@ -98,7 +102,9 @@ const tracks = [
       "Customer discovery, validation, business model, co-founder relationship, MVP / prototype.",
     outcome:
       "A validated concept, cross-continental founding team, and MVP / proof of concept.",
-    image: `${IMAGE_ROOT}/genesis.jpg`,
+    image: "/assets/kk.webp",
+    imageAlt: "Founder starting a venture on a laptop",
+    to: "/genesis",
   },
   {
     key: "ascend",
@@ -110,9 +116,11 @@ const tracks = [
       "Market testing, pilots, financial model, revenue strategy, legal / governance, investment readiness.",
     outcome:
       "Demonstrated traction and a clear investment pathway.",
-    image: `${IMAGE_ROOT}/ascend.jpg`,
+    image: "/assets/x.webp",
+    imageAlt: "Founders refining their business model in a workshop",
+    to: "/ascend",
   },
-  { 
+  {
     key: "horizon",
     name: "Horizon",
     title: "Scale it.",
@@ -122,7 +130,9 @@ const tracks = [
       "Expansion, capital strategy, strategic partnerships, governance, and scaling.",
     outcome:
       "A scale-ready venture positioned for market expansion and investment.",
-    image: `${IMAGE_ROOT}/horizon.jpg`,
+    image: "/assets/venture.webp",
+    imageAlt: "Founders planning growth in an office overlooking the city",
+    to: "/horizon",
   },
 ];
 
@@ -257,30 +267,35 @@ const compatibility = [
 const outcomes = [
   {
     title: "Admit",
+    tone: "gold",
     description:
       "You meet the requirements and are ready for the fellowship.",
     icon: CheckCircle2,
   },
   {
     title: "Admit with track placement",
+    tone: "blue",
     description:
       "You are accepted and assigned to Genesis, Ascend, or Horizon.",
     icon: TrendingUp,
   },
   {
     title: "Match required",
+    tone: "navy",
     description:
       "Your application is promising, but a cross-continental collaborator is needed before final admission.",
     icon: Users,
   },
   {
     title: "Waitlist",
+    tone: "muted",
     description:
       "You are a strong applicant, but cohort capacity is limited.",
     icon: Clock3,
   },
   {
     title: "Not selected",
+    tone: "muted",
     description:
       "You do not currently meet the fellowship requirements.",
     icon: XCircle,
@@ -433,67 +448,102 @@ function SectionLabel({
   light = false,
 }) {
   return (
-    <p
+    <span
       className={`cfcv-label${
         light ? " cfcv-label--light" : ""
       }`}
     >
-      <span>{children}</span>
-    </p>
+      {children}
+    </span>
   );
 }
 
 function ApplyButton({
-  gold = false,
+  tone = "gold",
   children = "Start your application",
 }) {
   return (
     <Link
       to="/cfcv/apply"
-      className={`cfcv-button${
-        gold ? " cfcv-button--gold" : ""
-      }`}
+      className={`cfcv-button cfcv-button--${tone}`}
     >
-      <span>{children}</span>
+      {children}
 
       <ArrowUpRight
-        size={17}
+        size={18}
         aria-hidden="true"
       />
     </Link>
   );
 }
 
-function PageFooter() {
-  return (
-    <footer className="cfcv-footer">
-      <div className="cfcv-container cfcv-footer__inner">
-        <Link
-          to="/"
-          className="cfcv-wordmark"
-        >
-          CONTINENTAL FOUNDERS
-        </Link>
+// ============================================================
+// SCROLL REVEAL
+// Content stays visible if scripts fail or motion is reduced.
+// ============================================================
 
-        <a href="https://www.continentalfounders.org">
-          www.continentalfounders.org
-        </a>
+function useReveal(ref) {
+  useEffect(() => {
+    const root = ref.current;
 
-        <span className="cfcv-footer__note">
-          Connecting founders across continents.
-        </span>
-      </div>
-    </footer>
-  );
+    if (
+      !root ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    root.classList.add("cfcv-page--reveal");
+
+    let pending = [...root.querySelectorAll("[data-reveal]")];
+    let frame = 0;
+
+    const reveal = () => {
+      frame = 0;
+      const limit = window.innerHeight * 0.92;
+
+      pending = pending.filter((element) => {
+        if (element.getBoundingClientRect().top < limit) {
+          element.classList.add("is-visible");
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!pending.length) {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(reveal);
+    };
+
+    reveal();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [ref]);
 }
 
 // ============================================================
-// PAGE — NO NAVBAR
+// PAGE
 // ============================================================
 
 export default function CFCV() {
+  const pageRef = useRef(null);
+
+  useReveal(pageRef);
+
   return (
-    <div className="cfcv-page">
+    <div className="cfcv-page" ref={pageRef}>
       <a
         className="cfcv-skip-link"
         href="#cfcv-main"
@@ -510,57 +560,58 @@ export default function CFCV() {
           className="cfcv-hero"
           aria-labelledby="cfcv-title"
         >
-          <div className="cfcv-hero__copy">
-            <SectionLabel>
-              CFCV FELLOWSHIP
-            </SectionLabel>
+          <div className="cfcv-container cfcv-hero__inner">
+            <div className="cfcv-hero__copy">
+              <SectionLabel light>
+                CFCV FELLOWSHIP
+              </SectionLabel>
 
-            <h1 id="cfcv-title">
-              Great ventures
-              <br />
-              start with
-              <br />
-              <em>meaningful connections.</em>
-            </h1>
+              <h1 id="cfcv-title">
+                Great ventures start with{" "}
+                <em>meaningful connections.</em>
+              </h1>
 
-            <p className="cfcv-hero__description">
-              A six-month fellowship bringing founders
-              in Africa and the United States / diaspora
-              together to build commercially viable
-              businesses.
-            </p>
-
-            <div className="cfcv-hero__actions">
-              <ApplyButton />
-
-              <a
-                className="cfcv-text-link"
-                href="#cfcv-overview"
-              >
-                Explore the fellowship
-
-                <ArrowDown
-                  size={17}
-                  aria-hidden="true"
-                />
-              </a>
-            </div>
-          </div>
-
-          <div className="cfcv-hero__visual">
-            <OptionalImage
-              src={`${IMAGE_ROOT}/hero-map.png`}
-              className="cfcv-hero__map"
-              loading="eager"
-              decoding="async"
-            />
-
-            <div className="cfcv-hero__visual-copy">
-              <p className="cfcv-hero__connection">
-                Africa <span>↔</span> U.S.
+              <p className="cfcv-hero__description">
+                A six-month fellowship bringing founders
+                in Africa and the United States / diaspora
+                together to build commercially viable
+                businesses.
               </p>
 
-              <p>Built across borders.</p>
+              <div className="cfcv-hero__actions">
+                <ApplyButton />
+
+                <a
+                  className="cfcv-button cfcv-button--ghost"
+                  href="#cfcv-overview"
+                >
+                  Explore the fellowship
+
+                  <ArrowDown
+                    size={18}
+                    aria-hidden="true"
+                  />
+                </a>
+              </div>
+            </div>
+
+            <div className="cfcv-hero__visual">
+              <OptionalImage
+                src={`${IMAGE_ROOT}/hero-map.jpg`}
+                className="cfcv-hero__map"
+                fetchPriority="high"
+                decoding="async"
+              />
+
+              <div className="cfcv-hero__visual-copy">
+                <p className="cfcv-hero__connection">
+                  Africa <span aria-hidden="true">↔</span>
+                  <span className="cfcv-visually-hidden">and the</span>{" "}
+                  U.S.
+                </p>
+
+                <p>Built across borders.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -573,16 +624,24 @@ export default function CFCV() {
           className="cfcv-facts"
           aria-label="Fellowship at a glance"
         >
-          <div className="cfcv-container cfcv-facts__grid">
-            {facts.map((fact) => (
-              <div
-                className="cfcv-fact"
-                key={fact.value}
-              >
-                <strong>{fact.value}</strong>
-                <span>{fact.label}</span>
-              </div>
-            ))}
+          <div className="cfcv-container">
+            <ul className="cfcv-facts__grid">
+              {facts.map(({ value, label, icon: Icon }) => (
+                <li
+                  className="cfcv-fact"
+                  key={value}
+                >
+                  <span className="cfcv-fact__icon">
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
+
+                  <span className="cfcv-fact__text">
+                    <strong>{value}</strong>
+                    <span>{label}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -592,11 +651,11 @@ export default function CFCV() {
 
         <section
           id="cfcv-overview"
-          className="cfcv-overview cfcv-bordered"
+          className="cfcv-section cfcv-overview"
           aria-labelledby="cfcv-overview-title"
         >
-          <div className="cfcv-container cfcv-overview__inner">
-            <div>
+          <div className="cfcv-container cfcv-split">
+            <div className="cfcv-split__content" data-reveal>
               <SectionLabel>
                 OVERVIEW
               </SectionLabel>
@@ -606,8 +665,8 @@ export default function CFCV() {
                 A platform for building.
               </h2>
 
-              <p>
-                Continental Founders Catalytic Ventures
+              <p className="cfcv-lead">
+                Continental Founders Fellowship
                 identifies promising founders, evaluates
                 their ventures, places them in the right
                 development track, and facilitates
@@ -616,16 +675,17 @@ export default function CFCV() {
               </p>
             </div>
 
-            <div
-              className="cfcv-overview__image"
+            <figure
+              className="cfcv-photo"
               aria-hidden="true"
+              data-reveal
             >
               <OptionalImage
                 src={`${IMAGE_ROOT}/overview-landscape.jpg`}
                 loading="lazy"
                 decoding="async"
               />
-            </div>
+            </figure>
           </div>
         </section>
 
@@ -635,36 +695,32 @@ export default function CFCV() {
 
         <section
           id="cfcv-admissions"
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section cfcv-section--soft"
           aria-labelledby="cfcv-process-title"
         >
           <div className="cfcv-container">
-            <SectionLabel>
-              ADMISSION PROCESS
-            </SectionLabel>
+            <header className="cfcv-heading" data-reveal>
+              <SectionLabel>
+                ADMISSION PROCESS
+              </SectionLabel>
 
-            <h2 id="cfcv-process-title">
-              A clear path into the fellowship.
-            </h2>
+              <h2 id="cfcv-process-title">
+                A clear path into the fellowship.
+              </h2>
+            </header>
 
-            <ol className="cfcv-stages">
+            <ol className="cfcv-stages" data-reveal>
               {stages.map((stage, index) => (
                 <li
                   className="cfcv-stage"
                   key={stage.name}
                 >
-                  <div className="cfcv-stage__top">
-                    <span className="cfcv-number">
-                      {index + 1}
-                    </span>
-
-                    <span
-                      className="cfcv-stage__connector"
-                      aria-hidden="true"
-                    >
-                      <ArrowRight size={16} />
-                    </span>
-                  </div>
+                  <span
+                    className="cfcv-number"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
 
                   <h3>{stage.name}</h3>
                   <p>{stage.description}</p>
@@ -680,37 +736,42 @@ export default function CFCV() {
 
         <section
           id="cfcv-tracks"
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section"
           aria-labelledby="cfcv-tracks-title"
         >
           <div className="cfcv-container">
-            <SectionLabel>
-              DEVELOPMENT TRACKS
-            </SectionLabel>
+            <header className="cfcv-heading" data-reveal>
+              <SectionLabel>
+                DEVELOPMENT TRACKS
+              </SectionLabel>
 
-            <h2 id="cfcv-tracks-title">
-              Start where you are.
-              Build what comes next.
-            </h2>
+              <h2 id="cfcv-tracks-title">
+                Start where you are.
+                Build what comes next.
+              </h2>
+            </header>
 
-            <div className="cfcv-tracks">
+            <div className="cfcv-tracks" data-reveal>
               {tracks.map((track) => (
                 <article
                   className={`cfcv-track cfcv-track--${track.key}`}
                   key={track.key}
                 >
-                  <OptionalImage
-                    src={track.image}
-                    className="cfcv-track__image"
-                    loading="lazy"
-                    decoding="async"
-                  />
+                  <div className="cfcv-track__media">
+                    <OptionalImage
+                      src={track.image}
+                      alt={track.imageAlt}
+                      className="cfcv-track__image"
+                      loading="lazy"
+                      decoding="async"
+                    />
+
+                    <span className="cfcv-track__name">
+                      {track.name}
+                    </span>
+                  </div>
 
                   <div className="cfcv-track__content">
-                    <p className="cfcv-track__name">
-                      {track.name}
-                    </p>
-
                     <h3>{track.title}</h3>
 
                     <p className="cfcv-track__fit">
@@ -728,6 +789,14 @@ export default function CFCV() {
                         <dd>{track.outcome}</dd>
                       </div>
                     </dl>
+
+                    <Link
+                      to={track.to}
+                      className="cfcv-track__link"
+                    >
+                      Explore {track.name}
+                      <ArrowRight size={17} aria-hidden="true" />
+                    </Link>
                   </div>
                 </article>
               ))}
@@ -745,11 +814,11 @@ export default function CFCV() {
         ================================================== */}
 
         <section
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section cfcv-section--soft"
           aria-label="Founder assessment and interview"
         >
           <div className="cfcv-container cfcv-founder-grid">
-            <article className="cfcv-assessment">
+            <article className="cfcv-card cfcv-assessment" data-reveal>
               <SectionLabel>
                 THE FOUNDER BEHIND THE VENTURE
               </SectionLabel>
@@ -766,7 +835,7 @@ export default function CFCV() {
                       className="cfcv-check"
                       aria-hidden="true"
                     >
-                      <Check size={14} />
+                      <Check size={14} strokeWidth={3} />
                     </span>
 
                     <span>{item}</span>
@@ -775,10 +844,10 @@ export default function CFCV() {
               </ul>
             </article>
 
-            <article className="cfcv-interview">
+            <article className="cfcv-card cfcv-interview" data-reveal>
               <div className="cfcv-interview__heading">
                 <div>
-                  <SectionLabel>
+                  <SectionLabel light>
                     FOUNDER INTERVIEW
                   </SectionLabel>
 
@@ -806,7 +875,10 @@ export default function CFCV() {
               <ol className="cfcv-questions">
                 {interviewQuestions.map((question, index) => (
                   <li key={question}>
-                    <span className="cfcv-number cfcv-number--small">
+                    <span
+                      className="cfcv-questions__number"
+                      aria-hidden="true"
+                    >
                       {index + 1}
                     </span>
 
@@ -824,11 +896,11 @@ export default function CFCV() {
 
         <section
           id="cfcv-matching"
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section"
           aria-labelledby="cfcv-matching-title"
         >
           <div className="cfcv-container">
-            <div className="cfcv-matching__header">
+            <header className="cfcv-heading cfcv-heading--split" data-reveal>
               <div>
                 <SectionLabel>
                   CROSS-CONTINENTAL MATCHING
@@ -838,48 +910,40 @@ export default function CFCV() {
                   Different perspectives.
                   Shared ambition.
                 </h2>
-
-                <p>
-                  Existing teams and individual founders
-                  may apply. Every venture must ultimately
-                  have meaningful participation connecting
-                  Africa and the United States / diaspora.
-                </p>
               </div>
 
-              <div
-                className="cfcv-matching__map"
-                aria-hidden="true"
-              >
-                <OptionalImage
-                  src={`${IMAGE_ROOT}/matching-map.png`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </div>
+              <p>
+                Existing teams and individual founders
+                may apply. Every venture must ultimately
+                have meaningful participation connecting
+                Africa and the United States / diaspora.
+              </p>
+            </header>
 
-            <div className="cfcv-criteria">
+            <ul className="cfcv-criteria" data-reveal>
               {matchingCriteria.map(
-                ({ title, description, icon: Icon }) => (
-                  <div
-                    className="cfcv-criterion"
+                ({ title, description, icon: Icon }, index) => (
+                  <li
+                    className={`cfcv-criterion cfcv-criterion--${
+                      ["gold", "blue", "navy"][index % 3]
+                    }`}
                     key={title}
                   >
-                    <Icon
-                      size={28}
-                      strokeWidth={1.5}
-                      aria-hidden="true"
-                    />
+                    <span className="cfcv-criterion__icon">
+                      <Icon
+                        size={22}
+                        aria-hidden="true"
+                      />
+                    </span>
 
                     <div>
                       <h3>{title}</h3>
                       <p>{description}</p>
                     </div>
-                  </div>
+                  </li>
                 )
               )}
-            </div>
+            </ul>
           </div>
         </section>
 
@@ -888,11 +952,15 @@ export default function CFCV() {
         ================================================== */}
 
         <section
-          className="cfcv-compatibility"
+          className="cfcv-section cfcv-compatibility"
           aria-labelledby="cfcv-compatibility-title"
         >
           <div className="cfcv-container cfcv-compatibility__inner">
-            <div className="cfcv-compatibility__copy">
+            <div className="cfcv-compatibility__copy" data-reveal>
+              <SectionLabel light>
+                COMPATIBILITY SPRINT
+              </SectionLabel>
+
               <h2 id="cfcv-compatibility-title">
                 Build trust before you build together.
               </h2>
@@ -905,17 +973,16 @@ export default function CFCV() {
               </p>
             </div>
 
-            <ul className="cfcv-compatibility__items">
+            <ul className="cfcv-compatibility__items" data-reveal>
               {compatibility.map(
                 ({ title, icon: Icon, detail }) => (
                   <li key={title}>
                     <Icon
-                      size={27}
-                      strokeWidth={1.4}
+                      size={22}
                       aria-hidden="true"
                     />
 
-                    <span>{title}</span>
+                    <h3>{title}</h3>
                     <p>{detail}</p>
                   </li>
                 )
@@ -929,11 +996,11 @@ export default function CFCV() {
         ================================================== */}
 
         <section
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section"
           aria-label="Admission outcomes and proposed timeline"
         >
           <div className="cfcv-container cfcv-results-grid">
-            <article className="cfcv-outcomes">
+            <article className="cfcv-outcomes" data-reveal>
               <SectionLabel>
                 ADMISSIONS OUTCOMES
               </SectionLabel>
@@ -944,15 +1011,22 @@ export default function CFCV() {
 
               <ul className="cfcv-outcomes__list">
                 {outcomes.map(
-                  ({ title, description, icon: Icon }) => (
-                    <li key={title}>
-                      <Icon
-                        size={23}
-                        aria-hidden="true"
-                      />
+                  ({ title, description, icon: Icon, tone }) => (
+                    <li
+                      className={`cfcv-outcome cfcv-outcome--${tone}`}
+                      key={title}
+                    >
+                      <span className="cfcv-outcome__icon">
+                        <Icon
+                          size={20}
+                          aria-hidden="true"
+                        />
+                      </span>
 
-                      <h3>{title}</h3>
-                      <p>{description}</p>
+                      <div>
+                        <h3>{title}</h3>
+                        <p>{description}</p>
+                      </div>
                     </li>
                   )
                 )}
@@ -964,7 +1038,7 @@ export default function CFCV() {
               </p>
             </article>
 
-            <article className="cfcv-timeline">
+            <article className="cfcv-card cfcv-timeline" data-reveal>
               <SectionLabel>
                 PROPOSED ADMISSIONS TIMELINE
               </SectionLabel>
@@ -973,23 +1047,17 @@ export default function CFCV() {
                 A transparent and structured process.
               </h2>
 
-              <ol className="cfcv-timeline__grid">
-                {timeline.map((item, index) => (
+              <ol className="cfcv-timeline__list">
+                {timeline.map((item) => (
                   <li key={item.title}>
-                    <span className="cfcv-number cfcv-number--pale">
-                      {index + 1}
+                    <span className="cfcv-timeline__timing">
+                      {item.timing}
                     </span>
 
                     <div>
-                      <p className="cfcv-timeline__timing">
-                        {item.timing}
-                      </p>
-
                       <h3>{item.title}</h3>
 
-                      <p className="cfcv-timeline__description">
-                        {item.description}
-                      </p>
+                      <p>{item.description}</p>
                     </div>
                   </li>
                 ))}
@@ -1003,37 +1071,29 @@ export default function CFCV() {
         ================================================== */}
 
         <section
-          className="cfcv-section cfcv-bordered"
+          className="cfcv-section cfcv-section--soft"
           aria-labelledby="cfcv-path-title"
         >
           <div className="cfcv-container">
-            <SectionLabel>
-              THE COMPLETE PATH
-            </SectionLabel>
+            <header className="cfcv-heading" data-reveal>
+              <SectionLabel>
+                THE COMPLETE PATH
+              </SectionLabel>
 
-            <h2
-              id="cfcv-path-title"
-              className="cfcv-small-heading"
-            >
-              From application to impact.
-            </h2>
+              <h2 id="cfcv-path-title">
+                From application to impact.
+              </h2>
+            </header>
 
-            <ol className="cfcv-path">
+            <ol className="cfcv-path" data-reveal>
               {pathway.map((item, index) => (
                 <li key={item.title}>
-                  <div className="cfcv-path__top">
-                    <span className="cfcv-number cfcv-number--small">
-                      {index + 1}
-                    </span>
-
-                    {index < pathway.length - 1 && (
-                      <ArrowRight
-                        size={16}
-                        className="cfcv-path__arrow"
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
+                  <span
+                    className="cfcv-path__number"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
 
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
@@ -1052,14 +1112,14 @@ export default function CFCV() {
           aria-labelledby="cfcv-mission-title"
         >
           <OptionalImage
-            src={`${IMAGE_ROOT}/mission-landscape.jpg`}
+            src={`${IMAGE_ROOT}/ascend.jpg`}
             className="cfcv-mission__image"
             loading="lazy"
             decoding="async"
           />
 
-          <div className="cfcv-container cfcv-mission__content">
-            <SectionLabel>
+          <div className="cfcv-container cfcv-mission__content" data-reveal>
+            <SectionLabel light>
               OUR MISSION
             </SectionLabel>
 
@@ -1071,7 +1131,7 @@ export default function CFCV() {
             <p>
               We bring African and U.S. / diaspora founders
               together to build real businesses, provide
-              catalytic capital to the strongest opportunities,
+              fellowship funding to the strongest opportunities,
               and create a pathway to investment readiness
               and global growth.
             </p>
@@ -1083,29 +1143,28 @@ export default function CFCV() {
         ================================================== */}
 
         <section
-          className="cfcv-final"
+          className="cfcv-section cfcv-final"
           aria-labelledby="cfcv-final-title"
         >
-          <div className="cfcv-container cfcv-final__inner">
-            <div>
+          <div className="cfcv-container">
+            <div className="cfcv-final__card" data-reveal>
               <h2 id="cfcv-final-title">
                 Build your next chapter.
               </h2>
-            </div>
 
-            <div className="cfcv-final__action">
-              <p>
-                Begin the CFCV admissions process.
-                Submit your founder and venture application.
-              </p>
+              <div className="cfcv-final__action">
+                <p>
+                  Begin the CFCV admissions process.
+                  Submit your founder and venture application.
+                </p>
 
-              <ApplyButton gold />
+                <ApplyButton tone="navy" />
+              </div>
             </div>
           </div>
         </section>
       </main>
 
-      <PageFooter />
     </div>
   );
 }

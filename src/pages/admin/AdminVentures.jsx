@@ -2723,7 +2723,7 @@ export default function AdminVentures() {
           <p>
             Manage CFCV ventures, track placement,
             cohorts, founders, venture information,
-            catalytic support and publication status.
+            fellowship support and publication status.
           </p>
         </div>
 
@@ -3518,7 +3518,7 @@ export default function AdminVentures() {
 
                   <div>
                     <span>
-                      Catalytic Support
+                      Fellowship Support
                     </span>
 
                     <strong>
@@ -3863,13 +3863,13 @@ export default function AdminVentures() {
                       />
 
                       {" "}
-                      Selected for Catalytic Support
+                      Selected for Fellowship Support
                     </label>
 
                     <p>
                       Use this after the venture has been
                       formally selected for additional
-                      catalytic support.
+                      fellowship support.
                     </p>
 
                   </div>
@@ -5069,7 +5069,7 @@ export default function AdminVentures() {
 
                     <div>
                       <span>
-                        Catalytic Support
+                        Fellowship Support
                       </span>
 
                       <strong>

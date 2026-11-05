@@ -119,7 +119,7 @@ export const PATHWAYS = {
       { q: "Will I only learn with Genesis founders?", a: "No. Genesis-specific development is complemented by shared learning with Ascend and Horizon." },
       { q: "Do I need international trade experience?", a: "No. Business fundamentals and trusted relationships come first." },
       { q: "Does selecting Genesis guarantee admission?", a: "No. Pathway interest is provisional and subject to review." },
-      { q: "Is funding guaranteed?", a: "No. Any catalytic grant availability and criteria must be confirmed separately." },
+      { q: "Is funding guaranteed?", a: "No. Any fellowship grant availability and criteria must be confirmed separately." },
     ],
   },
 

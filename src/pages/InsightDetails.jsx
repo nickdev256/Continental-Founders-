@@ -978,7 +978,7 @@ export default function InsightDetails() {
             to="/insights"
             className="insight-button insight-button--light"
           >
-            Explore All Insights
+            Explore all insights
 
             <ArrowUpRight
               size={18}

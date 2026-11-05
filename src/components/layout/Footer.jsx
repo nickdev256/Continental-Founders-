@@ -452,7 +452,7 @@ export default function Footer() {
             >
 
               <span>
-                Schedule a Meeting
+                Schedule a meeting
               </span>
 
               <ArrowUpRight

@@ -44,9 +44,9 @@ const DEFAULT_CONTENT = {
     description:
       "Continental Founders is proposing USAfrica as a Strategic Ecosystem & Market Access Partner — connecting CFCV fellows and alumni to markets, capital networks, corporate relationships, government stakeholders, and diaspora expertise.",
     image: "/assets/images/us-africa/business-week.webp",
-    primaryButtonText: "Explore the Partnership",
+    primaryButtonText: "Explore the partnership",
     primaryButtonLink: "/contact",
-    secondaryButtonText: "See the Opportunity",
+    secondaryButtonText: "See the opportunity",
   },
 
   highlights: [
@@ -74,7 +74,7 @@ const DEFAULT_CONTENT = {
     image: "/assets/images/us-africa/business-handshake.webp",
     imageCaption:
       "From founder development to commercial opportunity",
-    buttonText: "Explore Our Model",
+    buttonText: "Explore our model",
     buttonLink: "/our-model",
   },
 
@@ -187,7 +187,7 @@ const DEFAULT_CONTENT = {
     titleLine2: "to commercial evidence.",
     description:
       "Continental Founders welcomes the opportunity to explore how USAfrica's ecosystem can connect CFCV fellows with markets, capital, institutions, diaspora expertise, and cross-continental opportunity.",
-    buttonText: "Discuss the Partnership",
+    buttonText: "Discuss the partnership",
     buttonLink: "/contact",
     image: "/assets/images/us-africa/final-cta.webp",
   },

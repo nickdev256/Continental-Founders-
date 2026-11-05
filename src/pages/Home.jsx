@@ -1372,7 +1372,7 @@ export default function Home() {
               >
 
                 <span>
-                  Partner With Us
+                  Partner with us
                 </span>
 
                 <ArrowUpRight
@@ -1390,7 +1390,7 @@ export default function Home() {
               >
 
                 <span>
-                  Explore Our Ecosystem
+                  Explore our ecosystem
                 </span>
 
                 <ArrowRight
@@ -1543,7 +1543,7 @@ export default function Home() {
             >
 
               <span>
-                Explore Our Ecosystem
+                Explore our ecosystem
               </span>
 
               <ArrowRight
@@ -1822,7 +1822,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore the Continental Founders development model"
               >
-                <span>Learn More</span>
+                <span>Learn more</span>
 
                 <ArrowRight
                   size={16}
@@ -1854,7 +1854,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore Continental Founders university and research partnerships"
               >
-                <span>Learn More</span>
+                <span>Learn more</span>
 
                 <ArrowRight
                   size={16}
@@ -1886,7 +1886,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore the U.S.–Africa Trade and Business Network"
               >
-                <span>Learn More</span>
+                <span>Learn more</span>
 
                 <ArrowRight
                   size={16}
@@ -1960,7 +1960,7 @@ export default function Home() {
             >
 
               <span>
-                Discover Our Difference
+                Discover our difference
               </span>
 
               <ArrowRight
@@ -2001,12 +2001,12 @@ export default function Home() {
 
 
               <h2 id="what-we-do-heading">
-                Continental Founders Catalytic Ventures — <em>CFCV.</em>
+                Continental Founders Fellowship — <em>CFCV.</em>
               </h2>
 
 
               <p className="cf-section-intro">
-                Continental Founders Catalytic Ventures (CFCV) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
+                Continental Founders Fellowship (CFCV) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
               </p>
 
             </div>
@@ -2103,7 +2103,7 @@ export default function Home() {
             >
 
               <span>
-                Understand Our Model
+                Understand our model
               </span>
 
               <ArrowRight
@@ -2286,7 +2286,7 @@ export default function Home() {
               >
 
                 <span>
-                  Explore University Partnerships
+                  Explore university partnerships
                 </span>
 
                 <ArrowRight
@@ -2344,7 +2344,7 @@ export default function Home() {
             >
 
               <span>
-                Explore Strategic Partnerships
+                Explore strategic partnerships
               </span>
 
               <ArrowRight
@@ -2461,7 +2461,7 @@ export default function Home() {
               >
 
                 <span>
-                  Become a Corporate Partner
+                  Become a corporate partner
                 </span>
 
                 <ArrowUpRight
@@ -2626,7 +2626,7 @@ export default function Home() {
                   >
 
                     <span>
-                      View Event Details
+                      View event details
                     </span>
 
                     <ArrowUpRight
@@ -2780,7 +2780,7 @@ export default function Home() {
                   >
 
                     <span>
-                      Explore Events
+                      Explore events
                     </span>
 
                     <ArrowUpRight
@@ -2877,7 +2877,7 @@ export default function Home() {
             >
 
               <span>
-                Build With Us
+                Build with us
               </span>
 
               <ArrowRight
@@ -3219,7 +3219,7 @@ function HomePageLink({
 
       <span className="cf-flywheel-card__cta">
 
-        Learn More
+        Learn more
 
         <ArrowRight
           size={16}

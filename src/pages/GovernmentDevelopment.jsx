@@ -1,7 +1,4 @@
-import React, {
-  useEffect,
-  useRef,
-} from "react";
+import React from "react";
 
 import {
   ArrowRight,
@@ -90,59 +87,10 @@ const impactWords = [
 export default function GovernmentDevelopment() {
   // Reveal sections as they scroll into view. Anything already
   // above the fold (or skipped by a fast jump) is shown at once.
-  const pageRef = useRef(null);
 
-  useEffect(() => {
-    const root = pageRef.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("gd-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
 
   return (
-    <main className="gd-page" ref={pageRef}>
+    <main className="gd-page">
 
       {/* ======================================================
           HERO

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -213,61 +213,11 @@ export default function FellowshipCommunity() {
 
   // Reveal sections as they scroll into view. Anything already
   // above the fold (or skipped by a fast jump) is shown at once.
-  const pageRef = useRef(null);
 
-  useEffect(() => {
-    const root = pageRef.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("fc-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
 
   return (
     <main
       className="fc-page"
-      ref={pageRef}
     >
       {/* HERO */}
       <section className="fc-hero">
@@ -747,7 +697,7 @@ export default function FellowshipCommunity() {
             </p>
           </div>
 
-          <ol className="fc-journey-grid">
+          <ol className="fc-journey-grid" data-scroll-steps>
             {journey.map((step) => {
               const Icon = step.icon;
 

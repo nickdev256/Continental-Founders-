@@ -1133,22 +1133,7 @@
 
 /* ============================================================
    SCROLL REVEAL
-   Only active once the page script runs (.about-page--reveal),
-   so content is never hidden if scripts fail.
-============================================================ */
 
-.about-page--reveal [data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s var(--ease);
-}
-
-.about-page--reveal [data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
 
 
 /* ============================================================
@@ -1391,8 +1376,4 @@
     display: none;
   }
 
-  .about-page--reveal [data-reveal] {
-    opacity: 1;
-    transform: none;
-  }
 }

@@ -2,9 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
-  useState,
-} from "react";
+  useState } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -125,62 +123,7 @@ function VentureLogo({ venture }) {
   );
 }
 
-/* ============================================================
-   SCROLL REVEAL
-   Content stays visible if scripts fail or motion is reduced.
-============================================================ */
 
-function useReveal(ref, deps) {
-  useEffect(() => {
-    const root = ref.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("vn-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]:not(.is-visible)")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-}
 
 /* ============================================================
    VENTURES
@@ -193,7 +136,6 @@ export default function Ventures() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const pageRef = useRef(null);
 
   const loadVentures = useCallback(async () => {
     setLoading(true);
@@ -299,12 +241,11 @@ export default function Ventures() {
     setSearchTerm("");
   }
 
-  useReveal(pageRef, [loading]);
 
   const hasVentures = publishedVentures.length > 0;
 
   return (
-    <main className="vn-page" ref={pageRef}>
+    <main className="vn-page">
       {/* ======================================================
           HERO
       ====================================================== */}
@@ -367,7 +308,7 @@ export default function Ventures() {
             <div className="vn-state" aria-live="polite">
               <span className="vn-loader" aria-hidden="true" />
               <h3>Loading ventures…</h3>
-              <p>Please wait while we load the founders directory.</p>
+              <p>Please wait while we load the founders directory.</p> 
             </div>
           )}
 
@@ -538,7 +479,7 @@ export default function Ventures() {
             <h2>From potential to opportunity.</h2>
           </header>
 
-          <ol className="vn-steps" data-reveal>
+          <ol className="vn-steps" data-reveal data-scroll-steps="line">
             {journey.map((step, index) => (
               <li key={step.title}>
                 <span className="vn-steps__number" aria-hidden="true">

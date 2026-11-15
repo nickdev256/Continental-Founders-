@@ -27,6 +27,8 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 
 import PageTransition from "./components/layout/PageTransition";
+import Motion from "./components/Motion";
+import Interactions from "./components/Interactions";
 
 
 
@@ -2227,34 +2229,6 @@ function SEOManager() {
 
 
 
-function ScrollToTop() {
-
-  const { pathname } = useLocation();
-
-
-
-  useEffect(() => {
-
-    window.scrollTo({
-
-      top: 0,
-
-      left: 0,
-
-      behavior: "auto",
-
-    });
-
-  }, [pathname]);
-
-
-
-  return null;
-
-}
-
-
-
 /* ============================================================
 
    APP
@@ -2299,7 +2273,9 @@ export default function App() {
 
     >
 
-      <ScrollToTop />
+      <Motion />
+
+      <Interactions />
 
       <SEOManager />
 

@@ -1249,30 +1249,6 @@
 }
 
 
-/* ============================================================
-   SCROLL REVEAL
-   Only active once the page script runs (.cfcv-page--reveal),
-   so content is never hidden if scripts fail.
-============================================================ */
-
-.cfcv-page--reveal [data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s var(--cfcv-ease);
-}
-
-.cfcv-page--reveal [data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-
-/* ============================================================
-   LARGE SCREENS
-============================================================ */
-
 @media (min-width: 1920px) {
   .cfcv-page {
     font-size: 17px;
@@ -1607,8 +1583,4 @@
     color: #000;
   }
 
-  .cfcv-page--reveal [data-reveal] {
-    opacity: 1;
-    transform: none;
-  }
 }

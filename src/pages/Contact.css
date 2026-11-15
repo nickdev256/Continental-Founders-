@@ -275,6 +275,37 @@
   line-height: 1.7;
 }
 
+/* The global p size would otherwise win here */
+.ct-hero__aside p {
+  margin: 0;
+  font-size: inherit;
+}
+
+.ct-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.ct-hero__actions .ct-button {
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 14px;
+}
+
+.ct-button--glass {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(8px);
+}
+
+.ct-button--glass:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--ct-gold-light);
+}
+
 
 /* ============================================================
    FORM + DETAILS
@@ -349,6 +380,53 @@
 
 .ct-details a:hover {
   color: var(--ct-gold-dark);
+}
+
+.ct-details__icon--navy {
+  background: rgba(3, 27, 52, 0.06);
+}
+
+.ct-details__icon--navy img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Copy button and outbound arrow sit at the end of their row */
+.ct-details__copy,
+.ct-details__out {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.ct-details li > span:nth-child(2) {
+  min-width: 0;
+  display: grid;
+}
+
+.ct-details__copy {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--ct-navy);
+  background: var(--ct-soft);
+  border: 1px solid var(--ct-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.ct-details__copy:hover {
+  border-color: var(--ct-gold);
+}
+
+.ct-details__out {
+  color: var(--ct-muted);
 }
 
 .ct-details__icon {
@@ -579,7 +657,8 @@
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  padding: 0 18px;
+  gap: 8px;
+  padding: 0 18px 0 12px;
   color: var(--ct-ink);
   background: #fbfaf8;
   border: 1px solid var(--ct-line);
@@ -613,6 +692,106 @@
   color: #fff;
   background: var(--ct-navy);
   border-color: var(--ct-navy);
+}
+
+/* A small circle that fills with a tick when the topic is chosen */
+.ct-interests__tick {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: transparent;
+  border: 1.5px solid var(--ct-line);
+  border-radius: 50%;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    scale 0.25s var(--ct-ease);
+}
+
+.ct-interests label:hover .ct-interests__tick {
+  border-color: var(--ct-gold);
+}
+
+.ct-interests label.is-selected .ct-interests__tick {
+  color: var(--ct-navy);
+  background: var(--ct-gold-light);
+  border-color: var(--ct-gold-light);
+  scale: 1.08;
+}
+
+/* Progress through the required fields */
+.ct-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.ct-progress__bar {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  background: var(--ct-soft);
+  border-radius: 999px;
+}
+
+.ct-progress__bar span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--ct-gold), var(--ct-blue));
+  border-radius: inherit;
+  transform-origin: left center;
+  transition: transform 0.5s var(--ct-ease);
+}
+
+.ct-progress__text {
+  flex-shrink: 0;
+  color: var(--ct-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Submit button with the privacy note beside it */
+.ct-form__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+}
+
+.ct-form__privacy {
+  max-width: 320px;
+  margin: 0;
+  color: var(--ct-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.ct-form__privacy a {
+  color: var(--ct-navy);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 146, 32, 0.6);
+  text-underline-offset: 3px;
+}
+
+.ct-form__privacy a:hover {
+  color: var(--ct-blue);
+}
+
+.ct-spin {
+  animation: ct-spin 0.9s linear infinite;
+}
+
+@keyframes ct-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .ct-interests[aria-invalid="true"] label {
@@ -938,5 +1117,37 @@
   .ct-hero h1 em,
   .ct-hero__aside {
     color: #000;
+  }
+}
+
+
+/* ============================================================
+   CONTACT EXTRAS — phones
+============================================================ */
+
+@media (max-width: 640px) {
+  .ct-hero__actions .ct-button {
+    flex: 1 1 100%;
+  }
+
+  .ct-progress {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .ct-progress__bar {
+    flex: none;
+    width: 100%;
+  }
+
+  .ct-form__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ct-form__privacy {
+    max-width: none;
+    text-align: center;
   }
 }

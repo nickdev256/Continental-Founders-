@@ -1178,83 +1178,6 @@ export default function Home() {
       : "/events";
 
 
-  // ==========================================================
-  // REVEAL SECTIONS AS THEY SCROLL INTO VIEW
-  // ==========================================================
-
-  const homeRef =
-    useRef(null);
-
-  useEffect(() => {
-    const root =
-      homeRef.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    // Content stays visible unless this script runs.
-    root.classList.add(
-      "cf-home--reveal"
-    );
-
-    let pending =
-      [...root.querySelectorAll("[data-reveal]")];
-
-    let frame =
-      0;
-
-    // Reveal everything that has reached the lower part of the
-    // screen, including sections skipped by a fast jump.
-    const reveal = () => {
-      frame = 0;
-
-      const limit =
-        window.innerHeight * 0.92;
-
-      pending = pending.filter(
-        (element) => {
-          if (
-            element.getBoundingClientRect().top < limit
-          ) {
-            element.classList.add(
-              "is-visible"
-            );
-
-            return false;
-          }
-
-          return true;
-        }
-      );
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) {
-        frame =
-          window.requestAnimationFrame(reveal);
-      }
-    };
-
-    reveal();
-
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
 
 
   // ==========================================================
@@ -1264,7 +1187,6 @@ export default function Home() {
   return (
     <main
       className="cf-home"
-      ref={homeRef}
     >
 
       {/* =====================================================

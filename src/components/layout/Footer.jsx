@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import "./Footer.css";
-import { TbBrandThreejs } from "react-icons/tb";
+import { scrollToTarget } from "../../lib/smoothScroll";
 
 
 /* ============================================================
@@ -366,31 +366,21 @@ export default function Footer() {
   ========================================================== */
 
   return (
-
     <footer className="cf-footer">
-
-      <div
-        className="cf-footer__background"
-        aria-hidden="true"
-      />
-
+      <div className="cf-footer__background" aria-hidden="true" />
 
       <div className="cf-footer__container">
-
         {/* ====================================================
-            MAIN: BRAND + LINK COLUMNS
+            MAIN: BRAND | LINKS + NEWSLETTER
         ===================================================== */}
 
         <div className="cf-footer__main">
-
           <div className="cf-footer__brand">
-
             <Link
               to="/"
               className="cf-footer__logo"
               aria-label="Continental Founders home"
             >
-
               <img
                 src="/assets/logoo-trimmed.webp"
                 alt="Continental Founders"
@@ -398,15 +388,11 @@ export default function Footer() {
                 height="280"
                 loading="lazy"
               />
-             
-
             </Link>
-
 
             <span className="cf-footer__eyebrow">
               CONNECT. COLLABORATE. CREATE IMPACT.
             </span>
-
 
             <p className="cf-footer__description">
               Continental Founders builds strategic relationships around
@@ -415,424 +401,199 @@ export default function Footer() {
               the United States.
             </p>
 
-
             <div className="cf-footer__location">
-
-              <span
-                className="cf-footer__location-icon"
-                aria-hidden="true"
-              >
-
-                <Globe2
-                  size={20}
-                  strokeWidth={1.6}
-                />
-
+              <span className="cf-footer__location-icon" aria-hidden="true">
+                <Globe2 size={18} strokeWidth={1.7} />
               </span>
 
-
-              <div>
-
+              <span>
                 <span className="cf-footer__location-label">
                   GLOBAL NETWORK
                 </span>
+                <strong>United States × Africa</strong>
+              </span>
+            </div>
 
-                <strong>
-                  United States × Africa
-                </strong>
+            <Link to="/contact" className="cf-footer__meeting">
+              <span>Schedule a meeting</span>
+              <ArrowUpRight size={18} strokeWidth={2} aria-hidden="true" />
+            </Link>
+          </div>
 
+          <div className="cf-footer__side">
+            <div className="cf-footer__navigation">
+              <FooterLinks title="Explore" items={navigation.explore} />
+
+              <FooterLinks title="Resources" items={navigation.resources} />
+
+              <div className="cf-footer__column cf-footer__column--focus">
+                <h3>Our Focus</h3>
+
+                <ol className="cf-footer__focus">
+                  {focusAreas.map((area, index) => (
+                    <li className="cf-footer__focus-item" key={area}>
+                      <span aria-hidden="true">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <p>{area}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+
+            {/* ==================================================
+                NEWSLETTER
+            =================================================== */}
+
+            <section
+              className="cf-footer__newsletter"
+              id="newsletter"
+              aria-labelledby="footer-newsletter-heading"
+            >
+              <div className="cf-footer__newsletter-content">
+                <span className="cf-footer__newsletter-label">
+                  STAY CONNECTED
+                </span>
+
+                <h2 id="footer-newsletter-heading">
+                  Subscribe for More Information
+                </h2>
+
+                <p>
+                  Get updates on programs, partnerships, events, insights,
+                  and opportunities across the Continental Founders ecosystem.
+                </p>
               </div>
 
-            </div>
+              <form
+                className="cf-footer__newsletter-form"
+                onSubmit={handleNewsletterSubmit}
+                noValidate
+              >
+                <div className="cf-footer__field">
+                  <div className="cf-footer__input-wrap">
+                    <Mail
+                      className="cf-footer__input-icon"
+                      size={16}
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    />
 
+                    <input
+                      type="email"
+                      name="newsletterEmail"
+                      value={email}
+                      placeholder="Enter your email"
+                      aria-label="Email address"
+                      autoComplete="email"
+                      disabled={submitting}
+                      onChange={(event) => {
+                        setEmail(event.target.value);
+                        if (newsletterError) setNewsletterError("");
+                        if (newsletterMessage) setNewsletterMessage("");
+                      }}
+                      required
+                    />
+                  </div>
 
-            <Link
-              to="/contact"
-              className="cf-footer__meeting"
-            >
-
-              <span>
-                Schedule a meeting
-              </span>
-
-              <ArrowUpRight
-                size={18}
-                strokeWidth={2}
-                aria-hidden="true"
-              />
-
-            </Link>
-
-          </div>
-
-
-          <div className="cf-footer__navigation">
-
-            <FooterLinks
-              title="Explore"
-              items={
-                navigation.explore
-              }
-            />
-
-
-            <FooterLinks
-              title="Resources"
-              items={
-                navigation.resources
-              }
-            />
-
-
-            <div className="cf-footer__column cf-footer__column--focus">
-
-              <h3>
-                Our Focus
-              </h3>
-
-
-              <ol className="cf-footer__focus">
-
-                {focusAreas.map(
-                  (
-                    area,
-                    index
-                  ) => (
-
-                    <li
-                      className="cf-footer__focus-item"
-                      key={
-                        area
-                      }
-                    >
-
-                      <span aria-hidden="true">
-
-                        {String(
-                          index + 1
-                        ).padStart(
-                          2,
-                          "0"
-                        )}
-
-                      </span>
-
-
-                      <p>
-                        {area}
-                      </p>
-
-                    </li>
-
-                  )
-                )}
-
-              </ol>
-
-            </div>
-
-          </div>
-
-
-          {/* ====================================================
-              NEWSLETTER BAND
-          ===================================================== */}
-
-          <section
-            className="cf-footer__newsletter"
-            id="newsletter"
-            aria-labelledby="footer-newsletter-heading"
-          >
-
-            <div className="cf-footer__newsletter-content">
-
-              <span className="cf-footer__newsletter-label">
-                STAY CONNECTED
-              </span>
-
-
-              <h2 id="footer-newsletter-heading">
-                Subscribe for More Information
-              </h2>
-
-
-              <p>
-                Get updates on programs, partnerships, events, insights,
-                and opportunities across the Continental Founders ecosystem.
-              </p>
-
-            </div>
-
-
-            <form
-              className="cf-footer__newsletter-form"
-              onSubmit={
-                handleNewsletterSubmit
-              }
-              noValidate
-            >
-
-              <div className="cf-footer__field">
-
-                <div className="cf-footer__input-wrap">
-
-                  <Mail
-                    className="cf-footer__input-icon"
-                    size={18}
-                    strokeWidth={1.8}
-                    aria-hidden="true"
-                  />
-
-                  <input
-                    type="email"
-                    name="newsletterEmail"
-                    value={
-                      email
-                    }
-                    placeholder="Enter your email"
-                    aria-label="Email address"
-                    autoComplete="email"
-                    disabled={
-                      submitting
-                    }
-                    onChange={(
-                      event
-                    ) => {
-
-                      setEmail(
-                        event.target.value
-                      );
-
-
-                      if (
-                        newsletterError
-                      ) {
-
-                        setNewsletterError(
-                          ""
-                        );
-
-                      }
-
-
-                      if (
-                        newsletterMessage
-                      ) {
-
-                        setNewsletterMessage(
-                          ""
-                        );
-
-                      }
-
-                    }}
-                    required
-                  />
-
+                  <button
+                    type="submit"
+                    disabled={submitting || !email.trim()}
+                    aria-busy={submitting}
+                  >
+                    <span>{submitting ? "Subscribing..." : "Subscribe"}</span>
+                    <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
+                  </button>
                 </div>
 
+                {newsletterMessage && (
+                  <p
+                    className="cf-footer__newsletter-success"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {newsletterMessage}
+                  </p>
+                )}
 
-                <button
-                  type="submit"
-                  disabled={
-                    submitting ||
-                    !email.trim()
-                  }
-                  aria-busy={
-                    submitting
-                  }
-                >
-
-                  <span>
-
-                    {submitting
-                      ? "Subscribing..."
-                      : "Subscribe"}
-
-                  </span>
-
-
-                  <ArrowUpRight
-                    size={18}
-                    strokeWidth={2}
-                    aria-hidden="true"
-                  />
-
-                </button>
-
-              </div>
-
-
-              {newsletterMessage && (
-
-                <p
-                  className="cf-footer__newsletter-success"
-                  role="status"
-                  aria-live="polite"
-                >
-
-                  {newsletterMessage}
-
-                </p>
-
-              )}
-
-
-              {newsletterError && (
-
-                <p
-                  className="cf-footer__newsletter-error"
-                  role="alert"
-                  aria-live="assertive"
-                >
-
-                  {newsletterError}
-
-                </p>
-
-              )}
-
-            </form>
-
-          </section>
-
+                {newsletterError && (
+                  <p
+                    className="cf-footer__newsletter-error"
+                    role="alert"
+                    aria-live="assertive"
+                  >
+                    {newsletterError}
+                  </p>
+                )}
+              </form>
+            </section>
+          </div>
         </div>
 
-
         {/* ====================================================
-            CLOSING STATEMENT
+            SIGN-OFF: CLOSING STATEMENT + SOCIALS
         ===================================================== */}
 
-        <p className="cf-footer__statement">
-          Building a Brighter Future <em>Together</em>
-        </p>
+        <div className="cf-footer__signoff">
+          <p className="cf-footer__statement">
+            Building a Brighter Future <em>Together</em>
+          </p>
 
+          <div className="cf-footer__bottom-actions">
+            <ul className="cf-footer__socials" aria-label="Social media">
+              {socials.map((social) => (
+                <li key={social.label}>
+                  <a
+                    href={social.url}
+                    className="cf-footer__social"
+                    aria-label={`Continental Founders on ${social.label}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={social.image}
+                      alt=""
+                      width="24"
+                      height="24"
+                      loading="lazy"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <button
+              type="button"
+              className="cf-footer__top"
+              onClick={() => scrollToTarget(0)}
+            >
+              <span>Back to top</span>
+              <ArrowUp size={16} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
       </div>
-
 
       {/* ======================================================
           BOTTOM BAR
       ====================================================== */}
 
       <div className="cf-footer__bottom">
+        <div className="cf-footer__container cf-footer__bottom-inner">
+          <p className="cf-footer__copyright">
+            <span>© {year} Continental Founders™</span>
+            <span className="cf-footer__copyright-separator" aria-hidden="true">
+              |
+            </span>
+            <span>All rights reserved.</span>
+          </p>
 
-        <div className="cf-footer__container">
-
-          <div className="cf-footer__bottom-inner">
-
-            <p className="cf-footer__copyright">
-
-              <span>
-                © {year} Continental Founders™
-              </span>
-
-
-              <span
-                className="cf-footer__copyright-separator"
-                aria-hidden="true"
-              >
-                |
-              </span>
-
-
-              <span>
-                All rights reserved.
-              </span>
-
-            </p>
-
-
-            <nav
-              className="cf-footer__legal"
-              aria-label="Legal"
-            >
-
-              <Link to="/privacy">
-                Privacy
-              </Link>
-
-
-              <Link to="/terms">
-                Terms
-              </Link>
-
-
-              <Link to="/accessibility">
-                Accessibility
-              </Link>
-
-            </nav>
-
-
-            <div className="cf-footer__bottom-actions">
-
-              <ul
-                className="cf-footer__socials"
-                aria-label="Social media"
-              >
-
-                {socials.map(
-                  (social) => (
-
-                    <li key={social.label}>
-
-                      <a
-                        href={
-                          social.url
-                        }
-                        className="cf-footer__social"
-                        aria-label={`Continental Founders on ${social.label}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-
-                        <img
-                          src={
-                            social.image
-                          }
-                          alt=""
-                          width="24"
-                          height="24"
-                          loading="lazy"
-                        />
-
-                      </a>
-
-                    </li>
-
-                  )
-                )}
-
-              </ul>
-
-
-              <button
-                type="button"
-                className="cf-footer__top"
-                onClick={() =>
-                  window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                  })
-                }
-              >
-
-                <span>
-                  Back to top
-                </span>
-
-                <ArrowUp
-                  size={16}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                />
-
-              </button>
-
-            </div>
-
-          </div>
-
+          <nav className="cf-footer__legal" aria-label="Legal">
+            <Link to="/privacy">Privacy</Link>
+            <Link to="/terms">Terms</Link>
+            <Link to="/accessibility">Accessibility</Link>
+          </nav>
 
           <p className="cf-footer__credit">
             Website developed by{" "}
@@ -844,15 +605,10 @@ export default function Footer() {
               Eth Tech Solutions
             </a>
           </p>
-
         </div>
-
       </div>
-
     </footer>
-
   );
-
 }
 
 

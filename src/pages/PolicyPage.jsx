@@ -132,6 +132,13 @@ const PRIVACY = {
             twice. It is removed when you close the tab.
           </p>
           <p>
+            While you fill in the fellowship application, your answers are
+            saved in your own browser so you can finish later. They stay on
+            your device, are not sent to us until you submit, and are removed
+            when you submit the application or choose to start fresh. Your CV
+            file is never saved this way.
+          </p>
+          <p>
             Our fonts are loaded from Google Fonts, so your browser connects to
             Google's servers when a page loads. Links to LinkedIn, Instagram,
             Facebook, YouTube and Google Maps take you to those services, which

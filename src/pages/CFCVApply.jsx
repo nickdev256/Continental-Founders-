@@ -1,17 +1,26 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { gsap } from "gsap";
 import { Link, useNavigate } from "react-router-dom";
 
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   Check,
   CheckCircle2,
   ChevronLeft,
+  Clock3,
+  FileText,
   Globe2,
   Loader2,
+  RotateCcw,
   Send,
+  Target,
+  TrendingUp,
+  Upload,
   User,
   Users,
+  X,
 } from "lucide-react";
 
 import { submitCfcvApplication } from "../services/cfcvApi";
@@ -248,6 +257,109 @@ const INITIAL_FORM = {
 };
 
 /* ============================================================
+   DRAFT (autosave)
+   Answers are kept in this browser so an applicant can finish
+   later. The résumé file is never stored. The draft is removed
+   once the application is submitted or the applicant starts fresh.
+============================================================ */
+
+const DRAFT_KEY = "cfcv:application-draft";
+
+function hasAnswers(values) {
+  return Object.entries(values).some(
+    ([key, value]) =>
+      key !== "confirmation" &&
+      typeof value === "string" &&
+      value.trim()
+  );
+}
+
+function readDraft() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null");
+    if (!saved?.form) return null;
+
+    // Only accept known fields with the expected type.
+    const values = { ...INITIAL_FORM };
+    Object.keys(INITIAL_FORM).forEach((key) => {
+      if (typeof saved.form[key] === typeof INITIAL_FORM[key]) {
+        values[key] = saved.form[key];
+      }
+    });
+    values.confirmation = false;
+
+    if (!hasAnswers(values)) return null;
+
+    const step = Math.min(Math.max(Number(saved.step) || 1, 1), STEPS.length);
+    return { form: values, step, savedAt: Number(saved.savedAt) || Date.now() };
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // Storage unavailable: nothing to clear.
+  }
+}
+
+const formatSavedTime = (timestamp) =>
+  new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+const formatSavedDate = (timestamp) =>
+  new Date(timestamp).toLocaleString([], {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+const formatFileSize = (bytes) =>
+  bytes >= 1024 * 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
+/* ============================================================
+   FIELD NAMES (error summary) AND CHOICES
+============================================================ */
+
+const FIELD_LABELS = {
+  firstName: "First name",
+  lastName: "Last name",
+  email: "Email address",
+  country: "Country",
+  geography: "Applicant geography",
+  professionalBackground: "Professional / founder background",
+  relevantSkills: "Relevant skills and experience",
+  ventureDescription: "Your venture or idea",
+  problem: "The problem you are addressing",
+  solution: "Your solution",
+  ventureStage: "Venture stage",
+  currentProgress: "Current progress",
+  targetMarket: "Target market",
+  teamStatus: "Current team status",
+  existingCrossContinentalTeam: "Cross-continental team",
+  workingStyle: "Personality and working style",
+  longTermObjectives: "Long-term objectives",
+  timeCommitment: "Time commitment",
+  decisionMaking: "Disagreement and decision-making",
+  sixMonthGoals: "Success in six months",
+  resume: "Résumé / CV",
+  confirmation: "Confirmation",
+};
+
+// Values are sent to the backend as-is; keep them unchanged.
+const CHOICES = {
+  geography: ["Africa", "United States", "Diaspora"],
+  teamStatus: ["Individual founder", "Existing team"],
+  existingCrossContinentalTeam: ["Yes", "No"],
+};
+
+const countWords = (text) => (text.trim() ? text.trim().split(/\s+/).length : 0);
+
+/* ============================================================
    SHARED COMPONENTS
 ============================================================ */
 
@@ -300,9 +412,200 @@ function ReviewItem({ label, value }) {
   );
 }
 
+function WordCount({ value }) {
+  const words = countWords(value);
+
+  return (
+    <span className="cfcv-apply-count" aria-hidden="true">
+      {words} {words === 1 ? "word" : "words"}
+    </span>
+  );
+}
+
+// Clickable option cards in place of a dropdown.
+function ChoiceGroup({ name, value, options, onChange, invalid }) {
+  return (
+    <div
+      className={`cfcv-apply-choices${invalid ? " is-invalid" : ""}`}
+      role="radiogroup"
+      aria-label={FIELD_LABELS[name]}
+    >
+      {options.map((option) => (
+        <label
+          key={option}
+          className={value === option ? "is-selected" : undefined}
+        >
+          <input
+            type="radio"
+            name={name}
+            value={option}
+            checked={value === option}
+            onChange={onChange}
+          />
+          <span className="cfcv-apply-choices__dot" aria-hidden="true">
+            <Check size={12} strokeWidth={3} />
+          </span>
+          {option}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 /* ============================================================
    PAGE
 ============================================================ */
+
+/* ============================================================
+   VALIDATION
+   Pure, so it can check a whole step, a single field when the
+   applicant leaves it, or every step before submitting.
+============================================================ */
+
+function getStepErrors(step, form, resume) {
+  const nextErrors = {};
+
+  if (step === 1) {
+    if (!form.firstName.trim()) {
+      nextErrors.firstName =
+        "First name is required.";
+    }
+
+    if (!form.lastName.trim()) {
+      nextErrors.lastName =
+        "Last name is required.";
+    }
+
+    if (!form.email.trim()) {
+      nextErrors.email =
+        "Email address is required.";
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        form.email
+      )
+    ) {
+      nextErrors.email =
+        "Enter a valid email address.";
+    }
+
+    if (!form.country.trim()) {
+      nextErrors.country =
+        "Country is required.";
+    }
+
+    if (!form.geography) {
+      nextErrors.geography =
+        "Select the geography that applies to you.";
+    }
+
+    if (
+      !form.professionalBackground.trim()
+    ) {
+      nextErrors.professionalBackground =
+        "Please describe your background.";
+    }
+
+    if (!form.relevantSkills.trim()) {
+      nextErrors.relevantSkills =
+        "Please describe your relevant skills and experience.";
+    }
+  }
+
+  if (step === 2) {
+    if (!form.ventureDescription.trim()) {
+      nextErrors.ventureDescription =
+        "Please describe your venture or idea.";
+    }
+
+    if (!form.problem.trim()) {
+      nextErrors.problem =
+        "Please describe the problem you are addressing.";
+    }
+
+    if (!form.solution.trim()) {
+      nextErrors.solution =
+        "Please describe your proposed or current solution.";
+    }
+  }
+
+  if (step === 3) {
+    if (!form.ventureStage) {
+      nextErrors.ventureStage =
+        "Select your venture's current stage.";
+    }
+
+    if (!form.currentProgress.trim()) {
+      nextErrors.currentProgress =
+        "Please describe your current progress.";
+    }
+  }
+
+  if (step === 4) {
+    if (!form.targetMarket.trim()) {
+      nextErrors.targetMarket =
+        "Please describe your target market.";
+    }
+
+    if (!form.teamStatus) {
+      nextErrors.teamStatus =
+        "Select your current team status.";
+    }
+  }
+
+  if (step === 5) {
+    if (
+      !form.existingCrossContinentalTeam
+    ) {
+      nextErrors.existingCrossContinentalTeam =
+        "Please select an option.";
+    }
+
+    if (!form.workingStyle.trim()) {
+      nextErrors.workingStyle =
+        "Please describe your working style.";
+    }
+
+    if (
+      !form.longTermObjectives.trim()
+    ) {
+      nextErrors.longTermObjectives =
+        "Please describe your long-term objectives.";
+    }
+  }
+
+  if (step === 6) {
+    if (!form.timeCommitment.trim()) {
+      nextErrors.timeCommitment =
+        "Please describe the time you can commit.";
+    }
+
+    if (!form.decisionMaking.trim()) {
+      nextErrors.decisionMaking =
+        "Please describe how you approach disagreement and decision-making.";
+    }
+
+    if (!form.sixMonthGoals.trim()) {
+      nextErrors.sixMonthGoals =
+        "Please describe what success would look like after six months.";
+    }
+  }
+
+  if (step === 7) {
+    const message = resumeError(resume);
+
+    if (message) {
+      nextErrors.resume = message;
+    }
+
+    if (!form.confirmation) {
+      nextErrors.confirmation =
+        "Please confirm the information before submitting.";
+    }
+  }
+
+
+  return nextErrors;
+}
 
 function CFCVApply() {
   const navigate = useNavigate();
@@ -328,9 +631,27 @@ function CFCVApply() {
   const [retryPending, setRetryPending] =
     useState(false);
 
+  const [draftOffer, setDraftOffer] =
+    useState(() => readDraft());
+
+  const [savedAt, setSavedAt] =
+    useState(null);
+
+  const [showSummary, setShowSummary] =
+    useState(false);
+
+  const [returnToReview, setReturnToReview] =
+    useState(false);
+
+  const [dragging, setDragging] =
+    useState(false);
+
   const attemptRef = useRef(null);
   const submittingRef = useRef(false);
   const confirmedRef = useRef(null);
+  const formRef = useRef(null);
+  const touchedRef = useRef(new Set());
+  const previousStepRef = useRef(1);
 
   /* ==========================================================
      DERIVED VALUES
@@ -354,6 +675,217 @@ function CFCVApply() {
     [form.firstName, form.lastName]
   );
 
+  const errorList = Object.entries(errors).filter(
+    ([, message]) => message
+  );
+
+  // Every answer, grouped by step, for the review page.
+  const reviewSections = [
+    {
+      step: 1,
+      title: "Founder Information",
+      icon: User,
+      items: [
+        ["Founder", founderName],
+        ["Email", form.email],
+        ["Phone", form.phone],
+        ["Country", form.country],
+        ["City", form.city],
+        ["Geography", form.geography],
+        ["Background", form.professionalBackground],
+        ["Skills & Experience", form.relevantSkills],
+        ["Why entrepreneurship", form.entrepreneurshipReason],
+      ],
+    },
+    {
+      step: 2,
+      title: "Venture",
+      icon: Globe2,
+      items: [
+        ["Venture Name", form.ventureName],
+        ["Sector", form.sector],
+        ["Venture / Idea", form.ventureDescription],
+        ["Problem", form.problem],
+        ["Solution", form.solution],
+      ],
+    },
+    {
+      step: 3,
+      title: "Venture Stage",
+      icon: TrendingUp,
+      items: [
+        ["Current Stage", form.ventureStage],
+        ["Current Progress", form.currentProgress],
+      ],
+    },
+    {
+      step: 4,
+      title: "Market & Team",
+      icon: Target,
+      items: [
+        ["Target Market", form.targetMarket],
+        ["Target Customers", form.customerDescription],
+        ["Team Status", form.teamStatus],
+        ["Current Team", form.teamDescription],
+      ],
+    },
+    {
+      step: 5,
+      title: "Cross-Continental Collaboration",
+      icon: Users,
+      items: [
+        ["Cross-Continental Team", form.existingCrossContinentalTeam],
+        ["Collaborator Needs", form.collaboratorNeeds],
+        ["Market Knowledge", form.marketKnowledge],
+        ["Geographic Connections", form.geographicConnections],
+        ["Working Style", form.workingStyle],
+        ["Leadership Strengths", form.leadershipStrengths],
+        ["Long-Term Objectives", form.longTermObjectives],
+      ],
+    },
+    {
+      step: 6,
+      title: "Commitment & Goals",
+      icon: CheckCircle2,
+      items: [
+        ["Time Commitment", form.timeCommitment],
+        ["Decision-Making", form.decisionMaking],
+        ["Ownership Expectations", form.ownershipExpectations],
+        ["Six-Month Goals", form.sixMonthGoals],
+      ],
+    },
+  ];
+
+  /* ==========================================================
+     AUTOSAVE
+     Saves shortly after the applicant stops typing. Paused while
+     the "continue where you left off" choice is on screen so an
+     empty form never overwrites a saved draft.
+  ========================================================== */
+
+  useEffect(() => {
+    if (draftOffer || !hasAnswers(form)) return undefined;
+
+    const timer = setTimeout(() => {
+      try {
+        const at = Date.now();
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({
+            form: { ...form, confirmation: false },
+            step: currentStep,
+            savedAt: at,
+          })
+        );
+        setSavedAt(at);
+      } catch {
+        // Storage full or blocked: the form still works.
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [form, currentStep, draftOffer]);
+
+  function resumeDraft() {
+    setForm(draftOffer.form);
+    setCurrentStep(draftOffer.step);
+    setSavedAt(draftOffer.savedAt);
+    setDraftOffer(null);
+    scrollToForm();
+  }
+
+  function startFresh() {
+    clearDraft();
+    setDraftOffer(null);
+  }
+
+  /* ==========================================================
+     STEP TRANSITIONS
+     The new step slides in from the side it came from.
+  ========================================================== */
+
+  useEffect(() => {
+    const direction =
+      currentStep >= previousStepRef.current ? 1 : -1;
+    const changed = currentStep !== previousStepRef.current;
+
+    previousStepRef.current = currentStep;
+
+    if (currentStep === STEPS.length) setReturnToReview(false);
+
+    const step = formRef.current?.querySelector(".cfcv-apply-step");
+
+    if (
+      !changed ||
+      !step ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    const tween = gsap.fromTo(
+      step,
+      { autoAlpha: 0, x: 32 * direction },
+      {
+        autoAlpha: 1,
+        x: 0,
+        duration: 0.45,
+        ease: "power3.out",
+        clearProps: "opacity,visibility,transform",
+      }
+    );
+
+    return () => tween.kill();
+  }, [currentStep]);
+
+  /* ==========================================================
+     ERROR SUMMARY AND FIELD CHECKS
+  ========================================================== */
+
+  function focusField(name) {
+    const field = formRef.current?.querySelector(`[name="${name}"]`);
+    if (!field) return;
+
+    scrollToTarget(field, { block: "center" });
+    setTimeout(() => field.focus({ preventScroll: true }), 450);
+  }
+
+  // A field the applicant has typed in is checked when they leave it.
+  function handleBlur(event) {
+    const { name } = event.target;
+    if (!name || !touchedRef.current.has(name)) return;
+
+    const message = getStepErrors(currentStep, form, resume)[name] || "";
+
+    setErrors((previous) =>
+      previous[name] === message
+        ? previous
+        : { ...previous, [name]: message }
+    );
+  }
+
+  function editFromReview(step) {
+    setReturnToReview(true);
+    goToStep(step);
+  }
+
+  // After an edit, check the remaining steps and go straight back.
+  function backToReview() {
+    if (submittingRef.current || attemptRef.current) return;
+
+    for (let step = currentStep; step < STEPS.length; step += 1) {
+      if (!validateStep(step)) {
+        setCurrentStep(step);
+        scrollToForm();
+        return;
+      }
+    }
+
+    setShowSummary(false);
+    setCurrentStep(STEPS.length);
+    scrollToForm();
+  }
+
   /* ==========================================================
      INPUT HANDLING
   ========================================================== */
@@ -373,6 +905,8 @@ function CFCVApply() {
       checked,
     } = event.target;
 
+    touchedRef.current.add(name);
+
     setForm((previous) => ({
       ...previous,
       [name]:
@@ -389,16 +923,13 @@ function CFCVApply() {
     setSubmitError("");
   }
 
-  function handleResumeChange(event) {
+  function acceptResume(file) {
     if (
       submittingRef.current ||
       attemptRef.current
     ) {
-      return;
+      return false;
     }
-
-    const file =
-      event.target.files?.[0] || null;
 
     const message = resumeError(file);
 
@@ -409,11 +940,32 @@ function CFCVApply() {
       resume: message,
     }));
 
-    if (message) {
+    setSubmitError("");
+
+    return !message;
+  }
+
+  function handleResumeChange(event) {
+    const accepted = acceptResume(
+      event.target.files?.[0] || null
+    );
+
+    if (!accepted) {
       event.target.value = "";
     }
+  }
 
-    setSubmitError("");
+  function handleResumeDrop(event) {
+    event.preventDefault();
+    setDragging(false);
+    acceptResume(event.dataTransfer.files?.[0] || null);
+  }
+
+  function removeResume() {
+    if (submittingRef.current || attemptRef.current) return;
+
+    setResume(null);
+    setErrors((previous) => ({ ...previous, resume: "" }));
   }
 
   /* ==========================================================
@@ -421,151 +973,13 @@ function CFCVApply() {
   ========================================================== */
 
   function validateStep(step) {
-    const nextErrors = {};
-
-    if (step === 1) {
-      if (!form.firstName.trim()) {
-        nextErrors.firstName =
-          "First name is required.";
-      }
-
-      if (!form.lastName.trim()) {
-        nextErrors.lastName =
-          "Last name is required.";
-      }
-
-      if (!form.email.trim()) {
-        nextErrors.email =
-          "Email address is required.";
-      } else if (
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-          form.email
-        )
-      ) {
-        nextErrors.email =
-          "Enter a valid email address.";
-      }
-
-      if (!form.country.trim()) {
-        nextErrors.country =
-          "Country is required.";
-      }
-
-      if (!form.geography) {
-        nextErrors.geography =
-          "Select the geography that applies to you.";
-      }
-
-      if (
-        !form.professionalBackground.trim()
-      ) {
-        nextErrors.professionalBackground =
-          "Please describe your background.";
-      }
-
-      if (!form.relevantSkills.trim()) {
-        nextErrors.relevantSkills =
-          "Please describe your relevant skills and experience.";
-      }
-    }
-
-    if (step === 2) {
-      if (!form.ventureDescription.trim()) {
-        nextErrors.ventureDescription =
-          "Please describe your venture or idea.";
-      }
-
-      if (!form.problem.trim()) {
-        nextErrors.problem =
-          "Please describe the problem you are addressing.";
-      }
-
-      if (!form.solution.trim()) {
-        nextErrors.solution =
-          "Please describe your proposed or current solution.";
-      }
-    }
-
-    if (step === 3) {
-      if (!form.ventureStage) {
-        nextErrors.ventureStage =
-          "Select your venture's current stage.";
-      }
-
-      if (!form.currentProgress.trim()) {
-        nextErrors.currentProgress =
-          "Please describe your current progress.";
-      }
-    }
-
-    if (step === 4) {
-      if (!form.targetMarket.trim()) {
-        nextErrors.targetMarket =
-          "Please describe your target market.";
-      }
-
-      if (!form.teamStatus) {
-        nextErrors.teamStatus =
-          "Select your current team status.";
-      }
-    }
-
-    if (step === 5) {
-      if (
-        !form.existingCrossContinentalTeam
-      ) {
-        nextErrors.existingCrossContinentalTeam =
-          "Please select an option.";
-      }
-
-      if (!form.workingStyle.trim()) {
-        nextErrors.workingStyle =
-          "Please describe your working style.";
-      }
-
-      if (
-        !form.longTermObjectives.trim()
-      ) {
-        nextErrors.longTermObjectives =
-          "Please describe your long-term objectives.";
-      }
-    }
-
-    if (step === 6) {
-      if (!form.timeCommitment.trim()) {
-        nextErrors.timeCommitment =
-          "Please describe the time you can commit.";
-      }
-
-      if (!form.decisionMaking.trim()) {
-        nextErrors.decisionMaking =
-          "Please describe how you approach disagreement and decision-making.";
-      }
-
-      if (!form.sixMonthGoals.trim()) {
-        nextErrors.sixMonthGoals =
-          "Please describe what success would look like after six months.";
-      }
-    }
-
-    if (step === 7) {
-      const message = resumeError(resume);
-
-      if (message) {
-        nextErrors.resume = message;
-      }
-
-      if (!form.confirmation) {
-        nextErrors.confirmation =
-          "Please confirm the information before submitting.";
-      }
-    }
+    const nextErrors = getStepErrors(step, form, resume);
+    const valid = Object.keys(nextErrors).length === 0;
 
     setErrors(nextErrors);
+    setShowSummary(!valid);
 
-    return (
-      Object.keys(nextErrors).length === 0
-    );
+    return valid;
   }
 
   /* ==========================================================
@@ -585,6 +999,8 @@ function CFCVApply() {
 
       return;
     }
+
+    setShowSummary(false);
 
     setCurrentStep((previous) =>
       Math.min(
@@ -606,6 +1022,7 @@ function CFCVApply() {
 
     setErrors({});
     setSubmitError("");
+    setShowSummary(false);
 
     setCurrentStep((previous) =>
       Math.max(previous - 1, 1)
@@ -627,6 +1044,7 @@ function CFCVApply() {
     }
 
     setErrors({});
+    setShowSummary(false);
     setCurrentStep(step);
 
     scrollToForm();
@@ -808,6 +1226,8 @@ function CFCVApply() {
       }
 
       confirmedRef.current = data;
+
+      clearDraft();
 
       const submitted =
         attemptRef.current.application;
@@ -1008,6 +1428,20 @@ function CFCVApply() {
               />
             </div>
 
+            <p className="cfcv-apply-progress__meta">
+              <span>
+                <Clock3 size={14} aria-hidden="true" />
+                About 15–20 minutes
+              </span>
+
+              {savedAt && (
+                <span className="cfcv-apply-saved" role="status">
+                  <Check size={14} aria-hidden="true" />
+                  Saved {formatSavedTime(savedAt)}
+                </span>
+              )}
+            </p>
+
             <div className="cfcv-apply-progress__steps">
               {STEPS.map((step) => {
                 const complete =
@@ -1069,10 +1503,70 @@ function CFCVApply() {
           </aside>
 
           <form
+            ref={formRef}
             className="cfcv-apply-form"
             onSubmit={handleSubmit}
+            onBlur={handleBlur}
             noValidate
           >
+            {draftOffer && (
+              <div className="cfcv-apply-draft" role="status">
+                <span className="cfcv-apply-draft__icon" aria-hidden="true">
+                  <RotateCcw size={20} />
+                </span>
+
+                <div className="cfcv-apply-draft__text">
+                  <strong>Welcome back. Your saved answers are ready.</strong>
+                  <p>
+                    Last saved {formatSavedDate(draftOffer.savedAt)}. Your CV
+                    isn't saved, so you'll attach it again at the end.
+                  </p>
+                </div>
+
+                <div className="cfcv-apply-draft__actions">
+                  <button
+                    type="button"
+                    className="cfcv-apply-button cfcv-apply-button--primary"
+                    onClick={resumeDraft}
+                  >
+                    Continue where I left off
+                  </button>
+
+                  <button
+                    type="button"
+                    className="cfcv-apply-button cfcv-apply-button--secondary"
+                    onClick={startFresh}
+                  >
+                    Start fresh
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {showSummary && errorList.length > 0 && (
+              <div className="cfcv-apply-summary" role="alert">
+                <AlertCircle size={20} aria-hidden="true" />
+
+                <div>
+                  <strong>
+                    Please check {errorList.length}{" "}
+                    {errorList.length === 1 ? "answer" : "answers"} before
+                    continuing
+                  </strong>
+
+                  <ul>
+                    {errorList.map(([name, message]) => (
+                      <li key={name}>
+                        <button type="button" onClick={() => focusField(name)}>
+                          {FIELD_LABELS[name] || name}
+                        </button>
+                        <span>{message}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
             <fieldset
               disabled={
                 submitting || retryPending
@@ -1206,27 +1700,13 @@ function CFCVApply() {
                       label="Applicant Geography"
                       required
                     >
-                      <select
+                      <ChoiceGroup
                         name="geography"
                         value={form.geography}
+                        options={CHOICES.geography}
                         onChange={handleChange}
-                      >
-                        <option value="">
-                          Select
-                        </option>
-
-                        <option value="Africa">
-                          Africa
-                        </option>
-
-                        <option value="United States">
-                          United States
-                        </option>
-
-                        <option value="Diaspora">
-                          Diaspora
-                        </option>
-                      </select>
+                        invalid={Boolean(errors.geography)}
+                      />
 
                       {errors.geography && (
                         <span className="cfcv-apply-error">
@@ -1249,6 +1729,8 @@ function CFCVApply() {
                           rows={5}
                         />
 
+                        <WordCount value={form.professionalBackground} />
+
                         {errors.professionalBackground && (
                           <span className="cfcv-apply-error">
                             {errors.professionalBackground}
@@ -1269,6 +1751,8 @@ function CFCVApply() {
                           rows={5}
                         />
 
+                        <WordCount value={form.relevantSkills} />
+
                         {errors.relevantSkills && (
                           <span className="cfcv-apply-error">
                             {errors.relevantSkills}
@@ -1287,6 +1771,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.entrepreneurshipReason} />
                       </Field>
                     </div>
                   </div>
@@ -1345,6 +1831,8 @@ function CFCVApply() {
                           rows={6}
                         />
 
+                        <WordCount value={form.ventureDescription} />
+
                         {errors.ventureDescription && (
                           <span className="cfcv-apply-error">
                             {errors.ventureDescription}
@@ -1365,6 +1853,8 @@ function CFCVApply() {
                           rows={5}
                         />
 
+                        <WordCount value={form.problem} />
+
                         {errors.problem && (
                           <span className="cfcv-apply-error">
                             {errors.problem}
@@ -1384,6 +1874,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.solution} />
 
                         {errors.solution && (
                           <span className="cfcv-apply-error">
@@ -1499,6 +1991,8 @@ function CFCVApply() {
                         rows={6}
                       />
 
+                      <WordCount value={form.currentProgress} />
+
                       {errors.currentProgress && (
                         <span className="cfcv-apply-error">
                           {errors.currentProgress}
@@ -1555,6 +2049,8 @@ function CFCVApply() {
                           rows={5}
                         />
 
+                        <WordCount value={form.targetMarket} />
+
                         {errors.targetMarket && (
                           <span className="cfcv-apply-error">
                             {errors.targetMarket}
@@ -1573,6 +2069,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.customerDescription} />
                       </Field>
                     </div>
 
@@ -1580,23 +2078,13 @@ function CFCVApply() {
                       label="Current Team Status"
                       required
                     >
-                      <select
+                      <ChoiceGroup
                         name="teamStatus"
                         value={form.teamStatus}
+                        options={CHOICES.teamStatus}
                         onChange={handleChange}
-                      >
-                        <option value="">
-                          Select
-                        </option>
-
-                        <option value="Individual founder">
-                          Individual founder
-                        </option>
-
-                        <option value="Existing team">
-                          Existing team
-                        </option>
-                      </select>
+                        invalid={Boolean(errors.teamStatus)}
+                      />
 
                       {errors.teamStatus && (
                         <span className="cfcv-apply-error">
@@ -1613,6 +2101,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.teamDescription} />
                       </Field>
                     </div>
                   </div>
@@ -1644,25 +2134,13 @@ function CFCVApply() {
                       label="Do you already have a team connecting Africa and the U.S./diaspora?"
                       required
                     >
-                      <select
+                      <ChoiceGroup
                         name="existingCrossContinentalTeam"
-                        value={
-                          form.existingCrossContinentalTeam
-                        }
+                        value={form.existingCrossContinentalTeam}
+                        options={CHOICES.existingCrossContinentalTeam}
                         onChange={handleChange}
-                      >
-                        <option value="">
-                          Select
-                        </option>
-
-                        <option value="Yes">
-                          Yes
-                        </option>
-
-                        <option value="No">
-                          No
-                        </option>
-                      </select>
+                        invalid={Boolean(errors.existingCrossContinentalTeam)}
+                      />
 
                       {errors.existingCrossContinentalTeam && (
                         <span className="cfcv-apply-error">
@@ -1679,6 +2157,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.collaboratorNeeds} />
                       </Field>
                     </div>
 
@@ -1690,6 +2170,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.marketKnowledge} />
                       </Field>
                     </div>
 
@@ -1703,6 +2185,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.geographicConnections} />
                       </Field>
                     </div>
 
@@ -1717,6 +2201,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.workingStyle} />
 
                         {errors.workingStyle && (
                           <span className="cfcv-apply-error">
@@ -1736,6 +2222,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.leadershipStrengths} />
                       </Field>
                     </div>
 
@@ -1752,6 +2240,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.longTermObjectives} />
 
                         {errors.longTermObjectives && (
                           <span className="cfcv-apply-error">
@@ -1797,6 +2287,8 @@ function CFCVApply() {
                           rows={4}
                         />
 
+                        <WordCount value={form.timeCommitment} />
+
                         {errors.timeCommitment && (
                           <span className="cfcv-apply-error">
                             {errors.timeCommitment}
@@ -1817,6 +2309,8 @@ function CFCVApply() {
                           rows={5}
                         />
 
+                        <WordCount value={form.decisionMaking} />
+
                         {errors.decisionMaking && (
                           <span className="cfcv-apply-error">
                             {errors.decisionMaking}
@@ -1835,6 +2329,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={5}
                         />
+
+                        <WordCount value={form.ownershipExpectations} />
                       </Field>
                     </div>
 
@@ -1849,6 +2345,8 @@ function CFCVApply() {
                           onChange={handleChange}
                           rows={6}
                         />
+
+                        <WordCount value={form.sixMonthGoals} />
 
                         {errors.sixMonthGoals && (
                           <span className="cfcv-apply-error">
@@ -1881,268 +2379,112 @@ function CFCVApply() {
                   </header>
 
                   <div className="cfcv-review">
-                    <section>
-                      <div className="cfcv-review__heading">
-                        <div>
-                          <User size={18} />
+                    {reviewSections.map(({ step, title, icon: Icon, items }) => (
+                      <section key={step}>
+                        <div className="cfcv-review__heading">
+                          <div>
+                            <Icon size={18} />
 
-                          <h3>
-                            Founder Information
-                          </h3>
+                            <h3>
+                              {title}
+                            </h3>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              editFromReview(step)
+                            }
+                            aria-label={`Edit ${title}`}
+                          >
+                            Edit
+                          </button>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            goToStep(1)
-                          }
-                        >
-                          Edit
-                        </button>
-                      </div>
-
-                      <div className="cfcv-review__grid">
-                        <ReviewItem
-                          label="Founder"
-                          value={founderName}
-                        />
-
-                        <ReviewItem
-                          label="Email"
-                          value={form.email}
-                        />
-
-                        <ReviewItem
-                          label="Phone"
-                          value={form.phone}
-                        />
-
-                        <ReviewItem
-                          label="Country"
-                          value={form.country}
-                        />
-
-                        <ReviewItem
-                          label="City"
-                          value={form.city}
-                        />
-
-                        <ReviewItem
-                          label="Geography"
-                          value={form.geography}
-                        />
-
-                        <ReviewItem
-                          label="Background"
-                          value={
-                            form.professionalBackground
-                          }
-                        />
-
-                        <ReviewItem
-                          label="Skills & Experience"
-                          value={form.relevantSkills}
-                        />
-                      </div>
-                    </section>
-
-                    <section>
-                      <div className="cfcv-review__heading">
-                        <div>
-                          <Globe2 size={18} />
-
-                          <h3>
-                            Venture
-                          </h3>
+                        <div className="cfcv-review__grid">
+                          {items.map(([label, value]) => (
+                            <ReviewItem
+                              key={label}
+                              label={label}
+                              value={value}
+                            />
+                          ))}
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            goToStep(2)
-                          }
-                        >
-                          Edit
-                        </button>
-                      </div>
-
-                      <div className="cfcv-review__grid">
-                        <ReviewItem
-                          label="Venture Name"
-                          value={form.ventureName}
-                        />
-
-                        <ReviewItem
-                          label="Sector"
-                          value={form.sector}
-                        />
-
-                        <ReviewItem
-                          label="Venture / Idea"
-                          value={
-                            form.ventureDescription
-                          }
-                        />
-
-                        <ReviewItem
-                          label="Problem"
-                          value={form.problem}
-                        />
-
-                        <ReviewItem
-                          label="Solution"
-                          value={form.solution}
-                        />
-
-                        <ReviewItem
-                          label="Current Stage"
-                          value={form.ventureStage}
-                        />
-
-                        <ReviewItem
-                          label="Current Progress"
-                          value={form.currentProgress}
-                        />
-
-                        <ReviewItem
-                          label="Target Market"
-                          value={form.targetMarket}
-                        />
-                      </div>
-                    </section>
-
-                    <section>
-                      <div className="cfcv-review__heading">
-                        <div>
-                          <Users size={18} />
-
-                          <h3>
-                            Team & Collaboration
-                          </h3>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            goToStep(5)
-                          }
-                        >
-                          Edit
-                        </button>
-                      </div>
-
-                      <div className="cfcv-review__grid">
-                        <ReviewItem
-                          label="Team Status"
-                          value={form.teamStatus}
-                        />
-
-                        <ReviewItem
-                          label="Current Team"
-                          value={form.teamDescription}
-                        />
-
-                        <ReviewItem
-                          label="Cross-Continental Team"
-                          value={
-                            form.existingCrossContinentalTeam
-                          }
-                        />
-
-                        <ReviewItem
-                          label="Collaborator Needs"
-                          value={form.collaboratorNeeds}
-                        />
-
-                        <ReviewItem
-                          label="Working Style"
-                          value={form.workingStyle}
-                        />
-
-                        <ReviewItem
-                          label="Leadership Strengths"
-                          value={
-                            form.leadershipStrengths
-                          }
-                        />
-                      </div>
-                    </section>
-
-                    <section>
-                      <div className="cfcv-review__heading">
-                        <div>
-                          <CheckCircle2 size={18} />
-
-                          <h3>
-                            Commitment & Goals
-                          </h3>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            goToStep(6)
-                          }
-                        >
-                          Edit
-                        </button>
-                      </div>
-
-                      <div className="cfcv-review__grid">
-                        <ReviewItem
-                          label="Time Commitment"
-                          value={form.timeCommitment}
-                        />
-
-                        <ReviewItem
-                          label="Decision-Making"
-                          value={form.decisionMaking}
-                        />
-
-                        <ReviewItem
-                          label="Ownership Expectations"
-                          value={
-                            form.ownershipExpectations
-                          }
-                        />
-
-                        <ReviewItem
-                          label="Six-Month Goals"
-                          value={form.sixMonthGoals}
-                        />
-                      </div>
-                    </section>
+                      </section>
+                    ))}
                   </div>
 
                   <Field
                     label="Résumé / CV"
                     required
-                    hint="PDF, DOC, or DOCX. Maximum 5 MB."
                   >
-                    <input
-                      type="file"
-                      name="resume"
-                      aria-label="Résumé / CV"
-                      accept=".pdf,.doc,.docx"
-                      onChange={handleResumeChange}
-                      aria-invalid={
-                        Boolean(errors.resume)
-                      }
-                      aria-describedby="cfcv-resume-message"
-                    />
+                    {resume ? (
+                      <div className="cfcv-apply-file">
+                        <span className="cfcv-apply-file__icon" aria-hidden="true">
+                          <FileText size={20} />
+                        </span>
+
+                        <span className="cfcv-apply-file__meta">
+                          <strong>{resume.name}</strong>
+                          <small>{formatFileSize(resume.size)} · Ready to submit</small>
+                        </span>
+
+                        <button
+                          type="button"
+                          onClick={removeResume}
+                          aria-label="Remove résumé"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        className={[
+                          "cfcv-apply-drop",
+                          dragging ? "is-dragging" : "",
+                          errors.resume ? "has-error" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          setDragging(true);
+                        }}
+                        onDragLeave={() => setDragging(false)}
+                        onDrop={handleResumeDrop}
+                      >
+                        <input
+                          type="file"
+                          name="resume"
+                          aria-label="Résumé / CV"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleResumeChange}
+                          aria-invalid={
+                            Boolean(errors.resume)
+                          }
+                          aria-describedby="cfcv-resume-message"
+                        />
+
+                        <span className="cfcv-apply-drop__icon" aria-hidden="true">
+                          <Upload size={22} />
+                        </span>
+
+                        <strong>
+                          Drag your CV here, or <u>browse files</u>
+                        </strong>
+
+                        <small>PDF, DOC or DOCX, up to 5 MB</small>
+                      </label>
+                    )}
 
                     <span id="cfcv-resume-message">
-                      {errors.resume ? (
+                      {errors.resume && (
                         <span
                           className="cfcv-apply-error"
                           role="alert"
                         >
                           {errors.resume}
                         </span>
-                      ) : resume ? (
-                        `Selected: ${resume.name}`
-                      ) : (
-                        "Choose your résumé before submitting."
                       )}
                     </span>
                   </Field>
@@ -2207,7 +2549,26 @@ function CFCVApply() {
               </div>
 
               <div>
-                {currentStep < STEPS.length ? (
+                {currentStep < STEPS.length && returnToReview ? (
+                  <div className="cfcv-apply-actions__pair">
+                    <button
+                      type="button"
+                      className="cfcv-apply-button cfcv-apply-button--secondary"
+                      onClick={nextStep}
+                    >
+                      Continue
+                    </button>
+
+                    <button
+                      type="button"
+                      className="cfcv-apply-button cfcv-apply-button--primary"
+                      onClick={backToReview}
+                    >
+                      Back to review
+                      <ArrowRight size={18} />
+                    </button>
+                  </div>
+                ) : currentStep < STEPS.length ? (
                   <button
                     type="button"
                     className="cfcv-apply-button cfcv-apply-button--primary"

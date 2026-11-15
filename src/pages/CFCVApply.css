@@ -657,39 +657,142 @@
 
 
 /* ============================================================
-   RÉSUMÉ UPLOAD
+   RÉSUMÉ UPLOAD — drag-and-drop zone, then a file card
 ============================================================ */
 
-.cfcv-apply-step > .cfcv-apply-field:has(input[type="file"]) {
+.cfcv-apply-step > .cfcv-apply-field:has([name="resume"]),
+.cfcv-apply-step > .cfcv-apply-field:has(.cfcv-apply-file) {
   margin-top: 28px;
-  padding: 22px;
-  background: var(--cfcv-soft);
-  border: 1px dashed #c3ccd5;
-  border-radius: var(--cfcv-radius);
 }
 
-.cfcv-apply-field input[type="file"] {
-  min-height: 58px;
-  height: auto;
-  padding: 9px;
-  background: #fff;
+.cfcv-apply-drop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 30px 24px;
+  text-align: center;
+  background: var(--cfcv-soft);
+  border: 1.5px dashed #c3ccd5;
+  border-radius: var(--cfcv-radius);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.cfcv-apply-drop:hover,
+.cfcv-apply-drop.is-dragging {
+  background: rgba(201, 146, 32, 0.07);
+  border-color: var(--cfcv-gold);
+}
+
+.cfcv-apply-drop.has-error {
+  border-color: var(--cfcv-error);
+}
+
+.cfcv-apply-drop:has(input:focus-visible) {
+  outline: 3px solid var(--cfcv-gold);
+  outline-offset: 3px;
+}
+
+/* The real file input covers the zone, invisible, so clicks open it */
+.cfcv-apply-field .cfcv-apply-drop input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
   cursor: pointer;
 }
 
-.cfcv-apply-field input[type="file"]::file-selector-button {
-  min-height: 40px;
-  margin-right: 12px;
-  padding: 0 18px;
+.cfcv-apply-drop__icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 6px;
+  color: var(--cfcv-gold-dark);
+  background: rgba(201, 146, 32, 0.14);
+  border-radius: 50%;
+}
+
+.cfcv-apply-drop strong {
+  color: var(--cfcv-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cfcv-apply-drop u {
+  color: var(--cfcv-gold-dark);
+  text-underline-offset: 3px;
+}
+
+.cfcv-apply-drop small {
+  color: var(--cfcv-muted);
+  font-size: 13px;
+}
+
+.cfcv-apply-file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fff;
+  border: 1px solid var(--cfcv-line);
+  border-radius: var(--cfcv-radius);
+  box-shadow: var(--cfcv-shadow);
+}
+
+.cfcv-apply-file__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
   color: #fff;
   background: var(--cfcv-navy);
-  border: 0;
-  border-radius: 999px;
-  font: 600 14px/1 var(--cfcv-font);
+  border-radius: 12px;
+}
+
+.cfcv-apply-file__meta {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+}
+
+.cfcv-apply-file__meta strong {
+  overflow: hidden;
+  color: var(--cfcv-ink);
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cfcv-apply-file__meta small {
+  color: var(--cfcv-muted);
+  font-size: 13px;
+}
+
+.cfcv-apply-file button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  padding: 0;
+  color: var(--cfcv-ink);
+  background: var(--cfcv-soft);
+  border: 1px solid var(--cfcv-line);
+  border-radius: 50%;
   cursor: pointer;
 }
 
-.cfcv-apply-field input[type="file"]:not(:disabled)::file-selector-button:hover {
-  background: var(--cfcv-navy-2);
+.cfcv-apply-file button:hover {
+  border-color: var(--cfcv-error);
+  color: var(--cfcv-error);
 }
 
 #cfcv-resume-message {
@@ -700,8 +803,230 @@
   overflow-wrap: anywhere;
 }
 
+#cfcv-resume-message:empty {
+  display: none;
+}
+
 #cfcv-resume-message .cfcv-apply-error {
   margin-top: 0;
+}
+
+
+/* ============================================================
+   OPTION CARDS (in place of dropdowns)
+============================================================ */
+
+.cfcv-apply-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cfcv-apply-choices label {
+  position: relative;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px 0 14px;
+  color: var(--cfcv-ink);
+  background: #fff;
+  border: 1px solid var(--cfcv-field);
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.cfcv-apply-choices label:hover {
+  border-color: var(--cfcv-gold);
+}
+
+.cfcv-apply-field .cfcv-apply-choices input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cfcv-apply-choices label:has(input:focus-visible) {
+  outline: 3px solid var(--cfcv-gold);
+  outline-offset: 2px;
+}
+
+.cfcv-apply-choices__dot {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: transparent;
+  border: 1.5px solid var(--cfcv-field);
+  border-radius: 50%;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.cfcv-apply-choices label.is-selected {
+  background: rgba(201, 146, 32, 0.08);
+  border-color: var(--cfcv-gold);
+  box-shadow: 0 0 0 3px rgba(201, 146, 32, 0.14);
+}
+
+.cfcv-apply-choices label.is-selected .cfcv-apply-choices__dot {
+  color: #fff;
+  background: var(--cfcv-gold);
+  border-color: var(--cfcv-gold);
+}
+
+.cfcv-apply-choices.is-invalid label {
+  border-color: rgba(180, 35, 24, 0.5);
+}
+
+
+/* ============================================================
+   WORD COUNT, SAVED STATE, DRAFT AND ERROR SUMMARY
+============================================================ */
+
+.cfcv-apply-count {
+  display: block;
+  margin-top: 6px;
+  color: var(--cfcv-muted);
+  font-size: 12.5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cfcv-apply-progress__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 14px;
+  margin: -8px 0 18px;
+  color: var(--cfcv-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cfcv-apply-progress__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cfcv-apply-saved {
+  color: var(--cfcv-gold-dark);
+}
+
+.cfcv-apply-draft {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px 16px;
+  margin: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 40px) 0;
+  padding: 20px;
+  background: rgba(201, 146, 32, 0.08);
+  border: 1px solid rgba(201, 146, 32, 0.35);
+  border-radius: var(--cfcv-radius);
+}
+
+.cfcv-apply-draft__icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: var(--cfcv-gold-dark);
+  background: #fff;
+  border-radius: 50%;
+}
+
+.cfcv-apply-draft__text strong {
+  color: var(--cfcv-ink);
+  font-size: 16px;
+}
+
+.cfcv-apply-draft__text p {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.cfcv-apply-draft__actions {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cfcv-apply-draft__actions .cfcv-apply-button {
+  min-height: 44px;
+  padding: 0 20px;
+  font-size: 14px;
+}
+
+.cfcv-apply-summary {
+  display: flex;
+  gap: 14px;
+  margin: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 40px) 0;
+  padding: 18px 20px;
+  color: var(--cfcv-error);
+  background: var(--cfcv-error-bg);
+  border: 1px solid rgba(180, 35, 24, 0.25);
+  border-radius: var(--cfcv-radius);
+}
+
+.cfcv-apply-summary > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.cfcv-apply-summary strong {
+  display: block;
+  color: var(--cfcv-ink);
+  font-size: 15px;
+}
+
+.cfcv-apply-summary ul {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.cfcv-apply-summary li {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.cfcv-apply-summary li button {
+  margin-right: 6px;
+  padding: 0;
+  color: var(--cfcv-error);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.cfcv-apply-summary li span {
+  color: var(--cfcv-body);
+}
+
+.cfcv-apply-actions__pair {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 
@@ -1127,9 +1452,66 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Step labels hide; numbers stay */
-  .cfcv-apply-progress__steps button small {
+  /* A slim progress bar stays under the navbar instead of the step list */
+  .cfcv-apply-aside {
+    position: sticky;
+    /* Just below the 79px phone navbar */
+    top: 88px;
+    z-index: 6;
+  }
+
+  .cfcv-apply-progress {
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(3, 27, 52, 0.1);
+  }
+
+  .cfcv-apply-progress__top strong {
+    font-size: 16px;
+  }
+
+  .cfcv-apply-progress__bar {
+    margin: 10px 0 8px;
+  }
+
+  .cfcv-apply-progress__meta {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .cfcv-apply-progress__steps {
     display: none;
+  }
+
+  /* The card must not clip, or the bottom bar can't stay on screen */
+  .cfcv-apply-form {
+    overflow: visible;
+  }
+
+  /* Back / Continue stay at the bottom of the screen */
+  .cfcv-apply-actions {
+    border-radius: 0 0 var(--cfcv-radius-lg) var(--cfcv-radius-lg);
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: rgba(255, 255, 255, 0.96);
+    border-top: 1px solid var(--cfcv-line);
+    box-shadow: 0 -8px 24px rgba(3, 27, 52, 0.08);
+    backdrop-filter: blur(8px);
+  }
+
+  .cfcv-apply-actions .cfcv-apply-button {
+    min-height: 48px;
+    padding: 0 18px;
+  }
+
+  .cfcv-apply-draft {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cfcv-apply-draft__actions {
+    grid-column: auto;
   }
 }
 
@@ -1168,14 +1550,25 @@
     height: 46px;
   }
 
+  /* Back and Continue share the bottom bar side by side */
   .cfcv-apply-actions {
-    flex-direction: column-reverse;
-    align-items: stretch;
+    gap: 10px;
   }
 
-  .cfcv-apply-actions > div,
-  .cfcv-apply-button {
+  .cfcv-apply-actions > div {
+    flex: 1;
+  }
+
+  .cfcv-apply-actions > div:first-child {
+    flex: 0 0 auto;
+  }
+
+  .cfcv-apply-actions .cfcv-apply-button {
     width: 100%;
+  }
+
+  .cfcv-apply-actions__pair {
+    flex-direction: column-reverse;
   }
 
   .cfcv-apply-actions > div:empty {
@@ -1186,11 +1579,6 @@
     align-items: flex-start;
   }
 
-  .cfcv-apply-field input[type="file"]::file-selector-button {
-    display: block;
-    width: 100%;
-    margin: 0 0 8px;
-  }
 }
 
 

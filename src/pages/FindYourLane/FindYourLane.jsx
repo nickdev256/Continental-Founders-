@@ -13,6 +13,7 @@ import {
   X,
 } from 'lucide-react';
 import './FindYourLane.css';
+import { scrollToTarget } from '../../lib/smoothScroll';
 
 const pathways = [
   {
@@ -468,9 +469,9 @@ export default function FindYourLane() {
     setSelectedPathway(pathway);
 
     setTimeout(() => {
-      document
-        .getElementById('fyl-pathway-details')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToTarget(document.getElementById('fyl-pathway-details'), {
+        block: 'center',
+      });
     }, 0);
   }
 
@@ -478,9 +479,7 @@ export default function FindYourLane() {
     setAssessmentOpen(false);
 
     if (id === 'unsure') {
-      document
-        .getElementById('fyl-help')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      scrollToTarget(document.getElementById('fyl-help'), { block: 'center' });
       return;
     }
 

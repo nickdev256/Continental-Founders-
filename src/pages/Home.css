@@ -1515,25 +1515,6 @@
 }
 
 /* ============================================================
-   SCROLL REVEAL
-   Only active once the page script has run (.cf-home--reveal),
-   so content is never hidden if scripts fail.
-============================================================ */
-
-.cf-home--reveal [data-reveal] {
-  opacity: 0;
-  transform: translateY(28px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s var(--cf-ease);
-}
-
-.cf-home--reveal [data-reveal].is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* ============================================================
    FOCUS
 ============================================================ */
 

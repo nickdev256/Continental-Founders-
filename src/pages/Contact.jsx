@@ -1,12 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 
 import {
   AlertCircle,
   ArrowRight,
+  ArrowUpRight,
   CalendarDays,
+  Check,
   CheckCircle2,
+  Copy,
   Globe2,
   Handshake,
+  Loader2,
   Mail,
   Rocket,
   Send,
@@ -21,6 +26,9 @@ const API_URL =
   "http://localhost:5000";
 
 const CONTACT_EMAIL = "continentalfounders.info@gmail.com";
+
+// Same company page as the footer's LinkedIn icon.
+const LINKEDIN_URL = "https://www.linkedin.com/company/145206611/";
 
 const initialForm = {
   name: "",
@@ -76,6 +84,9 @@ const otherRoutes = [
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Required fields, in the order the progress bar counts them.
+const REQUIRED = ["name", "organization", "email", "partnership", "message"];
+
 function validate(form) {
   const errors = {};
 
@@ -101,7 +112,53 @@ export default function Contact() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const [copied, setCopied] = useState(false);
+
   const formRef = useRef(null);
+  const successRef = useRef(null);
+  const copyTimer = useRef(0);
+
+  // How much of the form is ready to send.
+  const remaining = validate(form);
+  const completed = REQUIRED.filter((name) => !remaining[name]).length;
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(CONTACT_EMAIL);
+      setCopied(true);
+      clearTimeout(copyTimer.current);
+      copyTimer.current = setTimeout(() => setCopied(false), 2200);
+    } catch {
+      // Clipboard blocked (old browser or permissions): open the mail app instead.
+      window.location.href = `mailto:${CONTACT_EMAIL}`;
+    }
+  }
+
+  useEffect(() => () => clearTimeout(copyTimer.current), []);
+
+  // The thank-you message settles in once the inquiry is sent.
+  useEffect(() => {
+    if (!submitted || !successRef.current) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    const context = gsap.context(() => {
+      gsap
+        .timeline({ defaults: { ease: "power3.out" } })
+        .from(".ct-success__icon", { scale: 0.4, autoAlpha: 0, duration: 0.6, ease: "back.out(2)" })
+        .from(".ct-success > :not(.ct-success__icon)", { y: 18, autoAlpha: 0, stagger: 0.08, duration: 0.6 }, "-=0.25");
+    }, successRef);
+
+    return () => context.revert();
+  }, [submitted]);
+
+  // Only point out an email typo once the visitor has left the field.
+  function checkOnLeave(event) {
+    const { name, value } = event.target;
+    if (name !== "email" || !value.trim()) return;
+
+    const message = validate({ ...form, email: value }).email;
+    if (message) setFieldErrors((current) => ({ ...current, email: message }));
+  }
 
   function update(event) {
     const { name, value } = event.target;
@@ -184,6 +241,7 @@ export default function Contact() {
       name,
       value: form[name],
       onChange: update,
+      onBlur: checkOnLeave,
       "aria-invalid": Boolean(fieldErrors[name]),
       "aria-describedby": fieldErrors[name] ? `contact-${name}-error` : undefined,
     };
@@ -222,11 +280,25 @@ export default function Contact() {
             </h1>
           </div>
 
-          <p className="ct-hero__aside">
-            Whether you represent a university, research institution,
-            foundation, nonprofit, or company, we would like to
-            understand what you are exploring.
-          </p>
+          <div className="ct-hero__aside">
+            <p>
+              Whether you represent a university, research institution,
+              foundation, nonprofit, or company, we would like to
+              understand what you are exploring.
+            </p>
+
+            <div className="ct-hero__actions">
+              <a className="ct-button ct-button--gold" href={`mailto:${CONTACT_EMAIL}`}>
+                <Mail size={17} aria-hidden="true" />
+                Email us
+              </a>
+
+              <button type="button" className="ct-button ct-button--glass" onClick={copyEmail}>
+                {copied ? <Check size={17} aria-hidden="true" /> : <Copy size={17} aria-hidden="true" />}
+                {copied ? "Email copied" : "Copy email"}
+              </button>
+            </div>
+          </div>
 
         </div>
 
@@ -244,6 +316,10 @@ export default function Contact() {
           {/* Left: what to expect and other ways to reach us */}
 
           <aside className="ct-info">
+
+            <span className="ct-visually-hidden" role="status" aria-live="polite">
+              {copied ? "Email address copied to the clipboard." : ""}
+            </span>
 
             <span className="ct-eyebrow">Start Here</span>
 
@@ -265,6 +341,31 @@ export default function Contact() {
                   <small>Email</small>
                   <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
                 </span>
+
+                <button
+                  type="button"
+                  className="ct-details__copy"
+                  onClick={copyEmail}
+                  aria-label={copied ? "Email address copied" : "Copy email address"}
+                  title={copied ? "Copied" : "Copy email"}
+                >
+                  {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
+                </button>
+              </li>
+
+              <li>
+                <span className="ct-details__icon ct-details__icon--navy">
+                  <img src="/assets/link.webp" alt="" width="20" height="20" />
+                </span>
+
+                <span>
+                  <small>LinkedIn</small>
+                  <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
+                    Continental Founders
+                  </a>
+                </span>
+
+                <ArrowUpRight className="ct-details__out" size={17} aria-hidden="true" />
               </li>
 
               <li>
@@ -305,7 +406,7 @@ export default function Contact() {
 
             {submitted ? (
 
-              <div className="ct-success" role="status">
+              <div className="ct-success" role="status" ref={successRef}>
                 <span className="ct-success__icon">
                   <CheckCircle2 size={36} aria-hidden="true" />
                 </span>
@@ -343,6 +444,24 @@ export default function Contact() {
                 <div className="ct-form__head">
                   <h3>Send us a message</h3>
                   <p>Fields marked <span aria-hidden="true">*</span><span className="ct-visually-hidden">with an asterisk</span> are required.</p>
+
+                  <div className="ct-progress">
+                    <div
+                      className="ct-progress__bar"
+                      role="progressbar"
+                      aria-label="Required fields completed"
+                      aria-valuemin={0}
+                      aria-valuemax={REQUIRED.length}
+                      aria-valuenow={completed}
+                    >
+                      <span style={{ transform: `scaleX(${completed / REQUIRED.length})` }} />
+                    </div>
+                    <span className="ct-progress__text">
+                      {completed === REQUIRED.length
+                        ? "Ready to send"
+                        : `${completed} of ${REQUIRED.length} required fields`}
+                    </span>
+                  </div>
                 </div>
 
                 {error && (
@@ -405,6 +524,9 @@ export default function Contact() {
                           checked={form.partnership === option}
                           onChange={update}
                         />
+                        <span className="ct-interests__tick" aria-hidden="true">
+                          <Check size={13} strokeWidth={3} />
+                        </span>
                         {option}
                       </label>
                     ))}
@@ -423,14 +545,25 @@ export default function Contact() {
                   {fieldError("message")}
                 </label>
 
-                <button
-                  className="ct-button ct-button--gold ct-form__submit"
-                  type="submit"
-                  disabled={submitting}
-                >
-                  {submitting ? "Sending..." : "Send partnership inquiry"}
-                  {submitting ? null : <Send size={17} aria-hidden="true" />}
-                </button>
+                <div className="ct-form__footer">
+                  <button
+                    className="ct-button ct-button--gold ct-form__submit"
+                    type="submit"
+                    disabled={submitting}
+                    aria-busy={submitting}
+                  >
+                    {submitting ? (
+                      <Loader2 className="ct-spin" size={17} aria-hidden="true" />
+                    ) : null}
+                    {submitting ? "Sending..." : "Send partnership inquiry"}
+                    {submitting ? null : <Send size={17} aria-hidden="true" />}
+                  </button>
+
+                  <p className="ct-form__privacy">
+                    We only use your details to reply to your inquiry.{" "}
+                    <Link to="/privacy">Privacy policy</Link>
+                  </p>
+                </div>
 
               </form>
 

@@ -1,9 +1,7 @@
 import React, {
   useEffect,
   useMemo,
-  useRef,
-  useState,
-} from "react";
+  useState } from "react";
 
 import {
   ArrowRight,
@@ -27,6 +25,7 @@ import {
 import { Link } from "react-router-dom";
 
 import "./Insights.css";
+import { scrollToTarget } from "../lib/smoothScroll";
 
 
 /* ============================================================
@@ -428,9 +427,7 @@ export default function Insights() {
     setQuery("");
     setCategory(match);
 
-    document
-      .getElementById("insights-list")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToTarget(document.getElementById("insights-list"));
   }
 
 
@@ -513,56 +510,7 @@ export default function Insights() {
      jump) is shown at once.
   ========================================================== */
 
-  const pageRef = useRef(null);
 
-  useEffect(() => {
-    const root = pageRef.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("in-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
 
 
   /* ==========================================================
@@ -570,7 +518,7 @@ export default function Insights() {
   ========================================================== */
 
   return (
-    <main className="in-page" ref={pageRef}>
+    <main className="in-page">
 
       {/* ======================================================
           HERO

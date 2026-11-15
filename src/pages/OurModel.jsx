@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -65,61 +65,7 @@ const lenses = [
 const number = (index) => String(index + 1).padStart(2, "0");
 
 
-/* ============================================================
-   SCROLL REVEAL
-   Content stays visible if scripts fail or motion is reduced.
-============================================================ */
 
-function useReveal(ref) {
-  useEffect(() => {
-    const root = ref.current;
-
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("om-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [ref]);
-}
 
 
 /* ============================================================
@@ -127,12 +73,10 @@ function useReveal(ref) {
 ============================================================ */
 
 export default function OurModel() {
-  const pageRef = useRef(null);
 
-  useReveal(pageRef);
 
   return (
-    <main className="om-page" ref={pageRef}>
+    <main className="om-page">
 
       {/* ======================================================
           HERO
@@ -243,7 +187,7 @@ export default function OurModel() {
             </p>
           </header>
 
-          <ol className="om-stages" data-reveal>
+          <ol className="om-stages" data-reveal data-scroll-steps="line">
             {stages.map(([title, text], index) => (
               <li className="om-stage" key={title}>
                 <span className="om-stage__number" aria-hidden="true">

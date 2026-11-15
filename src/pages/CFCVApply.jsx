@@ -17,6 +17,7 @@ import {
 import { submitCfcvApplication } from "../services/cfcvApi";
 
 import "./CFCVApply.css";
+import { scrollToTarget } from "../lib/smoothScroll";
 
 /* ============================================================
    RÉSUMÉ VALIDATION
@@ -137,18 +138,7 @@ async function submissionKeyFor(application, resume) {
 function scrollToForm() {
   const target = document.getElementById("cfcv-apply-start");
 
-  if (!target) {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
-
-  const header = document.querySelector("header.navbar");
-  const offset = (header?.getBoundingClientRect().height || 0) + 16;
-
-  window.scrollTo({
-    top: target.getBoundingClientRect().top + window.scrollY - offset,
-    behavior: "smooth",
-  });
+  scrollToTarget(target || 0);
 }
 
 /* ============================================================

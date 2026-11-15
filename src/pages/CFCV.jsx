@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -482,68 +482,17 @@ function ApplyButton({
 // Content stays visible if scripts fail or motion is reduced.
 // ============================================================
 
-function useReveal(ref) {
-  useEffect(() => {
-    const root = ref.current;
 
-    if (
-      !root ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      return undefined;
-    }
-
-    root.classList.add("cfcv-page--reveal");
-
-    let pending = [...root.querySelectorAll("[data-reveal]")];
-    let frame = 0;
-
-    const reveal = () => {
-      frame = 0;
-      const limit = window.innerHeight * 0.92;
-
-      pending = pending.filter((element) => {
-        if (element.getBoundingClientRect().top < limit) {
-          element.classList.add("is-visible");
-          return false;
-        }
-
-        return true;
-      });
-
-      if (!pending.length) {
-        window.removeEventListener("scroll", schedule);
-        window.removeEventListener("resize", schedule);
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = window.requestAnimationFrame(reveal);
-    };
-
-    reveal();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [ref]);
-}
 
 // ============================================================
 // PAGE
 // ============================================================
 
 export default function CFCV() {
-  const pageRef = useRef(null);
 
-  useReveal(pageRef);
 
   return (
-    <div className="cfcv-page" ref={pageRef}>
+    <div className="cfcv-page">
       <a
         className="cfcv-skip-link"
         href="#cfcv-main"
@@ -709,7 +658,7 @@ export default function CFCV() {
               </h2>
             </header>
 
-            <ol className="cfcv-stages" data-reveal>
+            <ol className="cfcv-stages" data-reveal data-scroll-steps="line">
               {stages.map((stage, index) => (
                 <li
                   className="cfcv-stage"
@@ -1085,7 +1034,7 @@ export default function CFCV() {
               </h2>
             </header>
 
-            <ol className="cfcv-path" data-reveal>
+            <ol className="cfcv-path" data-reveal data-scroll-horizontal>
               {pathway.map((item, index) => (
                 <li key={item.title}>
                   <span

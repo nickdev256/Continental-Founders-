@@ -20,6 +20,7 @@ import {
 import { Link } from "react-router-dom";
 
 import "./Contact.css";
+import { trackEvent } from "../lib/analytics";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
@@ -218,6 +219,7 @@ export default function Contact() {
       }
 
       setSubmitted(true);
+      trackEvent("contact_submit", { topic: form.partnership });
       setForm(initialForm);
       setFieldErrors({});
     } catch (submitError) {
@@ -355,7 +357,7 @@ export default function Contact() {
 
               <li>
                 <span className="ct-details__icon ct-details__icon--navy">
-                  <img src="/assets/link.webp" alt="" width="20" height="20" />
+                  <img src="/assets/link.webp" alt="" width="20" height="20" loading="lazy" />
                 </span>
 
                 <span>

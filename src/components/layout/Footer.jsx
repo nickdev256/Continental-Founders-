@@ -16,6 +16,7 @@ import {
 
 import "./Footer.css";
 import { scrollToTarget } from "../../lib/smoothScroll";
+import { trackEvent } from "../../lib/analytics";
 
 
 /* ============================================================
@@ -312,6 +313,8 @@ export default function Footer() {
       /* ------------------------------------------------------
          SUCCESS
       ------------------------------------------------------ */
+
+      trackEvent("newsletter_subscribe", { location: "footer" });
 
       setNewsletterMessage(
         result?.message ||

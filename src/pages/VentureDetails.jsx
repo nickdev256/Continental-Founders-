@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 
 import "./VentureDetails.css";
+import { setPageMeta } from "../lib/pageMeta";
 
 
 // ============================================================
@@ -994,6 +995,17 @@ export default function VentureDetails() {
     getLongDescription(
       venture
     );
+
+  // This venture's own name, summary and image for search and link previews.
+  useEffect(() => {
+    if (venture) {
+      setPageMeta({
+        title: venture.name,
+        description: venture.tagline || longDescription,
+        image: heroImage || ventureLogo,
+      });
+    }
+  }, [venture, longDescription, heroImage, ventureLogo]);
 
 
   const secondaryDescription =

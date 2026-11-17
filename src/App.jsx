@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 
 
 
@@ -29,6 +29,8 @@ import Footer from "./components/layout/Footer";
 import PageTransition from "./components/layout/PageTransition";
 import Motion from "./components/Motion";
 import Interactions from "./components/Interactions";
+import ApplyBar from "./components/ApplyBar";
+import { startAnalytics, trackPageView } from "./lib/analytics";
 
 
 
@@ -42,73 +44,73 @@ import Interactions from "./components/Interactions";
 
 import Home from "./pages/Home";
 
-import About from "./pages/About";
+const About = lazy(() => import("./pages/About"));
 
 
 
-import Ventures from "./pages/Ventures";
+const Ventures = lazy(() => import("./pages/Ventures"));
 
-import VentureDetails from "./pages/VentureDetails";
-
-
-
-import OurModel from "./pages/OurModel";
-
-import StrategicPartners from "./pages/StrategicPartners";
-
-import Universities from "./pages/Universities";
+const VentureDetails = lazy(() => import("./pages/VentureDetails"));
 
 
 
-import CFCV from "./pages/CFCV";
+const OurModel = lazy(() => import("./pages/OurModel"));
 
-import CFCVApply from "./pages/CFCVApply";
+const StrategicPartners = lazy(() => import("./pages/StrategicPartners"));
 
-import CFCVApplicationSuccess from "./pages/CFCVApplicationSuccess";
-
-
-
-import USAfricaTradeNetwork from "./pages/USAfricaTradeNetwork";
-
-import CorporatePartners from "./pages/CorporatePartners";
-
-import GovernmentDevelopment from "./pages/GovernmentDevelopment";
+const Universities = lazy(() => import("./pages/Universities"));
 
 
 
-import Programs from "./pages/Programs";
+const CFCV = lazy(() => import("./pages/CFCV"));
 
-import Impact from "./pages/Impact";
+const CFCVApply = lazy(() => import("./pages/CFCVApply"));
 
-
-
-import FindYourLane from "./pages/FindYourLane/FindYourLane";
-import Genesis from "./pages/Genesis/GenesisLandingPage";
-import Ascend from "./pages/Ascend/Ascend";
-import Horizon from "./pages/Horizon/Horizon";
-
-import FellowshipCommunity from "./pages/FellowshipCommunity/FellowshipCommunity";
+const CFCVApplicationSuccess = lazy(() => import("./pages/CFCVApplicationSuccess"));
 
 
 
-import Events from "./pages/Events";
+const USAfricaTradeNetwork = lazy(() => import("./pages/USAfricaTradeNetwork"));
 
-import EventDetails from "./pages/EventDetails";
+const CorporatePartners = lazy(() => import("./pages/CorporatePartners"));
 
-
-
-import Insights from "./pages/Insights";
-
-import InsightDetails from "./pages/InsightDetails";
+const GovernmentDevelopment = lazy(() => import("./pages/GovernmentDevelopment"));
 
 
 
-import Gallery from "./pages/Gallery";
+const Programs = lazy(() => import("./pages/Programs"));
 
-import Contact from "./pages/Contact";
+const Impact = lazy(() => import("./pages/Impact"));
 
-import NotFound from "./pages/NotFound";
-import PolicyPage from "./pages/PolicyPage";
+
+
+const FindYourLane = lazy(() => import("./pages/FindYourLane/FindYourLane"));
+const Genesis = lazy(() => import("./pages/Genesis/GenesisLandingPage"));
+const Ascend = lazy(() => import("./pages/Ascend/Ascend"));
+const Horizon = lazy(() => import("./pages/Horizon/Horizon"));
+
+const FellowshipCommunity = lazy(() => import("./pages/FellowshipCommunity/FellowshipCommunity"));
+
+
+
+const Events = lazy(() => import("./pages/Events"));
+
+const EventDetails = lazy(() => import("./pages/EventDetails"));
+
+
+
+const Insights = lazy(() => import("./pages/Insights"));
+
+const InsightDetails = lazy(() => import("./pages/InsightDetails"));
+
+
+
+const Gallery = lazy(() => import("./pages/Gallery"));
+
+const Contact = lazy(() => import("./pages/Contact"));
+
+const NotFound = lazy(() => import("./pages/NotFound"));
+const PolicyPage = lazy(() => import("./pages/PolicyPage"));
 
 
 
@@ -120,51 +122,51 @@ import PolicyPage from "./pages/PolicyPage";
 
 
 
-import AdminLogin from "./pages/admin/AdminLogin";
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
 
-import AdminRegister from "./pages/admin/AdminRegister";
+const AdminRegister = lazy(() => import("./pages/admin/AdminRegister"));
 
-import AdminOtp from "./pages/admin/AdminOtp";
-
-
-
-import AdminLayout from "./pages/admin/AdminLayout";
-
-import AdminDashboard from "./pages/admin/AdminDashboard";
-
-import AdminCFCV from "./pages/admin/AdminCFCV";
+const AdminOtp = lazy(() => import("./pages/admin/AdminOtp"));
 
 
 
-import AdminVentures from "./pages/admin/AdminVentures";
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 
-import AdminEvents from "./pages/admin/AdminEvents";
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 
-import AdminInsights from "./pages/admin/AdminInsights";
-
-import AdminGallery from "./pages/admin/AdminGallery";
-
-import AdminUniversities from "./pages/admin/AdminUniversities";
+const AdminCFCV = lazy(() => import("./pages/admin/AdminCFCV"));
 
 
 
-import AdminNewsletter from "./pages/admin/AdminNewsletter";
+const AdminVentures = lazy(() => import("./pages/admin/AdminVentures"));
 
-import AdminContacts from "./pages/admin/AdminContacts";
+const AdminEvents = lazy(() => import("./pages/admin/AdminEvents"));
+
+const AdminInsights = lazy(() => import("./pages/admin/AdminInsights"));
+
+const AdminGallery = lazy(() => import("./pages/admin/AdminGallery"));
+
+const AdminUniversities = lazy(() => import("./pages/admin/AdminUniversities"));
 
 
 
-import AdminAbout from "./pages/admin/AdminAbout";
+const AdminNewsletter = lazy(() => import("./pages/admin/AdminNewsletter"));
 
-import AdminLeadership from "./pages/admin/AdminLeadership";
+const AdminContacts = lazy(() => import("./pages/admin/AdminContacts"));
 
 
 
-import AdminUSAfricaTradeNetwork from "./pages/admin/AdminUSAfricaTradeNetwork";
+const AdminAbout = lazy(() => import("./pages/admin/AdminAbout"));
 
-import AdminCorporatePartners from "./pages/admin/AdminCorporatePartners";
+const AdminLeadership = lazy(() => import("./pages/admin/AdminLeadership"));
 
-import AdminGovernmentDevelopment from "./pages/admin/AdminGovernmentDevelopment";
+
+
+const AdminUSAfricaTradeNetwork = lazy(() => import("./pages/admin/AdminUSAfricaTradeNetwork"));
+
+const AdminCorporatePartners = lazy(() => import("./pages/admin/AdminCorporatePartners"));
+
+const AdminGovernmentDevelopment = lazy(() => import("./pages/admin/AdminGovernmentDevelopment"));
 
 
 
@@ -1737,6 +1739,27 @@ function setWebPageData({
 
 
 
+// Counts each page visit once analytics is configured (see lib/analytics.js).
+function AnalyticsTracker() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    startAnalytics();
+  }, []);
+
+  useEffect(() => {
+    if (pathname.startsWith("/admin")) return undefined;
+
+    // Short wait so the page title is already updated.
+    const timer = setTimeout(trackPageView, 400);
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
+  return null;
+}
+
+
+
 /* ============================================================
 
    APPLY PUBLIC SEO
@@ -2277,6 +2300,8 @@ export default function App() {
 
       <Interactions />
 
+      <AnalyticsTracker />
+
       <SEOManager />
 
 
@@ -2302,6 +2327,9 @@ export default function App() {
       >
 
         <PageTransition>
+
+          {/* Each page's code downloads only when it is first opened */}
+          <Suspense fallback={<div className="route-loading" aria-hidden="true" />}>
 
           <Routes>
 
@@ -2782,11 +2810,15 @@ export default function App() {
 
           </Routes>
 
+          </Suspense>
+
         </PageTransition>
 
       </div>
 
 
+
+      {!isAdminRoute && <ApplyBar />}
 
       {!isAdminRoute && <Footer />}
     </div>

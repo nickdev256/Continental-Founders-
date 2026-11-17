@@ -1695,9 +1695,9 @@
   }
 
   .cf-home .cf-video__controls button {
-    width: 32px;
-    height: 32px;
-    flex-basis: 32px;
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
   }
 
   .cf-home .cf-video__time {

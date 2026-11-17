@@ -26,6 +26,7 @@ import { Link } from "react-router-dom";
 
 import "./Insights.css";
 import { scrollToTarget } from "../lib/smoothScroll";
+import { trackEvent } from "../lib/analytics";
 
 
 /* ============================================================
@@ -484,6 +485,7 @@ export default function Insights() {
         );
       }
 
+      trackEvent("newsletter_subscribe", { location: "insights" });
       setSubscribeMessage(
         result?.message ||
         "Thank you for subscribing to Continental Founders."

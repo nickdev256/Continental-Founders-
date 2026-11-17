@@ -308,7 +308,7 @@ export default function Ventures() {
             <div className="vn-state" aria-live="polite">
               <span className="vn-loader" aria-hidden="true" />
               <h3>Loading ventures…</h3>
-              <p>Please wait while we load the founders directory.</p> 
+              <p>Please wait while we load the founders directory.</p>  
             </div>
           )}
 

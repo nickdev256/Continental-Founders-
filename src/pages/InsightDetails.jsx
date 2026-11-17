@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import "./InsightDetails.css";
+import { setPageMeta } from "../lib/pageMeta";
 
 
 /* ============================================================
@@ -321,6 +322,17 @@ export default function InsightDetails() {
 
   const image =
     getImage(insight);
+
+  // This insight's own title, summary and image for search and link previews.
+  useEffect(() => {
+    if (insight) {
+      setPageMeta({
+        title: insight.title,
+        description: insight.excerpt || insight.content,
+        image,
+      });
+    }
+  }, [insight, image]);
 
   const author =
     getAuthor(insight);

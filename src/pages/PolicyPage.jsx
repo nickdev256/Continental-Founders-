@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Ban, Cookie, Mail, ShieldCheck } from "lucide-react";
 import "./SimplePage.css";
+import { analyticsProvider } from "../lib/analytics";
 
 // Same address as the Contact page
 const CONTACT_EMAIL = "continentalfounders.info@gmail.com";
@@ -34,11 +35,17 @@ const PRIVACY = {
       title: "Never sold",
       text: "We don't sell your personal information or use it for advertising.",
     },
-    {
-      icon: Cookie,
-      title: "No tracking cookies",
-      text: "This website doesn't use advertising or analytics cookies.",
-    },
+    analyticsProvider === "google"
+      ? {
+          icon: Cookie,
+          title: "No advertising cookies",
+          text: "We count visits with Google Analytics, but don't use advertising cookies.",
+        }
+      : {
+          icon: Cookie,
+          title: "No tracking cookies",
+          text: "This website doesn't use advertising or tracking cookies.",
+        },
   ],
   sections: [
     {
@@ -126,7 +133,7 @@ const PRIVACY = {
       body: (
         <>
           <p>
-            This website doesn't use advertising or analytics cookies. When you
+            This website doesn't use advertising cookies. When you
             submit a fellowship application, your browser keeps a temporary
             reference for that session so the same application isn't sent
             twice. It is removed when you close the tab.
@@ -138,6 +145,22 @@ const PRIVACY = {
             when you submit the application or choose to start fresh. Your CV
             file is never saved this way.
           </p>
+          {analyticsProvider === "plausible" && (
+            <p>
+              We count visits and form sign-ups with Plausible Analytics, a
+              privacy-friendly service that uses no cookies and doesn't
+              collect personal information or track you across other sites.
+            </p>
+          )}
+          {analyticsProvider === "google" && (
+            <p>
+              We use Google Analytics to understand how visitors use the
+              website, such as which pages are viewed and how many people start
+              or complete an application. It sets cookies and receives
+              information such as your browser, device and approximate
+              location. You can block these cookies in your browser settings.
+            </p>
+          )}
           <p>
             Our fonts are loaded from Google Fonts, so your browser connects to
             Google's servers when a page loads. Links to LinkedIn, Instagram,

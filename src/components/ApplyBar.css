@@ -1,0 +1,110 @@
+/* ============================================================
+   PHONE APPLY BAR (src/components/ApplyBar.jsx)
+   Hidden on tablets and desktops, where the navbar's
+   "Apply now" button is always in view.
+============================================================ */
+
+.cf-apply-bar {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .cf-apply-bar {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 8px 8px 16px;
+    color: #fff;
+    background: rgba(3, 27, 52, 0.96);
+    border: 1px solid rgba(227, 189, 105, 0.35);
+    border-radius: 999px;
+    box-shadow: 0 14px 34px rgba(3, 27, 52, 0.35);
+    backdrop-filter: blur(10px);
+    font-family: "Montserrat", Arial, sans-serif;
+    transform: translateY(calc(100% + 24px));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+  }
+
+  .cf-apply-bar.is-visible {
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cf-apply-bar__text {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    line-height: 1.25;
+  }
+
+  .cf-apply-bar__text strong {
+    overflow: hidden;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cf-apply-bar__text span {
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cf-apply-bar__button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 0 18px;
+    color: #031b34;
+    background: #c99220;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .cf-apply-bar__button:active {
+    background: #e3bd69;
+  }
+
+  .cf-apply-bar__close {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.7);
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+}
+
+@media (max-width: 340px) {
+  .cf-apply-bar__text span {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf-apply-bar {
+    transition: none;
+  }
+}

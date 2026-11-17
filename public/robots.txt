@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
 
+# Private areas and the application receipt page
 Disallow: /admin/
+Disallow: /cfcv/application-success
 
-Sitemap: https://continentalfounders.org/sitemap.xml
+Sitemap: https://www.continentalfounders.org/sitemap.xml

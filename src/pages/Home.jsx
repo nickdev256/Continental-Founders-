@@ -808,7 +808,10 @@ export default function Home() {
       !video ||
       !frame ||
       !("IntersectionObserver" in window) ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      // Save phone data: no autoplay with data saver or a slow connection.
+      navigator.connection?.saveData ||
+      /(^|-)2g$/.test(navigator.connection?.effectiveType || "")
     ) {
       return undefined;
     }

@@ -1913,7 +1913,7 @@
   .insight-detail .container {
     width:
       min(
-        100% - 24px,
+        100% - 40px,
         1180px
       );
   }
@@ -2394,4 +2394,18 @@
     animation-iteration-count: 1 !important;
   }
 
+}
+
+/* ============================================================
+   READABLE SMALL LABELS
+   Labels never drop below 12px (they were 10.4–11px).
+============================================================ */
+
+.insight-detail :is(
+  .insight-kicker,
+  .insight-article__label,
+  .insight-sidebar__eyebrow,
+  .insight-article__footer span
+) {
+  font-size: 12px;
 }

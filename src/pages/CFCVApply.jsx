@@ -27,6 +27,7 @@ import { submitCfcvApplication } from "../services/cfcvApi";
 
 import "./CFCVApply.css";
 import { scrollToTarget } from "../lib/smoothScroll";
+import { trackEvent } from "../lib/analytics";
 
 /* ============================================================
    RÉSUMÉ VALIDATION
@@ -651,6 +652,7 @@ function CFCVApply() {
   const confirmedRef = useRef(null);
   const formRef = useRef(null);
   const touchedRef = useRef(new Set());
+  const startedRef = useRef(false);
   const previousStepRef = useRef(1);
 
   /* ==========================================================
@@ -906,6 +908,11 @@ function CFCVApply() {
     } = event.target;
 
     touchedRef.current.add(name);
+
+    if (!startedRef.current) {
+      startedRef.current = true;
+      trackEvent("application_start");
+    }
 
     setForm((previous) => ({
       ...previous,
@@ -1228,6 +1235,10 @@ function CFCVApply() {
       confirmedRef.current = data;
 
       clearDraft();
+      trackEvent("application_submit", {
+        geography: attemptRef.current.application.geography,
+        stage: attemptRef.current.application.ventureStage,
+      });
 
       const submitted =
         attemptRef.current.application;

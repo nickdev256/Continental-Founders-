@@ -1154,6 +1154,7 @@ function LeaderCard({
                   alt=""
                   width="18"
                   height="18"
+                  loading="lazy"
                 />
               );
 

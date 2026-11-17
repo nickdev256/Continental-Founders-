@@ -16,9 +16,6 @@ import {
 import { navigation } from "../../data/navigation";
 import "./Navbar.css";
 
-const SUBSCRIPTION_URL = "https://ethtechsolutions.com/pricing";
-// Subscribe button is shown but inactive for now; set to true to link it again.
-const SUBSCRIBE_ACTIVE = false;
 const ADMIN_LOGIN_PATH = "/admin/login";
 const LOGO_CLICK_DELAY = 800;
 
@@ -522,26 +519,16 @@ export default function Navbar() {
                   <span className="navbar__search-label">Search</span>
                 </button>
 
-                {SUBSCRIBE_ACTIVE ? (
-                  <a
-                    href={SUBSCRIPTION_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="navbar__subscribe"
-                    onClick={closeMenus}
-                  >
-                    Subscribe
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    className="navbar__subscribe"
-                    title="Coming soon"
-                    disabled
-                  >
-                    Subscribe
-                  </button>
-                )}
+                {/* Main call to action on every page */}
+                <Link
+                  to="/cfcv/apply"
+                  className="navbar__subscribe"
+                  data-track="apply_click"
+                  data-track-label="navbar"
+                  onClick={closeMenus}
+                >
+                  Apply now
+                </Link>
               </div>
             </nav>
 

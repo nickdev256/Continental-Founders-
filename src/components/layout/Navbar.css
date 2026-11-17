@@ -122,6 +122,15 @@
   -webkit-backdrop-filter: saturate(160%) blur(14px);
 }
 
+/* The frosted blur makes the header the frame for anything fixed
+   inside it, which squeezed the open phone menu to a thin strip.
+   While the menu is open the header is solid instead. */
+.navbar.is-menu-open .navbar__main {
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .navbar.is-mega-open .navbar__main,
 .navbar.is-menu-open .navbar__main {
   background: #fff;

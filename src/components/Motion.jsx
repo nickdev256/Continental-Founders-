@@ -102,7 +102,8 @@ export default function Motion() {
 
     const mm = gsap.matchMedia();
 
-    mm.add(
+    const start = () =>
+      mm.add(
       {
         motion: "(prefers-reduced-motion: no-preference)",
         desktop: "(min-width: 1101px)",
@@ -328,6 +329,24 @@ export default function Motion() {
       },
     );
 
+    // Pages load on demand, so wait until this one has rendered
+    // before looking for its hero, headings and cards.
+    const routeRoot = document.querySelector(".page-transition");
+    const rendered = () => routeRoot?.querySelector("main, section");
+    let waiting = null;
+
+    if (rendered()) {
+      start();
+    } else if (routeRoot) {
+      waiting = new MutationObserver(() => {
+        if (!rendered()) return;
+        waiting.disconnect();
+        waiting = null;
+        start();
+      });
+      waiting.observe(routeRoot, { childList: true, subtree: true });
+    }
+
     // Safety net: if the browser never runs animation frames (some hidden or
     // background views), drop the animations so the page is never left invisible.
     const startFrame = gsap.ticker.frame;
@@ -336,6 +355,7 @@ export default function Motion() {
     }, 2500);
 
     return () => {
+      waiting?.disconnect();
       clearTimeout(safety);
       mm.revert();
     };

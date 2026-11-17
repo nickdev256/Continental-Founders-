@@ -872,3 +872,77 @@ p {
     scale: none;
   }
 }
+
+
+/* ============================================================
+   ROUTE LOADING
+   Holds the space while a page's code downloads, so the footer
+   doesn't jump up for a moment.
+============================================================ */
+
+.route-loading {
+  min-height: 100vh;
+}
+
+
+
+/* ============================================================
+   PHONE TAP TARGETS
+   Links and buttons people tap on phones reach at least 44px,
+   the size Apple and Google recommend, without changing how
+   they look: the extra height is invisible space.
+============================================================ */
+
+@media (max-width: 760px) {
+  .cf-footer__link,
+  .cf-footer__legal a,
+  .cf-footer__credit a,
+  main a[class*="text-link"],
+  main a[class*="__link"]:not([class*="card"]),
+  .ed-back,
+  .ed-join__all,
+  .insight-back,
+  .about-link,
+  .about-hero__jump a,
+  .spg-toc a,
+  .ed-band__inner a,
+  .cf-footer__newsletter-form button {
+    /* Page styles load after this file, so these must win */
+    min-height: 44px !important;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Stacked footer links: the taller links replace the gap between them */
+  .cf-footer__links,
+  .cf-footer__focus {
+    gap: 0;
+  }
+
+  .cf-footer__focus-item {
+    min-height: 40px;
+    align-items: center;
+  }
+
+  .spg-toc ol {
+    gap: 0;
+  }
+
+  /* Round icon buttons */
+  .leader-card__social,
+  .ct-details__copy {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  /* Slideshow dots keep their look but get a larger tap area */
+  .cf-home .cf-home-hero__dots button {
+    position: relative;
+  }
+
+  .cf-home .cf-home-hero__dots button::before {
+    content: "";
+    position: absolute;
+    inset: -10px -4px;
+  }
+}

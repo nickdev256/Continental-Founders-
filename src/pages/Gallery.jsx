@@ -512,8 +512,14 @@ export default function Gallery() {
       <section className="gl-hero">
 
         <div className="gl-hero__slideshow" aria-hidden="true">
-          {HERO_SLIDES.map((src) => (
-            <img key={src} src={src} alt="" />
+          {HERO_SLIDES.map((src, index) => (
+            <img
+              key={src}
+              src={src}
+              alt=""
+              decoding="async"
+              {...(index === 0 ? { fetchPriority: "high" } : { loading: "lazy" })}
+            />
           ))}
         </div>
 

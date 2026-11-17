@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 
 import "./EventDetails.css";
+import { setPageMeta, setPageSchema } from "../lib/pageMeta";
 
 
 /* ============================================================
@@ -408,6 +409,50 @@ export default function EventDetails() {
   const endDate = getEventEndDate(event);
 
   const title = event?.title || "Continental Founders Event";
+
+  // This event's own title, summary and image for search and link previews.
+  useEffect(() => {
+    if (event) setPageMeta({ title: event.title, description, image: eventImage });
+  }, [event, description, eventImage]);
+
+  // Event details search engines can show in results (date, place, link).
+  useEffect(() => {
+    if (!event?.title || !eventDate) return undefined;
+
+    const start = new Date(eventDate);
+    if (Number.isNaN(start.getTime())) return undefined;
+
+    const end = endDate ? new Date(endDate) : null;
+    const online = /online|virtual/i.test(location || "");
+
+    return setPageSchema({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      name: event.title,
+      description: description || undefined,
+      startDate: start.toISOString(),
+      endDate: end && !Number.isNaN(end.getTime()) ? end.toISOString() : undefined,
+      eventStatus: "https://schema.org/EventScheduled",
+      eventAttendanceMode: online
+        ? "https://schema.org/OnlineEventAttendanceMode"
+        : "https://schema.org/OfflineEventAttendanceMode",
+      location: online
+        ? { "@type": "VirtualLocation", url: registrationUrl || window.location.href }
+        : location
+          ? { "@type": "Place", name: location, address: location }
+          : undefined,
+      image: eventImage ? [new URL(eventImage, window.location.origin).href] : undefined,
+      url: window.location.href,
+      organizer: {
+        "@type": "Organization",
+        name: "Continental Founders",
+        url: "https://www.continentalfounders.org",
+      },
+      offers: registrationUrl
+        ? { "@type": "Offer", url: registrationUrl, availability: "https://schema.org/InStock" }
+        : undefined,
+    });
+  }, [event, eventDate, endDate, location, description, eventImage, registrationUrl]);
   const status = getEventStatus(eventDate, endDate);
   const directionsUrl = getDirectionsUrl(event ? location : "");
   const canAddToCalendar = Boolean(

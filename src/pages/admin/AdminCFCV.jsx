@@ -1320,7 +1320,7 @@ export default function AdminCFCV() {
             CONTINENTAL FOUNDERS
           </span>
 
-          <h1>CFCV Admissions</h1>
+          <h1>CFF Admissions</h1>
 
           <p>
             Review applications, manage fellowship

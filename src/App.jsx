@@ -360,7 +360,7 @@ const SEO_ROUTES = {
 
     title:
 
-      "CFCV Fellowship | Continental Founders",
+      "Continental Founders Fellowship (CFF) | Continental Founders",
 
 
 
@@ -378,7 +378,7 @@ const SEO_ROUTES = {
 
       {
 
-        name: "CFCV Fellowship",
+        name: "Continental Founders Fellowship",
 
         path: "/cfcv",
 
@@ -394,13 +394,13 @@ const SEO_ROUTES = {
 
     title:
 
-      "Apply to CFCV | Continental Founders",
+      "Apply to CFF | Continental Founders",
 
 
 
     description:
 
-      "Apply to the Continental Founders Fellowship and begin the CFCV admissions process.",
+      "Apply to the Continental Founders Fellowship and begin the CFF admissions process.",
 
 
 
@@ -412,7 +412,7 @@ const SEO_ROUTES = {
 
       {
 
-        name: "CFCV Fellowship",
+        name: "Continental Founders Fellowship",
 
         path: "/cfcv",
 
@@ -436,7 +436,7 @@ const SEO_ROUTES = {
 
     title:
 
-      "CFCV Application Confirmation | Continental Founders",
+      "CFF Application Confirmation | Continental Founders",
 
 
 
@@ -454,7 +454,7 @@ const SEO_ROUTES = {
 
       {
 
-        name: "CFCV Fellowship",
+        name: "Continental Founders Fellowship",
 
         path: "/cfcv",
 
@@ -1990,13 +1990,13 @@ function SEOManager() {
 
         title:
 
-          "CFCV Application Confirmation | Continental Founders",
+          "CFF Application Confirmation | Continental Founders",
 
 
 
         description:
 
-          "View your CFCV application submission confirmation.",
+          "View your CFF application submission confirmation.",
 
       });
 

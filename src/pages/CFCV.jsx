@@ -512,7 +512,7 @@ export default function CFCV() {
           <div className="cfcv-container cfcv-hero__inner">
             <div className="cfcv-hero__copy">
               <SectionLabel light>
-                CFCV FELLOWSHIP
+                CONTINENTAL FOUNDERS FELLOWSHIP
               </SectionLabel>
 
               <h1 id="cfcv-title">
@@ -1103,7 +1103,7 @@ export default function CFCV() {
 
               <div className="cfcv-final__action">
                 <p>
-                  Begin the CFCV admissions process.
+                  Begin the CFF admissions process.
                   Submit your founder and venture application.
                 </p>
 

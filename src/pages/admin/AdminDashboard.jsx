@@ -63,7 +63,7 @@ const DEFAULT_CFCV_STATS = {
 
 const quickAccess = [
   {
-    title: "CFCV Admissions",
+    title: "CFF Admissions",
     description:
       "Review applications, interviews, matching, track placement and admissions decisions.",
     icon: ClipboardCheck,
@@ -547,7 +547,7 @@ export default function AdminDashboard() {
             ),
             readService(
               "/api/cfcv/admin/stats",
-              "CFCV admissions"
+              "CFF admissions"
             ),
           ]);
 
@@ -602,7 +602,7 @@ export default function AdminDashboard() {
       label: "Applications",
       value: cfcvStats.totalApplications,
       icon: ClipboardCheck,
-      helper: "CFCV fellowship",
+      helper: "Continental Founders Fellowship",
       unavailable: !cfcvAvailable,
     },
     {
@@ -890,7 +890,7 @@ export default function AdminDashboard() {
               <span className="admin-dashboard__section-eyebrow">
                 Fellowship programme
               </span>
-              <h2>CFCV admissions</h2>
+              <h2>CFF admissions</h2>
             </div>
 
             <Link
@@ -1155,7 +1155,7 @@ export default function AdminDashboard() {
                 available: dashboardAvailable,
               },
               {
-                label: "CFCV admissions",
+                label: "CFF admissions",
                 available: cfcvAvailable,
               },
             ].map((service) => (

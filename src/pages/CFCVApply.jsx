@@ -152,7 +152,7 @@ function scrollToForm() {
 }
 
 /* ============================================================
-   CFCV AT A GLANCE (same figures as the CFCV page)
+   CFF AT A GLANCE (same figures as the CFF page)
 ============================================================ */
 
 const GLANCE = [
@@ -1373,7 +1373,7 @@ function CFCVApply() {
             className="cfcv-apply-back"
           >
             <ArrowLeft size={16} />
-            CFCV Fellowship
+            CFF
           </Link>
 
           <div className="cfcv-apply-hero__content">
@@ -1383,7 +1383,7 @@ function CFCVApply() {
               </span>
 
               <h1>
-                CFCV Fellowship 
+                CFF 
                 <br />
                 <em>Application</em>
               </h1>
@@ -1393,7 +1393,7 @@ function CFCVApply() {
               <Globe2 size={26} />
 
               <p>
-                CFCV brings together founders in
+                CFF brings together founders in
                 Africa and the United States/diaspora
                 to build commercially viable
                 businesses together.
@@ -1500,7 +1500,7 @@ function CFCVApply() {
           </div>
 
           <div className="cfcv-apply-glance">
-            <span>CFCV at a glance</span>
+            <span>CFF at a glance</span>
 
             <ul>
               {GLANCE.map((item) => (
@@ -1912,7 +1912,7 @@ function CFCVApply() {
                       </h2>
 
                       <p>
-                        CFCV uses venture development
+                        CFF uses venture development
                         stage to determine appropriate
                         track placement.
                       </p>
@@ -2019,7 +2019,7 @@ function CFCVApply() {
 
                     <p>
                       Applicants do not select their
-                      final CFCV track. Placement in
+                      final CFF track. Placement in
                       Genesis, Ascend, or Horizon is
                       determined through the admissions
                       process based on business readiness.
@@ -2133,7 +2133,7 @@ function CFCVApply() {
                       </h2>
 
                       <p>
-                        CFCV ventures ultimately connect
+                        CFF ventures ultimately connect
                         Africa and the U.S./diaspora
                         through meaningful participation.
                       </p>

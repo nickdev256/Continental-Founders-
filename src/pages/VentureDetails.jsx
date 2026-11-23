@@ -1284,7 +1284,7 @@ export default function VentureDetails() {
                 size={16}
               />
 
-              CFCV Ventures
+              CFF Ventures
             </Link>
 
 
@@ -1428,7 +1428,7 @@ export default function VentureDetails() {
               <div>
 
                 <span>
-                  CFCV Track
+                  CFF Track
                 </span>
 
                 <strong>
@@ -1635,7 +1635,7 @@ export default function VentureDetails() {
 
 
       {/* ======================================================
-          CFCV POSITION
+          CFF POSITION
       ====================================================== */}
 
       <section className="venture-details-journey">
@@ -1651,7 +1651,7 @@ export default function VentureDetails() {
               </span>
 
               <span className="venture-details-eyebrow venture-details-eyebrow--light">
-                CFCV Journey
+                CFF Journey
               </span>
 
             </div>
@@ -1660,7 +1660,7 @@ export default function VentureDetails() {
             <h2>
               Building through
               <br />
-              the CFCV system.
+              the CFF system.
             </h2>
 
           </div>
@@ -1671,7 +1671,7 @@ export default function VentureDetails() {
             <div>
 
               <span>
-                CFCV Track
+                CFF Track
               </span>
 
               <strong>
@@ -1774,7 +1774,7 @@ export default function VentureDetails() {
               to="/ventures/our-system"
               className="venture-details-button venture-details-button--outline-light"
             >
-              Explore the CFCV System
+              Explore the CFF System
 
               <ArrowRight
                 size={17}
@@ -2498,7 +2498,7 @@ export default function VentureDetails() {
                 to="/ventures"
                 className="venture-details-button venture-details-button--outline"
               >
-                CFCV Ventures
+                CFF Ventures
               </Link>
 
             </div>

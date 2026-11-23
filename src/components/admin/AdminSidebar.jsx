@@ -58,7 +58,7 @@ const navigationSections = [
         icon: BriefcaseBusiness,
       },
       {
-        label: "CFCV Admissions",
+        label: "CFF Admissions",
         path: "/admin/cfcv",
         icon: ClipboardCheck,
       },
@@ -143,7 +143,7 @@ const navigationSections = [
 
 const publicShortcuts = [
   {
-    label: "CFCV",
+    label: "CFF",
     path: "/cfcv",
     icon: ClipboardCheck,
   },

@@ -40,7 +40,7 @@ const DEFAULT_CONTENT = {
     titleLine2: "to real markets.",
     titleHighlight: "Real opportunity.",
     description:
-      "Continental Founders is proposing USAfrica as a Strategic Ecosystem & Market Access Partner — connecting CFCV fellows and alumni to markets, capital networks, corporate relationships, government stakeholders, and diaspora expertise.",
+      "Continental Founders is proposing USAfrica as a Strategic Ecosystem & Market Access Partner — connecting CFF fellows and alumni to markets, capital networks, corporate relationships, government stakeholders, and diaspora expertise.",
     image: "/assets/images/us-africa/business-week.webp",
     primaryButtonText: "Explore the partnership",
     primaryButtonLink: "/contact",
@@ -68,7 +68,7 @@ const DEFAULT_CONTENT = {
     paragraph1:
       "Continental Founders develops rising founders through a rigorous, evidence-based pipeline. But founder development only becomes founder success when ideas and ventures are tested against real markets, real capital, and real institutions.",
     paragraph2:
-      "The proposed relationship with USAfrica is designed to close that gap by creating structured pathways from the CFCV founder-development environment into external commercial ecosystems.",
+      "The proposed relationship with USAfrica is designed to close that gap by creating structured pathways from the CFF founder-development environment into external commercial ecosystems.",
     image: "/assets/images/us-africa/business-handshake.webp",
     imageCaption:
       "From founder development to commercial opportunity",
@@ -81,13 +81,13 @@ const DEFAULT_CONTENT = {
     title:
       "Turning founder knowledge into measurable commercial outcomes.",
     description:
-      "The proposed partnership would connect CFCV fellows and alumni with the external relationships, institutions, and opportunities required to apply what they are building in real commercial environments.",
+      "The proposed partnership would connect CFF fellows and alumni with the external relationships, institutions, and opportunities required to apply what they are building in real commercial environments.",
 
     items: [
       {
         title: "Real-World Application",
         description:
-          "Give fellows access to investor meetings, corporate roundtables, procurement opportunities, and market-entry conversations across the CFCV pipeline — Genesis, Ascend, and Horizon.",
+          "Give fellows access to investor meetings, corporate roundtables, procurement opportunities, and market-entry conversations across the CFF pipeline — Genesis, Ascend, and Horizon.",
         image: "/assets/images/us-africa/market-access.webp",
       },
       {
@@ -122,7 +122,7 @@ const DEFAULT_CONTENT = {
     titleLine1: "The right founders.",
     titleLine2: "The right relationships.",
     description:
-      "The ecosystem would connect CFCV fellows and alumni with the institutions, professionals, markets, and networks capable of opening pathways to commercial opportunity.",
+      "The ecosystem would connect CFF fellows and alumni with the institutions, professionals, markets, and networks capable of opening pathways to commercial opportunity.",
 
     items: [
       "Investors & Capital Networks",
@@ -184,7 +184,7 @@ const DEFAULT_CONTENT = {
     titleLine1: "From founder potential",
     titleLine2: "to commercial evidence.",
     description:
-      "Continental Founders welcomes the opportunity to explore how USAfrica's ecosystem can connect CFCV fellows with markets, capital, institutions, diaspora expertise, and cross-continental opportunity.",
+      "Continental Founders welcomes the opportunity to explore how USAfrica's ecosystem can connect CFF fellows with markets, capital, institutions, diaspora expertise, and cross-continental opportunity.",
     buttonText: "Discuss the partnership",
     buttonLink: "/contact",
     image: "/assets/images/us-africa/final-cta.webp",

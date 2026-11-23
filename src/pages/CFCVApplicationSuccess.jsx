@@ -145,7 +145,7 @@ export default function CFCVApplicationSuccess() {
               className="cfcv-success-back"
             >
               <ArrowLeft size={16} />
-              CFCV Fellowship
+              CFF
             </Link>
 
             <span className="cfcv-success-eyebrow">
@@ -229,7 +229,7 @@ export default function CFCVApplicationSuccess() {
             className="cfcv-success-back"
           >
             <ArrowLeft size={16} />
-            CFCV Fellowship
+            CFF
           </Link>
 
           <span className="cfcv-success-eyebrow">
@@ -243,7 +243,7 @@ export default function CFCVApplicationSuccess() {
           </h1>
 
           <p>
-            Your CFCV Fellowship application
+            Your CFF application
             has been received.
           </p>
         </div>
@@ -425,7 +425,7 @@ export default function CFCVApplicationSuccess() {
               <p>
                 Submission confirms receipt of your
                 application. It does not constitute
-                admission to the CFCV Fellowship.
+                admission to the Continental Founders Fellowship.
               </p>
             </div>
 

@@ -59,7 +59,7 @@ const ALLOWED_IMAGE_TYPES = [
 const FORM_STEPS = [
   {
     number: 1,
-    label: "CFCV",
+    label: "CFF",
   },
   {
     number: 2,
@@ -2038,7 +2038,7 @@ export default function AdminVentures() {
         !form.cfcvTrack
       ) {
         setFormError(
-          "Select a CFCV track."
+          "Select a CFF track."
         );
 
         return false;
@@ -2713,7 +2713,7 @@ export default function AdminVentures() {
 
         <div>
           <span className="admin-ventures__eyebrow">
-            CFCV VENTURE MANAGEMENT
+            CFF VENTURE MANAGEMENT
           </span>
 
           <h1>
@@ -2721,7 +2721,7 @@ export default function AdminVentures() {
           </h1>
 
           <p>
-            Manage CFCV ventures, track placement,
+            Manage CFF ventures, track placement,
             cohorts, founders, venture information,
             fellowship support and publication status.
           </p>
@@ -2869,7 +2869,7 @@ export default function AdminVentures() {
               event.target.value
             )
           }
-          aria-label="Filter by CFCV track"
+          aria-label="Filter by CFF track"
         >
           <option value="all">
             All Tracks
@@ -2957,7 +2957,7 @@ export default function AdminVentures() {
             </h3>
 
             <p>
-              Retrieving CFCV venture profiles.
+              Retrieving CFF venture profiles.
             </p>
 
           </div>
@@ -3020,7 +3020,7 @@ export default function AdminVentures() {
                 trackFilter !== "all" ||
                 fellowFilter !== "all"
                   ? "Change the search or filters to find another venture."
-                  : "Add the first venture to the CFCV ecosystem."}
+                  : "Add the first venture to the CFF ecosystem."}
               </p>
 
 
@@ -3270,7 +3270,7 @@ export default function AdminVentures() {
 
               <div>
                 <span className="admin-ventures__drawer-eyebrow">
-                  CFCV VENTURE PROFILE
+                  CFF VENTURE PROFILE
                 </span>
 
                 <h2>
@@ -3400,7 +3400,7 @@ export default function AdminVentures() {
 
                   <div>
                     <span>
-                      CFCV Track
+                      CFF Track
                     </span>
 
                     <strong>
@@ -3602,8 +3602,8 @@ export default function AdminVentures() {
               <div>
                 <span className="admin-ventures__drawer-eyebrow">
                   {editingVenture
-                    ? "EDIT CFCV VENTURE"
-                    : "NEW CFCV VENTURE"}
+                    ? "EDIT CFF VENTURE"
+                    : "NEW CFF VENTURE"}
                 </span>
 
                 <h2>
@@ -3675,7 +3675,7 @@ export default function AdminVentures() {
 
 
               {/* =================================================
-                  STEP 1 — CFCV
+                  STEP 1 — CFF
               ================================================= */}
 
               {formStep === 1 && (
@@ -3683,11 +3683,11 @@ export default function AdminVentures() {
 
                   <div className="admin-ventures__step-heading">
                     <h3>
-                      CFCV Placement
+                      CFF Placement
                     </h3>
 
                     <p>
-                      Place the venture in its CFCV
+                      Place the venture in its CFF
                       pathway, cohort and fellowship status.
                     </p>
                   </div>
@@ -3818,7 +3818,7 @@ export default function AdminVentures() {
                       onChange={
                         handleFormChange
                       }
-                      placeholder="e.g. CFCV 2026 Cohort"
+                      placeholder="e.g. CFF 2026 Cohort"
                     />
                   </div>
 
@@ -4901,7 +4901,7 @@ export default function AdminVentures() {
                     "published" ? (
                       <p>
                         This venture will appear in the public
-                        CFCV venture directory after saving.
+                        CFF venture directory after saving.
                       </p>
                     ) : form.status ===
                       "archived" ? (
@@ -4936,7 +4936,7 @@ export default function AdminVentures() {
                     </h3>
 
                     <p>
-                      Confirm the CFCV placement, uploaded
+                      Confirm the CFF placement, uploaded
                       media and venture information before saving.
                     </p>
 
@@ -5014,7 +5014,7 @@ export default function AdminVentures() {
 
                     <div>
                       <span>
-                        CFCV Track
+                        CFF Track
                       </span>
 
                       <strong>

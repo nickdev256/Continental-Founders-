@@ -77,7 +77,7 @@ const PRIVACY = {
               <strong>Newsletter:</strong> your email address.
             </li>
             <li>
-              <strong>CFCV fellowship applications:</strong> your contact
+              <strong>CFF applications:</strong> your contact
               details (name, email, phone, country, and city), your background
               and skills, information about your venture and team, your goals
               and availability, and the CV or résumé you upload.

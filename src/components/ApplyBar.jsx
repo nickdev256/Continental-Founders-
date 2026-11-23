@@ -80,7 +80,7 @@ export default function ApplyBar() {
       aria-hidden={!visible}
     >
       <div className="cf-apply-bar__text">
-        <strong>CFCV Fellowship</strong>
+        <strong>CFF</strong>
         <span>6 months · Africa + U.S.</span>
       </div>
 

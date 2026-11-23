@@ -1338,7 +1338,7 @@ export default function Home() {
 
             <ul
               className="cf-home-hero__stats"
-              aria-label="CFCV fellowship at a glance"
+              aria-label="CFF at a glance"
             >
 
               {HERO_FACTS.map(
@@ -1918,12 +1918,12 @@ export default function Home() {
 
 
               <h2 id="what-we-do-heading">
-                Continental Founders Fellowship — <em>CFCV</em>
+                Continental Founders Fellowship — <em>CFF</em>
               </h2>
 
 
               <p className="cf-section-intro">
-                Continental Founders Fellowship (CFCV) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
+                Continental Founders Fellowship (CFF) is our flagship founder-development program, designed for diaspora and continental founders with the potential to build scalable, investment-ready, globally connected ventures.
               </p>
 
             </div>
@@ -1935,7 +1935,7 @@ export default function Home() {
             >
 
               <span>
-                Explore CFCV
+                Explore CFF
               </span>
 
               <ArrowRight
@@ -2125,7 +2125,7 @@ export default function Home() {
             <Matter
               number="02"
               title="INFORM STRATEGY"
-              text="Evidence helps identify barriers to growth, understand knowledge-transfer models, evaluate program outcomes, and continuously improve CFCV."
+              text="Evidence helps identify barriers to growth, understand knowledge-transfer models, evaluate program outcomes, and continuously improve CFF."
             />
 
             <Matter

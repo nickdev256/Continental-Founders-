@@ -12,7 +12,7 @@ const popular = [
   },
   {
     title: "Fellowship",
-    text: "The six-month CFCV fellowship for founders.",
+    text: "CFF: our six-month fellowship for founders.",
     to: "/cfcv",
   },
   {

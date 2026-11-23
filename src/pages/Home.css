@@ -566,23 +566,6 @@
   gap: 14px;
 }
 
-.cf-home .cf-home-hero__visual-caption {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  white-space: nowrap;
-}
-
-.cf-home .cf-home-hero__visual-caption i {
-  width: 36px;
-  height: 1px;
-  background: var(--cf-gold-light);
-}
-
 .cf-home .cf-home-hero__dots {
   display: flex;
   align-items: center;
@@ -1650,10 +1633,6 @@
 
   .cf-home .cf-home-hero__container {
     padding-block: 48px 24px;
-  }
-
-  .cf-home .cf-home-hero__visual-caption {
-    display: none;
   }
 
   .cf-home .cf-home-hero__controls {

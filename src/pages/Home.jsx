@@ -1362,11 +1362,6 @@ export default function Home() {
 
             <div className="cf-home-hero__controls">
 
-              <div className="cf-home-hero__visual-caption">
-
-               
-
-              </div>
 
 
               <div

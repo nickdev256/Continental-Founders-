@@ -92,11 +92,11 @@ const team = [
     },
   },
   {
-    name: "Ashley Robinson-Spann, PhD",
+    name: "Ashley Robinson-Spann, Ph.D.",
     role: "Treasurer",
     image: "/assets/team/ashley-robinson-spann-800.webp",
     bio:
-      "Ashley Robinson-Spann, PhD, is a researcher, writer, strategist, and nonprofit leader focused on education, human development, community capacity-building, and organizational strategy. She is the Founder and Executive Director of Still Rising Institute.",
+      "Ashley Robinson-Spann, Ph.D., is a researcher, writer, strategist, and nonprofit leader focused on education, human development, community capacity-building, and organizational strategy. She is the Founder and Executive Director of Still Rising Institute.",
     socials: {
       linkedin: "https://www.linkedin.com/in/arobinsonspann/",
       instagram: "",
@@ -320,7 +320,7 @@ export default function About() {
 
             <p>
               We believe that if we want stronger economies, we must
-              build stronger enterprises and if we want stronger
+              build stronger enterprises, and if we want stronger
               enterprises, we must invest in the people capable of
               building them. We invest in founders through knowledge,
               relationships, mentorship, market access, and practical
@@ -388,7 +388,7 @@ export default function About() {
             <p>
               We see a future where geography does not unnecessarily
               limit access to knowledge, relationships, expertise,
-              markets, or capital pathways and where cross-continental
+              markets, or capital pathways, and where cross-continental
               collaboration strengthens businesses, institutions,
               and economies.
             </p>
@@ -579,9 +579,7 @@ export default function About() {
                 <span
                   className="about-story__philosophy-mark"
                   aria-hidden="true"
-                >
-                  “
-                </span>
+                />
 
               </div>
 

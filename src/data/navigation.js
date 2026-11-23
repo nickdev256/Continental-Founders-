@@ -21,7 +21,7 @@ export const navigation = [
     label: "About",
     path: "/about",
     accent: "blue",
-    description: "Our mission, vision and the people behind Continental Founders.",
+    description: "Our mission, vision, and the people behind Continental Founders.",
   },
   {
     label: "Fellowship Community",
@@ -51,21 +51,21 @@ export const navigation = [
     path: "/strategic-partners",
     accent: "navy",
     intro:
-      "We connect universities, companies and institutions with founders across Africa and the United States.",
+      "We connect universities, companies, and institutions with founders across Africa and the United States.",
     children: [
       {
         label: "U.S.–Africa Trade & Business Network",
         color: "navy",
         path: "/partners/us-africa-trade-network",
         icon: Globe2,
-        description: "Trade, market access and business links across continents.",
+        description: "Trade, market access, and business links across continents.",
       },
       {
         label: "Universities",
         color: "blue",
         path: "/universities",
         icon: GraduationCap,
-        description: "Research, student founders and campus partnerships.",
+        description: "Research, student founders, and campus partnerships.",
       },
       {
         label: "Corporate Partners",
@@ -94,21 +94,21 @@ export const navigation = [
     label: "Events",
     path: "/events",
     accent: "coral",
-    description: "Upcoming gatherings, summits and founder sessions.",
+    description: "Upcoming gatherings, summits, and founder sessions.",
   },
   {
     label: "Insights",
     path: "/insights",
     accent: "violet",
     intro:
-      "Ideas, stories and evidence from founders and partners across our network.",
+      "Ideas, stories, and evidence from founders and partners across our network.",
     children: [
       {
         label: "All Insights",
         color: "violet",
         path: "/insights",
         icon: BookOpen,
-        description: "Articles, research and founder stories.",
+        description: "Articles, research, and founder stories.",
       },
       {
         label: "Gallery",

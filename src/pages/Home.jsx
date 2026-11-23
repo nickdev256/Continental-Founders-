@@ -1285,7 +1285,10 @@ export default function Home() {
 
 
             <p className="cf-home-hero__lead">
-              Continental Founders is a nonprofit organization building an interconnected ecosystem where founders, researchers, universities, corporations, investors, diaspora leaders, and global partners work together to transform entrepreneurial potential into sustainable economic impact.
+              Continental Founders is a nonprofit organization building an interconnected 
+              ecosystem where founders, researchers, universities, corporations, investors, 
+              diaspora leaders, and global partners work together to transform entrepreneurial 
+              potential into sustainable economic impact.
             </p>
 
 
@@ -1361,15 +1364,7 @@ export default function Home() {
 
               <div className="cf-home-hero__visual-caption">
 
-                <span>
-                  AFRICA
-                </span>
-
-                <i aria-hidden="true" />
-
-                <span>
-                  UNITED STATES
-                </span>
+               
 
               </div>
 
@@ -1458,7 +1453,9 @@ export default function Home() {
 
 
             <p>
-              Our integrated ecosystem connects founder development, research and evidence, market access, corporate partnerships, and investment, helping founders build stronger businesses, enter new markets, form institutional relationships, attract investment, and create measurable economic impact.
+              Our integrated ecosystem connects founder development, research and evidence, market access, 
+              corporate partnerships, and investment, helping founders build stronger businesses, enter 
+              new markets, form institutional relationships, attract investment, and create measurable economic impact.
             </p>
 
 
@@ -1729,7 +1726,7 @@ export default function Home() {
             {/* Opens Our Model — /our-model */}
             <article className="cf-impact-item">
 
-              <span className="cf-impact-item__number">
+              <span className="cf-impact-item__number" aria-hidden="true">
                 01
               </span>
 
@@ -1747,7 +1744,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore the Continental Founders development model"
               >
-                <span>Learn more</span>
+                <span>Explore our model</span>
 
                 <ArrowRight
                   size={16}
@@ -1761,7 +1758,7 @@ export default function Home() {
             {/* Opens Universities — /universities */}
             <article className="cf-impact-item">
 
-              <span className="cf-impact-item__number">
+              <span className="cf-impact-item__number" aria-hidden="true">
                 02
               </span>
 
@@ -1779,7 +1776,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore Continental Founders university and research partnerships"
               >
-                <span>Learn more</span>
+                <span>Explore research</span>
 
                 <ArrowRight
                   size={16}
@@ -1793,7 +1790,7 @@ export default function Home() {
             {/* Opens U.S.–Africa Trade & Business Network */}
             <article className="cf-impact-item">
 
-              <span className="cf-impact-item__number">
+              <span className="cf-impact-item__number" aria-hidden="true">
                 03
               </span>
 
@@ -1811,7 +1808,7 @@ export default function Home() {
                 className="cf-impact-item__link"
                 aria-label="Explore the U.S.–Africa Trade and Business Network"
               >
-                <span>Learn more</span>
+                <span>Explore market access</span>
 
                 <ArrowRight
                   size={16}
@@ -1863,7 +1860,7 @@ export default function Home() {
             <h2 id="who-we-are-heading">
               Africa + Diaspora
               <br />
-              <em>+ Global Ecosystem.</em>
+              <em>+ Global Ecosystem</em>
             </h2>
 
             <p>
@@ -1926,7 +1923,7 @@ export default function Home() {
 
 
               <h2 id="what-we-do-heading">
-                Continental Founders Fellowship — <em>CFCV.</em>
+                Continental Founders Fellowship — <em>CFCV</em>
               </h2>
 
 
@@ -2116,7 +2113,7 @@ export default function Home() {
 
 
             <p className="cf-section-intro">
-              CF Research Division — Evidence. Insight. Impact.
+              CF Research Division: Evidence. Insight. Impact.
             </p>
 
           </div>
@@ -2685,7 +2682,7 @@ export default function Home() {
                   <br />
 
                   <em>
-                    are coming.
+                    coming soon
                   </em>
                 </h2>
 
@@ -2722,7 +2719,7 @@ export default function Home() {
 
               <div
                 className="cf-conference-date"
-                aria-label="New events coming soon"
+                aria-label="Stay tuned for new events"
               >
 
                 <CalendarDays
@@ -2732,11 +2729,11 @@ export default function Home() {
                 />
 
                 <span>
-                  COMING
+                  STAY
                 </span>
 
                 <span>
-                  SOON
+                  TUNED
                 </span>
 
               </div>

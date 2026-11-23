@@ -2484,7 +2484,7 @@ function CFCVApply() {
                           Drag your CV here, or <u>browse files</u>
                         </strong>
 
-                        <small>PDF, DOC or DOCX, up to 5 MB</small>
+                        <small>PDF, DOC, or DOCX, up to 5 MB</small>
                       </label>
                     )}
 

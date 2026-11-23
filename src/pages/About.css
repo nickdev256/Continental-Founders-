@@ -756,6 +756,11 @@
   line-height: 0.5;
 }
 
+/* Drawn by CSS so it isn't read as part of the "OUR PHILOSOPHY" label */
+.about-story__philosophy-mark::before {
+  content: "\201C";
+}
+
 .about-story__philosophy blockquote {
   margin-top: 26px;
   font-family: var(--font-heading);

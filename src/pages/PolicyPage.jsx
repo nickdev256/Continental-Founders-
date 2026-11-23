@@ -22,7 +22,7 @@ const MailLink = () => <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
 const PRIVACY = {
   eyebrow: "Privacy",
   title: "Privacy policy",
-  lead: "How Continental Founders collects, uses and protects personal information.",
+  lead: "How Continental Founders collects, uses, and protects personal information.",
   updated: "15 November 2026",
   summary: [
     {
@@ -54,7 +54,7 @@ const PRIVACY = {
       body: (
         <p>
           Continental Founders™ is a nonprofit organization that connects
-          founders, universities, businesses and institutions across Africa
+          founders, universities, businesses, and institutions across Africa
           and the United States. This policy explains how we handle personal
           information collected through our website,
           www.continentalfounders.org.
@@ -78,7 +78,7 @@ const PRIVACY = {
             </li>
             <li>
               <strong>CFCV fellowship applications:</strong> your contact
-              details (name, email, phone, country and city), your background
+              details (name, email, phone, country, and city), your background
               and skills, information about your venture and team, your goals
               and availability, and the CV or résumé you upload.
             </li>
@@ -99,7 +99,7 @@ const PRIVACY = {
           <li>To send the newsletter updates you signed up for.</li>
           <li>
             To review fellowship applications and run the admissions process,
-            including assessments, interviews and track placement.
+            including assessments, interviews, and track placement.
           </li>
           <li>To plan and improve our programs and events.</li>
           <li>To meet our legal obligations.</li>
@@ -157,14 +157,14 @@ const PRIVACY = {
               We use Google Analytics to understand how visitors use the
               website, such as which pages are viewed and how many people start
               or complete an application. It sets cookies and receives
-              information such as your browser, device and approximate
+              information such as your browser, device, and approximate
               location. You can block these cookies in your browser settings.
             </p>
           )}
           <p>
             Our fonts are loaded from Google Fonts, so your browser connects to
             Google's servers when a page loads. Links to LinkedIn, Instagram,
-            Facebook, YouTube and Google Maps take you to those services, which
+            Facebook, YouTube, and Google Maps take you to those services, which
             have their own privacy policies.
           </p>
         </>

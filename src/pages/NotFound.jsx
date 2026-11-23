@@ -22,7 +22,7 @@ const popular = [
   },
   {
     title: "Insights",
-    text: "News, research and founder perspectives.",
+    text: "News, research, and founder perspectives.",
     to: "/insights",
   },
 ];

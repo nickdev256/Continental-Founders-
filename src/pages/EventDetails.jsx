@@ -49,19 +49,19 @@ const purposes = [
   {
     icon: Users,
     title: "Connect",
-    text: "Bring founders, institutions, professionals and partners into the same conversation.",
+    text: "Bring founders, institutions, professionals, and partners into the same conversation.",
     tone: "gold",
   },
   {
     icon: BookOpen,
     title: "Exchange",
-    text: "Create room for useful knowledge, experience and practical insight to move across networks.",
+    text: "Create room for useful knowledge, experience, and practical insight to move across networks.",
     tone: "navy",
   },
   {
     icon: TrendingUp,
     title: "Act",
-    text: "Move promising conversations toward relationships, collaboration and opportunity.",
+    text: "Move promising conversations toward relationships, collaboration, and opportunity.",
     tone: "blue",
   },
 ];
@@ -903,7 +903,7 @@ export default function EventDetails() {
             <p>
               Continental Founders convenings bring together diverse
               stakeholders to turn shared ambition into real progress
-              for people, businesses and communities across Africa.
+              for people, businesses, and communities across Africa.
             </p>
           </header>
 
@@ -944,8 +944,8 @@ export default function EventDetails() {
 
               <p>
                 Secure your place and join a community of founders,
-                professionals, institutions and partners working toward
-                practical connections, collaboration and opportunity.
+                professionals, institutions, and partners working toward
+                practical connections, collaboration, and opportunity.
               </p>
 
               <div className="ed-join__actions">

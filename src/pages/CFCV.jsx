@@ -774,7 +774,7 @@ export default function CFCV() {
 
               <h2 className="cfcv-small-heading">
                 We look for founders who are committed,
-                principled and collaborative.
+                principled, and collaborative.
               </h2>
 
               <ul className="cfcv-checklist">

@@ -51,7 +51,7 @@ const topics = [
   {
     icon: Lightbulb,
     title: "Founder Perspectives",
-    text: "Founders on building, scaling and leading across two continents.",
+    text: "Founders on building, scaling, and leading across two continents.",
   },
   {
     icon: FlaskConical,
@@ -61,22 +61,22 @@ const topics = [
   {
     icon: TrendingUp,
     title: "Markets",
-    text: "Trade, market access and the opportunities linking Africa and the U.S.",
+    text: "Trade, market access, and the opportunities linking Africa and the U.S.",
   },
   {
     icon: GraduationCap,
     title: "University Partnerships",
-    text: "How universities help grow founders, research and new ventures.",
+    text: "How universities help grow founders, research, and new ventures.",
   },
   {
     icon: Landmark,
     title: "Investment",
-    text: "Capital, investors and what makes a venture ready for funding.",
+    text: "Capital, investors, and what makes a venture ready for funding.",
   },
   {
     icon: Rocket,
     title: "Innovation",
-    text: "New ideas, technologies and models shaping African enterprise.",
+    text: "New ideas, technologies, and models shaping African enterprise.",
   },
   {
     icon: Newspaper,
@@ -754,7 +754,7 @@ export default function Insights() {
             </div>
 
             <p>
-              Every insight comes back to how people, institutions and
+              Every insight comes back to how people, institutions, and
               markets work together across Africa and the United States.
             </p>
           </header>
@@ -836,7 +836,7 @@ export default function Insights() {
               <h2>Get new insights in your inbox.</h2>
 
               <p>
-                Be the first to read new perspectives, research and field
+                Be the first to read new perspectives, research, and field
                 notes from the Continental Founders network.
               </p>
             </div>

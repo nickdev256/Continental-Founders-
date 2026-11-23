@@ -912,7 +912,7 @@ const SEO_ROUTES = {
   "/privacy": {
     title: "Privacy Policy | Continental Founders",
     description:
-      "How Continental Founders collects, uses and protects personal information.",
+      "How Continental Founders collects, uses, and protects personal information.",
     canonical: "/privacy",
     breadcrumb: [{ name: "Privacy", path: "/privacy" }],
   },

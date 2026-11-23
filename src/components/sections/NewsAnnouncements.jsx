@@ -517,7 +517,7 @@ export default function NewsAnnouncements() {
 
             <p>
               Explore the latest Continental Founders
-              insights, announcements, events and
+              insights, announcements, events, and
               institutional updates.
             </p>
 

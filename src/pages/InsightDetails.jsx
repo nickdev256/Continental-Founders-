@@ -595,7 +595,7 @@ export default function InsightDetails() {
                 perspectives shaping
                 meaningful partnerships
                 across institutions,
-                sectors and continents.
+                sectors, and continents.
               </p>
 
               <div className="insight-hero__line" />
@@ -979,7 +979,7 @@ export default function InsightDetails() {
 
             <p>
               Discover more research,
-              perspectives and stories
+              perspectives, and stories
               from Continental Founders.
             </p>
 
